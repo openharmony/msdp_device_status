@@ -156,7 +156,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
     void *data = nullptr;
 
     napi_status status = napi_get_cb_info(env, info, &argc, args, &jsthis, &data);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= 0), "Bad parameters");
+    NAPI_ASSERT(env, status == napi_ok, "Bad parameters");
 
     napi_valuetype valueType1 = napi_undefined;
     napi_typeof(env, args[ARG_0], &valueType1);
@@ -242,7 +242,7 @@ napi_value DevicestatusNapi::UnSubscribeDevicestatus(napi_env env, napi_callback
     void *data = nullptr;
 
     napi_status status = napi_get_cb_info(env, info, &argc, args, &jsthis, &data);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= 0), "Bad parameters");
+    NAPI_ASSERT(env, status == napi_ok, "Bad parameters");
 
     napi_valuetype valueType1 = napi_undefined;
     napi_typeof(env, args[ARG_0], &valueType1);
@@ -315,7 +315,7 @@ napi_value DevicestatusNapi::GetDevicestatus(napi_env env, napi_callback_info in
     void *data = nullptr;
 
     napi_status status = napi_get_cb_info(env, info, &argc, args, &jsthis, &data);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= 0), "Bad parameters");
+    NAPI_ASSERT(env, status == napi_ok, "Bad parameters");
 
     napi_valuetype valueType1 = napi_undefined;
     napi_typeof(env, args[ARG_0], &valueType1);

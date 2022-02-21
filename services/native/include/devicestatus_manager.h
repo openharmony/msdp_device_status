@@ -45,7 +45,9 @@ public:
     };
 
     bool Init();
+    bool EnableRdb();
     bool InitInterface();
+    bool DisableRdb();
     bool InitDataCallback();
     void NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData);
     void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);

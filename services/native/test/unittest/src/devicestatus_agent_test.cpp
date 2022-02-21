@@ -43,7 +43,17 @@ void DevicestatusAgentTest::TearDown()
 {
 }
 
-bool DevicestatusAgentListener::OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+bool DevicestatusAgentListenerMockFirstClient::OnEventResult(
+    const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+{
+    GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
+    GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
+    EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    return true;
+}
+
+bool DevicestatusAgentListenerMockSecondClient::OnEventResult(
+    const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
@@ -60,8 +70,8 @@ namespace {
 HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "DevicestatusAgentTest001 start";
-    std::shared_ptr<DevicestatusAgentListener> agentEvent1 =
-        std::make_shared<DevicestatusAgentListener>();
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
     int ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent1);
     EXPECT_EQ(true, ret == ERR_OK);
     sleep(10);
@@ -77,15 +87,18 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level0)
 HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "DevicestatusAgentTest002 start";
-    std::shared_ptr<DevicestatusAgentListener> agentEvent1 =
-        std::make_shared<DevicestatusAgentListener>();
-    std::shared_ptr<DevicestatusAgentListener> agentEvent2 =
-        std::make_shared<DevicestatusAgentListener>();
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    std::shared_ptr<DevicestatusAgentListenerMockSecondClient> agentEvent2 =
+        std::make_shared<DevicestatusAgentListenerMockSecondClient>();
     int ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent1);
     ret = agent2_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent2);
     EXPECT_EQ(true, ret == ERR_OK);
-    sleep(10);
+    sleep(5);
+    GTEST_LOG_(INFO) << "UnSubscribe agentEvent1";
     agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    sleep(5);
+    GTEST_LOG_(INFO) << "UnSubscribe agentEvent2";
     agent2_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest002 end";
 }

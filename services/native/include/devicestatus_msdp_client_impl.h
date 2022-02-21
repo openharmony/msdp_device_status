@@ -43,7 +43,9 @@ public:
     using CallbackManager = std::function<int32_t(DevicestatusDataUtils::DevicestatusData&)>;
 
     ErrCode InitMsdpImpl();
+    ErrCode DisableMsdpImpl();
     ErrCode RegisterImpl(CallbackManager& callback);
+    ErrCode UnregisterImpl();
     int32_t MsdpCallback(DevicestatusDataUtils::DevicestatusData& data);
     ErrCode RegisterMsdp();
     ErrCode UnregisterMsdp(void);
@@ -60,8 +62,6 @@ public:
     int32_t UnloadSensorHdiLibrary(bool bCreate);
 private:
     ErrCode ImplCallback(DevicestatusDataUtils::DevicestatusData& data);
-    DevicestatusMsdpInterface* msdpInterface_;
-    DevicestatusSensorInterface* sensorHdiInterface_;
     DevicestatusSensorInterface* GetSensorHdiInst();
     DevicestatusMsdpInterface* GetAlgorithmInst();
     MsdpAlgorithmHandle mAlgorithm_;

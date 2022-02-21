@@ -29,9 +29,14 @@ public:
     void SetUp();
     void TearDown();
 };
-class DevicestatusAgentListener : public DeviceStatusAgent::DeviceStatusAgentEvent {
+class DevicestatusAgentListenerMockFirstClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
 public:
-    virtual ~DevicestatusAgentListener() {};
+    virtual ~DevicestatusAgentListenerMockFirstClient() {};
+    bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+};
+class DevicestatusAgentListenerMockSecondClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
+public:
+    virtual ~DevicestatusAgentListenerMockSecondClient() {};
     bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
 };
 } // namespace Msdp

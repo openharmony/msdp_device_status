@@ -48,6 +48,7 @@ public:
     bool Init();
     void InitRdbStore();
     void SetTimerInterval(int interval);
+    void CloseTimer();
     void InitTimer();
     void TimerCallback();
     int RegisterTimerCallback(const int fd, const EventType et);

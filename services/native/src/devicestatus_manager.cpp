@@ -40,15 +40,6 @@ bool DevicestatusManager::Init()
     }
     LoadAlgorithm(false);
 
-    if (!InitInterface()) {
-        return false;
-    }
-
-    if (!InitDataCallback()) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "%{public}s init msdp callback fail.", __func__);
-        return false;
-    }
-
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusManager: Init success");
     return true;
 }
@@ -70,9 +61,35 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
     return data;
 }
 
+bool DevicestatusManager::EnableRdb()
+{
+    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    if (!InitInterface()) {
+        return false;
+    }
+
+    if (!InitDataCallback()) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "%{public}s init msdp callback fail.", __func__);
+        return false;
+    }
+    return true;
+}
+
+bool DevicestatusManager::DisableRdb()
+{
+    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    if (msdpImpl_ != nullptr) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "delete msdp client impl");
+        msdpImpl_->DisableMsdpImpl();
+        msdpImpl_->UnregisterImpl();
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "DisableRdb: after unregister impl");
+    }
+    return true;
+}
+
 bool DevicestatusManager::InitInterface()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Init msdp client impl");
         msdpImpl_->InitMsdpImpl();
@@ -82,7 +99,7 @@ bool DevicestatusManager::InitInterface()
 
 bool DevicestatusManager::InitDataCallback()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         DevicestatusMsdpClientImpl::CallbackManager callback =
             std::bind(&DevicestatusManager::MsdpDataCallback, this, std::placeholders::_1);
@@ -145,6 +162,11 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
 
+    if (!EnableRdb()) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enable failed!");
+        return;
+    }
+
     std::lock_guard lock(mutex_);
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
@@ -196,6 +218,12 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
                 }
             }
         }
+    }
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "listenerMap_.size = %{public}d", listenerMap_.size());
+    if (listenerMap_.size() == 0) {
+        DisableRdb();
+    } else {
+        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "other subscribe exist");
     }
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "object = %{public}p, callback = %{public}p",
         object.GetRefPtr(), callback.GetRefPtr());

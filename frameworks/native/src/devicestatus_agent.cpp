@@ -33,7 +33,7 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
 int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type,
     const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s enter", __func__);
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s Enter", __func__);
     RegisterServiceEvent(type);
     if (agentEvent == nullptr) {
         return ERR_INVALID_VALUE;
@@ -50,14 +50,14 @@ int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::De
 
 void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s enter", __func__);
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s Enter", __func__);
     callback_ = new DeviceStatusAgentCallback(shared_from_this());
     DevicestatusClient::GetInstance().SubscribeCallback(type, callback_);
 }
 
 void DeviceStatusAgent::UnRegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s enter", __func__);
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_INNERKIT, "%{public}s Enter", __func__);
     DevicestatusClient::GetInstance().UnSubscribeCallback(type, callback_);
 }
 } // namespace Msdp

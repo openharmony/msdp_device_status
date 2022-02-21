@@ -38,43 +38,43 @@ DevicestatusMsdpRdb* rdb;
 
 bool DevicestatusMsdpRdb::Init()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusMsdpRdbInit: enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusMsdpRdbInit: Enter");
     InitRdbStore();
 
     InitTimer();
     StartThread();
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusMsdpRdbInit: exit");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusMsdpRdbInit: Exit");
     return true;
 }
 
 void DevicestatusMsdpRdb::InitRdbStore()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     int errCode = ERR_OK;
     RdbStoreConfig config(DATABASE_NAME);
     InsertOpenCallback helper;
     store_ = RdbHelper::GetRdbStore(config, 1, helper, errCode);
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "exit");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
 }
 
 ErrCode DevicestatusMsdpRdb::RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     callbacksImpl_ = callback;
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpRdb::UnregisterCallback()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpRdb::Enable()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     Init();
 
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
@@ -83,8 +83,8 @@ ErrCode DevicestatusMsdpRdb::Enable()
 
 ErrCode DevicestatusMsdpRdb::Disable()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
-
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    CloseTimer();
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
     return ERR_OK;
 }
@@ -92,7 +92,7 @@ ErrCode DevicestatusMsdpRdb::Disable()
 
 ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     if (rdb->GetCallbacksImpl() == nullptr) {
         DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "callbacksImpl is nullptr");
         return ERR_NG;
@@ -104,7 +104,7 @@ ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusD
 
 DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     for (auto iter = rdbDataMap_.begin(); iter != rdbDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
             if (iter->second != data.value) {
@@ -126,7 +126,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(Devices
 
 int DevicestatusMsdpRdb::TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     int columnIndex;
     int intVal;
 
@@ -171,14 +171,13 @@ int DevicestatusMsdpRdb::TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resul
         return -1;
     }
 
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
     return ERR_OK;
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "exit");
 }
 
 int DevicestatusMsdpRdb::TrigerDatabaseObserver()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
-    std::string str;
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
 
     if (store_ == nullptr) {
         DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "store_ is not exist");
@@ -227,7 +226,7 @@ int DevicestatusMsdpRdb::TrigerDatabaseObserver()
 
 void DevicestatusMsdpRdb::InitTimer()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
     if (epFd_ == -1) {
         DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "create epoll fd fail.");
@@ -246,7 +245,7 @@ void DevicestatusMsdpRdb::InitTimer()
 
 void DevicestatusMsdpRdb::SetTimerInterval(int interval)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     struct itimerspec itval;
 
     if (timerFd_ == ERR_INVALID_FD) {
@@ -268,25 +267,32 @@ void DevicestatusMsdpRdb::SetTimerInterval(int interval)
         DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "set timer failed");
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     return;
+}
+
+void DevicestatusMsdpRdb::CloseTimer()
+{
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    close(timerFd_);
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
 }
 
 void DevicestatusMsdpRdb::TimerCallback()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     unsigned long long timers;
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
         DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "read timer fd fail.");
         return;
     }
     TrigerDatabaseObserver();
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "exit");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
 }
 
 int DevicestatusMsdpRdb::RegisterTimerCallback(const int fd, const EventType et)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     struct epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -301,20 +307,20 @@ int DevicestatusMsdpRdb::RegisterTimerCallback(const int fd, const EventType et)
         return -1;
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "exit");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
     return 0;
 }
 
 void DevicestatusMsdpRdb::StartThread()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     std::make_unique<std::thread>(&DevicestatusMsdpRdb::LoopingThreadEntry, this)->detach();
 }
 
 void DevicestatusMsdpRdb::LoopingThreadEntry()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
-    int nevents = 0;
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    int32_t nevents = 0;
     size_t cbct = callbacks_.size();
     struct epoll_event events[cbct];
 
@@ -336,7 +342,7 @@ void DevicestatusMsdpRdb::LoopingThreadEntry()
 
 int InsertOpenCallback::OnCreate(RdbStore &store)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
 
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
     return ERR_OK;
@@ -344,7 +350,7 @@ int InsertOpenCallback::OnCreate(RdbStore &store)
 
 int InsertOpenCallback::OnUpgrade(RdbStore &store, int oldVersion, int newVersion)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
 
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
     return ERR_OK;
@@ -352,14 +358,14 @@ int InsertOpenCallback::OnUpgrade(RdbStore &store, int oldVersion, int newVersio
 
 extern "C" DevicestatusMsdpInterface *Create(void)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     rdb = new DevicestatusMsdpRdb();
     return rdb;
 }
 
 extern "C" void Destroy(DevicestatusMsdpInterface* algorithm)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "enter");
+    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
     delete algorithm;
 }
 }
