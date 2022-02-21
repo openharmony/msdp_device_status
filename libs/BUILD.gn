@@ -1,0 +1,96 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/msdp/device_status/device_status.gni")
+
+config("devicestatus_private_config") {
+  include_dirs = [ "//utils/system/safwk/native/include" ]
+}
+
+config("devicestatus_srv_public_config") {
+  include_dirs = [
+    "include",
+    "interface",
+    "${device_status_interfaces_path}/innerkits/include",
+    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include/",
+    "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_rdb/include/",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native/include/",
+    "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_appdatafwk/include/",
+    "//base/sensors/sensor/interfaces/native/include/"
+  ]
+}
+
+ohos_shared_library("devicestatus_sensorhdi") {
+  sources = [
+    "src/devicestatus_sensor_rdb.cpp",
+  ]
+
+  configs = [
+    "${device_status_utils_path}:devicestatus_utils_config",
+    ":devicestatus_private_config",
+  ]
+
+  public_configs = [ ":devicestatus_srv_public_config" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "//utils/native/base:utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//third_party/jsoncpp"
+  ]
+
+  external_deps = [
+    "ability_runtime:base",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+    "permission_standard:libpermissionsdk_standard",
+    "native_appdatamgr:native_rdb",
+    "sensor:sensor_interface_native",
+  ]
+
+  part_name = "${device_status_part_name}"
+}
+
+ohos_shared_library("devicestatus_msdp") {
+  sources = [
+    "src/devicestatus_msdp_rdb.cpp",
+  ]
+
+  configs = [
+    "${device_status_utils_path}:devicestatus_utils_config",
+    ":devicestatus_private_config",
+  ]
+
+  public_configs = [ ":devicestatus_srv_public_config" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "//utils/native/base:utils",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//third_party/jsoncpp"
+  ]
+
+  external_deps = [
+    "ability_runtime:base",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+    "permission_standard:libpermissionsdk_standard",
+    "native_appdatamgr:native_rdb",
+  ]
+
+  part_name = "${device_status_part_name}"
+}

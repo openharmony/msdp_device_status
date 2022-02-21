@@ -1,0 +1,54 @@
+{
+  "name": "@ohos/device_status",
+  "description": "Msdp device status",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "segment": {
+    "destPath": "base/msdp/device_status"
+  },
+  "component": {
+    "name": "device_status",
+    "subsystem": "msdp",
+    "syscap": ["SystemCapability.Msdp.DeviceStatus"],
+    "features": [],
+    "adapted_system_type": [ "standard" ],
+    "rom": "2048KB",
+    "ram": "~4096KB",
+    "deps": {
+      "components": [
+        "hiviewdfx_hilog_native",
+        "ipc",
+        "safwk",
+        "samgr_standard",
+        "utils_base",
+        "appexecfwk_standard",
+        "permission_standard",
+        "napi"
+      ],
+      "third_party": []
+    },
+    "build": {
+      "sub_component": [
+        "//base/msdp/device_status/libs:devicestatus_sensorhdi",
+        "//base/msdp/device_status/libs:devicestatus_msdp",
+        "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
+        "//base/msdp/device_status/services:devicestatus_service",
+        "//base/msdp/device_status/frameworks/js/napi:devicestatus",
+        "//base/msdp/device_status/frameworks/native/src:deviceagent",
+        "//base/msdp/device_status/sa_profile:devicestatus_sa_profile"
+      ],
+      "inner_kits": [
+        {
+            "name": "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
+            "header": {
+              "header_files": [],
+              "header_base": "//base/msdp/device_status/interfaces/innerkits/include"
+            }
+          }
+      ],
+      "test": [
+        "//base/msdp/device_status/services/native/test:devicestatussrv_test"
+      ]
+    }
+  }
+}

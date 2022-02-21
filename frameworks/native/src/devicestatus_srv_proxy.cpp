@@ -1,0 +1,121 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "devicestatus_srv_proxy.h"
+
+#include <ipc_types.h>
+#include <message_parcel.h>
+#include <message_option.h>
+
+#include "idevicestatus_callback.h"
+#include "devicestatus_common.h"
+
+namespace OHOS {
+namespace Msdp {
+void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    const sptr<IdevicestatusCallback>& callback)
+{
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    sptr<IRemoteObject> remote = Remote();
+    DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed");
+        return;
+    }
+
+    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, type);
+    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, RemoteObject, callback->AsObject());
+
+    int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
+    if (ret != ERR_OK) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        return;
+    }
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+}
+
+void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+    const sptr<IdevicestatusCallback>& callback)
+{
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    sptr<IRemoteObject> remote = Remote();
+    DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed!");
+        return;
+    }
+
+    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, type);
+    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, RemoteObject, callback->AsObject());
+
+    int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE), data, reply, option);
+    if (ret != ERR_OK) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        return;
+    }
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+}
+
+DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
+    DevicestatusDataUtils::DevicestatusType& type)
+{
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DevicestatusDataUtils::DevicestatusData devicestatusData;
+    devicestatusData.type = DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
+    devicestatusData.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+
+    sptr<IRemoteObject> remote = Remote();
+    DEVICESTATUS_RETURN_IF_WITH_RET((remote == nullptr), devicestatusData);
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed!");
+        return devicestatusData;
+    }
+
+    DEVICESTATUS_WRITE_PARCEL_WITH_RET(data, Int32, type, devicestatusData);
+
+    int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
+    if (ret != ERR_OK) {
+        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        return devicestatusData;
+    }
+
+    int32_t devicestatusType = -1;
+    int32_t devicestatusValue = -1;
+    DEVICESTATUS_READ_PARCEL_WITH_RET(reply, Int32, devicestatusType, devicestatusData);
+    DEVICESTATUS_READ_PARCEL_WITH_RET(reply, Int32, devicestatusValue, devicestatusData);
+    devicestatusData.type = DevicestatusDataUtils::DevicestatusType(devicestatusType);
+    devicestatusData.value = DevicestatusDataUtils::DevicestatusValue(devicestatusValue);
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "type: %{public}d", devicestatusData.type);
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "value: %{public}d", devicestatusData.value);
+    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    return devicestatusData;
+}
+} // Msdp
+} // OHOS
