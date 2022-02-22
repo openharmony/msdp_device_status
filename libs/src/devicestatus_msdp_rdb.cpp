@@ -320,14 +320,13 @@ void DevicestatusMsdpRdb::StartThread()
 void DevicestatusMsdpRdb::LoopingThreadEntry()
 {
     DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
-    int32_t nevents = 0;
     size_t cbct = callbacks_.size();
     struct epoll_event events[cbct];
 
     while (true) {
         int timeout = 0;
 
-        nevents = epoll_wait(epFd_, events, cbct, timeout);
+        int32_t nevents = epoll_wait(epFd_, events, cbct, timeout);
         if (nevents == -1) {
             continue;
         }

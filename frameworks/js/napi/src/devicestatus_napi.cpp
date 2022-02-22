@@ -443,7 +443,7 @@ napi_value DevicestatusNapi::ResponseConstructor(napi_env env, napi_callback_inf
         env, thisVar, entity,
         [](napi_env env, void *data, void *hint) {
             DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_JS_NAPI, "Destructor");
-            auto entity = (ResponseEntity*)data;
+            auto entity = reinterpret_cast<ResponseEntity*>(data);
             delete entity;
         },
         nullptr, nullptr);
