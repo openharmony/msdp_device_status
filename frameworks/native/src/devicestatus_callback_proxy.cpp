@@ -32,7 +32,7 @@ void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtil
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DevicestatusCallbackProxy::GetDescriptor())) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return;
     }
 
@@ -41,7 +41,7 @@ void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtil
 
     int ret = remote->SendRequest(static_cast<int>(IdevicestatusCallback::DEVICESTATUS_CHANGE), data, reply, option);
     if (ret != ERR_OK) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
     }
 }
 } // Msdp

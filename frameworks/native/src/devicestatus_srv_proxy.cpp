@@ -27,7 +27,7 @@ namespace Msdp {
 void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -36,7 +36,7 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return;
     }
 
@@ -45,16 +45,16 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
 
     int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
     if (ret != ERR_OK) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -63,7 +63,7 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed!");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
         return;
     }
 
@@ -72,16 +72,16 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
 
     int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE), data, reply, option);
     if (ret != ERR_OK) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     DevicestatusDataUtils::DevicestatusData devicestatusData;
     devicestatusData.type = DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
     devicestatusData.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
@@ -94,7 +94,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Write descriptor failed!");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
         return devicestatusData;
     }
 
@@ -102,7 +102,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
 
     int ret = remote->SendRequest(static_cast<int>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
     if (ret != ERR_OK) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return devicestatusData;
     }
 
@@ -112,9 +112,9 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     DEVICESTATUS_READ_PARCEL_WITH_RET(reply, Int32, devicestatusValue, devicestatusData);
     devicestatusData.type = DevicestatusDataUtils::DevicestatusType(devicestatusType);
     devicestatusData.value = DevicestatusDataUtils::DevicestatusValue(devicestatusValue);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "type: %{public}d", devicestatusData.type);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "value: %{public}d", devicestatusData.value);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "type: %{public}d", devicestatusData.type);
+    DEV_HILOGD(INNERKIT, "value: %{public}d", devicestatusData.value);
+    DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
 } // Msdp

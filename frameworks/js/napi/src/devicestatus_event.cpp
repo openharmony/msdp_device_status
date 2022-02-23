@@ -37,20 +37,20 @@ DevicestatusEvent::~DevicestatusEvent()
 
 bool DevicestatusEvent::On(const int32_t& eventType, napi_value handler, bool isOnce)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_JS_NAPI, \
+    DEV_HILOGD(JS_NAPI, \
         "DevicestatusEvent On in for event: %{public}d, isOnce: %{public}d", eventType, isOnce);
 
     std::map<int32_t, std::shared_ptr<DevicestatusEventListener>>::iterator iter;
     if (isOnce) {
         iter = eventOnceMap_.find(eventType);
         if (iter != eventOnceMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "eventType: %{public}d already exists", eventType);
+            DEV_HILOGE(JS_NAPI, "eventType: %{public}d already exists", eventType);
             return false;
         }
     } else {
         iter = eventMap_.find(eventType);
         if (iter != eventMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "eventType: %{public}d already exists", eventType);
+            DEV_HILOGE(JS_NAPI, "eventType: %{public}d already exists", eventType);
             return false;
         }
     }
@@ -67,12 +67,12 @@ bool DevicestatusEvent::On(const int32_t& eventType, napi_value handler, bool is
 
 bool DevicestatusEvent::Off(const int32_t& eventType, bool isOnce)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_JS_NAPI, \
+    DEV_HILOGD(JS_NAPI, \
         "DevicestatusEvent off in for event: %{public}d, isOnce: %{public}d", eventType, isOnce);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "scope is nullptr");
+        DEV_HILOGE(JS_NAPI, "scope is nullptr");
         return false;
     }
 
@@ -80,13 +80,13 @@ bool DevicestatusEvent::Off(const int32_t& eventType, bool isOnce)
     if (isOnce) {
         iter = eventOnceMap_.find(eventType);
         if (iter == eventOnceMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "eventType %{public}d not find", eventType);
             return false;
         }
     } else {
         iter = eventMap_.find(eventType);
         if (iter == eventMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "eventType %{public}d not find", eventType);
             return false;
         }
     }
@@ -104,11 +104,11 @@ bool DevicestatusEvent::Off(const int32_t& eventType, bool isOnce)
 
 void DevicestatusEvent::OnEvent(const int32_t& eventType, size_t argc, const int32_t& value, bool isOnce)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_JS_NAPI, "OnEvent for %{public}d, isOnce: %{public}d", eventType, isOnce);
+    DEV_HILOGD(JS_NAPI, "OnEvent for %{public}d, isOnce: %{public}d", eventType, isOnce);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "scope is nullptr");
+        DEV_HILOGE(JS_NAPI, "scope is nullptr");
         return;
     }
 
@@ -116,13 +116,13 @@ void DevicestatusEvent::OnEvent(const int32_t& eventType, size_t argc, const int
     if (isOnce) {
         iter = eventOnceMap_.find(eventType);
         if (iter == eventOnceMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "OnEvent: eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "OnEvent: eventType %{public}d not find", eventType);
             return;
         }
     } else {
         iter = eventMap_.find(eventType);
         if (iter == eventMap_.end()) {
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, "OnEvent: eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "OnEvent: eventType %{public}d not find", eventType);
             return;
         }
     }
@@ -131,14 +131,14 @@ void DevicestatusEvent::OnEvent(const int32_t& eventType, size_t argc, const int
     napi_value thisVar = nullptr;
     napi_status status = napi_get_reference_value(env_, thisVarRef_, &thisVar);
     if (status != napi_ok) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, \
+        DEV_HILOGE(JS_NAPI, \
             "OnEvent napi_get_reference_value thisVar for %{public}d failed, status=%{public}d", eventType, status);
         return;
     }
     napi_value handler = nullptr;
     status = napi_get_reference_value(env_, listener->handlerRef, &handler);
     if (status != napi_ok) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, \
+        DEV_HILOGE(JS_NAPI, \
             "OnEvent napi_get_reference_value handler for %{public}d failed, status=%{public}d", eventType, status);
         return;
     }
@@ -154,10 +154,10 @@ void DevicestatusEvent::OnEvent(const int32_t& eventType, size_t argc, const int
 
     status = napi_call_function(env_, thisVar, handler, argc, &result, &callResult);
     if (status != napi_ok) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_JS_NAPI, \
+        DEV_HILOGE(JS_NAPI, \
             "OnEvent: napi_call_function for %{public}d failed, status=%{public}d", eventType, status);
         return;
     }
     napi_close_handle_scope(env_, scope);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_JS_NAPI, "Exit");
+    DEV_HILOGD(JS_NAPI, "Exit");
 }

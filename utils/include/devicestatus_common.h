@@ -29,7 +29,7 @@ namespace Msdp {
 #define DEVICESTATUS_RETURN_IF_WITH_LOG(cond, loginfo)                                  \
     do {                                                                                \
         if (cond) {                                                                     \
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_COMMON, "%{public}s "#loginfo" ", __func__); \
+            DEV_HILOGE(COMMON, "%{public}s "#loginfo" ", __func__); \
             return;                                                                     \
         }                                                                               \
     } while (0)                                                                         \
@@ -37,7 +37,7 @@ namespace Msdp {
 #define DEVICESTATUS_READ_PARCEL_NO_RET(parcel, type, out)                              \
     do {                                                                                \
         if (!(parcel).Read##type(out)) {                                                \
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_COMMON, "%{public}s read "#out" failed", __func__); \
+            DEV_HILOGE(COMMON, "%{public}s read "#out" failed", __func__); \
             return;                                                                     \
         }                                                                               \
     } while (0)                                                                         \
@@ -45,7 +45,7 @@ namespace Msdp {
 #define DEVICESTATUS_WRITE_PARCEL_NO_RET(parcel, type, data)                            \
     do {                                                                                \
         if (!(parcel).Write##type(data)) {                                              \
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_COMMON, "%{public}s write "#data" failed", __func__); \
+            DEV_HILOGE(COMMON, "%{public}s write "#data" failed", __func__); \
             return;                                                                     \
         }                                                                               \
     } while (0)                                                                         \
@@ -53,7 +53,7 @@ namespace Msdp {
 #define DEVICESTATUS_READ_PARCEL_WITH_RET(parcel, type, out, retval)                    \
     do {                                                                                \
         if (!(parcel).Read##type(out)) {                                                \
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_COMMON, "%{public}s read "#out" failed", __func__); \
+            DEV_HILOGE(COMMON, "%{public}s read "#out" failed", __func__); \
             return (retval);                                                            \
         }                                                                               \
     } while (0)                                                                         \
@@ -61,7 +61,7 @@ namespace Msdp {
 #define DEVICESTATUS_WRITE_PARCEL_WITH_RET(parcel, type, data, retval)                  \
     do {                                                                                \
         if (!(parcel).Write##type(data)) {                                              \
-            DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_COMMON, "%{public}s write "#data" failed", __func__); \
+            DEV_HILOGE(COMMON, "%{public}s write "#data" failed", __func__); \
             return (retval);                                                            \
         }                                                                               \
     } while (0)

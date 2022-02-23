@@ -25,11 +25,11 @@ namespace Msdp {
 int DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_SERVICE, "cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
+    DEV_HILOGD(SERVICE, "cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
     std::u16string descripter = DevicestatusCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, \
+        DEV_HILOGE(SERVICE, \
             "DevicestatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
@@ -46,7 +46,7 @@ int DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data
 
 int32_t DevicestatusCallbackStub::OnDevicestatusChangedStub(MessageParcel& data)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     int32_t type;
     int32_t value;
     DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, type, E_DEVICESTATUS_READ_PARCEL_ERROR);

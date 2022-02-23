@@ -64,7 +64,7 @@ HWTEST_F (DevicestatusModuleTest, DevicestatusCallbackTest, TestSize.Level0)
  */
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "GetDevicestatusDataTest001 Enter");
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 Enter");
     DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
@@ -81,7 +81,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
  */
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest002, TestSize.Level0)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "GetDevicestatusDataTest002 Enter");
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 Enter");
     DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
@@ -98,7 +98,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest002, TestSize.Level0)
  */
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest003, TestSize.Level0)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "GetDevicestatusDataTest003 Enter");
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest003 Enter");
     DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);

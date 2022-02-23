@@ -42,29 +42,29 @@ ErrCode DevicestatusClient::Connect()
 
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "GetSystemAbilityManager failed");
+        DEV_HILOGE(INNERKIT, "GetSystemAbilityManager failed");
         return E_DEVICESTATUS_GET_SYSTEM_ABILITY_MANAGER_FAILED;
     }
 
     sptr<IRemoteObject> remoteObject_ = sam->CheckSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID);
     if (remoteObject_ == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "CheckSystemAbility failed");
+        DEV_HILOGE(INNERKIT, "CheckSystemAbility failed");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
     deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new DevicestatusDeathRecipient());
     if (deathRecipient_ == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Failed to create DevicestatusDeathRecipient");
+        DEV_HILOGE(INNERKIT, "Failed to create DevicestatusDeathRecipient");
         return ERR_NO_MEMORY;
     }
 
     if ((remoteObject_->IsProxyObject()) && (!remoteObject_->AddDeathRecipient(deathRecipient_))) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "Add death recipient to Devicestatus service failed");
+        DEV_HILOGE(INNERKIT, "Add death recipient to Devicestatus service failed");
         return E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED;
     }
 
     devicestatusProxy_ = iface_cast<Idevicestatus>(remoteObject_);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Connecting DevicestatusService success");
+    DEV_HILOGD(INNERKIT, "Connecting DevicestatusService success");
     return ERR_OK;
 }
 
@@ -83,43 +83,43 @@ void DevicestatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
 void DevicestatusClient::DevicestatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_INNERKIT, "OnRemoteDied failed, remote is nullptr");
+        DEV_HILOGE(INNERKIT, "OnRemoteDied failed, remote is nullptr");
         return;
     }
 
     DevicestatusClient::GetInstance().ResetProxy(remote);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Recv death notice");
+    DEV_HILOGD(INNERKIT, "Recv death notice");
 }
 
 void DevicestatusClient::SubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     DEVICESTATUS_RETURN_IF((callback == nullptr) || (Connect() != ERR_OK));
     devicestatusProxy_->Subscribe(type, callback);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 void DevicestatusClient::UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     DEVICESTATUS_RETURN_IF((callback == nullptr) || (Connect() != ERR_OK));
     devicestatusProxy_->UnSubscribe(type, callback);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusClient::GetDevicestatusData(const \
     DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Enter");
+    DEV_HILOGD(INNERKIT, "Enter");
     DevicestatusDataUtils::DevicestatusData devicestatusData;
     devicestatusData.type = DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
     devicestatusData.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
 
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), devicestatusData);
     devicestatusData = devicestatusProxy_->GetCache(type);
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_INNERKIT, "Exit");
+    DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
 } // namespace Msdp
