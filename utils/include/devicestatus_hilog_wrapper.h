@@ -24,47 +24,47 @@ namespace Msdp {
 #define __FILENAME__            (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #define __FORMATED(fmt, ...)    "[%{public}s] %{public}s# " fmt, __FILENAME__, __FUNCTION__, ##__VA_ARGS__
 
-#ifdef DEVICESTATUS_HILOGF
-#undef DEVICESTATUS_HILOGF
+#ifdef DEV_HILOGF
+#undef DEV_HILOGF
 #endif
 
-#ifdef DEVICESTATUS_HILOGE
-#undef DEVICESTATUS_HILOGE
+#ifdef DEV_HILOGE
+#undef DEV_HILOGE
 #endif
 
-#ifdef DEVICESTATUS_HILOGW
-#undef DEVICESTATUS_HILOGW
+#ifdef DEV_HILOGW
+#undef DEV_HILOGW
 #endif
 
-#ifdef DEVICESTATUS_HILOGI
-#undef DEVICESTATUS_HILOGI
+#ifdef DEV_HILOGI
+#undef DEV_HILOGI
 #endif
 
-#ifdef DEVICESTATUS_HILOGD
-#undef DEVICESTATUS_HILOGD
+#ifdef DEV_HILOGD
+#undef DEV_HILOGD
 #endif
 
-// param of log interface, such as DEVICESTATUS_HILOGF.
+// param of log interface, such as DEV_HILOGF.
 enum DevicestatusSubModule {
-    DEVICESTATUS_MODULE_INNERKIT = 0,
-    DEVICESTATUS_MODULE_SERVICE,
-    DEVICESTATUS_MODULE_JS_NAPI,
-    DEVICESTATUS_MODULE_COMMON,
-    DEVICESTATUS_MODULE_BUTT,
+    INNERKIT = 0,
+    SERVICE,
+    JS_NAPI,
+    COMMON,
+    BUTT,
 };
 
-// 0xD002900: subsystem:Msdp module:Devicestatus, 8 bits reserved.
-static constexpr unsigned int BASE_MSDP_DOMAIN_ID = 0xD002900;
+// 0xD002200: subsystem:Msdp module:Devicestatus, 8 bits reserved.
+static constexpr unsigned int BASE_MSDP_DOMAIN_ID = 0xD002220;
 
 enum DevicestatusDomainId {
-    DEVICESTATUS_INNERKIT_DOMAIN = BASE_MSDP_DOMAIN_ID + DEVICESTATUS_MODULE_INNERKIT,
+    DEVICESTATUS_INNERKIT_DOMAIN = BASE_MSDP_DOMAIN_ID + INNERKIT,
     DEVICESTATUS_SERVICE_DOMAIN,
     DEVICESTATUS_JS_NAPI,
     DEVICESTATUS_COMMON,
     DEVICESTATUS_BUTT,
 };
 
-static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[DEVICESTATUS_MODULE_BUTT] = {
+static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
     {LOG_CORE, DEVICESTATUS_INNERKIT_DOMAIN, "DevicestatusClient"},
     {LOG_CORE, DEVICESTATUS_SERVICE_DOMAIN, "DevicestatusService"},
     {LOG_CORE, DEVICESTATUS_JS_NAPI, "DevicestatusJsNapi"},
@@ -72,27 +72,27 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[DEVICESTATUS_MOD
 };
 
 // In order to improve performance, do not check the module range.
-// Besides, make sure module is less than DEVICESTATUS_MODULE_BUTT.
-#define DEVICESTATUS_HILOGF(module, ...) \
+// Besides, make sure module is less than BUTT.
+#define DEV_HILOGF(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Fatal(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
-#define DEVICESTATUS_HILOGE(module, ...) \
+#define DEV_HILOGE(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Error(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
-#define DEVICESTATUS_HILOGW(module, ...) \
+#define DEV_HILOGW(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Warn(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
-#define DEVICESTATUS_HILOGI(module, ...) \
+#define DEV_HILOGI(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Info(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
-#define DEVICESTATUS_HILOGD(module, ...) \
+#define DEV_HILOGD(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Debug(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
 } // namespace Msdp
 } // namespace OHOS
 
 #else
 
-#define DEVICESTATUS_HILOGF(...)
-#define DEVICESTATUS_HILOGE(...)
-#define DEVICESTATUS_HILOGW(...)
-#define DEVICESTATUS_HILOGI(...)
-#define DEVICESTATUS_HILOGD(...)
+#define DEV_HILOGF(...)
+#define DEV_HILOGE(...)
+#define DEV_HILOGW(...)
+#define DEV_HILOGI(...)
+#define DEV_HILOGD(...)
 
 #endif // CONFIG_HILOG
 

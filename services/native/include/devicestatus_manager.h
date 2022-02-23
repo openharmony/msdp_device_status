@@ -33,7 +33,7 @@ class DevicestatusManager {
 public:
     explicit DevicestatusManager(const wptr<DevicestatusService>& ms) : ms_(ms)
     {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusManager instance is created.");
+        DEV_HILOGI(SERVICE, "DevicestatusManager instance is created.");
     }
     ~DevicestatusManager() = default;
 

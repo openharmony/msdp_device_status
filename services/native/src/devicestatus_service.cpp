@@ -31,34 +31,34 @@ const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPt
 }
 DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_SERVICE, "Add SystemAbility");
+    DEV_HILOGD(SERVICE, "Add SystemAbility");
 }
 
 DevicestatusService::~DevicestatusService() {}
 
 void DevicestatusService::OnStart()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (ready_) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "OnStart is ready, nothing to do.");
+        DEV_HILOGE(SERVICE, "OnStart is ready, nothing to do.");
         return;
     }
 
     if (!Init()) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "OnStart call init fail");
+        DEV_HILOGE(SERVICE, "OnStart call init fail");
         return;
     }
     if (!Publish(DelayedSpSingleton<DevicestatusService>::GetInstance())) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "OnStart register to system ability manager failed");
+        DEV_HILOGE(SERVICE, "OnStart register to system ability manager failed");
         return;
     }
     ready_ = true;
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "OnStart and add system ability success");
+    DEV_HILOGI(SERVICE, "OnStart and add system ability success");
 }
 
 void DevicestatusService::OnStop()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (!ready_) {
         return;
     }
@@ -66,21 +66,21 @@ void DevicestatusService::OnStop()
 
     if (!devicestatusManager_) {
         devicestatusManager_->UnloadAlgorithm(false);
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unload algorithm library");
+        DEV_HILOGI(SERVICE, "unload algorithm library");
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 bool DevicestatusService::Init()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
     if (!devicestatusManager_) {
         devicestatusManager_ = std::make_shared<DevicestatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "OnStart init fail");
+        DEV_HILOGE(SERVICE, "OnStart init fail");
         return false;
     }
 
@@ -89,36 +89,36 @@ bool DevicestatusService::Init()
 
 bool DevicestatusService::IsServiceReady()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     return ready_;
 }
 
 std::shared_ptr<DevicestatusManager> DevicestatusService::GetDevicestatusManager()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     return devicestatusManager_;
 }
 
 void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     devicestatusManager_->Subscribe(type, callback);
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     devicestatusManager_->UnSubscribe(type, callback);
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
     DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     return devicestatusManager_->GetLatestDevicestatusData(type);
 }
 } // namespace Msdp

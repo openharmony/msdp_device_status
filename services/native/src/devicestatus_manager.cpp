@@ -21,15 +21,15 @@ namespace Msdp {
 void DevicestatusManager::DevicestatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "OnRemoteDied failed, remote is nullptr");
+        DEV_HILOGE(SERVICE, "OnRemoteDied failed, remote is nullptr");
         return;
     }
-    DEVICESTATUS_HILOGD(DEVICESTATUS_MODULE_SERVICE, "Recv death notice");
+    DEV_HILOGD(SERVICE, "Recv death notice");
 }
 
 bool DevicestatusManager::Init()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusManager: Init start");
+    DEV_HILOGI(SERVICE, "DevicestatusManager: Init start");
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new DevicestatusCallbackDeathRecipient();
     }
@@ -40,14 +40,14 @@ bool DevicestatusManager::Init()
     }
     LoadAlgorithm(false);
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "DevicestatusManager: Init success");
+    DEV_HILOGI(SERVICE, "DevicestatusManager: Init success");
     return true;
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestatusData(const \
     DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
     msdpData_ = msdpImpl_->GetObserverData();
     for (auto iter = msdpData_.begin(); iter != msdpData_.end(); ++iter) {
@@ -63,13 +63,13 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
 
 bool DevicestatusManager::EnableRdb()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGE(SERVICE, "Enter");
     if (!InitInterface()) {
         return false;
     }
 
     if (!InitDataCallback()) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "%{public}s init msdp callback fail.", __func__);
+        DEV_HILOGE(SERVICE, "%{public}s init msdp callback fail.", __func__);
         return false;
     }
     return true;
@@ -77,21 +77,21 @@ bool DevicestatusManager::EnableRdb()
 
 bool DevicestatusManager::DisableRdb()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "delete msdp client impl");
+        DEV_HILOGE(SERVICE, "delete msdp client impl");
         msdpImpl_->DisableMsdpImpl();
         msdpImpl_->UnregisterImpl();
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "DisableRdb: after unregister impl");
+        DEV_HILOGE(SERVICE, "DisableRdb: after unregister impl");
     }
     return true;
 }
 
 bool DevicestatusManager::InitInterface()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Init msdp client impl");
+        DEV_HILOGE(SERVICE, "Init msdp client impl");
         msdpImpl_->InitMsdpImpl();
     }
     return true;
@@ -99,19 +99,19 @@ bool DevicestatusManager::InitInterface()
 
 bool DevicestatusManager::InitDataCallback()
 {
-    DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         DevicestatusMsdpClientImpl::CallbackManager callback =
             std::bind(&DevicestatusManager::MsdpDataCallback, this, std::placeholders::_1);
         msdpImpl_->RegisterImpl(callback);
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "InitDataCallback: after register impl");
+        DEV_HILOGE(SERVICE, "InitDataCallback: after register impl");
     }
     return true;
 }
 
 int32_t DevicestatusManager::MsdpDataCallback(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
     NotifyDevicestatusChange(data);
     return ERR_OK;
@@ -119,7 +119,7 @@ int32_t DevicestatusManager::MsdpDataCallback(DevicestatusDataUtils::Devicestatu
 
 int32_t DevicestatusManager::SensorDataCallback(const struct SensorEvents *event)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     // TO-DO, handle sensor event properly when we get the data details of sensor HDI.
     DevicestatusDataUtils::DevicestatusData data = {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
         DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER};
@@ -129,7 +129,7 @@ int32_t DevicestatusManager::SensorDataCallback(const struct SensorEvents *event
 
 void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
     // Call back for all listeners
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
@@ -142,9 +142,9 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
         }
     }
     if (!isExists) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "No listener found for type: %{public}d", \
+        DEV_HILOGI(SERVICE, "No listener found for type: %{public}d", \
             devicestatusData.type);
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+        DEV_HILOGI(SERVICE, "Exit");
         return;
     }
     for (auto& listener : listeners) {
@@ -155,15 +155,15 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
 void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
 
     if (!EnableRdb()) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Enable failed!");
+        DEV_HILOGE(SERVICE, "Enable failed!");
         return;
     }
 
@@ -171,43 +171,43 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
         if (listeners.insert(callback).second) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "no found set list of type, insert success");
+            DEV_HILOGI(SERVICE, "no found set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
         listenerMap_.insert(std::make_pair(type, listeners));
     } else {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "callbacklist.size=%{public}zu",
+        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
             listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
         if (iter != listenerMap_[dtTypeIter->first].end()) {
             return;
         } else {
             if (listenerMap_[dtTypeIter->first].insert(callback).second) {
-                DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "found set list of type, insert success");
+                DEV_HILOGI(SERVICE, "found set list of type, insert success");
                 object->AddDeathRecipient(devicestatusCBDeathRecipient_);
             }
         }
     }
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "object = %{public}p, callback = %{public}p",
+    DEV_HILOGI(SERVICE, "object = %{public}p, callback = %{public}p",
         object.GetRefPtr(), callback.GetRefPtr());
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     std::lock_guard lock(mutex_);
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
 
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
         return;
     } else {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "callbacklist.size=%{public}zu",
+        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
             listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
         if (iter != listenerMap_[dtTypeIter->first].end()) {
@@ -219,20 +219,20 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
             }
         }
     }
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "listenerMap_.size = %{public}d", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size = %{public}d", listenerMap_.size());
     if (listenerMap_.size() == 0) {
         DisableRdb();
     } else {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "other subscribe exist");
+        DEV_HILOGI(SERVICE, "other subscribe exist");
     }
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "object = %{public}p, callback = %{public}p",
+    DEV_HILOGI(SERVICE, "object = %{public}p, callback = %{public}p",
         object.GetRefPtr(), callback.GetRefPtr());
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         msdpImpl_->LoadAlgorithmLibrary(bCreate);
         msdpImpl_->LoadSensorHdiLibrary(bCreate);
@@ -243,7 +243,7 @@ int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
 
 int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         msdpImpl_->UnloadAlgorithmLibrary(bCreate);
         msdpImpl_->UnloadSensorHdiLibrary(bCreate);

@@ -43,11 +43,11 @@ DevicestatusSensorInterface* sensorHdiInterface_;
 
 ErrCode DevicestatusMsdpClientImpl::InitMsdpImpl()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (msdpInterface_ == nullptr) {
         msdpInterface_ = GetAlgorithmInst();
         if (msdpInterface_ == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "get msdp module instance failed");
+            DEV_HILOGI(SERVICE, "get msdp module instance failed");
             return ERR_NG;
         }
     }
@@ -55,7 +55,7 @@ ErrCode DevicestatusMsdpClientImpl::InitMsdpImpl()
     if (sensorHdiInterface_ == nullptr) {
         sensorHdiInterface_ = GetSensorHdiInst();
         if (sensorHdiInterface_ == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "get sensor module instance failed");
+            DEV_HILOGI(SERVICE, "get sensor module instance failed");
             return ERR_NG;
         }
     }
@@ -63,72 +63,72 @@ ErrCode DevicestatusMsdpClientImpl::InitMsdpImpl()
     msdpInterface_->Enable();
     sensorHdiInterface_->Enable();
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpClientImpl::DisableMsdpImpl()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (msdpInterface_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "disable msdp impl failed");
+        DEV_HILOGI(SERVICE, "disable msdp impl failed");
         return ERR_NG;
     }
 
     if (sensorHdiInterface_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "disable msdp impl failed");
+        DEV_HILOGI(SERVICE, "disable msdp impl failed");
         return ERR_NG;
     }
 
     msdpInterface_->Disable();
     sensorHdiInterface_->Disable();
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpClientImpl::RegisterSensor()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (sensorHdiInterface_ != nullptr) {
         std::shared_ptr<DevicestatusSensorHdiCallback> callback = std::make_shared<DevicestatusMsdpClientImpl>();
         sensorHdiInterface_->RegisterCallback(callback);
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "sensorHdiInterface_ is not nullptr");
+        DEV_HILOGI(SERVICE, "sensorHdiInterface_ is not nullptr");
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpClientImpl::UnregisterSensor(void)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
     if (sensorHdiInterface_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unregister callback failed");
+        DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
 
     int32_t ret = sensorHdiInterface_->UnregisterCallback();
     if (ret < 0) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unregister sensor failed");
+        DEV_HILOGI(SERVICE, "unregister sensor failed");
         return ERR_NG;
     }
 
     sensorHdiInterface_ = nullptr;
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     callbacksMgr_ = callback;
 
     if (msdpInterface_ == nullptr) {
         msdpInterface_ = GetAlgorithmInst();
         if (msdpInterface_ == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "get msdp module instance failed");
+            DEV_HILOGI(SERVICE, "get msdp module instance failed");
             return ERR_NG;
         }
     }
@@ -136,7 +136,7 @@ ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
     if (sensorHdiInterface_ == nullptr) {
         sensorHdiInterface_ = GetSensorHdiInst();
         if (sensorHdiInterface_ == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "get sensor module instance failed");
+            DEV_HILOGI(SERVICE, "get sensor module instance failed");
             return ERR_NG;
         }
     }
@@ -149,9 +149,9 @@ ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
 
 ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (callbacksMgr_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unregister callback failed");
+        DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
 
@@ -165,9 +165,9 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
 
 ErrCode DevicestatusMsdpClientImpl::ImplCallback(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (callbacksMgr_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "callbacksMgr_ is nullptr");
+        DEV_HILOGI(SERVICE, "callbacksMgr_ is nullptr");
         return ERR_NG;
     }
     callbacksMgr_(data);
@@ -177,52 +177,52 @@ ErrCode DevicestatusMsdpClientImpl::ImplCallback(DevicestatusDataUtils::Devicest
 
 void DevicestatusMsdpClientImpl::OnResult(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     MsdpCallback(data);
 }
 
 void DevicestatusMsdpClientImpl::OnSensorHdiResult(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     MsdpCallback(data);
 }
 
 ErrCode DevicestatusMsdpClientImpl::RegisterMsdp()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (msdpInterface_ != nullptr) {
         std::shared_ptr<MsdpAlgorithmCallback> callback = std::make_shared<DevicestatusMsdpClientImpl>();
         msdpInterface_->RegisterCallback(callback);
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 ErrCode DevicestatusMsdpClientImpl::UnregisterMsdp(void)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
     if (msdpInterface_ == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unregister callback failed");
+        DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
 
     int32_t ret = msdpInterface_->UnregisterCallback();
     if (ret < 0) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "unregister Msdp failed");
+        DEV_HILOGI(SERVICE, "unregister Msdp failed");
         return ERR_NG;
     }
 
     msdpInterface_ = nullptr;
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 int32_t DevicestatusMsdpClientImpl::MsdpCallback(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);
@@ -235,7 +235,7 @@ int32_t DevicestatusMsdpClientImpl::MsdpCallback(DevicestatusDataUtils::Devicest
 DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserverData(
     DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     for (auto iter = devicestatusDataMap_.begin(); iter != devicestatusDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;
@@ -252,51 +252,51 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserver
 
 std::map<clientType, clientValue> DevicestatusMsdpClientImpl::GetObserverData() const
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     return devicestatusDataMap_;
 }
 
 void DevicestatusMsdpClientImpl::GetDevicestatusTimestamp()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusMsdpClientImpl::GetLongtitude()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusMsdpClientImpl::GetLatitude()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 int32_t DevicestatusMsdpClientImpl::LoadSensorHdiLibrary(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (sensorHdi_.handle != nullptr) {
         return ERR_OK;
     }
     sensorHdi_.handle = dlopen(DEVICESTATUS_SENSOR_HDI_LIB_PATH.c_str(), RTLD_LAZY);
     if (sensorHdi_.handle == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE,
+        DEV_HILOGE(SERVICE,
             "Cannot load sensor hdi library error = %{public}s", dlerror());
         return ERR_NG;
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "start create sensor hdi pointer");
+    DEV_HILOGI(SERVICE, "start create sensor hdi pointer");
     sensorHdi_.create = (DevicestatusSensorInterface* (*)()) dlsym(sensorHdi_.handle, "Create");
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "start destroy sensor hdi pointer");
+    DEV_HILOGI(SERVICE, "start destroy sensor hdi pointer");
     sensorHdi_.destroy = (void *(*)(DevicestatusSensorInterface*))dlsym(sensorHdi_.handle, "Destroy");
 
     if (sensorHdi_.create == nullptr || sensorHdi_.destroy == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "%{public}s dlsym Create or Destory sensor hdi failed!",
+        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destory sensor hdi failed!",
             DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
         dlclose(sensorHdi_.handle);
         sensorHdi_.Clear();
@@ -308,13 +308,13 @@ int32_t DevicestatusMsdpClientImpl::LoadSensorHdiLibrary(bool bCreate)
         sensorHdi_.pAlgorithm = sensorHdi_.create();
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 int32_t DevicestatusMsdpClientImpl::UnloadSensorHdiLibrary(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (sensorHdi_.handle == nullptr) {
         return ERR_NG;
     }
@@ -329,13 +329,13 @@ int32_t DevicestatusMsdpClientImpl::UnloadSensorHdiLibrary(bool bCreate)
         sensorHdi_.Clear();
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 DevicestatusSensorInterface* DevicestatusMsdpClientImpl::GetSensorHdiInst()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (sensorHdi_.handle == nullptr) {
         return nullptr;
     }
@@ -343,7 +343,7 @@ DevicestatusSensorInterface* DevicestatusMsdpClientImpl::GetSensorHdiInst()
     if (sensorHdi_.pAlgorithm == nullptr) {
         std::unique_lock<std::mutex> lock(mMutex_);
         if (sensorHdi_.pAlgorithm == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Get mAlgorithm.pAlgorithm");
+            DEV_HILOGI(SERVICE, "Get mAlgorithm.pAlgorithm");
             sensorHdi_.pAlgorithm = sensorHdi_.create();
         }
     }
@@ -353,23 +353,23 @@ DevicestatusSensorInterface* DevicestatusMsdpClientImpl::GetSensorHdiInst()
 
 int32_t DevicestatusMsdpClientImpl::LoadAlgorithmLibrary(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (mAlgorithm_.handle != nullptr) {
         return ERR_OK;
     }
     mAlgorithm_.handle = dlopen(DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str(), RTLD_LAZY);
     if (mAlgorithm_.handle == nullptr) {
-        DEVICESTATUS_HILOGE(DEVICESTATUS_MODULE_SERVICE, "Cannot load library error = %{public}s", dlerror());
+        DEV_HILOGE(SERVICE, "Cannot load library error = %{public}s", dlerror());
         return ERR_NG;
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "start create pointer");
+    DEV_HILOGI(SERVICE, "start create pointer");
     mAlgorithm_.create = (DevicestatusMsdpInterface* (*)()) dlsym(mAlgorithm_.handle, "Create");
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "start destroy pointer");
+    DEV_HILOGI(SERVICE, "start destroy pointer");
     mAlgorithm_.destroy = (void *(*)(DevicestatusMsdpInterface*))dlsym(mAlgorithm_.handle, "Destroy");
 
     if (mAlgorithm_.create == nullptr || mAlgorithm_.destroy == nullptr) {
-        DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "%{public}s dlsym Create or Destory failed!",
+        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destory failed!",
             DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
         dlclose(mAlgorithm_.handle);
         mAlgorithm_.Clear();
@@ -381,13 +381,13 @@ int32_t DevicestatusMsdpClientImpl::LoadAlgorithmLibrary(bool bCreate)
         mAlgorithm_.pAlgorithm = mAlgorithm_.create();
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 int32_t DevicestatusMsdpClientImpl::UnloadAlgorithmLibrary(bool bCreate)
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (mAlgorithm_.handle == nullptr) {
         return ERR_NG;
     }
@@ -402,13 +402,13 @@ int32_t DevicestatusMsdpClientImpl::UnloadAlgorithmLibrary(bool bCreate)
         mAlgorithm_.Clear();
     }
 
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 
 DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
 {
-    DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "Enter");
     if (mAlgorithm_.handle == nullptr) {
         return nullptr;
     }
@@ -416,7 +416,7 @@ DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
     if (mAlgorithm_.pAlgorithm == nullptr) {
         std::unique_lock<std::mutex> lock(mMutex_);
         if (mAlgorithm_.pAlgorithm == nullptr) {
-            DEVICESTATUS_HILOGI(DEVICESTATUS_MODULE_SERVICE, "Get mAlgorithm.pAlgorithm");
+            DEV_HILOGI(SERVICE, "Get mAlgorithm.pAlgorithm");
             mAlgorithm_.pAlgorithm = mAlgorithm_.create();
         }
     }
