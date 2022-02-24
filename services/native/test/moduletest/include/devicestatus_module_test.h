@@ -17,6 +17,7 @@
 #define DEVICESTATUS_SERVICE_TEST_H
 
 #include <gtest/gtest.h>
+
 #include "devicestatus_callback_stub.h"
 #include "devicestatus_service.h"
 

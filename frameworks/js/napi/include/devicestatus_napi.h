@@ -17,9 +17,9 @@
 #define DEVICESTATUS_NAPI_H
 
 #include <map>
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
 #include "devicestatus_callback_stub.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_event.h"

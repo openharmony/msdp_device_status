@@ -14,6 +14,7 @@
  */
 
 #include "devicestatus_msdp_client_impl.h"
+
 #include <dlfcn.h>
 #include <string>
 #include <cerrno>
@@ -22,6 +23,7 @@
 #include <unistd.h>
 #include <errors.h>
 #include <linux/netlink.h>
+
 #include "dummy_values_bucket.h"
 #include "devicestatus_common.h"
 
@@ -115,7 +117,7 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterSensor(void)
     return ERR_OK;
 }
 
-ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
+ErrCode DevicestatusMsdpClientImpl::RegisterImpl(const CallbackManager& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
     g_callbacksMgr = callback;
@@ -158,9 +160,8 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
     return ERR_OK;
 }
 
-ErrCode DevicestatusMsdpClientImpl::ImplCallback(DevicestatusDataUtils::DevicestatusData& data)
+ErrCode DevicestatusMsdpClientImpl::ImplCallback(const DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
     if (g_callbacksMgr == nullptr) {
         DEV_HILOGI(SERVICE, "g_callbacksMgr is nullptr");
         return ERR_NG;
@@ -170,15 +171,13 @@ ErrCode DevicestatusMsdpClientImpl::ImplCallback(DevicestatusDataUtils::Devicest
     return ERR_OK;
 }
 
-void DevicestatusMsdpClientImpl::OnResult(DevicestatusDataUtils::DevicestatusData& data)
+void DevicestatusMsdpClientImpl::OnResult(const DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
     MsdpCallback(data);
 }
 
-void DevicestatusMsdpClientImpl::OnSensorHdiResult(DevicestatusDataUtils::DevicestatusData& data)
+void DevicestatusMsdpClientImpl::OnSensorHdiResult(const DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
     MsdpCallback(data);
 }
 
@@ -210,9 +209,8 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterMsdp(void)
     return ERR_OK;
 }
 
-int32_t DevicestatusMsdpClientImpl::MsdpCallback(DevicestatusDataUtils::DevicestatusData& data)
+int32_t DevicestatusMsdpClientImpl::MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);
@@ -223,7 +221,7 @@ int32_t DevicestatusMsdpClientImpl::MsdpCallback(DevicestatusDataUtils::Devicest
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserverData(
-    DevicestatusDataUtils::DevicestatusData& data)
+    const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
     for (auto iter = g_devicestatusDataMap.begin(); iter != g_devicestatusDataMap.end(); ++iter) {

@@ -20,6 +20,7 @@
 #include <memory>
 #include <map>
 #include <errors.h>
+
 #include "devicestatus_data_utils.h"
 
 namespace OHOS {
@@ -32,10 +33,10 @@ public:
     public:
         DevicestatusSensorHdiCallback() = default;
         virtual ~DevicestatusSensorHdiCallback() = default;
-        virtual void OnSensorHdiResult(DevicestatusDataUtils::DevicestatusData& data) = 0;
+        virtual void OnSensorHdiResult(const DevicestatusDataUtils::DevicestatusData& data) = 0;
     };
 
-    virtual void RegisterCallback(std::shared_ptr<DevicestatusSensorHdiCallback>& callback) = 0;
+    virtual void RegisterCallback(const std::shared_ptr<DevicestatusSensorHdiCallback>& callback) = 0;
     virtual void UnregisterCallback() = 0;
     virtual void Enable() = 0;
     virtual void Disable() = 0;

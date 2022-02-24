@@ -23,6 +23,7 @@
 #include <mutex>
 #include <map>
 #include <errors.h>
+
 #include "rdb_store.h"
 #include "rdb_helper.h"
 #include "rdb_open_callback.h"
@@ -54,12 +55,12 @@ public:
     void LoopingThreadEntry();
     void Enable() override;
     void Disable() override;
-    void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback) override;
+    void RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback) override;
     void UnregisterCallback() override;
-    ErrCode NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusData& data);
-    int32_t TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet);
+    ErrCode NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data);
+    int32_t TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet);
     int32_t TrigerDatabaseObserver();
-    DevicestatusDataUtils::DevicestatusData SaveRdbData(DevicestatusDataUtils::DevicestatusData& data);
+    DevicestatusDataUtils::DevicestatusData SaveRdbData(const DevicestatusDataUtils::DevicestatusData& data);
     std::shared_ptr<MsdpAlgorithmCallback> GetCallbacksImpl()
     {
         std::unique_lock lock(mutex_);

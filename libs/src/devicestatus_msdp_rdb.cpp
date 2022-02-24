@@ -14,12 +14,14 @@
  */
 
 #include "devicestatus_msdp_rdb.h"
+
 #include <string>
 #include <cerrno>
 #include <sys/epoll.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <linux/netlink.h>
+
 #include "dummy_values_bucket.h"
 #include "devicestatus_common.h"
 
@@ -56,7 +58,7 @@ void DevicestatusMsdpRdb::InitRdbStore()
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-void DevicestatusMsdpRdb::RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback)
+void DevicestatusMsdpRdb::RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback)
 {
     callbacksImpl_ = callback;
 }
@@ -80,7 +82,7 @@ void DevicestatusMsdpRdb::Disable()
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusData& data)
+ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (g_rdb->GetCallbacksImpl() == nullptr) {
@@ -92,7 +94,8 @@ ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusD
     return ERR_OK;
 }
 
-DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(DevicestatusDataUtils::DevicestatusData& data)
+DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(
+    const DevicestatusDataUtils::DevicestatusData& data)
 {
     for (auto iter = rdbDataMap_.begin(); iter != rdbDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
@@ -114,7 +117,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(Devices
     return data;
 }
 
-int32_t DevicestatusMsdpRdb::TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet)
+int32_t DevicestatusMsdpRdb::TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet)
 {
     int32_t columnIndex;
     int32_t intVal;

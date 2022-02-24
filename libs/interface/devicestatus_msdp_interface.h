@@ -20,6 +20,7 @@
 #include <memory>
 #include <map>
 #include <errors.h>
+
 #include "devicestatus_data_utils.h"
 
 namespace OHOS {
@@ -32,10 +33,10 @@ public:
     public:
         MsdpAlgorithmCallback() = default;
         virtual ~MsdpAlgorithmCallback() = default;
-        virtual void OnResult(DevicestatusDataUtils::DevicestatusData& data) = 0;
+        virtual void OnResult(const DevicestatusDataUtils::DevicestatusData& data) = 0;
     };
 
-    virtual void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback) = 0;
+    virtual void RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback) = 0;
     virtual void UnregisterCallback() = 0;
     virtual void Enable() = 0;
     virtual void Disable() = 0;
