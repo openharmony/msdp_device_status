@@ -19,7 +19,6 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
 

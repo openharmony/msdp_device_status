@@ -17,6 +17,7 @@
 #define DEVICESTATUS_CLIENT_H
 
 #include <singleton.h>
+
 #include "idevicestatus.h"
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"

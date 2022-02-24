@@ -17,6 +17,7 @@
 #define DEVICESTATUS_PERMISSION_H
 
 #include <string>
+
 #include "permission/permission_kit.h"
 
 namespace OHOS {

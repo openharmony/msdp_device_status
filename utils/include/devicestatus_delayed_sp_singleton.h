@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_SINGLETON_H
-#define DEVICESTATUS_SINGLETON_H
+#ifndef DEVICESTATUS_DELAYED_SP_SINGLETON_H
+#define DEVICESTATUS_DELAYED_SP_SINGLETON_H
 
 #include <mutex>
 #include <memory>
 #include <refbase.h>
+
 #include "nocopyable.h"
 
 namespace OHOS {
@@ -71,4 +72,4 @@ void DelayedSpSingleton<T>::DestroyInstance()
 }
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_SINGLETON_H
+#endif // DEVICESTATUS_DELAYED_SP_SINGLETON_H

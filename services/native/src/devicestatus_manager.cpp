@@ -128,7 +128,7 @@ bool DevicestatusManager::InitDataCallback()
     return true;
 }
 
-int32_t DevicestatusManager::MsdpDataCallback(DevicestatusDataUtils::DevicestatusData& data)
+int32_t DevicestatusManager::MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data)
 {
     NotifyDevicestatusChange(data);
     return ERR_OK;

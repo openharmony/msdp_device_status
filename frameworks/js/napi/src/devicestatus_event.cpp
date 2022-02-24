@@ -14,6 +14,7 @@
  */
 
 #include "devicestatus_event.h"
+
 #include "devicestatus_common.h"
 
 using namespace OHOS::Msdp;

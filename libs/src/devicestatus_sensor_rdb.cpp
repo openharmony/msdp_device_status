@@ -14,12 +14,14 @@
  */
 
 #include "devicestatus_sensor_rdb.h"
+
 #include <string>
 #include <cerrno>
 #include <sys/epoll.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <linux/netlink.h>
+
 #include "dummy_values_bucket.h"
 #include "devicestatus_common.h"
 
@@ -65,7 +67,7 @@ void DevicestatusSensorRdb::InitRdbStore()
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-void DevicestatusSensorRdb::RegisterCallback(std::shared_ptr<DevicestatusSensorHdiCallback>& callback)
+void DevicestatusSensorRdb::RegisterCallback(const std::shared_ptr<DevicestatusSensorHdiCallback>& callback)
 {
     callbacksImpl_ = callback;
 }
@@ -92,7 +94,7 @@ void DevicestatusSensorRdb::Disable()
 }
 
 
-ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusData& data)
+ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (g_rdb->GetCallbacksImpl() == nullptr) {
@@ -105,7 +107,7 @@ ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(DevicestatusDataUtils::Devicestatu
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusSensorRdb::SaveRdbData(
-    DevicestatusDataUtils::DevicestatusData& data)
+    const DevicestatusDataUtils::DevicestatusData& data)
 {
     for (auto iter = rdbDataMap_.begin(); iter != rdbDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
@@ -127,7 +129,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSensorRdb::SaveRdbData(
     return data;
 }
 
-int32_t DevicestatusSensorRdb::TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet)
+int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet)
 {
     int32_t columnIndex;
     int32_t intVal;

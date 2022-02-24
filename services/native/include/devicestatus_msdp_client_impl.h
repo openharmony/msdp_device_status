@@ -23,6 +23,7 @@
 #include <thread>
 #include <map>
 #include <errors.h>
+
 #include "rdb_store.h"
 #include "rdb_helper.h"
 #include "rdb_open_callback.h"
@@ -40,18 +41,18 @@ class DevicestatusMsdpClientImpl :
     public DevicestatusMsdpInterface::MsdpAlgorithmCallback,
     public DevicestatusSensorInterface::DevicestatusSensorHdiCallback {
 public:
-    using CallbackManager = std::function<int32_t(DevicestatusDataUtils::DevicestatusData&)>;
+    using CallbackManager = std::function<int32_t(const DevicestatusDataUtils::DevicestatusData&)>;
 
     ErrCode InitMsdpImpl();
     ErrCode DisableMsdpImpl();
-    ErrCode RegisterImpl(CallbackManager& callback);
+    ErrCode RegisterImpl(const CallbackManager& callback);
     ErrCode UnregisterImpl();
-    int32_t MsdpCallback(DevicestatusDataUtils::DevicestatusData& data);
+    int32_t MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data);
     ErrCode RegisterMsdp();
     ErrCode UnregisterMsdp(void);
     ErrCode RegisterSensor();
     ErrCode UnregisterSensor(void);
-    DevicestatusDataUtils::DevicestatusData SaveObserverData(DevicestatusDataUtils::DevicestatusData& data);
+    DevicestatusDataUtils::DevicestatusData SaveObserverData(const DevicestatusDataUtils::DevicestatusData& data);
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
     void GetDevicestatusTimestamp();
     void GetLongtitude();
@@ -61,15 +62,15 @@ public:
     int32_t LoadSensorHdiLibrary(bool bCreate);
     int32_t UnloadSensorHdiLibrary(bool bCreate);
 private:
-    ErrCode ImplCallback(DevicestatusDataUtils::DevicestatusData& data);
+    ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
     DevicestatusSensorInterface* GetSensorHdiInst();
     DevicestatusMsdpInterface* GetAlgorithmInst();
     MsdpAlgorithmHandle mAlgorithm_;
     SensorHdiHandle sensorHdi_;
     std::mutex mMutex_;
     bool notifyManagerFlag_ = false;
-    void OnResult(DevicestatusDataUtils::DevicestatusData& data) override;
-    void OnSensorHdiResult(DevicestatusDataUtils::DevicestatusData& data) override;
+    void OnResult(const DevicestatusDataUtils::DevicestatusData& data) override;
+    void OnSensorHdiResult(const DevicestatusDataUtils::DevicestatusData& data) override;
 };
 }
 }

@@ -16,7 +16,6 @@
 #include "devicestatus_srv_stub.h"
 
 #include "message_parcel.h"
-
 #include "devicestatus_srv_proxy.h"
 #include "devicestatus_common.h"
 #include "idevicestatus_callback.h"

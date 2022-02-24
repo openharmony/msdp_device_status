@@ -17,6 +17,7 @@
 #define OHOS_MSDP_DEVICESTATUS_AGENT_TEST_H
 
 #include <gtest/gtest.h>
+
 #include "devicestatus_agent.h"
 #include "devicestatus_data_utils.h"
 

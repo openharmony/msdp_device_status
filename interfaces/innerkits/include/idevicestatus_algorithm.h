@@ -17,6 +17,7 @@
 #define IDEVICESTATUS_ALGORITHM_H
 
 #include <iremote_broker.h>
+
 #include "idevicestatus_algorithm_callback.h"
 
 namespace OHOS {
