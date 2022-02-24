@@ -35,10 +35,10 @@ public:
         virtual void OnSensorHdiResult(DevicestatusDataUtils::DevicestatusData& data) = 0;
     };
 
-    virtual ErrCode RegisterCallback(std::shared_ptr<DevicestatusSensorHdiCallback>& callback) = 0;
-    virtual ErrCode UnregisterCallback() = 0;
-    virtual ErrCode Enable() = 0;
-    virtual ErrCode Disable() = 0;
+    virtual void RegisterCallback(std::shared_ptr<DevicestatusSensorHdiCallback>& callback) = 0;
+    virtual void UnregisterCallback() = 0;
+    virtual void Enable() = 0;
+    virtual void Disable() = 0;
 };
 
 struct SensorHdiHandle {

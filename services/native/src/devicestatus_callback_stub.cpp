@@ -22,20 +22,19 @@
 
 namespace OHOS {
 namespace Msdp {
-int DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
+int32_t DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}d, flags= %{public}d", code, option.GetFlags());
     std::u16string descripter = DevicestatusCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        DEV_HILOGE(SERVICE, \
-            "DevicestatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
+        DEV_HILOGE(SERVICE, "DevicestatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
     switch (code) {
-        case static_cast<int>(IdevicestatusCallback::DEVICESTATUS_CHANGE): {
+        case static_cast<int32_t>(IdevicestatusCallback::DEVICESTATUS_CHANGE): {
             return OnDevicestatusChangedStub(data);
         }
         default:

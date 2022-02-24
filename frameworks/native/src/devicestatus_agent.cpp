@@ -33,7 +33,7 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
 int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type,
     const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
 {
-    DEV_HILOGI(INNERKIT, "%{public}s Enter", __func__);
+    DEV_HILOGI(INNERKIT, "Enter");
     RegisterServiceEvent(type);
     if (agentEvent == nullptr) {
         return ERR_INVALID_VALUE;
@@ -50,14 +50,14 @@ int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::De
 
 void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEV_HILOGI(INNERKIT, "%{public}s Enter", __func__);
+    DEV_HILOGI(INNERKIT, "Enter");
     callback_ = new DeviceStatusAgentCallback(shared_from_this());
     DevicestatusClient::GetInstance().SubscribeCallback(type, callback_);
 }
 
 void DeviceStatusAgent::UnRegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
-    DEV_HILOGI(INNERKIT, "%{public}s Enter", __func__);
+    DEV_HILOGI(INNERKIT, "Enter");
     DevicestatusClient::GetInstance().UnSubscribeCallback(type, callback_);
 }
 } // namespace Msdp

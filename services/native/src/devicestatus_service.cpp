@@ -40,7 +40,7 @@ void DevicestatusService::OnStart()
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (ready_) {
-        DEV_HILOGE(SERVICE, "OnStart is ready, nothing to do.");
+        DEV_HILOGE(SERVICE, "OnStart is ready, nothing to do");
         return;
     }
 
@@ -104,8 +104,6 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
 {
     DEV_HILOGI(SERVICE, "Enter");
     devicestatusManager_->Subscribe(type, callback);
-
-    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,

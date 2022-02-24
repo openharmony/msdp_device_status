@@ -45,20 +45,20 @@ public:
     virtual ~DevicestatusMsdpRdb() {}
     bool Init();
     void InitRdbStore();
-    void SetTimerInterval(int interval);
+    void SetTimerInterval(int32_t interval);
     void CloseTimer();
     void InitTimer();
     void TimerCallback();
-    int RegisterTimerCallback(const int fd, const EventType et);
+    int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
-    ErrCode Enable() override;
-    ErrCode Disable() override;
-    ErrCode RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback) override;
-    ErrCode UnregisterCallback() override;
+    void Enable() override;
+    void Disable() override;
+    void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback>& callback) override;
+    void UnregisterCallback() override;
     ErrCode NotifyMsdpImpl(DevicestatusDataUtils::DevicestatusData& data);
-    int TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet);
-    int TrigerDatabaseObserver();
+    int32_t TrigerData(std::unique_ptr<NativeRdb::ResultSet> &resultSet);
+    int32_t TrigerDatabaseObserver();
     DevicestatusDataUtils::DevicestatusData SaveRdbData(DevicestatusDataUtils::DevicestatusData& data);
     std::shared_ptr<MsdpAlgorithmCallback> GetCallbacksImpl()
     {
@@ -71,10 +71,10 @@ private:
     std::shared_ptr<MsdpAlgorithmCallback> callbacksImpl_;
     std::map<int32_t, Callback> callbacks_;
     std::shared_ptr<NativeRdb::RdbStore> store_;
-    int devicestatusType_ = -1;
-    int devicestatusStatus_ = -1;
+    int32_t devicestatusType_ = -1;
+    int32_t devicestatusStatus_ = -1;
     bool notifyFlag_ = false;
-    int timerInterval_ = -1;
+    int32_t timerInterval_ = -1;
     int32_t timerFd_ = -1;
     int32_t epFd_ = -1;
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> rdbDataMap_;
@@ -83,8 +83,8 @@ private:
 
 class InsertOpenCallback : public NativeRdb::RdbOpenCallback {
 public:
-    int OnCreate(NativeRdb::RdbStore &rdbStore) override;
-    int OnUpgrade(NativeRdb::RdbStore &rdbStore, int oldVersion, int newVersion) override;
+    int32_t OnCreate(NativeRdb::RdbStore &rdbStore) override;
+    int32_t OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t oldVersion, int32_t newVersion) override;
 };
 }
 }

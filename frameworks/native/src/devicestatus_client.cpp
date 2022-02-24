@@ -37,6 +37,7 @@ ErrCode DevicestatusClient::Connect()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (devicestatusProxy_ != nullptr) {
+        DEV_HILOGE(INNERKIT, "devicestatusProxy_ is nut nullptr");
         return ERR_OK;
     }
 

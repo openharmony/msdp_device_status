@@ -53,7 +53,7 @@ enum DevicestatusSubModule {
     BUTT,
 };
 
-// 0xD002200: subsystem:Msdp module:Devicestatus, 8 bits reserved.
+// 0xD002220: subsystem:Msdp module:Devicestatus, 8 bits reserved.
 static constexpr unsigned int BASE_MSDP_DOMAIN_ID = 0xD002220;
 
 enum DevicestatusDomainId {
