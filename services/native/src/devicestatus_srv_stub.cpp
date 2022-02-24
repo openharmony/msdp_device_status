@@ -25,26 +25,25 @@
 
 namespace OHOS {
 namespace Msdp {
-int DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
+int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
     std::u16string descriptor = DevicestatusSrvStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        DEV_HILOGE(SERVICE, \
-            "DevicestatusSrvStub::OnRemoteRequest failed, descriptor is not matched!");
+        DEV_HILOGE(SERVICE, "DevicestatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
     switch (code) {
-        case static_cast<int>(Idevicestatus::DEVICESTATUS_SUBSCRIBE): {
+        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE): {
             return SubscribeStub(data);
         }
-        case static_cast<int>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE): {
+        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE): {
             return UnSubscribeStub(data);
         }
-        case static_cast<int>(Idevicestatus::DEVICESTATUS_GETCACHE): {
+        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE): {
             return GetLatestDevicestatusDataStub(data, reply);
         }
         default: {

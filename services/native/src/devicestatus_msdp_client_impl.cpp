@@ -29,39 +29,39 @@ using namespace OHOS::NativeRdb;
 namespace OHOS {
 namespace Msdp {
 namespace {
-const int ERR_OK = 0;
-const int ERR_NG = -1;
+constexpr int32_t ERR_OK = 0;
+constexpr int32_t ERR_NG = -1;
 const std::string DEVICESTATUS_SENSOR_HDI_LIB_PATH = "libdevicestatus_sensorhdi.z.so";
 const std::string DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH = "libdevicestatus_msdp.z.so";
-std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> devicestatusDataMap_;
-DevicestatusMsdpClientImpl::CallbackManager callbacksMgr_;
+std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> g_devicestatusDataMap;
+DevicestatusMsdpClientImpl::CallbackManager g_callbacksMgr;
 using clientType = DevicestatusDataUtils::DevicestatusType;
 using clientValue = DevicestatusDataUtils::DevicestatusValue;
-DevicestatusMsdpInterface* msdpInterface_;
-DevicestatusSensorInterface* sensorHdiInterface_;
+DevicestatusMsdpInterface* g_msdpInterface;
+DevicestatusSensorInterface* g_sensorHdiInterface_;
 }
 
 ErrCode DevicestatusMsdpClientImpl::InitMsdpImpl()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (msdpInterface_ == nullptr) {
-        msdpInterface_ = GetAlgorithmInst();
-        if (msdpInterface_ == nullptr) {
+    if (g_msdpInterface == nullptr) {
+        g_msdpInterface = GetAlgorithmInst();
+        if (g_msdpInterface == nullptr) {
             DEV_HILOGI(SERVICE, "get msdp module instance failed");
             return ERR_NG;
         }
     }
 
-    if (sensorHdiInterface_ == nullptr) {
-        sensorHdiInterface_ = GetSensorHdiInst();
-        if (sensorHdiInterface_ == nullptr) {
+    if (g_sensorHdiInterface_ == nullptr) {
+        g_sensorHdiInterface_ = GetSensorHdiInst();
+        if (g_sensorHdiInterface_ == nullptr) {
             DEV_HILOGI(SERVICE, "get sensor module instance failed");
             return ERR_NG;
         }
     }
 
-    msdpInterface_->Enable();
-    sensorHdiInterface_->Enable();
+    g_msdpInterface->Enable();
+    g_sensorHdiInterface_->Enable();
 
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
@@ -70,18 +70,18 @@ ErrCode DevicestatusMsdpClientImpl::InitMsdpImpl()
 ErrCode DevicestatusMsdpClientImpl::DisableMsdpImpl()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (msdpInterface_ == nullptr) {
+    if (g_msdpInterface == nullptr) {
         DEV_HILOGI(SERVICE, "disable msdp impl failed");
         return ERR_NG;
     }
 
-    if (sensorHdiInterface_ == nullptr) {
+    if (g_sensorHdiInterface_ == nullptr) {
         DEV_HILOGI(SERVICE, "disable msdp impl failed");
         return ERR_NG;
     }
 
-    msdpInterface_->Disable();
-    sensorHdiInterface_->Disable();
+    g_msdpInterface->Disable();
+    g_sensorHdiInterface_->Disable();
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
@@ -89,10 +89,10 @@ ErrCode DevicestatusMsdpClientImpl::DisableMsdpImpl()
 ErrCode DevicestatusMsdpClientImpl::RegisterSensor()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (sensorHdiInterface_ != nullptr) {
+    if (g_sensorHdiInterface_ != nullptr) {
         std::shared_ptr<DevicestatusSensorHdiCallback> callback = std::make_shared<DevicestatusMsdpClientImpl>();
-        sensorHdiInterface_->RegisterCallback(callback);
-        DEV_HILOGI(SERVICE, "sensorHdiInterface_ is not nullptr");
+        g_sensorHdiInterface_->RegisterCallback(callback);
+        DEV_HILOGI(SERVICE, "g_sensorHdiInterface_ is not nullptr");
     }
 
     DEV_HILOGI(SERVICE, "Exit");
@@ -103,18 +103,13 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterSensor(void)
 {
     DEV_HILOGI(SERVICE, "Enter");
 
-    if (sensorHdiInterface_ == nullptr) {
+    if (g_sensorHdiInterface_ == nullptr) {
         DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
 
-    int32_t ret = sensorHdiInterface_->UnregisterCallback();
-    if (ret < 0) {
-        DEV_HILOGI(SERVICE, "unregister sensor failed");
-        return ERR_NG;
-    }
-
-    sensorHdiInterface_ = nullptr;
+    g_sensorHdiInterface_->UnregisterCallback();
+    g_sensorHdiInterface_ = nullptr;
 
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
@@ -123,19 +118,19 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterSensor(void)
 ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    callbacksMgr_ = callback;
+    g_callbacksMgr = callback;
 
-    if (msdpInterface_ == nullptr) {
-        msdpInterface_ = GetAlgorithmInst();
-        if (msdpInterface_ == nullptr) {
+    if (g_msdpInterface == nullptr) {
+        g_msdpInterface = GetAlgorithmInst();
+        if (g_msdpInterface == nullptr) {
             DEV_HILOGI(SERVICE, "get msdp module instance failed");
             return ERR_NG;
         }
     }
 
-    if (sensorHdiInterface_ == nullptr) {
-        sensorHdiInterface_ = GetSensorHdiInst();
-        if (sensorHdiInterface_ == nullptr) {
+    if (g_sensorHdiInterface_ == nullptr) {
+        g_sensorHdiInterface_ = GetSensorHdiInst();
+        if (g_sensorHdiInterface_ == nullptr) {
             DEV_HILOGI(SERVICE, "get sensor module instance failed");
             return ERR_NG;
         }
@@ -150,7 +145,7 @@ ErrCode DevicestatusMsdpClientImpl::RegisterImpl(CallbackManager& callback)
 ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (callbacksMgr_ == nullptr) {
+    if (g_callbacksMgr == nullptr) {
         DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
@@ -158,7 +153,7 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
     UnregisterMsdp();
     UnregisterSensor();
 
-    callbacksMgr_ = nullptr;
+    g_callbacksMgr = nullptr;
 
     return ERR_OK;
 }
@@ -166,11 +161,11 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterImpl()
 ErrCode DevicestatusMsdpClientImpl::ImplCallback(DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (callbacksMgr_ == nullptr) {
-        DEV_HILOGI(SERVICE, "callbacksMgr_ is nullptr");
+    if (g_callbacksMgr == nullptr) {
+        DEV_HILOGI(SERVICE, "g_callbacksMgr is nullptr");
         return ERR_NG;
     }
-    callbacksMgr_(data);
+    g_callbacksMgr(data);
 
     return ERR_OK;
 }
@@ -190,9 +185,9 @@ void DevicestatusMsdpClientImpl::OnSensorHdiResult(DevicestatusDataUtils::Device
 ErrCode DevicestatusMsdpClientImpl::RegisterMsdp()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (msdpInterface_ != nullptr) {
+    if (g_msdpInterface != nullptr) {
         std::shared_ptr<MsdpAlgorithmCallback> callback = std::make_shared<DevicestatusMsdpClientImpl>();
-        msdpInterface_->RegisterCallback(callback);
+        g_msdpInterface->RegisterCallback(callback);
     }
 
     DEV_HILOGI(SERVICE, "Exit");
@@ -203,18 +198,13 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterMsdp(void)
 {
     DEV_HILOGI(SERVICE, "Enter");
 
-    if (msdpInterface_ == nullptr) {
+    if (g_msdpInterface == nullptr) {
         DEV_HILOGI(SERVICE, "unregister callback failed");
         return ERR_NG;
     }
 
-    int32_t ret = msdpInterface_->UnregisterCallback();
-    if (ret < 0) {
-        DEV_HILOGI(SERVICE, "unregister Msdp failed");
-        return ERR_NG;
-    }
-
-    msdpInterface_ = nullptr;
+    g_msdpInterface->UnregisterCallback();
+    g_msdpInterface = nullptr;
 
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
@@ -236,7 +226,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserver
     DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    for (auto iter = devicestatusDataMap_.begin(); iter != devicestatusDataMap_.end(); ++iter) {
+    for (auto iter = g_devicestatusDataMap.begin(); iter != g_devicestatusDataMap.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;
             notifyManagerFlag_ = true;
@@ -244,7 +234,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserver
         }
     }
 
-    devicestatusDataMap_.insert(std::make_pair(data.type, data.value));
+    g_devicestatusDataMap.insert(std::make_pair(data.type, data.value));
     notifyManagerFlag_ = true;
 
     return data;
@@ -253,7 +243,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpClientImpl::SaveObserver
 std::map<clientType, clientValue> DevicestatusMsdpClientImpl::GetObserverData() const
 {
     DEV_HILOGI(SERVICE, "Enter");
-    return devicestatusDataMap_;
+    return g_devicestatusDataMap;
 }
 
 void DevicestatusMsdpClientImpl::GetDevicestatusTimestamp()

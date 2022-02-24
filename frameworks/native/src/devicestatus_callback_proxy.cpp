@@ -39,7 +39,8 @@ void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtil
     DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, static_cast<int32_t>(devicestatusData.type));
     DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, static_cast<int32_t>(devicestatusData.value));
 
-    int ret = remote->SendRequest(static_cast<int>(IdevicestatusCallback::DEVICESTATUS_CHANGE), data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<int32_t>(IdevicestatusCallback::DEVICESTATUS_CHANGE),
+        data, reply, option);
     if (ret != ERR_OK) {
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
     }

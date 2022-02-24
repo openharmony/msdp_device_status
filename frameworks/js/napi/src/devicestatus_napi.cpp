@@ -23,11 +23,11 @@ using namespace OHOS;
 namespace {
 auto &g_DevicestatusClient = DevicestatusClient::GetInstance();
 static napi_ref g_responseConstructor;
-static const uint8_t ARG_0 = 0;
-static const uint8_t ARG_1 = 1;
-static const uint8_t ARG_2 = 2;
-static const int32_t CALLBACK_SUCCESS = 200;
-static const int32_t ERROR_MESSAGE = -1;
+static constexpr uint8_t ARG_0 = 0;
+static constexpr uint8_t ARG_1 = 1;
+static constexpr uint8_t ARG_2 = 2;
+static constexpr int32_t CALLBACK_SUCCESS = 200;
+static constexpr int32_t ERROR_MESSAGE = -1;
 static const std::vector<std::string> vecDevicestatusValue {
     "VALUE_ENTER", "VALUE_EXIT"
 };
@@ -475,7 +475,7 @@ napi_value DevicestatusNapi::CreateDevicestatusValueObject(napi_env env)
 
     status = napi_create_object(env, &result);
     if (status == napi_ok) {
-        for (unsigned int i = DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER; \
+        for (uint32_t i = DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER; \
             i < vecDevicestatusValue.size(); i++) {
             propName = vecDevicestatusValue[i];
             DEV_HILOGD(JS_NAPI, "propName: %{public}s", propName.c_str());

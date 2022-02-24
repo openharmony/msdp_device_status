@@ -29,7 +29,7 @@ public:
     virtual ~DevicestatusSrvStub() = default;
     DISALLOW_COPY_AND_MOVE(DevicestatusSrvStub);
 
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 private:
     int32_t SubscribeStub(MessageParcel& data);
     int32_t UnSubscribeStub(MessageParcel& data);

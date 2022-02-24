@@ -14,10 +14,13 @@
  */
 
 #include "devicestatus_manager.h"
-#include "devicestatus_msdp_client_impl.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace {
+constexpr int32_t ERR_OK = 0;
+constexpr int32_t ERR_NG = -1;
+}
 void DevicestatusManager::DevicestatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
@@ -29,7 +32,7 @@ void DevicestatusManager::DevicestatusCallbackDeathRecipient::OnRemoteDied(const
 
 bool DevicestatusManager::Init()
 {
-    DEV_HILOGI(SERVICE, "DevicestatusManager: Init start");
+    DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new DevicestatusCallbackDeathRecipient();
     }
@@ -40,7 +43,7 @@ bool DevicestatusManager::Init()
     }
     LoadAlgorithm(false);
 
-    DEV_HILOGI(SERVICE, "DevicestatusManager: Init success");
+    DEV_HILOGI(SERVICE, "Init success");
     return true;
 }
 
@@ -65,11 +68,12 @@ bool DevicestatusManager::EnableRdb()
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (!InitInterface()) {
+        DEV_HILOGE(SERVICE, "init interface fail");
         return false;
     }
 
     if (!InitDataCallback()) {
-        DEV_HILOGE(SERVICE, "%{public}s init msdp callback fail.", __func__);
+        DEV_HILOGE(SERVICE, "init msdp callback fail");
         return false;
     }
     return true;
@@ -78,41 +82,54 @@ bool DevicestatusManager::EnableRdb()
 bool DevicestatusManager::DisableRdb()
 {
     DEV_HILOGE(SERVICE, "Enter");
-    if (msdpImpl_ != nullptr) {
-        DEV_HILOGE(SERVICE, "delete msdp client impl");
-        msdpImpl_->DisableMsdpImpl();
-        msdpImpl_->UnregisterImpl();
-        DEV_HILOGE(SERVICE, "DisableRdb: after unregister impl");
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGE(SERVICE, "disable rdb failed, msdpImpl is nullptr");
+        return false;
     }
+
+    if (msdpImpl_->DisableMsdpImpl() == ERR_NG) {
+        DEV_HILOGE(SERVICE, "disable msdp impl failed");
+        return false;
+    }
+
+    if (msdpImpl_->UnregisterImpl() == ERR_NG) {
+        DEV_HILOGE(SERVICE, "unregister impl failed");
+        return false;
+    }
+
     return true;
 }
 
 bool DevicestatusManager::InitInterface()
 {
     DEV_HILOGE(SERVICE, "Enter");
-    if (msdpImpl_ != nullptr) {
-        DEV_HILOGE(SERVICE, "Init msdp client impl");
-        msdpImpl_->InitMsdpImpl();
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
+        return false;
     }
+    if (msdpImpl_->InitMsdpImpl() == ERR_NG) {
+        DEV_HILOGE(SERVICE, "init msdp impl failed");
+    };
     return true;
 }
 
 bool DevicestatusManager::InitDataCallback()
 {
     DEV_HILOGE(SERVICE, "Enter");
-    if (msdpImpl_ != nullptr) {
-        DevicestatusMsdpClientImpl::CallbackManager callback =
-            std::bind(&DevicestatusManager::MsdpDataCallback, this, std::placeholders::_1);
-        msdpImpl_->RegisterImpl(callback);
-        DEV_HILOGE(SERVICE, "InitDataCallback: after register impl");
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
+        return false;
+    }
+    DevicestatusMsdpClientImpl::CallbackManager callback =
+        std::bind(&DevicestatusManager::MsdpDataCallback, this, std::placeholders::_1);
+    if (msdpImpl_->RegisterImpl(callback) == ERR_NG) {
+        DEV_HILOGE(SERVICE, "register impl failed");
     }
     return true;
 }
 
 int32_t DevicestatusManager::MsdpDataCallback(DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
-
     NotifyDevicestatusChange(data);
     return ERR_OK;
 }
@@ -188,9 +205,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
             }
         }
     }
-    DEV_HILOGI(SERVICE, "object = %{public}p, callback = %{public}p",
-        object.GetRefPtr(), callback.GetRefPtr());
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
 void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -220,14 +235,12 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
         }
     }
     DEV_HILOGI(SERVICE, "listenerMap_.size = %{public}d", listenerMap_.size());
-    if (listenerMap_.size() == 0) {
+    if (listenerMap_.empty()) {
         DisableRdb();
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
-    DEV_HILOGI(SERVICE, "object = %{public}p, callback = %{public}p",
-        object.GetRefPtr(), callback.GetRefPtr());
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGI(SERVICE, "UnSubscribe success,Exit");
 }
 
 int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)

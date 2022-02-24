@@ -29,7 +29,7 @@ public:
     DISALLOW_COPY_AND_MOVE(DevicestatusCallbackStub);
     DevicestatusCallbackStub() = default;
     virtual ~DevicestatusCallbackStub() = default;
-    int OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
     void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& __attribute__((unused))value) override {}
 
 private:

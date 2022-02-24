@@ -22,7 +22,7 @@ namespace Msdp {
 bool DevicestatusPermission::CheckCallingPermission(const string &permissionName)
 {
     string appIdInfo = GetAppInfo();
-    int auth = Security::Permission::PermissionKit::CheckPermission(permissionName, appIdInfo);
+    int32_t auth = Security::Permission::PermissionKit::CheckPermission(permissionName, appIdInfo);
     return auth == Security::Permission::PermissionKit::GRANTED;
 }
 
