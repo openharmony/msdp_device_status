@@ -11,11 +11,11 @@
 
 ## 简介<a name="section_device_status_introduction"></a>
 
-MSDP设备状态感知框架能够识别出目前设备的状态并传递给订阅者，整个框架是基于MSDP算法库和系统SensorHDI组件，将其接收到的感知时间传递给订阅者。根据感知用途分为以下几个大类：
+MSDP设备状态感知框架能够识别出目前设备的状态并传递给订阅者，整个框架是基于MSDP算法库和系统SensorHDI组件组成的，将其接收到的感知时间传递给订阅者。根据感知用途分为以下三大类：
 
--   绝对静止类：利用加速度、陀螺仪等传感器信息识别设备处于绝对静止状态
--   水平/垂直姿态类：利用加速度、陀螺仪等传感器信息识别设备处于绝对静止状态
--   皮套开合事件感知：基于霍尔传感器识别皮套的开合的状态
+-   绝对静止类：利用加速度、陀螺仪等传感器信息识别设备处于绝对静止状态。
+-   水平/垂直姿态类：利用加速度、陀螺仪等传感器信息识别设备处于绝对静止状态。
+-   皮套开合事件感知：基于霍尔传感器识别皮套的开合的状态。
 
 MSDP设备状态感知架构图如下所示：
 
@@ -43,24 +43,24 @@ MSDP设备状态感知框架的示例代码如下：
 
 ## 约束<a name="section_device_status_constraint"></a>
 
--   要使用MSDP设备状态感知功能，设备必须具有对应的传感器器件和相应的MSDP算法库。
+要使用MSDP设备状态感知功能，设备必须具有对应的传感器器件和相应的MSDP算法库。
 
 
 ## 使用<a name="section_device_status_usage"></a>
 
--    本节以MSDP设备状态感知框架JS API为例，说明其提供的具体功能以及使用流程。
+本节以MSDP设备状态感知框架JS API为例，说明其提供的具体功能以及使用流程。
 
 ###  接口说明<a name="section_device_status_interface"></a>
 
-MSDP设备状态感知框架JS API: 监听Sensor HDI和MSDP算法库的设备状态感知事件，如果多次调用该接口，JS API开放的能力如下：
+MSDP设备状态感知框架JS API: 同时监听Sensor HDI事件和MSDP算法库的设备状态事件，JS API开放的能力如下：
 
 **表 1** JS API的主要接口
 
 | 接口名      | 描述        |
 | ----------- | ----------- |
-|on(type: DeviceStatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>) |订阅设备状态的变化。type为支持订阅的设备状态类型，callback表示订阅设备状态类型的回调函数，此函数是以TYPE_HIGH_STILL为例|
-|off(type: DeviceStatusType.TYPE_HIGH_STILL, callback: AsyncCallback<void>)|取消设备状态的订阅。type为支持的取消订阅的设备状态类型，callback表示取消订阅设备状态是否成功，此函数是以TYPE_HIGH_STILL为例|
-|once(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>)| 查询当前的设备状态。type为支持订阅的设备状态类型，callback表示订阅设备状态的回调函数，此函数是以TYPE_HIGH_STILL为例|
+|on(type: DeviceStatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>) |订阅设备状态的变化。type为支持订阅的设备状态类型，callback表示订阅设备状态类型的回调函数，TYPE_HIGH_STILL表示订阅类型|
+|off(type: DeviceStatusType.TYPE_HIGH_STILL, callback: AsyncCallback<void>)|取消设备状态的订阅。type为支持的取消订阅的设备状态类型，callback表示取消订阅设备状态是否成功，TYPE_HIGH_STILL表示订阅类型|
+|once(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>)| 查询当前的设备状态。type为支持订阅的设备状态类型，callback表示订阅设备状态的回调函数，TYPE_HIGH_STILL表示订阅类型|
 
 ### 使用说明<a name="section_device_status_sample"></a>
 
