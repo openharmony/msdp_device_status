@@ -33,7 +33,7 @@
             </policy>
         </policylist>
         <filefilterlist>
-            <filefilter name="defaultPolicyFilter" desc="Files not to check">
+            <filefilter name="defaultFilter" desc="Files not to check">
                 <filteritem type="filepath" name="figures/en-us_device_status_block.png" desc="png文件"/>
                 <filteritem type="filepath" name="figures/zh-cn_device_status_block.png" desc="png文件"/>
             </filefilter>
