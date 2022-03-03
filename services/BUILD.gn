@@ -53,7 +53,7 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

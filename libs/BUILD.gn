@@ -50,7 +50,7 @@ ohos_shared_library("devicestatus_sensorhdi") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -83,7 +83,7 @@ ohos_shared_library("devicestatus_msdp") {
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
