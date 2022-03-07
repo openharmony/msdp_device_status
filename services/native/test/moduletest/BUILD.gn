@@ -22,7 +22,7 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//utils/system/safwk/native/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include"
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
   ]
 }
 
@@ -39,20 +39,20 @@ ohos_moduletest("test_devicestatus_module") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_service_path}:devicestatus_service",
-    "//third_party/googletest:gtest_main",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
+    "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:base",
-    "ability_runtime:want",
+    "ability_base:base",
+    "ability_base:want",
     "ability_runtime:intent",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
-    "eventhandler:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -64,7 +64,5 @@ group("moduletest") {
   testonly = true
   deps = []
 
-  deps += [
-    ":test_devicestatus_module",
-  ]
+  deps += [ ":test_devicestatus_module" ]
 }

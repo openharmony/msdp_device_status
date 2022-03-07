@@ -26,14 +26,12 @@ config("devicestatus_srv_public_config") {
     "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_rdb/include/",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include/",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/innerkits/native_appdatafwk/include/",
-    "//base/sensors/sensor/interfaces/native/include/"
+    "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
 
 ohos_shared_library("devicestatus_sensorhdi") {
-  sources = [
-    "src/devicestatus_sensor_rdb.cpp",
-  ]
+  sources = [ "src/devicestatus_sensor_rdb.cpp" ]
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
@@ -44,19 +42,19 @@ ohos_shared_library("devicestatus_sensorhdi") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "//utils/native/base:utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp"
+    "//third_party/jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "native_appdatamgr:native_rdb",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "permission_standard:libpermissionsdk_standard",
-    "native_appdatamgr:native_rdb",
     "sensor:sensor_interface_native",
   ]
 
@@ -64,9 +62,7 @@ ohos_shared_library("devicestatus_sensorhdi") {
 }
 
 ohos_shared_library("devicestatus_msdp") {
-  sources = [
-    "src/devicestatus_msdp_rdb.cpp",
-  ]
+  sources = [ "src/devicestatus_msdp_rdb.cpp" ]
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
@@ -77,19 +73,19 @@ ohos_shared_library("devicestatus_msdp") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "//utils/native/base:utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp"
+    "//third_party/jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:base",
+    "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "native_appdatamgr:native_rdb",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "permission_standard:libpermissionsdk_standard",
-    "native_appdatamgr:native_rdb",
   ]
 
   part_name = "${device_status_part_name}"
