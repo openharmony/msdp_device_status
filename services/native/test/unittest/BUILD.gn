@@ -22,7 +22,7 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//utils/system/safwk/native/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include"
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
   ]
 }
 
@@ -39,9 +39,9 @@ ohos_unittest("test_devicestatus_service") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_service_path}:devicestatus_service",
-    "//third_party/googletest:gtest_main",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
+    "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
@@ -51,8 +51,8 @@ ohos_unittest("test_devicestatus_service") {
     "ability_runtime:intent",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
-    "eventhandler:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -62,9 +62,7 @@ ohos_unittest("test_devicestatus_service") {
 
 ohos_unittest("DevicestatusAgentTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//base/msdp/devicestatus/interfaces/innerkits/include",
-  ]
+  include_dirs = [ "//base/msdp/devicestatus/interfaces/innerkits/include" ]
 
   sources = [ "src/devicestatus_agent_test.cpp" ]
 
@@ -92,7 +90,7 @@ group("unittest") {
   deps = []
 
   deps += [
+    ":DevicestatusAgentTest",
     ":test_devicestatus_service",
-    ":DevicestatusAgentTest"
   ]
 }
