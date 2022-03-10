@@ -81,6 +81,7 @@ private:
     int32_t devicestatusStatus_ = -1;
     bool notifyFlag_ = false;
     int32_t timerInterval_ = -1;
+    int32_t curLidStatus = -1;
     int32_t timerFd_ = -1;
     int32_t epFd_ = -1;
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> rdbDataMap_;

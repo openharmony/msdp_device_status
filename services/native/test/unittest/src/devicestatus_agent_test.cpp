@@ -64,16 +64,17 @@ bool DevicestatusAgentListenerMockSecondClient::OnEventResult(
 namespace {
 /**
  * @tc.name: DevicestatusAgentTest001
- * @tc.desc: test devicestatus callback in proxy
+ * @tc.desc: test subscribing lid open event
  * @tc.type: FUNC
  */
-HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level0)
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DevicestatusAgentTest001 start";
-    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 =
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
-    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent1);
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent);
     EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(10);
     agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest001 end";
@@ -81,25 +82,53 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level0)
 
 /**
  * @tc.name: DevicestatusAgentTest002
- * @tc.desc: test devicestatus callback in proxy
+ * @tc.desc: test subscribing lid open event repeatedly
  * @tc.type: FUNC
  */
-HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest002, TestSize.Level0)
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DevicestatusAgentTest002 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(5);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will not report";
+    sleep(5);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report again";
+    sleep(5);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest002 end";
+}
+
+/**
+ * @tc.name: DevicestatusAgentTest003
+ * @tc.desc: test subscribing lid open event for 2 client
+ * @tc.type: FUNC
+ */
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest003 start";
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 =
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
     std::shared_ptr<DevicestatusAgentListenerMockSecondClient> agentEvent2 =
         std::make_shared<DevicestatusAgentListenerMockSecondClient>();
     int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent1);
+    EXPECT_EQ(true, ret == ERR_OK);
     ret = agent2_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent2);
     EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(5);
     GTEST_LOG_(INFO) << "UnSubscribe agentEvent1";
     agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     sleep(5);
     GTEST_LOG_(INFO) << "UnSubscribe agentEvent2";
     agent2_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
-    GTEST_LOG_(INFO) << "DevicestatusAgentTest002 end";
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest003 end";
 }
 }
