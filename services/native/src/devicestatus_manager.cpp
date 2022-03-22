@@ -234,7 +234,7 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
             }
         }
     }
-    DEV_HILOGI(SERVICE, "listenerMap_.size = %{public}d", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size = %{public}zu", listenerMap_.size());
     if (listenerMap_.empty()) {
         DisableRdb();
     } else {
