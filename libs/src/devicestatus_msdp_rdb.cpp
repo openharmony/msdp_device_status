@@ -49,14 +49,7 @@ bool DevicestatusMsdpRdb::Init()
 }
 
 void DevicestatusMsdpRdb::InitRdbStore()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    int32_t errCode = ERR_OK;
-    RdbStoreConfig config(DATABASE_NAME);
-    InsertOpenCallback helper;
-    store_ = RdbHelper::GetRdbStore(config, 1, helper, errCode);
-    DEV_HILOGI(SERVICE, "Exit");
-}
+{}
 
 void DevicestatusMsdpRdb::RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback)
 {
@@ -171,10 +164,8 @@ int32_t DevicestatusMsdpRdb::TrigerDatabaseObserver()
     DEV_HILOGI(SERVICE, "Enter");
 
     if (store_ == nullptr) {
-        DEV_HILOGE(SERVICE, "store_ is not exist");
         sleep(READ_RDB_WAIT_TIME);
         InitRdbStore();
-        DEV_HILOGI(SERVICE, "init rdb store again succes");
         return -1;
     }
 

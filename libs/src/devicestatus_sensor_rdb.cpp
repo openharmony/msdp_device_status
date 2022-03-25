@@ -58,14 +58,7 @@ bool DevicestatusSensorRdb::Init()
 }
 
 void DevicestatusSensorRdb::InitRdbStore()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    int32_t errCode = ERR_OK;
-    RdbStoreConfig config(DATABASE_NAME);
-    HelperCallback helper;
-    store_ = RdbHelper::GetRdbStore(config, 1, helper, errCode);
-    DEV_HILOGI(SERVICE, "Exit");
-}
+{}
 
 void DevicestatusSensorRdb::RegisterCallback(const std::shared_ptr<DevicestatusSensorHdiCallback>& callback)
 {
@@ -183,10 +176,8 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
     DEV_HILOGI(SERVICE, "Enter");
 
     if (store_ == nullptr) {
-        DEV_HILOGE(SERVICE, "store_ is not exist");
         sleep(READ_RDB_WAIT_TIME);
         InitRdbStore();
-        DEV_HILOGI(SERVICE, "init rdb store again succes");
         return -1;
     }
 
