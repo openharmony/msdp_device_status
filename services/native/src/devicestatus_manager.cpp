@@ -137,7 +137,7 @@ int32_t DevicestatusManager::MsdpDataCallback(const DevicestatusDataUtils::Devic
 int32_t DevicestatusManager::SensorDataCallback(const struct SensorEvents *event)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    // TO-DO, handle sensor event properly when we get the data details of sensor HDI.
+    // handle sensor event properly when we get the data details of sensor HDI.
     DevicestatusDataUtils::DevicestatusData data = {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
         DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER};
     NotifyDevicestatusChange(data);
@@ -177,7 +177,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
-    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}u", listenerMap_.size());
 
     if (!EnableRdb()) {
         DEV_HILOGE(SERVICE, "Enable failed!");

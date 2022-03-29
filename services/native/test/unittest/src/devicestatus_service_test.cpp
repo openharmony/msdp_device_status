@@ -38,7 +38,7 @@ void DevicestatusServiceTest::DevicestatusServiceTestCallback::OnDevicestatusCha
     GTEST_LOG_(INFO) << "DevicestatusServiceTestCallback value: " << devicestatusData.value;
     EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
         devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
-        "DevicestatusServiceTestCallback falied";
+        "DevicestatusServiceTestCallback failed";
 }
 
 /**
@@ -71,7 +71,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
@@ -88,7 +88,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
@@ -105,5 +105,5 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
