@@ -177,7 +177,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
-    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}u", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}lu", listenerMap_.size());
 
     if (!EnableRdb()) {
         DEV_HILOGE(SERVICE, "Enable failed!");
