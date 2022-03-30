@@ -284,7 +284,7 @@ int32_t DevicestatusMsdpClientImpl::LoadSensorHdiLibrary(bool bCreate)
     sensorHdi_.destroy = (void *(*)(DevicestatusSensorInterface*))dlsym(sensorHdi_.handle, "Destroy");
 
     if (sensorHdi_.create == nullptr || sensorHdi_.destroy == nullptr) {
-        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destory sensor hdi failed!",
+        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destroy sensor hdi failed!",
             DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
         dlclose(sensorHdi_.handle);
         sensorHdi_.Clear();
@@ -357,7 +357,7 @@ int32_t DevicestatusMsdpClientImpl::LoadAlgorithmLibrary(bool bCreate)
     mAlgorithm_.destroy = (void *(*)(DevicestatusMsdpInterface*))dlsym(mAlgorithm_.handle, "Destroy");
 
     if (mAlgorithm_.create == nullptr || mAlgorithm_.destroy == nullptr) {
-        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destory failed!",
+        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destroy failed!",
             DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
         dlclose(mAlgorithm_.handle);
         mAlgorithm_.Clear();
