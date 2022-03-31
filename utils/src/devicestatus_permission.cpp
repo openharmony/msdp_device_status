@@ -25,21 +25,18 @@ bool DevicestatusPermission::CheckCallingPermission(const string &permissionName
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID(); 
     int32_t auth = Security::AccessToken::TypePermissionState::PERMISSION_DENIED;
     
-    if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE){
-        auth = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callingToken,permissionName);
-    }
-    else if(GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP){
-        auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken,permissionName);
-    }
-    else{
-        DEV_HILOGE(COMMON,"invalid token id %{public}d",callingToken);
+    if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        auth = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callingToken, permissionName);
+    } else if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
+    } else {
+        DEV_HILOGE(COMMON, "invalid token id %{public}d", callingToken);
     }
 
-    if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED){
+    if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return ERR_OK;
-    }
-    else{
-        DEV_HILOGD(COMMON,"has no permission.permission name=%{public}s",permissionName.c_str());
+    } else {
+        DEV_HILOGD(COMMON, "has no permission.permission name = %{public}s", permissionName.c_str());
         return ERR_NG;
     }
 }
