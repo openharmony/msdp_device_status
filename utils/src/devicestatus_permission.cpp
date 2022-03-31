@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Msdp {
 bool DevicestatusPermission::CheckCallingPermission(const string &permissionName)
 {
-    Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID(); 
+    Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
     int32_t auth = Security::AccessToken::TypePermissionState::PERMISSION_DENIED;
     
     if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
