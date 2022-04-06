@@ -102,6 +102,10 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    if (devicestatusManager_ == nullptr) {
+        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        return;
+    }
     devicestatusManager_->Subscribe(type, callback);
 }
 
@@ -109,6 +113,10 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    if (devicestatusManager_ == nullptr) {
+        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        return;
+    }
     devicestatusManager_->UnSubscribe(type, callback);
 }
 
@@ -116,6 +124,12 @@ DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
     DevicestatusDataUtils::DevicestatusType& type)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    if (devicestatusManager_ == nullptr) {
+        DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
+        data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+        DEV_HILOGI(SERVICE, "GetLatestDevicestatusData func is nullptr,return default!");
+        return data;
+    }
     return devicestatusManager_->GetLatestDevicestatusData(type);
 }
 } // namespace Msdp
