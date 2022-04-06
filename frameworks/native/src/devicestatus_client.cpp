@@ -97,6 +97,10 @@ void DevicestatusClient::SubscribeCallback(const DevicestatusDataUtils::Devicest
 {
     DEV_HILOGD(INNERKIT, "Enter");
     DEVICESTATUS_RETURN_IF((callback == nullptr) || (Connect() != ERR_OK));
+    if (devicestatusProxy_ == nullptr) {
+        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
+        return;
+    }
     devicestatusProxy_->Subscribe(type, callback);
     DEV_HILOGD(INNERKIT, "Exit");
 }
@@ -106,6 +110,10 @@ void DevicestatusClient::UnSubscribeCallback(const DevicestatusDataUtils::Device
 {
     DEV_HILOGD(INNERKIT, "Enter");
     DEVICESTATUS_RETURN_IF((callback == nullptr) || (Connect() != ERR_OK));
+    if (devicestatusProxy_ == nullptr) {
+        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
+        return;
+    }
     devicestatusProxy_->UnSubscribe(type, callback);
     DEV_HILOGD(INNERKIT, "Exit");
 }
@@ -119,6 +127,10 @@ DevicestatusDataUtils::DevicestatusData DevicestatusClient::GetDevicestatusData(
     devicestatusData.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
 
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), devicestatusData);
+    if (devicestatusProxy_ == nullptr) {
+        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
+        return devicestatusData;
+    }
     devicestatusData = devicestatusProxy_->GetCache(type);
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;

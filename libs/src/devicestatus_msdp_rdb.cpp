@@ -78,6 +78,10 @@ void DevicestatusMsdpRdb::Disable()
 ErrCode DevicestatusMsdpRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    if (g_rdb == nullptr) {
+        DEV_HILOGE(SERVICE, "g_rdb is nullptr");
+        return ERR_NG;
+    }
     if (g_rdb->GetCallbacksImpl() == nullptr) {
         DEV_HILOGI(SERVICE, "callbacksImpl is nullptr");
         return ERR_NG;
@@ -114,7 +118,10 @@ int32_t DevicestatusMsdpRdb::TrigerData(const std::unique_ptr<NativeRdb::ResultS
 {
     int32_t columnIndex;
     int32_t intVal;
-
+    if (resultSet == nullptr) {
+        DEV_HILOGE(SERVICE, "resultSet is nullptr");
+        return ERR_NG;
+    }
     int32_t ret = resultSet->GetColumnIndex("ID", columnIndex);
     DEV_HILOGI(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {
