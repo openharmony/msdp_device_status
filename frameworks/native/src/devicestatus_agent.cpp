@@ -27,6 +27,10 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
         static_cast<DevicestatusDataUtils::DevicestatusType>(devicestatusData.type),
         static_cast<DevicestatusDataUtils::DevicestatusValue>(devicestatusData.value));
     std::shared_ptr<DeviceStatusAgent> agent = agent_.lock();
+    if (agent == nullptr) {
+        DEV_HILOGE(SERVICE, "agent is nullptr");
+        return;
+    }
     agent->agentEvent_->OnEventResult(devicestatusData);
 }
 
