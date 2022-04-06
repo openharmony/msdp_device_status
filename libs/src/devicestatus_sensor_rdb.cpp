@@ -45,6 +45,10 @@ static void OnReceivedSensorEvent(SensorEvent *event)
     if (event == nullptr) {
         DEV_HILOGE(SERVICE, "event is nullptr");
     }
+    if (g_rdb == nullptr) {
+        DEV_HILOGE(SERVICE, "g_rdb is nullptr");
+        return;
+    }
     g_rdb->HandleHallSensorEvent(event);
 }
 
@@ -91,6 +95,10 @@ void DevicestatusSensorRdb::Disable()
 ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    if (g_rdb == nullptr) {
+        DEV_HILOGI(SERVICE, "g_rdb is nullptr");
+        return ERR_NG;
+    }
     if (g_rdb->GetCallbacksImpl() == nullptr) {
         DEV_HILOGI(SERVICE, "callbacksImpl is nullptr");
         return ERR_NG;
@@ -128,6 +136,10 @@ int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::Resul
     int32_t columnIndex;
     int32_t intVal;
 
+    if (resultSet == nullptr) {
+        DEV_HILOGE(SERVICE, "resultSet is nullprt");
+        return -1;
+    }
     int32_t ret = resultSet->GetColumnIndex("ID", columnIndex);
     DEV_HILOGI(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {

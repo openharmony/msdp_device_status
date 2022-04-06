@@ -52,6 +52,11 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
 {
     DEV_HILOGI(SERVICE, "Enter");
     DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGI(SERVICE, "GetObserverData func is nullptr,return default!");
+        data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+        return data;
+    }
     msdpData_ = msdpImpl_->GetObserverData();
     for (auto iter = msdpData_.begin(); iter != msdpData_.end(); ++iter) {
         if (data.type == iter->first) {
@@ -165,6 +170,10 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
         return;
     }
     for (auto& listener : listeners) {
+        if (listener == nullptr) {
+            DEV_HILOGI(SERVICE, "Listener is nullptr");
+            return;
+        }
         listener->OnDevicestatusChanged(devicestatusData);
     }
 }
