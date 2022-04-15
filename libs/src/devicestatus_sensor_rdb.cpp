@@ -371,7 +371,7 @@ void DevicestatusSensorRdb::LoopingThreadEntry()
     struct epoll_event events[cbct];
 
     while (true) {
-        int32_t timeout = 0;
+        int32_t timeout = -1;
 
         int32_t nevents = epoll_wait(epFd_, events, cbct, timeout);
         if (nevents == -1) {
