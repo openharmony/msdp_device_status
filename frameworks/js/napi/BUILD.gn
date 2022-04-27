@@ -11,15 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
-import("//base/msdp/device_status/device_status.gni")
 
 config("devicestatusnapi_private_config") {
   include_dirs = [
     "include",
-    "//foundation/ace/napi/native_engine",
-    "//foundation/ace/napi/interfaces/kits",
+    "//foundation/arkui/napi/native_engine",
+    "//foundation/arkui/napi/interfaces/kits",
     "//utils/system/safwk/native/include",
     "//third_party/node/src",
     "${device_status_interfaces_path}/innerkits/include",
@@ -32,7 +32,7 @@ config("devicestatusnapi_private_config") {
 ohos_shared_library("devicestatus") {
   sources = [
     "${device_status_frameworks_path}/js/napi/src/devicestatus_event.cpp",
-    "${device_status_frameworks_path}/js/napi/src/devicestatus_napi.cpp"
+    "${device_status_frameworks_path}/js/napi/src/devicestatus_napi.cpp",
   ]
 
   configs = [
@@ -43,8 +43,8 @@ ohos_shared_library("devicestatus") {
   deps = [
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
     "//base/msdp/device_status/services:devicestatus_service",
-    "//foundation/ace/napi:ace_napi",
-    "//utils/native/base:utils"
+    "//foundation/arkui/napi:ace_napi",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
