@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <linux/netlink.h>
 
-#include "dummy_values_bucket.h"
 #include "devicestatus_common.h"
 
 using namespace OHOS::NativeRdb;
