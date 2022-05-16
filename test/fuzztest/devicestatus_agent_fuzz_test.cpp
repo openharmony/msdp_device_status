@@ -43,7 +43,7 @@ void DevicestatusAgentFuzzTest::TestSubscribeAgentEvent(const uint8_t* data)
     TestUnSubscribeAgentEvent(agent_);
 }
 
-void DevicestatusAgentFuzzTest::TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent> agent_)
+void DevicestatusAgentFuzzTest::TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent_)
 {
     std::cout << "TestUnSubscribeAgentEvent: Enter " << std::endl;
 
