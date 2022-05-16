@@ -42,7 +42,7 @@ class DevicestatusAgentFuzzTest {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
-    static void TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent> agent);
+    static void TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent);
     class DeviceStatusAgentClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentClient() {};
