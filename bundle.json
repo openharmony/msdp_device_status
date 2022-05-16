@@ -47,7 +47,8 @@
           }
       ],
       "test": [
-        "//base/msdp/device_status/services/native/test:devicestatussrv_test"
+        "//base/msdp/device_status/services/native/test:devicestatussrv_test",
+        "//base/msdp/device_status/test:fuzztest"
       ]
     }
   }

@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#####################hydra-fuzz###################
 import("//base/msdp/device_status/device_status.gni")
 import("//build/config/features.gni")
 import("//build/test.gni")
@@ -30,7 +29,6 @@ deps_ex = [
   "appspawn:appspawn_socket_client",
 ]
 
-##############################fuzztest##########################################
 ohos_fuzztest("DeviceStatusFuzzAgentTest") {
   module_out_path = module_output_path
 
@@ -55,14 +53,11 @@ ohos_fuzztest("DeviceStatusFuzzAgentTest") {
   external_deps = deps_ex
 }
 
-###############################################################################
 group("fuzztest") {
   testonly = true
   deps = []
 
   deps += [
-    # deps file
     ":DeviceStatusFuzzAgentTest",
   ]
 }
-###############################################################################
