@@ -45,8 +45,8 @@ ohos_fuzztest("DeviceStatusFuzzAgentTest") {
   ]
   sources = [ "./devicestatus_agent_fuzz_test.cpp" ]
   deps = [
-    "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_frameworks_path}/native/src:deviceagent",
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//utils/native/base:utils",
   ]
 
@@ -57,7 +57,5 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [
-    ":DeviceStatusFuzzAgentTest",
-  ]
+  deps += [ ":DeviceStatusFuzzAgentTest" ]
 }
