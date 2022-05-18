@@ -82,8 +82,8 @@ ohos_shared_library("devicestatus_msdp") {
     "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "relational_store:native_rdb",
     "permission_standard:libpermissionsdk_standard",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
