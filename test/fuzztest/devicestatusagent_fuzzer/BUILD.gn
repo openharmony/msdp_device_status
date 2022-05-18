@@ -31,7 +31,8 @@ deps_ex = [
 
 ohos_fuzztest("DeviceStatusAgentFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//base/msdp/device_status/test/fuzztest/devicestatusagent_fuzzer"
+  fuzz_config_file =
+      "//base/msdp/device_status/test/fuzztest/devicestatusagent_fuzzer"
 
   include_dirs = [
     "./",
