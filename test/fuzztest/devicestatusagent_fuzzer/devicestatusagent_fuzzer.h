@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_AGENT_FUZZ_TEST_H
-#define DEVICESTATUS_AGENT_FUZZ_TEST_H
+#ifndef DEVICESTATUSAGENT_FUZZER_H
+#define DEVICESTATUSAGENT_FUZZER_H
 
 #include <cstdio>
 #include <fcntl.h>
@@ -51,4 +51,4 @@ public:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_AGENT_FUZZ_TEST_H
+#endif // DEVICESTATUSAGENT_FUZZER_H

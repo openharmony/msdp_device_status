@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "devicestatus_agent_fuzz_test.h"
+#include "devicestatusagent_fuzzer.h"
 
 using namespace std;
 using namespace OHOS;
