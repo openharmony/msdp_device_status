@@ -38,7 +38,7 @@ enum class ApiNumber {
     NUM_TWO,
     NUM_THREE
 };
-class DevicestatusAgentFuzzTest {
+class DevicestatusAgentFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
