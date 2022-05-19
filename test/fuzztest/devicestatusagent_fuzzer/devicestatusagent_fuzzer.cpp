@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "devicestatus_agent_fuzz_test.h"
+#include "devicestatusagent_fuzzer.h"
 
 using namespace std;
 using namespace OHOS;
@@ -21,11 +21,11 @@ using namespace OHOS::Msdp;
 namespace {
 const int WAIT_TIME = 1000;
 }
-static std::shared_ptr<DevicestatusAgentFuzzTest::DeviceStatusAgentClient> agentEvent_ =
-            std::make_shared<DevicestatusAgentFuzzTest::DeviceStatusAgentClient>();
+static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
+            std::make_shared<DevicestatusAgentFuzzer::DeviceStatusAgentClient>();
 static std::shared_ptr<DeviceStatusAgent> agent_ = std::make_shared<DeviceStatusAgent>();
 
-bool DevicestatusAgentFuzzTest::DeviceStatusAgentClient::OnEventResult(
+bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
     const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     std::cout << "type: " << devicestatusData.type << std::endl;
@@ -33,7 +33,7 @@ bool DevicestatusAgentFuzzTest::DeviceStatusAgentClient::OnEventResult(
     return true;
 }
 
-void DevicestatusAgentFuzzTest::TestSubscribeAgentEvent(const uint8_t* data)
+void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEvent: Enter " << std::endl;
 
@@ -43,14 +43,14 @@ void DevicestatusAgentFuzzTest::TestSubscribeAgentEvent(const uint8_t* data)
     TestUnSubscribeAgentEvent(agent_);
 }
 
-void DevicestatusAgentFuzzTest::TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent_)
+void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent_)
 {
     std::cout << "TestUnSubscribeAgentEvent: Enter " << std::endl;
 
     agent_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
 }
 
-bool DevicestatusAgentFuzzTest::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     int idSize = 8;
     if (static_cast<int>(size) > idSize) {
@@ -63,6 +63,6 @@ bool DevicestatusAgentFuzzTest::DoSomethingInterestingWithMyAPI(const uint8_t* d
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DevicestatusAgentFuzzTest::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Msdp::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

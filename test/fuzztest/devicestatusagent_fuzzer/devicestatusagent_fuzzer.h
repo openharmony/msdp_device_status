@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_AGENT_FUZZ_TEST_H
-#define DEVICESTATUS_AGENT_FUZZ_TEST_H
+#ifndef DEVICESTATUSAGENT_FUZZER_H
+#define DEVICESTATUSAGENT_FUZZER_H
 
 #include <cstdio>
 #include <fcntl.h>
@@ -38,7 +38,7 @@ enum class ApiNumber {
     NUM_TWO,
     NUM_THREE
 };
-class DevicestatusAgentFuzzTest {
+class DevicestatusAgentFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
@@ -51,4 +51,4 @@ public:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_AGENT_FUZZ_TEST_H
+#endif // DEVICESTATUSAGENT_FUZZER_H

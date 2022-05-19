@@ -11,51 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/msdp/device_status/device_status.gni")
-import("//build/config/features.gni")
-import("//build/test.gni")
-
-module_output_path = "device_status/device_status_native"
-
-deps_ex = [
-  "ability_base:base",
-  "ability_base:want",
-  "bundle_framework:appexecfwk_base",
-  "eventhandler:libeventhandler",
-  "ipc:ipc_core",
-  "hiviewdfx_hilog_native:libhilog",
-  "safwk:system_ability_fwk",
-  "samgr_standard:samgr_proxy",
-  "appspawn:appspawn_socket_client",
-]
-
-ohos_fuzztest("DeviceStatusFuzzAgentTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "./",
-    "${device_status_interfaces_path}/innerkits/include",
-  ]
-
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
-  ]
-  sources = [ "./devicestatus_agent_fuzz_test.cpp" ]
-  deps = [
-    "${device_status_frameworks_path}/native/src:deviceagent",
-    "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "//utils/native/base:utils",
-  ]
-
-  external_deps = deps_ex
-}
-
 group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [ ":DeviceStatusFuzzAgentTest" ]
+  deps += [ "devicestatusagent_fuzzer:fuzztest" ]
 }
