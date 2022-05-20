@@ -18,7 +18,7 @@ group("devicestatussrv_test") {
   deps = []
 
   deps += [
-    "unittest:unittest",
     "moduletest:moduletest",
-    ]
+    "unittest:unittest",
+  ]
 }

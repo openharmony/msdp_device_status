@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 
+aafwk_kits_path = "//foundation/aafwk/standard/frameworks/kits"
 device_status_part_name = "device_status"
 device_status_root_path = "//base/msdp/device_status"
 device_status_interfaces_path = "${device_status_root_path}/interfaces"
