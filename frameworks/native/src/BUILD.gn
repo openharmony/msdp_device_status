@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
-import("//base/msdp/device_status/device_status.gni")
 
 config("devicestatusnapi_private_config") {
   include_dirs = [
@@ -26,9 +26,7 @@ config("devicestatusnapi_private_config") {
 }
 
 ohos_shared_library("deviceagent") {
-  sources = [
-      "./devicestatus_agent.cpp",
-  ]
+  sources = [ "./devicestatus_agent.cpp" ]
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
@@ -38,7 +36,7 @@ ohos_shared_library("deviceagent") {
   deps = [
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
     "//base/msdp/device_status/services:devicestatus_service",
-    "//utils/native/base:utils"
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
