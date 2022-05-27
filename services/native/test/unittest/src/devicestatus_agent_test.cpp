@@ -131,4 +131,96 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest003, TestSize.Level1)
     agent2_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest003 end";
 }
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest004 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest004 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest005 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest005 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest006 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest006 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest007 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, agentEvent);
+    EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    int32_t ret1 = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    EXPECT_EQ(true, ret1 == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest007 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest008 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10), agentEvent);
+    EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    int32_t ret1 = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    EXPECT_EQ(true, ret1 == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest008 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest009 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    DevicestatusDataUtils::DevicestatusType type;
+    int32_t ret = agent1_->SubscribeAgentEvent(type, agentEvent);
+    EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    sleep(10);
+    int32_t ret1 = agent1_->UnSubscribeAgentEvent(type);
+    EXPECT_EQ(true, ret1 == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest009 end";
+}
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest010 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent = nullptr;
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent);
+    EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest010 end";
+}
 }
