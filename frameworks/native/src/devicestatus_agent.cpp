@@ -38,18 +38,28 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::Devi
     const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
 {
     DEV_HILOGI(INNERKIT, "Enter");
-    RegisterServiceEvent(type);
+    
     if (agentEvent == nullptr) {
         return ERR_INVALID_VALUE;
     }
-    agentEvent_ = agentEvent;
+    if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
+        && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
+        RegisterServiceEvent(type);
+        agentEvent_ = agentEvent;
+    } else {
+        return ERR_INVALID_VALUE;
+    }
     return ERR_OK;
 }
 
 int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
-    UnRegisterServiceEvent(type);
-    return ERR_OK;
+    if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
+        && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
+        UnRegisterServiceEvent(type);
+        return ERR_OK;
+    }
+    return ERR_INVALID_VALUE;
 }
 
 void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)

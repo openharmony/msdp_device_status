@@ -72,6 +72,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 end");
 }
 
 /**
@@ -89,6 +90,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 end");
 }
 
 /**
@@ -106,4 +108,44 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
+    DEV_HILOGI(SERVICE, "GetDevicestatusDataTest003 end");
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest004 Enter";
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN;
+    auto& devicestatusClient = DevicestatusClient::GetInstance();
+    DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN && \
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest004 failed";
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest004 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest005 Enter";
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
+    auto& devicestatusClient = DevicestatusClient::GetInstance();
+    DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest005 failed";
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest005 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest006 Enter";
+    DevicestatusDataUtils::DevicestatusType type = static_cast<DevicestatusDataUtils::DevicestatusType>(10);
+    auto& devicestatusClient = DevicestatusClient::GetInstance();
+    DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest006 failed";
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest006 end";
 }
