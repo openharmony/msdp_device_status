@@ -204,13 +204,16 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest009, TestSize.Level1)
     GTEST_LOG_(INFO) << "DevicestatusAgentTest009 start";
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
-    DevicestatusDataUtils::DevicestatusType type;
-    int32_t ret = agent1_->SubscribeAgentEvent(type, agentEvent);
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, agentEvent);
     EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    EXPECT_EQ(true, ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(10);
-    int32_t ret1 = agent1_->UnSubscribeAgentEvent(type);
-    EXPECT_EQ(true, ret1 == ERR_INVALID_VALUE);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    EXPECT_EQ(true, ret == ERR_INVALID_VALUE);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    EXPECT_EQ(true, ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest009 end";
 }
 
