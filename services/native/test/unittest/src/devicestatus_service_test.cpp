@@ -119,8 +119,8 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest004, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest004 failed";
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN)
+        << "GetDevicestatusDataTest004 failed";
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest004 end";
 }
 
