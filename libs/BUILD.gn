@@ -23,9 +23,9 @@ config("devicestatus_srv_public_config") {
     "interface",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include/",
-    "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/rdb/include/",
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/rdb/include/",
     "${aafwk_kits_path}/ability/native/include/",
-    "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/appdatafwk/include/",
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/appdatafwk/include/",
     "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
