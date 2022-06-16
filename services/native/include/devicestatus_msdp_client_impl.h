@@ -32,6 +32,7 @@
 #include "result_set.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_delayed_sp_singleton.h"
+#include "devicestatus_dumper.h"
 #include "devicestatus_msdp_interface.h"
 #include "devicestatus_sensor_interface.h"
 

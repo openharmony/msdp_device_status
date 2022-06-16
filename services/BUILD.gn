@@ -27,11 +27,15 @@ config("devicestatus_srv_public_config") {
     "${aafwk_kits_path}/ability/native/include/",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/appdatafwk/include/",
   ]
+  cflags_cc = [
+    "-fexceptions",
+  ]
 }
 
 ohos_shared_library("devicestatus_service") {
   sources = [
     "native/src/devicestatus_callback_stub.cpp",
+    "native/src/devicestatus_dumper.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
     "native/src/devicestatus_service.cpp",
@@ -53,6 +57,7 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

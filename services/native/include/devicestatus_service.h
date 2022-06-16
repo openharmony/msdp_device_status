@@ -23,6 +23,7 @@
 #include "devicestatus_srv_stub.h"
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
+#include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 
@@ -32,6 +33,7 @@ class DevicestatusService final : public SystemAbility, public DevicestatusSrvSt
     DECLARE_SYSTEM_ABILITY(DevicestatusService)
     DECLARE_DELAYED_SP_SINGLETON(DevicestatusService);
 public:
+    virtual void OnDump() override;
     virtual void OnStart() override;
     virtual void OnStop() override;
 
@@ -42,6 +44,7 @@ public:
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
     bool IsServiceReady();
     std::shared_ptr<DevicestatusManager> GetDevicestatusManager();
+    int Dump(int fd, const std::vector<std::u16string>& args) override;
 private:
     bool Init();
     bool ready_ = false;

@@ -15,12 +15,15 @@
 
 #include "devicestatus_service.h"
 
+#include <vector>
 #include <ipc_skeleton.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "string_ex.h"
 #include "system_ability_definition.h"
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
+#include "devicestatus_dumper.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -34,6 +37,11 @@ DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SER
 }
 
 DevicestatusService::~DevicestatusService() {}
+
+void DevicestatusService::OnDump()
+{
+    DEV_HILOGI(SERVICE, "OnDump");
+}
 
 void DevicestatusService::OnStart()
 {
@@ -71,6 +79,44 @@ void DevicestatusService::OnStop()
     DEV_HILOGI(SERVICE, "unload algorithm library exit");
 }
 
+int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
+{
+    DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
+    DevicestatusDumper &deviceStatusDumper = DevicestatusDumper::GetInstance();
+
+    std::vector<std::string> params;
+    for (auto& arg : args) {
+        params.emplace_back(Str16ToStr8(arg));
+    }
+
+    std::string dumpInfo;
+    if (params.empty()) {
+        deviceStatusDumper.DumpIllegalArgsInfo(fd);
+    }
+
+    if (params[0] == ARG_DUMP_HELP) {
+        deviceStatusDumper.DumpHelpInfo(fd);
+    } else if (params[0] == ARG_DUMP_DEVICESTATUS_SUBSCRIBER) {
+        deviceStatusDumper.DumpDevicestatusSubscriber(fd);
+    } else if (params[0] == ARG_DUMP_DEVICESTATUS_CHANGES) {
+        deviceStatusDumper.DumpDevicestatusChanges(fd);
+    } else if (params[0] == ARG_DUMP_DEVICESTATUS_CURRENT_STATE) {
+        DevicestatusDataUtils::DevicestatusType type;
+        std::vector<DevicestatusDataUtils::DevicestatusData> datas;
+        for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
+            type <= DevicestatusDataUtils::TYPE_LID_OPEN;
+            type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
+            DevicestatusDataUtils::DevicestatusData data = GetCache(type);
+            datas.emplace_back(data);
+        }
+        deviceStatusDumper.DumpDevicestatusCurrentStatus(fd, datas);
+    } else {
+        deviceStatusDumper.DumpIllegalArgsInfo(fd);
+    }
+    return RET_OK;
+}
+
+
 bool DevicestatusService::Init()
 {
     DEV_HILOGI(SERVICE, "Enter");
@@ -106,6 +152,16 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+
+    auto appInfo = std::make_shared<AppInfo>();
+    appInfo->uid = GetCallingUid();
+    appInfo->pid = GetCallingPid();
+    appInfo->tokenId = GetCallingTokenID();
+    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    appInfo->type = type;
+    appInfo->callback = callback;
+    DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
+
     devicestatusManager_->Subscribe(type, callback);
 }
 
@@ -117,6 +173,15 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+
+    auto appInfo = std::make_shared<AppInfo>();
+    appInfo->uid = GetCallingUid();
+    appInfo->pid = GetCallingPid();
+    appInfo->tokenId = GetCallingTokenID();
+    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    appInfo->type = type;
+    appInfo->callback = callback;
+    DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
     devicestatusManager_->UnSubscribe(type, callback);
 }
 
