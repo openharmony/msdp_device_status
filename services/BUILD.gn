@@ -27,9 +27,6 @@ config("devicestatus_srv_public_config") {
     "${aafwk_kits_path}/ability/native/include/",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/appdatafwk/include/",
   ]
-  cflags_cc = [
-    "-fexceptions",
-  ]
 }
 
 ohos_shared_library("devicestatus_service") {
@@ -57,8 +54,8 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   external_deps = [
-    "access_token:libaccesstoken_sdk",
     "ability_base:base",
+    "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "permission_standard:libpermissionsdk_standard",

@@ -220,14 +220,11 @@ void DevicestatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     }
     DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
         appInfoMap_[appInfoSetIter->first].size());
-    //auto iter = appInfoMap_[appInfoSetIter->first].find(appInfo);
     std::set<std::shared_ptr<AppInfo>>::const_iterator iter;
     for (iter = appInfoMap_[appInfoSetIter->first].begin();
         iter != appInfoMap_[appInfoSetIter->first].end(); iter++) {
         if (iter->get()->pid == appInfo->pid) {
-            DEV_HILOGI(SERVICE, "iterato pid is %d", iter->get()->pid);
-            DEV_HILOGI(SERVICE, "appinfo pid is %d", appInfo->pid);
-            DEV_HILOGI(SERVICE, "find same pid");
+            DEV_HILOGI(SERVICE, "current pid is %d", appInfo->pid);
             break;
         }
     }
