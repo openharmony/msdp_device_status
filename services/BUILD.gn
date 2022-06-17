@@ -24,7 +24,7 @@ config("devicestatus_srv_public_config") {
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/rdb/include/",
-    "${aafwk_kits_path}/ability/native/include/",
+    "${aafwk_path}/interfaces/kits/native/ability/native/",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/appdatafwk/include/",
   ]
 }
