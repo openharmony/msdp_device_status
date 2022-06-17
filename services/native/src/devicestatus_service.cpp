@@ -21,9 +21,12 @@
 #include "system_ability_definition.h"
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
+#include "hisysevent.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
+using namespace OHOS::HiviewDFX;
 namespace {
 auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
@@ -106,7 +109,9 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::SUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->Subscribe(type, callback);
+    ReportSensorSysEvent(type, true);
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -117,7 +122,9 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->UnSubscribe(type, callback);
+    ReportSensorSysEvent(type, false);
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
@@ -131,6 +138,22 @@ DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
         return data;
     }
     return devicestatusManager_->GetLatestDevicestatusData(type);
+}
+
+void DevicestatusService::ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable)
+{
+    auto uid = this->GetCallingUid();
+    auto callerToken = this->GetCallingTokenID();
+    std::string packageName("");
+    devicestatusManager_->GetPackageName(callerToken, packageName);
+    std::string message;
+    if (enable) {
+        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "Subscribe", HiSysEvent::EventType::STATISTIC,
+            "UID", uid, "PKGNAME", packageName, "TYPE", type);
+    } else {
+        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UnSubscribe", HiSysEvent::EventType::STATISTIC,
+            "UID", uid, "PKGNAME", packageName, "TYPE", type);
+    }
 }
 } // namespace Msdp
 } // namespace OHOS

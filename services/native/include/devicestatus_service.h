@@ -42,6 +42,7 @@ public:
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
     bool IsServiceReady();
     std::shared_ptr<DevicestatusManager> GetDevicestatusManager();
+    void ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 private:
     bool Init();
     bool ready_ = false;

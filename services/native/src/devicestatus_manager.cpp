@@ -14,9 +14,11 @@
  */
 
 #include "devicestatus_manager.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
+using namespace OHOS::HiviewDFX;
 namespace {
 constexpr int32_t ERR_OK = 0;
 constexpr int32_t ERR_NG = -1;
@@ -214,6 +216,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
             }
         }
     }
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::SUBSCRIBE, BytraceAdapter::SERVICE);
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
@@ -249,6 +252,7 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::SERVICE);
     DEV_HILOGI(SERVICE, "UnSubscribe success,Exit");
 }
 
@@ -272,6 +276,35 @@ int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
     }
 
     return ERR_OK;
+}
+
+void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &packageName)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case ATokenTypeEnum::TOKEN_NATIVE: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                DEV_HILOGE(SERVICE, "get native token info fail");
+                return;
+            }
+            packageName = tokenInfo.processName;
+            break;
+        }
+        case ATokenTypeEnum::TOKEN_HAP: {
+            HapTokenInfo hapInfo;
+            if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+                DEV_HILOGE(SERVICE, "get hap token info fail");
+                return;
+            }
+            packageName = hapInfo.bundleName;
+            break;
+        }
+        default: {
+            DEV_HILOGE(SERVICE, "token type not match");
+            break;
+        }
+    }
 }
 } // namespace Msdp
 } // namespace OHOS
