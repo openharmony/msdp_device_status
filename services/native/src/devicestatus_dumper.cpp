@@ -139,7 +139,7 @@ void DevicestatusDumper::DumpDevicestatusCurrentStatus(int32_t fd,
     DEV_HILOGI(SERVICE, "start");
     std::string startTime;
     DumpCurrentTime(startTime);
-    dprintf(fd, "Current time: %s", startTime.c_str());
+    dprintf(fd, "Current time: %s \n", startTime.c_str());
     dprintf(fd, "Current device status: \n");
     if (datas.empty()) {
         dprintf(fd, "No device status available\n");

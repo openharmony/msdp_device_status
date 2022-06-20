@@ -105,7 +105,9 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
         type <= DevicestatusDataUtils::TYPE_LID_OPEN;
         type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
         DevicestatusDataUtils::DevicestatusData data = GetCache(type);
-        datas.emplace_back(data);
+        if (data.value != DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) {
+            datas.emplace_back(data);
+        }
     }
     deviceStatusDumper.ParseCommand(fd, argList, datas);
     return RET_OK;
