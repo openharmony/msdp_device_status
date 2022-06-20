@@ -59,7 +59,7 @@ class DevicestatusDumper final : public RefBase,
 public:
     DevicestatusDumper() = default;
     ~DevicestatusDumper() = default;
-    void ParseCommand(int32_t fd, const std::vector<std::string> &args, 
+    void ParseCommand(int32_t fd, const std::vector<std::string> &args,
         const std::vector<DevicestatusDataUtils::DevicestatusData> &datas);
     void DumpHelpInfo(int32_t fd) const;
     void DumpDevicestatusSubscriber(int32_t fd);

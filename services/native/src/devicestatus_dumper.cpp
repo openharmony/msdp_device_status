@@ -34,8 +34,8 @@ namespace Msdp {
 namespace {
     constexpr uint32_t MS_NS = 1000000;
 }
-void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args, 
-        const std::vector<DevicestatusDataUtils::DevicestatusData> &datas)
+void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args,
+    const std::vector<DevicestatusDataUtils::DevicestatusData> &datas)
 {
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
@@ -91,7 +91,6 @@ void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
 void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
 {
     DEV_HILOGI(SERVICE, "start");
-
     if (appInfoMap_.empty()) {
         DEV_HILOGI(SERVICE, "appInfoMap_ is empty");
         return;
@@ -266,8 +265,6 @@ void DevicestatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     }
     DEV_HILOGI(SERVICE, "callbacklist type=%d size=%{public}zu",
         appInfo->type, appInfoMap_[appInfoSetIter->first].size());
-
-
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
         DEV_HILOGW(SERVICE, "Remove app info is not exists");
