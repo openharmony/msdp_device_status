@@ -19,6 +19,7 @@
 #include <refbase.h>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <set>
 #include <singleton.h>
@@ -57,9 +58,10 @@ class DevicestatusDumper final : public RefBase,
     public Singleton<DevicestatusDumper> {
 public:
     DevicestatusDumper() = default;
-    virtual ~DevicestatusDumper() = default;
+    ~DevicestatusDumper() = default;
+    void ParseCommand(int32_t fd, const std::vector<std::string> &args, 
+        const std::vector<DevicestatusDataUtils::DevicestatusData> &datas);
     void DumpHelpInfo(int32_t fd) const;
-    void DumpIllegalArgsInfo(int32_t fd) const;
     void DumpDevicestatusSubscriber(int32_t fd);
     void DumpDevicestatusChanges(int32_t fd);
     void DumpDevicestatusCurrentStatus(int32_t fd,
@@ -76,6 +78,7 @@ private:
     std::map<DevicestatusDataUtils::DevicestatusType, std::set<std::shared_ptr<AppInfo>>> \
         appInfoMap_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
+    std::mutex mutex_;
 };
 } // namespace Msdp
 } // namespace OHOS

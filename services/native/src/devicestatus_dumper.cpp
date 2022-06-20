@@ -17,10 +17,13 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <cstring>
+#include <getopt.h>
 #include <iomanip>
 #include <map>
 #include <sstream>
 
+#include "securec.h"
 #include "string_ex.h"
 #include "unique_fd.h"
 
@@ -31,9 +34,63 @@ namespace Msdp {
 namespace {
     constexpr uint32_t MS_NS = 1000000;
 }
+void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args, 
+        const std::vector<DevicestatusDataUtils::DevicestatusData> &datas)
+{
+    int32_t optionIndex = 0;
+    struct option dumpOptions[] = {
+        {"help", no_argument, 0, 'h'},
+        {"subscribe", no_argument, 0, 's'},
+        {"list", no_argument, 0, 'l'},
+        {"current", no_argument, 0, 'c'},
+        {NULL, 0, 0, 0}
+    };
+    char **argv = new char *[args.size()];
+    for (size_t i = 0; i < args.size(); ++i) {
+        argv[i] = new char[args[i].size() + 1];
+        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
+            DEV_HILOGE(SERVICE, "strcpy_s error");
+            goto RELEASE_RES;
+            return;
+        }
+    }
+    optind = 1;
+    int32_t c;
+    while ((c = getopt_long(args.size(), argv, "hslc", dumpOptions, &optionIndex)) != -1) {
+        switch (c) {
+            case 'h': {
+                DumpHelpInfo(fd);
+                break;
+            }
+            case 's': {
+                DumpDevicestatusSubscriber(fd);
+                break;
+            }
+            case 'l': {
+                DumpDevicestatusChanges(fd);
+                break;
+            }
+            case 'c': {
+                DumpDevicestatusCurrentStatus(fd, datas);
+                break;
+            }
+            default: {
+                dprintf(fd, "cmd param is error\n");
+                DumpHelpInfo(fd);
+                break;
+            }
+        }
+    }
+    RELEASE_RES:
+    for (size_t i = 0; i < args.size(); ++i) {
+        delete[] argv[i];
+    }
+    delete[] argv;
+}
+
 void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
 {
-    DEV_HILOGI(SERVICE, "DumpDevicestatusSubscriber start");
+    DEV_HILOGI(SERVICE, "start");
 
     if (appInfoMap_.empty()) {
         DEV_HILOGI(SERVICE, "appInfoMap_ is empty");
@@ -42,10 +99,8 @@ void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
     std::string startTime;
     DumpCurrentTime(startTime);
     dprintf(fd, "Current time: %s \n", startTime.c_str());
-    
-    for (auto it = appInfoMap_.begin(); it != appInfoMap_.end(); ++it) {
-        auto appInfos = it->second;
-        for (auto appInfo : appInfos) {
+    for (const auto &item : appInfoMap_) {
+        for (auto appInfo : item.second) {
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | type:%s | packageName:%s\n",
                 appInfo->startTime.c_str(), appInfo->uid, appInfo->pid, GetStatusType(appInfo->type).c_str(),
                 appInfo->packageName.c_str());
@@ -55,8 +110,7 @@ void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
 
 void DevicestatusDumper::DumpDevicestatusChanges(int32_t fd)
 {
-    DEV_HILOGI(SERVICE, "DumpDevicestatusChanges start");
-
+    DEV_HILOGI(SERVICE, "start");
     if (deviceStatusQueue_.empty()) {
         DEV_HILOGI(SERVICE, "deviceStatusQueue_ is empty");
         return;
@@ -69,7 +123,8 @@ void DevicestatusDumper::DumpDevicestatusChanges(int32_t fd)
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
         if (record == nullptr) {
-            DEV_HILOGI(SERVICE, "deviceStatusQueue_ is empty");
+            DEV_HILOGI(SERVICE, "deviceStatusQueue_ is is null");
+            continue;
         }
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
@@ -82,78 +137,74 @@ void DevicestatusDumper::DumpDevicestatusChanges(int32_t fd)
 void DevicestatusDumper::DumpDevicestatusCurrentStatus(int32_t fd,
     const std::vector<DevicestatusDataUtils::DevicestatusData> &datas) const
 {
-    DEV_HILOGI(SERVICE, "DumpDevicestatusCurrentStatus start");
+    DEV_HILOGI(SERVICE, "start");
     std::string startTime;
     DumpCurrentTime(startTime);
     dprintf(fd, "Current time: %s", startTime.c_str());
     dprintf(fd, "Current device status: \n");
-    if (datas.size() == 0) {
+    if (datas.empty()) {
         dprintf(fd, "No device status available\n");
+        return;
     }
-    int32_t num = 0;
     for (auto it = datas.begin(); it != datas.end(); ++it) {
         if (it->value == DevicestatusDataUtils::VALUE_INVALID) {
             continue;
         }
-        num ++;
         dprintf(fd, "Device status Type is %s , current type state is %s .\n",
             GetStatusType(it->type).c_str(), GetDeviceState(it->value).c_str());
-    }
-    if (num == 0) {
-        dprintf(fd, "No device status available\n");
     }
 }
 
 std::string DevicestatusDumper::GetDeviceState(const DevicestatusDataUtils::DevicestatusValue &value) const
 {
-    std::string valueString;
+    std::string state;
     switch (value) {
         case DevicestatusDataUtils::VALUE_ENTER: {
-            valueString = "enter";
+            state = "enter";
             break;
         }
         case DevicestatusDataUtils::VALUE_EXIT: {
-            valueString = "exit";
+            state = "exit";
             break;
         }
         case DevicestatusDataUtils::VALUE_INVALID: {
-            valueString = "invalid";
+            state = "invalid";
             break;
         }
         default: {
-            valueString = "unknown";
+            state = "unknown";
             break;
         }
     }
-    return valueString;
+    return state;
 }
 
 std::string DevicestatusDumper::GetStatusType(const DevicestatusDataUtils::DevicestatusType &type) const
 {
-    std::string typeString;
+    std::string stateType;
     switch (type) {
         case DevicestatusDataUtils::TYPE_HIGH_STILL: {
-            typeString = "high still";
+            stateType = "high still";
             break;
         }
         case DevicestatusDataUtils::TYPE_FINE_STILL: {
-            typeString = "fine still";
+            stateType = "fine still";
             break;
         }
         case DevicestatusDataUtils::TYPE_CAR_BLUETOOTH: {
-            typeString = "car bluetooth";
+            stateType = "car bluetooth";
             break;
         }
         case DevicestatusDataUtils::TYPE_LID_OPEN: {
-            typeString = "lid open";
+            stateType = "lid open";
             break;
         }
         default: {
-            typeString = "unknown";
+            stateType = "unknown";
             break;
         }
     }
-    return typeString;
+    return stateType;
 }
 
 void DevicestatusDumper::DumpCurrentTime(std::string &startTime) const
@@ -162,7 +213,7 @@ void DevicestatusDumper::DumpCurrentTime(std::string &startTime) const
     clock_gettime(CLOCK_REALTIME, &curTime);
     struct tm *timeinfo = localtime(&(curTime.tv_sec));
     if (timeinfo == nullptr) {
-        DEV_HILOGI(SERVICE, "DumpCurrentTime get localtime failed");
+        DEV_HILOGI(SERVICE, "get localtime failed");
         return;
     }
     startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
@@ -170,11 +221,6 @@ void DevicestatusDumper::DumpCurrentTime(std::string &startTime) const
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
         .append(":").append(std::to_string(timeinfo->tm_sec)).append(".")
         .append(std::to_string(curTime.tv_nsec / MS_NS));
-}
-
-void DevicestatusDumper::DumpIllegalArgsInfo(int32_t fd) const
-{
-    dprintf(fd, "The arguments are illegal and you can enter '-h' for help.");
 }
 
 void DevicestatusDumper::DumpHelpInfo(int32_t fd) const
@@ -191,17 +237,15 @@ void DevicestatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     DEV_HILOGI(SERVICE, "Enter");
     DumpCurrentTime(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
-
-    auto appInfoSetIter = appInfoMap_.find(appInfo->type);
-    if (appInfoSetIter == appInfoMap_.end() && appInfos.insert(appInfo).second) {
-        DEV_HILOGI(SERVICE, "no found app info set list of type, insert success");
-        appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
+    auto iter = appInfoMap_.find(appInfo->type);
+    if (iter == appInfoMap_.end()) {
+        if (appInfos.insert(appInfo).second) {
+            appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
+        }
     } else {
-        auto iter = appInfoMap_[appInfoSetIter->first].find(appInfo);
-        if (iter != appInfoMap_[appInfoSetIter->first].end()) {
+        if (!appInfoMap_[iter->first].insert(appInfo).second) {
+            DEV_HILOGW(SERVICE, "duplicated app info");
             return;
-        } else if (appInfoMap_[appInfoSetIter->first].insert(appInfo).second) {
-            DEV_HILOGI(SERVICE, "found app info set list of type, insert success");
         }
     }
 }
@@ -210,35 +254,42 @@ void DevicestatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (appInfo->callback == nullptr) {
+        DEV_HILOGW(SERVICE, "callback is null");
         return;
     }
-    DEV_HILOGI(SERVICE, "appInfoMap_.size=%{public}zu", appInfoMap_.size());
+    DEV_HILOGI(SERVICE, "appInfoMap_ size=%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
+        DEV_HILOGE(SERVICE, "not exist %d type appInfo", appInfo->type);
         return;
     }
-    DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
-        appInfoMap_[appInfoSetIter->first].size());
-    std::set<std::shared_ptr<AppInfo>>::const_iterator iter;
-    for (iter = appInfoMap_[appInfoSetIter->first].begin();
-        iter != appInfoMap_[appInfoSetIter->first].end(); iter++) {
-        if (iter->get()->pid == appInfo->pid) {
-            DEV_HILOGI(SERVICE, "current pid is %d", appInfo->pid);
+    DEV_HILOGI(SERVICE, "callbacklist type=%d size=%{public}zu",
+        appInfo->type, appInfoMap_[appInfoSetIter->first].size());
+
+
+    auto iter = appInfoMap_.find(appInfo->type);
+    if (iter == appInfoMap_.end()) {
+        DEV_HILOGW(SERVICE, "Remove app info is not exists");
+        return;
+    }
+    for (const auto &item : iter->second) {
+        if (item->pid == appInfo->pid) {
+            iter->second.erase(item);
             break;
         }
-    }
-
-    if (iter != appInfoMap_[appInfoSetIter->first].end()) {
-        appInfoMap_[appInfoSetIter->first].erase(iter);
-        return;
     }
 }
 
 void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
+    std::unique_lock lock(mutex_);
     auto record = std::make_shared<DeviceStatusRecord>();
+    if (record == nullptr) {
+        DEV_HILOGI(SERVICE, "record is null");
+        return;
+    }
     DumpCurrentTime(record->startTime);
     record->data = data;
     deviceStatusQueue_.push(record);

@@ -82,37 +82,32 @@ void DevicestatusService::OnStop()
 int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
 {
     DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
+    if (fd < 0) {
+        DEV_HILOGE(SERVICE, "fd is invalid");
+        return RET_NG;
+    }
     DevicestatusDumper &deviceStatusDumper = DevicestatusDumper::GetInstance();
-
-    std::vector<std::string> params;
-    for (auto& arg : args) {
-        params.emplace_back(Str16ToStr8(arg));
-    }
-
-    std::string dumpInfo;
-    if (params.empty()) {
-        deviceStatusDumper.DumpIllegalArgsInfo(fd);
-    }
-
-    if (params[0] == ARG_DUMP_HELP) {
+    if (args.empty()) {
+        DEV_HILOGE(SERVICE, "param cannot be empty");
+        dprintf(fd, "param cannot be empty\n");
         deviceStatusDumper.DumpHelpInfo(fd);
-    } else if (params[0] == ARG_DUMP_DEVICESTATUS_SUBSCRIBER) {
-        deviceStatusDumper.DumpDevicestatusSubscriber(fd);
-    } else if (params[0] == ARG_DUMP_DEVICESTATUS_CHANGES) {
-        deviceStatusDumper.DumpDevicestatusChanges(fd);
-    } else if (params[0] == ARG_DUMP_DEVICESTATUS_CURRENT_STATE) {
-        DevicestatusDataUtils::DevicestatusType type;
-        std::vector<DevicestatusDataUtils::DevicestatusData> datas;
-        for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
-            type <= DevicestatusDataUtils::TYPE_LID_OPEN;
-            type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
-            DevicestatusDataUtils::DevicestatusData data = GetCache(type);
-            datas.emplace_back(data);
-        }
-        deviceStatusDumper.DumpDevicestatusCurrentStatus(fd, datas);
-    } else {
-        deviceStatusDumper.DumpIllegalArgsInfo(fd);
+        return RET_NG;
     }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    DevicestatusDataUtils::DevicestatusType type;
+    std::vector<DevicestatusDataUtils::DevicestatusData> datas;
+    for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
+        type <= DevicestatusDataUtils::TYPE_LID_OPEN;
+        type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
+        DevicestatusDataUtils::DevicestatusData data = GetCache(type);
+        datas.emplace_back(data);
+    }
+    deviceStatusDumper.ParseCommand(fd, argList, datas);
     return RET_OK;
 }
 
@@ -154,6 +149,10 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     }
 
     auto appInfo = std::make_shared<AppInfo>();
+    if (appInfo == nullptr) {
+        DEV_HILOGI(SERVICE, "appInfo is null");
+        return;
+    }
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
@@ -175,6 +174,10 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     }
 
     auto appInfo = std::make_shared<AppInfo>();
+    if (appInfo == nullptr) {
+        DEV_HILOGI(SERVICE, "appInfo is null");
+        return;
+    }
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
