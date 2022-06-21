@@ -26,6 +26,7 @@ config("devicestatus_public_config") {
 
 ohos_shared_library("devicestatus_client") {
   sources = [
+    "${device_status_frameworks_path}/native/src/bytrace_adapter.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
@@ -42,6 +43,7 @@ ohos_shared_library("devicestatus_client") {
   deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
