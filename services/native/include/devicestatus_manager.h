@@ -25,9 +25,11 @@
 #include "idevicestatus_callback.h"
 #include "devicestatus_common.h"
 #include "devicestatus_msdp_client_impl.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace Msdp {
+using namespace Security::AccessToken;
 class DevicestatusService;
 class DevicestatusManager {
 public:
@@ -58,6 +60,7 @@ public:
     int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);
     int32_t LoadAlgorithm(bool bCreate);
     int32_t UnloadAlgorithm(bool bCreate);
+    void GetPackageName(AccessTokenID tokenId, std::string &packageName);
 
 private:
     struct classcomp {

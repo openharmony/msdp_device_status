@@ -21,7 +21,7 @@ config("devicestatus_srv_public_config") {
   include_dirs = [
     "native/include",
     "${device_status_interfaces_path}/innerkits/include",
-    "//foundation/distributedhardware/devicemanager/interfaces/inner_kits/native_cpp/include/",
+    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/rdb/include/",
     "${aafwk_kits_path}/ability/native/include/",
@@ -56,9 +56,10 @@ ohos_shared_library("devicestatus_service") {
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "permission_standard:libpermissionsdk_standard",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

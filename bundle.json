@@ -23,7 +23,6 @@
         "samgr_standard",
         "utils_base",
         "appexecfwk_standard",
-        "permission_standard",
         "napi"
       ],
       "third_party": []

@@ -36,7 +36,7 @@ void DevicestatusServiceTest::DevicestatusServiceTestCallback::OnDevicestatusCha
 {
     GTEST_LOG_(INFO) << "DevicestatusServiceTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DevicestatusServiceTestCallback value: " << devicestatusData.value;
-    EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_TRUE(devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
         devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
         "DevicestatusServiceTestCallback failed";
 }
@@ -70,7 +70,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest001, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 end");
 }
@@ -88,7 +88,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest002, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 end");
 }
@@ -106,7 +106,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest003, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest003 end");
 }
@@ -119,8 +119,8 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest004, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest004 failed";
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN)
+        << "GetDevicestatusDataTest004 failed";
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest004 end";
 }
 
@@ -132,7 +132,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest005, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest005 failed";
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest005 end";
 }
@@ -145,7 +145,7 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest006, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest006 end";
 }

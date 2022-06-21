@@ -45,6 +45,7 @@ public:
     bool IsServiceReady();
     std::shared_ptr<DevicestatusManager> GetDevicestatusManager();
     int Dump(int fd, const std::vector<std::u16string>& args) override;
+    void ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 private:
     bool Init();
     bool ready_ = false;
