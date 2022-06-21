@@ -16,6 +16,7 @@
     "ram": "~4096KB",
     "deps": {
       "components": [
+        "access_token",
         "hiviewdfx_hilog_native",
         "ipc",
         "safwk",
