@@ -210,12 +210,14 @@ ErrCode DevicestatusMsdpClientImpl::UnregisterMsdp(void)
 
 int32_t DevicestatusMsdpClientImpl::MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data)
 {
+    DEV_HILOGI(SERVICE, "Enter");
+    DevicestatusDumper::GetInstance().pushDeviceStatus(data);
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);
         notifyManagerFlag_ = false;
     }
-
+    DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
 

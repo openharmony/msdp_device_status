@@ -18,8 +18,6 @@
 
 #include <string>
 
-#include "permission/permission_kit.h"
-
 namespace OHOS {
 namespace Msdp {
 class DevicestatusPermission {

@@ -23,9 +23,9 @@ config("devicestatus_srv_public_config") {
     "interface",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
-    "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/rdb/include/",
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/rdb/include/",
     "${aafwk_path}/interfaces/kits/native/ability/native/",
-    "//foundation/distributeddatamgr/appdatamgr/interfaces/inner_api/native/appdatafwk/include/",
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/appdatafwk/include/",
     "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
@@ -51,7 +51,6 @@ ohos_shared_library("devicestatus_sensorhdi") {
     "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "permission_standard:libpermissionsdk_standard",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
@@ -82,7 +81,6 @@ ohos_shared_library("devicestatus_msdp") {
     "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "permission_standard:libpermissionsdk_standard",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

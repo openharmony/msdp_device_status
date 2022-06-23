@@ -15,15 +15,21 @@
 
 #include "devicestatus_service.h"
 
+#include <vector>
 #include <ipc_skeleton.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "string_ex.h"
 #include "system_ability_definition.h"
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
+#include "devicestatus_dumper.h"
+#include "hisysevent.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
+using namespace OHOS::HiviewDFX;
 namespace {
 auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
@@ -34,6 +40,11 @@ DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SER
 }
 
 DevicestatusService::~DevicestatusService() {}
+
+void DevicestatusService::OnDump()
+{
+    DEV_HILOGI(SERVICE, "OnDump");
+}
 
 void DevicestatusService::OnStart()
 {
@@ -71,6 +82,41 @@ void DevicestatusService::OnStop()
     DEV_HILOGI(SERVICE, "unload algorithm library exit");
 }
 
+int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
+{
+    DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
+    if (fd < 0) {
+        DEV_HILOGE(SERVICE, "fd is invalid");
+        return RET_NG;
+    }
+    DevicestatusDumper &deviceStatusDumper = DevicestatusDumper::GetInstance();
+    if (args.empty()) {
+        DEV_HILOGE(SERVICE, "param cannot be empty");
+        dprintf(fd, "param cannot be empty\n");
+        deviceStatusDumper.DumpHelpInfo(fd);
+        return RET_NG;
+    }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+
+    DevicestatusDataUtils::DevicestatusType type;
+    std::vector<DevicestatusDataUtils::DevicestatusData> datas;
+    for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
+        type <= DevicestatusDataUtils::TYPE_LID_OPEN;
+        type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
+        DevicestatusDataUtils::DevicestatusData data = GetCache(type);
+        if (data.value != DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) {
+            datas.emplace_back(data);
+        }
+    }
+    deviceStatusDumper.ParseCommand(fd, argList, datas);
+    return RET_OK;
+}
+
+
 bool DevicestatusService::Init()
 {
     DEV_HILOGI(SERVICE, "Enter");
@@ -106,7 +152,23 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+
+    auto appInfo = std::make_shared<AppInfo>();
+    if (appInfo == nullptr) {
+        DEV_HILOGI(SERVICE, "appInfo is null");
+        return;
+    }
+    appInfo->uid = GetCallingUid();
+    appInfo->pid = GetCallingPid();
+    appInfo->tokenId = GetCallingTokenID();
+    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    appInfo->type = type;
+    appInfo->callback = callback;
+    DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
+
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::SUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->Subscribe(type, callback);
+    ReportSensorSysEvent(type, true);
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -117,7 +179,22 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
         DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
         return;
     }
+
+    auto appInfo = std::make_shared<AppInfo>();
+    if (appInfo == nullptr) {
+        DEV_HILOGI(SERVICE, "appInfo is null");
+        return;
+    }
+    appInfo->uid = GetCallingUid();
+    appInfo->pid = GetCallingPid();
+    appInfo->tokenId = GetCallingTokenID();
+    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    appInfo->type = type;
+    appInfo->callback = callback;
+    DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
+    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->UnSubscribe(type, callback);
+    ReportSensorSysEvent(type, false);
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
@@ -131,6 +208,22 @@ DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
         return data;
     }
     return devicestatusManager_->GetLatestDevicestatusData(type);
+}
+
+void DevicestatusService::ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable)
+{
+    auto uid = this->GetCallingUid();
+    auto callerToken = this->GetCallingTokenID();
+    std::string packageName("");
+    devicestatusManager_->GetPackageName(callerToken, packageName);
+    std::string message;
+    if (enable) {
+        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "Subscribe", HiSysEvent::EventType::STATISTIC,
+            "UID", uid, "PKGNAME", packageName, "TYPE", type);
+    } else {
+        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UnSubscribe", HiSysEvent::EventType::STATISTIC,
+            "UID", uid, "PKGNAME", packageName, "TYPE", type);
+    }
 }
 } // namespace Msdp
 } // namespace OHOS
