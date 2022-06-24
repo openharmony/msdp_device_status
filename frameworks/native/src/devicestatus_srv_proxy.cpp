@@ -21,7 +21,6 @@
 
 #include "idevicestatus_callback.h"
 #include "devicestatus_common.h"
-#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -29,7 +28,6 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::SUBSCRIBE, BytraceAdapter::CLIENT);
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -50,7 +48,6 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::SUBSCRIBE, BytraceAdapter::CLIENT);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
@@ -58,7 +55,6 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::CLIENT);
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -80,7 +76,6 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::CLIENT);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
