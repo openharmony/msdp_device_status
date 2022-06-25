@@ -14,7 +14,6 @@
  */
 
 #include "devicestatus_manager.h"
-#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -216,7 +215,6 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
             }
         }
     }
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::SUBSCRIBE, BytraceAdapter::SERVICE);
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
@@ -252,7 +250,6 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::SERVICE);
     DEV_HILOGI(SERVICE, "UnSubscribe success,Exit");
 }
 
