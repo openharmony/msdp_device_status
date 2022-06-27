@@ -25,7 +25,6 @@
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
 #include "hisysevent.h"
-#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -166,9 +165,7 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
 
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::SUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->Subscribe(type, callback);
-    ReportSensorSysEvent(type, true);
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -192,9 +189,7 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
-    BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::UNSUBSCRIBE, BytraceAdapter::SERVICE);
     devicestatusManager_->UnSubscribe(type, callback);
-    ReportSensorSysEvent(type, false);
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
@@ -210,7 +205,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
     return devicestatusManager_->GetLatestDevicestatusData(type);
 }
 
-void DevicestatusService::ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable)
+void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable)
 {
     auto uid = this->GetCallingUid();
     auto callerToken = this->GetCallingTokenID();
