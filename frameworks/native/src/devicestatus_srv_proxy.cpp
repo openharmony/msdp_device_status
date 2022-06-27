@@ -21,6 +21,7 @@
 
 #include "idevicestatus_callback.h"
 #include "devicestatus_common.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -28,6 +29,7 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
+    StartTrace(HITRACE_TAG_MSDP, "clientSubcribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -48,6 +50,7 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
+    FinishTrace(HITRACE_TAG_MSDP);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
@@ -55,6 +58,7 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
+    StartTrace(HITRACE_TAG_MSDP, "clientUnSubcribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -76,6 +80,7 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
+    FinishTrace(HITRACE_TAG_MSDP);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 

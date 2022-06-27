@@ -25,6 +25,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
 #include "hisysevent.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -164,8 +165,10 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
-
+    StartTrace(HITRACE_TAG_MSDP, "serviceSubcribeStart");
     devicestatusManager_->Subscribe(type, callback);
+    FinishTrace(HITRACE_TAG_MSDP);
+    ReportMsdpSysEvent(type, true);
 }
 
 void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -189,7 +192,10 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
+    StartTrace(HITRACE_TAG_MSDP, "serviceUnSubcribeStart");
     devicestatusManager_->UnSubscribe(type, callback);
+    FinishTrace(HITRACE_TAG_MSDP);
+    ReportMsdpSysEvent(type, false);
 }
 
 DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
@@ -213,12 +219,12 @@ void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::Device
     devicestatusManager_->GetPackageName(callerToken, packageName);
     std::string message;
     if (enable) {
-        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "Subscribe", HiSysEvent::EventType::STATISTIC,
+        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,
             "UID", uid, "PKGNAME", packageName, "TYPE", type);
-    } else {
-        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UnSubscribe", HiSysEvent::EventType::STATISTIC,
-            "UID", uid, "PKGNAME", packageName, "TYPE", type);
+        return;
     }
+    HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
+        "UID", uid, "PKGNAME", packageName, "TYPE", type);
 }
 } // namespace Msdp
 } // namespace OHOS
