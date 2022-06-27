@@ -10,6 +10,7 @@
     "name": "device_status",
     "subsystem": "msdp",
     "syscap": ["SystemCapability.Msdp.DeviceStatus"],
+    "hisysevent_config": ["//base/msdp/device_status/hisysevent.yaml"],
     "features": [],
     "adapted_system_type": [ "standard" ],
     "rom": "2048KB",

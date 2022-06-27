@@ -57,6 +57,7 @@ ohos_shared_library("devicestatus_service") {
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",

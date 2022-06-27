@@ -42,6 +42,7 @@ ohos_shared_library("devicestatus_client") {
   deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
