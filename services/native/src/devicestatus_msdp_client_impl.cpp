@@ -272,31 +272,6 @@ int32_t DevicestatusMsdpClientImpl::LoadSensorHdiLibrary(bool bCreate)
     if (sensorHdi_.handle != nullptr) {
         return ERR_OK;
     }
-    sensorHdi_.handle = dlopen(DEVICESTATUS_SENSOR_HDI_LIB_PATH.c_str(), RTLD_LAZY);
-    if (sensorHdi_.handle == nullptr) {
-        DEV_HILOGE(SERVICE,
-            "Cannot load sensor hdi library error = %{public}s", dlerror());
-        return ERR_NG;
-    }
-
-    DEV_HILOGI(SERVICE, "start create sensor hdi pointer");
-    sensorHdi_.create = (DevicestatusSensorInterface* (*)()) dlsym(sensorHdi_.handle, "Create");
-    DEV_HILOGI(SERVICE, "start destroy sensor hdi pointer");
-    sensorHdi_.destroy = (void *(*)(DevicestatusSensorInterface*))dlsym(sensorHdi_.handle, "Destroy");
-
-    if (sensorHdi_.create == nullptr || sensorHdi_.destroy == nullptr) {
-        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destroy sensor hdi failed!",
-            DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
-        dlclose(sensorHdi_.handle);
-        sensorHdi_.Clear();
-        bCreate = false;
-        return ERR_NG;
-    }
-
-    if (bCreate) {
-        sensorHdi_.pAlgorithm = sensorHdi_.create();
-    }
-
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
@@ -346,30 +321,6 @@ int32_t DevicestatusMsdpClientImpl::LoadAlgorithmLibrary(bool bCreate)
     if (mAlgorithm_.handle != nullptr) {
         return ERR_OK;
     }
-    mAlgorithm_.handle = dlopen(DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str(), RTLD_LAZY);
-    if (mAlgorithm_.handle == nullptr) {
-        DEV_HILOGE(SERVICE, "Cannot load library error = %{public}s", dlerror());
-        return ERR_NG;
-    }
-
-    DEV_HILOGI(SERVICE, "start create pointer");
-    mAlgorithm_.create = (DevicestatusMsdpInterface* (*)()) dlsym(mAlgorithm_.handle, "Create");
-    DEV_HILOGI(SERVICE, "start destroy pointer");
-    mAlgorithm_.destroy = (void *(*)(DevicestatusMsdpInterface*))dlsym(mAlgorithm_.handle, "Destroy");
-
-    if (mAlgorithm_.create == nullptr || mAlgorithm_.destroy == nullptr) {
-        DEV_HILOGI(SERVICE, "%{public}s dlsym Create or Destroy failed!",
-            DEVICESTATUS_MSDP_ALGORITHM_LIB_PATH.c_str());
-        dlclose(mAlgorithm_.handle);
-        mAlgorithm_.Clear();
-        bCreate = false;
-        return ERR_NG;
-    }
-
-    if (bCreate) {
-        mAlgorithm_.pAlgorithm = mAlgorithm_.create();
-    }
-
     DEV_HILOGI(SERVICE, "Exit");
     return ERR_OK;
 }
