@@ -37,7 +37,7 @@ ohos_unittest("test_devicestatus_service") {
   ]
 
   deps = [
-    "${aafwk_path}/frameworks/native/appkit:appkit_native",
+    "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_service_path}:devicestatus_service",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
