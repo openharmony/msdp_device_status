@@ -301,15 +301,6 @@ std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessToke
     std::string packageName = "unknown";
     int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: {
-            Security::AccessToken::NativeTokenInfo tokenInfo;
-            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                DEV_HILOGI(SERVICE, "get native token info fail");
-                return packageName;
-            }
-            packageName = tokenInfo.processName;
-            break;
-        }
         case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
             Security::AccessToken::HapTokenInfo hapInfo;
             if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
@@ -317,6 +308,17 @@ std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessToke
                 return packageName;
             }
             packageName = hapInfo.bundleName;
+            break;
+        }
+        case ATokenTypeEnum::TOKEN_NATIVE: { // Native type and shell type get processname in the same way
+        }
+        case ATokenTypeEnum::TOKEN_SHELL: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                SEN_HILOGE("get native token info fail");
+                return;
+            }
+            packageName = tokenInfo.processName;
             break;
         }
         default: {
