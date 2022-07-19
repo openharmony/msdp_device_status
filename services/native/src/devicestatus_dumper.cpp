@@ -315,7 +315,7 @@ std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessToke
         case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
             Security::AccessToken::NativeTokenInfo tokenInfo;
             if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                DEV_HILOGI("get native token info fail");
+                DEV_HILOGI(SERVICE, "get native token info fail");
                 return packageName;
             }
             packageName = tokenInfo.processName;
