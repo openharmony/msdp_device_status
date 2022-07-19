@@ -310,13 +310,13 @@ std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessToke
             packageName = hapInfo.bundleName;
             break;
         }
-        case ATokenTypeEnum::TOKEN_NATIVE: { // Native type and shell type get processname in the same way
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: { // Native type and shell type get processname in the same way
         }
-        case ATokenTypeEnum::TOKEN_SHELL: {
-            NativeTokenInfo tokenInfo;
-            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                SEN_HILOGE("get native token info fail");
-                return;
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                DEV_HILOGI("get native token info fail");
+                return packageName;
             }
             packageName = tokenInfo.processName;
             break;
