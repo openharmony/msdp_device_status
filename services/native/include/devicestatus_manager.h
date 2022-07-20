@@ -60,7 +60,6 @@ public:
     int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);
     int32_t LoadAlgorithm(bool bCreate);
     int32_t UnloadAlgorithm(bool bCreate);
-    void GetPackageName(AccessTokenID tokenId, std::string &packageName);
 
 private:
     struct classcomp {
