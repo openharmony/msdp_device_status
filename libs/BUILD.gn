@@ -44,11 +44,11 @@ ohos_shared_library("devicestatus_sensorhdi") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
@@ -74,11 +74,11 @@ ohos_shared_library("devicestatus_msdp") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",

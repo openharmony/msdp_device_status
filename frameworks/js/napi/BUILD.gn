@@ -44,10 +44,10 @@ ohos_shared_library("devicestatus") {
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
     "//base/msdp/device_status/services:devicestatus_service",
     "//foundation/arkui/napi:ace_napi",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
