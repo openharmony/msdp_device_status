@@ -23,9 +23,7 @@ config("devicestatus_srv_public_config") {
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
-    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/rdb/include/",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/appdatafwk/include/",
   ]
 }
 
@@ -60,6 +58,7 @@ ohos_shared_library("devicestatus_service") {
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
