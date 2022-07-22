@@ -27,6 +27,7 @@ config("devicestatus_srv_public_config") {
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/rdb/include/",
+    "${relational_store_innerapi_path}/appdatafwk/include/",
   ]
 }
 
