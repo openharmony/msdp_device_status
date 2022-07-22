@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
+import(
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/relational_store.gni")
 
 config("devicestatus_private_config") {
   include_dirs = [ "//utils/system/safwk/native/include" ]
@@ -24,6 +26,7 @@ config("devicestatus_srv_public_config") {
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
+    "${relational_store_innerapi_path}/rdb/include/",
   ]
 }
 
