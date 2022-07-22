@@ -24,15 +24,7 @@ bool DevicestatusPermission::CheckCallingPermission(const string &permissionName
 {
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
     int32_t auth = Security::AccessToken::TypePermissionState::PERMISSION_DENIED;
-    
-    if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
-        auth = Security::AccessToken::AccessTokenKit::VerifyNativeToken(callingToken, permissionName);
-    } else if (GetTokenTypeFlag(callingToken) == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
-    } else {
-        DEV_HILOGE(COMMON, "invalid token id %{public}d", callingToken);
-    }
-
+    auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
     if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return ERR_OK;
     } else {

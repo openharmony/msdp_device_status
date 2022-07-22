@@ -294,37 +294,5 @@ void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::Devicesta
         deviceStatusQueue_.pop();
     }
 }
-
-std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    std::string packageName = "unknown";
-    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    switch (tokenType) {
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: {
-            Security::AccessToken::NativeTokenInfo tokenInfo;
-            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                DEV_HILOGI(SERVICE, "get native token info fail");
-                return packageName;
-            }
-            packageName = tokenInfo.processName;
-            break;
-        }
-        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
-            Security::AccessToken::HapTokenInfo hapInfo;
-            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                DEV_HILOGI(SERVICE, "get hap token info fail");
-                return packageName;
-            }
-            packageName = hapInfo.bundleName;
-            break;
-        }
-        default: {
-            DEV_HILOGI(SERVICE, "token type not match");
-            break;
-        }
-    }
-    return packageName;
-}
 } // namespace Msdp
 } // namespace OHOS
