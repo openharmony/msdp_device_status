@@ -62,7 +62,7 @@ ohos_shared_library("devicestatus_service") {
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "${device_status_part_name}"
