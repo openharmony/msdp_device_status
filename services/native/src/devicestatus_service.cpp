@@ -161,7 +161,7 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
-    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
@@ -188,7 +188,7 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
-    appInfo->packageName = DevicestatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
@@ -215,7 +215,8 @@ void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::Device
 {
     auto uid = this->GetCallingUid();
     auto callerToken = this->GetCallingTokenID();
-    std::string packageName = DevicestatusDumper::GetInstance().GetPackageName(callerToken);
+    std::string packageName("");
+    devicestatusManager_->GetPackageName(callerToken, packageName);
     std::string message;
     if (enable) {
         HiSysEvent::Write(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,

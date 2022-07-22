@@ -274,5 +274,34 @@ int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
 
     return ERR_OK;
 }
+
+void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &packageName)
+{
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case ATokenTypeEnum::TOKEN_NATIVE: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                DEV_HILOGE(SERVICE, "get native token info fail");
+                return;
+            }
+            packageName = tokenInfo.processName;
+            break;
+        }
+        case ATokenTypeEnum::TOKEN_HAP: {
+            HapTokenInfo hapInfo;
+            if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+                DEV_HILOGE(SERVICE, "get hap token info fail");
+                return;
+            }
+            packageName = hapInfo.bundleName;
+            break;
+        }
+        default: {
+            DEV_HILOGE(SERVICE, "token type not match");
+            break;
+        }
+    }
+}
 } // namespace Msdp
 } // namespace OHOS
