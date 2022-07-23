@@ -13,7 +13,7 @@
 
 import("//base/msdp/device_status/device_status.gni")
 import(
-    "//foundation/distributeddatamgr/appdatamgr/relational_store/relational_store.gni")
+    "//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
 config("devicestatus_private_config") {
   include_dirs = [ "//utils/system/safwk/native/include" ]
