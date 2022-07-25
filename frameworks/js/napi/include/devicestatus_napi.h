@@ -24,6 +24,8 @@
 #include "devicestatus_data_utils.h"
 #include "devicestatus_event.h"
 
+#include "idevicestatus_callback.h"
+
 namespace OHOS {
 namespace Msdp {
 class DevicestatusCallback : public DevicestatusCallbackStub {
