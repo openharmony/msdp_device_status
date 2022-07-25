@@ -52,12 +52,12 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
