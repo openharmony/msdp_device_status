@@ -19,9 +19,10 @@
 #include <iremote_stub.h>
 #include <nocopyable.h>
 
-#include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
-
+#include "idevicestatus_callback.h"
+#include "message_option.h"
+#include "message_parcel.h"
 namespace OHOS {
 namespace Msdp {
 class DevicestatusCallbackStub : public IRemoteStub<IdevicestatusCallback> {

@@ -16,12 +16,10 @@
 #ifndef DEVICESTATUS_EVENT_H
 #define DEVICESTATUS_EVENT_H
 
-#include <string>
-#include <list>
-#include <memory>
-#include <map>
-
 #include "napi/native_api.h"
+
+#include <map>
+#include <memory>
 
 namespace OHOS {
 namespace Msdp {
