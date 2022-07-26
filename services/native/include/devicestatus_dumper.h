@@ -17,11 +17,12 @@
 #define DEVICESTATUS_DUMPER_H
 
 #include <refbase.h>
-#include <singleton.h>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <set>
+#include <singleton.h>
 #include <string>
 #include <vector>
 

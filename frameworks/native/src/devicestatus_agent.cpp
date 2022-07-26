@@ -18,8 +18,6 @@
 #include "devicestatus_common.h"
 #include "devicestatus_client.h"
 
-#include "idevicestatus_callback.h"
-
 namespace OHOS {
 namespace Msdp {
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(

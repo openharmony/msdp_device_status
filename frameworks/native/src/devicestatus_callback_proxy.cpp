@@ -15,12 +15,10 @@
 
 #include "devicestatus_callback_proxy.h"
 
+#include <ipc_types.h>
 #include <message_parcel.h>
 
 #include "devicestatus_common.h"
-
-#include "iremote_object.h"
-#include "message_option.h"
 
 namespace OHOS {
 namespace Msdp {

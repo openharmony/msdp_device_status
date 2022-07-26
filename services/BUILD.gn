@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
-import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
+import(
+    "//foundation/distributeddatamgr/appdatamgr/relational_store/relational_store.gni")
 
 config("devicestatus_private_config") {
   include_dirs = [ "//utils/system/safwk/native/include" ]
@@ -50,13 +51,12 @@ ohos_shared_library("devicestatus_service") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
-    "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
