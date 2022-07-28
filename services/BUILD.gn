@@ -50,7 +50,6 @@ ohos_shared_library("devicestatus_service") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
   ]
 
   external_deps = [
