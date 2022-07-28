@@ -43,7 +43,6 @@ ohos_shared_library("devicestatus_sensorhdi") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
     "//utils/native/base:utils",
   ]
 
@@ -54,7 +53,6 @@ ohos_shared_library("devicestatus_sensorhdi") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
 
   part_name = "${device_status_part_name}"
@@ -73,7 +71,6 @@ ohos_shared_library("devicestatus_msdp") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
     "//utils/native/base:utils",
   ]
 

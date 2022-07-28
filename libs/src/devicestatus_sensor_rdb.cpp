@@ -32,23 +32,9 @@ const std::string DATABASE_NAME = "/data/MsdpStub.db";
 constexpr int32_t TIMER_INTERVAL = 3;
 constexpr int32_t ERR_INVALID_FD = -1;
 constexpr int32_t READ_RDB_WAIT_TIME = 30;
-constexpr int32_t SENSOR_SAMPLING_INTERVAL = 100000000;
-constexpr int32_t HALL_SENSOR_ID = 10;
 std::unique_ptr<DevicestatusSensorRdb> g_msdpRdb = std::make_unique<DevicestatusSensorRdb>();
 constexpr int32_t ERR_NG = -1;
 DevicestatusSensorRdb* g_rdb;
-SensorUser user;
-}
-static void OnReceivedSensorEvent(SensorEvent *event)
-{
-    if (event == nullptr) {
-        DEV_HILOGE(SERVICE, "event is nullptr");
-    }
-    if (g_rdb == nullptr) {
-        DEV_HILOGE(SERVICE, "g_rdb is nullptr");
-        return;
-    }
-    g_rdb->HandleHallSensorEvent(event);
 }
 
 bool DevicestatusSensorRdb::Init()
@@ -234,39 +220,9 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
     return ERR_OK;
 }
 
-void DevicestatusSensorRdb::HandleHallSensorEvent(SensorEvent *event)
-{
-    if (event == nullptr) {
-        DEV_HILOGE(SERVICE, "HandleHallSensorEvent event is null");
-        return;
-    }
-
-    DEV_HILOGI(SERVICE, "HandleHallSensorEvent sensorTypeId: %{public}d, version: %{public}d, mode: %{public}d",
-        event->sensorTypeId, event->version, event->mode);
-    DevicestatusDataUtils::DevicestatusData data;
-    float *tmpData = (float *)(event->data);
-    int32_t hallData = (int32_t)(*tmpData);
-    if (event->sensorTypeId == SENSOR_TYPE_ID_HALL) {
-        DEV_HILOGI(SERVICE, "HandleHallSensorEvent sensor_data: %{public}d", hallData);
-        int32_t eventFilter = hallData & 1;
-        if (eventFilter != curLidStatus) {
-            curLidStatus = eventFilter;
-            data.type = DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN;
-            data.value = DevicestatusDataUtils::DevicestatusValue(curLidStatus);
-            NotifyMsdpImpl(data);
-        }
-    }
-}
-
 void DevicestatusSensorRdb::SubscribeHallSensor()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    user.callback = OnReceivedSensorEvent;
-
-    DEV_HILOGI(SERVICE, "SubcribeHallSensor");
-    SubscribeSensor(HALL_SENSOR_ID, &user);
-    SetBatch(HALL_SENSOR_ID, &user, SENSOR_SAMPLING_INTERVAL, 0);
-    ActivateSensor(HALL_SENSOR_ID, &user);
 
     DEV_HILOGI(SERVICE, "Exit");
 }
@@ -274,11 +230,6 @@ void DevicestatusSensorRdb::SubscribeHallSensor()
 void DevicestatusSensorRdb::UnSubscribeHallSensor()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    user.callback = OnReceivedSensorEvent;
-
-    DEV_HILOGI(SERVICE, "UnsubcribeHallSensor");
-    DeactivateSensor(HALL_SENSOR_ID, &user);
-    UnsubscribeSensor(HALL_SENSOR_ID, &user);
 
     DEV_HILOGI(SERVICE, "Exit");
 }
