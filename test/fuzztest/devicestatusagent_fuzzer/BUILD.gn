@@ -27,6 +27,7 @@ deps_ex = [
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
   "appspawn:appspawn_socket_client",
+  "c_utils:utils",
 ]
 
 ohos_fuzztest("DeviceStatusAgentFuzzTest") {
@@ -49,7 +50,6 @@ ohos_fuzztest("DeviceStatusAgentFuzzTest") {
   deps = [
     "${device_status_frameworks_path}/native/src:deviceagent",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "//utils/native/base:utils",
   ]
 
   external_deps = deps_ex

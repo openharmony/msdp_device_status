@@ -23,9 +23,7 @@ config("devicestatus_srv_public_config") {
     "interface",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
-    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/rdb/include/",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "//foundation/distributeddatamgr/appdatamgr/relational_store/interfaces/inner_api/appdatafwk/include/",
     "//base/sensors/sensor/interfaces/native/include/",
   ]
 }
@@ -43,18 +41,17 @@ ohos_shared_library("devicestatus_sensorhdi") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
 
   part_name = "${device_status_part_name}"
@@ -73,12 +70,11 @@ ohos_shared_library("devicestatus_msdp") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//third_party/jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
