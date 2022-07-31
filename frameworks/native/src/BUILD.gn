@@ -34,8 +34,13 @@ ohos_shared_library("deviceagent") {
   ]
 
   deps = [
+    "//base/msdp/device_status/frameworks/js/napi:devicestatus",
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
-    "//base/msdp/device_status/services:devicestatus_service",
+    "//utils/native/base:utils",
+  ]
+
+  public_configs = [
+    "${device_status_frameworks_path}/js/napi:devicestatus_callback_config",
   ]
 
   external_deps = [
