@@ -279,15 +279,6 @@ void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &pac
 {
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {
-        case ATokenTypeEnum::TOKEN_NATIVE: {
-            NativeTokenInfo tokenInfo;
-            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                DEV_HILOGE(SERVICE, "get native token info fail");
-                return;
-            }
-            packageName = tokenInfo.processName;
-            break;
-        }
         case ATokenTypeEnum::TOKEN_HAP: {
             HapTokenInfo hapInfo;
             if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
@@ -295,6 +286,17 @@ void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &pac
                 return;
             }
             packageName = hapInfo.bundleName;
+            break;
+        }
+        // Native type and shell type get processname in the same way
+        case ATokenTypeEnum::TOKEN_NATIVE:
+        case ATokenTypeEnum::TOKEN_SHELL: {
+            NativeTokenInfo tokenInfo;
+            if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                DEV_HILOGE(SERVICE, "get native token info fail");
+                return;
+            }
+            packageName = tokenInfo.processName;
             break;
         }
         default: {
