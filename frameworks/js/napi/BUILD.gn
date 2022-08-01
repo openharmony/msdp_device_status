@@ -29,8 +29,13 @@ config("devicestatusnapi_private_config") {
   ]
 }
 
+config("devicestatus_callback_config") {
+  include_dirs = [ "include" ]
+}
+
 ohos_shared_library("devicestatus") {
   sources = [
+    "${device_status_frameworks_path}/js/napi/src/devicestatus_callback_stub.cpp",
     "${device_status_frameworks_path}/js/napi/src/devicestatus_event.cpp",
     "${device_status_frameworks_path}/js/napi/src/devicestatus_napi.cpp",
   ]
@@ -39,6 +44,8 @@ ohos_shared_library("devicestatus") {
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatusnapi_private_config",
   ]
+
+  public_configs = [ ":devicestatus_callback_config" ]
 
   deps = [
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",

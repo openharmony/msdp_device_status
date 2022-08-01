@@ -21,6 +21,7 @@ config("devicestatus_public_config") {
   include_dirs = [
     "include",
     "${device_status_service_path}/native/include",
+    "${device_status_frameworks_path}/js/napi/include",
   ]
 }
 
