@@ -15,36 +15,198 @@
 
 import { AsyncCallback } from "./basic";
 
-declare namespace devicestatus {
-    export enum DevicestatusType {
-        TYPE_HIGH_STILL = 0,
-        TYPE_FINE_STILL = 1,
-        TYPE_CAR_BLUETOOTH = 2
+/**
+ * 订阅用户设备状态通知
+ *
+ * @since 9
+ * @syscap SystemCapability.Msdp.DeviceStatus
+ * @import import sensor from '@ohos.DeviceStatus'
+ * @permission N/A
+ */
+declare namespace DeviceStatus {
+    /**
+     * 行为识别数据。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export interface ActivityResponse {
+        eventType: EventType
+    }
+	
+    /**
+     * 绝对静止的数据。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export interface StillResponse extends ActivityResponse {}
+    
+    /**
+     * 相对静止的数据。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export interface RelativeStillResponse extends ActivityResponse {}
+    
+    /**
+     * 水平位置的数据。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export interface VerticalPositionResponse extends ActivityResponse {}
+    
+    /**
+     * 垂直位置的数据。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export interface HorizontalPositionResponse extends ActivityResponse {}
+	
+    /**
+     * 行为识别类型。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export enum ActivityType {
+        TYPE_STILL = "still",
+        TYPE_RELATIVE_STILL = "relativeStill",
+        TYPE_VERTICAL_POSITION = "verticalPosition",
+        TYPE_HORIZONTAL_POSITION = "horizontalPosition"
     }
 
-    export enum DevicestatusValue {
-        VALUE_ENTER = 0,
-        VALUE_EXIT
+    /**
+     * 事件类型。
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     */
+    export enum EventType {
+        ENTER = 1,
+        EXIT = 2,
+        ENTER_EXIT = 3
     }
 
-    export interface DevicestatusResponse {
-        devicestatusValue: DevicestatusValue
-    }
-
-    export interface HighStillResponse extends DevicestatusResponse {}
-    export interface FineStillResponse extends DevicestatusResponse {}
-    export interface CarBluetoothResponse extends DevicestatusResponse {}
-
-    function on(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>): void;
-    function once(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>): void;
-    function off(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<void>): void;
-
-    function on(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<FineStillResponse>): void;
-    function once(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<FineStillResponse>): void;
-    function off(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<void>): void;
-
-    function on(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<CarBluetoothResponse>): void;
-    function once(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<CarBluetoothResponse>): void;
-    function off(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<void>): void;
+    /**	
+     * 订阅绝对静止。
+     *
+     * @since 9
+     * @param type 订阅绝对静止, {@code type: ActivityType.TYPE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function on(type: ActivityType.TYPE_STILL, eventType: EventType, reportLatencyNs: number, callback: AsyncCallback<StillResponse>): void;
+	
+    /**
+     * 订阅相对静止。
+     *
+     * @since 9
+     * @param type 订阅相对静止, {@code type: ActivityType.TYPE_RELATIVE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function on(type: ActivityType.TYPE_RELATIVE_STILL, eventType: EventType, reportLatencyNs: number, callback: AsyncCallback<RelativeStillResponse>): void;
+	
+    /**
+     * 订阅水平位置。
+     *
+     * @since 9
+     * @param type 订阅水平位置, {@code type: ActivityType.TYPE_VERTICAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function on(type: ActivityType.TYPE_VERTICAL_POSITION, eventType: EventType, reportLatencyNs: number, callback: AsyncCallback<VerticalPositionResponse>): void;
+	
+    /**
+     * 订阅垂直位置。
+     *
+     * @since 9
+     * @param type 订阅垂直位置, {@code type: ActivityType.TYPE_HORIZONTAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function on(type: ActivityType.TYPE_HORIZONTAL_POSITION, eventType: EventType, reportLatencyNs: number, callback: AsyncCallback<HorizontalPositionResponse>): void;
+     
+    /**
+     * 查询是否绝对静止。
+     *
+     * @since 9
+     * @param type 查询是否绝对静止, {@code type: ActivityType.TYPE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function once(type: ActivityType.TYPE_STILL, callback: AsyncCallback<StillResponse>): void;
+	
+    /**
+     * 查询是否相对静止。
+     *
+     * @since 9
+     * @param type 查询是否相对静止, {@code type: ActivityType.TYPE_RELATIVE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function once(type: ActivityType.TYPE_RELATIVE_STILL, callback: AsyncCallback<RelativeStillResponse>): void;
+	
+    /**
+     * 查询是否水平位置。
+     *
+     * @since 9
+     * @param type 查询是否水平位置, {@code type: ActivityType.TYPE_VERTICAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function once(type: ActivityType.TYPE_VERTICAL_POSITION, callback: AsyncCallback<VerticalPositionResponse>): void;
+	
+    /**
+     * 查询是否垂直位置。
+     *
+     * @since 9
+     * @param type 查询是否垂直位置, {@code type: ActivityType.TYPE_HORIZONTAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function once(type: ActivityType.TYPE_HORIZONTAL_POSITION, callback: AsyncCallback<HorizontalPositionResponse>): void;
+	
+    /**
+     * 取消订阅绝对静止。
+     *
+     * @since 9
+     * @param type 查询是否绝对静止, {@code type: ActivityType.TYPE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function off(type: ActivityType.TYPE_STILL, eventType: EventType, callback?: AsyncCallback<void>): void;
+    
+    /**
+     * 取消订阅相对静止。
+     *
+     * @since 9
+     * @param type 查询是否相对静止, {@code type: ActivityType.TYPE_RELATIVE_STILL}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function off(type: ActivityType.TYPE_RELATIVE_STILL, eventType: EventType, callback?: AsyncCallback<void>): void;
+    
+    /**
+     * 取消订阅水平位置。
+     *
+     * @since 9
+     * @param type 查询是否水平位置, {@code type: ActivityType.TYPE_VERTICAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function off(type: ActivityType.TYPE_VERTICAL_POSITION, eventType: EventType, callback?: AsyncCallback<void>): void;
+    
+    /**
+     * 取消订阅垂直位置。
+     *
+     * @since 9
+     * @param type 查询是否垂直位置, {@code type: ActivityType.TYPE_HORIZONTAL_POSITION}.
+     * @param eventType enter and exit event.
+     * @param reportLatencyNs report event latency.
+     * @param callback callback function, receive reported data.
+     */
+    function off(type: ActivityType.TYPE_HORIZONTAL_POSITION, eventType: EventType, callback?: AsyncCallback<void>): void;
 }
-export default devicestatus;
+export default DeviceStatus;
