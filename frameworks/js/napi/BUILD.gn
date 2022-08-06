@@ -24,8 +24,8 @@ config("devicestatusnapi_private_config") {
     "//third_party/node/src",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_service_path}/native/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
+    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/systemabilitymgr/samgr/adapter/interfaces/innerkits/include",
   ]
 }
 

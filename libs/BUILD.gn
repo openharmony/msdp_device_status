@@ -51,7 +51,7 @@ ohos_shared_library("devicestatus_sensorhdi") {
     "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "${device_status_part_name}"
@@ -79,7 +79,7 @@ ohos_shared_library("devicestatus_msdp") {
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "${device_status_part_name}"
