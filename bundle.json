@@ -22,7 +22,7 @@
         "ipc",
         "safwk",
         "samgr",
-        "utils_base",
+        "c_utils",
         "appexecfwk_standard",
         "napi"
       ],
