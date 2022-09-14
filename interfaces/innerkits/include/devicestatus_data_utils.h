@@ -25,6 +25,7 @@ public:
         TYPE_HIGH_STILL,
         TYPE_FINE_STILL,
         TYPE_CAR_BLUETOOTH,
+		TYPE_STAND,
         TYPE_LID_OPEN
     };
 
