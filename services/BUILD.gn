@@ -52,17 +52,14 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   external_deps = [
-    "ability_base:base",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 
   part_name = "${device_status_part_name}"
