@@ -28,10 +28,9 @@ using namespace OHOS::NativeRdb;
 namespace OHOS {
 namespace Msdp {
 namespace {
-const std::string DATABASE_NAME = "/data/MsdpStub.db";
-constexpr int32_t TIMER_INTERVAL = 3;
+const std::string DATABASE_NAME = "/data/accounts/account_0/appdata/com.ohos.ohostestapp/database/db/MsdpStub.db";
+constexpr int32_t TIMER_INTERVAL = 1;
 constexpr int32_t ERR_INVALID_FD = -1;
-constexpr int32_t READ_RDB_WAIT_TIME = 30;
 std::unique_ptr<DevicestatusMsdpRdb> g_msdpRdb = std::make_unique<DevicestatusMsdpRdb>();
 constexpr int32_t ERR_NG = -1;
 DevicestatusMsdpRdb* g_rdb;
@@ -40,7 +39,10 @@ DevicestatusMsdpRdb* g_rdb;
 bool DevicestatusMsdpRdb::Init()
 {
     DEV_HILOGI(SERVICE, "DevicestatusMsdpRdbInit: Enter");
-    InitRdbStore();
+    if (dataParse_ == nullptr) {
+        dataParse_ =  std::make_unique<DeviceStatusDataParse>();
+    }
+    dataParse_->CreateJsonFile();
     InitTimer();
     StartThread();
     DEV_HILOGI(SERVICE, "DevicestatusMsdpRdbInit: Exit");
@@ -48,7 +50,14 @@ bool DevicestatusMsdpRdb::Init()
 }
 
 void DevicestatusMsdpRdb::InitRdbStore()
-{}
+{
+    DEV_HILOGI(SERVICE, "Enter");
+    int32_t errCode = ERR_OK;
+    RdbStoreConfig config(DATABASE_NAME);
+    InsertOpenCallback helper;
+    store_ = RdbHelper::GetRdbStore(config, 1, helper, errCode);
+    DEV_HILOGI(SERVICE, "Exit");
+}
 
 void DevicestatusMsdpRdb::RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback)
 {
@@ -113,106 +122,16 @@ DevicestatusDataUtils::DevicestatusData DevicestatusMsdpRdb::SaveRdbData(
     return data;
 }
 
-int32_t DevicestatusMsdpRdb::TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet)
-{
-    int32_t columnIndex;
-    int32_t intVal;
-    if (resultSet == nullptr) {
-        DEV_HILOGE(SERVICE, "resultSet is nullptr");
-        return ERR_NG;
-    }
-    int32_t ret = resultSet->GetColumnIndex("ID", columnIndex);
-    DEV_HILOGI(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckID: GetColumnIndex failed");
-        return -1;
-    }
-    ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, id = %{public}d", ret, intVal);
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckID: GetValue failed");
-        return -1;
-    }
-
-    ret = resultSet->GetColumnIndex("DEVICESTATUS_TYPE", columnIndex);
-    DEV_HILOGI(SERVICE, "DEVICESTATUS_TYPE GetColumnIndex = %{public}d", columnIndex);
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckDevicestatusType: GetColumnIndex failed");
-        return -1;
-    }
-    ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, DevicestatusType = %{public}d", ret, intVal);
-    devicestatusType_ = intVal;
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckDevicestatusType: GetValue failed");
-        return -1;
-    }
-
-    ret = resultSet->GetColumnIndex("DEVICESTATUS_STATUS", columnIndex);
-    DEV_HILOGI(SERVICE, "DEVICESTATUS_STATUS GetColumnIndex = %{public}d", columnIndex);
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckDevicestatusStatus: GetColumnIndex failed");
-        return -1;
-    }
-    ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, DevicestatusStatus = %{public}d", ret, intVal);
-    devicestatusStatus_ = intVal;
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "CheckDevicestatusStatus: GetValue failed");
-        return -1;
-    }
-
-    return ERR_OK;
-}
-
-int32_t DevicestatusMsdpRdb::TrigerDatabaseObserver()
+int32_t DevicestatusMsdpRdb::TriggerDatabaseObserver()
 {
     DEV_HILOGI(SERVICE, "Enter");
 
-    if (store_ == nullptr) {
-        sleep(READ_RDB_WAIT_TIME);
-        InitRdbStore();
-        return -1;
-    }
-
-    std::unique_ptr<ResultSet> resultSet =
-        store_->QuerySql("SELECT * FROM DEVICESTATUSSENSOR WHERE ID = (SELECT max(ID) from DEVICESTATUSSENSOR)");
-
-    if (resultSet == nullptr) {
-        DEV_HILOGE(SERVICE, "database is not exist");
-        return -1;
-    }
-
-    int32_t ret = resultSet->GoToFirstRow();
-    DEV_HILOGI(SERVICE, "GoToFirstRow = %{public}d", ret);
-    if (ret != ERR_OK) {
-        sleep(READ_RDB_WAIT_TIME);
-        DEV_HILOGE(SERVICE, "database observer is null");
-        return -1;
-    }
-
-    if (TrigerData(resultSet) != ERR_OK) {
-        DEV_HILOGE(SERVICE, "triger data failed");
-        return -1;
-    }
-
-    ret = resultSet->Close();
-    if (ret != ERR_OK) {
-        DEV_HILOGE(SERVICE, "close database observer failed");
-        return -1;
-    }
-
-    DevicestatusDataUtils::DevicestatusData data;
-    data.type = (DevicestatusDataUtils::DevicestatusType)devicestatusType_;
-    data.value = (DevicestatusDataUtils::DevicestatusValue)devicestatusStatus_;
-
-    SaveRdbData(data);
-    DEV_HILOGI(SERVICE, "notifyFlag_ is %{public}d", notifyFlag_);
-    if (notifyFlag_) {
+   for (int type = 0; type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN; ++type) {
+        DevicestatusDataUtils::DevicestatusData data;
+        dataParse_->ParseDeviceStatusData(data, type);
         NotifyMsdpImpl(data);
-        notifyFlag_ = false;
-    }
-
+     }
+     
     return ERR_OK;
 }
 
@@ -280,7 +199,7 @@ void DevicestatusMsdpRdb::TimerCallback()
         DEV_HILOGI(SERVICE, "read timer fd failed");
         return;
     }
-    TrigerDatabaseObserver();
+    TriggerDatabaseObserver();
 }
 
 int32_t DevicestatusMsdpRdb::RegisterTimerCallback(const int32_t fd, const EventType et)

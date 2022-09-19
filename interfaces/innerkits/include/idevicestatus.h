@@ -33,8 +33,11 @@ public:
     };
 
     virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
+        const DevicestatusDataUtils::DevicestatusReportLatencyNs& latency,
         const sptr<IdevicestatusCallback>& callback) = 0;
     virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
         const sptr<IdevicestatusCallback>& callback) = 0;
     virtual DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) = 0;
 

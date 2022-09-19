@@ -32,6 +32,7 @@
 #include "result_set.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_msdp_interface.h"
+#include "devicestatus_data_parse.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -53,13 +54,14 @@ public:
     int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
+
     void Enable() override;
     void Disable() override;
     void RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback) override;
     void UnregisterCallback() override;
+    
     ErrCode NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data);
-    int32_t TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet);
-    int32_t TrigerDatabaseObserver();
+    int32_t TriggerDatabaseObserver();
     DevicestatusDataUtils::DevicestatusData SaveRdbData(const DevicestatusDataUtils::DevicestatusData& data);
     std::shared_ptr<MsdpAlgorithmCallback> GetCallbacksImpl()
     {
@@ -80,6 +82,7 @@ private:
     int32_t epFd_ = -1;
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> rdbDataMap_;
     std::mutex mutex_;
+    std::unique_ptr<DeviceStatusDataParse> dataParse_;
 };
 
 class InsertOpenCallback : public NativeRdb::RdbOpenCallback {

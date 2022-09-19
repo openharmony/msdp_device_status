@@ -18,7 +18,3 @@ import("//build/test.gni")
 #  deps = [ "systemtest/:systemtest" ]
 #}
 
-group("fuzztest") {
-  testonly = true
-  deps = [ "fuzztest/:fuzztest" ]
-}

@@ -25,6 +25,7 @@
 #include "devicestatus_data_utils.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
+#include "devicestatus_dump.h"
 #include "devicestatus_delayed_sp_singleton.h"
 
 namespace OHOS {
@@ -38,14 +39,17 @@ public:
     virtual void OnStop() override;
 
     void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
+        const DevicestatusDataUtils::DevicestatusReportLatencyNs& latency,
         const sptr<IdevicestatusCallback>& callback) override;
     void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
         const sptr<IdevicestatusCallback>& callback) override;
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
+    int Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     bool IsServiceReady();
     std::shared_ptr<DevicestatusManager> GetDevicestatusManager();
-    int Dump(int fd, const std::vector<std::u16string>& args) override;
-    void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
+    void ReportSensorSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 private:
     bool Init();
     bool ready_ = false;

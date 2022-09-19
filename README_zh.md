@@ -16,6 +16,7 @@ MSDP设备状态感知框架能够识别出目前设备的状态并传递给订�
 MSDP设备状态感知架构图如下所示：
 
 **图 1**  MSDP设备状态感知架构图
+
 ![](figures/zh-cn_device_status_block.png)
 
 ## 目录<a name="section_device_status_directory"></a>

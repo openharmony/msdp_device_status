@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0 
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,38 +13,107 @@
  * limitations under the License.
  */
 
-import { AsyncCallback } from "./basic";
+import { Callback } from "./basic";
 
-declare namespace devicestatus {
-    export enum DevicestatusType {
-        TYPE_HIGH_STILL = 0,
-        TYPE_FINE_STILL = 1,
-        TYPE_CAR_BLUETOOTH = 2
+/**
+ * Declares a namespace that provides APIs to report the device status.
+ *
+ * @since 9
+ * @syscap SystemCapability.Msdp.DeviceStatus
+ * @import import DeviceStatus from '@ohos.DeviceStatus'
+ */
+declare namespace deviceStatus {
+    /**
+     * Declares a response interface to receive the device status.
+     *
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    interface ActivityResponse {
+        state: ActivityState;
+    }
+	
+    /**
+     * Declares the device status type.
+     *
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    type ActivityType = 'still' | 'relativeStill' | 'horizontalPosition' | 'verticalPosition';
+
+    /**
+     * Enumerates the device status events.
+     *
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    enum ActivityEvent {
+        /**
+         * Event indicating entering device status.
+         */ 
+        ENTER = 1,
+		
+        /**
+         * Event indicating exiting device status.
+         */
+        EXIT = 2,
+		
+        /**
+         * Event indicating entering and exiting device status.
+         */
+        ENTER_EXIT = 3
+    }
+	
+    /**
+     * Declares a response interface to receive the device status.
+     *
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    enum ActivityState {
+        /**
+         * Entering device status.
+         */
+        ENTER = 1,
+		
+        /**
+         * Exiting device status.
+         */
+        EXIT = 2
     }
 
-    export enum DevicestatusValue {
-        VALUE_ENTER = 0,
-        VALUE_EXIT
-    }
-
-    export interface DevicestatusResponse {
-        devicestatusValue: DevicestatusValue
-    }
-
-    export interface HighStillResponse extends DevicestatusResponse {}
-    export interface FineStillResponse extends DevicestatusResponse {}
-    export interface CarBluetoothResponse extends DevicestatusResponse {}
-
-    function on(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>): void;
-    function once(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<HighStillResponse>): void;
-    function off(type: DevicestatusType.TYPE_HIGH_STILL, callback: AsyncCallback<void>): void;
-
-    function on(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<FineStillResponse>): void;
-    function once(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<FineStillResponse>): void;
-    function off(type: DevicestatusType.TYPE_FINE_STILL, callback: AsyncCallback<void>): void;
-
-    function on(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<CarBluetoothResponse>): void;
-    function once(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<CarBluetoothResponse>): void;
-    function off(type: DevicestatusType.TYPE_CAR_BLUETOOTH, callback: AsyncCallback<void>): void;
+    /**	
+     * Subscribes to the device status.
+     *
+     * @param activity Indicates the device status type. For details, see {@code type: ActivityType}.
+     * @param event Indicates the device status event.
+     * @param reportLatencyNs Indicates the event reporting period.
+     * @param callback Indicates the callback for receiving reported data.
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    function on(activity: ActivityType, event: ActivityEvent, reportLatencyNs: number, callback: Callback<ActivityResponse>): void;
+	
+    /**
+     * Obtains the device status.
+     *
+     * @param activity Indicates the device status type. For details, see {@code type: ActivityType}.
+     * @param callback Indicates the callback for receiving reported data.
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    function once(activity: ActivityType, callback: Callback<ActivityResponse>): void;
+	
+    /**
+     * Unsubscribes from the device status.
+     *
+     * @param activity Indicates the device status type. For details, see {@code type: ActivityType}.
+     * @param event Indicates the device status event.
+     * @param callback Indicates the callback for receiving reported data.
+     * @syscap SystemCapability.Msdp.DeviceStatus
+     * @since 9
+     */
+    function off(activity: ActivityType, event: ActivityEvent, callback?: Callback<ActivityResponse>): void;
 }
-export default devicestatus;
+
+export default deviceStatus;

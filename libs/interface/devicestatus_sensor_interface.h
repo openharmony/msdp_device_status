@@ -38,8 +38,8 @@ public:
 
     virtual void RegisterCallback(const std::shared_ptr<DevicestatusSensorHdiCallback>& callback) = 0;
     virtual void UnregisterCallback() = 0;
-    virtual void Enable() = 0;
-    virtual void Disable() = 0;
+    virtual void Enable(const DevicestatusDataUtils::DevicestatusType& type) = 0;
+    virtual void Disable(const DevicestatusDataUtils::DevicestatusType& type) = 0;
 };
 
 struct SensorHdiHandle {

@@ -31,8 +31,11 @@ public:
     DISALLOW_COPY_AND_MOVE(DevicestatusSrvProxy);
 
     virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
-        const sptr<IdevicestatusCallback>& callback) override;
+    const DevicestatusDataUtils::DevicestatusActivityEvent& event,
+    const DevicestatusDataUtils::DevicestatusReportLatencyNs& latency,
+    const sptr<IdevicestatusCallback>& callback) override;
     virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
         const sptr<IdevicestatusCallback>& callback) override;
     virtual DevicestatusDataUtils::DevicestatusData GetCache(const \
         DevicestatusDataUtils::DevicestatusType& type) override;

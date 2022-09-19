@@ -47,13 +47,13 @@ public:
     };
 
     bool Init();
-    bool EnableRdb();
-    bool InitInterface();
-    bool DisableRdb();
+    bool EnableRdb(const DevicestatusDataUtils::DevicestatusType& type);
+    bool InitInterface(const DevicestatusDataUtils::DevicestatusType& type);
+    bool DisableRdb(const DevicestatusDataUtils::DevicestatusType& type);
     bool InitDataCallback();
     void NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData);
-    void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
-    void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
+    void Subscribe(const DevicestatusDataUtils::DevicestatusType& type,const DevicestatusDataUtils::DevicestatusActivityEvent& event,const DevicestatusDataUtils::DevicestatusReportLatencyNs& latency, const sptr<IdevicestatusCallback>& callback);
+    void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,const DevicestatusDataUtils::DevicestatusActivityEvent& event, const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetLatestDevicestatusData(const \
         DevicestatusDataUtils::DevicestatusType& type);
     int32_t SensorDataCallback(const struct SensorEvents *event);
@@ -76,6 +76,9 @@ private:
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> msdpData_;
     std::map<DevicestatusDataUtils::DevicestatusType, std::set<const sptr<IdevicestatusCallback>, classcomp>> \
         listenerMap_;
+    int32_t type_;
+    int32_t event_;
+    int arrs [4] = {0};
 };
 } // namespace Msdp
 } // namespace OHOS

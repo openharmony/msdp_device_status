@@ -37,10 +37,11 @@ ohos_unittest("test_devicestatus_service") {
   ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
+    "${aafwk_kits_path}/appkit:appkit_native",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_service_path}:devicestatus_service",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//foundation/ability/ability_runtime/frameworks/native/appkit:appkit_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -56,7 +57,7 @@ ohos_unittest("test_devicestatus_service") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -81,7 +82,7 @@ ohos_unittest("DevicestatusAgentTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 

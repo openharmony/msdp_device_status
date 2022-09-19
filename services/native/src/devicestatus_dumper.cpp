@@ -182,16 +182,16 @@ std::string DevicestatusDumper::GetStatusType(const DevicestatusDataUtils::Devic
 {
     std::string stateType;
     switch (type) {
-        case DevicestatusDataUtils::TYPE_HIGH_STILL: {
-            stateType = "high still";
+        case DevicestatusDataUtils::TYPE_STILL: {
+            stateType = "still";
             break;
         }
-        case DevicestatusDataUtils::TYPE_FINE_STILL: {
-            stateType = "fine still";
+        case DevicestatusDataUtils::TYPE_HORIZONTAL_POSITION: {
+            stateType = "horizontal position";
             break;
         }
-        case DevicestatusDataUtils::TYPE_CAR_BLUETOOTH: {
-            stateType = "car bluetooth";
+        case DevicestatusDataUtils::TYPE_VERTICAL_POSITION: {
+            stateType = "vertical position";
             break;
         }
         case DevicestatusDataUtils::TYPE_LID_OPEN: {
@@ -293,6 +293,38 @@ void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::Devicesta
     if (deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE) {
         deviceStatusQueue_.pop();
     }
+}
+
+std::string DevicestatusDumper::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
+{
+    DEV_HILOGI(SERVICE, "Enter");
+    std::string packageName = "unknown";
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                DEV_HILOGI(SERVICE, "get native token info fail");
+                return packageName;
+            }
+            packageName = tokenInfo.processName;
+            break;
+        }
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
+            Security::AccessToken::HapTokenInfo hapInfo;
+            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+                DEV_HILOGI(SERVICE, "get hap token info fail");
+                return packageName;
+            }
+            packageName = hapInfo.bundleName;
+            break;
+        }
+        default: {
+            DEV_HILOGI(SERVICE, "token type not match");
+            break;
+        }
+    }
+    return packageName;
 }
 } // namespace Msdp
 } // namespace OHOS

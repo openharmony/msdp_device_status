@@ -35,17 +35,19 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_msdp_interface.h"
 #include "devicestatus_sensor_interface.h"
+#include "devicestatus_algorithm_manager_interface.h"
 
 namespace OHOS {
 namespace Msdp {
 class DevicestatusMsdpClientImpl :
     public DevicestatusMsdpInterface::MsdpAlgorithmCallback,
-    public DevicestatusSensorInterface::DevicestatusSensorHdiCallback {
+    public DevicestatusSensorInterface::DevicestatusSensorHdiCallback,
+    public DevicestatusAlgorithmManagerInterface::DevicestatusAlgorithmCallback {
 public:
     using CallbackManager = std::function<int32_t(const DevicestatusDataUtils::DevicestatusData&)>;
 
-    ErrCode InitMsdpImpl();
-    ErrCode DisableMsdpImpl();
+    ErrCode InitMsdpImpl(const DevicestatusDataUtils::DevicestatusType& type);
+    ErrCode DisableMsdpImpl(const DevicestatusDataUtils::DevicestatusType& type);
     ErrCode RegisterImpl(const CallbackManager& callback);
     ErrCode UnregisterImpl();
     int32_t MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data);
@@ -53,6 +55,8 @@ public:
     ErrCode UnregisterMsdp(void);
     ErrCode RegisterSensor();
     ErrCode UnregisterSensor(void);
+    ErrCode RegisterDevAlgorithm();
+    ErrCode UnregisterDevAlgorithm(void);
     DevicestatusDataUtils::DevicestatusData SaveObserverData(const DevicestatusDataUtils::DevicestatusData& data);
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
     void GetDevicestatusTimestamp();
@@ -62,16 +66,21 @@ public:
     int32_t UnloadAlgorithmLibrary(bool bCreate);
     int32_t LoadSensorHdiLibrary(bool bCreate);
     int32_t UnloadSensorHdiLibrary(bool bCreate);
+    int32_t LoadDevAlgorithmLibrary(bool bCreate);
+    int32_t UnloadDevAlgorithmLibrary(bool bCreate);
 private:
     ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
     DevicestatusSensorInterface* GetSensorHdiInst();
     DevicestatusMsdpInterface* GetAlgorithmInst();
+    DevicestatusAlgorithmManagerInterface* GetDevAlgorithmInst();
     MsdpAlgorithmHandle mAlgorithm_;
     SensorHdiHandle sensorHdi_;
+    DevicestatusAlgorithmHandle devAlgorithm_;
     std::mutex mMutex_;
     bool notifyManagerFlag_ = false;
     void OnResult(const DevicestatusDataUtils::DevicestatusData& data) override;
     void OnSensorHdiResult(const DevicestatusDataUtils::DevicestatusData& data) override;
+    void OnAlogrithmResult(const DevicestatusDataUtils::DevicestatusData& data) override;
 };
 }
 }

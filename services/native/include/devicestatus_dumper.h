@@ -69,6 +69,7 @@ public:
     void SaveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void RemoveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void pushDeviceStatus(const DevicestatusDataUtils::DevicestatusData& data);
+    std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 private:
     DISALLOW_COPY_AND_MOVE(DevicestatusDumper);
     void DumpCurrentTime(std::string &startTime) const;

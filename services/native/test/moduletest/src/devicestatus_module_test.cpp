@@ -65,12 +65,12 @@ HWTEST_F (DevicestatusModuleTest, DevicestatusCallbackTest, TestSize.Level0)
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 Enter");
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
 }
 

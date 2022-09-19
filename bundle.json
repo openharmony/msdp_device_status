@@ -10,7 +10,6 @@
     "name": "device_status",
     "subsystem": "msdp",
     "syscap": ["SystemCapability.Msdp.DeviceStatus"],
-    "hisysevent_config": ["//base/msdp/device_status/hisysevent.yaml"],
     "features": [],
     "adapted_system_type": [ "standard" ],
     "rom": "2048KB",
@@ -21,7 +20,7 @@
         "hiviewdfx_hilog_native",
         "ipc",
         "safwk",
-        "samgr_standard",
+        "samgr",
         "utils_base",
         "appexecfwk_standard",
         "napi"
@@ -32,6 +31,7 @@
       "sub_component": [
         "//base/msdp/device_status/libs:devicestatus_sensorhdi",
         "//base/msdp/device_status/libs:devicestatus_msdp",
+        "//base/msdp/device_status/libs:devicestatus_algorithm_manager",
         "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
         "//base/msdp/device_status/services:devicestatus_service",
         "//base/msdp/device_status/frameworks/js/napi:devicestatus",

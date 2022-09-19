@@ -32,8 +32,11 @@ public:
     DISALLOW_COPY_AND_MOVE(DevicestatusClient);
 
     void SubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
-        const sptr<IdevicestatusCallback>& callback);
+    const DevicestatusDataUtils::DevicestatusActivityEvent& event,
+    const DevicestatusDataUtils::DevicestatusReportLatencyNs& latency,
+    const sptr<IdevicestatusCallback>& callback);
     void UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
+        const DevicestatusDataUtils::DevicestatusActivityEvent& event,
         const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetDevicestatusData(const DevicestatusDataUtils::DevicestatusType& type);
 

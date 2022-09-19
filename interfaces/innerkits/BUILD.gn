@@ -21,11 +21,13 @@ config("devicestatus_public_config") {
   include_dirs = [
     "include",
     "${device_status_service_path}/native/include",
+    "${device_status_utils_path}/include",
   ]
 }
 
 ohos_shared_library("devicestatus_client") {
   sources = [
+    "${device_status_frameworks_path}/native/src/bytrace_adapter.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
@@ -46,7 +48,7 @@ ohos_shared_library("devicestatus_client") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "${device_status_part_name}"
