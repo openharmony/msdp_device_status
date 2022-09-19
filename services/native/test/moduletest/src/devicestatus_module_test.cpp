@@ -38,7 +38,7 @@ void DevicestatusModuleTest::DevicestatusModuleTestCallback::OnDevicestatusChang
     GTEST_LOG_(INFO) << "DevicestatusModuleTestCallback value: " << devicestatusData.value;
     EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
         devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
-        "DevicestatusModuleTestCallback falied";
+        "DevicestatusModuleTestCallback failed";
 }
 
 /**
@@ -71,7 +71,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
@@ -88,7 +88,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
@@ -105,5 +105,5 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData falied";
+        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
