@@ -15,5 +15,8 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [ "devicestatusagent_fuzzer:fuzztest" ]
+  deps += [
+    "devicestatusagent_fuzzer:fuzztest",
+    "devicestatusclient_fuzzer:fuzztest",
+  ]
 }
