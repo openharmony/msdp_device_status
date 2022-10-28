@@ -51,8 +51,6 @@ public:
         virtual ~DeviceStatusAgentClient() {};
         bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
     };
-    class DeviceStatusAgentChange : public DeviceStatusAgent::DeviceStatusAgentCallback {
-};
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUSAGENT_FUZZER_H

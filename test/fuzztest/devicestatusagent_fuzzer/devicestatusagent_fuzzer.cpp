@@ -24,8 +24,6 @@ const int WAIT_TIME = 1000;
 static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
             std::make_shared<DevicestatusAgentFuzzer::DeviceStatusAgentClient>();
 static std::shared_ptr<DeviceStatusAgent> agent_ = std::make_shared<DeviceStatusAgent>();
-static std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentCallback> agentCb_ =
-            std::make_shared<DeviceStatusAgent::DeviceStatusAgentCallback>();
 
 bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
     const DevicestatusDataUtils::DevicestatusData& devicestatusData)
