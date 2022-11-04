@@ -62,7 +62,7 @@ DevicestatusNapi* DevicestatusNapi::GetDevicestatusNapi(int32_t type)
     for (auto it = objectMap_.begin(); it != objectMap_.end(); ++it) {
         if (it->first == type) {
             isExists = true;
-            obj = (DevicestatusNapi*)(it->second);
+            obj = static_cast<DevicestatusNapi*>(it->second);
             DEV_HILOGD(JS_NAPI, "Found object");
             break;
         }
@@ -196,7 +196,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
             [](napi_env env, void *data, void *hint) {
                 (void)env;
                 (void)hint;
-                DevicestatusNapi *devicestatus = (DevicestatusNapi *)data;
+                DevicestatusNapi *devicestatus = static_cast<DevicestatusNapi *>(data);
                 delete devicestatus;
             },
             nullptr, &(obj->callbackRef_));
@@ -270,7 +270,7 @@ napi_value DevicestatusNapi::UnSubscribeDevicestatus(napi_env env, napi_callback
     for (auto it = objectMap_.begin(); it != objectMap_.end(); ++it) {
         if (it->first == type) {
             isObjExists = true;
-            obj = (DevicestatusNapi*)(it->second);
+            obj = static_cast<DevicestatusNapi*>(it->second);
             DEV_HILOGD(JS_NAPI, "Found object");
         }
     }
@@ -347,7 +347,7 @@ napi_value DevicestatusNapi::GetDevicestatus(napi_env env, napi_callback_info in
         [](napi_env env, void *data, void *hint) {
             (void)env;
             (void)hint;
-            DevicestatusNapi *devicestatus = (DevicestatusNapi *)data;
+            DevicestatusNapi *devicestatus = static_cast<DevicestatusNapi *>(data);
             delete devicestatus;
         },
         nullptr, &(obj->callbackRef_));
@@ -479,13 +479,12 @@ napi_value DevicestatusNapi::CreateDevicestatusValueObject(napi_env env)
     DEV_HILOGD(JS_NAPI, "Enter");
     napi_value result = nullptr;
     napi_status status;
-    std::string propName;
 
     status = napi_create_object(env, &result);
     if (status == napi_ok) {
         for (uint32_t i = DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER; \
             i < vecDevicestatusValue.size(); i++) {
-            propName = vecDevicestatusValue[i];
+            std::string propName = vecDevicestatusValue[i];
             DEV_HILOGD(JS_NAPI, "propName: %{public}s", propName.c_str());
             status = AddProperty(env, result, propName, i);
             if (status != napi_ok) {

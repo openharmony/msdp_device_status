@@ -60,10 +60,6 @@ bool DevicestatusEvent::On(const int32_t& eventType, napi_value handler, bool is
         }
     }
     auto listener = std::make_shared<DevicestatusEventListener>();
-    if (listener == nullptr) {
-        DEV_HILOGE(JS_NAPI, "listener is nullptr");
-        return false;
-    }
     listener->eventType = eventType;
     napi_create_reference(env_, handler, 1, &listener->handlerRef);
     if (isOnce) {
