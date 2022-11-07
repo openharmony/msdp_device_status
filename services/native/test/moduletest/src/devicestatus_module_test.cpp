@@ -27,7 +27,7 @@
 #include "devicestatus_client.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
+using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 

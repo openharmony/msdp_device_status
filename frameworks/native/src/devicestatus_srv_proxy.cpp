@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
@@ -123,5 +124,6 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
+} // namespace DeviceStatus
 } // Msdp
 } // OHOS

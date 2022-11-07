@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusMsdpInterface {
 public:
     DevicestatusMsdpInterface() {}
@@ -57,6 +58,7 @@ struct MsdpAlgorithmHandle {
         pAlgorithm = nullptr;
     }
 };
+} // namespace DeviceStatus
 }
 }
 #endif // DEVICESTATUS_MSDP_INTERFACE_H

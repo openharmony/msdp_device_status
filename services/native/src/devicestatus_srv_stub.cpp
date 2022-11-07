@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
@@ -94,5 +95,6 @@ int32_t DevicestatusSrvStub::GetLatestDevicestatusDataStub(MessageParcel& data, 
     DEV_HILOGD(SERVICE, "Exit");
     return ERR_OK;
 }
+} // namespace DeviceStatus
 } // Msdp
 } // OHOS

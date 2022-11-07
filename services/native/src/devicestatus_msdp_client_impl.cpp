@@ -29,6 +29,7 @@
 using namespace OHOS::NativeRdb;
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr int32_t ERR_OK = 0;
 constexpr int32_t ERR_NG = -1;
@@ -363,5 +364,6 @@ DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
 
     return mAlgorithm_.pAlgorithm;
 }
+} // namespace DeviceStatus
 }
 }

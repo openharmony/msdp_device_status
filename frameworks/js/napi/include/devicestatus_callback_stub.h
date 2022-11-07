@@ -25,6 +25,7 @@
 #include "message_parcel.h"
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusCallbackStub : public IRemoteStub<IdevicestatusCallback> {
 public:
     DISALLOW_COPY_AND_MOVE(DevicestatusCallbackStub);
@@ -36,6 +37,7 @@ public:
 private:
     int32_t OnDevicestatusChangedStub(MessageParcel& data);
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_CALLBACK_STUB_H

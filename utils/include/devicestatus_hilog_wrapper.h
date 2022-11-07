@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 #define __FILENAME__            (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #define __FORMATED(fmt, ...)    "[%{public}s] %{public}s# " fmt, __FILENAME__, __FUNCTION__, ##__VA_ARGS__
 
@@ -85,6 +86,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
     (void)OHOS::HiviewDFX::HiLog::Info(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
 #define DEV_HILOGD(module, ...) \
     (void)OHOS::HiviewDFX::HiLog::Debug(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 

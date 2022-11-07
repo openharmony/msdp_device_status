@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusCallback : public DevicestatusCallbackStub {
 public:
     explicit DevicestatusCallback() {};
@@ -65,6 +66,7 @@ private:
     static napi_ref devicestatusValueRef_;
     napi_env env_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_NAPI_H

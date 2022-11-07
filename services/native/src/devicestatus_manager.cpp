@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 using namespace OHOS::HiviewDFX;
 namespace {
 constexpr int32_t ERR_OK = 0;
@@ -305,5 +306,6 @@ void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &pac
         }
     }
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

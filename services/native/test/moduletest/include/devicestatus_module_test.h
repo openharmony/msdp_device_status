@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusModuleTest : public testing::Test {
 public:
 
@@ -32,6 +33,7 @@ public:
         virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
     };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_SERVICE_TEST_H

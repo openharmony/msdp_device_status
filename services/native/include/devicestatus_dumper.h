@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 const std::string ARG_DUMP_HELP = "-h";
 const std::string ARG_DUMP_DEVICESTATUS_SUBSCRIBER = "-s";
 const std::string ARG_DUMP_DEVICESTATUS_CHANGES = "-l";
@@ -78,6 +79,7 @@ private:
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_DUMPER_H

@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusAgentTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -40,6 +41,7 @@ public:
     virtual ~DevicestatusAgentListenerMockSecondClient() {};
     bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // OHOS_MSDP_DEVICESTATUS_AGENT_TEST_H

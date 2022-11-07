@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusService final : public SystemAbility, public DevicestatusSrvStub {
     DECLARE_SYSTEM_ABILITY(DevicestatusService)
     DECLARE_DELAYED_SP_SINGLETON(DevicestatusService);
@@ -52,6 +53,7 @@ private:
     std::shared_ptr<DevicestatusManager> devicestatusManager_;
     std::shared_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_SERVICE_H

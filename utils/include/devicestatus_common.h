@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 #define DEVICESTATUS_RETURN_IF_WITH_RET(cond, retval) if (cond) {return (retval);}
 #define DEVICESTATUS_RETURN_IF(cond) if (cond) {return;}
 #define DEVICESTATUS_RETURN_IF_WITH_LOG(cond, loginfo)                                  \
@@ -71,6 +72,7 @@ constexpr auto DevicestatusToUnderlying(E e) noexcept
 {
     return static_cast<std::underlying_type_t<E>>(e);
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 

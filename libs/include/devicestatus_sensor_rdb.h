@@ -35,6 +35,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusSensorRdb : public DevicestatusSensorInterface {
 public:
     enum EventType {
@@ -89,6 +90,7 @@ public:
     int32_t OnCreate(NativeRdb::RdbStore &rdbStore) override;
     int32_t OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t oldVersion, int32_t newVersion) override;
 };
-}
-}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
 #endif // DEVICESTATUS_SENSOR_RDB_H

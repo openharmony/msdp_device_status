@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class IdevicestatusCallback : public IRemoteBroker {
 public:
     enum  {
@@ -33,6 +34,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusCallback");
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // IDEVICESTATUS_CALLBACK_H

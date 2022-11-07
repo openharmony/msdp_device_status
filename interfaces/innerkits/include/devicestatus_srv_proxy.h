@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusSrvProxy : public IRemoteProxy<Idevicestatus> {
 public:
     explicit DevicestatusSrvProxy(const sptr<IRemoteObject>& impl)
@@ -40,6 +41,7 @@ public:
 private:
     static inline BrokerDelegator<DevicestatusSrvProxy> delegator_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_SRV_PROXY_H

@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 struct DevicestatusEventListener {
     int32_t eventType;
     napi_ref handlerRef = nullptr;
@@ -49,6 +50,7 @@ class JsResponse {
 public:
     int32_t devicestatusValue_ = -1;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_EVENT_H

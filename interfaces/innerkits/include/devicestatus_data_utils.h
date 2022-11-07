@@ -18,6 +18,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusDataUtils {
 public:
     enum DevicestatusType {
@@ -40,6 +41,7 @@ public:
         DevicestatusValue value;
     };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_DATA_UTILS_H

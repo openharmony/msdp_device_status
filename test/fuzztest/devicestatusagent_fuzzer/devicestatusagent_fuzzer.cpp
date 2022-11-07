@@ -17,7 +17,7 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::Msdp;
+using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 const int WAIT_TIME = 1000;
 }
@@ -85,6 +85,6 @@ bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* dat
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Msdp::DeviceStatus::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

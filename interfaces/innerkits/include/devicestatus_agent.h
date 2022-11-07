@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DeviceStatusAgent : public std::enable_shared_from_this<DeviceStatusAgent> {
 public:
     DeviceStatusAgent() {};
@@ -52,6 +53,7 @@ private:
     sptr<IdevicestatusCallback> callback_;
     std::shared_ptr<DeviceStatusAgentEvent> agentEvent_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // OHOS_MSDP_DEVICESTATUS_AGENT_H

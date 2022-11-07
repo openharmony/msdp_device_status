@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class IdevicestatusStorage : public IRemoteBroker {
 public:
     struct DevicestatusRecord {
@@ -35,6 +36,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusStorage");
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // IDEVICESTATUS_STORAGE_H
