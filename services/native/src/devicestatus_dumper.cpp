@@ -235,9 +235,9 @@ void DevicestatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGI(SERVICE, "Enter");
     DumpCurrentTime(appInfo->startTime);
-    std::set<std::shared_ptr<AppInfo>> appInfos;
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
+        std::set<std::shared_ptr<AppInfo>> appInfos;
         if (appInfos.insert(appInfo).second) {
             appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
         }
@@ -283,10 +283,6 @@ void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::Devicesta
     DEV_HILOGI(SERVICE, "Enter");
     std::unique_lock lock(mutex_);
     auto record = std::make_shared<DeviceStatusRecord>();
-    if (record == nullptr) {
-        DEV_HILOGI(SERVICE, "record is null");
-        return;
-    }
     DumpCurrentTime(record->startTime);
     record->data = data;
     deviceStatusQueue_.push(record);

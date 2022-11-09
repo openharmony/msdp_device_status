@@ -186,7 +186,6 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
-    std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
     DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
 
     if (!EnableRdb()) {
@@ -197,6 +196,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     std::lock_guard lock(mutex_);
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
+        std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
         if (listeners.insert(callback).second) {
             DEV_HILOGI(SERVICE, "no found set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
