@@ -180,7 +180,6 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
         return result;
     }
 
-    DevicestatusNapi* obj = nullptr;
     bool isObjExists = false;
     for (auto it = objectMap_.begin(); it != objectMap_.end(); ++it) {
         if (it->first == type) {
@@ -189,6 +188,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
             return result;
         }
     }
+    DevicestatusNapi* obj = nullptr;
     if (!isObjExists) {
         DEV_HILOGD(JS_NAPI, "Didn't find object, so created it");
         obj = new (std::nothrow) DevicestatusNapi(env, jsthis);
@@ -446,7 +446,7 @@ napi_value DevicestatusNapi::ResponseConstructor(napi_env env, napi_callback_inf
     void *data = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data);
 
-    auto entity = new ResponseEntity();
+    auto entity = new (std::nothrow) ResponseEntity();
     napi_wrap(
         env, thisVar, entity,
         [](napi_env env, void *data, void *hint) {
