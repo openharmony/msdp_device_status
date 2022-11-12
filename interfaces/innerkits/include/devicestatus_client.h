@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusClient final : public DelayedRefSingleton<DevicestatusClient> {
     DECLARE_DELAYED_REF_SINGLETON(DevicestatusClient)
 
@@ -53,6 +54,7 @@ private:
     void ResetProxy(const wptr<IRemoteObject>& remote);
     std::mutex mutex_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // IDEVICESTATUS_H

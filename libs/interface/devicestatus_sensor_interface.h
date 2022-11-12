@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusSensorInterface {
 public:
     DevicestatusSensorInterface() {}
@@ -57,6 +58,7 @@ struct SensorHdiHandle {
         pAlgorithm = nullptr;
     }
 };
+} // namespace DeviceStatus
 }
 }
 #endif // DEVICESTATUS_SENSOR_INTERFACE_H

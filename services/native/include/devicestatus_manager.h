@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 using namespace Security::AccessToken;
 class DevicestatusService;
 class DevicestatusManager {
@@ -77,6 +78,7 @@ private:
     std::map<DevicestatusDataUtils::DevicestatusType, std::set<const sptr<IdevicestatusCallback>, classcomp>> \
         listenerMap_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_MANAGER_H

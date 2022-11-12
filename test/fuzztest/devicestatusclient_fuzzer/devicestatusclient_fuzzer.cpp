@@ -20,7 +20,7 @@
 
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::Msdp;
+using namespace OHOS::Msdp::DeviceStatus;
 auto &client_ = DevicestatusClient::GetInstance();
 sptr<DevicestatusClientFuzzer::DevicestatusTestCallback> cb = new DevicestatusClientFuzzer::DevicestatusTestCallback();
 const int WAIT_TIME = 1000;

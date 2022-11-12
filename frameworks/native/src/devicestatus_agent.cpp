@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
     const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
@@ -76,5 +77,6 @@ void DeviceStatusAgent::UnRegisterServiceEvent(const DevicestatusDataUtils::Devi
     DEV_HILOGI(INNERKIT, "Enter");
     DevicestatusClient::GetInstance().UnSubscribeCallback(type, callback_);
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

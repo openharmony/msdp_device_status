@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 #define DECLARE_DELAYED_SP_SINGLETON(MyClass) \
 public: \
     ~MyClass(); \
@@ -70,6 +71,7 @@ void DelayedSpSingleton<T>::DestroyInstance()
         instance_ = nullptr;
     }
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_DELAYED_SP_SINGLETON_H

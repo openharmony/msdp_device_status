@@ -26,6 +26,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 DevicestatusClient::DevicestatusClient() {}
 DevicestatusClient::~DevicestatusClient()
 {
@@ -150,5 +151,6 @@ DevicestatusDataUtils::DevicestatusData DevicestatusClient::GetDevicestatusData(
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

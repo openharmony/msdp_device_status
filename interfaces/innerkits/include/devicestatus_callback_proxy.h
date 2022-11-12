@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusCallbackProxy : public IRemoteProxy<IdevicestatusCallback> {
 public:
     explicit DevicestatusCallbackProxy(const sptr<IRemoteObject>& impl)
@@ -35,6 +36,7 @@ public:
 private:
     static inline BrokerDelegator<DevicestatusCallbackProxy> delegator_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_CALLBACK_PROXY_H

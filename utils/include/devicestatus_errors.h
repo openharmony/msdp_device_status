@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 enum {
     /**
      *  Module type: Devicestatus Service
@@ -42,6 +43,7 @@ enum {
     E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED,
     E_DEVICESTATUS_INNER_ERR
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 

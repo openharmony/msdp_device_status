@@ -18,7 +18,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_client.h"
 
-using namespace OHOS::Msdp;
+using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 namespace {
 auto &g_DevicestatusClient = DevicestatusClient::GetInstance();

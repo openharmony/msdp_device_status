@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
     constexpr uint32_t MS_NS = 1000000;
 }
@@ -290,5 +291,6 @@ void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::Devicesta
         deviceStatusQueue_.pop();
     }
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

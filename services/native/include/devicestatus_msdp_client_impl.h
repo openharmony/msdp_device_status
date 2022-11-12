@@ -38,6 +38,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusMsdpClientImpl :
     public DevicestatusMsdpInterface::MsdpAlgorithmCallback,
     public DevicestatusSensorInterface::DevicestatusSensorHdiCallback {
@@ -73,6 +74,7 @@ private:
     void OnResult(const DevicestatusDataUtils::DevicestatusData& data) override;
     void OnSensorHdiResult(const DevicestatusDataUtils::DevicestatusData& data) override;
 };
+} // namespace DeviceStatus
 }
 }
 #endif // DEVICESTATUS_MSDP_CLIENT_IMPL_H

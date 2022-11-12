@@ -32,6 +32,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 enum class ApiNumber {
     NUM_ZERO = 0,
     NUM_ONE,
@@ -52,6 +53,7 @@ public:
         bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
     };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUSAGENT_FUZZER_H

@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 int32_t DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
@@ -56,5 +57,6 @@ int32_t DevicestatusCallbackStub::OnDevicestatusChangedStub(MessageParcel& data)
     OnDevicestatusChanged(devicestatusData);
     return ERR_OK;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

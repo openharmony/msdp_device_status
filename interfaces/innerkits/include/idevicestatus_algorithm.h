@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class IdevicestatusAlgorithm : public IRemoteBroker {
 public:
     virtual bool Enable() = 0;
@@ -31,6 +32,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithm");
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // IDEVICESTATUS_ALGORITHM_H

@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 using namespace OHOS::HiviewDFX;
 namespace {
 auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
@@ -218,5 +219,6 @@ void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::Device
     HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
         "UID", uid, "PKGNAME", packageName, "TYPE", type);
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

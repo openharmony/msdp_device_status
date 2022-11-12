@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class DevicestatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
     DevicestatusSrvStub() = default;
@@ -37,6 +38,7 @@ private:
     int32_t UnSubscribeStub(MessageParcel& data);
     int32_t GetLatestDevicestatusDataStub(MessageParcel& data, MessageParcel& reply);
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEVICESTATUS_SRV_STUB_H

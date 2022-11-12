@@ -17,7 +17,7 @@
 
 #include "devicestatus_common.h"
 
-using namespace OHOS::Msdp;
+using namespace OHOS::Msdp::DeviceStatus;
 
 DevicestatusEvent::DevicestatusEvent(napi_env env, napi_value thisVar)
 {

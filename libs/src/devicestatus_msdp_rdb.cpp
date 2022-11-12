@@ -27,6 +27,7 @@
 using namespace OHOS::NativeRdb;
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 const std::string DATABASE_NAME = "/data/MsdpStub.db";
 constexpr int32_t TIMER_INTERVAL = 3;
@@ -354,5 +355,6 @@ extern "C" void Destroy(DevicestatusMsdpInterface* algorithm)
     DEV_HILOGI(SERVICE, "Enter");
     delete algorithm;
 }
-}
-}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
