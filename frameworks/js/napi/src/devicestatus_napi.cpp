@@ -191,7 +191,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
     }
     if (!isObjExists) {
         DEV_HILOGD(JS_NAPI, "Didn't find object, so created it");
-        obj = new DevicestatusNapi(env, jsthis);
+        obj = new (std::nothrow) DevicestatusNapi(env, jsthis);
         napi_wrap(env, jsthis, reinterpret_cast<void *>(obj),
             [](napi_env env, void *data, void *hint) {
                 (void)env;
@@ -222,7 +222,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
     }
     if (!isCallbackExists) {
         DEV_HILOGD(JS_NAPI, "Didn't find callback, so created it");
-        callback = new DevicestatusCallback();
+        callback = new (std::nothrow) DevicestatusCallback();
         g_DevicestatusClient.SubscribeCallback(DevicestatusDataUtils::DevicestatusType(type), callback);
         callbackMap_.insert(std::pair<int32_t, sptr<IdevicestatusCallback>>(type, callback));
         InvokeCallBack(env, args, false, CALLBACK_SUCCESS);
@@ -342,7 +342,7 @@ napi_value DevicestatusNapi::GetDevicestatus(napi_env env, napi_callback_info in
         return result;
     }
 
-    DevicestatusNapi* obj = new DevicestatusNapi(env, jsthis);
+    DevicestatusNapi* obj = new (std::nothrow) DevicestatusNapi(env, jsthis);
     napi_wrap(env, jsthis, reinterpret_cast<void *>(obj),
         [](napi_env env, void *data, void *hint) {
             (void)env;
