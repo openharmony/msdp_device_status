@@ -68,7 +68,11 @@ int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::De
 void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
     DEV_HILOGI(INNERKIT, "Enter");
-    callback_ = new DeviceStatusAgentCallback(shared_from_this());
+    callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
+    if (callback_ == nullptr) {
+        DEV_HILOGE(INNERKIT, "callback_ is nullptr");
+        return;
+    }
     DevicestatusClient::GetInstance().SubscribeCallback(type, callback_);
 }
 

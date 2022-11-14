@@ -36,7 +36,11 @@ bool DevicestatusManager::Init()
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusCBDeathRecipient_ == nullptr) {
-        devicestatusCBDeathRecipient_ = new DevicestatusCallbackDeathRecipient();
+        devicestatusCBDeathRecipient_ = new (std::nothrow) DevicestatusCallbackDeathRecipient();
+        if (devicestatusCBDeathRecipient_ == nullptr) {
+            DEV_HILOGE(SERVICE, "devicestatusCBDeathRecipient_ is nullptr");
+            return false;
+        }
     }
 
     msdpImpl_ = std::make_unique<DevicestatusMsdpClientImpl>();
@@ -166,9 +170,7 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
         }
     }
     if (!isExists) {
-        DEV_HILOGI(SERVICE, "No listener found for type: %{public}d", \
-            devicestatusData.type);
-        DEV_HILOGI(SERVICE, "Exit");
+        DEV_HILOGI(SERVICE, "No listener found for type: %{public}d", devicestatusData.type);
         return;
     }
     for (auto& listener : listeners) {
@@ -178,6 +180,7 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
         }
         listener->OnDevicestatusChanged(devicestatusData);
     }
+    DEV_HILOGI(SERVICE, "Exit");
 }
 
 void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
@@ -187,7 +190,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
-    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size: %{public}zu", listenerMap_.size());
 
     if (!EnableRdb()) {
         DEV_HILOGE(SERVICE, "Enable failed!");
@@ -204,7 +207,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
         }
         listenerMap_.insert(std::make_pair(type, listeners));
     } else {
-        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
+        DEV_HILOGI(SERVICE, "callbacklist.size: %{public}zu",
             listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
         if (iter != listenerMap_[dtTypeIter->first].end()) {
@@ -227,13 +230,13 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
-    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size: %{public}zu", listenerMap_.size());
 
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
         return;
     } else {
-        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
+        DEV_HILOGI(SERVICE, "callbacklist.size: %{public}zu",
             listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
         if (iter != listenerMap_[dtTypeIter->first].end()) {
@@ -245,7 +248,7 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
             }
         }
     }
-    DEV_HILOGI(SERVICE, "listenerMap_.size = %{public}zu", listenerMap_.size());
+    DEV_HILOGI(SERVICE, "listenerMap_.size: %{public}zu", listenerMap_.size());
     if (listenerMap_.empty()) {
         DisableRdb();
     } else {

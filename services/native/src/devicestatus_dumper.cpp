@@ -49,7 +49,7 @@ void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
     char **argv = new char *[args.size()];
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new char[args[i].size() + 1];
-        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
+        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             DEV_HILOGE(SERVICE, "strcpy_s error");
             goto RELEASE_RES;
             return;
@@ -245,7 +245,6 @@ void DevicestatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     } else {
         if (!appInfoMap_[iter->first].insert(appInfo).second) {
             DEV_HILOGW(SERVICE, "duplicated app info");
-            return;
         }
     }
 }

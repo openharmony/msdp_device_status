@@ -356,10 +356,8 @@ DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
 
     if (mAlgorithm_.pAlgorithm == nullptr) {
         std::unique_lock<std::mutex> lock(mMutex_);
-        if (mAlgorithm_.pAlgorithm == nullptr) {
-            DEV_HILOGI(SERVICE, "Get mAlgorithm.pAlgorithm");
-            mAlgorithm_.pAlgorithm = mAlgorithm_.create();
-        }
+        DEV_HILOGI(SERVICE, "Get mAlgorithm.pAlgorithm");
+        mAlgorithm_.pAlgorithm = mAlgorithm_.create();
     }
 
     return mAlgorithm_.pAlgorithm;
