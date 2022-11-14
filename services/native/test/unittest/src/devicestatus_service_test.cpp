@@ -51,6 +51,7 @@ HWTEST_F (DevicestatusServiceTest, DevicestatusCallbackTest, TestSize.Level0)
     DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     sptr<IdevicestatusCallback> cb = new (std::nothrow) DevicestatusServiceTestCallback();
+    EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     devicestatusClient.SubscribeCallback(type, cb);
     GTEST_LOG_(INFO) << "Cancell register";

@@ -37,6 +37,10 @@ bool DevicestatusManager::Init()
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new (std::nothrow) DevicestatusCallbackDeathRecipient();
+        if (devicestatusCBDeathRecipient_ == nullptr) {
+            DEV_HILOGE(SERVICE, "devicestatusCBDeathRecipient_ is nullptr");
+            return false;
+        }
     }
 
     msdpImpl_ = std::make_unique<DevicestatusMsdpClientImpl>();
