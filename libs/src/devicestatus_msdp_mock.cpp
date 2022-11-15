@@ -32,7 +32,6 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t TIMER_INTERVAL = 3;
 constexpr int32_t ERR_INVALID_FD = -1;
-constexpr int32_t TIMER_MS = 1000;
 DeviceStatusMsdpMock* g_msdpMock = nullptr;
 } // namespace
 
@@ -180,14 +179,14 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    Data Data;
+    Data data;
     for (int32_t n = int(Type::TYPE_STILL); n < Type::TYPE_MAX; ++n) {
         if (enabledType_[n] == TypeValue::VALID) {
             Type type = Type(n);
             if (dataParse_ != nullptr) {
-                dataParse_->ParseDeviceStatusData(Data, type);
+                dataParse_->ParseDeviceStatusData(data, type);
             }
-            NotifyMsdpImpl(Data);
+            NotifyMsdpImpl(data);
         }
     }
 }

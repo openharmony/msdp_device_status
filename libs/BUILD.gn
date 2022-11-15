@@ -35,7 +35,6 @@ ohos_shared_library("devicestatus_mock") {
   sources = [
     "src/devicestatus_data_parse.cpp",
     "src/devicestatus_msdp_mock.cpp",
-    "src/devicestatus_sensor_mock.cpp",
   ]
 
   configs = [

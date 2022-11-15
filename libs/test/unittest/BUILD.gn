@@ -146,5 +146,8 @@ group("unittest") {
   testonly = true
   deps = []
 
-  deps += [ ":device_status_algorithm_test" ]
+  deps += [
+    ":device_status_algorithm_test",
+    ":device_status_datahub_test",
+  ]
 }
