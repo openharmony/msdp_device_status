@@ -39,7 +39,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteBool(data)) { \
             DEV_HILOGE(COMMON, "WriteBool "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -47,7 +47,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteInt32(data)) { \
             DEV_HILOGE(COMMON, "WriteInt32 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -55,7 +55,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteInt64(data)) { \
             DEV_HILOGE(COMMON, "WriteInt64 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -63,7 +63,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteUint32(data)) { \
             DEV_HILOGE(COMMON, "WriteUint32 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -71,7 +71,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteDouble(data)) { \
             DEV_HILOGE(COMMON, "WriteDouble "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -79,7 +79,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteString(data)) { \
             DEV_HILOGE(COMMON, "WriteString "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -87,7 +87,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).WriteRemoteObject(data)) { \
             DEV_HILOGE(COMMON, "WriteRemoteObject "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -95,7 +95,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadBool(data)) { \
             DEV_HILOGE(COMMON, "ReadBool "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -103,7 +103,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadInt32(data)) { \
             DEV_HILOGE(COMMON, "ReadInt32 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -111,7 +111,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadInt64(data)) { \
             DEV_HILOGE(COMMON, "ReadInt64 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -119,7 +119,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadUint32(data)) { \
             DEV_HILOGE(COMMON, "ReadUint32 "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -127,7 +127,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadDouble(data)) { \
             DEV_HILOGE(COMMON, "ReadDouble "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
@@ -135,7 +135,7 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadString(data)) { \
             DEV_HILOGE(COMMON, "ReadString "#data" failed"); \
-            return ##__VA_ARGS__; \
+            return __VA_ARGS__; \
         } \
     } while (0)
 
