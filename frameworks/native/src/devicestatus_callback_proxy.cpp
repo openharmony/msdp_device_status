@@ -39,8 +39,8 @@ void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtil
         return;
     }
 
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, static_cast<int32_t>(devicestatusData.type));
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, static_cast<int32_t>(devicestatusData.value));
+    WRITEINT32(data, static_cast<int32_t>(devicestatusData.type));
+    WRITEINT32(data, static_cast<int32_t>(devicestatusData.value));
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(IdevicestatusCallback::DEVICESTATUS_CHANGE),
         data, reply, option);

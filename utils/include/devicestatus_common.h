@@ -35,36 +35,108 @@ namespace DeviceStatus {
         }                                                                               \
     } while (0)                                                                         \
 
-#define DEVICESTATUS_READ_PARCEL_NO_RET(parcel, type, out)                              \
-    do {                                                                                \
-        if (!(parcel).Read##type(out)) {                                                \
-            DEV_HILOGE(COMMON, "%{public}s read "#out" failed", __func__); \
-            return;                                                                     \
-        }                                                                               \
-    } while (0)                                                                         \
+#define WRITEBOOL(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteBool(data)) { \
+            DEV_HILOGE(COMMON, "WriteBool "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
 
-#define DEVICESTATUS_WRITE_PARCEL_NO_RET(parcel, type, data)                            \
-    do {                                                                                \
-        if (!(parcel).Write##type(data)) {                                              \
-            DEV_HILOGE(COMMON, "%{public}s write "#data" failed", __func__); \
-            return;                                                                     \
-        }                                                                               \
-    } while (0)                                                                         \
+#define WRITEINT32(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteInt32(data)) { \
+            DEV_HILOGE(COMMON, "WriteInt32 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
 
-#define DEVICESTATUS_READ_PARCEL_WITH_RET(parcel, type, out, retval)                    \
-    do {                                                                                \
-        if (!(parcel).Read##type(out)) {                                                \
-            DEV_HILOGE(COMMON, "%{public}s read "#out" failed", __func__); \
-            return (retval);                                                            \
-        }                                                                               \
-    } while (0)                                                                         \
+#define WRITEINT64(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteInt64(data)) { \
+            DEV_HILOGE(COMMON, "WriteInt64 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
 
-#define DEVICESTATUS_WRITE_PARCEL_WITH_RET(parcel, type, data, retval)                  \
-    do {                                                                                \
-        if (!(parcel).Write##type(data)) {                                              \
-            DEV_HILOGE(COMMON, "%{public}s write "#data" failed", __func__); \
-            return (retval);                                                            \
-        }                                                                               \
+#define WRITEUINT32(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteUint32(data)) { \
+            DEV_HILOGE(COMMON, "WriteUint32 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define WRITEDOUBLE(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteDouble(data)) { \
+            DEV_HILOGE(COMMON, "WriteDouble "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define WRITESTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteString(data)) { \
+            DEV_HILOGE(COMMON, "WriteString "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define WRITEREMOTEOBJECT(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteRemoteObject(data)) { \
+            DEV_HILOGE(COMMON, "WriteRemoteObject "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READBOOL(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadBool(data)) { \
+            DEV_HILOGE(COMMON, "ReadBool "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READINT32(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadInt32(data)) { \
+            DEV_HILOGE(COMMON, "ReadInt32 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READINT64(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadInt64(data)) { \
+            DEV_HILOGE(COMMON, "ReadInt64 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READUINT32(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadUint32(data)) { \
+            DEV_HILOGE(COMMON, "ReadUint32 "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READDOUBLE(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadDouble(data)) { \
+            DEV_HILOGE(COMMON, "ReadDouble "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READSTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadString(data)) { \
+            DEV_HILOGE(COMMON, "ReadString "#data" failed"); \
+            return ##__VA_ARGS__; \
+        } \
     } while (0)
 
 template<typename E>

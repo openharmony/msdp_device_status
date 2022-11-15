@@ -44,8 +44,8 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
         return;
     }
 
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, type);
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, RemoteObject, callback->AsObject());
+    WRITEINT32(data, type);
+    WRITEREMOTEOBJECT(data, callback->AsObject());
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
     if (ret != ERR_OK) {
@@ -73,8 +73,8 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
         return;
     }
 
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, Int32, type);
-    DEVICESTATUS_WRITE_PARCEL_NO_RET(data, RemoteObject, callback->AsObject());
+    WRITEINT32(data, type);
+    WRITEREMOTEOBJECT(data, callback->AsObject());
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
@@ -106,7 +106,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
         return devicestatusData;
     }
 
-    DEVICESTATUS_WRITE_PARCEL_WITH_RET(data, Int32, type, devicestatusData);
+    WRITEINT32(data, type, devicestatusData);
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
     if (ret != ERR_OK) {
@@ -116,8 +116,8 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
 
     int32_t devicestatusType = -1;
     int32_t devicestatusValue = -1;
-    DEVICESTATUS_READ_PARCEL_WITH_RET(reply, Int32, devicestatusType, devicestatusData);
-    DEVICESTATUS_READ_PARCEL_WITH_RET(reply, Int32, devicestatusValue, devicestatusData);
+    READINT32(reply, devicestatusType, devicestatusData);
+    READINT32(reply, devicestatusValue, devicestatusData);
     devicestatusData.type = DevicestatusDataUtils::DevicestatusType(devicestatusType);
     devicestatusData.value = DevicestatusDataUtils::DevicestatusValue(devicestatusValue);
     DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
