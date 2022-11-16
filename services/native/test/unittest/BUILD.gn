@@ -85,12 +85,39 @@ ohos_unittest("DevicestatusAgentTest") {
   ]
 }
 
+ohos_unittest("DevicestatusClientTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "//base/msdp/devicestatus/interfaces/innerkits/include" ]
+
+  sources = [ "src/devicestatus_client_test.cpp" ]
+
+  configs = [
+    "${device_status_utils_path}:devicestatus_utils_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "//base/msdp/device_status/frameworks/native/src:deviceagent",
+    "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
+    "//base/msdp/device_status/services:devicestatus_service",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = []
 
   deps += [
     ":DevicestatusAgentTest",
+    ":DevicestatusClientTest",
     ":test_devicestatus_service",
   ]
 }
