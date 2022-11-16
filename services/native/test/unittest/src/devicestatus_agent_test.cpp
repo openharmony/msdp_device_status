@@ -311,4 +311,17 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest013, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest013 end";
 }
+
+HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest014 start";
+
+    sptr<IdevicestatusCallback> callback = new DeviceStatusAgent::DeviceStatusAgentCallback(agent1_);
+    DevicestatusDataUtils::DevicestatusData devicestatusData = {
+        DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
+        DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER
+    };
+    callback->OnDevicestatusChanged(devicestatusData);
+    GTEST_LOG_(INFO) << "DevicestatusAgentTest014 end";
+}
 }
