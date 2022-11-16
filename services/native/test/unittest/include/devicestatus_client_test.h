@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace Msdp {
-namespace DeviceStatus {
 class DevicestatusClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -35,7 +34,6 @@ public:
     void SetUp();
     void TearDown();
 };
-} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // OHOS_MSDP_DEVICESTATUS_CLIENT_TEST_H
