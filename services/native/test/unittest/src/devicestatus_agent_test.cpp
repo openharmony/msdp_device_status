@@ -315,10 +315,14 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest013, TestSize.Level1)
 HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DevicestatusAgentTest014 start";
+    std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
+        std::make_shared<DevicestatusAgentListenerMockFirstClient>();
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, agentEvent);
+    EXPECT_TRUE(ret == ERR_OK);
 
     sptr<IdevicestatusCallback> callback = new DeviceStatusAgent::DeviceStatusAgentCallback(agent1_);
     DevicestatusDataUtils::DevicestatusData devicestatusData = {
-        DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
+        DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN,
         DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER
     };
     callback->OnDevicestatusChanged(devicestatusData);
