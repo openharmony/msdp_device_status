@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 #define __FILENAME__            (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-#define __FORMATED(fmt, ...)    "[%{public}s] %{public}s# " fmt, __FILENAME__, __FUNCTION__, ##__VA_ARGS__
+#define __FORMATTED(fmt, ...)    "[%{public}s] %{public}s# " fmt, __FILENAME__, __FUNCTION__, ##__VA_ARGS__
 
 #ifdef DEV_HILOGF
 #undef DEV_HILOGF
@@ -77,15 +77,15 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
 // In order to improve performance, do not check the module range.
 // Besides, make sure module is less than BUTT.
 #define DEV_HILOGF(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Fatal(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+    (void)OHOS::HiviewDFX::HiLog::Fatal(DEVICESTATUS_LABEL[module], __FORMATTED(__VA_ARGS__))
 #define DEV_HILOGE(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Error(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+    (void)OHOS::HiviewDFX::HiLog::Error(DEVICESTATUS_LABEL[module], __FORMATTED(__VA_ARGS__))
 #define DEV_HILOGW(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Warn(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+    (void)OHOS::HiviewDFX::HiLog::Warn(DEVICESTATUS_LABEL[module], __FORMATTED(__VA_ARGS__))
 #define DEV_HILOGI(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Info(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+    (void)OHOS::HiviewDFX::HiLog::Info(DEVICESTATUS_LABEL[module], __FORMATTED(__VA_ARGS__))
 #define DEV_HILOGD(module, ...) \
-    (void)OHOS::HiviewDFX::HiLog::Debug(DEVICESTATUS_LABEL[module], __FORMATED(__VA_ARGS__))
+    (void)OHOS::HiviewDFX::HiLog::Debug(DEVICESTATUS_LABEL[module], __FORMATTED(__VA_ARGS__))
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

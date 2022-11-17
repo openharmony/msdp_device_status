@@ -162,7 +162,7 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
-    StartTrace(HITRACE_TAG_MSDP, "serviceSubcribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
     devicestatusManager_->Subscribe(type, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportMsdpSysEvent(type, true);
@@ -185,7 +185,7 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
-    StartTrace(HITRACE_TAG_MSDP, "serviceUnSubcribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
     devicestatusManager_->UnSubscribe(type, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportMsdpSysEvent(type, false);

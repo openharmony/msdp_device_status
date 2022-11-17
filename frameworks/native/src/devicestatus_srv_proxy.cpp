@@ -31,7 +31,7 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientSubcribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "clientSubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -60,7 +60,7 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientUnSubcribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 

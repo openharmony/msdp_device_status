@@ -57,7 +57,7 @@ public:
     DevicestatusDataUtils::DevicestatusData SaveObserverData(const DevicestatusDataUtils::DevicestatusData& data);
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
     void GetDevicestatusTimestamp();
-    void GetLongtitude();
+    void GetLongitude();
     void GetLatitude();
     int32_t LoadAlgorithmLibrary(bool bCreate);
     int32_t UnloadAlgorithmLibrary(bool bCreate);
