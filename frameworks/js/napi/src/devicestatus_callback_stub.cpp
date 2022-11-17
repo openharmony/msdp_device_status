@@ -26,9 +26,9 @@ int32_t DevicestatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}u, flags= %{public}d", code, option.GetFlags());
-    std::u16string descripter = DevicestatusCallbackStub::GetDescriptor();
-    std::u16string remoteDescripter = data.ReadInterfaceToken();
-    if (descripter != remoteDescripter) {
+    std::u16string descriptor = DevicestatusCallbackStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (descriptor != remoteDescriptor) {
         DEV_HILOGE(SERVICE, "DevicestatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }

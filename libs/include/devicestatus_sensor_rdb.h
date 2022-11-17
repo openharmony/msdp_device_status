@@ -59,8 +59,8 @@ public:
     void RegisterCallback(const std::shared_ptr<DevicestatusSensorHdiCallback>& callback) override;
     void UnregisterCallback() override;
     ErrCode NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data);
-    int32_t TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet);
-    int32_t TrigerDatabaseObserver();
+    int32_t TriggerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet);
+    int32_t TriggerDatabaseObserver();
     DevicestatusDataUtils::DevicestatusData SaveRdbData(const DevicestatusDataUtils::DevicestatusData& data);
     std::shared_ptr<DevicestatusSensorHdiCallback> GetCallbacksImpl()
     {

@@ -26,7 +26,7 @@ namespace DeviceStatus {
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
     const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
-    DEV_HILOGI(INNERKIT, "type=%{punlic}d, value=%{public}d",
+    DEV_HILOGI(INNERKIT, "type=%{public}d, value=%{public}d",
         static_cast<DevicestatusDataUtils::DevicestatusType>(devicestatusData.type),
         static_cast<DevicestatusDataUtils::DevicestatusValue>(devicestatusData.value));
     std::shared_ptr<DeviceStatusAgent> agent = agent_.lock();

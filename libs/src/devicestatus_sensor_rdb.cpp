@@ -117,17 +117,17 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSensorRdb::SaveRdbData(
     return data;
 }
 
-int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet)
+int32_t DevicestatusSensorRdb::TriggerData(const std::unique_ptr<NativeRdb::ResultSet> &resultSet)
 {
     int32_t columnIndex;
     int32_t intVal;
 
     if (resultSet == nullptr) {
-        DEV_HILOGE(SERVICE, "resultSet is nullprt");
+        DEV_HILOGE(SERVICE, "resultSet is nullptr");
         return -1;
     }
     int32_t ret = resultSet->GetColumnIndex("ID", columnIndex);
-    DEV_HILOGI(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
+    DEV_HILOGI(SERVICE, "TriggerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckID: GetColumnIndex failed");
         return -1;
@@ -170,7 +170,7 @@ int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::Resul
     return ERR_OK;
 }
 
-int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
+int32_t DevicestatusSensorRdb::TriggerDatabaseObserver()
 {
     DEV_HILOGI(SERVICE, "Enter");
 
@@ -196,8 +196,8 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
         return -1;
     }
 
-    if (TrigerData(resultSet) != ERR_OK) {
-        DEV_HILOGE(SERVICE, "triger data failed");
+    if (TriggerData(resultSet) != ERR_OK) {
+        DEV_HILOGE(SERVICE, "trigger data failed");
         return -1;
     }
 
@@ -299,7 +299,7 @@ void DevicestatusSensorRdb::TimerCallback()
         DEV_HILOGI(SERVICE, "read timer fd failed");
         return;
     }
-    TrigerDatabaseObserver();
+    TriggerDatabaseObserver();
 }
 
 int32_t DevicestatusSensorRdb::RegisterTimerCallback(const int32_t fd, const EventType et)

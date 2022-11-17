@@ -253,7 +253,7 @@ void DevicestatusMsdpClientImpl::GetDevicestatusTimestamp()
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-void DevicestatusMsdpClientImpl::GetLongtitude()
+void DevicestatusMsdpClientImpl::GetLongitude()
 {
     DEV_HILOGI(SERVICE, "Enter");
 
