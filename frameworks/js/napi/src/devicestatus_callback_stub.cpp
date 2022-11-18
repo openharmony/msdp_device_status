@@ -48,8 +48,8 @@ int32_t DevicestatusCallbackStub::OnDevicestatusChangedStub(MessageParcel& data)
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type;
     int32_t value;
-    DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, value, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, value, E_DEVICESTATUS_READ_PARCEL_ERROR);
     DevicestatusDataUtils::DevicestatusData devicestatusData = {
         static_cast<DevicestatusDataUtils::DevicestatusType>(type),
         static_cast<DevicestatusDataUtils::DevicestatusValue>(value)

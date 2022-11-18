@@ -57,7 +57,7 @@ int32_t DevicestatusSrvStub::SubscribeStub(MessageParcel& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
-    DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Read type successfully");
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -73,7 +73,7 @@ int32_t DevicestatusSrvStub::UnSubscribeStub(MessageParcel& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
-    DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
@@ -86,12 +86,12 @@ int32_t DevicestatusSrvStub::GetLatestDevicestatusDataStub(MessageParcel& data, 
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
-    DEVICESTATUS_READ_PARCEL_WITH_RET(data, Int32, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     DevicestatusDataUtils::DevicestatusData devicestatusData = GetCache(DevicestatusDataUtils::DevicestatusType(type));
     DEV_HILOGD(SERVICE, "devicestatusData.type: %{public}d", devicestatusData.type);
     DEV_HILOGD(SERVICE, "devicestatusData.value: %{public}d", devicestatusData.value);
-    DEVICESTATUS_WRITE_PARCEL_WITH_RET(reply, Int32, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
-    DEVICESTATUS_WRITE_PARCEL_WITH_RET(reply, Int32, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Exit");
     return ERR_OK;
 }
