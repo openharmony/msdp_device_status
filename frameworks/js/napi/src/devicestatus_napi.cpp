@@ -15,6 +15,7 @@
 
 #include "devicestatus_napi.h"
 
+#include <uv.h>
 #include "devicestatus_common.h"
 #include "devicestatus_client.h"
 
@@ -42,14 +43,38 @@ struct ResponseEntity {
 
 void DevicestatusCallback::OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
-    DEV_HILOGD(JS_NAPI, "Callback enter");
-    DevicestatusNapi* devicestatusNapi = DevicestatusNapi::GetDevicestatusNapi(devicestatusData.type);
-    if (devicestatusNapi == nullptr) {
-        DEV_HILOGD(JS_NAPI, "devicestatus is nullptr");
+    DEV_HILOGD(JS_NAPI, "Callback enter type %{public}d value %{public}d", devicestatusData.type,
+        devicestatusData.value);
+    uv_loop_s* loop = nullptr;
+    napi_status status = napi_get_uv_event_loop(env_, &loop);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "%{public}s Looping events is failed", __func__);
         return;
     }
-    devicestatusNapi->OnDevicestatusChangedDone(static_cast<int32_t> (devicestatusData.type),
-        static_cast<int32_t> (devicestatusData.value), false);
+    uv_work_t* work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        DEV_HILOGE(JS_NAPI, "%{public}s Work is nullptr", __func__);
+        return;
+    }
+    static DevicestatusDataUtils::DevicestatusData statusData;
+    statusData = devicestatusData;
+    work->data = &statusData;
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t* work){}, [](uv_work_t* work, int32_t status){
+        DevicestatusDataUtils::DevicestatusData* deviceStatusData =
+            static_cast<DevicestatusDataUtils::DevicestatusData*>(work->data);
+        DevicestatusNapi* deviceStatusNapi = DevicestatusNapi::GetDevicestatusNapi(deviceStatusData->type);
+        if (deviceStatusNapi == nullptr) {
+            DEV_HILOGD(JS_NAPI, "device status napi is nullptr");
+            delete work;
+            return;
+        }
+        deviceStatusNapi->OnDevicestatusChangedDone(static_cast<int32_t>(deviceStatusData->type), static_cast<int32_t>(deviceStatusData->value),false);
+        delete work;
+    });
+    if (ret != 0) {
+        DEV_HILOGE(JS_NAPI, "Failed to execute work queue");
+        delete work;
+    }
     DEV_HILOGD(JS_NAPI, "Callback exit");
 }
 
@@ -224,7 +249,7 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
         return result;
     }
     DEV_HILOGD(JS_NAPI, "Didn't find callback, so created it");
-    sptr<IdevicestatusCallback> callback = new (std::nothrow) DevicestatusCallback();
+    sptr<IdevicestatusCallback> callback = new (std::nothrow) DevicestatusCallback(env);
     if (callback == nullptr) {
         DEV_HILOGE(JS_NAPI, "Callback is nullptr.");
         return result;
