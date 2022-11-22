@@ -31,9 +31,12 @@ namespace Msdp {
 namespace DeviceStatus {
 class DevicestatusCallback : public DevicestatusCallbackStub {
 public:
-    explicit DevicestatusCallback() {};
-    virtual ~DevicestatusCallback() {};
-    void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+    explicit DevicestatusCallback(napi_env env) : env_(env){};
+    virtual ~DevicestatusCallback(){};
+    void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData &devicestatusData) override;
+
+private:
+    napi_env env_;
 };
 
 class DevicestatusNapi : public DevicestatusEvent {

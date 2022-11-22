@@ -32,12 +32,12 @@
       "group_type": {
         "base_group":[],
         "fwk_group":[
-          "//base/msdp/device_status/libs:devicestatus_sensorhdi",
-          "//base/msdp/device_status/libs:devicestatus_msdp",
           "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
           "//base/msdp/device_status/frameworks/js/napi:devicestatus"
         ],
         "service_group":[
+          "//base/msdp/device_status/libs:devicestatus_sensorhdi",
+          "//base/msdp/device_status/libs:devicestatus_msdp",
           "//base/msdp/device_status/services:devicestatus_service",
           "//base/msdp/device_status/frameworks/native/src:deviceagent",
           "//base/msdp/device_status/sa_profile:devicestatus_sa_profile"
