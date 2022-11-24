@@ -56,7 +56,6 @@ public:
     void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetLatestDevicestatusData(const \
         DevicestatusDataUtils::DevicestatusType& type);
-    int32_t SensorDataCallback(const struct SensorEvents *event);
     int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);
     int32_t LoadAlgorithm(bool bCreate);
     int32_t UnloadAlgorithm(bool bCreate);
