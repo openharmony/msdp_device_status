@@ -207,9 +207,8 @@ HWTEST_F (DevicestatusClientTest, DevicestatusClientTest008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DevicestatusClientTest008 start";
     sptr<IdevicestatusCallback> callback =
-        sptr<IdevicestatusCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
+        sptr<IdevicestatusCallback>(new (std::nothrow) DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
     auto& client = DevicestatusClient::GetInstance();
-    // client.devicestatusProxy_ = nullptr;
     DEV_HILOGE(INNERKIT, "test SubscribeCallback start");
     client.SubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
     client.SubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
