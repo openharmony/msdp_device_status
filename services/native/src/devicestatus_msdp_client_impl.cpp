@@ -245,27 +245,6 @@ std::map<clientType, clientValue> DevicestatusMsdpClientImpl::GetObserverData() 
     return g_devicestatusDataMap;
 }
 
-void DevicestatusMsdpClientImpl::GetDevicestatusTimestamp()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-
-    DEV_HILOGI(SERVICE, "Exit");
-}
-
-void DevicestatusMsdpClientImpl::GetLongtitude()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-
-    DEV_HILOGI(SERVICE, "Exit");
-}
-
-void DevicestatusMsdpClientImpl::GetLatitude()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-
-    DEV_HILOGI(SERVICE, "Exit");
-}
-
 int32_t DevicestatusMsdpClientImpl::LoadSensorHdiLibrary(bool bCreate)
 {
     DEV_HILOGI(SERVICE, "Enter");
