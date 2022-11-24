@@ -133,18 +133,6 @@ bool DevicestatusService::Init()
     return true;
 }
 
-bool DevicestatusService::IsServiceReady()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    return ready_;
-}
-
-std::shared_ptr<DevicestatusManager> DevicestatusService::GetDevicestatusManager()
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    return devicestatusManager_;
-}
-
 void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {

@@ -43,8 +43,6 @@ public:
     void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
-    bool IsServiceReady();
-    std::shared_ptr<DevicestatusManager> GetDevicestatusManager();
     int Dump(int fd, const std::vector<std::u16string>& args) override;
     void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 private:

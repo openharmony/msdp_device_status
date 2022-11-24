@@ -145,16 +145,6 @@ int32_t DevicestatusManager::MsdpDataCallback(const DevicestatusDataUtils::Devic
     return ERR_OK;
 }
 
-int32_t DevicestatusManager::SensorDataCallback(const struct SensorEvents *event)
-{
-    DEV_HILOGI(SERVICE, "Enter");
-    // handle sensor event properly when we get the data details of sensor HDI.
-    DevicestatusDataUtils::DevicestatusData data = {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
-        DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER};
-    NotifyDevicestatusChange(data);
-    return ERR_OK;
-}
-
 void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     DEV_HILOGI(SERVICE, "Enter");
