@@ -197,4 +197,22 @@ HWTEST_F (DevicestatusClientTest, DevicestatusClientTest007, TestSize.Level1)
     EXPECT_TRUE(client.devicestatusProxy_ != nullptr);
     GTEST_LOG_(INFO) << "DevicestatusClientTest007 end";
 }
+
+/**
+ * @tc.name: DevicestatusClientTest008
+ * @tc.desc: test proxy double subscribe
+ * @tc.type: FUNC
+ */
+HWTEST_F (DevicestatusClientTest, DevicestatusClientTest008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DevicestatusClientTest008 start";
+    sptr<IdevicestatusCallback> callback =
+        sptr<IdevicestatusCallback>(new (std::nothrow) DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
+    auto& client = DevicestatusClient::GetInstance();
+    DEV_HILOGE(INNERKIT, "test SubscribeCallback start");
+    client.SubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
+    client.SubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
+    DEV_HILOGE(INNERKIT, "test SubscribeCallback end");
+    GTEST_LOG_(INFO) << "DevicestatusClientTest008 end";
+}
 }
