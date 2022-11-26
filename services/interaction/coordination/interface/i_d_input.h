@@ -29,27 +29,27 @@ namespace Msdp {
 namespace DeviceStatus {
 class IDInput {
 public:
-	using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
-	using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
-	virtual void Init(DelegateTasksCallback delegateTasksCallback) = 0;
-	virtual void RegisterEventCallback(SimulateEventCallback callback) = 0;
-	virtual void EnableInputDeviceCooperate(bool enabled) = 0;
-	virtual int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
+    using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
+    virtual void Init(DelegateTasksCallback delegateTasksCallback) = 0;
+    virtual void RegisterEventCallback(SimulateEventCallback callback) = 0;
+    virtual void EnableInputDeviceCooperate(bool enabled) = 0;
+    virtual int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
         const std::string &sinkDeviceId, int32_t srcInputDeviceId) = 0;
-	virtual int32_t OnStopDeviceCooperate(SessionPtr sess, int32_t userData) = 0;
-	virtual int32_t OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
+    virtual int32_t OnStopDeviceCooperate(SessionPtr sess, int32_t userData) = 0;
+    virtual int32_t OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
         const std::string& deviceId) = 0;
-	virtual int32_t OnRegisterCooperateListener(SessionPtr sess) = 0;
-	virtual int32_t OnUnregisterCooperateListener(SessionPtr sess) = 0;
+    virtual int32_t OnRegisterCooperateListener(SessionPtr sess) = 0;
+    virtual int32_t OnUnregisterCooperateListener(SessionPtr sess) = 0;
 
-	virtual void OnKeyboardOnline(const std::string& dhid) = 0;
-	virtual void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,
+    virtual void OnKeyboardOnline(const std::string& dhid) = 0;
+    virtual void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,
         const std::vector<std::string>& keyboards) = 0;
     virtual bool HandleEvent(libinput_event* event) = 0;
     virtual bool CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent) = 0;
-	virtual std::string GetLocalDeviceId() = 0;
+    virtual std::string GetLocalDeviceId() = 0;
 
-	virtual void Dump(int32_t fd, const std::vector<std::string>& args) = 0;
+    virtual void Dump(int32_t fd, const std::vector<std::string>& args) = 0;
 };
 
 extern "C" IDInput* CreateIDInpt(IInputContext* context);
