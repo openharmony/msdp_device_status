@@ -32,5 +32,3 @@ group("coordination_group") {
     deps += [ "//base/msdp/device_status/services/interaction/coordination/lib:coordination_lib" ]
   }
 }
-
- 

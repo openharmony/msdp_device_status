@@ -44,20 +44,20 @@ ohos_shared_library("coordination_lib") {
   defines = [ "OHOS_BUILD_ENABLE_COOPERATE" ]
 
   deps = [
+    "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
     "//third_party/cJSON:cjson_static",
-    "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk"
   ]
 
   external_deps = [
-    "eventhandler:libeventhandler",
+    "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
-    "input:libmmi-client",
     "device_manager:devicemanagersdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "input:libmmi-client",
     "ipc:ipc_core",
-    "c_utils:utils",
   ]
 
   relative_install_dir = "module/devicestatus/plugins"
