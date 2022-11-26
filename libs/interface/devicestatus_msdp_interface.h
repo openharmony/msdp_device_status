@@ -37,10 +37,11 @@ public:
         virtual void OnResult(const DevicestatusDataUtils::DevicestatusData& data) = 0;
     };
 
-    virtual void RegisterCallback(const std::shared_ptr<MsdpAlgorithmCallback>& callback) = 0;
+    virtual void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) = 0;
     virtual void UnregisterCallback() = 0;
-    virtual void Enable() = 0;
-    virtual void Disable() = 0;
+    virtual void Enable(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual void Disable(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual void DisableCount(DevicestatusDataUtils::DevicestatusType type) = 0;
 };
 
 struct MsdpAlgorithmHandle {

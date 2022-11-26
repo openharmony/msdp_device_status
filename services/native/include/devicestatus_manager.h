@@ -48,9 +48,9 @@ public:
     };
 
     bool Init();
-    bool EnableRdb();
-    bool InitInterface();
-    bool DisableRdb();
+    bool EnableMock(DevicestatusDataUtils::DevicestatusType type);
+    bool InitInterface(DevicestatusDataUtils::DevicestatusType type);
+    bool DisableMock(DevicestatusDataUtils::DevicestatusType type);
     bool InitDataCallback();
     void NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData);
     void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
