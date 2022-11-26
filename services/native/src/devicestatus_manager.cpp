@@ -75,10 +75,10 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
     return data;
 }
 
-bool DevicestatusManager::EnableRdb()
+bool DevicestatusManager::EnableMock(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
-    if (!InitInterface()) {
+    if (!InitInterface(type)) {
         DEV_HILOGE(SERVICE, "init interface fail");
         return false;
     }
@@ -90,15 +90,15 @@ bool DevicestatusManager::EnableRdb()
     return true;
 }
 
-bool DevicestatusManager::DisableRdb()
+bool DevicestatusManager::DisableMock(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ == nullptr) {
-        DEV_HILOGE(SERVICE, "disable rdb failed, msdpImpl is nullptr");
+        DEV_HILOGE(SERVICE, "disable failed, msdpImpl is nullptr");
         return false;
     }
 
-    if (msdpImpl_->DisableMsdpImpl() == ERR_NG) {
+    if (msdpImpl_->DisableMsdpImpl(type) == ERR_NG) {
         DEV_HILOGE(SERVICE, "disable msdp impl failed");
         return false;
     }
@@ -111,14 +111,14 @@ bool DevicestatusManager::DisableRdb()
     return true;
 }
 
-bool DevicestatusManager::InitInterface()
+bool DevicestatusManager::InitInterface(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ == nullptr) {
         DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
         return false;
     }
-    if (msdpImpl_->InitMsdpImpl() == ERR_NG) {
+    if (msdpImpl_->InitMsdpImpl(type) == ERR_NG) {
         DEV_HILOGE(SERVICE, "init msdp impl failed");
     };
     return true;
@@ -182,7 +182,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEVICESTATUS_RETURN_IF(object == nullptr);
     DEV_HILOGI(SERVICE, "listenerMap_.size: %{public}zu", listenerMap_.size());
 
-    if (!EnableRdb()) {
+    if (!EnableMock(type)) {
         DEV_HILOGE(SERVICE, "Enable failed!");
         return;
     }
@@ -240,7 +240,7 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     }
     DEV_HILOGI(SERVICE, "listenerMap_.size: %{public}zu", listenerMap_.size());
     if (listenerMap_.empty()) {
-        DisableRdb();
+        DisableMock(type);
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
@@ -252,7 +252,6 @@ int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
     DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         msdpImpl_->LoadAlgorithmLibrary(bCreate);
-        msdpImpl_->LoadSensorHdiLibrary(bCreate);
     }
 
     return ERR_OK;
@@ -263,7 +262,6 @@ int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
     DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
         msdpImpl_->UnloadAlgorithmLibrary(bCreate);
-        msdpImpl_->UnloadSensorHdiLibrary(bCreate);
     }
 
     return ERR_OK;

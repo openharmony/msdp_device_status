@@ -150,7 +150,7 @@ void DevicestatusDumper::DumpDevicestatusCurrentStatus(int32_t fd,
         if (it->value == DevicestatusDataUtils::VALUE_INVALID) {
             continue;
         }
-        dprintf(fd, "Device status Type is %s , current type state is %s .\n",
+        dprintf(fd, "Device status DevicestatusType is %s , current type state is %s .\n",
             GetStatusType(it->type).c_str(), GetDeviceState(it->value).c_str());
     }
 }

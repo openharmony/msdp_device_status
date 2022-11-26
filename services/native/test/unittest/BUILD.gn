@@ -22,7 +22,6 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//utils/system/safwk/native/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
   ]
 }
 
