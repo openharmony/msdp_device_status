@@ -47,6 +47,14 @@ namespace DeviceStatus {
 #undef DEV_HILOGD
 #endif
 
+#ifndef RET_OK
+    #define RET_OK (0)
+#endif
+
+#ifndef RET_ERR
+    #define RET_ERR (-1)
+#endif
+
 // param of log interface, such as DEV_HILOGF.
 enum DevicestatusSubModule {
     INNERKIT = 0,
