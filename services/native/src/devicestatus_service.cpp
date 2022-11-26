@@ -117,7 +117,6 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
     return RET_OK;
 }
 
-
 bool DevicestatusService::Init()
 {
     DEV_HILOGI(SERVICE, "Enter");

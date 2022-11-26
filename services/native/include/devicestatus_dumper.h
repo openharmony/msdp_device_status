@@ -36,7 +36,6 @@ const std::string ARG_DUMP_HELP = "-h";
 const std::string ARG_DUMP_DEVICESTATUS_SUBSCRIBER = "-s";
 const std::string ARG_DUMP_DEVICESTATUS_CHANGES = "-l";
 const std::string ARG_DUMP_DEVICESTATUS_CURRENT_STATE = "-c";
-constexpr int32_t RET_OK = 0;
 constexpr int32_t RET_NG = -1;
 constexpr uint32_t MAX_DEVICE_STATUS_SIZE = 10;
 constexpr uint32_t BASE_YEAR = 1900;
