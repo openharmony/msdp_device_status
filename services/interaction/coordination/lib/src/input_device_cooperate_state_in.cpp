@@ -21,8 +21,6 @@
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_cooperate_util.h"
-//#include "input_device_manager.h"
-//#include "mouse_event_normalize.h"
 
 namespace OHOS {
 namespace Msdp {

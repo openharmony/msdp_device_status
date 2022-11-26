@@ -25,8 +25,6 @@
 #include "nocopyable.h"
 #include "session.h"
 
-//#include "i_multimodal_input_connect.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

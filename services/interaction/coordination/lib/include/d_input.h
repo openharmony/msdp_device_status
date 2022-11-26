@@ -26,23 +26,15 @@ public:
     DInput();
     virtual ~DInput();
 
-    /* 分布式输入消息（设备上下线，穿越变更）处理，多模可以去掉，新部件需要添加 */
     void Init(DelegateTasksCallback delegateTasksCallback);
-    /* 处理鼠标按下时穿越，对端发送模拟事件，新部件添加 */
     void RegisterEventCallback(SimulateEventCallback callback);
-    /* 键鼠穿越的开关 */
     void EnableInputDeviceCooperate(bool enabled);
-    /* */
     int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
         const std::string& sinkDeviceId, int32_t srcInputDeviceId);
-    /* */
     int32_t OnStopDeviceCooperate(SessionPtr sess, int32_t userData);
-    /* */
     int32_t OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
         const std::string& deviceId);
-    /* */
     int32_t OnRegisterCooperateListener(SessionPtr sess);
-    /* */
     int32_t OnUnregisterCooperateListener(SessionPtr sess);
 
     void OnKeyboardOnline(const std::string& dhid);
