@@ -77,7 +77,6 @@ void DevicestatusSensorRdb::Disable()
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-
 ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");

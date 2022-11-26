@@ -387,7 +387,8 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     auto mouseInfo = context->GetMouseInfo();
     int32_t xPercent = mouseInfo.physicalX * MOUSE_ABS_LOCATION / displayWidth;
     int32_t yPercent = mouseInfo.physicalY * MOUSE_ABS_LOCATION / displayHeight;
-    DEV_HILOGI(SERVICE, "displayWidth: %{public}d, displayHeight: %{public}d, physicalX: %{public}d, physicalY: %{public}d,",
+    DEV_HILOGI(SERVICE, "displayWidth: %{public}d, displayHeight: %{public}d, "
+        "physicalX: %{public}d, physicalY: %{public}d,",
         displayWidth, displayHeight, mouseInfo.physicalX, mouseInfo.physicalY);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;

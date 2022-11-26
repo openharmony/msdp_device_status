@@ -22,8 +22,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-#define CALL_INFO_TRACE 
-#define CALL_DEBUG_ENTER 
+#define CALL_INFO_TRACE
+#define CALL_DEBUG_ENTER
 #define ERROR_NULL_POINTER (-1)
 #define MMI_DINPUT_PKG_NAME "ohos.multimodalinput.dinput"
 

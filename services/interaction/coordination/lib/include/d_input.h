@@ -54,5 +54,3 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 #endif // D_INPUT_H
-
-

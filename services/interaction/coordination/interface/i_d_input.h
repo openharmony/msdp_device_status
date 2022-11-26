@@ -57,5 +57,3 @@ extern "C" IDInput* CreateIDInpt(IInputContext* context);
 } // namespace Msdp
 } // namespace OHOS
 #endif // I_D_INPUT_H
-
-

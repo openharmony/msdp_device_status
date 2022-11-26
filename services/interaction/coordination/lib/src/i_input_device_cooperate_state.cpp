@@ -20,7 +20,6 @@
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

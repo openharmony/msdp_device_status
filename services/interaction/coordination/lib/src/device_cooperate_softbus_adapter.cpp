@@ -246,7 +246,6 @@ std::shared_ptr<DeviceCooperateSoftbusAdapter> DeviceCooperateSoftbusAdapter::Ge
     return g_instance;
 }
 
-
 int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &localDeviceId,
     const std::string &remoteDeviceId)
 {

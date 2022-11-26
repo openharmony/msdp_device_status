@@ -35,12 +35,21 @@ public:
     NetPacket(MmiMessageId msgId) {}
     ~NetPacket() {}
 
-    bool ChkRWError() const { return true; }
+    bool ChkRWError() const
+    {
+        return true;
+    }
 
     template<typename T>
-    NetPacket &operator >> (T &data) { return *this; }
+    NetPacket &operator >> (T &data)
+    {
+        return *this;
+    }
     template<typename T>
-    NetPacket &operator << (const T &data) { return *this; }
+    NetPacket &operator << (const T &data)
+    {
+        return *this;
+    }
 };
 class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
@@ -51,8 +60,14 @@ public:
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
-    bool SendMsg(const char *buf, size_t size) const { return true; }
-    bool SendMsg(NetPacket &pkt) const { return true; }
+    bool SendMsg(const char *buf, size_t size) const
+    {
+        return true;
+    }
+    bool SendMsg(NetPacket &pkt) const
+    {
+        return true;
+    }
     void Close() {}
 
     int32_t GetUid() const
@@ -120,8 +135,14 @@ public:
     {
         return {};
     }
-    int64_t GetEarliestEventTime(int32_t type = 0) const { return 0; }
-    bool IsEventQueueEmpty(int32_t type = 0) { return true; }
+    int64_t GetEarliestEventTime(int32_t type = 0) const
+    {
+        return 0;
+    }
+    bool IsEventQueueEmpty(int32_t type = 0)
+    {
+        return true;
+    }
 
 protected:
     struct EventTime {
