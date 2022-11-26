@@ -29,7 +29,8 @@ enum {
     /**
      *  Module type: Devicestatus Kit
      */
-    DEVICESTATUS_MODULE_TYPE_KIT = 1
+    DEVICESTATUS_MODULE_TYPE_KIT = 1,
+    DEVICESTATUS_MODULE_TYPE_UTIL = 2
 };
 
 // offset of devicestatus error, only be used in this file.
@@ -42,6 +43,11 @@ enum {
     E_DEVICESTATUS_GET_SERVICE_FAILED,
     E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED,
     E_DEVICESTATUS_INNER_ERR
+};
+
+enum {
+    NON_STD_EVENT = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_UTIL),
+    VAL_NOT_EXP,
 };
 } // namespace DeviceStatus
 } // namespace Msdp
