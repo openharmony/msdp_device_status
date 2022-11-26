@@ -46,9 +46,6 @@ public:
     std::string GetLocalDeviceId();
 
     void Dump(int32_t fd, const std::vector<std::string>& args);
-
-private:
-
 };
 } // namespace DeviceStatus
 } // namespace Msdp
