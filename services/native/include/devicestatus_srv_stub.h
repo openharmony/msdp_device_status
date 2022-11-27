@@ -37,6 +37,13 @@ private:
     int32_t SubscribeStub(MessageParcel& data);
     int32_t UnSubscribeStub(MessageParcel& data);
     int32_t GetLatestDevicestatusDataStub(MessageParcel& data, MessageParcel& reply);
+
+    int32_t StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

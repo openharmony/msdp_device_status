@@ -26,6 +26,7 @@ config("devicestatus_srv_public_config") {
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
+    "${device_status_utils_path}/common/include",
   ]
 }
 
@@ -47,6 +48,7 @@ ohos_shared_library("devicestatus_service") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_utils_path}/common:devicestatus-util",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
 

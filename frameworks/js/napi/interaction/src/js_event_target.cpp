@@ -15,9 +15,9 @@
 
 #include "js_event_target.h"
 
-#include "coordination_impl.h"
 #include "define_interaction.h"
 #include "devicestatus_errors.h"
+#include "interaction_manager.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
@@ -238,7 +238,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InputDevCooperateImpl.RegisterCooperateListener(shared_from_this());
+        InteractionMgr->RegisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -266,7 +266,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InputDevCooperateImpl.UnregisterCooperateListener(shared_from_this());
+        InteractionMgr->UnregisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -303,10 +303,10 @@ void JsEventTarget::ResetEnv()
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
     cooperateListener_.clear();
-    InputDevCooperateImpl.UnregisterCooperateListener(shared_from_this());
+    InteractionMgr->UnregisterCoordinationListener(shared_from_this());
 }
 
-void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CoordinationMessage msg)
+void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -326,7 +326,7 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, Coordination
         item->data.msg = msg;
         item->data.deviceDescriptor = deviceId;
         work->data = static_cast<void*>(&item);
-        int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCooperateMessageEvent);
+        int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCoordinationMessageEvent);
         if (result != 0) {
             FI_HILOGE("uv_queue_work failed");
             JsUtil::DeletePtr<uv_work_t*>(work);
@@ -572,7 +572,7 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
+void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);

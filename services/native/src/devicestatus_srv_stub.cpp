@@ -21,10 +21,15 @@
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_service.h"
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusSrvStub" };
+} // namespace
+
 int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
@@ -44,6 +49,24 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return UnSubscribeStub(data);
         }
         case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE): {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case REGISTER_COORDINATION_MONITOR: {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case UNREGISTER_COORDINATION_MONITOR: {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case ENABLE_COORDINATION: {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case START_COORDINATION: {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case STOP_COORDINATION: {
+            return GetLatestDevicestatusDataStub(data, reply);
+        }
+        case GET_COORDINATION_STATE: {
             return GetLatestDevicestatusDataStub(data, reply);
         }
         default: {
@@ -94,6 +117,82 @@ int32_t DevicestatusSrvStub::GetLatestDevicestatusDataStub(MessageParcel& data, 
     WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Exit");
     return ERR_OK;
+}
+
+int32_t DevicestatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RegisterCoordinationListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DevicestatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = UnregisterCoordinationListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DevicestatusSrvStub::StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool enabled;
+    READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READBOOL(data, enabled, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = EnableInputDeviceCoordination(userData, enabled);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DevicestatusSrvStub::StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    std::string sinkDeviceId;
+    READSTRING(data, sinkDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t srcInputDeviceId;
+    READINT32(data, srcInputDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StartInputDeviceCoordination(userData, sinkDeviceId, srcInputDeviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StartInputDeviceCoordination failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DevicestatusSrvStub::StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StopDeviceCoordination(userData);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DevicestatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    std::string deviceId;
+    READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = GetInputDeviceCoordinationState(userData, deviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // Msdp

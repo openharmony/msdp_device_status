@@ -17,19 +17,19 @@
 
 namespace OHOS {
 namespace Msdp {
-static napi_module mmiInputDeviceCooperateModule = {
+static napi_module msdpCoordinationModule = {
     .nm_version = 1,
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsCoordinationContext::Export,
-    .nm_modname = "multimodalInput.inputDeviceCooperate",
+    .nm_modname = "device_status.interaction_Coordination",
     .nm_priv = ((void *)0),
-    .reserved = {0},
+    .reserved = { 0 },
 };
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    napi_module_register(&mmiInputDeviceCooperateModule);
+    napi_module_register(&msdpCoordinationModule);
 }
 } // namespace Msdp
 } // namespace OHOS
