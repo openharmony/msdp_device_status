@@ -38,8 +38,8 @@ ohos_shared_library("interaction_coordination") {
 
   deps = [
     "${device_status_frameworks_path}/native/interaction:interaction_proxy",
-    "${device_status_utils_path}:devicestatus-util",
     "${device_status_root_path}/utils/ipc:devicestatus-ipc",
+    "${device_status_utils_path}:devicestatus-util",
     "//third_party/libuv:uv",
   ]
 
