@@ -20,7 +20,6 @@ config("interaction_config") {
   include_dirs = [
     "include",
     "${device_status_utils_path}/include",
-    "${device_status_utils_path}/common/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_frameworks_path}/native/interaction/include",
   ]
@@ -39,7 +38,7 @@ ohos_shared_library("interaction_coordination") {
 
   deps = [
     "${device_status_frameworks_path}/native/interaction:interaction_proxy",
-    "${device_status_utils_path}/common:devicestatus-util",
+    "${device_status_utils_path}:devicestatus-util",
     "//third_party/libuv:uv",
   ]
 

@@ -31,3 +31,10 @@ ohos_shared_library("devicestatus-util") {
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
+
+config("devicestatus_utils_config") {
+  include_dirs = [
+    "include",
+    "//commonlibrary/c_utils/base/include",
+  ]
+}
