@@ -16,10 +16,23 @@ import("//build/ohos.gni")
 
 ohos_shared_library("devicestatus-ipc") {
   sources = [
+    "src/circle_stream_buffer.cpp",
+    "src/net_packet.cpp",
+    "src/stream_buffer.cpp",
+    "src/uds_client.cpp",
+    "src/uds_session.cpp",
+    "src/uds_socket.cpp",
   ]
 
   include_dirs = [ "include" ]
+  deps = [
+    "//commonlibrary/c_utils/base:utils",
+  ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
+  configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
