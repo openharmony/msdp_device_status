@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class JsCoordinationContext final {
 public:
     JsCoordinationContext();
@@ -51,6 +52,7 @@ private:
     static void DeclareDeviceCooperateData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // JS_COORDINATION_CONTEXT_H

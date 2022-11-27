@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class JsCoordinationManager : public JsEventTarget {
 public:
     JsCoordinationManager() = default;
@@ -41,6 +42,7 @@ public:
 private:
     std::mutex mutex_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // JS_INPUT_DEVICE_COOPERATE_MANAGER_H

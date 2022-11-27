@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 #ifndef RET_OK
     #define RET_OK (0)
 #endif
@@ -112,6 +113,7 @@ namespace Msdp {
         FI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
             __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
     } while (0)
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DEFINE_INTERACTION_H
