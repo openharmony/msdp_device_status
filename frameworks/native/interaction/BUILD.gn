@@ -23,7 +23,7 @@ ohos_shared_library("interaction_proxy") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
 
-  deps = [ "${device_status_utils_path}:devicestatus-util" ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
