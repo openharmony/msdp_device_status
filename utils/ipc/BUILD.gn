@@ -32,3 +32,8 @@ ohos_shared_library("devicestatus-ipc") {
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
+
+config("devicestatus_ipc_config") {
+  include_dirs = ["include"]
+}
+

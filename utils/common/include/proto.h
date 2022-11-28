@@ -24,6 +24,14 @@ static const int32_t PARAM_INPUT_INVALID = 5;
 static const int32_t MAX_STREAM_BUF_SIZE = 256;
 static const int32_t MAX_PACKET_BUF_SIZE = 256;
 static const int32_t ONCE_PROCESS_NETPACKET_LIMIT = 100;
+static const int32_t INVALID_FD = 6;
+static const int32_t INVALID_PID = 7;
+static const int32_t SESSION_NOT_FOUND = 8;
+static const int32_t EPOLL_MODIFY_FAIL = 9;
+static const int32_t MAKE_SHARED_FAIL = 10;
+static const int32_t ADD_SESSION_FAIL = 11;
+static const int32_t MAX_SESSON_ALARM = 12;
+static const int32_t MAX_RECV_LIMIT = 13;
 #define SEND_RETRY_LIMIT 32
 #define SEND_RETRY_SLEEP_TIME 10000
 
