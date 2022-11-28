@@ -15,7 +15,7 @@
 
 #include "js_event_target.h"
 
-#include "define_interaction.h"
+#include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
 #include "napi_constants.h"

@@ -24,21 +24,22 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "IInputDeviceCooperateState" };
 } // namespace
 
 IInputDeviceCooperateState::IInputDeviceCooperateState()
 {
     runner_ = AppExecFwk::EventRunner::Create(true);
-    CHKPL(runner_, SERVICE);
+    CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
-    CHKPL(eventHandler_, SERVICE);
+    CHKPL(eventHandler_);
 }
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPR(context, SERVICE, RET_ERR);
+    CHKPR(context, RET_ERR);
     std::string sinkNetworkId = context->GetOriginNetworkId(startInputDeviceId);
     int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
@@ -48,14 +49,14 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
-            DEV_HILOGE(SERVICE, "Prepare remote input fail");
+            FI_HILOGE("Prepare remote input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartRemoteInput(startInputDeviceId);
         if (ret != RET_OK) {
-            DEV_HILOGE(SERVICE, "Start remoteNetworkId input fail");
+            FI_HILOGE("Start remoteNetworkId input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
         }
     }
@@ -65,7 +66,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
 void IInputDeviceCooperateState::OnPrepareDistributedInput(
     bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
-    DEV_HILOGI(SERVICE, "isSuccess: %{public}s", isSuccess ? "true" : "false");
+    FI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
         InputDevCooSM->UpdatePreparedDevices("", "");
         InputDevCooSM->OnStartFinish(false, srcNetworkId, startInputDeviceId);
@@ -73,7 +74,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
             std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
-        CHKPV(eventHandler_, SERVICE);
+        CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
     }
 }
@@ -83,7 +84,7 @@ int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPR(context, SERVICE, RET_ERR);
+    CHKPR(context, RET_ERR);
     std::vector<std::string> dhids = context->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
@@ -107,7 +108,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
-    CHKPV(eventHandler_, SERVICE);
+    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
 }
 
@@ -116,7 +117,7 @@ bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, co
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
     bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
-    DEV_HILOGI(SERVICE, "NeedPrepare?: %{public}s", isNeed ? "true" : "false");
+    FI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;
 }
 } // namespace DeviceStatus

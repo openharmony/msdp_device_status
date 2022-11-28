@@ -19,7 +19,7 @@
 #include <functional>
 #include <string>
 
-#include "devicestatus_define.h"
+#include "fi_log.h"
 #include "display_info.h"
 #include "key_event.h"
 #include "pointer_event.h"

@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateOut" };
 } // namespace
 
 InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& startDhid)
@@ -42,13 +43,13 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     }
     int32_t ret = DevCooperateSoftbusAdapter->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Stop input device cooperate fail");
+        FI_HILOGE("Stop input device cooperate fail");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
         std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, srcNetworkId);
-    CHKPR(eventHandler_, SERVICE, RET_ERR);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
@@ -58,7 +59,7 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
     CALL_DEBUG_ENTER;
     std::string sink = COOPERATE::GetLocalDeviceId();
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     std::vector<std::string> dhids = context->GetCooperateDhids(startDhid_);
     if (dhids.empty()) {
         InputDevCooSM->OnStopFinish(false, srcNetworkId);
@@ -77,7 +78,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
-    CHKPV(eventHandler_, SERVICE);
+    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
 

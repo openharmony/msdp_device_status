@@ -23,7 +23,7 @@ config("devicestatus_public_config") {
     "${device_status_service_path}/native/include",
     "${device_status_frameworks_path}/js/napi/include",
     "${device_status_frameworks_path}/native/interaction/include",
-    "${device_status_utils_path}/common/include",
+    "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
   ]

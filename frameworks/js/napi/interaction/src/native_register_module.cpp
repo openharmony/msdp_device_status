@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 static napi_module msdpCoordinationModule = {
     .nm_version = 1,
     .nm_flags = 0,

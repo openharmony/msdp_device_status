@@ -14,12 +14,12 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
-ohos_shared_library("coordination_lib") {
+ohos_source_set("coordination_lib") {
   include_dirs = [
     "stub",
     "include",
     "//base/msdp/device_status/services/interaction/coordination/interface",
-    "//base/msdp/device_status/utils/include",
+    "//base/msdp/device_status/utils/common/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
@@ -60,7 +60,6 @@ ohos_shared_library("coordination_lib") {
     "ipc:ipc_core",
   ]
 
-  relative_install_dir = "module/devicestatus/plugins"
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

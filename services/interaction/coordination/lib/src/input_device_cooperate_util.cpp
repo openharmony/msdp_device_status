@@ -17,8 +17,6 @@
 
 #include "softbus_bus_center.h"
 
-#include "config_multimodal.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -26,14 +24,15 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace COOPERATE {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateUtil" };
 } // namespace
 std::string GetLocalDeviceId()
 {
     auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPS(localNode, SERVICE);
+    CHKPS(localNode);
     int32_t ret = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
         return {};
     }
     return localNode->networkId;

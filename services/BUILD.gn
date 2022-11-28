@@ -20,20 +20,22 @@ config("devicestatus_private_config") {
 
 config("devicestatus_srv_public_config") {
   include_dirs = [
+    "delegate_task/include",
     "native/include",
     "timer_manager/include",
-    "${device_status_utils_path}/common/include",
+    "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
-    "${device_status_utils_path}/common/include",
+    "${device_status_utils_path}/include",
   ]
 }
 
 ohos_shared_library("devicestatus_service") {
   sources = [
+    "delegate_task/src/delegate_tasks.cpp",
     "native/src/devicestatus_dumper.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
@@ -57,6 +59,10 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_root_path}/utils/ipc:devicestatus-ipc",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
+
+  if (device_status_feature_coordination) {
+    deps += [ "interaction/coordination/lib:coordination_lib" ]
+  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
