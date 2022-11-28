@@ -20,6 +20,7 @@ config("devicestatus_private_config") {
 
 config("devicestatus_srv_public_config") {
   include_dirs = [
+    "delegate_task/include",
     "native/include",
     "timer_manager/include",
     "${device_status_utils_path}/include",
@@ -34,6 +35,7 @@ config("devicestatus_srv_public_config") {
 
 ohos_shared_library("devicestatus_service") {
   sources = [
+    "delegate_task/src/delegate_tasks.cpp",
     "native/src/devicestatus_dumper.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
