@@ -141,6 +141,11 @@ bool DevicestatusService::Init()
         DEV_HILOGE(SERVICE, "OnStart init fail");
         return false;
     }
+    mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
+    if (mmiFd_ < 0) {
+        FI_HILOGE("Create epoll failed");
+        return EPOLL_CREATE_FAIL;
+    }
     if (!InitDelegateTasks()) {
         FI_HILOGE("Delegate tasks init failed");
         return false;
@@ -234,12 +239,12 @@ int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const
 {
     FI_HILOGD("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
-    // toReturnClientFd = -1;
-    // int32_t serverFd = -1;
-    // int32_t pid = GetCallingPid();
-    // int32_t uid = GetCallingUid();
-    // int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
-    //     programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
+    toReturnClientFd = -1;
+    int32_t serverFd = -1;
+    int32_t pid = GetCallingPid();
+    int32_t uid = GetCallingUid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
+        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     // DfxHisysevent::ClientConnectData data = {
     //     .pid = pid,
     //     .uid = uid,
@@ -247,25 +252,27 @@ int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const
     //     .programName = programName,
     //     .serverFd = serverFd
     // };
-    // if (ret != RET_OK) {
-    //     FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
-    //     // DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    //     return RET_ERR;
-    // }
-    // MMI_HILOGIK("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
-    //     programName.c_str(), moduleType);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
+        // DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        return RET_ERR;
+    }
+    FI_HILOGD("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+        programName.c_str(), moduleType);
     // DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
 void DevicestatusService::OnConnected(SessionPtr s)
 {
-
+    CHKPV(s);
+    FI_HILOGI("fd:%{public}d", s->GetFd());
 }
 void DevicestatusService::OnDisconnected(SessionPtr s)
 {
-
-}
+    CHKPV(s);
+    FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
+}   
 
 int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
 {
@@ -277,8 +284,8 @@ int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
-    if (epollFd_ < 0) {
-        FI_HILOGE("Invalid param epollFd_");
+    if (mmiFd_ < 0) {
+        FI_HILOGE("Invalid param mmiFd_");
         return RET_ERR;
     }
     auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
@@ -293,7 +300,7 @@ int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
-    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, epollFd_);
+    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {
         free(eventData);
         eventData = nullptr;
@@ -313,12 +320,12 @@ int32_t DevicestatusService::DelEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
-    if (epollFd_ < 0) {
-        FI_HILOGE("Invalid param epollFd_");
+    if (mmiFd_ < 0) {
+        FI_HILOGE("Invalid param mmiFd_");
         return RET_ERR;
     }
     struct epoll_event ev = {};
-    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, epollFd_);
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
     if (ret < 0) {
         FI_HILOGE("DelEpoll failed");
         return ret;
@@ -333,6 +340,18 @@ bool DevicestatusService::IsRunning() const
 
 bool DevicestatusService::InitDelegateTasks()  //预留委托
 {
+    CALL_DEBUG_ENTER;
+    if (!delegateTasks_.Init()) {
+        FI_HILOGE("The delegate task init failed");
+        return false;
+    }
+    auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
+    if (ret <  0) {
+        FI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 
@@ -348,21 +367,21 @@ bool DevicestatusService::InitEpoll()
         EpollClose();
         return false;
     }
-    FI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", epollFd_, epollFd_);
+    FI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
     
 void DevicestatusService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
-    // uint64_t tid = GetThisThreadId();
-    // delegateTasks_.SetWorkerThreadId(tid);
-    // FI_HILOGDI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    uint64_t tid = GetThisThreadId();
+    delegateTasks_.SetWorkerThreadId(tid);
+    FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         FI_HILOGD("timeout:%{public}d", timeout);
-        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, epollFd_);
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
             CHKPC(epollEvent);
@@ -381,7 +400,7 @@ void DevicestatusService::OnThread()
             break;
         }
     }
-    // FI_HILOGDI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    FI_HILOGD("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
 void DevicestatusService::OnSignalEvent(int32_t signalFd)
 {
@@ -415,7 +434,18 @@ void DevicestatusService::OnSignalEvent(int32_t signalFd)
 
 void DevicestatusService::OnDelegateTask(epoll_event& ev)
 {
-
+    if ((ev.events & EPOLLIN) == 0) {
+        FI_HILOGW("Not epollin");
+        return;
+    }
+    DelegateTasks::TaskData data = {};
+    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
+    if (res == -1) {
+        FI_HILOGW("Read failed erron:%{public}d", errno);
+    }
+    FI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
+        ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
+    delegateTasks_.ProcessTasks();
 }    
 
 

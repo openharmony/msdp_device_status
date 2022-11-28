@@ -27,6 +27,7 @@
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "uds_server.h"
+#include "delegate_tasks.h"
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -74,11 +75,11 @@ public:
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t epollFd_ { -1 };
-    std::mutex mu_;
+    int32_t mmiFd_ { -1 };
     std::thread t_;
     bool Init();
     bool ready_ = false;
+    DelegateTasks delegateTasks_;
     std::shared_ptr<DevicestatusManager> devicestatusManager_;
     std::shared_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
 };
