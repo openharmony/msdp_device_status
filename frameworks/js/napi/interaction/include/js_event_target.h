@@ -50,7 +50,7 @@ public:
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
 
-    void OnCooperateMessage(const std::string &deviceId, CoordinationMessage msg) override;
+    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
@@ -66,7 +66,7 @@ private:
     static void CallStopAsyncWork(uv_work_t *work, int32_t status);
     static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
-    static void EmitCooperateMessageEvent(uv_work_t *work, int32_t status);
+    static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };

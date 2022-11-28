@@ -38,7 +38,7 @@ public:
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
 
-    std::shared_ptr<JsCoordinationManager> GetJsInputDeviceCooperateMgr();
+    std::shared_ptr<JsCoordinationManager> GetJsInputDeviceCoordinationMgr();
 
 private:
     std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };
@@ -48,8 +48,8 @@ private:
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static JsCoordinationContext *GetInstance(napi_env env);
-    static void DeclareDeviceCooperateInterface(napi_env env, napi_value exports);
-    static void DeclareDeviceCooperateData(napi_env env, napi_value exports);
+    static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
+    static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };
 } // namespace DeviceStatus

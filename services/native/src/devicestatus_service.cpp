@@ -24,6 +24,7 @@
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
+#include "define_interaction.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 
@@ -32,9 +33,11 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::HiviewDFX;
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusService" };
 auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
-}
+} // namespace
+
 DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
     DEV_HILOGD(SERVICE, "Add SystemAbility");
@@ -204,6 +207,43 @@ void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::Device
     }
     HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
         "UID", uid, "PKGNAME", packageName, "TYPE", type);
+}
+
+int32_t DevicestatusService::RegisterCoordinationListener()
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DevicestatusService::UnregisterCoordinationListener()
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DevicestatusService::EnableInputDeviceCoordination(int32_t userData, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DevicestatusService::StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
+    int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DevicestatusService::StopDeviceCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DevicestatusService::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
