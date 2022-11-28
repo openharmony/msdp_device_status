@@ -30,7 +30,13 @@ public:
     enum {
         DEVICESTATUS_SUBSCRIBE = 0,
         DEVICESTATUS_UNSUBSCRIBE,
-        DEVICESTATUS_GETCACHE
+        DEVICESTATUS_GETCACHE,
+        REGISTER_COORDINATION_MONITOR = 30,
+        UNREGISTER_COORDINATION_MONITOR = 31,
+        ENABLE_COORDINATION = 32,
+        START_COORDINATION = 33,
+        STOP_COORDINATION = 34,
+        GET_COORDINATION_STATE = 35
     };
 
     virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
@@ -38,6 +44,14 @@ public:
     virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) = 0;
     virtual DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) = 0;
+
+    virtual int32_t RegisterCoordinationListener() = 0;
+    virtual int32_t UnregisterCoordinationListener() = 0;
+    virtual int32_t EnableInputDeviceCoordination(int32_t userData, bool enabled) = 0;
+    virtual int32_t StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcInputDeviceId) = 0;
+    virtual int32_t StopDeviceCoordination(int32_t userData) = 0;
+    virtual int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };

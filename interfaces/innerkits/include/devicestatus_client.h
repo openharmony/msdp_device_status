@@ -22,6 +22,7 @@
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_common.h"
+#include "i_coordination_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,6 +38,14 @@ public:
     void UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetDevicestatusData(const DevicestatusDataUtils::DevicestatusType& type);
+
+    int32_t RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener);
+    int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
+    int32_t EnableInputDeviceCoordination(bool enabled, std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t StartInputDeviceCoordination(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t StopDeviceCoordination(std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t GetInputDeviceCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
 private:
     class DevicestatusDeathRecipient : public IRemoteObject::DeathRecipient {
