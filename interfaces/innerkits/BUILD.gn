@@ -22,21 +22,34 @@ config("devicestatus_public_config") {
     "include",
     "${device_status_service_path}/native/include",
     "${device_status_frameworks_path}/js/napi/include",
+    "${device_status_frameworks_path}/native/interaction/include",
+    "${device_status_utils_path}/common/include",
+    "${device_status_interfaces_path}/innerkits/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
+
+  defines = device_status_default_defines
 }
 
 ohos_shared_library("devicestatus_client") {
   sources = [
+    "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
   ]
+
+  if (device_status_feature_coordination) {
+    sources += [ "${device_status_frameworks_path}/native/interaction/src/coordination_manager_impl.cpp" ]
+  }
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
     ":devicestatus_public_config",
   ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   public_configs = [ ":devicestatus_public_config" ]
 

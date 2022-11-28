@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class JsEventTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
@@ -49,7 +50,7 @@ public:
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
 
-    void OnCooperateMessage(const std::string &deviceId, CoordinationMessage msg) override;
+    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
@@ -65,10 +66,11 @@ private:
     static void CallStopAsyncWork(uv_work_t *work, int32_t status);
     static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
-    static void EmitCooperateMessageEvent(uv_work_t *work, int32_t status);
+    static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // JS_EVENT_TARGET_H

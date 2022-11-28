@@ -15,6 +15,17 @@
 #ifndef PROTO_H
 #define PROTO_H
 #include <sys/types.h>
+static const int32_t STREAM_BUF_READ_FAIL = 1;
+static const int32_t STREAM_BUF_WRITE_FAIL = 2;
+static const int32_t MAX_VECTOR_SIZE = 10;
+static const int32_t MEM_OUT_OF_BOUNDS = 3;
+static const int32_t MEMCPY_SEC_FUN_FAIL = 4;
+static const int32_t PARAM_INPUT_INVALID = 5;
+static const int32_t MAX_STREAM_BUF_SIZE = 256;
+static const int32_t MAX_PACKET_BUF_SIZE = 256;
+static const int32_t ONCE_PROCESS_NETPACKET_LIMIT = 100;
+#define SEND_RETRY_LIMIT 32
+#define SEND_RETRY_SLEEP_TIME 10000
 
 enum class MmiMessageId : int32_t {
     INVALID,

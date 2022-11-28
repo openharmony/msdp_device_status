@@ -15,13 +15,13 @@
 
 #include "js_coordination_manager.h"
 
-#include <functional>
-
+#include "coordination_manager_impl.h"
 #include "define_interaction.h"
-#include "coordination_impl.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationManager" };
 } // namespace
@@ -30,10 +30,10 @@ napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value h
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = CoordinationMgrImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputDevCooperateImpl.EnableInputDeviceCooperate(enable, callback);
+    int32_t errCode = InteractionMgr->EnableInputDeviceCoordination(enable, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
         RemoveCallbackInfo(userData);
@@ -46,10 +46,10 @@ napi_value JsCoordinationManager::Start(napi_env env, const std::string &sinkDev
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = CoordinationMgrImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputDevCooperateImpl.StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    int32_t errCode = InteractionMgr->StartInputDeviceCoordination(sinkDeviceDescriptor, srcInputDeviceId, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
         RemoveCallbackInfo(userData);
@@ -61,10 +61,10 @@ napi_value JsCoordinationManager::Stop(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = CoordinationMgrImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputDevCooperateImpl.StopDeviceCooperate(callback);
+    int32_t errCode = InteractionMgr->StopDeviceCoordination(callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
         RemoveCallbackInfo(userData);
@@ -76,10 +76,10 @@ napi_value JsCoordinationManager::GetState(napi_env env, const std::string &devi
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
+    int32_t userData = CoordinationMgrImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
-    int32_t errCode = InputDevCooperateImpl.GetInputDeviceCooperateState(deviceDescriptor, callback);
+    int32_t errCode = InteractionMgr->GetInputDeviceCoordinationState(deviceDescriptor, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
         RemoveCallbackInfo(userData);
@@ -104,5 +104,6 @@ void JsCoordinationManager::ResetEnv()
     CALL_INFO_TRACE;
     JsEventTarget::ResetEnv();
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

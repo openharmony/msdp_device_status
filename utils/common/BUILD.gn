@@ -14,7 +14,7 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-ohos_shared_library("devicestatus-util") {
+ohos_shared_library("devicestatus_util") {
   sources = [
     "src/util.cpp",
     "src/util_napi.cpp",
@@ -30,4 +30,11 @@ ohos_shared_library("devicestatus-util") {
 
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
+}
+
+config("devicestatus_utils_config") {
+  include_dirs = [
+    "include",
+    "//commonlibrary/c_utils/base/include",
+  ]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,28 @@
  * limitations under the License.
  */
 
-#include "js_coordination_context.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace Msdp {
-static napi_module msdpCoordinationModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = JsCoordinationContext::Export,
-    .nm_modname = "device_status.Coordination",
-    .nm_priv = ((void *)0),
-    .reserved = { 0 },
-};
+NetPacket::NetPacket(MmiMessageId msgId) : msgId_(msgId) {}
 
-extern "C" __attribute__((constructor)) void RegisterModule(void)
+NetPacket::NetPacket(const NetPacket &pkt) : NetPacket(pkt.GetMsgId())
 {
-    napi_module_register(&msdpCoordinationModule);
+    Clone(pkt);
 }
-} // namespace DeviceStatus
-} // namespace Msdp
+NetPacket::~NetPacket() {}
+
+void NetPacket::MakeData(StreamBuffer &buf) const
+{
+    PACKHEAD head = {msgId_, wPos_};
+    buf << head;
+    if (wPos_ > 0) {
+        if (!buf.Write(&szBuff_[0], wPos_)) {
+            FI_HILOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+            return;
+        }
+    }
+}
+} // namespace MMI
 } // namespace OHOS

@@ -12,25 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "js_coordination_context.h"
+#ifndef CIRCLE_STREAM_BUFFER_H
+#define CIRCLE_STREAM_BUFFER_H
+#include "stream_buffer.h"
 
 namespace OHOS {
 namespace Msdp {
-static napi_module msdpCoordinationModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = JsCoordinationContext::Export,
-    .nm_modname = "device_status.Coordination",
-    .nm_priv = ((void *)0),
-    .reserved = { 0 },
-};
+class CircleStreamBuffer : public StreamBuffer {
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CircleStreamBuffer" };
+public:
+    CircleStreamBuffer() = default;
+    virtual ~CircleStreamBuffer() = default;
+    DISALLOW_MOVE(CircleStreamBuffer);
 
-extern "C" __attribute__((constructor)) void RegisterModule(void)
-{
-    napi_module_register(&msdpCoordinationModule);
-}
-} // namespace DeviceStatus
-} // namespace Msdp
+    bool CheckWrite(size_t size);
+    virtual bool Write(const char *buf, size_t size) override;
+
+protected:
+    void CopyDataToBegin();
+};
+} // namespace MMI
 } // namespace OHOS
+#endif // CIRCLE_STREAM_BUFFER_H

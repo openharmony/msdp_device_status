@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE = 10;
@@ -61,5 +62,13 @@ uint64_t GetThisThreadId()
     auto tid = std::stoull(stid);
     return tid;
 }
+
+int64_t GetMillisTime()
+{
+    auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
+    auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
+    return tmp.count();
+}
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

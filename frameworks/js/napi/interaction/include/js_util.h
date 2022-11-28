@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class JsUtil {
 public:
     struct UserData {
@@ -74,6 +75,7 @@ public:
         }
     }
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // JS_UTIL_H

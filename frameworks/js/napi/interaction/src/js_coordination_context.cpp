@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
 constexpr const char *INPUT_DEVICE_CLASS = "coordination_class";
@@ -48,8 +49,8 @@ napi_value JsCoordinationContext::Export(napi_env env, napi_value exports)
         FI_HILOGE("instance is nullptr");
         return nullptr;
     }
-    DeclareDeviceCooperateInterface(env, exports);
-    DeclareDeviceCooperateData(env, exports);
+    DeclareDeviceCoordinationInterface(env, exports);
+    DeclareDeviceCoordinationData(env, exports);
     return exports;
 }
 
@@ -75,7 +76,7 @@ napi_value JsCoordinationContext::Enable(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (argc == 1) {
         return jsInputDeviceMgr->Enable(env, enable);
     }
@@ -119,7 +120,7 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (argc == 2) {
         return jsInputDeviceMgr->Start(env, sinkDeviceDescriptor, srcInputDeviceId);
     }
@@ -140,7 +141,7 @@ napi_value JsCoordinationContext::Stop(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (argc == 0) {
         return jsInputDeviceMgr->Stop(env);
     }
@@ -177,7 +178,7 @@ napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (argc == 1) {
         return jsInputDeviceMgr->GetState(env, deviceDescriptor_);
     }
@@ -216,7 +217,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         FI_HILOGE("The second parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
@@ -250,7 +251,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
     if (argc == 1) {
         jsInputDeviceMgr->UnregisterListener(env, type_);
         return nullptr;
@@ -264,7 +265,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-std::shared_ptr<JsCoordinationManager> JsCoordinationContext::GetJsInputDeviceCooperateMgr()
+std::shared_ptr<JsCoordinationManager> JsCoordinationContext::GetJsInputDeviceCoordinationMgr()
 {
     std::lock_guard<std::mutex> guard(mutex_);
     return mgr_;
@@ -359,7 +360,7 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
     return instance;
 }
 
-void JsCoordinationContext::DeclareDeviceCooperateInterface(napi_env env, napi_value exports)
+void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, napi_value exports)
 {
     napi_value infoStart = nullptr;
     CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::INFO_START), &infoStart),
@@ -391,7 +392,7 @@ void JsCoordinationContext::DeclareDeviceCooperateInterface(napi_env env, napi_v
     CHKRV(napi_set_named_property(env, exports, "EventMsg", eventMsg), SET_NAMED_PROPERTY);
 }
 
-void JsCoordinationContext::DeclareDeviceCooperateData(napi_env env, napi_value exports)
+void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_value exports)
 {
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("enable", Enable),
@@ -414,5 +415,6 @@ napi_value JsCoordinationContext::EnumClassConstructor(napi_env env, napi_callba
     CHKRP(napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);
     return result;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

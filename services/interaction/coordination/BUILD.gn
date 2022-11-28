@@ -28,7 +28,7 @@ import("//base/msdp/device_status/device_status.gni")
 
 group("coordination_group") {
   deps = []
-  if (input_feature_input_cooperation) {
+  if (device_status_feature_coordination) {
     deps += [ "//base/msdp/device_status/services/interaction/coordination/lib:coordination_lib" ]
   }
 }

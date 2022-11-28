@@ -15,14 +15,14 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("interaction_config") {
-  visibility = [ ":interaction" ]
+  visibility = [ ":interaction_coordination" ]
 
   include_dirs = [
     "include",
     "${device_status_utils_path}/include",
-    "${device_status_utils_path}/common/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_frameworks_path}/native/interaction/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
 }
 
@@ -38,8 +38,9 @@ ohos_shared_library("interaction_coordination") {
   configs = [ ":interaction_config" ]
 
   deps = [
-    "${device_status_frameworks_path}/native/interaction:interaction_proxy",
-    "${device_status_utils_path}/common:devicestatus-util",
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/utils/ipc:devicestatus-ipc",
+    "${device_status_utils_path}:devicestatus_util",
     "//third_party/libuv:uv",
   ]
 
