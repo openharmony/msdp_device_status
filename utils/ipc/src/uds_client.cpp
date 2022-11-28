@@ -117,5 +117,5 @@ void UDSClient::Stop()
     isRunning_ = false;
     Close();
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS

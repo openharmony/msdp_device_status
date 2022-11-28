@@ -350,5 +350,5 @@ void UDSServer::NotifySessionDeleted(SessionPtr ses)
         callback(ses);
     }
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS

@@ -36,5 +36,5 @@ void NetPacket::MakeData(StreamBuffer &buf) const
         }
     }
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS

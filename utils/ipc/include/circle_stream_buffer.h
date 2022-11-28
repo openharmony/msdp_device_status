@@ -31,6 +31,6 @@ public:
 protected:
     void CopyDataToBegin();
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // CIRCLE_STREAM_BUFFER_H

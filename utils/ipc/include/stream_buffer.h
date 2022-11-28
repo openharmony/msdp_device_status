@@ -175,6 +175,6 @@ StreamBuffer &StreamBuffer::operator<<(const T &data)
     }
     return *this;
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_BUFFER_H

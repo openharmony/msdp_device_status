@@ -28,6 +28,6 @@ public:
                                       int32_t& tokenType) = 0;
     virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // I_UDS_SERVER_H

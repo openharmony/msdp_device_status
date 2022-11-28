@@ -78,6 +78,6 @@ protected:
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // UDS_SERVER_H
