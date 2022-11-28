@@ -24,8 +24,7 @@
 
 #include "circle_stream_buffer.h"
 #include "uds_socket.h"
-#include "uds_session.h"
-// #include "i_uds_server.h"
+#include "i_uds_server.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -39,7 +38,7 @@ enum EpollEventType {
 };
 
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
-class UDSServer : public UDSSocket {//, public IUdsServer {
+class UDSServer : public UDSSocket, public IUdsServer {
 public:
     UDSServer() = default;
     DISALLOW_COPY_AND_MOVE(UDSServer);
@@ -52,10 +51,10 @@ public:
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
     int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType);
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType) override;
 
     SessionPtr GetSession(int32_t fd) const;
-    SessionPtr GetSessionByPid(int32_t pid) const;
+    SessionPtr GetSessionByPid(int32_t pid) const override;
 
 protected:
     virtual void OnConnected(SessionPtr s);

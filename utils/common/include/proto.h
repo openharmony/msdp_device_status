@@ -15,6 +15,7 @@
 #ifndef PROTO_H
 #define PROTO_H
 #include <sys/types.h>
+#define MAX_EVENT_SIZE 100
 static const int32_t STREAM_BUF_READ_FAIL = 1;
 static const int32_t STREAM_BUF_WRITE_FAIL = 2;
 static const int32_t MAX_VECTOR_SIZE = 10;
