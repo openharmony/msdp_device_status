@@ -55,7 +55,6 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, "TYPE_INVALID"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, "TYPE_HIGH_STILL"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, "TYPE_FINE_STILL"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH, "TYPE_CAR_BLUETOOTH"},

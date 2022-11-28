@@ -28,7 +28,7 @@ const std::string MSDP_DATA_DIR = "/data/msdp";
 
 std::vector<int32_t> DeviceStatusDataParse::tempcount_ =
     std::vector<int32_t> (static_cast<int32_t>(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN),
-    static_cast<int32_t>(DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID));
+    static_cast<int32_t>(DevicestatusDataUtils::Value::INVALID));
 
 bool DeviceStatusDataParse::ParseDeviceStatusData(DevicestatusDataUtils::DevicestatusData& data,
     DevicestatusDataUtils::DevicestatusType& type)
@@ -106,7 +106,7 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
         DEV_HILOGE(SERVICE, "File not exist");
         return "";
     }
-    if (!CheckFileSize(filePath)) {
+    if (CheckFileSize(filePath) == INVALID_FILE_SIZE) {
         DEV_HILOGE(SERVICE, "File size out of read range");
         return "";
     }
@@ -132,14 +132,14 @@ bool DeviceStatusDataParse::CheckFileDir(const std::string& filePath, const std:
     return true;
 }
 
-bool DeviceStatusDataParse::CheckFileSize(const std::string& filePath)
+int32_t DeviceStatusDataParse::CheckFileSize(const std::string& filePath)
 {
     int32_t fileSize = GetFileSize(filePath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         DEV_HILOGE(SERVICE, "File size out of read range");
-        return false;
+        return INVALID_FILE_SIZE;
     }
-    return true;
+    return fileSize;
 }
 
 bool DeviceStatusDataParse::CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)

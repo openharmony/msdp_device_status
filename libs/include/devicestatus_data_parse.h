@@ -51,7 +51,7 @@ private:
     bool JudgeTypeData(const int32_t valueInt);
     int32_t GetFileSize(const std::string& filePath);
     bool CheckFileDir(const std::string& filePath, const std::string& dir);
-    bool CheckFileSize(const std::string& filePath);
+    int32_t CheckFileSize(const std::string& filePath);
     bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
     bool IsFileExists(const std::string& fileName);
     std::string ReadFile(const std::string &filePath);
