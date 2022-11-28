@@ -165,8 +165,6 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest008 Enter";
     auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
-    bool result = devicestatusService->Init();
-    EXPECT_TRUE(result);
     std::vector<std::u16string> args;
     int32_t ret = devicestatusService->Dump(-1, args);
     EXPECT_TRUE(ret == RET_NG);
