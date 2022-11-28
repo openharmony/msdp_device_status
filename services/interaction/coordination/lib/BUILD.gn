@@ -14,7 +14,7 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
-ohos_shared_library("coordination_lib") {
+ohos_source_set("coordination_lib") {
   include_dirs = [
     "stub",
     "include",
@@ -60,7 +60,6 @@ ohos_shared_library("coordination_lib") {
     "ipc:ipc_core",
   ]
 
-  relative_install_dir = "module/devicestatus/plugins"
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

@@ -50,6 +50,10 @@ ohos_shared_library("devicestatus_service") {
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]
 
+  if (input_feature_input_cooperation) {
+    deps += [ "interaction/coordination/lib:coordination_lib" ]
+  }
+
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
