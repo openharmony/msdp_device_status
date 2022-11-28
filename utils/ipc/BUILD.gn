@@ -25,12 +25,8 @@ ohos_shared_library("devicestatus-ipc") {
   ]
 
   include_dirs = [ "include" ]
-  deps = [
-    "//commonlibrary/c_utils/base:utils",
-  ]
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-  ]
+  deps = [ "//commonlibrary/c_utils/base:utils" ]
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
   configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
   subsystem_name = "msdp"
