@@ -34,6 +34,5 @@ ohos_shared_library("devicestatus-ipc") {
 }
 
 config("devicestatus_ipc_config") {
-  include_dirs = ["include"]
+  include_dirs = [ "include" ]
 }
-
