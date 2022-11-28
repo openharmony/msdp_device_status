@@ -239,21 +239,12 @@ int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
-    // DfxHisysevent::ClientConnectData data = {
-    //     .pid = pid,
-    //     .uid = uid,
-    //     .moduleType = moduleType,
-    //     .programName = programName,
-    //     .serverFd = serverFd
-    // };
     if (ret != RET_OK) {
         FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
-        // DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
     FI_HILOGD("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
-    // DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
@@ -324,7 +315,7 @@ bool DevicestatusService::IsRunning() const
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
-bool DevicestatusService::InitDelegateTasks()  //预留委托
+bool DevicestatusService::InitDelegateTasks()
 {
     CALL_DEBUG_ENTER;
     if (!delegateTasks_.Init()) {
