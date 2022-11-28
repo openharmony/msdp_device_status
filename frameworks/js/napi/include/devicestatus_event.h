@@ -13,41 +13,41 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_EVENT_H
-#define DEVICESTATUS_EVENT_H
+#ifndef DEVICE_STATUS_EVENT_H
+#define DEVICE_STATUS_EVENT_H
+
+#include <list>
+#include <map>
+#include <memory>
+#include <string>
 
 #include "napi/native_api.h"
 
-#include <map>
-#include <memory>
-
 namespace OHOS {
 namespace Msdp {
-struct DevicestatusEventListener {
-    int32_t eventType;
-    napi_ref handlerRef = nullptr;
+struct DeviceStatusEventListener {
+    napi_ref onHandlerRef;
 };
 
-class DevicestatusEvent {
+class DeviceStatusEvent {
 public:
-    DevicestatusEvent(napi_env env, napi_value thisVar);
-    DevicestatusEvent() {};
-    virtual ~DevicestatusEvent();
+    explicit DeviceStatusEvent(napi_env env);
+    DeviceStatusEvent() = default;
+    virtual ~DeviceStatusEvent();
 
-    virtual bool On(const int32_t& eventType, napi_value handler, bool isOnce);
-    virtual bool Off(const int32_t& eventType, bool isOnce);
-    virtual void OnEvent(const int32_t& eventType, size_t argc, const int32_t& value, bool isOnce);
-
+    virtual bool On(int32_t eventType, napi_value handler, bool isOnce);
+    virtual bool Off(int32_t eventType, napi_value handler);
+    virtual bool OffOnce(int32_t eventType, napi_value handler);
+    virtual void OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce);
+    void CheckRet(int32_t eventType, size_t argc, int32_t value,
+        std::shared_ptr<DeviceStatusEventListener> &typeHandler);
+    void SendRet(int32_t eventType, int32_t value, napi_value &result);
+    void ClearEventMap();
 protected:
     napi_env env_;
-    napi_ref thisVarRef_;
-    std::map<int32_t, std::shared_ptr<DevicestatusEventListener>> eventMap_;
-    std::map<int32_t, std::shared_ptr<DevicestatusEventListener>> eventOnceMap_;
-};
-
-class JsResponse {
-public:
-    int32_t devicestatusValue_ = -1;
+    napi_ref thisVarRef_ { nullptr };
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_;
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventOnceMap_;
 };
 } // namespace Msdp
 } // namespace OHOS

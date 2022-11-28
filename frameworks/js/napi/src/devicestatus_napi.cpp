@@ -73,7 +73,7 @@ DevicestatusNapi* DevicestatusNapi::GetDevicestatusNapi(int32_t type)
     return obj;
 }
 
-DevicestatusNapi::DevicestatusNapi(napi_env env, napi_value thisVar) : DevicestatusEvent(env, thisVar)
+DevicestatusNapi::DevicestatusNapi(napi_env env) : DeviceStatusEvent(env)
 {
     env_ = env;
     callbackRef_ = nullptr;
@@ -191,8 +191,12 @@ napi_value DevicestatusNapi::SubscribeDevicestatus(napi_env env, napi_callback_i
     }
     if (!isObjExists) {
         DEV_HILOGD(JS_NAPI, "Didn't find object, so created it");
-        obj = new DevicestatusNapi(env, jsthis);
-        napi_wrap(env, jsthis, reinterpret_cast<void *>(obj),
+        obj = new (std::nothrow) DevicestatusNapi(env);
+        if (obj == nullptr) {
+            DEV_HILOGE(JS_NAPI, "obj is nullptr");
+            return result;
+        }
+        napi_wrap(env, nullptr, reinterpret_cast<void *>(obj),
             [](napi_env env, void *data, void *hint) {
                 (void)env;
                 (void)hint;
@@ -283,7 +287,7 @@ napi_value DevicestatusNapi::UnSubscribeDevicestatus(napi_env env, napi_callback
         DEV_HILOGE(JS_NAPI, "obj is nullptr");
         return result;
     }
-    if (!obj->Off(type, false)) {
+    if (!obj->Off(type, args[ARG_1])) {
         DEV_HILOGE(JS_NAPI, "Failed to get callback for type: %{public}d", type);
         return result;
     } else {
@@ -342,8 +346,12 @@ napi_value DevicestatusNapi::GetDevicestatus(napi_env env, napi_callback_info in
         return result;
     }
 
-    DevicestatusNapi* obj = new DevicestatusNapi(env, jsthis);
-    napi_wrap(env, jsthis, reinterpret_cast<void *>(obj),
+    DevicestatusNapi* obj = new (std::nothrow) DevicestatusNapi(env);
+    if (obj == nullptr) {
+        DEV_HILOGE(JS_NAPI, "obj is nullptr");
+        return result;
+    }
+    napi_wrap(env, nullptr, reinterpret_cast<void *>(obj),
         [](napi_env env, void *data, void *hint) {
             (void)env;
             (void)hint;
@@ -361,7 +369,7 @@ napi_value DevicestatusNapi::GetDevicestatus(napi_env env, napi_callback_info in
         g_DevicestatusClient.GetDevicestatusData(DevicestatusDataUtils::DevicestatusType(type));
 
     obj->OnDevicestatusChangedDone(devicestatusData.type, devicestatusData.value, true);
-    obj->Off(devicestatusData.type, true);
+    obj->OffOnce(devicestatusData.type, args[ARG_1]);
 
     napi_get_undefined(env, &result);
     DEV_HILOGD(JS_NAPI, "Exit");

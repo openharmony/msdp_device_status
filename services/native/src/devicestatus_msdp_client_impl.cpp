@@ -257,6 +257,7 @@ DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
         }
     }
 
+    DEV_HILOGI(SERVICE, "Exit");
     return mAlgorithm_.pAlgorithm;
 }
 }
