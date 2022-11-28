@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-input_feature_input_cooperation = false
+device_status_feature_coordination = false
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
@@ -23,3 +23,9 @@ device_status_interfaces_path = "${device_status_root_path}/interfaces"
 device_status_frameworks_path = "${device_status_root_path}/frameworks"
 device_status_service_path = "${device_status_root_path}/services"
 device_status_utils_path = "${device_status_root_path}/utils/common"
+
+device_status_default_defines = []
+
+if (device_status_feature_coordination) {
+  device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
+}

@@ -62,3 +62,10 @@ ohos_shared_library("devicestatus") {
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
+
+group("device_status_jsapi_group") {
+  deps = []
+  if (device_status_feature_coordination) {
+    deps += [ "${device_status_frameworks_path}/js/napi/interaction:interaction_coordination" ]
+  }
+}

@@ -43,6 +43,15 @@ public:
     void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
+
+    int32_t RegisterCoordinationListener() override;
+    int32_t UnregisterCoordinationListener() override;
+    int32_t EnableInputDeviceCoordination(int32_t userData, bool enable) override;
+    int32_t StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcInputDeviceId) override;
+    int32_t StopDeviceCoordination(int32_t userData) override;
+    int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) override;
+
     int Dump(int fd, const std::vector<std::u16string>& args) override;
     void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 private:
