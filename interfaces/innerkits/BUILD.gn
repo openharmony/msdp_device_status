@@ -49,7 +49,7 @@ ohos_shared_library("devicestatus_client") {
     ":devicestatus_public_config",
   ]
 
-  deps = [ "${device_status_utils_path}/common:devicestatus_util" ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   public_configs = [ ":devicestatus_public_config" ]
 
