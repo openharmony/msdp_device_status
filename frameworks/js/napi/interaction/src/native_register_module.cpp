@@ -17,6 +17,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 static napi_module mmiInputDeviceCooperateModule = {
     .nm_version = 1,
     .nm_flags = 0,
@@ -31,5 +32,6 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiInputDeviceCooperateModule);
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

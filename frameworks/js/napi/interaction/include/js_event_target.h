@@ -31,6 +31,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class JsEventTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
@@ -69,6 +70,7 @@ private:
 
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // JS_EVENT_TARGET_H

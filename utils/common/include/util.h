@@ -14,13 +14,44 @@
  */
 #ifndef UTIL_H
 #define UTIL_H
+#include <limits>
 
 #include <sys/types.h>
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 uint64_t GetThisThreadId();
 int32_t GetPid();
+
+int64_t GetMillisTime();
+
+template<typename T>
+bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
+{
+    if (op1 >= 0) {
+        if (op2 > maxVal - op1) {
+            return false;
+        }
+    } else {
+        if (op2 < minVal - op1) {
+            return false;
+        }
+    }
+    res = op1 + op2;
+    return true;
+}
+
+inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)
+{
+    return AddInt(op1, op2, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max(), res);
+}
+
+inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
+{
+    return AddInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
+}
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // UTIL_H
