@@ -15,12 +15,13 @@
 
 #include "cooperate_event_handler.h"
 
-#include "devicestatus_define.h"
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CooperateEventHandler" };
 } // namespace
 CooperateEventHandler::CooperateEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)

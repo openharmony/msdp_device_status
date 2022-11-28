@@ -16,7 +16,7 @@
 #include "js_coordination_manager.h"
 
 #include "coordination_manager_impl.h"
-#include "define_interaction.h"
+#include "devicestatus_define.h"
 #include "interaction_manager.h"
 
 namespace OHOS {

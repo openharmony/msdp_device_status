@@ -18,7 +18,7 @@
 #include <message_option.h>
 #include <message_parcel.h>
 
-#include "define_interaction.h"
+#include "devicestatus_define.h"
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "hitrace_meter.h"

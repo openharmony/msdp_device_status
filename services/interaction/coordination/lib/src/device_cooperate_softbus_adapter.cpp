@@ -21,7 +21,6 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
-#include "config_multimodal.h"
 #include "device_cooperate_softbus_define.h"
 #include "devicestatus_define.h"
 #include "input_device_cooperate_sm.h"
@@ -31,6 +30,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceCooperateSoftbusAdapter" };
 std::shared_ptr<DeviceCooperateSoftbusAdapter> g_instance = nullptr;
 constexpr int32_t DINPUT_LINK_TYPE_MAX = 4;
 const SessionAttribute g_sessionAttr = {
@@ -49,7 +49,7 @@ void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser& parser)
     CALL_DEBUG_ENTER;
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
     if (!cJSON_IsString(deviceId)) {
-        DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
     InputDevCooSM->StartRemoteCooperate(deviceId->valuestring);
@@ -63,7 +63,7 @@ void ResponseStartRemoteCooperateResult(int32_t sessionId, const JsonParser& par
     cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_POINTER_X);
     cJSON* y = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_POINTER_Y);
     if (!cJSON_IsBool(result) || !cJSON_IsString(dhid) || !cJSON_IsNumber(x) || !cJSON_IsNumber(y)) {
-        DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
     InputDevCooSM->StartRemoteCooperateResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
@@ -80,7 +80,7 @@ void ResponseStopRemoteCooperateResult(int32_t sessionId, const JsonParser& pars
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
-        DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
     InputDevCooSM->StopRemoteCooperateResult(cJSON_IsTrue(result));
@@ -92,7 +92,7 @@ void ResponseStartCooperateOtherResult(int32_t sessionId, const JsonParser& pars
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_OTHER_DEVICE_ID);
 
     if (!cJSON_IsString(deviceId)) {
-        DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
     InputDevCooSM->StartCooperateOtherResult(deviceId->valuestring);
@@ -142,13 +142,13 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
     };
     std::string networkId = COOPERATE::GetLocalDeviceId();
     if (networkId.empty()) {
-        DEV_HILOGE(SERVICE, "Local networkid is empty");
+        FI_HILOGE("Local networkid is empty");
         return RET_ERR;
     }
     localSessionName_ = SESSION_NAME + networkId.substr(0, INTERCEPT_STRING_LENGTH);
     int32_t ret = CreateSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Create session server failed, error code:%{public}d", ret);
+        FI_HILOGE("Create session server failed, error code:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -165,10 +165,10 @@ void DeviceCooperateSoftbusAdapter::Release()
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     std::for_each(sessionDevMap_.begin(), sessionDevMap_.end(), [](auto item) {
         CloseSession(item.second);
-        DEV_HILOGD(SERVICE, "Close session success");
+        FI_HILOGD("Close session success");
     });
     int32_t ret = RemoveSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str());
-    DEV_HILOGD(SERVICE, "RemoveSessionServer ret:%{public}d", ret);
+    FI_HILOGD("RemoveSessionServer ret:%{public}d", ret);
     sessionDevMap_.clear();
     channelStatusMap_.clear();
 }
@@ -177,7 +177,7 @@ bool DeviceCooperateSoftbusAdapter::CheckDeviceSessionState(const std::string &d
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(devId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Check session state error");
+        FI_HILOGE("Check session state error");
         return false;
     }
     return true;
@@ -187,13 +187,13 @@ int32_t DeviceCooperateSoftbusAdapter::OpenInputSoftbus(const std::string &remot
 {
     CALL_INFO_TRACE;
     if (CheckDeviceSessionState(remoteDevId)) {
-        DEV_HILOGD(SERVICE, "Softbus session has already  opened");
+        FI_HILOGD("Softbus session has already  opened");
         return RET_OK;
     }
 
     int32_t ret = Init();
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Init failed");
+        FI_HILOGE("Init failed");
         return RET_ERR;
     }
 
@@ -201,7 +201,7 @@ int32_t DeviceCooperateSoftbusAdapter::OpenInputSoftbus(const std::string &remot
     int32_t sessionId = OpenSession(localSessionName_.c_str(), peerSessionName.c_str(), remoteDevId.c_str(),
         GROUP_ID.c_str(), &g_sessionAttr);
     if (sessionId < 0) {
-        DEV_HILOGE(SERVICE, "OpenSession failed");
+        FI_HILOGE("OpenSession failed");
         return RET_ERR;
     }
     return WaitSessionOpend(remoteDevId, sessionId);
@@ -215,7 +215,7 @@ int32_t DeviceCooperateSoftbusAdapter::WaitSessionOpend(const std::string &remot
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
         [this, remoteDevId] () { return channelStatusMap_[remoteDevId]; });
     if (!status) {
-        DEV_HILOGE(SERVICE, "OpenSession timeout");
+        FI_HILOGE("OpenSession timeout");
         return RET_ERR;
     }
     channelStatusMap_[remoteDevId] = false;
@@ -227,7 +227,7 @@ void DeviceCooperateSoftbusAdapter::CloseInputSoftbus(const std::string &remoteD
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDevId) == sessionDevMap_.end()) {
-        DEV_HILOGI(SERVICE, "SessionDevIdMap not find");
+        FI_HILOGI("SessionDevIdMap not find");
         return;
     }
     int32_t sessionId = sessionDevMap_[remoteDevId];
@@ -252,7 +252,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Start remote cooperate error, not find this device");
+        FI_HILOGE("Start remote cooperate error, not find this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
@@ -265,7 +265,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start remote cooperate send session msg failed, ret:%{public}d", ret);
+        FI_HILOGE("Start remote cooperate send session msg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -277,7 +277,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Stop remote cooperate error, not find this device");
+        FI_HILOGE("Stop remote cooperate error, not find this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
@@ -293,7 +293,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start remote cooperate result send session msg failed");
+        FI_HILOGE("Start remote cooperate result send session msg failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -304,7 +304,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperate(const std::string &re
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Stop remote cooperate error, not find this device");
+        FI_HILOGE("Stop remote cooperate error, not find this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
@@ -316,7 +316,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperate(const std::string &re
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Stop remote cooperate send session msg failed");
+        FI_HILOGE("Stop remote cooperate send session msg failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -327,7 +327,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperateResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Stop remote cooperate result error, not find this device");
+        FI_HILOGE("Stop remote cooperate result error, not find this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
@@ -340,7 +340,7 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperateResult(const std::stri
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Stop remote cooperate result send session msg failed");
+        FI_HILOGE("Stop remote cooperate result send session msg failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -352,7 +352,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartCooperateOtherResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "Start cooperate other result error, not find this device");
+        FI_HILOGE("Start cooperate other result error, not find this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
@@ -365,7 +365,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartCooperateOtherResult(const std::stri
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start cooperate other result send session msg failed");
+        FI_HILOGE("Start cooperate other result send session msg failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -376,15 +376,15 @@ void DeviceCooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const s
     JsonParser parser;
     parser.json_ = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json_)) {
-        DEV_HILOGE(SERVICE, "Parser.json_ is not object");
+        FI_HILOGE("Parser.json_ is not object");
         return;
     }
     cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_CMD_TYPE);
     if (!cJSON_IsNumber(comType)) {
-        DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is not number type");
+        FI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
     }
-    DEV_HILOGD(SERVICE, "valueint: %{public}d", comType->valueint);
+    FI_HILOGD("valueint: %{public}d", comType->valueint);
     switch (comType->valueint) {
         case REMOTE_COOPERATE_START: {
             ResponseStartRemoteCooperate(sessionId, parser);
@@ -407,7 +407,7 @@ void DeviceCooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const s
             break;
         }
         default: {
-            DEV_HILOGE(SERVICE, "OnBytesReceived cmdType is undefined");
+            FI_HILOGE("OnBytesReceived cmdType is undefined");
             break;
         }
     }
@@ -415,9 +415,9 @@ void DeviceCooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const s
 
 void DeviceCooperateSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
-    DEV_HILOGD(SERVICE, "dataLen:%{public}d", dataLen);
+    FI_HILOGD("dataLen:%{public}d", dataLen);
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
-        DEV_HILOGE(SERVICE, "Param check failed");
+        FI_HILOGE("Param check failed");
         return;
     }
     std::string message = std::string(static_cast<const char *>(data), dataLen);
@@ -428,7 +428,7 @@ int32_t DeviceCooperateSoftbusAdapter::SendMsg(int32_t sessionId, const std::str
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
-        DEV_HILOGW(SERVICE, "error:message.size() > MSG_MAX_SIZE message size:%{public}zu", message.size());
+        FI_HILOGW("error:message.size() > MSG_MAX_SIZE message size:%{public}zu", message.size());
         return RET_ERR;
     }
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
@@ -442,7 +442,7 @@ std::string DeviceCooperateSoftbusAdapter::FindDevice(int32_t sessionId)
         return item.second == sessionId;
     });
     if (find_item == sessionDevMap_.end()) {
-        DEV_HILOGE(SERVICE, "FindDevice error");
+        FI_HILOGE("FindDevice error");
         return {};
     }
     return find_item->first;
@@ -453,10 +453,10 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     CALL_INFO_TRACE;
     char peerDevId[DEVICE_ID_SIZE_MAX] = {};
     int32_t getPeerDeviceIdResult = GetPeerDeviceId(sessionId, peerDevId, sizeof(peerDevId));
-    DEV_HILOGD(SERVICE, "Get peer device id ret:%{public}d", getPeerDeviceIdResult);
+    FI_HILOGD("Get peer device id ret:%{public}d", getPeerDeviceIdResult);
     if (result != RET_OK) {
         std::string deviceId = FindDevice(sessionId);
-        DEV_HILOGE(SERVICE, "Session open failed result:%{public}d", result);
+        FI_HILOGE("Session open failed result:%{public}d", result);
         std::unique_lock<std::mutex> sessionLock(operationMutex_);
         if (sessionDevMap_.find(deviceId) != sessionDevMap_.end()) {
             sessionDevMap_.erase(deviceId);
@@ -469,7 +469,7 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     }
 
     int32_t sessionSide = GetSessionSide(sessionId);
-    DEV_HILOGI(SERVICE, "session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
+    FI_HILOGI("session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
         sessionId, sessionSide);
     std::lock_guard<std::mutex> notifyLock(operationMutex_);
     if (sessionSide == SESSION_SIDE_SERVER) {

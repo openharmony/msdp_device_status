@@ -15,7 +15,7 @@
 
 #include "js_coordination_context.h"
 
-#include "define_interaction.h"
+#include "devicestatus_define.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 

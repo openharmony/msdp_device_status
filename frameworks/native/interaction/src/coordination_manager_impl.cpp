@@ -15,12 +15,12 @@
 
 #include "coordination_manager_impl.h"
 
-#include "define_interaction.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 #include "util.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
 } // namespace
@@ -138,5 +138,6 @@ const CoordinationManagerImpl::CoordinationState *CoordinationManagerImpl::GetCo
     auto iter = devCoordinationEvent_.find(userData);
     return iter == devCoordinationEvent_.end() ? nullptr : &iter->second.state;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

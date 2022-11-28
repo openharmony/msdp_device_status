@@ -12,102 +12,111 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef DEVICESTATUS_DEFINE_H
 #define DEVICESTATUS_DEFINE_H
 
-#include "devicestatus_hilog_wrapper.h"
+#include "devicestatus_errors.h"
+#include "fi_log.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-
-// #define CALL_INFO_TRACE
-// #define CALL_DEBUG_ENTER
-#define ERROR_NULL_POINTER (-1)
 #define MMI_DINPUT_PKG_NAME "ohos.multimodalinput.dinput"
 
-#define CHKPL(cond, module) \
+#ifndef RET_OK
+    #define RET_OK (0)
+#endif
+
+#ifndef RET_ERR
+    #define RET_ERR (-1)
+#endif
+
+#define CHKPL(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGW(module, "CHKPL(%{public}s) is null, do nothing", #cond); \
+            FI_HILOGW("CHKPL(%{public}s) is null, do nothing", #cond); \
         } \
     } while (0)
 
-#define CHKPV(cond, module) \
+#define CHKPV(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGE(module, "CHKPV(%{public}s) is null", #cond); \
+            FI_HILOGE("CHKPV(%{public}s) is null", #cond); \
             return; \
         } \
     } while (0)
 
-#define CHKPF(cond, module) \
+#define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGE(module, "CHKPF(%{public}s) is null", #cond); \
+            FI_HILOGE("CHKPF(%{public}s) is null", #cond); \
             return false; \
         } \
     } while (0)
 
-#define CHKPS(cond, module) \
+#define CHKPS(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGE(module, "CHKPS(%{public}s) is null", #cond); \
+            FI_HILOGE("CHKPS(%{public}s) is null", #cond); \
             return ""; \
         } \
     } while (0)
 
-#define CHKPC(cond, module) \
+#define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
-            DEV_HILOGW(module, "CHKPC(%{public}s) is null, skip then continue", #cond); \
+            FI_HILOGW("CHKPC(%{public}s) is null, skip then continue", #cond); \
             continue; \
         } \
     }
 
-#define CHKPB(cond, module) \
+#define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            DEV_HILOGW(module, "CHKPB(%{public}s) is null, skip then break", #cond); \
+            FI_HILOGW("CHKPB(%{public}s) is null, skip then break", #cond); \
             break; \
         } \
     }
 
-#define CHKPR(cond, module, r) \
+#define CHKPR(cond, r) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGE(module, "CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
+            FI_HILOGE("CHKPR(%{public}s) is null, return value is %{public}d", #cond, r); \
             return r; \
         } \
     } while (0)
 
-#define CHKPP(cond, module) \
+#define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGE(module, "CHKPP(%{public}s) is null, return value is null", #cond); \
+            FI_HILOGE("CHKPP(%{public}s) is null, return value is null", #cond); \
             return nullptr; \
         } \
     } while (0)
 
-#define CHKPO(cond, module) \
+#define CHKPO(cond) \
     do { \
         if ((cond) == nullptr) { \
-            DEV_HILOGW(module, "%{public}s, (%{public}d), CHKPO(%{public}s) is null, return object is null", \
+            FI_HILOGW("%{public}s, (%{public}d), CHKPO(%{public}s) is null, return object is null", \
                 __FILE__, __LINE__, #cond); \
             return {}; \
         } \
     } while (0)
 
-#define CK(cond, module, ec) \
+#define CK(cond, ec) \
     do { \
         if (!(cond)) { \
-            DEV_HILOGE(module, "CK(%{public}s), errCode:%{public}d", #cond, ec); \
+            FI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
         } \
     } while (0)
 
+#define CHK_PID_AND_TID() \
+    do { \
+        FI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
+            __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
+    } while (0)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#endif // DEVICESTATUS_COMMON_H
+#endif // DEVICESTATUS_DEFINE_H

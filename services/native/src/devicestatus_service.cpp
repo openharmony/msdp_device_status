@@ -24,7 +24,7 @@
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
-#include "define_interaction.h"
+#include "devicestatus_define.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 

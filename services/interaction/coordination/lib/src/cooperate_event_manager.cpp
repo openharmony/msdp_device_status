@@ -15,11 +15,13 @@
 
 #include "cooperate_event_manager.h"
 #include "devicestatus_hilog_wrapper.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CooperateEventManager" };
 } // namespace
 
 CooperateEventManager::CooperateEventManager() {}
@@ -40,7 +42,7 @@ void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
     if (remoteCooperateCallbacks_.empty() || event == nullptr) {
-        DEV_HILOGE(SERVICE, "Remove listener failed");
+        FI_HILOGE("Remove listener failed");
         return;
     }
     for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
@@ -56,12 +58,12 @@ int32_t CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const 
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (remoteCooperateCallbacks_.empty()) {
-        DEV_HILOGE(SERVICE, "No listener, send cooperate message failed");
+        FI_HILOGE("No listener, send cooperate message failed");
         return RET_ERR;
     }
     for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
         sptr<EventInfo> info = *it;
-        CHKPC(info, SERVICE);
+        CHKPC(info);
         NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     }
     return RET_OK;
@@ -72,7 +74,7 @@ void CooperateEventManager::OnEnable(CooperationMessage msg, const std::string &
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::ENABLE];
-    CHKPV(info, SERVICE);
+    CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::ENABLE] =  nullptr;
 }
@@ -82,7 +84,7 @@ void CooperateEventManager::OnStart(CooperationMessage msg, const std::string &d
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::START];
-    CHKPV(info, SERVICE);
+    CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::START] =  nullptr;
 }
@@ -92,7 +94,7 @@ void CooperateEventManager::OnStop(CooperationMessage msg, const std::string &de
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
-    CHKPV(info, SERVICE);
+    CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     cooperateCallbacks_[EventType::STOP] =  nullptr;
 }
@@ -102,7 +104,7 @@ void CooperateEventManager::OnGetState(bool state)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STATE];
-    CHKPV(info, SERVICE);
+    CHKPV(info);
     NotifyCooperateState(info->sess, info->msgId, info->userData, state);
     cooperateCallbacks_[EventType::STATE] =  nullptr;
 }
@@ -111,7 +113,7 @@ void CooperateEventManager::OnErrorMessage(EventType type, CooperationMessage ms
 {
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[type];
-    CHKPV(info, SERVICE);
+    CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, "", msg);
     cooperateCallbacks_[type] =  nullptr;
 }
@@ -130,15 +132,15 @@ void CooperateEventManager::NotifyCooperateMessage(
     SessionPtr sess, MmiMessageId msgId, int32_t userData, const std::string &deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(sess, SERVICE);
+    CHKPV(sess);
     NetPacket pkt(msgId);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
-        DEV_HILOGE(SERVICE, "Packet write data failed");
+        FI_HILOGE("Packet write data failed");
         return;
     }
     if (!sess->SendMsg(pkt)) {
-        DEV_HILOGE(SERVICE, "Sending failed");
+        FI_HILOGE("Sending failed");
         return;
     }
 }
@@ -146,15 +148,15 @@ void CooperateEventManager::NotifyCooperateMessage(
 void CooperateEventManager::NotifyCooperateState(SessionPtr sess, MmiMessageId msgId, int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(sess, SERVICE);
+    CHKPV(sess);
     NetPacket pkt(msgId);
     pkt << userData << state;
     if (pkt.ChkRWError()) {
-        DEV_HILOGE(SERVICE, "Packet write data failed");
+        FI_HILOGE("Packet write data failed");
         return;
     }
     if (!sess->SendMsg(pkt)) {
-        DEV_HILOGE(SERVICE, "Sending failed");
+        FI_HILOGE("Sending failed");
         return;
     }
 }
