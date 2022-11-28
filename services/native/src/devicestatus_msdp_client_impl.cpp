@@ -256,6 +256,7 @@ DevicestatusMsdpInterface* DevicestatusMsdpClientImpl::GetAlgorithmInst()
         mAlgorithm_.pAlgorithm = mAlgorithm_.create();
     }
 
+    DEV_HILOGI(SERVICE, "Exit");
     return mAlgorithm_.pAlgorithm;
 }
 } // namespace DeviceStatus
