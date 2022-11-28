@@ -162,16 +162,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    // mprintf(fd, "Uds_server information:\t");
-    // mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
-    // for (const auto &item : sessionsMap_) {
-    //     std::shared_ptr<UDSSession> udsSession = item.second;
-    //     CHKPV(udsSession);
-    //     mprintf(fd,
-    //             "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t",
-    //             udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-    //             udsSession->GetTokenType(), udsSession->GetDescript().c_str());
-    // }
 }
 
 void UDSServer::OnConnected(SessionPtr sess)
@@ -203,8 +193,6 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
-    } else {
-        // DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
@@ -212,11 +200,6 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     }
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
-    }
-    if (close(fd) == RET_OK) {
-        // DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    } else {
-        // DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
 }
 
