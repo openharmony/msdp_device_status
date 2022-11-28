@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
 constexpr const char *INPUT_DEVICE_CLASS = "coordination_class";
@@ -414,5 +415,6 @@ napi_value JsCoordinationContext::EnumClassConstructor(napi_env env, napi_callba
     CHKRP(napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);
     return result;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

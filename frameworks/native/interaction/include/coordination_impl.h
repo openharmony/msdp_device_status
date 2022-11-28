@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class InputDeviceCooperateImpl final {
 public:
     static InputDeviceCooperateImpl &GetInstance();
@@ -70,7 +71,9 @@ private:
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
 };
+
+#define InputDevCooperateImpl InputDeviceCooperateImpl::GetInstance()
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define InputDevCooperateImpl OHOS::Msdp::InputDeviceCooperateImpl::GetInstance()
 #endif // INPUT_DEVICE_COOPERATE_IMPL_H

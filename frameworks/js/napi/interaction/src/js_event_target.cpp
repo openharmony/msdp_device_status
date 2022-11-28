@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
 constexpr std::string_view COOPERATION = "cooperation";
@@ -650,5 +651,6 @@ void JsEventTarget::HandleExecuteResult(napi_env env, int32_t errCode)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, napiError.msg.c_str());
     }
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
 } // namespace
@@ -109,5 +110,6 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     CHKRF(napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
     return isEqual;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
