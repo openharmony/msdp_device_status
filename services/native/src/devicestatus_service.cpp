@@ -77,7 +77,6 @@ void DevicestatusService::OnStart()
     ready_ = true;
     t_ = std::thread(std::bind(&DevicestatusService::OnThread, this));
     t_.join();
-    DEV_HILOGI(SERVICE, "OnStart and add system ability success");
 }
 
 void DevicestatusService::OnStop()
@@ -141,17 +140,12 @@ bool DevicestatusService::Init()
         DEV_HILOGE(SERVICE, "OnStart init fail");
         return false;
     }
-    mmiFd_ = EpollCreate(MAX_EVENT_SIZE);
-    if (mmiFd_ < 0) {
+    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         FI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
     }
     if (!InitDelegateTasks()) {
         FI_HILOGE("Delegate tasks init failed");
-        return false;
-    }
-    if (!InitEpoll()) {
-        FI_HILOGE("Epoll init failed");
         return false;
     }
     if (TimerMgr->Init() != RET_OK) {
@@ -284,10 +278,6 @@ int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
-    if (mmiFd_ < 0) {
-        FI_HILOGE("Invalid param mmiFd_");
-        return RET_ERR;
-    }
     auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
     if (!eventData) {
         FI_HILOGE("Malloc failed");
@@ -300,7 +290,7 @@ int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
-    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
+    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, -1);
     if (ret < 0) {
         free(eventData);
         eventData = nullptr;
@@ -320,12 +310,8 @@ int32_t DevicestatusService::DelEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
-    if (mmiFd_ < 0) {
-        FI_HILOGE("Invalid param mmiFd_");
-        return RET_ERR;
-    }
     struct epoll_event ev = {};
-    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, -1);
     if (ret < 0) {
         FI_HILOGE("DelEpoll failed");
         return ret;
@@ -351,26 +337,10 @@ bool DevicestatusService::InitDelegateTasks()  //预留委托
         EpollClose();
         return false;
     }
-    FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
     return true;
 }
 
-bool DevicestatusService::InitEpoll()
-{
-    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
-        FI_HILOGE("Create epoll failed");
-        return false;
-    }
-    auto ret = AddEpoll(EPOLL_EVENT_SOCKET, epollFd_);
-    if (ret <  0) {
-        FI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        EpollClose();
-        return false;
-    }
-    FI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
-    return true;
-}
-    
 void DevicestatusService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -381,7 +351,7 @@ void DevicestatusService::OnThread()
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         FI_HILOGD("timeout:%{public}d", timeout);
-        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, -1);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
             CHKPC(epollEvent);

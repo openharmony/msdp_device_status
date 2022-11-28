@@ -66,16 +66,13 @@ public:
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const;
 
-
     bool InitDelegateTasks();
-    bool InitEpoll();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ { -1 };
     std::thread t_;
     bool Init();
     bool ready_ = false;
