@@ -28,7 +28,7 @@ const std::string MSDP_DATA_DIR = "/data/msdp";
 
 std::vector<int32_t> DeviceStatusDataParse::tempcount_ =
     std::vector<int32_t> (static_cast<int32_t>(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN),
-    static_cast<int32_t>(DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID));
+    static_cast<int32_t>(DevicestatusDataUtils::Value::INVALID));
 
 bool DeviceStatusDataParse::ParseDeviceStatusData(DevicestatusDataUtils::DevicestatusData& data,
     DevicestatusDataUtils::DevicestatusType& type)
