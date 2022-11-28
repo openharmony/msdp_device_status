@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Msdp {
+const std::u16string ARGS_H = u"-h";
 class DevicestatusServiceTest : public testing::Test {
 public:
 
