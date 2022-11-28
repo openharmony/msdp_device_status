@@ -26,7 +26,7 @@
 #include "uds_session.h"
 
 #include "cooperation_message.h"
-#include "devicestatus_define.h"
+#include "fi_log.h"
 #include "i_input_context.h"
 
 namespace OHOS {

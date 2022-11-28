@@ -36,6 +36,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateSM" };
 constexpr int32_t INTERVAL_MS = 2000;
 constexpr int32_t MOUSE_ABS_LOCATION = 100;
 constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
@@ -47,13 +48,13 @@ InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
 
 void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
 {
-    CHKPL(delegateTasksCallback, SERVICE);
+    CHKPL(delegateTasksCallback);
     delegateTasksCallback_ = delegateTasksCallback;
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     DevCooperateSoftbusAdapter->Init();
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     context->AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
     });
@@ -71,7 +72,7 @@ void InputDeviceCooperateSM::Reset(const std::string &networkId)
     }
     if (cooperateState_ == CooperateState::STATE_IN) {
         auto* context = CooperateEventMgr->GetIInputContext();
-        CHKPV(context, SERVICE);
+        CHKPV(context);
         std::string sinkNetwoekId = context->GetOriginNetworkId(startDhid_);
         if (networkId != sinkNetwoekId) {
             needReset = false;
@@ -91,7 +92,7 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     cooperateState_ = CooperateState::STATE_FREE;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     bool hasPointer = context->HasLocalPointerDevice();
     if (hasPointer && adjustAbsolutionLocation) {
         context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
@@ -131,7 +132,7 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
         return;
     }
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     std::string originNetworkId = context->GetOriginNetworkId(startDhid_);
     if (originNetworkId == networkId) {
         Reset();
@@ -163,15 +164,15 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
-        DEV_HILOGE(SERVICE, "In transition state, not process");
+        FI_HILOGE("In transition state, not process");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
-    CHKPR(currentStateSM_, SERVICE, ERROR_NULL_POINTER);
+    CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStarting_ = true;
     DevCooperateSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
     int32_t ret = currentStateSM_->StartInputDeviceCooperate(remoteNetworkId, startInputDeviceId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start remote input fail");
+        FI_HILOGE("Start remote input fail");
         isStarting_ = false;
         return ret;
     }
@@ -187,15 +188,15 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStopping_) {
-        DEV_HILOGE(SERVICE, "In transition state, not process");
+        FI_HILOGE("In transition state, not process");
         return RET_ERR;
     }
-    CHKPR(currentStateSM_, SERVICE, ERROR_NULL_POINTER);
+    CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStopping_ = true;
     std::string stopNetworkId = "";
     if (cooperateState_ == CooperateState::STATE_IN) {
         auto* context = CooperateEventMgr->GetIInputContext();
-        CHKPR(context, SERVICE, ERROR_NULL_POINTER);
+        CHKPR(context, ERROR_NULL_POINTER);
         stopNetworkId = context->GetOriginNetworkId(startDhid_);
     }
     if (cooperateState_ == CooperateState::STATE_OUT) {
@@ -203,7 +204,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     }
     int32_t ret = currentStateSM_->StopInputDeviceCooperate(stopNetworkId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Stop input device cooperate fail");
+        FI_HILOGE("Stop input device cooperate fail");
         isStopping_ = false;
     }
     return ret;
@@ -213,7 +214,7 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(delegateTasksCallback_, SERVICE);
+    CHKPV(delegateTasksCallback_);
     delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage,
         CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
     isStarting_ = true;
@@ -225,7 +226,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStarting_) {
-        DEV_HILOGI(SERVICE, "Not in starting");
+        FI_HILOGI("Not in starting");
         return;
     }
     startDhid_ = startDhid;
@@ -238,7 +239,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
         return;
     }
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     if (cooperateState_ == CooperateState::STATE_FREE) {
         context->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CooperateState::STATE_IN);
@@ -262,7 +263,7 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStopping_) {
-        DEV_HILOGI(SERVICE, "Not in stopping");
+        FI_HILOGI("Not in stopping");
         return;
     }
     if (isSuccess) {
@@ -284,16 +285,16 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStarting_) {
-        DEV_HILOGE(SERVICE, "Not in starting");
+        FI_HILOGE("Not in starting");
         return;
     }
 
     if (!isSuccess) {
-        DEV_HILOGE(SERVICE, "Start distributed fail, startInputDevice: %{public}d", startInputDeviceId);
+        FI_HILOGE("Start distributed fail, startInputDevice: %{public}d", startInputDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         auto* context = CooperateEventMgr->GetIInputContext();
-        CHKPV(context, SERVICE);
+        CHKPV(context);
         startDhid_ = context->GetDhid(startInputDeviceId);
         NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (cooperateState_ == CooperateState::STATE_FREE) {
@@ -305,7 +306,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
             }
             UpdateState(CooperateState::STATE_FREE);
         } else {
-            DEV_HILOGI(SERVICE, "Current state is out");
+            FI_HILOGI("Current state is out");
         }
     }
     isStarting_ = false;
@@ -316,20 +317,20 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStopping_) {
-        DEV_HILOGE(SERVICE, "Not in stopping");
+        FI_HILOGE("Not in stopping");
         return;
     }
     NotifyRemoteStopFinish(isSuccess, remoteNetworkId);
     if (isSuccess) {
         auto* context = CooperateEventMgr->GetIInputContext();
-        CHKPV(context, SERVICE);
+        CHKPV(context);
         if (context->HasLocalPointerDevice()) {
             context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         if (cooperateState_ == CooperateState::STATE_IN || cooperateState_ == CooperateState::STATE_OUT) {
             UpdateState(CooperateState::STATE_FREE);
         } else {
-            DEV_HILOGI(SERVICE, "Current state is free");
+            FI_HILOGI("Current state is free");
         }
     }
     DevCooperateSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
@@ -366,9 +367,9 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPF(context, SERVICE);
+    CHKPF(context);
     auto pointerEvent = context->GetPointerEvent();
-    CHKPF(pointerEvent, SERVICE);
+    CHKPF(pointerEvent);
     int32_t displayId = pointerEvent->GetTargetDisplayId();
     auto displayGroupInfo = context->GetDisplayGroupInfo();
     MMI::DisplayInfo physicalDisplayInfo;
@@ -381,13 +382,13 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     int32_t displayWidth = physicalDisplayInfo.width;
     int32_t displayHeight = physicalDisplayInfo.height;
     if (displayWidth == 0 || displayHeight == 0) {
-        DEV_HILOGE(SERVICE, "display width or height is 0");
+        FI_HILOGE("display width or height is 0");
         return false;
     }
     auto mouseInfo = context->GetMouseInfo();
     int32_t xPercent = mouseInfo.physicalX * MOUSE_ABS_LOCATION / displayWidth;
     int32_t yPercent = mouseInfo.physicalY * MOUSE_ABS_LOCATION / displayHeight;
-    DEV_HILOGI(SERVICE, "displayWidth: %{public}d, displayHeight: %{public}d, "
+    FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, "
         "physicalX: %{public}d, physicalY: %{public}d,",
         displayWidth, displayHeight, mouseInfo.physicalX, mouseInfo.physicalY);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
@@ -396,7 +397,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
 
 void InputDeviceCooperateSM::UpdateState(CooperateState state)
 {
-    DEV_HILOGI(SERVICE, "state: %{public}d", state);
+    FI_HILOGI("state: %{public}d", state);
     switch (state) {
         case CooperateState::STATE_FREE: {
             Reset();
@@ -408,7 +409,7 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
         }
         case CooperateState::STATE_OUT: {
             auto* context = CooperateEventMgr->GetIInputContext();
-            CHKPV(context, SERVICE);
+            CHKPV(context);
             context->SetPointerVisible(getpid(), false);
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
             break;
@@ -456,7 +457,7 @@ void InputDeviceCooperateSM::OnKeyboardOnline(const std::string &dhid)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(currentStateSM_, SERVICE);
+    CHKPV(currentStateSM_);
     currentStateSM_->OnKeyboardOnline(dhid);
 }
 
@@ -485,8 +486,8 @@ void InputDeviceCooperateSM::OnPointerOffline(const std::string &dhid, const std
 
 bool InputDeviceCooperateSM::HandleEvent(libinput_event *event)
 {
-    DEV_HILOGI(SERVICE, "current state :%{public}d", cooperateState_);
-    CHKPF(event, SERVICE);
+    FI_HILOGI("current state :%{public}d", cooperateState_);
+    CHKPF(event);
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
@@ -509,20 +510,20 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
 {
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStopping_ || isStarting_) {
-        DEV_HILOGE(SERVICE, "In transition state, not process");
+        FI_HILOGE("In transition state, not process");
         return false;
     }
     auto inputDevice = libinput_event_get_device(event);
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPF(context, SERVICE);
+    CHKPF(context);
     if (cooperateState_ == CooperateState::STATE_IN) {
         if (!context->IsRemote(inputDevice)) {
-            CHKPF(currentStateSM_, SERVICE);
+            CHKPF(currentStateSM_);
             isStopping_ = true;
             std::string sink = context->GetOriginNetworkId(startDhid_);
             int32_t ret = currentStateSM_->StopInputDeviceCooperate(sink);
             if (ret != RET_OK) {
-                DEV_HILOGE(SERVICE, "Stop input device cooperate fail");
+                FI_HILOGE("Stop input device cooperate fail");
                 isStopping_ = false;
             }
             return false;
@@ -531,12 +532,12 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
         int32_t deviceId = context->FindInputDeviceId(inputDevice);
         std::string dhid = context->GetDhid(deviceId);
         if (startDhid_ != dhid) {
-            DEV_HILOGI(SERVICE, "Move other mouse, stop input device cooperate");
-            CHKPF(currentStateSM_, SERVICE);
+            FI_HILOGI("Move other mouse, stop input device cooperate");
+            CHKPF(currentStateSM_);
             isStopping_ = true;
             int32_t ret = currentStateSM_->StopInputDeviceCooperate(srcNetworkId_);
             if (ret != RET_OK) {
-                DEV_HILOGE(SERVICE, "Stop input device cooperate fail");
+                FI_HILOGE("Stop input device cooperate fail");
                 isStopping_ = false;
             }
         }
@@ -553,16 +554,16 @@ bool InputDeviceCooperateSM::InitDeviceManager()
 {
     CALL_DEBUG_ENTER;
     initCallback_ = std::make_shared<DeviceInitCallBack>();
-    CHKPR(initCallback_, SERVICE, false);
+    CHKPR(initCallback_, false);
     int32_t ret = DisHardware.InitDeviceManager(MMI_DINPUT_PKG_NAME, initCallback_);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Init device manager failed, ret:%{public}d", ret);
+        FI_HILOGE("Init device manager failed, ret:%{public}d", ret);
         return false;
     }
     stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
     ret = DisHardware.RegisterDevStateCallback(MMI_DINPUT_PKG_NAME, "", stateCallback_);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Register devStateCallback failed, ret:%{public}d", ret);
+        FI_HILOGE("Register devStateCallback failed, ret:%{public}d", ret);
         return false;
     }
     return true;

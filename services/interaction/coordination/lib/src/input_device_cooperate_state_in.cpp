@@ -26,6 +26,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateIn" };
 } // namespace
 
 InputDeviceCooperateStateIn::InputDeviceCooperateStateIn(const std::string &startDhid) : startDhid_(startDhid) {}
@@ -35,23 +36,23 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
-        DEV_HILOGE(SERVICE, "RemoteNetworkId is empty");
+        FI_HILOGE("RemoteNetworkId is empty");
         return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     std::string localNetworkId = COOPERATE::GetLocalDeviceId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
-        DEV_HILOGE(SERVICE, "Input Parameters error");
+        FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     int32_t ret = DevCooperateSoftbusAdapter->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start input device cooperate fail");
+        FI_HILOGE("Start input device cooperate fail");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remoteNetworkId, startInputDeviceId);
-    CHKPR(eventHandler_, SERVICE, RET_ERR);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }
@@ -60,7 +61,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
 {
     CALL_DEBUG_ENTER;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPR(context, SERVICE, RET_ERR);
+    CHKPR(context, RET_ERR);
     std::string originNetworkId = context->GetOriginNetworkId(startInputDeviceId);
     if (remoteNetworkId == originNetworkId) {
         ComeBack(remoteNetworkId, startInputDeviceId);
@@ -75,12 +76,12 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string 
     CALL_DEBUG_ENTER;
     int32_t ret = DevCooperateSoftbusAdapter->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Stop input device cooperate fail");
+        FI_HILOGE("Stop input device cooperate fail");
         return ret;
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc = std::bind(&InputDeviceCooperateStateIn::ProcessStop, this);
-    CHKPR(eventHandler_, SERVICE, RET_ERR);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
@@ -89,7 +90,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPR(context, SERVICE, RET_ERR);
+    CHKPR(context, RET_ERR);
     std::vector<std::string> dhids = context->GetCooperateDhids(startDhid_);
     std::string sink = context->GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
@@ -109,14 +110,14 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
         return;
     }
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     std::string sinkNetworkId = context->GetOriginNetworkId(startInputDeviceId);
     std::vector<std::string> dhid = context->GetCooperateDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
     std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
         this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
-    CHKPV(eventHandler_, SERVICE);
+    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleRelayStopFunc, taskName, 0);
 }
 
@@ -140,13 +141,13 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
         std::string taskName = "start_finish_task";
         std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
             InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
-        CHKPV(eventHandler_, SERVICE);
+        CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
-        CHKPV(eventHandler_, SERVICE);
+        CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
     }
 }
@@ -155,7 +156,7 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
 {
     CALL_DEBUG_ENTER;
     auto* context = CooperateEventMgr->GetIInputContext();
-    CHKPV(context, SERVICE);
+    CHKPV(context);
     std::vector<std::string> dhids = context->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);

@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class CoordinationManagerImpl final {
 public:
     static CoordinationManagerImpl &GetInstance();
@@ -66,7 +67,8 @@ private:
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define CoordinationMgrImpl OHOS::Msdp::CoordinationManagerImpl::GetInstance()
+#define CoordinationMgrImpl OHOS::Msdp::DeviceStatus::CoordinationManagerImpl::GetInstance()
 #endif // COORDINATION_MANAGER_IMPL_H

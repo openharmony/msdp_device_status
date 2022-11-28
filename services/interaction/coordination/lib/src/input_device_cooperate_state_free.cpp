@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateFree" };
 } // namespace
 
 int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
@@ -30,23 +31,23 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
-        DEV_HILOGE(SERVICE, "RemoteNetworkId is empty");
+        FI_HILOGE("RemoteNetworkId is empty");
         return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     std::string localNetworkId = COOPERATE::GetLocalDeviceId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
-        DEV_HILOGE(SERVICE, "Input Parameters error");
+        FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
     }
     int32_t ret = DevCooperateSoftbusAdapter->StartRemoteCooperate(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
-        DEV_HILOGE(SERVICE, "Start input device cooperate fail");
+        FI_HILOGE("Start input device cooperate fail");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
-    CHKPR(eventHandler_, SERVICE, RET_ERR);
+    CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }

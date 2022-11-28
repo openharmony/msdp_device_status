@@ -22,8 +22,7 @@
 #include "proto.h"
 #include "nocopyable.h"
 #include "securec.h"
-#include "define_interaction.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {

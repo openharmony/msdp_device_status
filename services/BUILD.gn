@@ -22,13 +22,13 @@ config("devicestatus_srv_public_config") {
   include_dirs = [
     "native/include",
     "timer_manager/include",
-    "${device_status_utils_path}/common/include",
+    "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
-    "${device_status_utils_path}/common/include",
+    "${device_status_utils_path}/include",
   ]
 }
 

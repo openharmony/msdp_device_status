@@ -30,6 +30,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID = "InputDeviceCooperation";
 const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
@@ -59,7 +60,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Put device profile failed, ret:%{public}d", ret);
+        FI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;
@@ -72,7 +73,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Sync device profile failed");
+        FI_HILOGE("Sync device profile failed");
     }
     return ret;
 }
@@ -102,12 +103,12 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     JsonParser parser;
     parser.json_ = cJSON_Parse(jsonData.c_str());
     if (!cJSON_IsObject(parser.json_)) {
-        DEV_HILOGE(SERVICE, "Parser.json_ is not object");
+        FI_HILOGE("Parser.json_ is not object");
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
     if (!cJSON_IsBool(state)) {
-        DEV_HILOGE(SERVICE, "State is not bool type");
+        FI_HILOGE("State is not bool type");
         return false;
     }
     return cJSON_IsTrue(state);
@@ -115,22 +116,22 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
 {
-    CHKPR(callback, SERVICE, RET_ERR);
+    CHKPR(callback, RET_ERR);
     if (deviceId.empty()) {
-        DEV_HILOGE(SERVICE, "DeviceId is nullptr");
+        FI_HILOGE("DeviceId is nullptr");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter != callbacks_.end()) {
         callbackIter->second = callback;
-        DEV_HILOGW(SERVICE, "Callback is updated");
+        FI_HILOGW("Callback is updated");
         return RET_OK;
     }
     callbacks_[deviceId] = callback;
-    DEV_HILOGI(SERVICE, "Register crossing state listener success");
+    FI_HILOGI("Register crossing state listener success");
     if (RegisterProfileListener(deviceId) != RET_OK) {
-        DEV_HILOGE(SERVICE, "Register profile listener failed");
+        FI_HILOGE("Register profile listener failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -140,7 +141,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
 {
     CALL_INFO_TRACE;
     if (deviceId.empty()) {
-        DEV_HILOGE(SERVICE, "DeviceId is empty");
+        FI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
@@ -155,7 +156,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
     }
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter == callbacks_.end()) {
-        DEV_HILOGW(SERVICE, "This device has no callback");
+        FI_HILOGW("This device has no callback");
         return RET_OK;
     }
     callbacks_.erase(callbackIter);
@@ -192,7 +193,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = callbacks_.find(deviceId);
     if (it == callbacks_.end()) {
-        DEV_HILOGW(SERVICE, "The device has no callback");
+        FI_HILOGW("The device has no callback");
         return;
     }
     if (it->second != nullptr) {
