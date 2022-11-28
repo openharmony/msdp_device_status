@@ -105,16 +105,6 @@ public:
         return programName_;
     }
 
-    void SetAnrStatus(int32_t type, bool status)
-    {
-        isAnrProcess_[type] = status;
-    }
-
-    bool CheckAnrStatus(int32_t type)
-    {
-        return isAnrProcess_[type];
-    }
-
     void SetTokenType(int32_t type)
     {
         tokenType_ = type;
@@ -126,32 +116,12 @@ public:
     }
 
     void UpdateDescript() {}
-    void SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId) {}
-    std::vector<int32_t> GetTimerIds(int32_t type)
-    {
-        return {};
-    }
-    std::list<int32_t> DelEvents(int32_t type, int32_t id)
-    {
-        return {};
-    }
-    int64_t GetEarliestEventTime(int32_t type = 0) const
-    {
-        return 0;
-    }
-    bool IsEventQueueEmpty(int32_t type = 0)
-    {
-        return true;
-    }
-
 protected:
     struct EventTime {
         int32_t id { 0 };
         int64_t eventTime { 0 };
         int32_t timerId { -1 };
     };
-    std::map<int32_t, std::vector<EventTime>> events_;
-    std::map<int32_t, bool> isAnrProcess_;
     std::string descript_;
     const std::string programName_;
     const int32_t moduleType_ { -1 };
