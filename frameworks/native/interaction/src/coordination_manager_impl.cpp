@@ -77,6 +77,10 @@ listenerLabel:
 std::optional<int32_t> CoordinationManagerImpl::AddCoordinationUserData(FuncCoordinationMessage callback)
 {
     CALL_DEBUG_ENTER;
+    if (!MMIEventHdl.InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return std::nullopt;
+    }
     std::lock_guard<std::mutex> guard(mtx_);
     CoordinationEvent event;
     event.msg = callback;
