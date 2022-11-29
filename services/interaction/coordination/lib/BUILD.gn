@@ -20,6 +20,7 @@ ohos_source_set("coordination_lib") {
     "include",
     "//base/msdp/device_status/services/interaction/coordination/interface",
     "//base/msdp/device_status/utils/common/include",
+    "//base/msdp/device_status/utils/ipc/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
     "//third_party/cJSON",

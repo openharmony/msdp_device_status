@@ -52,6 +52,17 @@ enum {
 };
 
 enum {
+    // 文件打开失败
+    FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_KIT),
+    // 流缓冲读取失败
+    STREAM_BUF_READ_FAIL,
+    // 事件注册失败
+    EVENT_REG_FAIL,
+    // 参数注入失败
+    PARAM_INPUT_FAIL
+};
+
+enum {
     NON_STD_EVENT = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_CLIENT),
     VAL_NOT_EXP,
     ERROR_UNSUPPORT,
