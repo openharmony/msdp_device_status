@@ -57,7 +57,7 @@ ohos_shared_library("devicestatus_client") {
 
   deps = [ 
     "${device_status_utils_path}:devicestatus_util",
-    "${device_status_root_path}/utils/ipc:devicestatus-ipc",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
   public_configs = [ ":devicestatus_public_config" ]
