@@ -40,6 +40,8 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
+    "${device_status_frameworks_path}/native/src/client.cpp",
+    "${device_status_frameworks_path}/native/src/fd_listener.cpp",
   ]
 
   if (device_status_feature_coordination) {
@@ -50,9 +52,13 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
     ":devicestatus_public_config",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
   ]
 
-  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+  deps = [ 
+    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus-ipc",
+  ]
 
   public_configs = [ ":devicestatus_public_config" ]
 
@@ -62,6 +68,7 @@ ohos_shared_library("devicestatus_client") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "eventhandler:libeventhandler",
   ]
 
   part_name = "${device_status_part_name}"

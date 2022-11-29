@@ -73,7 +73,7 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     auto ses = GetSession(fd);
     if (ses == nullptr) {
         FI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                   fd, SESSION_NOT_FOUND);
+            fd, SESSION_NOT_FOUND);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -306,7 +306,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
         FI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-                   MAX_SESSON_ALARM, sessionsMap_.size());
+            MAX_SESSON_ALARM, sessionsMap_.size());
     }
     FI_HILOGI("AddSession end");
     return true;

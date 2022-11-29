@@ -58,13 +58,13 @@ public:
     void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd, int32_t &tokenType);
+        int32_t &toReturnClientFd, int32_t &tokenType) override;
 
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
-    bool IsRunning() const;
+    bool IsRunning() const override;
 
     bool InitDelegateTasks();
     void OnThread();

@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class UDSClient;
 using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
@@ -56,6 +57,7 @@ protected:
     bool isConnected_ { false };
     MsgClientFunCallback recvFun_;
 };
+} //
 } // namespace Msdp
 } // namespace OHOS
 #endif // UDS_CLIENT_H

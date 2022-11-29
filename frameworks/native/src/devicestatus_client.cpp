@@ -26,6 +26,7 @@
 
 #include "coordination_manager_impl.h"
 #include "fi_log.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -276,6 +277,34 @@ int32_t DevicestatusClient::GetInputDeviceCoordinationState(
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
+
+
+int32_t DevicestatusClient::AllocSocketPair(const int32_t moduleType)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (devicestatusProxy_ == nullptr) {
+        FI_HILOGE("Client has not connect server");
+        return RET_ERR;
+    }
+
+    const std::string programName(GetProgramName());
+    int32_t result = devicestatusProxy_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
+    if (result != RET_OK) {
+        FI_HILOGE("AllocSocketFd has error:%{public}d", result);
+        return RET_ERR;
+    }
+
+    FI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
+    return RET_OK;
+}
+
+int32_t DevicestatusClient::GetClientSocketFdOfAllocedSocketPair() const
+{
+    CALL_DEBUG_ENTER;
+    return socketFd_;
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

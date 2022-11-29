@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,24 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef MMI_FD_LISTENER_H
+#define MMI_FD_LISTENER_H
+#include "file_descriptor_listener.h"
 
-#ifndef DEVICESTATUS_PERMISSION_H
-#define DEVICESTATUS_PERMISSION_H
-
-#include <string>
+#include "i_client.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusPermission {
+class FdListener final : public AppExecFwk::FileDescriptorListener {
 public:
-    /* check caller's permission by finding pid uid by system */
-    static bool CheckCallingPermission(const std::string &permissionName);
+    explicit FdListener(IClientPtr client);
+    DISALLOW_COPY_AND_MOVE(FdListener);
+    ~FdListener() override = default;
 
-    /* construct appIdInfo string */
-    static std::string FindAppIdInfo();
+    void OnReadable(int32_t fd) override;
+    void OnShutdown(int32_t fd) override;
+    void OnException(int32_t fd) override;
+
+private:
+    IClientPtr iClient_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_PERMISSION_H
+#endif // MMI_FD_LISTENER_H

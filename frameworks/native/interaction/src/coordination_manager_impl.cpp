@@ -125,6 +125,29 @@ int32_t CoordinationManagerImpl::GetUserData()
     return userData_;
 }
 
+
+bool CoordinationManagerImpl::InitClient(EventHandlerPtr eventHandler)
+{
+    CALL_DEBUG_ENTER;
+    if (client_ != nullptr) {
+        if (eventHandler != nullptr) {
+            client_->MarkIsEventHandlerChanged(eventHandler);
+        }
+        return true;
+    }
+    client_ = std::make_shared<MMIClient>();
+    client_->SetEventHandler(eventHandler);
+    client_->RegisterConnectedFunction(&OnConnected);
+    if (!(client_->Start())) {
+        client_.reset();
+        client_ = nullptr;
+        MMI_HILOGE("The client fails to start");
+        return false;
+    }
+    return true;
+}
+
+
 const CoordinationManagerImpl::CoordinationMsg *CoordinationManagerImpl::GetCoordinationMessageEvent(
     int32_t userData) const
 {
