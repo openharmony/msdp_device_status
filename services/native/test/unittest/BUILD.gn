@@ -23,6 +23,7 @@ config("module_private_config") {
     "include",
     "//utils/system/safwk/native/include",
     "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
+    "//base/msdp/device_status/libs/interface",
   ]
 }
 
@@ -40,6 +41,7 @@ ohos_unittest("test_devicestatus_service") {
     "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
     "${device_status_frameworks_path}/js/napi:devicestatus",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_service_path}:devicestatus_service",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/googletest:gtest_main",
   ]
@@ -55,6 +57,7 @@ ohos_unittest("test_devicestatus_service") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

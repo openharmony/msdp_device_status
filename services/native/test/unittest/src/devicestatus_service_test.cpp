@@ -25,6 +25,8 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_client.h"
+#include "devicestatus_dumper.h"
+#include "devicestatus_service.h"
 
 using namespace testing::ext;
 using namespace OHOS::Msdp;
@@ -148,4 +150,46 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest006, TestSize.Level0)
     EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_INVALID && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest006 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest007 Enter";
+    auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
+    devicestatusService->OnDump();
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest007 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest008 Enter";
+    auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
+    std::vector<std::u16string> args;
+    int32_t ret = devicestatusService->Dump(-1, args);
+    EXPECT_TRUE(ret == RET_NG);
+    ret = devicestatusService->Dump(1, args);
+    EXPECT_TRUE(ret == RET_NG);
+    args.emplace_back(ARGS_H);
+    ret = devicestatusService->Dump(1, args);
+    EXPECT_TRUE(ret == RET_OK);
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest008 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest009 Enter";
+    auto devicestatusCBDeathRecipient = new (std::nothrow) DevicestatusManager::DevicestatusCallbackDeathRecipient();
+    devicestatusCBDeathRecipient->OnRemoteDied(nullptr);
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest009 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest010 Enter";
+    auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
+    auto devicestatusManager = std::make_shared<DevicestatusManager>(devicestatusService);
+    Security::AccessToken::AccessTokenID tokenId = static_cast<Security::AccessToken::AccessTokenID>(1);
+    std::string packageName;
+    devicestatusManager->GetPackageName(tokenId, packageName);
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest010 end";
 }
