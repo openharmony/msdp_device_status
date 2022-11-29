@@ -37,10 +37,10 @@ ohos_shared_library("devicestatus_client") {
   sources = [
     "${device_status_frameworks_path}/native/event_handler/src/client_msg_handler.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
+    "${device_status_frameworks_path}/native/src/client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
-    "${device_status_frameworks_path}/native/src/client.cpp",
     "${device_status_frameworks_path}/native/src/fd_listener.cpp",
   ]
 
@@ -55,20 +55,20 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
   ]
 
-  deps = [ 
-    "${device_status_utils_path}:devicestatus_util",
+  deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
   ]
 
   public_configs = [ ":devicestatus_public_config" ]
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "eventhandler:libeventhandler",
   ]
 
   part_name = "${device_status_part_name}"
