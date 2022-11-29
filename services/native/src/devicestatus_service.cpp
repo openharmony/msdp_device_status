@@ -151,6 +151,9 @@ bool DevicestatusService::Init()
     if (TimerMgr->Init() != RET_OK) {
         FI_HILOGE("TimerMgr init failed");
     }
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    coordinationHandler.Init(*this);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return true;
 }
 
@@ -407,44 +410,111 @@ void DevicestatusService::OnDelegateTask(epoll_event& ev)
     FI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
         ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
     delegateTasks_.ProcessTasks();
-}    
-
+}
 
 int32_t DevicestatusService::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnRegisterCoordinationListener, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 
 int32_t DevicestatusService::UnregisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnUnregisterCoordinationListener, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnUnregisterCoordinationListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 
 int32_t DevicestatusService::EnableInputDeviceCoordination(int32_t userData, bool enable)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnEnableInputDeviceCoordination, this, pid, userData, enabled));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnEnableInputDeviceCoordination failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(userData);
+    (void)(enable);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 
-int32_t DevicestatusService::StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
-    int32_t srcInputDeviceId)
+int32_t DevicestatusService::StartInputDeviceCoordination(int32_t userData,
+    const std::string &sinkDeviceId, int32_t srcInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnStartInputDeviceCoordination,
+        this, pid, userData, sinkDeviceId, srcInputDeviceId));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(userData);
+    (void)(sinkDeviceId);
+    (void)(srcInputDeviceId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 
 int32_t DevicestatusService::StopDeviceCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnStopInputDeviceCoordination, this, pid, userData));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(userData);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 
 int32_t DevicestatusService::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&coordinationHandler.OnGetInputDeviceCoordinationState, this, pid, userData, deviceId));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnGetInputDeviceCoordinationState failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    (void)(userData);
+    (void)(deviceId);
+    FI_HILOGW("Get input device cooperate state does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

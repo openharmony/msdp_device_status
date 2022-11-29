@@ -149,7 +149,7 @@ std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId)
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (devPtr->GetKeyboardType() == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+        if (devPtr->GetKeyboardType() == ::OHOS::MMI::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(devPtr->GetDhid());
             FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }

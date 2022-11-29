@@ -52,22 +52,22 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return GetLatestDevicestatusDataStub(data, reply);
         }
         case REGISTER_COORDINATION_MONITOR: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubRegisterCoordinationMonitor(data, reply);
         }
         case UNREGISTER_COORDINATION_MONITOR: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubUnregisterCoordinationMonitor(data, reply);
         }
         case ENABLE_COORDINATION: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubEnableInputDeviceCoordination(data, reply);
         }
         case START_COORDINATION: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubStartInputDeviceCoordination(data, reply);
         }
         case STOP_COORDINATION: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubStopDeviceCoordination(data, reply);
         }
         case GET_COORDINATION_STATE: {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return StubGetInputDeviceCoordinationState(data, reply);
         }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
