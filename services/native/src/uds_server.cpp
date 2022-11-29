@@ -138,11 +138,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         goto CLOSE_SOCK;
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-    if (sess == nullptr) {
-        FI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-            programName.c_str(), pid, MAKE_SHARED_FAIL);
-        goto CLOSE_SOCK;
-    }
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
         FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);

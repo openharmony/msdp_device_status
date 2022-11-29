@@ -167,11 +167,6 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
-    if (task == nullptr) {
-        RecoveryId(id);
-        FI_HILOGE("Make task failed");
-        return nullptr;
-    }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
     FI_HILOGD("Post %{public}s", taskType.c_str());
