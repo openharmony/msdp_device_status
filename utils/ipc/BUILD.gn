@@ -14,7 +14,7 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-ohos_shared_library("devicestatus-ipc") {
+ohos_shared_library("devicestatus_ipc") {
   sources = [
     "src/circle_stream_buffer.cpp",
     "src/net_packet.cpp",
@@ -34,5 +34,5 @@ ohos_shared_library("devicestatus-ipc") {
 }
 
 config("devicestatus_ipc_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "//base/msdp/device_status/utils/ipc/include" ]
 }

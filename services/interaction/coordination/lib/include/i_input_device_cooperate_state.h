@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cooperate_event_handler.h"
-#include "cooperation_message.h"
+#include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_hilog_wrapper.h"
 #include "i_input_context.h"

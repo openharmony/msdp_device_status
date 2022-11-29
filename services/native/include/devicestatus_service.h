@@ -22,12 +22,16 @@
 
 #include "devicestatus_srv_stub.h"
 #include "idevicestatus_callback.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "coordination_event_handler.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "devicestatus_data_utils.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "uds_server.h"
 #include "delegate_tasks.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -77,6 +81,9 @@ private:
     bool Init();
     bool ready_ = false;
     DelegateTasks delegateTasks_;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    CoordinationEventHandler coordinationHandler;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     std::shared_ptr<DevicestatusManager> devicestatusManager_;
     std::shared_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
 };
