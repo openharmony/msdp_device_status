@@ -22,10 +22,12 @@ config("devicestatus_public_config") {
     "include",
     "${device_status_service_path}/native/include",
     "${device_status_frameworks_path}/js/napi/include",
+    "${device_status_frameworks_path}/native/event_handler/include",
     "${device_status_frameworks_path}/native/interaction/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_root_path}/utils/ipc/include",
   ]
 
   defines = device_status_default_defines
@@ -33,6 +35,7 @@ config("devicestatus_public_config") {
 
 ohos_shared_library("devicestatus_client") {
   sources = [
+    "${device_status_frameworks_path}/native/event_handler/src/client_msg_handler.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
