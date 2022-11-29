@@ -142,10 +142,6 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     }
 
     auto appInfo = std::make_shared<AppInfo>();
-    if (appInfo == nullptr) {
-        DEV_HILOGI(SERVICE, "appInfo is null");
-        return;
-    }
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
@@ -169,10 +165,6 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     }
 
     auto appInfo = std::make_shared<AppInfo>();
-    if (appInfo == nullptr) {
-        DEV_HILOGI(SERVICE, "appInfo is null");
-        return;
-    }
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
     appInfo->tokenId = GetCallingTokenID();
