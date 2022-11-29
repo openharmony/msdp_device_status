@@ -52,12 +52,6 @@ ohos_shared_library("devicestatus_service") {
     "timer_manager/src/timer_manager.cpp",
   ]
 
-  if (device_status_feature_coordination) {
-    sources += [
-      "${device_status_service_path}/native/src/coordination_event_handler.cpp",
-    ]
-  }
-
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",

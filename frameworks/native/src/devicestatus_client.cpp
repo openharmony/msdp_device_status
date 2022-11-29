@@ -25,7 +25,7 @@
 #include "iremote_object.h"
 
 #include "coordination_manager_impl.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -159,122 +159,47 @@ DevicestatusDataUtils::DevicestatusData DevicestatusClient::GetDevicestatusData(
     return devicestatusData;
 }
 
-int32_t DevicestatusClient::RegisterCoordinationListener(
-    std::shared_ptr<ICoordinationListener> listener)
+int32_t DevicestatusClient::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(listener, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    return InputDevCoordinationImpl.RegisterCoordinationListener(listener);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(listener);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->RegisterCoordinationListener();
 }
 
-int32_t DevicestatusClient::UnregisterCoordinationListener(
-    std::shared_ptr<ICoordinationListener> listener)
+int32_t DevicestatusClient::UnregisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(listener, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    return InputDevCoordinationImpl.UnregisterCoordinationListener(listener);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(listener);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->UnregisterCoordinationListener();
 }
 
-int32_t DevicestatusClient::EnableInputDeviceCoordination(bool enabled,
-    std::function<void(std::string, CoordinationMessage)> callback)
+int32_t DevicestatusClient::EnableInputDeviceCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(callback, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    auto tempUserData = InputDevCoordinationImpl.AddCoordinationUserData(callback);
-    if (!tempUserData) {
-        FI_HILOGE("Failed to add user data");
-        return RET_ERR;
-    }
-    int32_t userData = tempUserData.value();
-    return devicestatusProxy_>EnableInputDeviceCoordination(userData, enabled);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(enabled);
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->EnableInputDeviceCoordination(userData, enabled);
 }
 
-int32_t DevicestatusClient::StartInputDeviceCoordination(const std::string &sinkDeviceId,
-    int32_t srcInputDeviceId, std::function<void(std::string, CoordinationMessage)> callback)
+int32_t DevicestatusClient::StartInputDeviceCoordination(int32_t userData,
+    const std::string &sinkDeviceId, int32_t srcInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(callback, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    auto tempUserData = InputDevCoordinationImpl.AddCoordinationUserData(callback);
-    if (!tempUserData) {
-        FI_HILOGE("Failed to add user data");
-        return RET_ERR;
-    }
-    int32_t userData = tempUserData.value();
-    return InputDevCoordinationImpl.StartInputDeviceCoordination(userData, sinkDeviceId, srcInputDeviceId);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(sinkDeviceId);
-    (void)(srcInputDeviceId);
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->StartInputDeviceCoordination(userData, sinkDeviceId, srcInputDeviceId);
 }
 
-int32_t DevicestatusClient::StopDeviceCoordination(
-    std::function<void(std::string, CoordinationMessage)> callback)
+int32_t DevicestatusClient::StopDeviceCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(callback, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    auto tempUserData = InputDevCoordinationImpl.AddCoordinationUserData(callback);
-    if (!tempUserData) {
-        FI_HILOGE("Failed to add user data");
-        return RET_ERR;
-    }
-    int32_t userData = tempUserData.value();
-    return InputDevCoordinationImpl.StopDeviceCoordination(userData);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->StopDeviceCoordination(userData);
 }
 
-int32_t DevicestatusClient::GetInputDeviceCoordinationState(
-    const std::string &deviceId, std::function<void(bool)> callback)
+int32_t DevicestatusClient::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CHKPR(callback, ERROR_NULL_POINTER);
     DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
-    auto tempUserData = InputDevCoordinationImpl.AddCoordinationUserData(callback);
-    if (!tempUserData) {
-        FI_HILOGE("Failed to add user data");
-        return RET_ERR;
-    }
-    int32_t userData = tempUserData.value();
-    return InputDevCoordinationImpl.GetInputDeviceCoordinationState(userData, deviceId);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(deviceId);
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return devicestatusProxy_->GetInputDeviceCoordinationState(userData, deviceId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
