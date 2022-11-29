@@ -283,10 +283,6 @@ void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::Devicesta
     DEV_HILOGI(SERVICE, "Enter");
     std::unique_lock lock(mutex_);
     auto record = std::make_shared<DeviceStatusRecord>();
-    if (record == nullptr) {
-        DEV_HILOGI(SERVICE, "record is null");
-        return;
-    }
     DumpCurrentTime(record->startTime);
     record->data = data;
     deviceStatusQueue_.push(record);

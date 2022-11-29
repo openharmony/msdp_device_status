@@ -39,9 +39,6 @@ bool DevicestatusManager::Init()
     }
 
     msdpImpl_ = std::make_unique<DevicestatusMsdpClientImpl>();
-    if (msdpImpl_ == nullptr) {
-        return false;
-    }
     LoadAlgorithm(false);
 
     DEV_HILOGI(SERVICE, "Init success");
