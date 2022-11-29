@@ -17,7 +17,7 @@
 #include <limits>
 
 #include <sys/types.h>
-
+#include <string>
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -25,7 +25,8 @@ uint64_t GetThisThreadId();
 int32_t GetPid();
 
 int64_t GetMillisTime();
-
+uint64_t GetThisThreadId();
+void SetThreadName(const std::string &name);
 template<typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
 {
@@ -51,6 +52,7 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
 {
     return AddInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
 }
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

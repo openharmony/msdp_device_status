@@ -17,6 +17,8 @@
 
 #include <vector>
 #include <ipc_skeleton.h>
+#include <csignal>
+#include <sys/signalfd.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "string_ex.h"
@@ -27,6 +29,7 @@
 #include "devicestatus_define.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,6 +40,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
 } // namespace
+
+struct device_status_epoll_event {
+    int32_t fd { 0 };
+    EpollEventType event_type { EPOLL_EVENT_BEGIN };
+};
 
 DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
@@ -67,7 +75,8 @@ void DevicestatusService::OnStart()
         return;
     }
     ready_ = true;
-    DEV_HILOGI(SERVICE, "OnStart and add system ability success");
+    t_ = std::thread(std::bind(&DevicestatusService::OnThread, this));
+    t_.join();
 }
 
 void DevicestatusService::OnStop()
@@ -131,7 +140,17 @@ bool DevicestatusService::Init()
         DEV_HILOGE(SERVICE, "OnStart init fail");
         return false;
     }
-
+    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
+        FI_HILOGE("Create epoll failed");
+        return EPOLL_CREATE_FAIL;
+    }
+    if (!InitDelegateTasks()) {
+        FI_HILOGE("Delegate tasks init failed");
+        return false;
+    }
+    if (TimerMgr->Init() != RET_OK) {
+        FI_HILOGE("TimerMgr init failed");
+    }
     return true;
 }
 
@@ -208,6 +227,188 @@ void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::Device
     HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
         "UID", uid, "PKGNAME", packageName, "TYPE", type);
 }
+
+int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &toReturnClientFd, int32_t &tokenType)
+{
+    FI_HILOGD("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+
+    toReturnClientFd = -1;
+    int32_t serverFd = -1;
+    int32_t pid = GetCallingPid();
+    int32_t uid = GetCallingUid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
+        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
+    if (ret != RET_OK) {
+        FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    FI_HILOGD("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+        programName.c_str(), moduleType);
+    return RET_OK;
+}
+
+void DevicestatusService::OnConnected(SessionPtr s)
+{
+    CHKPV(s);
+    FI_HILOGI("fd:%{public}d", s->GetFd());
+}
+void DevicestatusService::OnDisconnected(SessionPtr s)
+{
+    CHKPV(s);
+    FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
+}   
+
+int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
+{
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        FI_HILOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        FI_HILOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
+    if (!eventData) {
+        FI_HILOGE("Malloc failed");
+        return RET_ERR;
+    }
+    eventData->fd = fd;
+    eventData->event_type = type;
+    FI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+
+    struct epoll_event ev = {};
+    ev.events = EPOLLIN;
+    ev.data.ptr = eventData;
+    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, -1);
+    if (ret < 0) {
+        free(eventData);
+        eventData = nullptr;
+        ev.data.ptr = nullptr;
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t DevicestatusService::DelEpoll(EpollEventType type, int32_t fd)
+{
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        FI_HILOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        FI_HILOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    struct epoll_event ev = {};
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, -1);
+    if (ret < 0) {
+        FI_HILOGE("DelEpoll failed");
+        return ret;
+    }
+    return RET_OK;
+}
+
+bool DevicestatusService::IsRunning() const
+{
+    return (state_ == ServiceRunningState::STATE_RUNNING);
+}
+
+bool DevicestatusService::InitDelegateTasks()
+{
+    CALL_DEBUG_ENTER;
+    if (!delegateTasks_.Init()) {
+        FI_HILOGE("The delegate task init failed");
+        return false;
+    }
+    auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
+    if (ret <  0) {
+        FI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
+    return true;
+}
+
+void DevicestatusService::OnThread()
+{
+    SetThreadName(std::string("mmi_service"));
+    uint64_t tid = GetThisThreadId();
+    delegateTasks_.SetWorkerThreadId(tid);
+    FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    while (state_ == ServiceRunningState::STATE_RUNNING) {
+        epoll_event ev[MAX_EVENT_SIZE] = {};
+        int32_t timeout = TimerMgr->CalcNextDelay();
+        FI_HILOGD("timeout:%{public}d", timeout);
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, -1);
+        for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
+            auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
+            CHKPC(epollEvent);
+            if (epollEvent->event_type == EPOLL_EVENT_SOCKET) {
+                OnEpollEvent(ev[i]);
+            } else if (epollEvent->event_type == EPOLL_EVENT_SIGNAL) {
+                OnSignalEvent(epollEvent->fd);
+            } else if (epollEvent->event_type == EPOLL_EVENT_ETASK) {
+                OnDelegateTask(ev[i]);
+            } else {
+                FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->event_type);
+            }
+        }
+        TimerMgr->ProcessTimers();
+        if (state_ != ServiceRunningState::STATE_RUNNING) {
+            break;
+        }
+    }
+    FI_HILOGD("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+}
+void DevicestatusService::OnSignalEvent(int32_t signalFd)
+{
+    CALL_DEBUG_ENTER;
+    signalfd_siginfo sigInfo;
+    int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
+    if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
+        FI_HILOGE("Read signal info failed, invalid size:%{public}d,errno:%{public}d", size, errno);
+        return;
+    }
+    int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
+    FI_HILOGD("Receive signal:%{public}d", signo);
+    switch (signo) {
+        case SIGINT:
+        case SIGQUIT:
+        case SIGILL:
+        case SIGABRT:
+        case SIGBUS:
+        case SIGFPE:
+        case SIGKILL:
+        case SIGSEGV:
+        case SIGTERM: {
+            state_ = ServiceRunningState::STATE_EXIT;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+void DevicestatusService::OnDelegateTask(epoll_event& ev)
+{
+    if ((ev.events & EPOLLIN) == 0) {
+        FI_HILOGW("Not epollin");
+        return;
+    }
+    DelegateTasks::TaskData data = {};
+    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
+    if (res == -1) {
+        FI_HILOGW("Read failed erron:%{public}d", errno);
+    }
+    FI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
+        ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
+    delegateTasks_.ProcessTasks();
+}    
+
 
 int32_t DevicestatusService::RegisterCoordinationListener()
 {

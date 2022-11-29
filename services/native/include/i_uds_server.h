@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CIRCLE_STREAM_BUFFER_H
-#define CIRCLE_STREAM_BUFFER_H
-#include "stream_buffer.h"
+
+#ifndef I_UDS_SERVER_H
+#define I_UDS_SERVER_H
+
+#include "refbase.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace Msdp {
-class CircleStreamBuffer : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CircleStreamBuffer" };
+class IUdsServer : public virtual RefBase {
 public:
-    CircleStreamBuffer() = default;
-    virtual ~CircleStreamBuffer() = default;
-    DISALLOW_MOVE(CircleStreamBuffer);
-
-    bool CheckWrite(size_t size);
-    virtual bool Write(const char *buf, size_t size) override;
-
-protected:
-    void CopyDataToBegin();
+    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
+                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
+                                      int32_t& tokenType) = 0;
+    virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // CIRCLE_STREAM_BUFFER_H
+#endif // I_UDS_SERVER_H

@@ -26,11 +26,13 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
-
+#include "uds_server.h"
+#include "delegate_tasks.h"
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusService final : public SystemAbility, public DevicestatusSrvStub {
+enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};   
+class DevicestatusService final : public UDSServer, public SystemAbility, public DevicestatusSrvStub {
     DECLARE_SYSTEM_ABILITY(DevicestatusService)
     DECLARE_DELAYED_SP_SINGLETON(DevicestatusService);
 public:
@@ -54,9 +56,27 @@ public:
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
     void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
+
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &toReturnClientFd, int32_t &tokenType);
+
+    void OnConnected(SessionPtr s) override;
+    void OnDisconnected(SessionPtr s) override;
+    int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
+    bool IsRunning() const;
+
+    bool InitDelegateTasks();
+    void OnThread();
+    void OnSignalEvent(int32_t signalFd);
+    void OnDelegateTask(epoll_event& ev);
+
 private:
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::thread t_;
     bool Init();
     bool ready_ = false;
+    DelegateTasks delegateTasks_;
     std::shared_ptr<DevicestatusManager> devicestatusManager_;
     std::shared_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
 };

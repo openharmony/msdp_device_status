@@ -20,7 +20,7 @@
 #include <string>
 
 #include <sys/syscall.h>
-
+#include <sys/prctl.h>
 #include "securec.h"
 
 #include "fi_log.h"
@@ -69,6 +69,12 @@ int64_t GetMillisTime()
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
 }
+
+void SetThreadName(const std::string &name)
+{
+    prctl(PR_SET_NAME, name.c_str());
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

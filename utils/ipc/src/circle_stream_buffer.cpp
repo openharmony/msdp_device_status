@@ -51,5 +51,5 @@ bool CircleStreamBuffer::Write(const char *buf, size_t size)
     }
     return StreamBuffer::Write(buf, size);
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS

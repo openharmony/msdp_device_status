@@ -58,6 +58,6 @@ public:
 protected:
     MmiMessageId msgId_ = MmiMessageId::INVALID;
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // NET_PACKET_H

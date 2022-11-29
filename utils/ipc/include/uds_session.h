@@ -103,6 +103,6 @@ protected:
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // UDS_SESSION_H

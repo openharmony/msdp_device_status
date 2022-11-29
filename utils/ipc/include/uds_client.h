@@ -56,6 +56,6 @@ protected:
     bool isConnected_ { false };
     MsgClientFunCallback recvFun_;
 };
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
 #endif // UDS_CLIENT_H

@@ -41,18 +41,21 @@ ohos_shared_library("devicestatus_service") {
     "native/src/devicestatus_msdp_client_impl.cpp",
     "native/src/devicestatus_service.cpp",
     "native/src/devicestatus_srv_stub.cpp",
+    "native/src/uds_server.cpp",
     "timer_manager/src/timer_manager.cpp",
   ]
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
   ]
 
   public_configs = [ ":devicestatus_srv_public_config" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/utils/ipc:devicestatus-ipc",
     "${device_status_utils_path}:devicestatus_util",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
   ]

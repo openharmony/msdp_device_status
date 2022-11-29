@@ -145,5 +145,5 @@ void UDSSocket::Close()
     }
     fd_ = -1;
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS

@@ -121,5 +121,5 @@ bool UDSSession::SendMsg(NetPacket &pkt) const
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
-} // namespace MMI
+} // namespace Msdp
 } // namespace OHOS
