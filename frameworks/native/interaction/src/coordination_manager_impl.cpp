@@ -141,7 +141,7 @@ bool CoordinationManagerImpl::InitClient(EventHandlerPtr eventHandler)
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
-        MMI_HILOGE("The client fails to start");
+        FI_HILOGE("The client fails to start");
         return false;
     }
     return true;
