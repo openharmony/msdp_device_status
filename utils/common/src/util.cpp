@@ -23,6 +23,7 @@
 #include <sys/prctl.h>
 #include "securec.h"
 
+#include "devicestatus_hilog_wrapper.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -75,6 +76,62 @@ void SetThreadName(const std::string &name)
     prctl(PR_SET_NAME, name.c_str());
 }
 
+static size_t StringToken(std::string &str, const std::string &sep, std::string &token)
+{
+    token = "";
+    if (str.empty()) {
+        return str.npos;
+    }
+    size_t pos = str.npos;
+    size_t tmp = 0;
+    for (auto &item : sep) {
+        tmp = str.find(item);
+        if (str.npos != tmp) {
+            pos = (std::min)(pos, tmp);
+        }
+    }
+    if (str.npos != pos) {
+        token = str.substr(0, pos);
+        if (str.npos != pos + 1) {
+            str = str.substr(pos + 1, str.npos);
+        }
+        if (pos == 0) {
+            return StringToken(str, sep, token);
+        }
+    } else {
+        token = str;
+        str = "";
+    }
+    return token.size();
+}
+
+size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList)
+{
+    size_t size;
+    auto strs = str;
+    std::string token;
+    while (str.npos != (size = StringToken(strs, sep, token))) {
+        vecList.push_back(token);
+    }
+    return vecList.size();
+}
+
+std::string StringPrintf(const char *format, ...)
+{
+    char space[1024];
+
+    va_list ap;
+    va_start(ap, format);
+    std::string result;
+    int32_t ret = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, ap);
+    if (ret >= RET_OK && (size_t)ret < sizeof(space)) {
+        result = space;
+    } else {
+        FI_HILOGE("The buffer is overflow");
+    }
+    va_end(ap);
+    return result;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

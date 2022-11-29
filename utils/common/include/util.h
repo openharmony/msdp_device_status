@@ -14,7 +14,10 @@
  */
 #ifndef UTIL_H
 #define UTIL_H
+
 #include <limits>
+#include <string>
+#include <vector>
 
 #include <sys/types.h>
 #include <string>
@@ -53,6 +56,9 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
     return AddInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
 }
 
+size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);
+
+std::string StringPrintf(const char *format, ...);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
