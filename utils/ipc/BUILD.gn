@@ -34,5 +34,5 @@ ohos_shared_library("devicestatus_ipc") {
 }
 
 config("devicestatus_ipc_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "//base/msdp/device_status/utils/ipc/include" ]
 }

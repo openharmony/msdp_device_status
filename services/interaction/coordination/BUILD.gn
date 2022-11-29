@@ -11,24 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import("//base/msdp/device_status/device_status.gni")
+
+config("coordination_config") {
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/interaction/coordination/include",
+    "${device_status_service_path}/interaction/coordination/lib/include",
+    "${device_status_service_path}/interaction/coordination/interface",
+    "${device_status_service_path}/interaction/coordination/lib/stub",
+    "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+  ]
+}
 
 group("coordination_group") {
   deps = []
   if (device_status_feature_coordination) {
-    deps += [ "//base/msdp/device_status/services/interaction/coordination/lib:coordination_lib" ]
+    deps += [ "${device_status_service_path}/interaction/coordination/lib:coordination_lib" ]
   }
 }

@@ -52,13 +52,22 @@ ohos_shared_library("devicestatus_service") {
     "timer_manager/src/timer_manager.cpp",
   ]
 
+  if (device_status_feature_coordination) {
+    sources += [
+      "${device_status_service_path}/native/src/coordination_event_handler.cpp",
+    ]
+  }
+
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
   ]
 
-  public_configs = [ ":devicestatus_srv_public_config" ]
+  public_configs = [
+    ":devicestatus_srv_public_config",
+    "${device_status_service_path}/interaction/coordination:coordination_config",
+  ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -69,7 +78,10 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   if (device_status_feature_coordination) {
-    deps += [ "interaction/coordination/lib:coordination_lib" ]
+    deps += [
+      "interaction/coordination/lib:coordination_lib",
+      "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
+    ]
   }
 
   external_deps = [

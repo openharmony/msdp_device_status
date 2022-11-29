@@ -22,7 +22,6 @@ config("interaction_config") {
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_frameworks_path}/native/interaction/include",
-    "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
 }
 

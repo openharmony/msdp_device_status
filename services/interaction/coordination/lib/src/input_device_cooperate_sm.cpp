@@ -21,7 +21,7 @@
 #include "hitrace_meter.h"
 
 #include "cooperate_event_manager.h"
-#include "cooperation_message.h"
+#include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "device_profile_adapter.h"
 #include "devicestatus_define.h"

@@ -16,7 +16,7 @@
 #include "input_device_cooperate_state_in.h"
 
 #include "cooperate_event_manager.h"
-#include "cooperation_message.h"
+#include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
