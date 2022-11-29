@@ -61,7 +61,7 @@ ohos_unittest("test_devicestatus_service") {
 
 ohos_unittest("DevicestatusAgentTest") {
   module_out_path = module_output_path
-  include_dirs = [ "//base/msdp/devicestatus/interfaces/innerkits/include" ]
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
 
   sources = [ "src/devicestatus_agent_test.cpp" ]
 

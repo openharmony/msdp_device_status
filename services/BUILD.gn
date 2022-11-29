@@ -15,27 +15,34 @@ import("//base/msdp/device_status/device_status.gni")
 import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
 config("devicestatus_private_config") {
-  include_dirs = [ "//utils/system/safwk/native/include" ]
-}
-
-config("devicestatus_srv_public_config") {
   include_dirs = [
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
-    "${device_status_utils_path}/include",
+    "device_manager/include",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
-    "${device_status_utils_path}/include",
+    "${device_status_service_path}/interaction/coordination/lib/include",
+    "//utils/system/safwk/native/include",
   ]
+
+  defines = device_status_default_defines
+}
+
+config("devicestatus_srv_public_config") {
+  include_dirs = []
 }
 
 ohos_shared_library("devicestatus_service") {
+  include_dirs = [ "//third_party/cJSON" ]
+
   sources = [
     "delegate_task/src/delegate_tasks.cpp",
+    "device_manager/src/device.cpp",
+    "device_manager/src/device_manager.cpp",
     "native/src/devicestatus_dumper.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
@@ -58,6 +65,7 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_root_path}/utils/ipc:devicestatus-ipc",
     "${device_status_utils_path}:devicestatus_util",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   if (device_status_feature_coordination) {
@@ -70,6 +78,7 @@ ohos_shared_library("devicestatus_service") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "input:libmmi-client",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",

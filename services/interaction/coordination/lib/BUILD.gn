@@ -22,10 +22,9 @@ ohos_source_set("coordination_lib") {
     "//base/msdp/device_status/utils/common/include",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//third_party/cJSON",
   ]
+
   sources = [
     "src/cooperate_event_handler.cpp",
     "src/cooperate_event_manager.cpp",
