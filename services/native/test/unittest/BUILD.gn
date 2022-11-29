@@ -20,6 +20,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "delegate_task/include",
     "include",
     "//utils/system/safwk/native/include",
     "//base/msdp/device_status/libs/interface",
