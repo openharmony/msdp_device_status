@@ -47,7 +47,6 @@ public:
     int32_t StopDeviceCoordination(std::function<void(std::string, CoordinationMessage)> callback);
     int32_t GetInputDeviceCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
-
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
 private:
