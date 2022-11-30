@@ -31,16 +31,14 @@ public:
     ~ClientMsgHandler() override = default;
 
     void Init();
-    void InitProcessedCallback();
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
 
 protected:
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnCooperationListener(const UDSClient& client, NetPacket& pkt);
     int32_t OnCooperationMessage(const UDSClient& client, NetPacket& pkt);
     int32_t OnCooperationState(const UDSClient& client, NetPacket& pkt);
-
-private:
-    static void OnDispatchEventProcessed(int32_t eventId);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:
     std::function<void(int32_t)> dispatchCallback_ { nullptr };

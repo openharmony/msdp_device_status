@@ -69,6 +69,9 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case GET_COORDINATION_STATE: {
             return StubGetInputDeviceCoordinationState(data, reply);
         }
+        case ALLOC_SOCKET_FD : {
+            return StubHandleAllocSocketFd(data, reply);
+        }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
@@ -194,6 +197,43 @@ int32_t DevicestatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& 
     }
     return ret;
 }
+
+int32_t DevicestatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t pid = GetCallingPid();
+    if (!IsRunning()) {
+        FI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t moduleId;
+    READINT32(data, moduleId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    std::string clientName;
+    READSTRING(data, clientName, E_DEVICESTATUS_READ_PARCEL_ERROR);
+
+    int32_t clientFd = -1;
+    int32_t tokenId = GetCallingTokenID();
+    int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    int32_t ret = AllocSocketFd(clientName, moduleId, clientFd, tokenType);
+    if (ret != RET_OK) {
+        FI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
+        if (clientFd >= 0) {
+            close(clientFd);
+        }
+        return ret;
+    }
+
+    if (!reply.WriteFileDescriptor(clientFd)) {
+        FI_HILOGE("Write file descriptor failed");
+        close(clientFd);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+
+    WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
+    FI_HILOGD("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
+    close(clientFd);
+    return RET_OK;
+}
+
 } // namespace DeviceStatus
 } // Msdp
 } // OHOS

@@ -24,6 +24,7 @@
 #include "nocopyable.h"
 
 #include "i_coordination_listener.h"
+#include "client.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -58,7 +59,7 @@ public:
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationState(int32_t userData, bool state);
     int32_t GetUserData();
-
+    bool InitClient();
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
@@ -70,6 +71,7 @@ private:
     std::mutex mtx_;
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
+    IClientPtr client_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

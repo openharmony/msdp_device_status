@@ -46,6 +46,8 @@ public:
     int32_t StopDeviceCoordination(int32_t userData);
     int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId);
 
+    int32_t AllocSocketPair(const int32_t moduleType);
+    int32_t GetClientSocketFdOfAllocedSocketPair() const;
 private:
     class DevicestatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -61,6 +63,8 @@ private:
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
     void ResetProxy(const wptr<IRemoteObject>& remote);
     std::mutex mutex_;
+    int32_t tokenType_ { -1 };
+    int32_t socketFd_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

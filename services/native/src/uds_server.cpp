@@ -19,6 +19,8 @@
 #include <list>
 
 #include <sys/socket.h>
+
+#include "devicestatus_service.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -73,7 +75,7 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     auto ses = GetSession(fd);
     if (ses == nullptr) {
         FI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
-                   fd, SESSION_NOT_FOUND);
+            fd, SESSION_NOT_FOUND);
         return false;
     }
     return ses->SendMsg(pkt);
@@ -196,6 +198,9 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
+    close(fd);
+    auto DevicestatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DevicestatusService>::GetInstance();
+    DevicestatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
@@ -306,7 +311,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
         FI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-                   MAX_SESSON_ALARM, sessionsMap_.size());
+            MAX_SESSON_ALARM, sessionsMap_.size());
     }
     FI_HILOGI("AddSession end");
     return true;

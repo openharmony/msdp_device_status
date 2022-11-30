@@ -252,6 +252,36 @@ int32_t DevicestatusSrvProxy::GetInputDeviceCoordinationState(int32_t userData, 
     }
     return ret;
 }
+
+int32_t DevicestatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd, int32_t &tokenType)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, moduleType, ERR_INVALID_VALUE);
+    WRITESTRING(data, programName, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    socketFd = reply.ReadFileDescriptor();
+    if (socketFd < RET_OK) {
+        FI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
+    FI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // Msdp
 } // OHOS

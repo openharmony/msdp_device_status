@@ -37,6 +37,10 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     for (const auto &item : devCoordinationListener_) {
         if (item == listener) {
             FI_HILOGW("The listener already exists");
@@ -56,6 +60,10 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     if (listener == nullptr) {
         devCoordinationListener_.clear();
         goto listenerLabel;
@@ -79,6 +87,10 @@ int32_t CoordinationManagerImpl::EnableInputDeviceCoordination(bool enabled, Fun
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX) {
@@ -94,6 +106,10 @@ int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string 
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX) {
@@ -109,6 +125,10 @@ int32_t CoordinationManagerImpl::StopDeviceCoordination(FuncCoordinationMessage 
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX) {
@@ -124,6 +144,10 @@ int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.state = callback;
     if (userData_ == INT32_MAX) {
@@ -169,6 +193,22 @@ int32_t CoordinationManagerImpl::GetUserData()
 {
     std::lock_guard<std::mutex> guard(mtx_);
     return userData_;
+}
+
+bool CoordinationManagerImpl::InitClient()
+{
+    CALL_DEBUG_ENTER;
+    if (client_ != nullptr) {
+        return true;
+    }
+    client_ = std::make_shared<Client>();
+    if (!(client_->Start())) {
+        client_.reset();
+        client_ = nullptr;
+        FI_HILOGE("The client fails to start");
+        return false;
+    }
+    return true;
 }
 
 const CoordinationManagerImpl::CoordinationMsg *CoordinationManagerImpl::GetCoordinationMessageEvent(

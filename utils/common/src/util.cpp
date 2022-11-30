@@ -32,6 +32,8 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE = 10;
+constexpr size_t PROGRAM_NAME_SIZE = 256;
+constexpr size_t BUF_CMD_SIZE = 512;
 } // namespace
 
 int32_t GetPid()
@@ -132,6 +134,73 @@ std::string StringPrintf(const char *format, ...)
     va_end(ap);
     return result;
 }
+
+static std::string GetFileName(const std::string &strPath)
+{
+    size_t nPos = strPath.find_last_of('/');
+    if (strPath.npos == nPos) {
+        nPos = strPath.find_last_of('\\');
+    }
+    if (strPath.npos == nPos) {
+        return strPath;
+    }
+
+    return strPath.substr(nPos + 1, strPath.npos);
+}
+
+const char* GetProgramName()
+{
+    static char programName[PROGRAM_NAME_SIZE] = {};
+    if (programName[0] != '\0') {
+        return programName;
+    }
+
+    char buf[BUF_CMD_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+        FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
+        return "";
+    }
+    FILE *fp = fopen(buf, "rb");
+    if (fp == nullptr) {
+        FI_HILOGE("The fp is nullptr, filename:%s.", buf);
+        return "";
+    }
+    static constexpr size_t bufLineSize = 512;
+    char bufLine[bufLineSize] = { 0 };
+    if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
+        FI_HILOGE("fgets failed");
+        if (fclose(fp) != 0) {
+            FI_HILOGW("Close file failed");
+        }
+        fp = nullptr;
+        return "";
+    }
+    if (fclose(fp) != 0) {
+        FI_HILOGW("Close file:%s failed", buf);
+    }
+    fp = nullptr;
+
+    std::string tempName(bufLine);
+    tempName = GetFileName(tempName);
+    if (tempName.empty()) {
+        FI_HILOGE("tempName is empty.");
+        return "";
+    }
+    size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
+    if (copySize == 0) {
+        FI_HILOGE("The copySize is 0.");
+        return "";
+    }
+    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
+        return "";
+    }
+    FI_HILOGI("GetProgramName success. programName:%s", programName);
+
+    return programName;
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -40,6 +40,7 @@ string DevicestatusPermission::GetAppInfo()
     uid_t uid = IPCSkeleton::GetCallingUid();
     return Security::Permission::AppIdInfoHelper::CreateAppIdInfo(pid, uid);
 }
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

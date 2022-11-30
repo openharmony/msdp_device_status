@@ -20,8 +20,10 @@
 #include <sstream>
 
 #include "devicestatus_define.h"
-#include "devicestatus_errors.h"
 #include "devicestatus_func_callback.h"
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "coordination_manager_impl.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "time_cost_chk.h"
 
 namespace OHOS {
@@ -34,9 +36,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Clien
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
         {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this)},
         {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
         {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -46,12 +50,9 @@ void ClientMsgHandler::Init()
     }
 }
 
-void ClientMsgHandler::InitProcessedCallback()
-{
-}
-
 void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_DEBUG_ENTER;
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
@@ -66,24 +67,51 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
-void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
-{
-}
-
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    CoordinationMgrImpl.OnDevCoordinationListener(deviceId, CoordinationMessage(nType));
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    CoordinationMgrImpl.OnCoordinationMessageEvent(userData, deviceId, CoordinationMessage(nType));
     return RET_OK;
 }
 
 int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket& pkt)
 {
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool state;
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read cooperate msg failed");
+        return RET_ERR;
+    }
+    CoordinationMgrImpl.OnCoordinationState(userData, state);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

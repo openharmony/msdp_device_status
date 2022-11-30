@@ -26,7 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 uint64_t GetThisThreadId();
 int32_t GetPid();
-
+const char* GetProgramName();
 int64_t GetMillisTime();
 uint64_t GetThisThreadId();
 void SetThreadName(const std::string &name);

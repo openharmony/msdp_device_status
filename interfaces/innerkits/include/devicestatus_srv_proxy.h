@@ -46,6 +46,9 @@ public:
     virtual int32_t StopDeviceCoordination(int32_t userData) override;
     virtual int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd, int32_t &tokenType) override;
+
 private:
     static inline BrokerDelegator<DevicestatusSrvProxy> delegator_;
 };
