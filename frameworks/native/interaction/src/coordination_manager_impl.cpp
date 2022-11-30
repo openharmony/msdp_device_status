@@ -78,7 +78,7 @@ std::optional<int32_t> CoordinationManagerImpl::AddCoordinationUserData(FuncCoor
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (InitClient()) {
         FI_HILOGE("Get mmi client is nullptr");
         return std::nullopt;
     }
@@ -139,7 +139,7 @@ bool CoordinationManagerImpl::InitClient(EventHandlerPtr eventHandler)
         }
         return true;
     }
-    client_ = std::make_shared<MMIClient>();
+    client_ = std::make_shared<Client>();
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
