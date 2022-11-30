@@ -38,6 +38,7 @@ ohos_shared_library("interaction_coordination") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
     "//third_party/libuv:uv",
   ]

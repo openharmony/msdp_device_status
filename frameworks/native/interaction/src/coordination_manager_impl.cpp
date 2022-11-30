@@ -78,6 +78,10 @@ std::optional<int32_t> CoordinationManagerImpl::AddCoordinationUserData(FuncCoor
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return std::nullopt;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX || userData_ < 0) {
@@ -124,6 +128,29 @@ int32_t CoordinationManagerImpl::GetUserData()
     std::lock_guard<std::mutex> guard(mtx_);
     return userData_;
 }
+
+
+bool CoordinationManagerImpl::InitClient(EventHandlerPtr eventHandler)
+{
+    CALL_DEBUG_ENTER;
+    if (client_ != nullptr) {
+        if (eventHandler != nullptr) {
+            client_->MarkIsEventHandlerChanged(eventHandler);
+        }
+        return true;
+    }
+    client_ = std::make_shared<Client>();
+    client_->SetEventHandler(eventHandler);
+    client_->RegisterConnectedFunction(&OnConnected);
+    if (!(client_->Start())) {
+        client_.reset();
+        client_ = nullptr;
+        FI_HILOGE("The client fails to start");
+        return false;
+    }
+    return true;
+}
+
 
 const CoordinationManagerImpl::CoordinationMsg *CoordinationManagerImpl::GetCoordinationMessageEvent(
     int32_t userData) const

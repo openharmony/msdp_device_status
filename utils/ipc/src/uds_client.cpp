@@ -18,6 +18,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UDSClient" };
 } // namespace
@@ -116,6 +117,7 @@ void UDSClient::Stop()
     isExit = true;
     isRunning_ = false;
     Close();
+}
 }
 } // namespace Msdp
 } // namespace OHOS
