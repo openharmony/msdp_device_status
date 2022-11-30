@@ -193,3 +193,29 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest010, TestSize.Level0)
     devicestatusManager->GetPackageName(tokenId, packageName);
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest010 end";
 }
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest011 Enter";
+    auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
+    devicestatusService->OnStop();
+    devicestatusService->OnStart();
+    devicestatusService->OnStart();
+    devicestatusService->OnStop();
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest011 end";
+}
+
+HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest012 Enter";
+    auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
+    auto devicestatusManager = std::make_shared<DevicestatusManager>(devicestatusService);
+    bool result = devicestatusManager->Init();
+    EXPECT_TRUE(result);
+    int32_t ret = devicestatusManager->LoadAlgorithm(false);
+    EXPECT_TRUE(ret == RET_OK);
+    ret = devicestatusManager->UnloadAlgorithm(false);
+    EXPECT_TRUE(ret == RET_OK);
+    DelayedSpSingleton<DevicestatusService>::DestroyInstance();
+    GTEST_LOG_(INFO) << "GetDevicestatusDataTest012 end";
+}
