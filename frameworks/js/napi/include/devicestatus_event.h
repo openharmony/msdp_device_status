@@ -22,6 +22,7 @@
 #include <string>
 
 #include "napi/native_api.h"
+#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {

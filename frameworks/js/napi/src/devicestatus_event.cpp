@@ -200,11 +200,13 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
         DEV_HILOGE(JS_NAPI, "Failed to set name");
         return;
     }
-    bool flag = (value == 1);
-    status = napi_get_boolean(env_, flag, &tmpValue);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get_boolean");
-        return;
+    if (value >= static_cast<int32_t>(DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID)
+        && value <= static_cast<int32_t>(DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT)) {
+        status = napi_create_int32(env_, value, &tmpValue);
+        if (status != napi_ok) {
+            DEV_HILOGE(JS_NAPI, "Failed to get int32");
+            return;
+        }
     }
     status = napi_set_named_property(env_, result, "value", tmpValue);
     if (status != napi_ok) {

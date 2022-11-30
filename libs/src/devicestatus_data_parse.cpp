@@ -36,7 +36,6 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(DevicestatusDataUtils::Devices
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
         DEV_HILOGE(SERVICE, "read json failed, errno is %{public}d", errno);
-        return false;
     }
     return DataInit(jsonBuf, true, type, data);
 }
@@ -47,6 +46,8 @@ bool DeviceStatusDataParse::DataInit(const std::string& fileData, bool logStatus
     DEV_HILOGD(SERVICE, "Enter");
     JsonParser parser;
     parser.json_ = cJSON_Parse(fileData.c_str());
+    data.type = type;
+    data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
     if (cJSON_IsArray(parser.json_)) {
         DEV_HILOGE(SERVICE, "parser is array");
         return false;
@@ -69,9 +70,8 @@ bool DeviceStatusDataParse::DataInit(const std::string& fileData, bool logStatus
         return false;
     }
     tempcount_[type]++;
-    data.type = type;
     data.value = static_cast<DevicestatusDataUtils::DevicestatusValue>(mockvalue->valueint);
-    DEV_HILOGE(SERVICE, "type:%{public}d, status:%{public}d", data.type, data.value);
+    DEV_HILOGD(SERVICE, "type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
 }
 
