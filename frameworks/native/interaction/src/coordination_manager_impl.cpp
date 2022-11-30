@@ -37,6 +37,10 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     for (const auto &item : devCoordinationListener_) {
         if (item == listener) {
             FI_HILOGW("The listener already exists");
@@ -56,6 +60,10 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     if (listener == nullptr) {
         devCoordinationListener_.clear();
         goto listenerLabel;
@@ -79,6 +87,10 @@ int32_t CoordinationManagerImpl::EnableInputDeviceCoordination(bool enabled, Fun
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX) {
@@ -94,6 +106,10 @@ int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string 
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == INT32_MAX) {
@@ -109,9 +125,9 @@ int32_t CoordinationManagerImpl::StopDeviceCoordination(FuncCoordinationMessage 
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (InitClient()) {
+    if (!InitClient()) {
         FI_HILOGE("Get mmi client is nullptr");
-        return std::nullopt;
+        return RET_ERR;
     }
     CoordinationEvent event;
     event.msg = callback;
@@ -175,7 +191,6 @@ int32_t CoordinationManagerImpl::GetUserData()
     return userData_;
 }
 
-
 bool CoordinationManagerImpl::InitClient()
 {
     CALL_DEBUG_ENTER;
@@ -183,8 +198,6 @@ bool CoordinationManagerImpl::InitClient()
         return true;
     }
     client_ = std::make_shared<Client>();
-    client_->SetEventHandler(eventHandler);
-    client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
@@ -193,7 +206,6 @@ bool CoordinationManagerImpl::InitClient()
     }
     return true;
 }
-
 
 const CoordinationManagerImpl::CoordinationMsg *CoordinationManagerImpl::GetCoordinationMessageEvent(
     int32_t userData) const
