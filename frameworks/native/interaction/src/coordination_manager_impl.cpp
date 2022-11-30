@@ -176,13 +176,10 @@ int32_t CoordinationManagerImpl::GetUserData()
 }
 
 
-bool CoordinationManagerImpl::InitClient(EventHandlerPtr eventHandler)
+bool CoordinationManagerImpl::InitClient()
 {
     CALL_DEBUG_ENTER;
     if (client_ != nullptr) {
-        if (eventHandler != nullptr) {
-            client_->MarkIsEventHandlerChanged(eventHandler);
-        }
         return true;
     }
     client_ = std::make_shared<Client>();

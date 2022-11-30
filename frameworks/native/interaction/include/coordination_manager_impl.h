@@ -59,7 +59,7 @@ public:
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationState(int32_t userData, bool state);
     int32_t GetUserData();
-    bool InitClient(EventHandlerPtr eventHandler = nullptr);
+    bool InitClient();
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
