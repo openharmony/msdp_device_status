@@ -19,6 +19,8 @@
 #include <list>
 
 #include <sys/socket.h>
+
+#include "devicestatus_service.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -197,6 +199,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
         circleBufMap_.erase(it);
     }
     close(fd);
+    auto DevicestatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DevicestatusService>::GetInstance();
+    DevicestatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)

@@ -102,8 +102,9 @@ bool Client::StartEventRunner()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPF(runner);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    CHKPF(eventHandler_);
+
     FI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
 
     if (isConnected_ && fd_ >= 0) {
@@ -133,7 +134,6 @@ bool Client::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<FdListener>(GetSharedPtr());
-    CHKPF(fdListener);
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
         FI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
@@ -226,7 +226,7 @@ void Client::OnDisconnected()
         funDisconnected_(*this);
     }
     if (!DelFdListener(fd_)) {
-        FI_HILOGE("Delete fd listener failed");
+        FI_HILOGW("Delete fd listener failed");
     }
     Close();
     if (!isExit && eventHandler_ != nullptr) {
@@ -264,9 +264,8 @@ int32_t Client::Socket()
     fd_ = DevicestatusClient::GetInstance().GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == -1) {
         FI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
-    } else {
-        FI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
+    FI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     return fd_;
 }
 

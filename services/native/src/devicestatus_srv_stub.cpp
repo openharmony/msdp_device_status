@@ -224,11 +224,12 @@ int32_t DevicestatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         FI_HILOGE("Write file descriptor failed");
+        close(clientFd);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
-    FI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
+    FI_HILOGD("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
 }

@@ -28,10 +28,7 @@ constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "FdListener"
 }
 
 using namespace AppExecFwk;
-FdListener::FdListener(IClientPtr client) : iClient_(client)
-{
-    CALL_DEBUG_ENTER;
-}
+FdListener::FdListener(IClientPtr client) : iClient_(client) {}
 
 void FdListener::OnReadable(int32_t fd)
 {

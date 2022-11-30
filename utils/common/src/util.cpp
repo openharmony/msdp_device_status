@@ -157,20 +157,20 @@ const char* GetProgramName()
 
     char buf[BUF_CMD_SIZE] = { 0 };
     if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
-        FI_HILOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
+        FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
         return "";
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        FI_HILOGE("The fp is nullptr, filename = %s.", buf);
+        FI_HILOGE("The fp is nullptr, filename:%s.", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
-        FI_HILOGE("fgets failed.");
+        FI_HILOGE("fgets failed");
         if (fclose(fp) != 0) {
-            FI_HILOGW("Close file:%s failed", buf);
+            FI_HILOGW("Close file failed");
         }
         fp = nullptr;
         return "";
@@ -186,16 +186,17 @@ const char* GetProgramName()
         FI_HILOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
+    size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         FI_HILOGE("The copySize is 0.");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
     if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return "";
     }
-    FI_HILOGI("GetProgramName success. programName = %s", programName);
+    FI_HILOGI("GetProgramName success. programName:%s", programName);
 
     return programName;
 }

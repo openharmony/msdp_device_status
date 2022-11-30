@@ -14,12 +14,13 @@
  */
 #ifndef MMI_CLIENT_H
 #define MMI_CLIENT_H
+
 #include "nocopyable.h"
 
-#include "i_client.h"
-#include "uds_client.h"
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
+#include "i_client.h"
+#include "uds_client.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -43,7 +44,7 @@ public:
     int32_t Reconnect() override;
     void OnDisconnect() override;
     IClientPtr GetSharedPtr() override;
-    bool IsEventHandlerChanged() override
+    bool IsEventHandlerChanged() const override
     {
         return isEventHandlerChanged_;
     }

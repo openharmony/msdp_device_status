@@ -19,15 +19,15 @@
 #include <iservice_registry.h>
 #include <system_ability_definition.h>
 
-#include "devicestatus_common.h"
-
 #include "iremote_broker.h"
 #include "iremote_object.h"
 
 #include "coordination_manager_impl.h"
+#include "devicestatus_common.h"
+#include "devicestatus_define.h"
 #include "fi_log.h"
 #include "util.h"
-#include "devicestatus_define.h"
+
 
 namespace OHOS {
 namespace Msdp {

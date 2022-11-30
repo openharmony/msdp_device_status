@@ -39,7 +39,7 @@ public:
     virtual void OnDisconnect() = 0;
     virtual void SetEventHandler(EventHandlerPtr eventHandler) = 0;
     virtual void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
-    virtual bool IsEventHandlerChanged() = 0;
+    virtual bool IsEventHandlerChanged() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
