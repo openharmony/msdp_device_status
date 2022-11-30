@@ -24,6 +24,7 @@ config("module_private_config") {
     "//utils/system/safwk/native/include",
     "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
     "//base/msdp/device_status/libs/interface",
+    "//base/msdp/device_status/services/delegate_task/include",
   ]
 }
 
