@@ -15,6 +15,7 @@
 
 #include "coordination_manager_impl.h"
 
+#include "devicestatus_client.h"
 #include "devicestatus_define.h"
 #include "util.h"
 
@@ -46,7 +47,7 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     if (!isListeningProcess_) {
         FI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
-        return RET_ERR;
+        return DevicestatusClient::GetInstance().RegisterCoordinationListener();
     }
     return RET_OK;
 }
@@ -69,12 +70,42 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
 listenerLabel:
     if (isListeningProcess_ && devCoordinationListener_.empty()) {
         isListeningProcess_ = false;
-        return RET_ERR;
+        return DevicestatusClient::GetInstance().UnregisterCoordinationListener();
     }
     return RET_OK;
 }
 
-std::optional<int32_t> CoordinationManagerImpl::AddCoordinationUserData(FuncCoordinationMessage callback)
+int32_t CoordinationManagerImpl::EnableInputDeviceCoordination(bool enabled, FuncCoordinationMessage callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CoordinationEvent event;
+    event.msg = callback;
+    if (userData_ == INT32_MAX) {
+        FI_HILOGE("userData exceeds the maximum");
+        return RET_ERR;
+    }
+    devCoordinationEvent_[userData_] = event;
+    return DevicestatusClient::GetInstance().EnableInputDeviceCoordination(userData_++, enabled);
+}
+
+int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string &sinkDeviceId,
+    int32_t srcInputDeviceId, FuncCoordinationMessage callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CoordinationEvent event;
+    event.msg = callback;
+    if (userData_ == INT32_MAX) {
+        FI_HILOGE("userData exceeds the maximum");
+        return RET_ERR;
+    }
+    devCoordinationEvent_[userData_] = event;
+    return DevicestatusClient::GetInstance().StartInputDeviceCoordination(
+        userData_++, sinkDeviceId, srcInputDeviceId);
+}
+
+int32_t CoordinationManagerImpl::StopDeviceCoordination(FuncCoordinationMessage callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -84,12 +115,27 @@ std::optional<int32_t> CoordinationManagerImpl::AddCoordinationUserData(FuncCoor
     }
     CoordinationEvent event;
     event.msg = callback;
-    if (userData_ == INT32_MAX || userData_ < 0) {
-        FI_HILOGE("User data Exception");
-        return std::nullopt;
+    if (userData_ == INT32_MAX) {
+        FI_HILOGE("userData exceeds the maximum");
+        return RET_ERR;
     }
     devCoordinationEvent_[userData_] = event;
-    return userData_++;
+    return DevicestatusClient::GetInstance().StopDeviceCoordination(userData_++);
+}
+
+int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
+    const std::string &deviceId, FuncCoordinationState callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CoordinationEvent event;
+    event.state = callback;
+    if (userData_ == INT32_MAX) {
+        FI_HILOGE("userData exceeds the maximum");
+        return RET_ERR;
+    }
+    devCoordinationEvent_[userData_] = event;
+    return DevicestatusClient::GetInstance().GetInputDeviceCoordinationState(userData_++, deviceId);
 }
 
 void CoordinationManagerImpl::OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg)

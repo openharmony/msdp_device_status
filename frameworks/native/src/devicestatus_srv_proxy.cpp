@@ -168,7 +168,7 @@ int32_t DevicestatusSrvProxy::UnregisterCoordinationListener()
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bool enable)
+int32_t DevicestatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -177,7 +177,7 @@ int32_t DevicestatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bo
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+    WRITEBOOL(data, enabled, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
