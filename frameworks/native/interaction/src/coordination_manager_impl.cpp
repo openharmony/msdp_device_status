@@ -144,6 +144,10 @@ int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (!InitClient()) {
+        FI_HILOGE("Get mmi client is nullptr");
+        return RET_ERR;
+    }
     CoordinationEvent event;
     event.state = callback;
     if (userData_ == INT32_MAX) {

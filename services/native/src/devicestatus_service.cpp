@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <ipc_skeleton.h>
+#include <unistd.h>
 #include <csignal>
 #include <sys/signalfd.h>
 #include "if_system_ability_manager.h"
@@ -263,7 +264,7 @@ void DevicestatusService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
-}   
+}
 
 int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
 {

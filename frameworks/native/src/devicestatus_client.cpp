@@ -208,6 +208,7 @@ int32_t DevicestatusClient::GetInputDeviceCoordinationState(int32_t userData, co
 int32_t DevicestatusClient::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
+    DEVICESTATUS_RETURN_IF_WITH_RET((Connect() != ERR_OK), RET_ERR);
     std::lock_guard<std::mutex> guard(mutex_);
     if (devicestatusProxy_ == nullptr) {
         FI_HILOGE("Client has not connect server");

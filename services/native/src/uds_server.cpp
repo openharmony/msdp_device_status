@@ -196,6 +196,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
+    close(fd);
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)

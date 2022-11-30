@@ -241,7 +241,6 @@ void Client::OnConnected()
     CALL_DEBUG_ENTER;
     FI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
-    msgHandler_.InitProcessedCallback();
     if (funConnected_) {
         funConnected_(*this);
     }
