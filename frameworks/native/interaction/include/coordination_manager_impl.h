@@ -49,7 +49,11 @@ public:
 
     int32_t RegisterCoordinationListener(CoordinationListenerPtr listener);
     int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener = nullptr);
-    std::optional<int32_t> AddCoordinationUserData(FuncCoordinationMessage callback);
+    int32_t EnableInputDeviceCoordination(bool enabled, FuncCoordinationMessage callback);
+    int32_t StartInputDeviceCoordination(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        FuncCoordinationMessage callback);
+    int32_t StopDeviceCoordination(FuncCoordinationMessage callback);
+    int32_t GetInputDeviceCoordinationState(const std::string &deviceId, FuncCoordinationState callback);
     void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationState(int32_t userData, bool state);

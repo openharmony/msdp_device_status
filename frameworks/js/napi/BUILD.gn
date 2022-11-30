@@ -66,6 +66,7 @@ ohos_shared_library("devicestatus") {
 group("device_status_jsapi_group") {
   deps = []
   if (device_status_feature_coordination) {
-    deps += [ "${device_status_frameworks_path}/js/napi/interaction:interaction_coordination" ]
+    deps +=
+        [ "${device_status_frameworks_path}/js/napi/interaction:coordination" ]
   }
 }

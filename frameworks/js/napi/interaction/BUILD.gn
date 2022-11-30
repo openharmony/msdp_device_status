@@ -15,7 +15,7 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("interaction_config") {
-  visibility = [ ":interaction_coordination" ]
+  visibility = [ ":coordination" ]
 
   include_dirs = [
     "include",
@@ -25,7 +25,7 @@ config("interaction_config") {
   ]
 }
 
-ohos_shared_library("interaction_coordination") {
+ohos_shared_library("coordination") {
   sources = [
     "src/js_coordination_context.cpp",
     "src/js_coordination_manager.cpp",
@@ -47,7 +47,7 @@ ohos_shared_library("interaction_coordination") {
     "napi:ace_napi",
   ]
 
-  relative_install_dir = "module"
+  relative_install_dir = "module/device_status"
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

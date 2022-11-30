@@ -40,7 +40,7 @@ public:
 
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;
-    virtual int32_t EnableInputDeviceCoordination(int32_t userData, bool enable) override;
+    virtual int32_t EnableInputDeviceCoordination(int32_t userData, bool enabled) override;
     virtual int32_t StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
         int32_t srcInputDeviceId) override;
     virtual int32_t StopDeviceCoordination(int32_t userData) override;
