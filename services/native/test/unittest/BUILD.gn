@@ -34,7 +34,6 @@ ohos_unittest("test_devicestatus_service") {
 
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
     ":module_private_config",
   ]
 
@@ -42,7 +41,6 @@ ohos_unittest("test_devicestatus_service") {
     "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
     "${device_status_frameworks_path}/js/napi:devicestatus",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/utils/ipc:devicestatus-ipc",
     "${device_status_service_path}:devicestatus_service",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/googletest:gtest_main",
