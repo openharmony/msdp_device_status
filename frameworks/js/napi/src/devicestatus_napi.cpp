@@ -125,9 +125,9 @@ void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bo
 
 int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 {
-    if (type == "highStill") {
+    if (type == "still") {
         return DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
-    } else if (type == "fineStill") {
+    } else if (type == "relativeStill") {
         return DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
     } else if (type == "carBluetooth") {
         return DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH;
@@ -448,9 +448,9 @@ EXTERN_C_END
 static napi_module g_module = {
     .nm_version = 1,
     .nm_flags = 0,
-    .nm_filename = "devicestatus",
+    .nm_filename = "stationary",
     .nm_register_func = DeviceStatusInit,
-    .nm_modname = "devicestatus",
+    .nm_modname = "stationary",
     .nm_priv = (static_cast<void *>(0)),
     .reserved = {0}
 };
