@@ -51,7 +51,7 @@ ohos_fuzztest("DeviceStatusClientFuzzTest") {
   configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
 
   deps = [
-    "${device_status_frameworks_path}/js/napi:devicestatus",
+    "${device_status_frameworks_path}/js/napi:stationary",
     "${device_status_frameworks_path}/native/src:deviceagent",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
   ]
