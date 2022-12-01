@@ -20,19 +20,22 @@
 #include <list>
 #include <memory>
 
-#include "singleton.h"
+#include "nocopyable.h"
+
+#include "i_timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class TimerManager final {
-    DECLARE_DELAYED_SINGLETON(TimerManager);
-
+class TimerManager final : public ITimerManager {
 public:
+    TimerManager() = default;
+    ~TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
+
     int32_t Init();
-    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
-    int32_t RemoveTimer(int32_t timerId);
+    int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
+    int32_t RemoveTimer(int32_t timerId) override;
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);
     int64_t CalcNextDelay();
@@ -48,6 +51,7 @@ private:
         int64_t nextCallTime  { 0 };
         std::function<void()> callback;
     };
+
 private:
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
@@ -68,8 +72,6 @@ inline int TimerManager::GetTimerFd() const
 {
     return timerFd_;
 }
-
-#define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

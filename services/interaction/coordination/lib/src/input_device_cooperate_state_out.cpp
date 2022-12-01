@@ -58,9 +58,9 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = COOPERATE::GetLocalDeviceId();
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    std::vector<std::string> dhids = context->GetCooperateDhids(startDhid_);
+    std::vector<std::string> dhids = context->GetDeviceManager().GetCooperateDhids(startDhid_);
     if (dhids.empty()) {
         InputDevCooSM->OnStopFinish(false, srcNetworkId);
     }

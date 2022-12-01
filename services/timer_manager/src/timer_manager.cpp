@@ -31,9 +31,6 @@ constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 } // namespace
 
-TimerManager::TimerManager() {}
-TimerManager::~TimerManager() {}
-
 int32_t TimerManager::Init()
 {
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);

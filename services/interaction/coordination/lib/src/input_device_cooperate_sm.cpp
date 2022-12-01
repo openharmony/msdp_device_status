@@ -53,11 +53,14 @@ void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     DevCooperateSoftbusAdapter->Init();
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    context->AddTimer(INTERVAL_MS, 1, [this]() {
+    context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
     });
+
+    devObserver_ = std::make_shared<DeviceObserver>();
+    context->GetDeviceManager().AddDeviceObserver(devObserver_);
 }
 
 void InputDeviceCooperateSM::Reset(const std::string &networkId)
@@ -71,9 +74,9 @@ void InputDeviceCooperateSM::Reset(const std::string &networkId)
         }
     }
     if (cooperateState_ == CooperateState::STATE_IN) {
-        auto* context = CooperateEventMgr->GetIInputContext();
+        auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
-        std::string sinkNetwoekId = context->GetOriginNetworkId(startDhid_);
+        std::string sinkNetwoekId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
         if (networkId != sinkNetwoekId) {
             needReset = false;
         }
@@ -91,9 +94,9 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     srcNetworkId_ = "";
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     cooperateState_ = CooperateState::STATE_FREE;
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    bool hasPointer = context->HasLocalPointerDevice();
+    bool hasPointer = context->GetDeviceManager().HasLocalPointerDevice();
     if (hasPointer && adjustAbsolutionLocation) {
         context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     } else {
@@ -131,9 +134,9 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
         Reset(true);
         return;
     }
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    std::string originNetworkId = context->GetOriginNetworkId(startDhid_);
+    std::string originNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
     if (originNetworkId == networkId) {
         Reset();
     }
@@ -195,9 +198,9 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     isStopping_ = true;
     std::string stopNetworkId = "";
     if (cooperateState_ == CooperateState::STATE_IN) {
-        auto* context = CooperateEventMgr->GetIInputContext();
+        auto* context = CooperateEventMgr->GetIContext();
         CHKPR(context, ERROR_NULL_POINTER);
-        stopNetworkId = context->GetOriginNetworkId(startDhid_);
+        stopNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
     }
     if (cooperateState_ == CooperateState::STATE_OUT) {
         stopNetworkId = srcNetworkId_;
@@ -238,7 +241,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
         isStarting_ = false;
         return;
     }
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
     if (cooperateState_ == CooperateState::STATE_FREE) {
         context->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
@@ -293,14 +296,14 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
         FI_HILOGE("Start distributed fail, startInputDevice: %{public}d", startInputDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
-        auto* context = CooperateEventMgr->GetIInputContext();
+        auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
-        startDhid_ = context->GetDhid(startInputDeviceId);
+        startDhid_ = context->GetDeviceManager().GetDhid(startInputDeviceId);
         NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (cooperateState_ == CooperateState::STATE_FREE) {
             UpdateState(CooperateState::STATE_OUT);
         } else if (cooperateState_ == CooperateState::STATE_IN) {
-            std::string sink = context->GetOriginNetworkId(startInputDeviceId);
+            std::string sink = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
             if (!sink.empty() && remoteNetworkId != sink) {
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
@@ -322,9 +325,9 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
     }
     NotifyRemoteStopFinish(isSuccess, remoteNetworkId);
     if (isSuccess) {
-        auto* context = CooperateEventMgr->GetIInputContext();
+        auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
-        if (context->HasLocalPointerDevice()) {
+        if (context->GetDeviceManager().HasLocalPointerDevice()) {
             context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         if (cooperateState_ == CooperateState::STATE_IN || cooperateState_ == CooperateState::STATE_OUT) {
@@ -366,7 +369,7 @@ void InputDeviceCooperateSM::NotifyRemoteStopFinish(bool isSuccess, const std::s
 bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPF(context);
     auto pointerEvent = context->GetPointerEvent();
     CHKPF(pointerEvent);
@@ -408,7 +411,7 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
             break;
         }
         case CooperateState::STATE_OUT: {
-            auto* context = CooperateEventMgr->GetIInputContext();
+            auto* context = CooperateEventMgr->GetIContext();
             CHKPV(context);
             context->SetPointerVisible(getpid(), false);
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
@@ -514,13 +517,15 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
         return false;
     }
     auto inputDevice = libinput_event_get_device(event);
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPF(context);
+    IDeviceManager &devMgr = context->GetDeviceManager();
+
     if (cooperateState_ == CooperateState::STATE_IN) {
         if (!context->IsRemote(inputDevice)) {
             CHKPF(currentStateSM_);
             isStopping_ = true;
-            std::string sink = context->GetOriginNetworkId(startDhid_);
+            std::string sink = devMgr.GetOriginNetworkId(startDhid_);
             int32_t ret = currentStateSM_->StopInputDeviceCooperate(sink);
             if (ret != RET_OK) {
                 FI_HILOGE("Stop input device cooperate fail");
@@ -530,7 +535,7 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
         }
     } else if (cooperateState_ == CooperateState::STATE_OUT) {
         int32_t deviceId = context->FindInputDeviceId(inputDevice);
-        std::string dhid = context->GetDhid(deviceId);
+        std::string dhid = devMgr.GetDhid(deviceId);
         if (startDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device cooperate");
             CHKPF(currentStateSM_);
@@ -633,6 +638,25 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
+}
+
+void InputDeviceCooperateSM::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
+{
+    CHKPV(device);
+    if (device->IsKeyboard()) {
+        InputDevCooSM->OnKeyboardOnline(device->GetDhid());
+    }
+}
+
+void InputDeviceCooperateSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> device)
+{
+    CHKPV(device);
+    if (device->IsPointerDevice()) {
+        auto *context = CooperateEventMgr->GetIContext();
+        CHKPV(context);
+        InputDevCooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
+                                        context->GetDeviceManager().GetCooperateDhids(device->GetId()));
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

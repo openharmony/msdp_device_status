@@ -12,24 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef OHOS_MSDP_DEVICE_STATUS_UTIL_H
+#define OHOS_MSDP_DEVICE_STATUS_UTIL_H
 
 #include <limits>
 #include <string>
 #include <vector>
 
 #include <sys/types.h>
-#include <string>
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-uint64_t GetThisThreadId();
 int32_t GetPid();
 const char* GetProgramName();
 int64_t GetMillisTime();
+
 uint64_t GetThisThreadId();
+
 void SetThreadName(const std::string &name);
+
 template<typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
 {
@@ -62,4 +64,4 @@ std::string StringPrintf(const char *format, ...);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // UTIL_H
+#endif // OHOS_MSDP_DEVICE_STATUS_UTIL_H

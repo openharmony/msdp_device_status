@@ -141,14 +141,16 @@ bool DInput::HandleEvent(libinput_event* event)
 
 bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPF(context);
+    IDeviceManager &devMgr = context->GetDeviceManager();
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     FI_HILOGI("Get current cooperate state:%{public}d", state);
+
     if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
-        if (context->IsRemote(deviceId)) {
-            auto networkId = context->GetOriginNetworkId(deviceId);
+        if (devMgr.IsRemote(deviceId)) {
+            auto networkId = devMgr.GetOriginNetworkId(deviceId);
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
@@ -197,13 +199,13 @@ void DInput::Dump(int32_t fd, const std::vector<std::string>& args)
     InputDevCooSM->Dump(fd, args);
 }
 
-IDInput* CreateIDInpt(IInputContext* context)
+IDInput* CreateIDInpt(IContext *context)
 {
     if (context == nullptr) {
         FI_HILOGE("Parameter error");
         return nullptr;
     }
-    CooperateEventMgr->SetIInputContext(context);
+    CooperateEventMgr->SetIContext(context);
     IDInput* input = new (std::nothrow) DInput();
     if (input == nullptr) {
         FI_HILOGE("Create IDInpt failed");

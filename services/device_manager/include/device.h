@@ -19,37 +19,38 @@
 #include <string>
 #include <vector>
 
-#include "input_manager.h"
 #include "nocopyable.h"
+
+#include "i_device.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class Device final {
+class Device final : public IDevice {
 public:
     Device(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev);
     ~Device() = default;
     DISALLOW_COPY_AND_MOVE(Device);
 
-    int32_t GetId() const;
-    std::string GetName() const;
-    int32_t GetType() const;
-    int32_t GetBus() const;
-    int32_t GetVersion() const;
-    int32_t GetProduct() const;
-    int32_t GetVendor() const;
-    std::string GetPhys() const;
-    std::string GetUniq() const;
+    int32_t GetId() const override;
+    std::string GetName() const override;
+    int32_t GetType() const override;
+    int32_t GetBus() const override;
+    int32_t GetVersion() const override;
+    int32_t GetProduct() const override;
+    int32_t GetVendor() const override;
+    std::string GetPhys() const override;
+    std::string GetUniq() const override;
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    std::string GetDhid() const;
-    std::string GetNetworkId() const;
-    bool IsRemote() const;
+    std::string GetDhid() const override;
+    std::string GetNetworkId() const override;
+    bool IsRemote() const override;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-    ::OHOS::MMI::KeyboardType GetKeyboardType() const;
-    bool IsPointerDevice() const;
-    bool IsKeyboard() const;
+    ::OHOS::MMI::KeyboardType GetKeyboardType() const override;
+    bool IsPointerDevice() const override;
+    bool IsKeyboard() const override;
 
 private:
     void Populate();

@@ -118,12 +118,12 @@ void CooperateEventManager::OnErrorMessage(EventType type, CooperationMessage ms
     cooperateCallbacks_[type] =  nullptr;
 }
 
-void CooperateEventManager::SetIInputContext(IInputContext* context)
+void CooperateEventManager::SetIContext(IContext *context)
 {
     context_ = context;
 }
 
-IInputContext* CooperateEventManager::GetIInputContext() const
+IContext* CooperateEventManager::GetIContext() const
 {
     return context_;
 }
