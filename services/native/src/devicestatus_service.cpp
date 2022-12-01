@@ -151,6 +151,10 @@ bool DevicestatusService::Init()
         FI_HILOGE("Create epoll failed");
         return EPOLL_CREATE_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    CooperateEventMgr->SetIInputContext(this);
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     if (!InitDelegateTasks()) {
         FI_HILOGE("Delegate tasks init failed");
         return false;
