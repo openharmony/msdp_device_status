@@ -170,10 +170,10 @@ bool DevicestatusService::Init()
         return EPOLL_CREATE_FAIL;
     }
 
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     CooperateEventMgr->SetIContext(this);
     InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 
     if (InitDelegateTasks() != RET_OK) {
         FI_HILOGE("Delegate tasks init failed");
