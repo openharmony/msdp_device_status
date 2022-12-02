@@ -35,7 +35,7 @@ int32_t TimerManager::Init()
 {
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
     if (timerFd_ < 0) {
-        DEV_HILOGE(SERVICE, "timer: timerfd_create error: %s", strerror(errno));
+        DEV_HILOGE(SERVICE, "timer: timerfd_create failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -243,7 +243,7 @@ int32_t TimerManager::ArmTimer()
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {
-        DEV_HILOGE(SERVICE, "timer: timerfd_settime error: %s", strerror(errno));
+        DEV_HILOGE(SERVICE, "timer: timerfd_settime error");
         return RET_ERR;
     }
     return RET_OK;
