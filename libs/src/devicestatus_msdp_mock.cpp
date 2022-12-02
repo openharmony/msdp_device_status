@@ -184,6 +184,8 @@ void DeviceStatusMsdpMock::GetDeviceStatusData()
             DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType(i);
             DEV_HILOGE(SERVICE, "type:%{public}d", type);
             if (dataParse_ == nullptr) {
+                DEV_HILOGE(SERVICE, "dataParse_ is nullptr");
+                return;
             }
             dataParse_->ParseDeviceStatusData(data, type);
             NotifyMsdpImpl(data);
