@@ -23,10 +23,9 @@
 #include <string>
 
 #include "cooperate_event_handler.h"
-#include "coordination_message.h"
+#include "cooperate_event_manager.h"
 #include "devicestatus_define.h"
 #include "devicestatus_hilog_wrapper.h"
-#include "i_input_context.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -49,6 +49,7 @@ enum class CooperateMsg {
 
 class InputDeviceCooperateSM final {
     DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
+
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
     };
@@ -59,6 +60,12 @@ class InputDeviceCooperateSM final {
         void OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
+
+    class DeviceObserver : public IDeviceObserver {
+        virtual void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
+        virtual void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
+    };
+
 public:
     using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
@@ -99,6 +106,9 @@ private:
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
+
+private:
+    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;

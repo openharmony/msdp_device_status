@@ -14,6 +14,14 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
+config("devicestatus_ipc_private_config") {
+  include_dirs = [ "include" ]
+}
+
+config("devicestatus_ipc_public_config") {
+  include_dirs = [ "include" ]
+}
+
 ohos_shared_library("devicestatus_ipc") {
   sources = [
     "src/circle_stream_buffer.cpp",
@@ -24,15 +32,17 @@ ohos_shared_library("devicestatus_ipc") {
     "src/uds_socket.cpp",
   ]
 
-  include_dirs = [ "include" ]
-  deps = [ "//commonlibrary/c_utils/base:utils" ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  configs = [ ":devicestatus_ipc_private_config" ]
 
-  configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
+  public_configs = [ ":devicestatus_ipc_public_config" ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
-}
-
-config("devicestatus_ipc_config") {
-  include_dirs = [ "//base/msdp/device_status/utils/ipc/include" ]
 }

@@ -14,12 +14,14 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
-config("devicestatus_private_config") {
+config("devicestatus_services_private_config") {
   include_dirs = [
+    "context/include",
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
     "device_manager/include",
+    "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
@@ -32,8 +34,16 @@ config("devicestatus_private_config") {
   defines = device_status_default_defines
 }
 
-config("devicestatus_srv_public_config") {
-  include_dirs = []
+config("devicestatus_services_public_config") {
+  include_dirs = [
+    "context/include",
+    "delegate_task/include",
+    "native/include",
+    "timer_manager/include",
+    "device_manager/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+  ]
 }
 
 ohos_shared_library("devicestatus_service") {
@@ -52,16 +62,9 @@ ohos_shared_library("devicestatus_service") {
     "timer_manager/src/timer_manager.cpp",
   ]
 
-  configs = [
-    "${device_status_utils_path}:devicestatus_utils_config",
-    ":devicestatus_private_config",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc_config",
-  ]
+  configs = [ ":devicestatus_services_private_config" ]
 
-  public_configs = [
-    ":devicestatus_srv_public_config",
-    "${device_status_service_path}/interaction/coordination:coordination_config",
-  ]
+  public_configs = [ ":devicestatus_services_public_config" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",

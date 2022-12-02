@@ -179,9 +179,9 @@ void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback cal
 void DistributedInputAdapter::AddTimer(const CallbackType &type)
 {
     DEV_HILOGD(SERVICE, "AddTimer type:%{public}d", type);
-    auto context = CooperateEventMgr->GetIInputContext();
+    auto context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    int32_t timerId = context->AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
+    int32_t timerId = context->GetTimerManager().AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
         if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
             FI_HILOGE("Callback or watching is not exist");
             return;
@@ -206,9 +206,9 @@ void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
     DEV_HILOGD(SERVICE, "RemoveTimer type:%{public}d", type);
     if (watchingMap_.find(type) != watchingMap_.end()) {
-        auto context = CooperateEventMgr->GetIInputContext();
+        auto context = CooperateEventMgr->GetIContext();
         CHKPV(context);
-        context->RemoveTimer(watchingMap_[type].timerId);
+        context->GetTimerManager().RemoveTimer(watchingMap_[type].timerId);
         watchingMap_.erase(type);
     }
 }
