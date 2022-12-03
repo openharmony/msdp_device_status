@@ -96,7 +96,7 @@ public:
 
     void Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
         const sptr<IdevicestatusCallback>& callback) override;
-    void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+    void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
         const sptr<IdevicestatusCallback>& callback) override;
     DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
 

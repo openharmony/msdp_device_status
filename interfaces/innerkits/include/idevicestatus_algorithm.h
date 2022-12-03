@@ -28,7 +28,7 @@ public:
     virtual bool Enable() = 0;
     virtual bool Disable() = 0;
     virtual bool Subscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
-    virtual bool UnSubscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
+    virtual bool Unsubscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithm");
 };

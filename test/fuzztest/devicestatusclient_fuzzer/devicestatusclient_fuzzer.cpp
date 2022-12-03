@@ -47,14 +47,14 @@ void DevicestatusClientFuzzer::TestGetDevicestatusData()
     client_.GetDevicestatusData(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnSubscribeCallback();
+    TestUnsubscribeCallback();
 }
 
-void DevicestatusClientFuzzer::TestUnSubscribeCallback()
+void DevicestatusClientFuzzer::TestUnsubscribeCallback()
 {
-    std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
+    std::cout << "TestUnsubscribeCallback: Enter " << std::endl;
     
-    client_.UnSubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, cb);
+    client_.UnsubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)

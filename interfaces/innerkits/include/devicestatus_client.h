@@ -35,7 +35,7 @@ public:
 
     void SubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback);
-    void UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
+    void UnsubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetDevicestatusData(const DevicestatusDataUtils::DevicestatusType& type);
 

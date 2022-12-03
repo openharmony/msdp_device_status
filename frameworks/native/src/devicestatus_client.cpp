@@ -123,7 +123,7 @@ void DevicestatusClient::SubscribeCallback(const DevicestatusDataUtils::Devicest
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-void DevicestatusClient::UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
+void DevicestatusClient::UnsubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
@@ -134,7 +134,7 @@ void DevicestatusClient::UnSubscribeCallback(const DevicestatusDataUtils::Device
     }
     if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
         && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
-        devicestatusProxy_->UnSubscribe(type, callback);
+        devicestatusProxy_->Unsubscribe(type, callback);
     }
     return;
     DEV_HILOGD(INNERKIT, "Exit");

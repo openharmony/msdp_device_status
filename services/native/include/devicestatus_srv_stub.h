@@ -36,7 +36,7 @@ public:
     int32_t StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t SubscribeStub(MessageParcel& data);
-    int32_t UnSubscribeStub(MessageParcel& data);
+    int32_t UnsubscribeStub(MessageParcel& data);
     int32_t GetLatestDevicestatusDataStub(MessageParcel& data, MessageParcel& reply);
 
     int32_t StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);

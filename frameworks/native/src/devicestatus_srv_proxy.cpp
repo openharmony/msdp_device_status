@@ -61,11 +61,11 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DevicestatusSrvProxy::Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "clientUnsubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 

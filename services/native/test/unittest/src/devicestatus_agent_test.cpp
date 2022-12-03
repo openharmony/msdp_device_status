@@ -76,7 +76,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest001, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest001 end";
 }
 
@@ -94,7 +94,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest002, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will not report";
     sleep(2);
@@ -102,7 +102,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest002, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report again";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest002 end";
 }
 
@@ -124,11 +124,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest003, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    GTEST_LOG_(INFO) << "UnSubscribe agentEvent1";
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    GTEST_LOG_(INFO) << "Unsubscribe agentEvent1";
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     sleep(2);
-    GTEST_LOG_(INFO) << "UnSubscribe agentEvent2";
-    agent2_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    GTEST_LOG_(INFO) << "Unsubscribe agentEvent2";
+    agent2_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest003 end";
 }
 
@@ -141,7 +141,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest004, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest004 end";
 }
 
@@ -154,7 +154,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest005, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest005 end";
 }
 
@@ -167,7 +167,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest006, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest006 end";
 }
 
@@ -180,7 +180,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest007, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest007 end";
 }
@@ -194,7 +194,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest008, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest008 end";
 }
@@ -210,9 +210,9 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest009, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest009 end";
 }
@@ -247,17 +247,17 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest011, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
     EXPECT_TRUE(ret == ERR_OK);
-    ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
+    ret = agent1_->UnsubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
     EXPECT_TRUE(ret == ERR_OK);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest011 end";
 }
@@ -278,13 +278,13 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest012, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
     EXPECT_TRUE(ret == ERR_OK);
-    ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
+    ret = agent1_->UnsubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest012 end";
 }
@@ -303,11 +303,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest013, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnsubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
     EXPECT_TRUE(ret == ERR_OK);
-    ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
+    ret = agent1_->UnsubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest013 end";
 }

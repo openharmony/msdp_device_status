@@ -33,7 +33,7 @@ public:
 
     virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
-    virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
     virtual DevicestatusDataUtils::DevicestatusData GetCache(const \
         DevicestatusDataUtils::DevicestatusType& type) override;

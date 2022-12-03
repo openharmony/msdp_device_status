@@ -354,7 +354,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        DevicestatusClient::GetInstance().UnSubscribeCallback(DevicestatusDataUtils::DevicestatusType(type),
+        DevicestatusClient::GetInstance().UnsubscribeCallback(DevicestatusDataUtils::DevicestatusType(type),
             callbackIter->second);
         callbackMap_.erase(type);
     } else {

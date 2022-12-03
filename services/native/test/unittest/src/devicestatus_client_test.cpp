@@ -26,7 +26,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 
-static std::shared_ptr<DevicestatusCallbackProxy> callbackProxy_;
+static std::shared_ptr<DeviceStatusCallbackProxy> callbackProxy_;
 static std::shared_ptr<DeviceStatusAgent> agent_;
 
 void DevicestatusClientTest::SetUpTestCase()
@@ -96,7 +96,7 @@ HWTEST_F (DevicestatusClientTest, DevicestatusClientTest002, TestSize.Level1)
         GTEST_LOG_(INFO) << "CheckSystemAbility failed";
         return;
     }
-    callbackProxy_ = std::make_shared<DevicestatusCallbackProxy>(remoteObject_);
+    callbackProxy_ = std::make_shared<DeviceStatusCallbackProxy>(remoteObject_);
     DevicestatusDataUtils::DevicestatusData devicestatusData = {
         DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
         DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER
@@ -137,9 +137,9 @@ HWTEST_F (DevicestatusClientTest, DevicestatusClientTest004, TestSize.Level1)
         sptr<IdevicestatusCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
     auto& client = DevicestatusClient::GetInstance();
     client.devicestatusProxy_ = nullptr;
-    DEV_HILOGE(INNERKIT, "test UnSubscribeCallback start");
-    client.UnSubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
-    DEV_HILOGE(INNERKIT, "test UnSubscribeCallback end");
+    DEV_HILOGE(INNERKIT, "test UnsubscribeCallback start");
+    client.UnsubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, callback);
+    DEV_HILOGE(INNERKIT, "test UnsubscribeCallback end");
     GTEST_LOG_(INFO) << "DevicestatusClientTest004 end";
 }
 

@@ -25,16 +25,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusCallbackProxy : public IRemoteProxy<IdevicestatusCallback> {
+class DeviceStatusCallbackProxy : public IRemoteProxy<IdevicestatusCallback> {
 public:
-    explicit DevicestatusCallbackProxy(const sptr<IRemoteObject>& impl)
+    explicit DeviceStatusCallbackProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<IdevicestatusCallback>(impl) {}
-    ~DevicestatusCallbackProxy() = default;
-    DISALLOW_COPY_AND_MOVE(DevicestatusCallbackProxy);
+    ~DeviceStatusCallbackProxy() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackProxy);
     virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
 
 private:
-    static inline BrokerDelegator<DevicestatusCallbackProxy> delegator_;
+    static inline BrokerDelegator<DeviceStatusCallbackProxy> delegator_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

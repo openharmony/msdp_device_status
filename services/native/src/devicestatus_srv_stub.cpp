@@ -48,7 +48,7 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return SubscribeStub(data);
         }
         case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE): {
-            return UnSubscribeStub(data);
+            return UnsubscribeStub(data);
         }
         case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE): {
             return GetLatestDevicestatusDataStub(data, reply);
@@ -97,7 +97,7 @@ int32_t DevicestatusSrvStub::SubscribeStub(MessageParcel& data)
     return ERR_OK;
 }
 
-int32_t DevicestatusSrvStub::UnSubscribeStub(MessageParcel& data)
+int32_t DevicestatusSrvStub::UnsubscribeStub(MessageParcel& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
@@ -106,7 +106,7 @@ int32_t DevicestatusSrvStub::UnSubscribeStub(MessageParcel& data)
     DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
     DEVICESTATUS_RETURN_IF_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    UnSubscribe(DevicestatusDataUtils::DevicestatusType(type), callback);
+    Unsubscribe(DevicestatusDataUtils::DevicestatusType(type), callback);
     return ERR_OK;
 }
 

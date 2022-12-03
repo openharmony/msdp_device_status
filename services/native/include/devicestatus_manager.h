@@ -54,7 +54,7 @@ public:
     bool InitDataCallback();
     void NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData);
     void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
-    void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
+    void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
     DevicestatusDataUtils::DevicestatusData GetLatestDevicestatusData(const \
         DevicestatusDataUtils::DevicestatusType& type);
     int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);

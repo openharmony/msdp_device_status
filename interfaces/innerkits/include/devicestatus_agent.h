@@ -45,7 +45,7 @@ public:
 
     int32_t SubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type,
         const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
-    int32_t UnSubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type);
+    int32_t UnsubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type);
     friend class DeviceStatusAgentCallback;
 private:
     void RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type);

@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF(remote == nullptr);
@@ -34,7 +34,7 @@ void DevicestatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtil
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(DevicestatusCallbackProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusCallbackProxy::GetDescriptor())) {
         DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return;
     }

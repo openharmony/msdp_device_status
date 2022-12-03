@@ -209,7 +209,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
-void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DevicestatusManager::Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
@@ -241,7 +241,7 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
-    DEV_HILOGI(SERVICE, "UnSubscribe success,Exit");
+    DEV_HILOGI(SERVICE, "Unsubscribe success,Exit");
 }
 
 int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)

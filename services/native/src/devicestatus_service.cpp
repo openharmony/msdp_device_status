@@ -195,7 +195,7 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
-        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        DEV_HILOGI(SERVICE, "Unsubscribe func is nullptr");
         return;
     }
 
@@ -213,12 +213,12 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     ReportMsdpSysEvent(type, true);
 }
 
-void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DevicestatusService::Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
-        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        DEV_HILOGI(SERVICE, "Unsubscribe func is nullptr");
         return;
     }
 
@@ -230,8 +230,8 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     appInfo->type = type;
     appInfo->callback = callback;
     DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
-    StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
-    devicestatusManager_->UnSubscribe(type, callback);
+    StartTrace(HITRACE_TAG_MSDP, "serviceUnsubscribeStart");
+    devicestatusManager_->Unsubscribe(type, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportMsdpSysEvent(type, false);
 }

@@ -37,7 +37,7 @@ public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeCallback(const uint8_t* data);
     static void TestGetDevicestatusData();
-    static void TestUnSubscribeCallback();
+    static void TestUnsubscribeCallback();
 
     class DevicestatusTestCallback : public DevicestatusCallbackStub {
     public:

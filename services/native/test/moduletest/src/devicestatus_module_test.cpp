@@ -55,7 +55,7 @@ HWTEST_F (DevicestatusModuleTest, DevicestatusCallbackTest, TestSize.Level0)
     GTEST_LOG_(INFO) << "Start register";
     devicestatusClient.SubscribeCallback(type, cb);
     GTEST_LOG_(INFO) << "Cancel register";
-    devicestatusClient.UnSubscribeCallback(type, cb);
+    devicestatusClient.UnsubscribeCallback(type, cb);
 }
 
 /**

@@ -55,7 +55,7 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::Devi
     return ERR_OK;
 }
 
-int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type)
+int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
     if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
         && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
@@ -79,7 +79,7 @@ void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::Device
 void DeviceStatusAgent::UnRegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
 {
     DEV_HILOGI(INNERKIT, "Enter");
-    DevicestatusClient::GetInstance().UnSubscribeCallback(type, callback_);
+    DevicestatusClient::GetInstance().UnsubscribeCallback(type, callback_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

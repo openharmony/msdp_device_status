@@ -42,7 +42,7 @@ public:
 
     virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) = 0;
-    virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
         const sptr<IdevicestatusCallback>& callback) = 0;
     virtual DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) = 0;
 
