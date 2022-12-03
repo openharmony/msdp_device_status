@@ -40,11 +40,11 @@ public:
         ALLOC_SOCKET_FD = 40
     };
 
-    virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback) = 0;
-    virtual void UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback) = 0;
-    virtual DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) = 0;
+    virtual DeviceStatusDataUtils::DeviceStatusData GetCache(const DeviceStatusDataUtils::DeviceStatusType& type) = 0;
 
     virtual int32_t RegisterCoordinationListener() = 0;
     virtual int32_t UnregisterCoordinationListener() = 0;

@@ -51,7 +51,7 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     if (!isListeningProcess_) {
         FI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
-        return DevicestatusClient::GetInstance().RegisterCoordinationListener();
+        return DeviceStatusClient::GetInstance().RegisterCoordinationListener();
     }
     return RET_OK;
 }
@@ -78,7 +78,7 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
 listenerLabel:
     if (isListeningProcess_ && devCoordinationListener_.empty()) {
         isListeningProcess_ = false;
-        return DevicestatusClient::GetInstance().UnregisterCoordinationListener();
+        return DeviceStatusClient::GetInstance().UnregisterCoordinationListener();
     }
     return RET_OK;
 }
@@ -98,7 +98,7 @@ int32_t CoordinationManagerImpl::EnableInputDeviceCoordination(bool enabled, Fun
         return RET_ERR;
     }
     devCoordinationEvent_[userData_] = event;
-    return DevicestatusClient::GetInstance().EnableInputDeviceCoordination(userData_++, enabled);
+    return DeviceStatusClient::GetInstance().EnableInputDeviceCoordination(userData_++, enabled);
 }
 
 int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string &sinkDeviceId,
@@ -117,7 +117,7 @@ int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string 
         return RET_ERR;
     }
     devCoordinationEvent_[userData_] = event;
-    return DevicestatusClient::GetInstance().StartInputDeviceCoordination(
+    return DeviceStatusClient::GetInstance().StartInputDeviceCoordination(
         userData_++, sinkDeviceId, srcInputDeviceId);
 }
 
@@ -136,7 +136,7 @@ int32_t CoordinationManagerImpl::StopDeviceCoordination(FuncCoordinationMessage 
         return RET_ERR;
     }
     devCoordinationEvent_[userData_] = event;
-    return DevicestatusClient::GetInstance().StopDeviceCoordination(userData_++);
+    return DeviceStatusClient::GetInstance().StopDeviceCoordination(userData_++);
 }
 
 int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
@@ -155,7 +155,7 @@ int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
         return RET_ERR;
     }
     devCoordinationEvent_[userData_] = event;
-    return DevicestatusClient::GetInstance().GetInputDeviceCoordinationState(userData_++, deviceId);
+    return DeviceStatusClient::GetInstance().GetInputDeviceCoordinationState(userData_++, deviceId);
 }
 
 void CoordinationManagerImpl::OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg)

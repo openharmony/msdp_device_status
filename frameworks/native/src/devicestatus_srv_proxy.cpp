@@ -29,10 +29,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusSrvProxy" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
 } // namespace
 
-void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+void DeviceStatusSrvProxy::Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
@@ -44,7 +44,7 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return;
     }
@@ -61,11 +61,11 @@ void DevicestatusSrvProxy::Subscribe(const DevicestatusDataUtils::DevicestatusTy
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DeviceStatusSrvProxy::Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
+    StartTrace(HITRACE_TAG_MSDP, "clientUnsubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
 
@@ -73,7 +73,7 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         DEV_HILOGE(INNERKIT, "Write descriptor failed!");
         return;
     }
@@ -91,13 +91,13 @@ void DevicestatusSrvProxy::UnSubscribe(const DevicestatusDataUtils::Devicestatus
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
-    DevicestatusDataUtils::DevicestatusType& type)
+DeviceStatusDataUtils::DeviceStatusData DeviceStatusSrvProxy::GetCache(const \
+    DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    DevicestatusDataUtils::DevicestatusData devicestatusData;
-    devicestatusData.type = DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
-    devicestatusData.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+    DeviceStatusDataUtils::DeviceStatusData devicestatusData;
+    devicestatusData.type = DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID;
+    devicestatusData.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
 
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF_WITH_RET((remote == nullptr), devicestatusData);
@@ -106,7 +106,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     MessageParcel reply;
     MessageOption option;
 
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         DEV_HILOGE(INNERKIT, "Write descriptor failed!");
         return devicestatusData;
     }
@@ -123,18 +123,18 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSrvProxy::GetCache(const \
     int32_t devicestatusValue = -1;
     READINT32(reply, devicestatusType, devicestatusData);
     READINT32(reply, devicestatusValue, devicestatusData);
-    devicestatusData.type = DevicestatusDataUtils::DevicestatusType(devicestatusType);
-    devicestatusData.value = DevicestatusDataUtils::DevicestatusValue(devicestatusValue);
+    devicestatusData.type = DeviceStatusDataUtils::DeviceStatusType(devicestatusType);
+    devicestatusData.value = DeviceStatusDataUtils::DeviceStatusValue(devicestatusValue);
     DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
 
-int32_t DevicestatusSrvProxy::RegisterCoordinationListener()
+int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -149,11 +149,11 @@ int32_t DevicestatusSrvProxy::RegisterCoordinationListener()
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::UnregisterCoordinationListener()
+int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -168,11 +168,11 @@ int32_t DevicestatusSrvProxy::UnregisterCoordinationListener()
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -189,12 +189,12 @@ int32_t DevicestatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bo
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
+int32_t DeviceStatusSrvProxy::StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
     int32_t srcInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -212,11 +212,11 @@ int32_t DevicestatusSrvProxy::StartInputDeviceCoordination(int32_t userData, con
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::StopDeviceCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::StopDeviceCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -232,11 +232,11 @@ int32_t DevicestatusSrvProxy::StopDeviceCoordination(int32_t userData)
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusSrvProxy::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
@@ -253,12 +253,12 @@ int32_t DevicestatusSrvProxy::GetInputDeviceCoordinationState(int32_t userData, 
     return ret;
 }
 
-int32_t DevicestatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
-    if (!data.WriteInterfaceToken(DevicestatusSrvProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }

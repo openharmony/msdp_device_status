@@ -21,45 +21,45 @@
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
-auto &client_ = DevicestatusClient::GetInstance();
-sptr<DevicestatusClientFuzzer::DevicestatusTestCallback> cb = new DevicestatusClientFuzzer::DevicestatusTestCallback();
+auto &client_ = DeviceStatusClient::GetInstance();
+sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb = new DeviceStatusClientFuzzer::DeviceStatusTestCallback();
 const int WAIT_TIME = 1000;
-void DevicestatusClientFuzzer::DevicestatusTestCallback::OnDevicestatusChanged(const \
-    DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const \
+    DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
 {
-    std::cout << "DevicestatusTestCallback type: " << devicestatusData.type << std::endl;
-    std::cout << "DevicestatusTestCallback value: " << devicestatusData.value << std::endl;
+    std::cout << "DeviceStatusTestCallback type: " << devicestatusData.type << std::endl;
+    std::cout << "DeviceStatusTestCallback value: " << devicestatusData.value << std::endl;
 }
 
-void DevicestatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
+void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 {
     std::cout << "TestSubscribeCallback: Enter " << std::endl;
     
-    client_.SubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, cb);
+    client_.SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, cb);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestGetDevicestatusData();
+    TestGetDeviceStatusData();
 }
 
-void DevicestatusClientFuzzer::TestGetDevicestatusData()
+void DeviceStatusClientFuzzer::TestGetDeviceStatusData()
 {
-    std::cout << "TestGetDevicestatusData: Enter " << std::endl;
-    client_.GetDevicestatusData(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    std::cout << "TestGetDeviceStatusData: Enter " << std::endl;
+    client_.GetDeviceStatusData(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN);
     
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnSubscribeCallback();
+    TestUnsubscribeCallback();
 }
 
-void DevicestatusClientFuzzer::TestUnSubscribeCallback()
+void DeviceStatusClientFuzzer::TestUnsubscribeCallback()
 {
-    std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
+    std::cout << "TestUnsubscribeCallback: Enter " << std::endl;
     
-    client_.UnSubscribeCallback(DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, cb);
+    client_.UnsubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    DevicestatusClientFuzzer::TestSubscribeCallback(data);
+    DeviceStatusClientFuzzer::TestSubscribeCallback(data);
     return true;
 }
 

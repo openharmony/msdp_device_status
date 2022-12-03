@@ -23,12 +23,12 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
-    const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
+    const DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
 {
     DEV_HILOGI(INNERKIT, "type=%{public}d, value=%{public}d",
-        static_cast<DevicestatusDataUtils::DevicestatusType>(devicestatusData.type),
-        static_cast<DevicestatusDataUtils::DevicestatusValue>(devicestatusData.value));
+        static_cast<DeviceStatusDataUtils::DeviceStatusType>(devicestatusData.type),
+        static_cast<DeviceStatusDataUtils::DeviceStatusValue>(devicestatusData.value));
     std::shared_ptr<DeviceStatusAgent> agent = agent_.lock();
     if (agent == nullptr) {
         DEV_HILOGE(SERVICE, "agent is nullptr");
@@ -37,7 +37,7 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDevicestatusChanged(
     agent->agentEvent_->OnEventResult(devicestatusData);
 }
 
-int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type,
+int32_t DeviceStatusAgent::SubscribeAgentEvent(const DeviceStatusDataUtils::DeviceStatusType& type,
     const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
 {
     DEV_HILOGI(INNERKIT, "Enter");
@@ -45,8 +45,8 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::Devi
     if (agentEvent == nullptr) {
         return ERR_INVALID_VALUE;
     }
-    if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
-        && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
+    if (type > DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID
+        && type <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN) {
         RegisterServiceEvent(type);
         agentEvent_ = agentEvent;
     } else {
@@ -55,17 +55,17 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const DevicestatusDataUtils::Devi
     return ERR_OK;
 }
 
-int32_t DeviceStatusAgent::UnSubscribeAgentEvent(const DevicestatusDataUtils::DevicestatusType& type)
+int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const DeviceStatusDataUtils::DeviceStatusType& type)
 {
-    if (type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
-        && type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
+    if (type > DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID
+        && type <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN) {
         UnRegisterServiceEvent(type);
         return ERR_OK;
     }
     return ERR_INVALID_VALUE;
 }
 
-void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
+void DeviceStatusAgent::RegisterServiceEvent(const DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGI(INNERKIT, "Enter");
     callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
@@ -73,13 +73,13 @@ void DeviceStatusAgent::RegisterServiceEvent(const DevicestatusDataUtils::Device
         DEV_HILOGE(INNERKIT, "callback_ is nullptr");
         return;
     }
-    DevicestatusClient::GetInstance().SubscribeCallback(type, callback_);
+    DeviceStatusClient::GetInstance().SubscribeCallback(type, callback_);
 }
 
-void DeviceStatusAgent::UnRegisterServiceEvent(const DevicestatusDataUtils::DevicestatusType& type)
+void DeviceStatusAgent::UnRegisterServiceEvent(const DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGI(INNERKIT, "Enter");
-    DevicestatusClient::GetInstance().UnSubscribeCallback(type, callback_);
+    DeviceStatusClient::GetInstance().UnsubscribeCallback(type, callback_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

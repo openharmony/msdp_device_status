@@ -30,7 +30,7 @@ public:
         DEVICESTATUS_CHANGE = 0,
     };
 
-    virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) = 0;
+    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusCallback");
 };

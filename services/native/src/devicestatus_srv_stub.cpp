@@ -29,17 +29,17 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusSrvStub" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
 } // namespace
 
-int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
+int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
-    std::u16string descriptor = DevicestatusSrvStub::GetDescriptor();
+    std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        DEV_HILOGE(SERVICE, "DevicestatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
+        DEV_HILOGE(SERVICE, "DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
@@ -48,10 +48,10 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return SubscribeStub(data);
         }
         case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE): {
-            return UnSubscribeStub(data);
+            return UnsubscribeStub(data);
         }
         case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE): {
-            return GetLatestDevicestatusDataStub(data, reply);
+            return GetLatestDeviceStatusDataStub(data, reply);
         }
         case REGISTER_COORDINATION_MONITOR: {
             return StubRegisterCoordinationMonitor(data, reply);
@@ -81,7 +81,7 @@ int32_t DevicestatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     return ERR_OK;
 }
 
-int32_t DevicestatusSrvStub::SubscribeStub(MessageParcel& data)
+int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
@@ -93,11 +93,11 @@ int32_t DevicestatusSrvStub::SubscribeStub(MessageParcel& data)
     sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
     DEVICESTATUS_RETURN_IF_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Read callback successfully");
-    Subscribe(DevicestatusDataUtils::DevicestatusType(type), callback);
+    Subscribe(DeviceStatusDataUtils::DeviceStatusType(type), callback);
     return ERR_OK;
 }
 
-int32_t DevicestatusSrvStub::UnSubscribeStub(MessageParcel& data)
+int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
@@ -106,16 +106,16 @@ int32_t DevicestatusSrvStub::UnSubscribeStub(MessageParcel& data)
     DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
     DEVICESTATUS_RETURN_IF_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    UnSubscribe(DevicestatusDataUtils::DevicestatusType(type), callback);
+    Unsubscribe(DeviceStatusDataUtils::DeviceStatusType(type), callback);
     return ERR_OK;
 }
 
-int32_t DevicestatusSrvStub::GetLatestDevicestatusDataStub(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DevicestatusDataUtils::DevicestatusData devicestatusData = GetCache(DevicestatusDataUtils::DevicestatusType(type));
+    DeviceStatusDataUtils::DeviceStatusData devicestatusData = GetCache(DeviceStatusDataUtils::DeviceStatusType(type));
     DEV_HILOGD(SERVICE, "devicestatusData.type: %{public}d", devicestatusData.type);
     DEV_HILOGD(SERVICE, "devicestatusData.value: %{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
@@ -124,7 +124,7 @@ int32_t DevicestatusSrvStub::GetLatestDevicestatusDataStub(MessageParcel& data, 
     return ERR_OK;
 }
 
-int32_t DevicestatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterCoordinationListener();
@@ -134,7 +134,7 @@ int32_t DevicestatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterCoordinationListener();
@@ -144,7 +144,7 @@ int32_t DevicestatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& da
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -158,7 +158,7 @@ int32_t DevicestatusSrvStub::StubEnableInputDeviceCoordination(MessageParcel& da
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -174,7 +174,7 @@ int32_t DevicestatusSrvStub::StubStartInputDeviceCoordination(MessageParcel& dat
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -186,7 +186,7 @@ int32_t DevicestatusSrvStub::StubStopDeviceCoordination(MessageParcel& data, Mes
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -200,7 +200,7 @@ int32_t DevicestatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& 
     return ret;
 }
 
-int32_t DevicestatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {

@@ -24,22 +24,22 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusAgentTest : public testing::Test {
+class DeviceStatusAgentTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
-class DevicestatusAgentListenerMockFirstClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
+class DeviceStatusAgentListenerMockFirstClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
 public:
-    virtual ~DevicestatusAgentListenerMockFirstClient() {};
-    bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+    virtual ~DeviceStatusAgentListenerMockFirstClient() {};
+    bool OnEventResult(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
 };
-class DevicestatusAgentListenerMockSecondClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
+class DeviceStatusAgentListenerMockSecondClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
 public:
-    virtual ~DevicestatusAgentListenerMockSecondClient() {};
-    bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+    virtual ~DeviceStatusAgentListenerMockSecondClient() {};
+    bool OnEventResult(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

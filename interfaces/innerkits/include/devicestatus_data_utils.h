@@ -21,9 +21,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusDataUtils {
+class DeviceStatusDataUtils {
 public:
-    enum DevicestatusType {
+    enum DeviceStatusType {
         TYPE_INVALID = -1,
         TYPE_HIGH_STILL,
         TYPE_FINE_STILL,
@@ -33,7 +33,7 @@ public:
         TYPE_MAX
     };
 
-    enum DevicestatusValue {
+    enum DeviceStatusValue {
         VALUE_INVALID = -1,
         VALUE_ENTER,
         VALUE_EXIT
@@ -44,9 +44,9 @@ public:
         VALID
     };
 
-    struct DevicestatusData {
-        DevicestatusType type;
-        DevicestatusValue value;
+    struct DeviceStatusData {
+        DeviceStatusType type;
+        DeviceStatusValue value;
     };
 };
 
@@ -56,11 +56,11 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, "TYPE_HIGH_STILL"},
-    {DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, "TYPE_FINE_STILL"},
-    {DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH, "TYPE_CAR_BLUETOOTH"},
-    {DevicestatusDataUtils::DevicestatusType::TYPE_STAND, "TYPE_STAND"},
-    {DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, "TYPE_LID_OPEN"}
+    {DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL, "TYPE_HIGH_STILL"},
+    {DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL, "TYPE_FINE_STILL"},
+    {DeviceStatusDataUtils::DeviceStatusType::TYPE_CAR_BLUETOOTH, "TYPE_CAR_BLUETOOTH"},
+    {DeviceStatusDataUtils::DeviceStatusType::TYPE_STAND, "TYPE_STAND"},
+    {DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, "TYPE_LID_OPEN"}
 };
 } // namespace DeviceStatus
 } // namespace Msdp

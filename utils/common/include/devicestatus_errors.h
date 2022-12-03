@@ -23,11 +23,11 @@ namespace Msdp {
 namespace DeviceStatus {
 enum {
     /**
-     *  Module type: Devicestatus Service
+     *  Module type: DeviceStatus Service
      */
     DEVICESTATUS_MODULE_TYPE_SERVICE = 0,
     /**
-     *  Module type: Devicestatus Kit
+     *  Module type: DeviceStatus Kit
      */
     DEVICESTATUS_MODULE_TYPE_KIT = 1,
     DEVICESTATUS_MODULE_TYPE_CLIENT = 2
