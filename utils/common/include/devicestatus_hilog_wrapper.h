@@ -56,7 +56,7 @@ namespace DeviceStatus {
 #endif
 
 // param of log interface, such as DEV_HILOGF.
-enum DevicestatusSubModule {
+enum DeviceStatusSubModule {
     INNERKIT = 0,
     SERVICE,
     JS_NAPI,
@@ -64,10 +64,10 @@ enum DevicestatusSubModule {
     BUTT,
 };
 
-// 0xD002220: subsystem:Msdp module:Devicestatus, 8 bits reserved.
+// 0xD002220: subsystem:Msdp module:DeviceStatus, 8 bits reserved.
 static constexpr unsigned int BASE_MSDP_DOMAIN_ID = 0xD002220;
 
-enum DevicestatusDomainId {
+enum DeviceStatusDomainId {
     DEVICESTATUS_INNERKIT_DOMAIN = BASE_MSDP_DOMAIN_ID + INNERKIT,
     DEVICESTATUS_SERVICE_DOMAIN,
     DEVICESTATUS_JS_NAPI,
@@ -76,10 +76,10 @@ enum DevicestatusDomainId {
 };
 
 static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
-    {LOG_CORE, DEVICESTATUS_INNERKIT_DOMAIN, "DevicestatusClient"},
-    {LOG_CORE, DEVICESTATUS_SERVICE_DOMAIN, "DevicestatusService"},
-    {LOG_CORE, DEVICESTATUS_JS_NAPI, "DevicestatusJsNapi"},
-    {LOG_CORE, DEVICESTATUS_COMMON, "DevicestatusCommon"},
+    {LOG_CORE, DEVICESTATUS_INNERKIT_DOMAIN, "DeviceStatusClient"},
+    {LOG_CORE, DEVICESTATUS_SERVICE_DOMAIN, "DeviceStatusService"},
+    {LOG_CORE, DEVICESTATUS_JS_NAPI, "DeviceStatusJsNapi"},
+    {LOG_CORE, DEVICESTATUS_COMMON, "DeviceStatusCommon"},
 };
 
 // In order to improve performance, do not check the module range.

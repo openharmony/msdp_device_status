@@ -23,14 +23,14 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusModuleTest : public testing::Test {
+class DeviceStatusModuleTest : public testing::Test {
 public:
 
-    class DevicestatusModuleTestCallback : public DevicestatusCallbackStub {
+    class DeviceStatusModuleTestCallback : public DeviceStatusCallbackStub {
     public:
-        DevicestatusModuleTestCallback() {};
-        virtual ~DevicestatusModuleTestCallback() {};
-        virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+        DeviceStatusModuleTestCallback() {};
+        virtual ~DeviceStatusModuleTestCallback() {};
+        virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus

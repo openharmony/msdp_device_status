@@ -39,12 +39,12 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};   
-class DevicestatusService final : public IContext,
+class DeviceStatusService final : public IContext,
                                   public UDSServer,
                                   public SystemAbility,
-                                  public DevicestatusSrvStub {
-    DECLARE_SYSTEM_ABILITY(DevicestatusService)
-    DECLARE_DELAYED_SP_SINGLETON(DevicestatusService);
+                                  public DeviceStatusSrvStub {
+    DECLARE_SYSTEM_ABILITY(DeviceStatusService)
+    DECLARE_DELAYED_SP_SINGLETON(DeviceStatusService);
 
 public:
     virtual void OnDump() override;
@@ -94,11 +94,11 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent) override
     {}
 
-    void Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
+    void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
         const sptr<IdevicestatusCallback>& callback) override;
-    void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+    void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
         const sptr<IdevicestatusCallback>& callback) override;
-    DevicestatusDataUtils::DevicestatusData GetCache(const DevicestatusDataUtils::DevicestatusType& type) override;
+    DeviceStatusDataUtils::DeviceStatusData GetCache(const DeviceStatusDataUtils::DeviceStatusType& type) override;
 
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
@@ -109,7 +109,7 @@ public:
     int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
-    void ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable);
+    void ReportMsdpSysEvent(const DeviceStatusDataUtils::DeviceStatusType& type, bool enable);
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -150,8 +150,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     CoordinationEventHandler coordinationHandler;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    std::shared_ptr<DevicestatusManager> devicestatusManager_;
-    std::shared_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
+    std::shared_ptr<DeviceStatusManager> devicestatusManager_;
+    std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

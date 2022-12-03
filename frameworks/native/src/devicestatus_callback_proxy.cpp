@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-void DeviceStatusCallbackProxy::OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
 {
     sptr<IRemoteObject> remote = Remote();
     DEVICESTATUS_RETURN_IF(remote == nullptr);

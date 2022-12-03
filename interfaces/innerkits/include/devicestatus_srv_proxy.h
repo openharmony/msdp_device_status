@@ -24,19 +24,19 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusSrvProxy : public IRemoteProxy<Idevicestatus> {
+class DeviceStatusSrvProxy : public IRemoteProxy<Idevicestatus> {
 public:
-    explicit DevicestatusSrvProxy(const sptr<IRemoteObject>& impl)
+    explicit DeviceStatusSrvProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<Idevicestatus>(impl) {}
-    ~DevicestatusSrvProxy() = default;
-    DISALLOW_COPY_AND_MOVE(DevicestatusSrvProxy);
+    ~DeviceStatusSrvProxy() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceStatusSrvProxy);
 
-    virtual void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
-    virtual void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type, \
+    virtual void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback) override;
-    virtual DevicestatusDataUtils::DevicestatusData GetCache(const \
-        DevicestatusDataUtils::DevicestatusType& type) override;
+    virtual DeviceStatusDataUtils::DeviceStatusData GetCache(const \
+        DeviceStatusDataUtils::DeviceStatusType& type) override;
 
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;
@@ -50,7 +50,7 @@ public:
         int32_t &socketFd, int32_t &tokenType) override;
 
 private:
-    static inline BrokerDelegator<DevicestatusSrvProxy> delegator_;
+    static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

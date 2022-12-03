@@ -31,33 +31,33 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace Security::AccessToken;
-class DevicestatusService;
-class DevicestatusManager {
+class DeviceStatusService;
+class DeviceStatusManager {
 public:
-    explicit DevicestatusManager(const wptr<DevicestatusService>& ms) : ms_(ms)
+    explicit DeviceStatusManager(const wptr<DeviceStatusService>& ms) : ms_(ms)
     {
-        DEV_HILOGI(SERVICE, "DevicestatusManager instance is created.");
+        DEV_HILOGI(SERVICE, "DeviceStatusManager instance is created.");
     }
-    ~DevicestatusManager() = default;
+    ~DeviceStatusManager() = default;
 
-    class DevicestatusCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    class DeviceStatusCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        DevicestatusCallbackDeathRecipient() = default;
+        DeviceStatusCallbackDeathRecipient() = default;
         virtual void OnRemoteDied(const wptr<IRemoteObject> &remote);
-        virtual ~DevicestatusCallbackDeathRecipient() = default;
+        virtual ~DeviceStatusCallbackDeathRecipient() = default;
     };
 
     bool Init();
-    bool EnableMock(DevicestatusDataUtils::DevicestatusType type);
-    bool InitInterface(DevicestatusDataUtils::DevicestatusType type);
-    bool DisableMock(DevicestatusDataUtils::DevicestatusType type);
+    bool EnableMock(DeviceStatusDataUtils::DeviceStatusType type);
+    bool InitInterface(DeviceStatusDataUtils::DeviceStatusType type);
+    bool DisableMock(DeviceStatusDataUtils::DeviceStatusType type);
     bool InitDataCallback();
-    void NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData);
-    void Subscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
-    void Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type, const sptr<IdevicestatusCallback>& callback);
-    DevicestatusDataUtils::DevicestatusData GetLatestDevicestatusData(const \
-        DevicestatusDataUtils::DevicestatusType& type);
-    int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);
+    void NotifyDeviceStatusChange(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData);
+    void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, const sptr<IdevicestatusCallback>& callback);
+    void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type, const sptr<IdevicestatusCallback>& callback);
+    DeviceStatusDataUtils::DeviceStatusData GetLatestDeviceStatusData(const \
+        DeviceStatusDataUtils::DeviceStatusType& type);
+    int32_t MsdpDataCallback(const DeviceStatusDataUtils::DeviceStatusData& data);
     int32_t LoadAlgorithm(bool bCreate);
     int32_t UnloadAlgorithm(bool bCreate);
     void GetPackageName(AccessTokenID tokenId, std::string &packageName);
@@ -69,12 +69,12 @@ private:
             return l->AsObject() < r->AsObject();
         }
     };
-    const wptr<DevicestatusService> ms_;
+    const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_;
-    std::unique_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
-    std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> msdpData_;
-    std::map<DevicestatusDataUtils::DevicestatusType, std::set<const sptr<IdevicestatusCallback>, classcomp>> \
+    std::unique_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
+    std::map<DeviceStatusDataUtils::DeviceStatusType, DeviceStatusDataUtils::DeviceStatusValue> msdpData_;
+    std::map<DeviceStatusDataUtils::DeviceStatusType, std::set<const sptr<IdevicestatusCallback>, classcomp>> \
         listenerMap_;
 };
 } // namespace DeviceStatus

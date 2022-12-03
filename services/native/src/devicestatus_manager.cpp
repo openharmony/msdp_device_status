@@ -23,7 +23,7 @@ namespace {
 constexpr int32_t ERR_OK = 0;
 constexpr int32_t ERR_NG = -1;
 }
-void DevicestatusManager::DevicestatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
         DEV_HILOGE(SERVICE, "OnRemoteDied failed, remote is nullptr");
@@ -32,32 +32,32 @@ void DevicestatusManager::DevicestatusCallbackDeathRecipient::OnRemoteDied(const
     DEV_HILOGD(SERVICE, "Recv death notice");
 }
 
-bool DevicestatusManager::Init()
+bool DeviceStatusManager::Init()
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusCBDeathRecipient_ == nullptr) {
-        devicestatusCBDeathRecipient_ = new (std::nothrow) DevicestatusCallbackDeathRecipient();
+        devicestatusCBDeathRecipient_ = new (std::nothrow) DeviceStatusCallbackDeathRecipient();
         if (devicestatusCBDeathRecipient_ == nullptr) {
             DEV_HILOGE(SERVICE, "devicestatusCBDeathRecipient_ is nullptr");
             return false;
         }
     }
 
-    msdpImpl_ = std::make_unique<DevicestatusMsdpClientImpl>();
+    msdpImpl_ = std::make_unique<DeviceStatusMsdpClientImpl>();
     LoadAlgorithm(false);
 
     DEV_HILOGI(SERVICE, "Init success");
     return true;
 }
 
-DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestatusData(const \
-    DevicestatusDataUtils::DevicestatusType& type)
+DeviceStatusDataUtils::DeviceStatusData DeviceStatusManager::GetLatestDeviceStatusData(const \
+    DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
+    DeviceStatusDataUtils::DeviceStatusData data = {type, DeviceStatusDataUtils::DeviceStatusValue::VALUE_EXIT};
     if (msdpImpl_ == nullptr) {
         DEV_HILOGI(SERVICE, "GetObserverData func is nullptr,return default!");
-        data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+        data.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
         return data;
     }
     msdpData_ = msdpImpl_->GetObserverData();
@@ -68,11 +68,11 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
         }
     }
 
-    data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
+    data.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
     return data;
 }
 
-bool DevicestatusManager::EnableMock(DevicestatusDataUtils::DevicestatusType type)
+bool DeviceStatusManager::EnableMock(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (!InitInterface(type)) {
@@ -87,7 +87,7 @@ bool DevicestatusManager::EnableMock(DevicestatusDataUtils::DevicestatusType typ
     return true;
 }
 
-bool DevicestatusManager::DisableMock(DevicestatusDataUtils::DevicestatusType type)
+bool DeviceStatusManager::DisableMock(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ == nullptr) {
@@ -108,7 +108,7 @@ bool DevicestatusManager::DisableMock(DevicestatusDataUtils::DevicestatusType ty
     return true;
 }
 
-bool DevicestatusManager::InitInterface(DevicestatusDataUtils::DevicestatusType type)
+bool DeviceStatusManager::InitInterface(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ == nullptr) {
@@ -121,28 +121,28 @@ bool DevicestatusManager::InitInterface(DevicestatusDataUtils::DevicestatusType 
     return true;
 }
 
-bool DevicestatusManager::InitDataCallback()
+bool DeviceStatusManager::InitDataCallback()
 {
     DEV_HILOGE(SERVICE, "Enter");
     if (msdpImpl_ == nullptr) {
         DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
         return false;
     }
-    DevicestatusMsdpClientImpl::CallbackManager callback =
-        std::bind(&DevicestatusManager::MsdpDataCallback, this, std::placeholders::_1);
+    DeviceStatusMsdpClientImpl::CallbackManager callback =
+        std::bind(&DeviceStatusManager::MsdpDataCallback, this, std::placeholders::_1);
     if (msdpImpl_->RegisterImpl(callback) == ERR_NG) {
         DEV_HILOGE(SERVICE, "register impl failed");
     }
     return true;
 }
 
-int32_t DevicestatusManager::MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data)
+int32_t DeviceStatusManager::MsdpDataCallback(const DeviceStatusDataUtils::DeviceStatusData& data)
 {
-    NotifyDevicestatusChange(data);
+    NotifyDeviceStatusChange(data);
     return ERR_OK;
 }
 
-void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusManager::NotifyDeviceStatusChange(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
 {
     DEV_HILOGI(SERVICE, "Enter");
 
@@ -165,12 +165,12 @@ void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::
             DEV_HILOGI(SERVICE, "Listener is nullptr");
             return;
         }
-        listener->OnDevicestatusChanged(devicestatusData);
+        listener->OnDeviceStatusChanged(devicestatusData);
     }
     DEV_HILOGI(SERVICE, "Exit");
 }
 
-void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DeviceStatusManager::Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
@@ -209,7 +209,7 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
-void DevicestatusManager::Unsubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DeviceStatusManager::Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
@@ -244,7 +244,7 @@ void DevicestatusManager::Unsubscribe(const DevicestatusDataUtils::DevicestatusT
     DEV_HILOGI(SERVICE, "Unsubscribe success,Exit");
 }
 
-int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
+int32_t DeviceStatusManager::LoadAlgorithm(bool bCreate)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
@@ -254,7 +254,7 @@ int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
     return ERR_OK;
 }
 
-int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
+int32_t DeviceStatusManager::UnloadAlgorithm(bool bCreate)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (msdpImpl_ != nullptr) {
@@ -264,7 +264,7 @@ int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
     return ERR_OK;
 }
 
-void DevicestatusManager::GetPackageName(AccessTokenID tokenId, std::string &packageName)
+void DeviceStatusManager::GetPackageName(AccessTokenID tokenId, std::string &packageName)
 {
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {

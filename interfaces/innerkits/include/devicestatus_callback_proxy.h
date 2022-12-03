@@ -31,7 +31,7 @@ public:
         : IRemoteProxy<IdevicestatusCallback>(impl) {}
     ~DeviceStatusCallbackProxy() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackProxy);
-    virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
 
 private:
     static inline BrokerDelegator<DeviceStatusCallbackProxy> delegator_;

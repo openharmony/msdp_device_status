@@ -32,18 +32,18 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusClientFuzzer {
+class DeviceStatusClientFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeCallback(const uint8_t* data);
-    static void TestGetDevicestatusData();
+    static void TestGetDeviceStatusData();
     static void TestUnsubscribeCallback();
 
-    class DevicestatusTestCallback : public DevicestatusCallbackStub {
+    class DeviceStatusTestCallback : public DeviceStatusCallbackStub {
     public:
-        DevicestatusTestCallback() {};
-        virtual ~DevicestatusTestCallback() {};
-        virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+        DeviceStatusTestCallback() {};
+        virtual ~DeviceStatusTestCallback() {};
+        virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus

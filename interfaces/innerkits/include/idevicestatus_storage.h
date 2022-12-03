@@ -25,14 +25,14 @@ namespace Msdp {
 namespace DeviceStatus {
 class IdevicestatusStorage : public IRemoteBroker {
 public:
-    struct DevicestatusRecord {
-        DevicestatusDataUtils::DevicestatusType type;
-        DevicestatusDataUtils::DevicestatusValue value;
+    struct DeviceStatusRecord {
+        DeviceStatusDataUtils::DeviceStatusType type;
+        DeviceStatusDataUtils::DeviceStatusValue value;
         std::string date;
         std::string time;
     };
 
-    virtual bool Save(DevicestatusRecord record) = 0;
+    virtual bool Save(DeviceStatusRecord record) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusStorage");
 };

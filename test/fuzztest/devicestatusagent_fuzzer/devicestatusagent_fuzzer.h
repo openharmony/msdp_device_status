@@ -39,7 +39,7 @@ enum class ApiNumber {
     NUM_TWO,
     NUM_THREE
 };
-class DevicestatusAgentFuzzer {
+class DeviceStatusAgentFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
@@ -50,7 +50,7 @@ public:
     class DeviceStatusAgentClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentClient() {};
-        bool OnEventResult(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+        bool OnEventResult(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus

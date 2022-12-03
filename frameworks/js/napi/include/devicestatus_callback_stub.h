@@ -26,16 +26,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusCallbackStub : public IRemoteStub<IdevicestatusCallback> {
+class DeviceStatusCallbackStub : public IRemoteStub<IdevicestatusCallback> {
 public:
-    DISALLOW_COPY_AND_MOVE(DevicestatusCallbackStub);
-    DevicestatusCallbackStub() = default;
-    virtual ~DevicestatusCallbackStub() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackStub);
+    DeviceStatusCallbackStub() = default;
+    virtual ~DeviceStatusCallbackStub() = default;
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
-    void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& __attribute__((unused))value) override {}
+    void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& __attribute__((unused))value) override {}
 
 private:
-    int32_t OnDevicestatusChangedStub(MessageParcel& data);
+    int32_t OnDeviceStatusChangedStub(MessageParcel& data);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

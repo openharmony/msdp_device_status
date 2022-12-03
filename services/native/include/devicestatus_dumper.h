@@ -46,34 +46,34 @@ struct AppInfo {
     int32_t pid = 0;
     Security::AccessToken::AccessTokenID tokenId;
     std::string packageName;
-    DevicestatusDataUtils::DevicestatusType type;
+    DeviceStatusDataUtils::DeviceStatusType type;
     sptr<IdevicestatusCallback> callback;
 };
 struct DeviceStatusRecord {
     std::string startTime;
-    DevicestatusDataUtils::DevicestatusData data;
+    DeviceStatusDataUtils::DeviceStatusData data;
 };
-class DevicestatusDumper final : public RefBase,
-    public Singleton<DevicestatusDumper> {
+class DeviceStatusDumper final : public RefBase,
+    public Singleton<DeviceStatusDumper> {
 public:
-    DevicestatusDumper() = default;
-    ~DevicestatusDumper() = default;
+    DeviceStatusDumper() = default;
+    ~DeviceStatusDumper() = default;
     void ParseCommand(int32_t fd, const std::vector<std::string> &args,
-        const std::vector<DevicestatusDataUtils::DevicestatusData> &datas);
+        const std::vector<DeviceStatusDataUtils::DeviceStatusData> &datas);
     void DumpHelpInfo(int32_t fd) const;
-    void DumpDevicestatusSubscriber(int32_t fd);
-    void DumpDevicestatusChanges(int32_t fd);
-    void DumpDevicestatusCurrentStatus(int32_t fd,
-        const std::vector<DevicestatusDataUtils::DevicestatusData> &datas) const;
+    void DumpDeviceStatusSubscriber(int32_t fd);
+    void DumpDeviceStatusChanges(int32_t fd);
+    void DumpDeviceStatusCurrentStatus(int32_t fd,
+        const std::vector<DeviceStatusDataUtils::DeviceStatusData> &datas) const;
     void SaveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void RemoveAppInfo(std::shared_ptr<AppInfo> appInfo);
-    void pushDeviceStatus(const DevicestatusDataUtils::DevicestatusData& data);
+    void pushDeviceStatus(const DeviceStatusDataUtils::DeviceStatusData& data);
 private:
-    DISALLOW_COPY_AND_MOVE(DevicestatusDumper);
+    DISALLOW_COPY_AND_MOVE(DeviceStatusDumper);
     void DumpCurrentTime(std::string &startTime) const;
-    std::string GetStatusType(const DevicestatusDataUtils::DevicestatusType &type) const;
-    std::string GetDeviceState(const DevicestatusDataUtils::DevicestatusValue &type) const;
-    std::map<DevicestatusDataUtils::DevicestatusType, std::set<std::shared_ptr<AppInfo>>> \
+    std::string GetStatusType(const DeviceStatusDataUtils::DeviceStatusType &type) const;
+    std::string GetDeviceState(const DeviceStatusDataUtils::DeviceStatusValue &type) const;
+    std::map<DeviceStatusDataUtils::DeviceStatusType, std::set<std::shared_ptr<AppInfo>>> \
         appInfoMap_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;

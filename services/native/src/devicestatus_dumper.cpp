@@ -35,8 +35,8 @@ namespace DeviceStatus {
 namespace {
     constexpr uint32_t MS_NS = 1000000;
 }
-void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args,
-    const std::vector<DevicestatusDataUtils::DevicestatusData> &datas)
+void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args,
+    const std::vector<DeviceStatusDataUtils::DeviceStatusData> &datas)
 {
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
@@ -64,15 +64,15 @@ void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
                 break;
             }
             case 's': {
-                DumpDevicestatusSubscriber(fd);
+                DumpDeviceStatusSubscriber(fd);
                 break;
             }
             case 'l': {
-                DumpDevicestatusChanges(fd);
+                DumpDeviceStatusChanges(fd);
                 break;
             }
             case 'c': {
-                DumpDevicestatusCurrentStatus(fd, datas);
+                DumpDeviceStatusCurrentStatus(fd, datas);
                 break;
             }
             default: {
@@ -89,7 +89,7 @@ void DevicestatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
     delete[] argv;
 }
 
-void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
+void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 {
     DEV_HILOGI(SERVICE, "start");
     if (appInfoMap_.empty()) {
@@ -108,7 +108,7 @@ void DevicestatusDumper::DumpDevicestatusSubscriber(int32_t fd)
     }
 }
 
-void DevicestatusDumper::DumpDevicestatusChanges(int32_t fd)
+void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
 {
     DEV_HILOGI(SERVICE, "start");
     if (deviceStatusQueue_.empty()) {
@@ -134,8 +134,8 @@ void DevicestatusDumper::DumpDevicestatusChanges(int32_t fd)
     }
 }
 
-void DevicestatusDumper::DumpDevicestatusCurrentStatus(int32_t fd,
-    const std::vector<DevicestatusDataUtils::DevicestatusData> &datas) const
+void DeviceStatusDumper::DumpDeviceStatusCurrentStatus(int32_t fd,
+    const std::vector<DeviceStatusDataUtils::DeviceStatusData> &datas) const
 {
     DEV_HILOGI(SERVICE, "start");
     std::string startTime;
@@ -147,27 +147,27 @@ void DevicestatusDumper::DumpDevicestatusCurrentStatus(int32_t fd,
         return;
     }
     for (auto it = datas.begin(); it != datas.end(); ++it) {
-        if (it->value == DevicestatusDataUtils::VALUE_INVALID) {
+        if (it->value == DeviceStatusDataUtils::VALUE_INVALID) {
             continue;
         }
-        dprintf(fd, "Device status DevicestatusType is %s , current type state is %s .\n",
+        dprintf(fd, "Device status DeviceStatusType is %s , current type state is %s .\n",
             GetStatusType(it->type).c_str(), GetDeviceState(it->value).c_str());
     }
 }
 
-std::string DevicestatusDumper::GetDeviceState(const DevicestatusDataUtils::DevicestatusValue &value) const
+std::string DeviceStatusDumper::GetDeviceState(const DeviceStatusDataUtils::DeviceStatusValue &value) const
 {
     std::string state;
     switch (value) {
-        case DevicestatusDataUtils::VALUE_ENTER: {
+        case DeviceStatusDataUtils::VALUE_ENTER: {
             state = "enter";
             break;
         }
-        case DevicestatusDataUtils::VALUE_EXIT: {
+        case DeviceStatusDataUtils::VALUE_EXIT: {
             state = "exit";
             break;
         }
-        case DevicestatusDataUtils::VALUE_INVALID: {
+        case DeviceStatusDataUtils::VALUE_INVALID: {
             state = "invalid";
             break;
         }
@@ -179,23 +179,23 @@ std::string DevicestatusDumper::GetDeviceState(const DevicestatusDataUtils::Devi
     return state;
 }
 
-std::string DevicestatusDumper::GetStatusType(const DevicestatusDataUtils::DevicestatusType &type) const
+std::string DeviceStatusDumper::GetStatusType(const DeviceStatusDataUtils::DeviceStatusType &type) const
 {
     std::string stateType;
     switch (type) {
-        case DevicestatusDataUtils::TYPE_HIGH_STILL: {
+        case DeviceStatusDataUtils::TYPE_HIGH_STILL: {
             stateType = "high still";
             break;
         }
-        case DevicestatusDataUtils::TYPE_FINE_STILL: {
+        case DeviceStatusDataUtils::TYPE_FINE_STILL: {
             stateType = "fine still";
             break;
         }
-        case DevicestatusDataUtils::TYPE_CAR_BLUETOOTH: {
+        case DeviceStatusDataUtils::TYPE_CAR_BLUETOOTH: {
             stateType = "car bluetooth";
             break;
         }
-        case DevicestatusDataUtils::TYPE_LID_OPEN: {
+        case DeviceStatusDataUtils::TYPE_LID_OPEN: {
             stateType = "lid open";
             break;
         }
@@ -207,7 +207,7 @@ std::string DevicestatusDumper::GetStatusType(const DevicestatusDataUtils::Devic
     return stateType;
 }
 
-void DevicestatusDumper::DumpCurrentTime(std::string &startTime) const
+void DeviceStatusDumper::DumpCurrentTime(std::string &startTime) const
 {
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
@@ -223,7 +223,7 @@ void DevicestatusDumper::DumpCurrentTime(std::string &startTime) const
         .append(std::to_string(curTime.tv_nsec / MS_NS));
 }
 
-void DevicestatusDumper::DumpHelpInfo(int32_t fd) const
+void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
 {
     dprintf(fd, "Usage:\n");
     dprintf(fd, "      -h: dump help\n");
@@ -232,7 +232,7 @@ void DevicestatusDumper::DumpHelpInfo(int32_t fd) const
     dprintf(fd, "      -c: dump the device_status current device status\n");
 }
 
-void DevicestatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
+void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGI(SERVICE, "Enter");
     DumpCurrentTime(appInfo->startTime);
@@ -249,7 +249,7 @@ void DevicestatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     }
 }
 
-void DevicestatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
+void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (appInfo->callback == nullptr) {
@@ -278,7 +278,7 @@ void DevicestatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     }
 }
 
-void DevicestatusDumper::pushDeviceStatus(const DevicestatusDataUtils::DevicestatusData& data)
+void DeviceStatusDumper::pushDeviceStatus(const DeviceStatusDataUtils::DeviceStatusData& data)
 {
     DEV_HILOGI(SERVICE, "Enter");
     std::unique_lock lock(mutex_);
