@@ -35,7 +35,7 @@ public:
 
     enum DeviceStatusValue {
         VALUE_INVALID = -1,
-        VALUE_ENTER,
+        VALUE_ENTER = 1,
         VALUE_EXIT
     };
 

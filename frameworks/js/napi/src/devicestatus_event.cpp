@@ -156,6 +156,10 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
+    if (value == 0) {
+        DEV_HILOGE(JS_NAPI, "value is invalid");
+        return;
+    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
