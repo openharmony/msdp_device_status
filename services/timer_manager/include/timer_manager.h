@@ -16,13 +16,14 @@
 #ifndef OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
 #define OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
 
+#include <future>
 #include <functional>
 #include <list>
 #include <memory>
 
 #include "nocopyable.h"
 
-#include "i_timer_manager.h"
+#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -33,12 +34,11 @@ public:
     ~TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
 
-    int32_t Init();
+    int32_t Init(IContext *context);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
     int32_t RemoveTimer(int32_t timerId) override;
     int32_t ResetTimer(int32_t timerId);
-    bool IsExist(int32_t timerId);
-    int64_t CalcNextDelay();
+    bool IsExist(int32_t timerId) const;
     void ProcessTimers();
     int GetTimerFd() const;
 
@@ -53,11 +53,19 @@ private:
     };
 
 private:
+    int32_t OnInit(IContext *context);
+    int32_t OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t OnRemoveTimer(int32_t timerId);
+    int32_t OnResetTimer(int32_t timerId);
+    int32_t OnProcessTimers();
+
+    bool OnIsExist(int32_t timerId) const;
+    int32_t RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const;
+
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
-    bool IsExistInternal(int32_t timerId);
     void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int64_t CalcNextDelayInternal();
     void ProcessTimersInternal();
@@ -65,6 +73,7 @@ private:
 
 private:
     int timerFd_ { -1 };
+    IContext *context_ { nullptr };
     std::list<std::unique_ptr<TimerItem>> timers_;
 };
 

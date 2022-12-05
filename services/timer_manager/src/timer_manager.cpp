@@ -17,13 +17,15 @@
 
 #include <sys/timerfd.h>
 
-#include "devicestatus_hilog_wrapper.h"
+#include "devicestatus_define.h"
+#include "fi_log.h"
 #include "util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL_MS = 10000;
@@ -31,11 +33,20 @@ constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 } // namespace
 
-int32_t TimerManager::Init()
+int32_t TimerManager::Init(IContext *context)
 {
+    CHKPR(context, RET_ERR);
+    return context->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
+}
+
+int32_t TimerManager::OnInit(IContext *context)
+{
+    CHKPR(context, RET_ERR);
+    context_ = context;
+
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
     if (timerFd_ < 0) {
-        DEV_HILOGE(SERVICE, "timer: timerfd_create failed");
+        FI_HILOGE("timer: timerfd_create failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -43,17 +54,30 @@ int32_t TimerManager::Init()
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
+    CALL_INFO_TRACE;
+    CHKPR(context_, RET_ERR);
+    return context_->GetDelegateTasks().PostSyncTask(
+        std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
+}
+
+int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+{
     int32_t timerId = AddTimerInternal(intervalMs, repeatCount, callback);
-    if (timerId != NONEXISTENT_ID) {
-        ArmTimer();
-    }
+    ArmTimer();
     return timerId;
 }
 
 int32_t TimerManager::RemoveTimer(int32_t timerId)
 {
+    CALL_INFO_TRACE;
+    CHKPR(context_, RET_ERR);
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
+}
+
+int32_t TimerManager::OnRemoveTimer(int32_t timerId)
+{
     int32_t ret = RemoveTimerInternal(timerId);
-    if (ret != RET_OK) {
+    if (ret == RET_OK) {
         ArmTimer();
     }
     return ret;
@@ -61,25 +85,61 @@ int32_t TimerManager::RemoveTimer(int32_t timerId)
 
 int32_t TimerManager::ResetTimer(int32_t timerId)
 {
+    CALL_INFO_TRACE;
+    CHKPR(context_, RET_ERR);
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
+}
+
+int32_t TimerManager::OnResetTimer(int32_t timerId)
+{
     int32_t ret = ResetTimerInternal(timerId);
     ArmTimer();
     return ret;
 }
 
-bool TimerManager::IsExist(int32_t timerId)
+bool TimerManager::IsExist(int32_t timerId) const
 {
-    return IsExistInternal(timerId);
+    CHKPR(context_, false);
+    std::packaged_task<bool(int32_t)> task { std::bind(&TimerManager::OnIsExist, this, std::placeholders::_1) };
+    auto fu = task.get_future();
+
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
+        std::bind(&TimerManager::RunIsExist, this, std::ref(task), timerId));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post task failed");
+        return false;
+    }
+    return fu.get();
 }
 
-int64_t TimerManager::CalcNextDelay()
+bool TimerManager::OnIsExist(int32_t timerId) const
 {
-    return CalcNextDelayInternal();
+    for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
+        if ((*tIter)->id == timerId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int32_t TimerManager::RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const
+{
+    task(timerId);
+    return RET_OK;
 }
 
 void TimerManager::ProcessTimers()
 {
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
+}
+
+int32_t TimerManager::OnProcessTimers()
+{
     ProcessTimersInternal();
     ArmTimer();
+    return RET_OK;
 }
 
 int32_t TimerManager::TakeNextTimerId()
@@ -101,6 +161,7 @@ int32_t TimerManager::TakeNextTimerId()
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
+    CALL_INFO_TRACE;
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
     } else if (intervalMs > MAX_INTERVAL_MS) {
@@ -120,7 +181,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->callbackCount = 0;
     auto nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-        DEV_HILOGE(SERVICE, "The addition of nextCallTime in TimerItem overflows");
+        FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
@@ -147,7 +208,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             timers_.erase(tIter);
             auto nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-                DEV_HILOGE(SERVICE, "The addition of nextCallTime in TimerItem overflows");
+                FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
                 return RET_ERR;
             }
             timer->callbackCount = 0;
@@ -156,16 +217,6 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
         }
     }
     return RET_ERR;
-}
-
-bool TimerManager::IsExistInternal(int32_t timerId)
-{
-    for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
-        if ((*tIter)->id == timerId) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
@@ -216,7 +267,7 @@ void TimerManager::ProcessTimersInternal()
             continue;
         }
         if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
-            DEV_HILOGE(SERVICE, "The addition of nextCallTime in TimerItem overflows");
+            FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }
         auto callback = curTimer->callback;
@@ -227,23 +278,25 @@ void TimerManager::ProcessTimersInternal()
 
 int32_t TimerManager::ArmTimer()
 {
+    CALL_INFO_TRACE;
     if (timerFd_ < 0) {
-        DEV_HILOGE(SERVICE, "Timer has not been created");
+        FI_HILOGE("TimerManager is uninitialized");
         return RET_ERR;
     }
     struct itimerspec tspec {};
     int64_t expire = CalcNextDelayInternal();
+    FI_HILOGI("next expire %{public}" PRId64, expire);
 
     if (expire == 0) {
         expire = 1;
     }
     if (expire > 0) {
         tspec.it_value.tv_sec = expire / 1000;
-        tspec.it_value.tv_nsec = expire * 1000000;
+        tspec.it_value.tv_nsec = (expire % 1000) * 1000000;
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {
-        DEV_HILOGE(SERVICE, "timer: timerfd_settime error");
+        FI_HILOGE("timer: timerfd_settime error");
         return RET_ERR;
     }
     return RET_OK;

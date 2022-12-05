@@ -48,6 +48,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
 auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
+constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
+constexpr int32_t WAIT_FOR_ONCE { 1 };
+constexpr int32_t MAX_N_RETRIES { 100 };
 } // namespace
 
 struct device_status_epoll_event {
@@ -74,6 +77,9 @@ void DeviceStatusService::OnStart()
         DEV_HILOGE(SERVICE, "OnStart is ready, nothing to do");
         return;
     }
+
+    uint64_t tid = GetThisThreadId();
+    delegateTasks_.SetWorkerThreadId(tid);
 
     if (!Init()) {
         DEV_HILOGE(SERVICE, "OnStart call init fail");
@@ -156,18 +162,17 @@ int DeviceStatusService::Dump(int fd, const std::vector<std::u16string>& args)
 
 bool DeviceStatusService::Init()
 {
-    DEV_HILOGI(SERVICE, "Enter");
-
+    CALL_INFO_TRACE;
     if (!devicestatusManager_) {
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
-        DEV_HILOGE(SERVICE, "OnStart init fail");
+        FI_HILOGE("OnStart init fail");
         return false;
     }
     if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         FI_HILOGE("Create epoll failed");
-        return EPOLL_CREATE_FAIL;
+        return false;
     }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -181,6 +186,10 @@ bool DeviceStatusService::Init()
     }
     if (InitTimerMgr() != RET_OK) {
         FI_HILOGE("TimerMgr init failed");
+        goto INIT_FAIL;
+    }
+    if (devMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("DevMgr init failed");
         goto INIT_FAIL;
     }
     return true;
@@ -236,8 +245,8 @@ void DeviceStatusService::Unsubscribe(const DeviceStatusDataUtils::DeviceStatusT
     ReportMsdpSysEvent(type, false);
 }
 
-DeviceStatusDataUtils::DeviceStatusData DeviceStatusService::GetCache(const \
-    DeviceStatusDataUtils::DeviceStatusType& type)
+DeviceStatusDataUtils::DeviceStatusData DeviceStatusService::GetCache(
+    const DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
@@ -353,7 +362,7 @@ bool DeviceStatusService::IsRunning() const
 
 int32_t DeviceStatusService::InitDelegateTasks()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!delegateTasks_.Init()) {
         FI_HILOGE("The delegate task init failed");
         return RET_ERR;
@@ -369,7 +378,8 @@ int32_t DeviceStatusService::InitDelegateTasks()
 
 int32_t DeviceStatusService::InitTimerMgr()
 {
-    int32_t ret = timerMgr_.Init();
+    CALL_INFO_TRACE;
+    int32_t ret = timerMgr_.Init(this);
     if (ret != RET_OK) {
         FI_HILOGE("TimerMgr init failed");
         return ret;
@@ -384,10 +394,15 @@ int32_t DeviceStatusService::InitTimerMgr()
 
 void DeviceStatusService::OnThread()
 {
-    SetThreadName(std::string("mmi_service"));
+    SetThreadName(std::string("device_status_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
+
+    FI_HILOGI("Failed to enable device manager, try again after delay");
+    EnableDevMgr(MAX_N_RETRIES);
+    FI_HILOGI("Enter loop ...");
+
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] {};
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, -1);
@@ -458,6 +473,7 @@ void DeviceStatusService::OnDelegateTask(epoll_event &ev)
 
 void DeviceStatusService::OnTimeout(epoll_event &ev)
 {
+    CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         uint64_t expiration {};
         int ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
@@ -468,6 +484,28 @@ void DeviceStatusService::OnTimeout(epoll_event &ev)
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup : %{public}s", strerror(errno));
     }
+}
+
+int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
+{
+    CALL_INFO_TRACE;
+    static int32_t timerId { -1 };
+    int32_t ret = devMgr_.Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable device manager");
+        if (nRetries > 0) {
+            timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+                std::bind(&DeviceStatusService::EnableDevMgr, this, nRetries - 1));
+            if (timerId < 0) {
+                FI_HILOGE("AddTimer failed, Failed to enable device manager");
+            }
+        } else {
+            FI_HILOGE("Maximum number of retries exceeded, Failed to enable device manager");
+        }
+    } else if (timerId >= 0) {
+        timerMgr_.RemoveTimer(timerId);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusService::RegisterCoordinationListener()

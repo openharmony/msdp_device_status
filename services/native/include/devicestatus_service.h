@@ -129,6 +129,7 @@ private:
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event &ev);
     void OnTimeout(epoll_event &ev);
+    int32_t EnableDevMgr(int32_t nRetries);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
