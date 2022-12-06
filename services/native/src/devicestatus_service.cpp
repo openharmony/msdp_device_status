@@ -177,6 +177,10 @@ bool DeviceStatusService::Init()
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     CooperateEventMgr->SetIContext(this);
+    if (devMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("DevMgr init failed");
+        goto INIT_FAIL;
+    }
     InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
@@ -186,10 +190,6 @@ bool DeviceStatusService::Init()
     }
     if (InitTimerMgr() != RET_OK) {
         FI_HILOGE("TimerMgr init failed");
-        goto INIT_FAIL;
-    }
-    if (devMgr_.Init(this) != RET_OK) {
-        FI_HILOGE("DevMgr init failed");
         goto INIT_FAIL;
     }
     return true;
