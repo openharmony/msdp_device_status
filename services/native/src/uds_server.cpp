@@ -199,8 +199,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
         circleBufMap_.erase(it);
     }
     close(fd);
-    auto DevicestatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DevicestatusService>::GetInstance();
-    DevicestatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
+    auto DeviceStatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DeviceStatusService>::GetInstance();
+    DeviceStatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)

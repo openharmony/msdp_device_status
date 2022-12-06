@@ -26,18 +26,18 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusSrvStub : public IRemoteStub<Idevicestatus> {
+class DeviceStatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
-    DevicestatusSrvStub() = default;
-    virtual ~DevicestatusSrvStub() = default;
-    DISALLOW_COPY_AND_MOVE(DevicestatusSrvStub);
+    DeviceStatusSrvStub() = default;
+    virtual ~DeviceStatusSrvStub() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     int32_t StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t SubscribeStub(MessageParcel& data);
-    int32_t UnSubscribeStub(MessageParcel& data);
-    int32_t GetLatestDevicestatusDataStub(MessageParcel& data, MessageParcel& reply);
+    int32_t UnsubscribeStub(MessageParcel& data);
+    int32_t GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply);
 
     int32_t StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);

@@ -29,16 +29,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusCallback : public DevicestatusCallbackStub {
+class DeviceStatusCallback : public DeviceStatusCallbackStub {
 public:
     explicit DeviceStatusCallback(napi_env env) : env_(env) {}
     virtual ~DeviceStatusCallback() {};
-    void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData &devicestatusData) override;
+    void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData &devicestatusData) override;
     static void EmitOnEvent(uv_work_t *work, int status);
 private:
     napi_env env_ = { nullptr };
     std::mutex mutex_;
-    DevicestatusDataUtils::DevicestatusData data_;
+    DeviceStatusDataUtils::DeviceStatusData data_;
 };
 
 class DeviceStatusNapi : public DeviceStatusEvent {

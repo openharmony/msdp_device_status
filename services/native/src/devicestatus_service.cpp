@@ -16,14 +16,21 @@
 #include "devicestatus_service.h"
 
 #include <vector>
-#include <ipc_skeleton.h>
-#include <unistd.h>
+
 #include <csignal>
+
 #include <sys/signalfd.h>
+#include <unistd.h>
+
+#include <ipc_skeleton.h>
+
+#include "hisysevent.h"
+#include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "cooperate_event_manager.h"
 #include "input_device_cooperate_sm.h"
@@ -32,19 +39,18 @@
 #include "devicestatus_permission.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
-#include "devicestatus_define.h"
-#include "hisysevent.h"
-#include "hitrace_meter.h"
-#include "timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::HiviewDFX;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusService" };
-auto ms = DelayedSpSingleton<DevicestatusService>::GetInstance();
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
+auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
 const bool G_REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(ms.GetRefPtr());
+constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
+constexpr int32_t WAIT_FOR_ONCE { 1 };
+constexpr int32_t MAX_N_RETRIES { 100 };
 } // namespace
 
 struct device_status_epoll_event {
@@ -52,19 +58,19 @@ struct device_status_epoll_event {
     EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
-DevicestatusService::DevicestatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
+DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
 {
     DEV_HILOGD(SERVICE, "Add SystemAbility");
 }
 
-DevicestatusService::~DevicestatusService() {}
+DeviceStatusService::~DeviceStatusService() {}
 
-void DevicestatusService::OnDump()
+void DeviceStatusService::OnDump()
 {
     DEV_HILOGI(SERVICE, "OnDump");
 }
 
-void DevicestatusService::OnStart()
+void DeviceStatusService::OnStart()
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (ready_) {
@@ -72,21 +78,24 @@ void DevicestatusService::OnStart()
         return;
     }
 
+    uint64_t tid = GetThisThreadId();
+    delegateTasks_.SetWorkerThreadId(tid);
+
     if (!Init()) {
         DEV_HILOGE(SERVICE, "OnStart call init fail");
         return;
     }
-    if (!Publish(DelayedSpSingleton<DevicestatusService>::GetInstance())) {
+    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
         DEV_HILOGE(SERVICE, "OnStart register to system ability manager failed");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
-    t_ = std::thread(std::bind(&DevicestatusService::OnThread, this));
+    t_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
     t_.join();
 }
 
-void DevicestatusService::OnStop()
+void DeviceStatusService::OnStop()
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (!ready_) {
@@ -102,14 +111,29 @@ void DevicestatusService::OnStop()
     DEV_HILOGI(SERVICE, "unload algorithm library exit");
 }
 
-int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
+IDelegateTasks& DeviceStatusService::GetDelegateTasks()
+{
+    return delegateTasks_;
+}
+
+IDeviceManager& DeviceStatusService::GetDeviceManager()
+{
+    return devMgr_;
+}
+
+ITimerManager& DeviceStatusService::GetTimerManager()
+{
+    return timerMgr_;
+}
+
+int DeviceStatusService::Dump(int fd, const std::vector<std::u16string>& args)
 {
     DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
     if (fd < 0) {
         DEV_HILOGE(SERVICE, "fd is invalid");
         return RET_NG;
     }
-    DevicestatusDumper &deviceStatusDumper = DevicestatusDumper::GetInstance();
+    DeviceStatusDumper &deviceStatusDumper = DeviceStatusDumper::GetInstance();
     if (args.empty()) {
         DEV_HILOGE(SERVICE, "param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
@@ -122,13 +146,13 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
         return Str16ToStr8(arg);
     });
 
-    DevicestatusDataUtils::DevicestatusType type;
-    std::vector<DevicestatusDataUtils::DevicestatusData> datas;
-    for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
-        type <= DevicestatusDataUtils::TYPE_LID_OPEN;
-        type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
-        DevicestatusDataUtils::DevicestatusData data = GetCache(type);
-        if (data.value != DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) {
+    DeviceStatusDataUtils::DeviceStatusType type;
+    std::vector<DeviceStatusDataUtils::DeviceStatusData> datas;
+    for (type = DeviceStatusDataUtils::TYPE_HIGH_STILL;
+        type <= DeviceStatusDataUtils::TYPE_LID_OPEN;
+        type = (DeviceStatusDataUtils::DeviceStatusType)(type+1)) {
+        DeviceStatusDataUtils::DeviceStatusData data = GetCache(type);
+        if (data.value != DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) {
             datas.emplace_back(data);
         }
     }
@@ -136,37 +160,51 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
     return RET_OK;
 }
 
-bool DevicestatusService::Init()
+bool DeviceStatusService::Init()
 {
-    DEV_HILOGI(SERVICE, "Enter");
-
+    CALL_INFO_TRACE;
     if (!devicestatusManager_) {
-        devicestatusManager_ = std::make_shared<DevicestatusManager>(ms);
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
-        DEV_HILOGE(SERVICE, "OnStart init fail");
+        FI_HILOGE("OnStart init fail");
         return false;
     }
     if (EpollCreate(MAX_EVENT_SIZE) < 0) {
         FI_HILOGE("Create epoll failed");
-        return EPOLL_CREATE_FAIL;
-    }
-    if (!InitDelegateTasks()) {
-        FI_HILOGE("Delegate tasks init failed");
         return false;
     }
-    if (TimerMgr->Init() != RET_OK) {
+
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    CooperateEventMgr->SetIContext(this);
+    if (devMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("DevMgr init failed");
+        goto INIT_FAIL;
+    }
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+
+    if (InitDelegateTasks() != RET_OK) {
+        FI_HILOGE("Delegate tasks init failed");
+        goto INIT_FAIL;
+    }
+    if (InitTimerMgr() != RET_OK) {
         FI_HILOGE("TimerMgr init failed");
+        goto INIT_FAIL;
     }
     return true;
+
+INIT_FAIL:
+    EpollClose();
+    return false;
 }
 
-void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DeviceStatusService::Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
-        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        DEV_HILOGI(SERVICE, "Unsubscribe func is nullptr");
         return;
     }
 
@@ -177,19 +215,19 @@ void DevicestatusService::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-    DevicestatusDumper::GetInstance().SaveAppInfo(appInfo);
+    DeviceStatusDumper::GetInstance().SaveAppInfo(appInfo);
     StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
     devicestatusManager_->Subscribe(type, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportMsdpSysEvent(type, true);
 }
 
-void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusType& type,
+void DeviceStatusService::Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
-        DEV_HILOGI(SERVICE, "UnSubscribe func is nullptr");
+        DEV_HILOGI(SERVICE, "Unsubscribe func is nullptr");
         return;
     }
 
@@ -200,42 +238,42 @@ void DevicestatusService::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-    DevicestatusDumper::GetInstance().RemoveAppInfo(appInfo);
-    StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
-    devicestatusManager_->UnSubscribe(type, callback);
+    DeviceStatusDumper::GetInstance().RemoveAppInfo(appInfo);
+    StartTrace(HITRACE_TAG_MSDP, "serviceUnsubscribeStart");
+    devicestatusManager_->Unsubscribe(type, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportMsdpSysEvent(type, false);
 }
 
-DevicestatusDataUtils::DevicestatusData DevicestatusService::GetCache(const \
-    DevicestatusDataUtils::DevicestatusType& type)
+DeviceStatusDataUtils::DeviceStatusData DeviceStatusService::GetCache(
+    const DeviceStatusDataUtils::DeviceStatusType& type)
 {
     DEV_HILOGI(SERVICE, "Enter");
     if (devicestatusManager_ == nullptr) {
-        DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
-        data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
-        DEV_HILOGI(SERVICE, "GetLatestDevicestatusData func is nullptr,return default!");
+        DeviceStatusDataUtils::DeviceStatusData data = {type, DeviceStatusDataUtils::DeviceStatusValue::VALUE_EXIT};
+        data.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
+        DEV_HILOGI(SERVICE, "GetLatestDeviceStatusData func is nullptr,return default!");
         return data;
     }
-    return devicestatusManager_->GetLatestDevicestatusData(type);
+    return devicestatusManager_->GetLatestDeviceStatusData(type);
 }
 
-void DevicestatusService::ReportMsdpSysEvent(const DevicestatusDataUtils::DevicestatusType& type, bool enable)
+void DeviceStatusService::ReportMsdpSysEvent(const DeviceStatusDataUtils::DeviceStatusType& type, bool enable)
 {
     auto uid = this->GetCallingUid();
     auto callerToken = this->GetCallingTokenID();
     std::string packageName("");
     devicestatusManager_->GetPackageName(callerToken, packageName);
     if (enable) {
-        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,
+        HiSysEventWrite(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,
             "UID", uid, "PKGNAME", packageName, "TYPE", type);
         return;
     }
-    HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
+    HiSysEventWrite(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
         "UID", uid, "PKGNAME", packageName, "TYPE", type);
 }
 
-int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType)
 {
     FI_HILOGD("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
@@ -255,18 +293,18 @@ int32_t DevicestatusService::AllocSocketFd(const std::string &programName, const
     return RET_OK;
 }
 
-void DevicestatusService::OnConnected(SessionPtr s)
+void DeviceStatusService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     FI_HILOGI("fd:%{public}d", s->GetFd());
 }
-void DevicestatusService::OnDisconnected(SessionPtr s)
+void DeviceStatusService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
 }
 
-int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
+int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
 {
     if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
         FI_HILOGE("Invalid param type");
@@ -298,7 +336,7 @@ int32_t DevicestatusService::AddEpoll(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
-int32_t DevicestatusService::DelEpoll(EpollEventType type, int32_t fd)
+int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
 {
     if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
         FI_HILOGE("Invalid param type");
@@ -317,39 +355,57 @@ int32_t DevicestatusService::DelEpoll(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
-bool DevicestatusService::IsRunning() const
+bool DeviceStatusService::IsRunning() const
 {
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
-bool DevicestatusService::InitDelegateTasks()
+int32_t DeviceStatusService::InitDelegateTasks()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!delegateTasks_.Init()) {
         FI_HILOGE("The delegate task init failed");
-        return false;
+        return RET_ERR;
     }
     auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
-    if (ret <  0) {
+    if (ret != RET_OK) {
         FI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        EpollClose();
-        return false;
+        return ret;
     }
     FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
-    return true;
+    return RET_OK;
 }
 
-void DevicestatusService::OnThread()
+int32_t DeviceStatusService::InitTimerMgr()
 {
-    SetThreadName(std::string("mmi_service"));
+    CALL_INFO_TRACE;
+    int32_t ret = timerMgr_.Init(this);
+    if (ret != RET_OK) {
+        FI_HILOGE("TimerMgr init failed");
+        return ret;
+    }
+    ret = AddEpoll(EPOLL_EVENT_TIMER, timerMgr_.GetTimerFd());
+    if (ret != RET_OK) {
+        FI_HILOGE("AddEpoll for timer fail");
+        return ret;
+    }
+    return RET_OK;
+}
+
+void DeviceStatusService::OnThread()
+{
+    SetThreadName(std::string("device_status_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
+
+    FI_HILOGI("Failed to enable device manager, try again after delay");
+    EnableDevMgr(MAX_N_RETRIES);
+    FI_HILOGI("Enter loop ...");
+
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        epoll_event ev[MAX_EVENT_SIZE] = {};
-        int32_t timeout = TimerMgr->CalcNextDelay();
-        FI_HILOGD("timeout:%{public}d", timeout);
-        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, -1);
+        epoll_event ev[MAX_EVENT_SIZE] {};
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, -1);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
             CHKPC(epollEvent);
@@ -359,18 +415,17 @@ void DevicestatusService::OnThread()
                 OnSignalEvent(epollEvent->fd);
             } else if (epollEvent->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
+            } else if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
+                OnTimeout(ev[i]);
             } else {
                 FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->event_type);
             }
         }
-        TimerMgr->ProcessTimers();
-        if (state_ != ServiceRunningState::STATE_RUNNING) {
-            break;
-        }
     }
     FI_HILOGD("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
-void DevicestatusService::OnSignalEvent(int32_t signalFd)
+
+void DeviceStatusService::OnSignalEvent(int32_t signalFd)
 {
     CALL_DEBUG_ENTER;
     signalfd_siginfo sigInfo;
@@ -400,13 +455,13 @@ void DevicestatusService::OnSignalEvent(int32_t signalFd)
     }
 }
 
-void DevicestatusService::OnDelegateTask(epoll_event& ev)
+void DeviceStatusService::OnDelegateTask(epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
         FI_HILOGW("Not epollin");
         return;
     }
-    DelegateTasks::TaskData data = {};
+    DelegateTasks::TaskData data {};
     auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
     if (res == -1) {
         FI_HILOGW("Read failed erron:%{public}d", errno);
@@ -416,13 +471,50 @@ void DevicestatusService::OnDelegateTask(epoll_event& ev)
     delegateTasks_.ProcessTasks();
 }
 
-int32_t DevicestatusService::RegisterCoordinationListener()
+void DeviceStatusService::OnTimeout(epoll_event &ev)
+{
+    CALL_INFO_TRACE;
+    if ((ev.events & EPOLLIN) == EPOLLIN) {
+        uint64_t expiration {};
+        int ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
+        if (ret < 0) {
+            FI_HILOGE("Read expiration failed: %{public}s", strerror(errno));
+        }
+        timerMgr_.ProcessTimers();
+    } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
+        FI_HILOGE("Epoll hangup : %{public}s", strerror(errno));
+    }
+}
+
+int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
+{
+    CALL_INFO_TRACE;
+    static int32_t timerId { -1 };
+    int32_t ret = devMgr_.Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable device manager");
+        if (nRetries > 0) {
+            timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+                std::bind(&DeviceStatusService::EnableDevMgr, this, nRetries - 1));
+            if (timerId < 0) {
+                FI_HILOGE("AddTimer failed, Failed to enable device manager");
+            }
+        } else {
+            FI_HILOGE("Maximum number of retries exceeded, Failed to enable device manager");
+        }
+    } else if (timerId >= 0) {
+        timerMgr_.RemoveTimer(timerId);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnRegisterCoordinationListener, this, pid));
+        std::bind(&DeviceStatusService::OnRegisterCoordinationListener, this, pid));
     if (ret != RET_OK) {
         FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -431,13 +523,13 @@ int32_t DevicestatusService::RegisterCoordinationListener()
     return RET_OK;
 }
 
-int32_t DevicestatusService::UnregisterCoordinationListener()
+int32_t DeviceStatusService::UnregisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnUnregisterCoordinationListener, this, pid));
+        std::bind(&DeviceStatusService::OnUnregisterCoordinationListener, this, pid));
     if (ret != RET_OK) {
         FI_HILOGE("OnUnregisterCoordinationListener failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -446,13 +538,13 @@ int32_t DevicestatusService::UnregisterCoordinationListener()
     return RET_OK;
 }
 
-int32_t DevicestatusService::EnableInputDeviceCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusService::EnableInputDeviceCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnEnableInputDeviceCoordination, this, pid, userData, enabled));
+        std::bind(&DeviceStatusService::OnEnableInputDeviceCoordination, this, pid, userData, enabled));
     if (ret != RET_OK) {
         FI_HILOGE("OnEnableInputDeviceCoordination failed, ret:%{public}d", ret);
         return ret;
@@ -464,14 +556,14 @@ int32_t DevicestatusService::EnableInputDeviceCoordination(int32_t userData, boo
     return RET_OK;
 }
 
-int32_t DevicestatusService::StartInputDeviceCoordination(int32_t userData,
+int32_t DeviceStatusService::StartInputDeviceCoordination(int32_t userData,
     const std::string &sinkDeviceId, int32_t srcInputDeviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnStartInputDeviceCoordination,
+        std::bind(&DeviceStatusService::OnStartInputDeviceCoordination,
         this, pid, userData, sinkDeviceId, srcInputDeviceId));
     if (ret != RET_OK) {
         FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
@@ -485,13 +577,13 @@ int32_t DevicestatusService::StartInputDeviceCoordination(int32_t userData,
     return RET_OK;
 }
 
-int32_t DevicestatusService::StopDeviceCoordination(int32_t userData)
+int32_t DeviceStatusService::StopDeviceCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnStopInputDeviceCoordination, this, pid, userData));
+        std::bind(&DeviceStatusService::OnStopInputDeviceCoordination, this, pid, userData));
     if (ret != RET_OK) {
         FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
         return ret;
@@ -502,13 +594,13 @@ int32_t DevicestatusService::StopDeviceCoordination(int32_t userData)
     return RET_OK;
 }
 
-int32_t DevicestatusService::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusService::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DevicestatusService::OnGetInputDeviceCoordinationState, this, pid, userData, deviceId));
+        std::bind(&DeviceStatusService::OnGetInputDeviceCoordinationState, this, pid, userData, deviceId));
     if (ret != RET_OK) {
         FI_HILOGE("OnGetInputDeviceCoordinationState failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -522,7 +614,7 @@ int32_t DevicestatusService::GetInputDeviceCoordinationState(int32_t userData, c
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-int32_t DevicestatusService::OnRegisterCoordinationListener(int32_t pid)
+int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -536,7 +628,7 @@ int32_t DevicestatusService::OnRegisterCoordinationListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t DevicestatusService::OnUnregisterCoordinationListener(int32_t pid)
+int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -548,7 +640,7 @@ int32_t DevicestatusService::OnUnregisterCoordinationListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t DevicestatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled)
+int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
     InputDevCooSM->EnableInputDeviceCooperate(enabled);
@@ -570,7 +662,7 @@ int32_t DevicestatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_
     return RET_OK;
 }
 
-int32_t DevicestatusService::OnStartInputDeviceCoordination(int32_t pid,
+int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     int32_t userData, const std::string &sinkDeviceId, int32_t srcInputDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -592,7 +684,7 @@ int32_t DevicestatusService::OnStartInputDeviceCoordination(int32_t pid,
     return RET_OK;
 }
 
-int32_t DevicestatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t userData)
+int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -613,7 +705,7 @@ int32_t DevicestatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     return RET_OK;
 }
 
-int32_t DevicestatusService::OnGetInputDeviceCoordinationState(
+int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
     int32_t pid, int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;

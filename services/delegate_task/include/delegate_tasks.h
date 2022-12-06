@@ -22,13 +22,14 @@
 #include <queue>
 
 #include "id_factory.h"
+#include "i_delegate_tasks.h"
 #include "util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using DTaskCallback = std::function<int32_t()>;
-class DelegateTasks final : public IdFactory<int32_t> {
+class DelegateTasks final : public IDelegateTasks,
+                            public IdFactory<int32_t> {
 public:
     struct TaskData {
         uint64_t tid { 0 };
@@ -73,8 +74,8 @@ public:
 
     bool Init();
     void ProcessTasks();
-    int32_t PostSyncTask(DTaskCallback callback);
-    int32_t PostAsyncTask(DTaskCallback callback);
+    int32_t PostSyncTask(DTaskCallback callback) override;
+    int32_t PostAsyncTask(DTaskCallback callback) override;
 
     int32_t GetReadFd() const
     {

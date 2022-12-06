@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusPermission {
+class DeviceStatusPermission {
 public:
     /* check caller's permission by finding pid uid by system */
     static bool CheckCallingPermission(const std::string &permissionName);

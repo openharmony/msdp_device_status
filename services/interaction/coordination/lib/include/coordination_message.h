@@ -13,23 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_ALGORITHM_CALLBACK_H
-#define IDEVICESTATUS_ALGORITHM_CALLBACK_H
-
-#include <iremote_broker.h>
-
-#include "devicestatus_data_utils.h"
-
+#ifndef OHOS_MSDP_DEVICE_STATUS_COORDINATION_MESSAGE_H
+#define OHOS_MSDP_DEVICE_STATUS_COORDINATION_MESSAGE_H
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IdevicestatusAlgorithmCallback : public IRemoteBroker {
-public:
-    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& data) = 0;
-
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithmCallback");
+enum class CooperationMessage {
+    OPEN_SUCCESS = 100,
+    OPEN_FAIL = 101,
+    INFO_START = 200,
+    INFO_SUCCESS = 201,
+    INFO_FAIL = 202,
+    CLOSE = 300,
+    CLOSE_SUCCESS = 301,
+    STOP = 400,
+    STOP_SUCCESS = 401,
+    STOP_FAIL = 402,
+    STATE_ON = 500,
+    STATE_OFF = 501,
+    INPUT_DEVICE_ID_ERROR = 4400001,
+    COOPERATE_FAIL = 4400002,
+    COOPERATION_DEVICE_ERROR = 4400003,
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_ALGORITHM_CALLBACK_H
+#endif // OHOS_MSDP_DEVICE_STATUS_COORDINATION_MESSAGE_H

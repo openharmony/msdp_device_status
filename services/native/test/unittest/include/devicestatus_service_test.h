@@ -24,14 +24,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 const std::u16string ARGS_H = u"-h";
-class DevicestatusServiceTest : public testing::Test {
+class DeviceStatusServiceTest : public testing::Test {
 public:
 
-    class DevicestatusServiceTestCallback : public DevicestatusCallbackStub {
+    class DeviceStatusServiceTestCallback : public DeviceStatusCallbackStub {
     public:
-        DevicestatusServiceTestCallback() {};
-        virtual ~DevicestatusServiceTestCallback() {};
-        virtual void OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData) override;
+        DeviceStatusServiceTestCallback() {};
+        virtual ~DeviceStatusServiceTestCallback() {};
+        virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus

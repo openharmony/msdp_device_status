@@ -37,8 +37,8 @@ DeviceStatusMsdpMock* g_msdpMock = nullptr;
 } // namespace
 
 std::vector<int32_t> DeviceStatusMsdpMock::enabledType_ =
-    std::vector<int32_t> (static_cast<int32_t>(DevicestatusDataUtils::DevicestatusType::TYPE_MAX),
-    static_cast<int32_t>(DevicestatusDataUtils::Value::INVALID));
+    std::vector<int32_t> (static_cast<int32_t>(DeviceStatusDataUtils::DeviceStatusType::TYPE_MAX),
+    static_cast<int32_t>(DeviceStatusDataUtils::Value::INVALID));
 
 bool DeviceStatusMsdpMock::Init()
 {
@@ -67,19 +67,19 @@ void DeviceStatusMsdpMock::UnregisterCallback()
     callback_ = nullptr;
 }
 
-void DeviceStatusMsdpMock::Enable(DevicestatusDataUtils::DevicestatusType type)
+void DeviceStatusMsdpMock::Enable(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (type < DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL ||
-        type >= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
+    if (type < DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL ||
+        type >= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN) {
         DEV_HILOGE(SERVICE, "Type error");
     }
-    enabledType_[type] = static_cast<int32_t>(DevicestatusDataUtils::Value::VALID);
+    enabledType_[type] = static_cast<int32_t>(DeviceStatusDataUtils::Value::VALID);
     Init();
     DEV_HILOGD(SERVICE, "Exit");
 }
 
-void DeviceStatusMsdpMock::Disable(DevicestatusDataUtils::DevicestatusType type)
+void DeviceStatusMsdpMock::Disable(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
     scFlag_ = false;
@@ -87,15 +87,15 @@ void DeviceStatusMsdpMock::Disable(DevicestatusDataUtils::DevicestatusType type)
     DEV_HILOGD(SERVICE, "Exit");
 }
 
-void DeviceStatusMsdpMock::DisableCount(DevicestatusDataUtils::DevicestatusType type)
+void DeviceStatusMsdpMock::DisableCount(DeviceStatusDataUtils::DeviceStatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    enabledType_[type] = static_cast<int32_t>(DevicestatusDataUtils::Value::INVALID);
+    enabledType_[type] = static_cast<int32_t>(DeviceStatusDataUtils::Value::INVALID);
     dataParse_->DisableCount(type);
     DEV_HILOGD(SERVICE, "Exit");
 }
 
-ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
+ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const DeviceStatusDataUtils::DeviceStatusData& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (g_msdpMock == nullptr) {
@@ -177,13 +177,15 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    DevicestatusDataUtils::DevicestatusData data;
-    for (int32_t i = int(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
-        i <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN; ++i) {
-        if (enabledType_[i] == static_cast<int32_t>(DevicestatusDataUtils::Value::VALID)) {
-            DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType(i);
+    DeviceStatusDataUtils::DeviceStatusData data;
+    for (int32_t i = int(DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL);
+        i <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN; ++i) {
+        if (enabledType_[i] == static_cast<int32_t>(DeviceStatusDataUtils::Value::VALID)) {
+            DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType(i);
             DEV_HILOGE(SERVICE, "type:%{public}d", type);
             if (dataParse_ == nullptr) {
+                DEV_HILOGE(SERVICE, "dataParse_ is nullptr");
+                return;
             }
             dataParse_->ParseDeviceStatusData(data, type);
             NotifyMsdpImpl(data);
@@ -238,14 +240,14 @@ void DeviceStatusMsdpMock::LoopingThreadEntry()
     }
 }
 
-extern "C" DevicestatusMsdpInterface *Create(void)
+extern "C" DeviceStatusMsdpInterface *Create(void)
 {
     DEV_HILOGI(SERVICE, "Enter");
     g_msdpMock = new DeviceStatusMsdpMock();
     return g_msdpMock;
 }
 
-extern "C" void Destroy(const DevicestatusMsdpInterface* algorithm)
+extern "C" void Destroy(const DeviceStatusMsdpInterface* algorithm)
 {
     DEV_HILOGI(SERVICE, "Enter");
     delete algorithm;

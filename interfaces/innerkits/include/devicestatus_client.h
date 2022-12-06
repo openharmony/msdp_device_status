@@ -27,17 +27,17 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusClient final : public DelayedRefSingleton<DevicestatusClient> {
-    DECLARE_DELAYED_REF_SINGLETON(DevicestatusClient)
+class DeviceStatusClient final : public DelayedRefSingleton<DeviceStatusClient> {
+    DECLARE_DELAYED_REF_SINGLETON(DeviceStatusClient)
 
 public:
-    DISALLOW_COPY_AND_MOVE(DevicestatusClient);
+    DISALLOW_COPY_AND_MOVE(DeviceStatusClient);
 
-    void SubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
+    void SubscribeCallback(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback);
-    void UnSubscribeCallback(const DevicestatusDataUtils::DevicestatusType& type, \
+    void UnsubscribeCallback(const DeviceStatusDataUtils::DeviceStatusType& type, \
         const sptr<IdevicestatusCallback>& callback);
-    DevicestatusDataUtils::DevicestatusData GetDevicestatusData(const DevicestatusDataUtils::DevicestatusType& type);
+    DeviceStatusDataUtils::DeviceStatusData GetDeviceStatusData(const DeviceStatusDataUtils::DeviceStatusType& type);
 
     int32_t RegisterCoordinationListener();
     int32_t UnregisterCoordinationListener();
@@ -49,13 +49,13 @@ public:
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
 private:
-    class DevicestatusDeathRecipient : public IRemoteObject::DeathRecipient {
+    class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        DevicestatusDeathRecipient() = default;
-        ~DevicestatusDeathRecipient() = default;
+        DeviceStatusDeathRecipient() = default;
+        ~DeviceStatusDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote);
     private:
-        DISALLOW_COPY_AND_MOVE(DevicestatusDeathRecipient);
+        DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };
 
     ErrCode Connect();

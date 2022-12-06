@@ -256,12 +256,12 @@ void Client::OnConnected()
 int32_t Client::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = DevicestatusClient::GetInstance().AllocSocketPair(CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret = DeviceStatusClient::GetInstance().AllocSocketPair(CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         FI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
-    fd_ = DevicestatusClient::GetInstance().GetClientSocketFdOfAllocedSocketPair();
+    fd_ = DeviceStatusClient::GetInstance().GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == -1) {
         FI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     }

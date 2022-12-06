@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusMsdpMock final : public DevicestatusMsdpInterface {
+class DeviceStatusMsdpMock final : public DeviceStatusMsdpInterface {
 public:
     DeviceStatusMsdpMock() = default;
     ~DeviceStatusMsdpMock() = default;
@@ -47,12 +47,12 @@ public:
     int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
-    void Enable(DevicestatusDataUtils::DevicestatusType type) override;
-    void Disable(DevicestatusDataUtils::DevicestatusType type) override;
-    void DisableCount(DevicestatusDataUtils::DevicestatusType type) override;
+    void Enable(DeviceStatusDataUtils::DeviceStatusType type) override;
+    void Disable(DeviceStatusDataUtils::DeviceStatusType type) override;
+    void DisableCount(DeviceStatusDataUtils::DeviceStatusType type) override;
     void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) override;
     void UnregisterCallback() override;
-    ErrCode NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data);
+    ErrCode NotifyMsdpImpl(const DeviceStatusDataUtils::DeviceStatusData& data);
     void GetDeviceStatusData();
     std::shared_ptr<MsdpAlgorithmCallback> GetCallbackImpl()
     {

@@ -13,23 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_ALGORITHM_CALLBACK_H
-#define IDEVICESTATUS_ALGORITHM_CALLBACK_H
+#ifndef OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H
+#define OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H
 
-#include <iremote_broker.h>
+#include <memory>
 
-#include "devicestatus_data_utils.h"
+#include "i_device.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IdevicestatusAlgorithmCallback : public IRemoteBroker {
+class IDeviceObserver {
 public:
-    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& data) = 0;
+    IDeviceObserver() = default;
+    virtual ~IDeviceObserver() = default;
 
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithmCallback");
+    virtual void OnDeviceAdded(std::shared_ptr<IDevice>) = 0;
+    virtual void OnDeviceRemoved(std::shared_ptr<IDevice>) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_ALGORITHM_CALLBACK_H
+#endif // OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H

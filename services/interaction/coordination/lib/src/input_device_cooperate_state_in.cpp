@@ -60,9 +60,9 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
 int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
-    std::string originNetworkId = context->GetOriginNetworkId(startInputDeviceId);
+    std::string originNetworkId = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
     if (remoteNetworkId == originNetworkId) {
         ComeBack(remoteNetworkId, startInputDeviceId);
         return RET_OK;
@@ -89,10 +89,12 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string 
 int32_t InputDeviceCooperateStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
-    std::vector<std::string> dhids = context->GetCooperateDhids(startDhid_);
-    std::string sink = context->GetOriginNetworkId(startDhid_);
+    IDeviceManager &devMgr = context->GetDeviceManager();
+
+    std::vector<std::string> dhids = devMgr.GetCooperateDhids(startDhid_);
+    std::string sink = devMgr.GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
@@ -109,10 +111,12 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
         IInputDeviceCooperateState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
         return;
     }
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    std::string sinkNetworkId = context->GetOriginNetworkId(startInputDeviceId);
-    std::vector<std::string> dhid = context->GetCooperateDhids(startInputDeviceId);
+    IDeviceManager &devMgr = context->GetDeviceManager();
+
+    std::string sinkNetworkId = devMgr.GetOriginNetworkId(startInputDeviceId);
+    std::vector<std::string> dhid = devMgr.GetCooperateDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
     std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
@@ -155,9 +159,9 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
 void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIInputContext();
+    auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
-    std::vector<std::string> dhids = context->GetCooperateDhids(startInputDeviceId);
+    std::vector<std::string> dhids = context->GetDeviceManager().GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }

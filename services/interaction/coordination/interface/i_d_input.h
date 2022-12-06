@@ -20,7 +20,7 @@
 #include <memory>
 #include <vector>
 
-#include "i_input_context.h"
+#include "i_context.h"
 #include "key_event.h"
 #include "uds_session.h"
 
@@ -52,7 +52,7 @@ public:
     virtual void Dump(int32_t fd, const std::vector<std::string>& args) = 0;
 };
 
-extern "C" IDInput* CreateIDInpt(IInputContext* context);
+extern "C" IDInput* CreateIDInpt(IContext* context);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

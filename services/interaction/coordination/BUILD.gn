@@ -12,23 +12,3 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
-
-config("coordination_config") {
-  include_dirs = [
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_service_path}/interaction/coordination/include",
-    "${device_status_service_path}/interaction/coordination/lib/include",
-    "${device_status_service_path}/interaction/coordination/interface",
-    "${device_status_service_path}/interaction/coordination/lib/stub",
-    "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-  ]
-}
-
-group("coordination_group") {
-  deps = []
-  if (device_status_feature_coordination) {
-    deps += [ "${device_status_service_path}/interaction/coordination/lib:coordination_lib" ]
-  }
-}

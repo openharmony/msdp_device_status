@@ -38,28 +38,28 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusMsdpClientImpl : public DevicestatusMsdpInterface::MsdpAlgorithmCallback {
+class DeviceStatusMsdpClientImpl : public DeviceStatusMsdpInterface::MsdpAlgorithmCallback {
 public:
-    using CallbackManager = std::function<int32_t(const DevicestatusDataUtils::DevicestatusData&)>;
+    using CallbackManager = std::function<int32_t(const DeviceStatusDataUtils::DeviceStatusData&)>;
 
-    ErrCode InitMsdpImpl(DevicestatusDataUtils::DevicestatusType type);
-    ErrCode DisableMsdpImpl(DevicestatusDataUtils::DevicestatusType type);
+    ErrCode InitMsdpImpl(DeviceStatusDataUtils::DeviceStatusType type);
+    ErrCode DisableMsdpImpl(DeviceStatusDataUtils::DeviceStatusType type);
     ErrCode RegisterImpl(const CallbackManager& callback);
     ErrCode UnregisterImpl();
-    int32_t MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data);
+    int32_t MsdpCallback(const DeviceStatusDataUtils::DeviceStatusData& data);
     ErrCode RegisterMsdp();
     ErrCode UnregisterMsdp(void);
-    DevicestatusDataUtils::DevicestatusData SaveObserverData(const DevicestatusDataUtils::DevicestatusData& data);
-    std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
+    DeviceStatusDataUtils::DeviceStatusData SaveObserverData(const DeviceStatusDataUtils::DeviceStatusData& data);
+    std::map<DeviceStatusDataUtils::DeviceStatusType, DeviceStatusDataUtils::DeviceStatusValue> GetObserverData() const;
     int32_t LoadAlgorithmLibrary(bool bCreate);
     int32_t UnloadAlgorithmLibrary(bool bCreate);
 private:
-    ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
-    DevicestatusMsdpInterface* GetAlgorithmInst();
+    ErrCode ImplCallback(const DeviceStatusDataUtils::DeviceStatusData& data);
+    DeviceStatusMsdpInterface* GetAlgorithmInst();
     MsdpAlgorithmHandle mAlgorithm_;
     std::mutex mMutex_;
     bool notifyManagerFlag_ = false;
-    void OnResult(const DevicestatusDataUtils::DevicestatusData& data) override;
+    void OnResult(const DeviceStatusDataUtils::DeviceStatusData& data) override;
 };
 } // namespace DeviceStatus
 } // Msdp

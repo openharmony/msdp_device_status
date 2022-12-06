@@ -26,29 +26,29 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DevicestatusMsdpInterface {
+class DeviceStatusMsdpInterface {
 public:
-    DevicestatusMsdpInterface() {}
-    virtual ~DevicestatusMsdpInterface() {}
+    DeviceStatusMsdpInterface() {}
+    virtual ~DeviceStatusMsdpInterface() {}
     class MsdpAlgorithmCallback {
     public:
         MsdpAlgorithmCallback() = default;
         virtual ~MsdpAlgorithmCallback() = default;
-        virtual void OnResult(const DevicestatusDataUtils::DevicestatusData& data) = 0;
+        virtual void OnResult(const DeviceStatusDataUtils::DeviceStatusData& data) = 0;
     };
 
     virtual void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) = 0;
     virtual void UnregisterCallback() = 0;
-    virtual void Enable(DevicestatusDataUtils::DevicestatusType type) = 0;
-    virtual void Disable(DevicestatusDataUtils::DevicestatusType type) = 0;
-    virtual void DisableCount(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual void Enable(DeviceStatusDataUtils::DeviceStatusType type) = 0;
+    virtual void Disable(DeviceStatusDataUtils::DeviceStatusType type) = 0;
+    virtual void DisableCount(DeviceStatusDataUtils::DeviceStatusType type) = 0;
 };
 
 struct MsdpAlgorithmHandle {
     void* handle;
-    DevicestatusMsdpInterface* (*create)();
-    void* (*destroy)(DevicestatusMsdpInterface*);
-    DevicestatusMsdpInterface* pAlgorithm;
+    DeviceStatusMsdpInterface* (*create)();
+    void* (*destroy)(DeviceStatusMsdpInterface*);
+    DeviceStatusMsdpInterface* pAlgorithm;
     MsdpAlgorithmHandle() : handle(nullptr), create(nullptr), destroy(nullptr), pAlgorithm(nullptr) {}
     ~MsdpAlgorithmHandle() {}
     void Clear()

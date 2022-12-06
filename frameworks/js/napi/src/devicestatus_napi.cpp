@@ -42,12 +42,12 @@ std::map<int32_t, sptr<IdevicestatusCallback>> DeviceStatusNapi::callbackMap_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
 struct ResponseEntity {
-    DevicestatusDataUtils::DevicestatusValue value;
+    DeviceStatusDataUtils::DeviceStatusValue value;
 };
 
-void DeviceStatusCallback::OnDevicestatusChanged(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
+void DeviceStatusCallback::OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
 {
-    DEV_HILOGD(JS_NAPI, "OnDevicestatusChanged enter");
+    DEV_HILOGD(JS_NAPI, "OnDeviceStatusChanged enter");
     std::lock_guard<std::mutex> guard(mutex_);
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
@@ -72,7 +72,7 @@ void DeviceStatusCallback::OnDevicestatusChanged(const DevicestatusDataUtils::De
 
 void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int status)
 {
-    DevicestatusDataUtils::DevicestatusData* data = static_cast<DevicestatusDataUtils::DevicestatusData*>(work->data);
+    DeviceStatusDataUtils::DeviceStatusData* data = static_cast<DeviceStatusDataUtils::DeviceStatusData*>(work->data);
     delete work;
     if (data == nullptr) {
         DEV_HILOGE(JS_NAPI, "work->data is nullptr");
@@ -127,13 +127,13 @@ void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bo
 int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 {
     if (type == "still") {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
+        return DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL;
     } else if (type == "relativeStill") {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+        return DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL;
     } else if (type == "carBluetooth") {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH;
+        return DeviceStatusDataUtils::DeviceStatusType::TYPE_CAR_BLUETOOTH;
     } else {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_INVALID;
+        return DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID;
     }
 }
 
@@ -259,7 +259,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         DEV_HILOGE(JS_NAPI, "callback is nullptr");
         return nullptr;
     }
-    DevicestatusClient::GetInstance().SubscribeCallback(DevicestatusDataUtils::DevicestatusType(type), callback);
+    DeviceStatusClient::GetInstance().SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType(type), callback);
     auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IdevicestatusCallback>>(type, callback));
     if (!ret.second) {
         DEV_HILOGE(JS_NAPI, "Failed to insert");
@@ -309,8 +309,8 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     int32_t event = eventMode;
     int32_t latency = latencyMode;
     DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
-        (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL) &&
+        (type <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN), "type is illegal");
     return SubscribeDeviceStatusCallback(env, info, args, type, event, latency);
 }
 
@@ -338,8 +338,8 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
-        (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL) &&
+        (type <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN), "type is illegal");
     int32_t eventMode = 0;
     status = napi_get_value_int32(env, args[ARG_1], &eventMode);
     if (status != napi_ok) {
@@ -354,7 +354,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        DevicestatusClient::GetInstance().UnSubscribeCallback(DevicestatusDataUtils::DevicestatusType(type),
+        DeviceStatusClient::GetInstance().UnsubscribeCallback(DeviceStatusDataUtils::DeviceStatusType(type),
             callbackIter->second);
         callbackMap_.erase(type);
     } else {
@@ -389,8 +389,8 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
-        (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL) &&
+        (type <= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN), "type is illegal");
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
         if (g_obj == nullptr) {
@@ -410,8 +410,8 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         DEV_HILOGE(JS_NAPI, "type:%{public}d already exists", type);
         return nullptr;
     }
-    DevicestatusDataUtils::DevicestatusData devicestatusData =
-        DevicestatusClient::GetInstance().GetDevicestatusData(DevicestatusDataUtils::DevicestatusType(type));
+    DeviceStatusDataUtils::DeviceStatusData devicestatusData =
+        DeviceStatusClient::GetInstance().GetDeviceStatusData(DeviceStatusDataUtils::DeviceStatusType(type));
     g_obj->OnDeviceStatusChangedDone(devicestatusData.type, devicestatusData.value, true);
     g_obj->OffOnce(devicestatusData.type, args[ARG_1]);
     return nullptr;

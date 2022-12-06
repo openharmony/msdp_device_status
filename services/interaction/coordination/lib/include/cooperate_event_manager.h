@@ -25,9 +25,9 @@
 #include "singleton.h"
 #include "uds_session.h"
 
-#include "cooperation_message.h"
+#include "coordination_message.h"
 #include "fi_log.h"
-#include "i_input_context.h"
+#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -58,8 +58,8 @@ public:
     void OnGetState(bool state);
     void OnErrorMessage(EventType type, CooperationMessage msg);
 
-    void SetIInputContext(IInputContext* context);
-    IInputContext* GetIInputContext() const;
+    void SetIContext(IContext *context);
+    IContext* GetIContext() const;
 
 private:
     void NotifyCooperateMessage(SessionPtr sess, MmiMessageId msgId, int32_t userData,
@@ -75,7 +75,7 @@ private:
         {EventType::STOP, nullptr},
         {EventType::STATE, nullptr}
     };
-    IInputContext* context_;
+    IContext *context_ { nullptr };
 };
 
 #define CooperateEventMgr ::OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
