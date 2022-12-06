@@ -265,11 +265,11 @@ void DeviceStatusService::ReportMsdpSysEvent(const DeviceStatusDataUtils::Device
     std::string packageName("");
     devicestatusManager_->GetPackageName(callerToken, packageName);
     if (enable) {
-        HiSysEvent::Write(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,
+        HiSysEventWrite(HiSysEvent::Domain::MSDP, "SUBSCRIBE", HiSysEvent::EventType::STATISTIC,
             "UID", uid, "PKGNAME", packageName, "TYPE", type);
         return;
     }
-    HiSysEvent::Write(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
+    HiSysEventWrite(HiSysEvent::Domain::MSDP, "UNSUBSCRIBE", HiSysEvent::EventType::STATISTIC,
         "UID", uid, "PKGNAME", packageName, "TYPE", type);
 }
 
