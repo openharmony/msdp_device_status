@@ -21,7 +21,10 @@
 #include "device_manager_callback.h"
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
+#include "input_manager.h"
 #include "i_input_device_cooperate_state.h"
+#include "i_input_event_consumer.h"
+#include "i_input_event_filter.h"
 
 struct libinput_event;
 namespace OHOS {
@@ -47,6 +50,50 @@ enum class CooperateMsg {
     COOPERATE_NULL = 10,
 };
 
+struct InputDevCooperateCallback : public MMI::IInputEventConsumer {
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+    {
+        monitor_(pointerEvent);
+        lastPointerEvent_ = pointerEvent;
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const {}
+
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
+
+    inline std::shared_ptr<MMI::PointerEvent> GetLastPointerEvent() const
+    {
+        return lastPointerEvent_;
+    }
+private:
+    std::function<void(std::shared_ptr<MMI::PointerEvent>)> monitor_;
+    mutable std::shared_ptr<MMI::PointerEvent> lastPointerEvent_ { nullptr };
+};
+
+struct PointerFilter : public MMI::IInputEventFilter {
+    bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override 
+    { 
+        return false;
+    }
+
+    bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        // FI_HILOGI("PointerFilter::OnInputEvent enter,pid: %{public}d", getpid());
+        if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+            InputMgr->RemoveInputEventFilter(filterId_);
+            return true;
+        }
+        return false;
+    }
+
+    inline void UpdateCurrentFilterId(int32_t filterId)
+    {
+        filterId_ = filterId;
+    }
+private:
+    int32_t filterId_ { 0 };
+};
+
 class InputDeviceCooperateSM final {
     DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
@@ -67,7 +114,8 @@ public:
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
     void GetCooperateState(const std::string &deviceId);
-    void StartRemoteCooperate(const std::string &remoteNetworkId);
+    void StartRemoteCooperate(const std::string &remoteNetworkId, bool buttonIsPressed);
+    void StartPointerEventFilter();
     void StartRemoteCooperateResult(bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
     void StopRemoteCooperate();
     void StopRemoteCooperateResult(bool isSuccess);
@@ -90,7 +138,8 @@ public:
     bool IsStopping() const;
     void Reset(const std::string &networkId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
-
+    std::shared_ptr<InputDevCooperateCallback> GetCooperateCallback();
+    
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     bool CheckPointerEvent(struct libinput_event *event);
@@ -99,6 +148,7 @@ private:
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
+    int32_t StartInputDeviceCooperateMonitor();
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
@@ -112,6 +162,9 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
     DelegateTasksCallback delegateTasksCallback_ { nullptr };
+    int32_t monitorId_ { 0 };
+    int32_t filterId_ { 0 };
+    std::shared_ptr<InputDevCooperateCallback> inputDevCooperateCb_ { nullptr };
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()

@@ -146,10 +146,17 @@ void InputDeviceCooperateSM::GetCooperateState(const std::string &deviceId)
     CooperateEventMgr->OnGetState(state);
 }
 
+int32_t InputDeviceCooperateSM::StartInputDeviceCooperateMonitor()
+{
+    inputDevCooperateCb_ = std::make_shared<InputDevCooperateCallback>();
+    return InputMgr->AddMonitor(inputDevCooperateCb_);
+}
+
 void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
+        monitorId_ = StartInputDeviceCooperateMonitor();
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
     } else {
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
@@ -210,7 +217,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     return ret;
 }
 
-void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId)
+void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId, bool buttonIsPressed)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -218,6 +225,18 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
     delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage,
         CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
     isStarting_ = true;
+    if (buttonIsPressed == true) {
+        StartPointerEventFilter();
+    }
+}
+
+void InputDeviceCooperateSM::StartPointerEventFilter()
+{
+    CALL_INFO_TRACE;
+    int32_t POINTER_DEFAULT_PRIORITY = 220;
+    auto filter = std::make_shared<PointerFilter>();
+    filterId_ = InputMgr->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
+    filter->UpdateCurrentFilterId(filterId_);
 }
 
 void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
@@ -633,6 +652,11 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
+}
+
+std::shared_ptr<InputDevCooperateCallback> InputDeviceCooperateSM::GetCooperateCallback()
+{
+    return inputDevCooperateCb_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -42,6 +42,7 @@ const std::string GROUP_ID = "mmi_softbus_group_id";
 #define MMI_SOFTBUS_KEY_RESULT "mmi_softbus_key_result"
 #define MMI_SOFTBUS_KEY_OTHER_DEVICE_ID "mmi_softbus_key_other_device_id"
 #define MMI_SOFTBUS_KEY_SESSION_ID "mmi_softbus_key_session_id"
+#define MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS "mmi_softbus_pointer_button_is_press"
 
 enum {
     REMOTE_COOPERATE_START = 1,

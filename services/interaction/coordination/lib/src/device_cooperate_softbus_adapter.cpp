@@ -48,11 +48,12 @@ void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
-    if (!cJSON_IsString(deviceId)) {
+    cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
+    if (!cJSON_IsString(deviceId) || !cJSON_IsBool(buttonIsPressed)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    InputDevCooSM->StartRemoteCooperate(deviceId->valuestring);
+    InputDevCooSM->StartRemoteCooperate(deviceId->valuestring, cJSON_IsTrue(buttonIsPressed));
 }
 
 void ResponseStartRemoteCooperateResult(int32_t sessionId, const JsonParser& parser)
@@ -256,10 +257,15 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
+    auto inputDevCooperateCb = InputDevCooSM->GetCooperateCallback();
+    CHKPR(inputDevCooperateCb, RET_ERR);
+    auto pointerEvent = inputDevCooperateCb->GetLastPointerEvent();
+    bool isPointerButtonPressed = (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localDeviceId.c_str()));
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS, cJSON_CreateNumber(isPointerButtonPressed));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
