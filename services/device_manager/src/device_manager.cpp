@@ -63,6 +63,7 @@ int32_t DeviceManager::Init(IContext *context)
 
 int32_t DeviceManager::OnInit(IContext *context)
 {
+    CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
     inputDevListener_ = std::make_shared<InputDeviceListener>(*this);
@@ -85,13 +86,11 @@ int32_t DeviceManager::OnEnable()
 {
     CALL_INFO_TRACE;
     CHKPR(InputMgr, RET_ERR);
-    FI_HILOGI("RegisterDevListener");
     int32_t ret = InputMgr->RegisterDevListener(CHANGED_TYPE, inputDevListener_);
     if (ret != RET_OK) {
         FI_HILOGE("RegisterDevListener failed");
         return ret;
     }
-    FI_HILOGI("GetDeviceIds");
     ret = InputMgr->GetDeviceIds(std::bind(&DeviceManager::OnGetDeviceIds, this, std::placeholders::_1));
     if (ret != RET_OK) {
         FI_HILOGE("GetDeviceIds failed");
@@ -236,7 +235,7 @@ int32_t DeviceManager::OnAddDevice(std::shared_ptr<::OHOS::MMI::InputDevice> inp
     if (isOk || needNotify) {
         FI_HILOGI("Add \'%{public}s\'", dev->GetName().c_str());
     } else {
-        FI_HILOGW("Device(\'%{public}s\') exists already", dev->GetName().c_str());
+        FI_HILOGW("There exists \'%{public}s\'", dev->GetName().c_str());
     }
 
     if (needNotify) {
