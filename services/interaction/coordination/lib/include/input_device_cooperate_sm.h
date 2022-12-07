@@ -67,9 +67,8 @@ class InputDeviceCooperateSM final {
     };
 
 public:
-    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
-    void Init(DelegateTasksCallback delegateTasksCallback);
+    void Init();
     void EnableInputDeviceCooperate(bool enabled);
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
@@ -121,7 +120,6 @@ private:
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
-    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()
