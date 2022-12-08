@@ -27,34 +27,55 @@ const std::string MSDP_DATA_DIR = "/data/msdp";
 } // namespace
 
 std::vector<int32_t> DeviceStatusDataParse::tempcount_ =
-    std::vector<int32_t> (static_cast<int32_t>(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN),
-    static_cast<int32_t>(DeviceStatusDataUtils::Value::INVALID));
+    std::vector<int32_t> (static_cast<int32_t>(Type::TYPE_MAX), static_cast<int32_t>(TypeValue::INVALID));
 
-bool DeviceStatusDataParse::ParseDeviceStatusData(DeviceStatusDataUtils::DeviceStatusData& data,
-    DeviceStatusDataUtils::DeviceStatusType& type)
+int32_t DeviceStatusDataParse::CreateJsonFile()
+{
+    int32_t fd = open(MSDP_DATA_PATH.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
+    if (fd < 0) {
+        DEV_HILOGE(SERVICE, "open failed");
+        return DEVICESTATUS_FAILED;
+    }
+    close(fd);
+    fd = -1;
+
+    struct stat buf;
+    if (stat(MSDP_DATA_DIR.c_str(), &buf) != 0) {
+        DEV_HILOGE(SERVICE, "stat folder path is invalid %{public}d", errno);
+        return DEVICESTATUS_FAILED;
+    }
+    if (chown(MSDP_DATA_PATH.c_str(), buf.st_uid, buf.st_gid) != 0) {
+        DEV_HILOGE(SERVICE, "chown failed, errno is %{public}d", errno);
+        return DEVICESTATUS_FAILED;
+    }
+
+    return DEVICESTATUS_OK;
+}
+
+bool DeviceStatusDataParse::ParseDeviceStatusData(const Data& data, Type type)
 {
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
         DEV_HILOGE(SERVICE, "read json failed, errno is %{public}d", errno);
+        return false;
     }
-    return DataInit(jsonBuf, true, type, data);
+    return DeviceStatusDataInit(jsonBuf, true, type, data);
 }
 
-bool DeviceStatusDataParse::DataInit(const std::string& fileData, bool logStatus,
-    DeviceStatusDataUtils::DeviceStatusType& type, DeviceStatusDataUtils::DeviceStatusData& data)
+bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bool logStatus, Type& type,
+    Data& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     JsonParser parser;
     parser.json_ = cJSON_Parse(fileData.c_str());
     data.type = type;
-    data.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
+    data.value = OnChangedValue::VALUE_INVALID;
     if (cJSON_IsArray(parser.json_)) {
         DEV_HILOGE(SERVICE, "parser is array");
         return false;
     }
 
-    if (type < DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL ||
-        type >= DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN) {
+    if (type < Type::TYPE_STILL || type >= Type::TYPE_MAX) {
         DEV_HILOGE(SERVICE, "Type error");
         return false;
     }
@@ -66,20 +87,17 @@ bool DeviceStatusDataParse::DataInit(const std::string& fileData, bool logStatus
     }
     tempcount_[type] = tempcount_[type] % jsonsize;
     cJSON* mockvalue = cJSON_GetArrayItem(mockarray, tempcount_[type]);
-    if (mockvalue == nullptr) {
-        return false;
-    }
     tempcount_[type]++;
-    data.value = static_cast<DeviceStatusDataUtils::DeviceStatusValue>(mockvalue->valueint);
+    data.type = type;
+    data.value = static_cast<OnChangedValue>(mockvalue->valueint);
     DEV_HILOGD(SERVICE, "type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
 }
 
-bool DeviceStatusDataParse::DisableCount(const DeviceStatusDataUtils::DeviceStatusType& type)
+bool DeviceStatusDataParse::DisableCount(const Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    tempcount_[static_cast<int32_t>(type)] =
-        static_cast<int32_t>(DeviceStatusDataUtils::DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID);
+    tempcount_[static_cast<int32_t>(type)] = static_cast<int32_t>(TypeValue::INVALID);
     return true;
 }
 
