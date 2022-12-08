@@ -38,14 +38,13 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};   
+enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class DeviceStatusService final : public IContext,
                                   public UDSServer,
                                   public SystemAbility,
                                   public DeviceStatusSrvStub {
     DECLARE_SYSTEM_ABILITY(DeviceStatusService)
     DECLARE_DELAYED_SP_SINGLETON(DeviceStatusService);
-
 public:
     virtual void OnDump() override;
     virtual void OnStart() override;
@@ -94,11 +93,14 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent) override
     {}
 
-    void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
-        const sptr<IdevicestatusCallback>& callback) override;
-    void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
-        const sptr<IdevicestatusCallback>& callback) override;
-    DeviceStatusDataUtils::DeviceStatusData GetCache(const DeviceStatusDataUtils::DeviceStatusType& type) override;
+    void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
+        sptr<IRemoteDevStaCallback> callback) override;
+    void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback) override;
+    Data GetCache(const Type& type) override;
+    bool IsServiceReady() const;
+    std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    void ReportSensorSysEvent(int32_t type, bool enable);
 
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
@@ -108,9 +110,6 @@ public:
     int32_t StopDeviceCoordination(int32_t userData) override;
     int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) override;
 
-    int Dump(int fd, const std::vector<std::u16string>& args) override;
-    void ReportMsdpSysEvent(const DeviceStatusDataUtils::DeviceStatusType& type, bool enable);
-
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
 
@@ -119,7 +118,6 @@ public:
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
-
 private:
     bool Init();
     int32_t InitDelegateTasks();
@@ -143,7 +141,6 @@ private:
 
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
-    bool ready_ { false };
     std::thread t_;
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
@@ -151,6 +148,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     CoordinationEventHandler coordinationHandler;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
 };
