@@ -561,7 +561,6 @@ std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 std::string DeviceManager::OnGetOriginNetworkId(const std::string &dhid) const
 {
     CALL_INFO_TRACE;
-    FI_HILOGI("----------dhid:%{public}s", dhid.c_str());
     if (dhid.empty()) {
         return EMPTYSTR;
     }

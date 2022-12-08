@@ -212,7 +212,6 @@ int32_t DeviceCooperateSoftbusAdapter::WaitSessionOpend(const std::string &remot
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> waitLock(operationMutex_);
     sessionDevMap_[remoteDevId] = sessionId;
-    FI_HILOGD("---In WaitSessionOpend ,remoteDevId:%{public}s, sessionId:%{public}d",remoteDevId.c_str(), sessionId);
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
         [this, remoteDevId] () { return channelStatusMap_[remoteDevId]; });
     if (!status) {
@@ -276,7 +275,6 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
     const std::string &startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("---xh2--In StartRemoteCooperateResult : xPercent:%{public}d, xPercent:%{public}d", xPercent, yPercent);
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
         FI_HILOGE("Stop remote cooperate error, not find this device");
@@ -304,10 +302,6 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
 int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperate(const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("------------- StopRemoteCooperate remoteDeviceId:%{public}s",remoteDeviceId.c_str());
-    for(const auto &item : sessionDevMap_) {
-        FI_HILOGD("----1--- remoteDeviceId:%{public}s, sessionId:%{public}d",item.first.c_str(), item.second);
-    }
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteDeviceId) == sessionDevMap_.end()) {
         FI_HILOGE("Stop remote cooperate error, not find this device");
@@ -459,7 +453,6 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     CALL_INFO_TRACE;
     char peerDevId[DEVICE_ID_SIZE_MAX] = {};
     int32_t getPeerDeviceIdResult = GetPeerDeviceId(sessionId, peerDevId, sizeof(peerDevId));
-    FI_HILOGD("------In OnSessionOpened : sessionId:%{public}d, peerDevId:%{public}s", sessionId, peerDevId);
     FI_HILOGD("Get peer device id ret:%{public}d", getPeerDeviceIdResult);
     if (result != RET_OK) {
         std::string deviceId = FindDevice(sessionId);

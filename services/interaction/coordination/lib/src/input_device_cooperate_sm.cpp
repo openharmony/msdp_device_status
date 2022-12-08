@@ -71,13 +71,6 @@ void InputDeviceCooperateSM::Init()
 
     auto monitor = std::make_shared<MonitorConsumer>();
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
-    // if (monitorId_ <= 0) {
-    //     // isStopping_ = true;
-    //     // std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
-    //     // currentStateSM_->StopInputDeviceCooperate(sink);
-    //     // StopInputDeviceCooperate();
-    //     return;
-    // }
 }
 
 void InputDeviceCooperateSM::Reset(const std::string &networkId)
@@ -122,7 +115,6 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     isStarting_ = false;
     isStopping_ = false;
     // 关掉监听，拦截
-    // RemoveMonitor();
     RemoveInterceptor();
 }
 
@@ -200,7 +192,6 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
-    FI_HILOGI("---- remoteNetworkId:[%{public}s],startInputDeviceId", remoteNetworkId.c_str());
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         FI_HILOGE("In transition state, not process");
@@ -233,7 +224,6 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStopping_ = true;
     std::string stopNetworkId = "";
-    FI_HILOGI("---- startDhid_:[%{public}s]", startDhid_.c_str());
     if (cooperateState_ == CooperateState::STATE_IN) {
         auto* context = CooperateEventMgr->GetIContext();
         CHKPR(context, ERROR_NULL_POINTER);
@@ -242,7 +232,6 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     if (cooperateState_ == CooperateState::STATE_OUT) {
         stopNetworkId = srcNetworkId_;
     }
-    FI_HILOGI("---- stopNetworkId:[%{public}s], srcNetworkId_:[%{public}s]", stopNetworkId.c_str(), srcNetworkId_.c_str());
     int32_t ret = currentStateSM_->StopInputDeviceCooperate(stopNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device cooperate fail");
@@ -270,7 +259,6 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     const std::string& startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_INFO_TRACE;
-    FI_HILOGD("---xh1--In StartRemoteCooperateResult : xPercent:%{public}d, xPercent:%{public}d", xPercent, yPercent);
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStarting_) {
         FI_HILOGI("Not in starting");
@@ -444,32 +432,26 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
             Reset();
             break;
         }
-        case CooperateState::STATE_IN: {    // 添加监听器（鼠标）, 还没写 RemoveMonitor
+        case CooperateState::STATE_IN: {
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD)); // interceptorId_是-2，标识拦截裁减掉了，需要处理，穿越失败
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
-                // RemoveMonitor();
-                // isStopping_ = true;
-                // std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
-                // currentStateSM_->StopInputDeviceCooperate(sink);
                 StopInputDeviceCooperate();
                 return;
             }
             break;
         }
-        case CooperateState::STATE_OUT: {   // 添加拦截器（鼠标）, 还没写 RemoveInterceptor
+        case CooperateState::STATE_OUT: {
             auto* context = CooperateEventMgr->GetIContext();
             CHKPV(context);
             InputMgr->SetPointerVisible(false);
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER)); // interceptorId_是-2，标识拦截裁减掉了，需要处理，穿越失败
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));
             if (interceptorId_ <= 0) {
-                // isStopping_ = true;
-                // currentStateSM_->StopInputDeviceCooperate(srcNetworkId_);
                 StopInputDeviceCooperate();
                 return;
             }
@@ -580,7 +562,6 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
     IDeviceManager &devMgr = context->GetDeviceManager();
 
     if (cooperateState_ == CooperateState::STATE_IN) {
-        // 本端使用拦截（隐藏鼠标前添加拦截器），只拦截鼠标事件，远端使用监听
         if (!context->IsRemote(inputDevice)) {
             CHKPF(currentStateSM_);
             isStopping_ = true;
@@ -593,7 +574,6 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
             return false;
         }
     } else if (cooperateState_ == CooperateState::STATE_OUT) {
-        // 移动本端另外一个鼠标，事件被拦截，不用注入回去
         int32_t deviceId = context->FindInputDeviceId(inputDevice);
         std::string dhid = devMgr.GetDhid(deviceId);
         if (startDhid_ != dhid) {
@@ -608,7 +588,6 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
         }
         return false;
     } else {
-        // 不用考虑，可以先去使能分布式创建的节点，再切换为STATE_FREE
         if (context->IsRemote(inputDevice)) {
             return false;
         }
@@ -777,7 +756,6 @@ void InputDeviceCooperateSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDe
 
 void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
-    // 注入回去要在KeyEvent中标识不拦截
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     int32_t keyCode = keyEvent->GetKeyCode();
@@ -793,12 +771,9 @@ void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<M
         auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = keyEvent->GetDeviceId();
-        FI_HILOGE("###IsRemote begin###");
         if (context->GetDeviceManager().IsRemote(deviceId)) {
-            FI_HILOGE("###IsRemote true###");
             auto networkId = context->GetDeviceManager().GetOriginNetworkId(deviceId);
             if (!InputDevCooSM->IsNeedFilterOut(networkId, keyEvent)) {
-                FI_HILOGE("###IsNeedFilterOut###");
                 keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
                 MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
             }
@@ -819,7 +794,6 @@ void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<M
     CHKPV(pointerEvent);
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     if (state == CooperateState::STATE_OUT) {
-        // 移动本端另外一个鼠标，事件被拦截，不用注入回去
         auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
@@ -827,12 +801,6 @@ void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<M
         if (InputDevCooSM->startDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device cooperate");
             CHKPV(InputDevCooSM->currentStateSM_);
-            // InputDevCooSM->isStopping_ = true;
-            // int32_t ret = InputDevCooSM->currentStateSM_->StopInputDeviceCooperate(InputDevCooSM->srcNetworkId_);
-            // if (ret != RET_OK) {
-            //     FI_HILOGE("Stop input device cooperate fail");
-            //     InputDevCooSM->isStopping_ = false;
-            // }
             InputDevCooSM->StopInputDeviceCooperate();
         }
     }
@@ -858,24 +826,12 @@ void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     if (state == CooperateState::STATE_IN) {
-        // 本端使用拦截（隐藏鼠标前添加拦截器），只拦截鼠标事件，远端使用监听
         auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
-        FI_HILOGE("###IsRemote begin###,ID:%{public}d",deviceId);
         if (!context->GetDeviceManager().IsRemote(deviceId)) {
-            FI_HILOGE("###IsRemote true###");
             CHKPV(InputDevCooSM->currentStateSM_);
-            // InputDevCooSM->isStopping_ = true;
-            // std::string sink = context->GetDeviceManager().GetOriginNetworkId(InputDevCooSM->startDhid_);
-            // int32_t ret = InputDevCooSM->currentStateSM_->StopInputDeviceCooperate(sink);
-            // if (ret != RET_OK) {
-            //     FI_HILOGE("Stop input device cooperate fail");
-            //     InputDevCooSM->isStopping_ = false;
-            // }
             InputDevCooSM->StopInputDeviceCooperate();
-        } else {
-            FI_HILOGE("###IsRemote false###");
         }
     }
 }
