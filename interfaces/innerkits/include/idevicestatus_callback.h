@@ -24,15 +24,15 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IdevicestatusCallback : public IRemoteBroker {
+class IRemoteDevStaCallback : public IRemoteBroker {
 public:
     enum  {
         DEVICESTATUS_CHANGE = 0,
     };
 
-    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) = 0;
+    virtual void OnDeviceStatusChanged(const Data& devicestatusData) = 0;
 
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusCallback");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IRemoteDevStaCallback");
 };
 } // namespace DeviceStatus
 } // namespace Msdp

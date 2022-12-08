@@ -21,17 +21,18 @@
 
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
+#include "devicestatus_client.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusCallbackProxy : public IRemoteProxy<IdevicestatusCallback> {
+class DeviceStatusCallbackProxy : public IRemoteProxy<IRemoteDevStaCallback> {
 public:
     explicit DeviceStatusCallbackProxy(const sptr<IRemoteObject>& impl)
-        : IRemoteProxy<IdevicestatusCallback>(impl) {}
+        : IRemoteProxy<IRemoteDevStaCallback>(impl) {}
     ~DeviceStatusCallbackProxy() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackProxy);
-    virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
+    virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
 
 private:
     static inline BrokerDelegator<DeviceStatusCallbackProxy> delegator_;

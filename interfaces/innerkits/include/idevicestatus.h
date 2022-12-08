@@ -40,11 +40,14 @@ public:
         ALLOC_SOCKET_FD = 40
     };
 
-    virtual void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback) = 0;
-    virtual void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback) = 0;
-    virtual DeviceStatusDataUtils::DeviceStatusData GetCache(const DeviceStatusDataUtils::DeviceStatusType& type) = 0;
+    virtual void Subscribe(Type type,
+        ActivityEvent event,
+        ReportLatencyNs latency,
+        sptr<IRemoteDevStaCallback> callback) = 0;
+    virtual void Unsubscribe(Type type,
+        ActivityEvent event,
+        sptr<IRemoteDevStaCallback> callback) = 0;
+    virtual Data GetCache(const Type& type) = 0;
 
     virtual int32_t RegisterCoordinationListener() = 0;
     virtual int32_t UnregisterCoordinationListener() = 0;

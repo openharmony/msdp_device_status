@@ -18,44 +18,45 @@
 #include <message_parcel.h>
 
 #include "devicestatus_common.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
+int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}u, flags= %{public}d", code, option.GetFlags());
-    std::u16string descriptor = DeviceStatusCallbackStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
+    std::u16string descripter = DeviceStatusCallbackStub::GetDescriptor();
+    std::u16string remoteDescripter = data.ReadInterfaceToken();
+    if (descripter != remoteDescripter) {
         DEV_HILOGE(SERVICE, "DeviceStatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
     switch (code) {
-        case static_cast<int32_t>(IdevicestatusCallback::DEVICESTATUS_CHANGE): {
+        case static_cast<int32_t>(IRemoteDevStaCallback::DEVICESTATUS_CHANGE): {
             return OnDeviceStatusChangedStub(data);
         }
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    return ERR_OK;
+    return RET_OK;
 }
 
-int32_t DeviceStatusCallbackStub::OnDeviceStatusChangedStub(MessageParcel& data)
+int32_t DeviceStatusCallbackStub::OnDeviceStatusChangedStub(MessageParcel &data)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type;
     int32_t value;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, value, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DeviceStatusDataUtils::DeviceStatusData devicestatusData = {
-        static_cast<DeviceStatusDataUtils::DeviceStatusType>(type),
-        static_cast<DeviceStatusDataUtils::DeviceStatusValue>(value)
+    Data devicestatusData = {
+        static_cast<Type>(type),
+        static_cast<OnChangedValue>(value)
     };
     OnDeviceStatusChanged(devicestatusData);
-    return ERR_OK;
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

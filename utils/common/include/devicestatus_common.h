@@ -25,15 +25,15 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-#define DEVICESTATUS_RETURN_IF_WITH_RET(cond, retval) if (cond) {return (retval);}
-#define DEVICESTATUS_RETURN_IF(cond) if (cond) {return;}
-#define DEVICESTATUS_RETURN_IF_WITH_LOG(cond, loginfo)                                  \
-    do {                                                                                \
-        if (cond) {                                                                     \
+#define DEV_RET_IF_NULL_WITH_RET(cond, retval) if (cond) {return (retval);}
+#define DEV_RET_IF_NULL(cond) if (cond) {return;}
+#define DEV_RET_IF_NULL_WITH_LOG(cond, loginfo) \
+    do { \
+        if (cond) { \
             DEV_HILOGE(COMMON, "%{public}s "#loginfo" ", __func__); \
-            return;                                                                     \
-        }                                                                               \
-    } while (0)                                                                         \
+            return; \
+        } \
+    } while (0) \
 
 #define WRITEBOOL(parcel, data, ...) \
     do { \

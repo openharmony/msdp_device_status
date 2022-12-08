@@ -89,7 +89,6 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
 {
     DEV_HILOGD(JS_NAPI, "DeviceStatusEvent off in for event:%{public}d", eventType);
-
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         DEV_HILOGE(JS_NAPI, "eventType %{public}d not find", eventType);
@@ -156,10 +155,6 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
-    if (value == 0) {
-        DEV_HILOGE(JS_NAPI, "value is invalid");
-        return;
-    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
@@ -205,13 +200,11 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
         DEV_HILOGE(JS_NAPI, "Failed to set name");
         return;
     }
-    if (value >= static_cast<int32_t>(DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID)
-        && value <= static_cast<int32_t>(DeviceStatusDataUtils::DeviceStatusValue::VALUE_EXIT)) {
-        status = napi_create_int32(env_, value, &tmpValue);
-        if (status != napi_ok) {
-            DEV_HILOGE(JS_NAPI, "Failed to get int32");
-            return;
-        }
+    bool flag = (value == 1);
+    status = napi_get_boolean(env_, flag, &tmpValue);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to get_boolean");
+        return;
     }
     status = napi_set_named_property(env_, result, "value", tmpValue);
     if (status != napi_ok) {

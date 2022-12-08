@@ -16,38 +16,78 @@
 #ifndef DEVICESTATUS_DATA_UTILS_H
 #define DEVICESTATUS_DATA_UTILS_H
 
-#include<string>
+#include <string>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusDataUtils {
-public:
-    enum DeviceStatusType {
-        TYPE_INVALID = -1,
-        TYPE_HIGH_STILL,
-        TYPE_FINE_STILL,
-        TYPE_CAR_BLUETOOTH,
-		TYPE_STAND,
-        TYPE_LID_OPEN,
-        TYPE_MAX
-    };
+constexpr double MOVEMENT_THRESHOLD = 0.001;
+enum Type {
+    TYPE_INVALID = -1,
+    TYPE_STILL,
+    TYPE_HORIZONTAL_POSITION,
+    TYPE_VERTICAL_POSITION,
+    TYPE_LID_OPEN,
+    TYPE_MAX
+};
 
-    enum DeviceStatusValue {
-        VALUE_INVALID = -1,
-        VALUE_ENTER = 1,
-        VALUE_EXIT
-    };
+enum TypeValue : bool {
+    INVALID = false,
+    VALID = true,
+};
 
-    enum Value {
-        INVALID = 0,
-        VALID
-    };
+enum OnChangedValue {
+    VALUE_INVALID = -1,
+    VALUE_EXIT,
+    VALUE_ENTER
+};
 
-    struct DeviceStatusData {
-        DeviceStatusType type;
-        DeviceStatusValue value;
-    };
+enum ActivityEvent {
+    EVENT_INVALID = 0,
+    ENTER = 1,
+    EXIT = 2,
+    ENTER_EXIT = 3
+};
+
+enum ReportLatencyNs {
+    Latency_INVALID = -1,
+    SHORT = 1,
+    MIDDLE = 2,
+    LONG = 3
+};
+enum Status {
+    STATUS_INVALID = -1,
+    STATUS_CANCEL,
+    STATUS_START,
+    STATUS_PROCESS,
+    STATUS_FINISH
+};
+
+enum Action {
+    ACTION_INVALID = -1,
+    ACTION_ENLARGE,
+    ACTION_REDUCE,
+    ACTION_UP,
+    ACTION_LEFT,
+    ACTION_DOWN,
+    ACTION_RIGHT
+};
+
+struct Data {
+    Type type;
+    OnChangedValue value;
+    Status status;
+    Action action;
+    double movement;
+
+    bool operator !=(const Data& r) const
+    {
+        if (type == r.type && value == r.value &&
+            status - r.status && action == r.action && (movement - r.movement) < MOVEMENT_THRESHOLD) {
+            return false;
+        }
+        return true;
+    }
 };
 
 typedef struct DeviceStatusJsonData {
@@ -56,11 +96,11 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL, "TYPE_HIGH_STILL"},
-    {DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL, "TYPE_FINE_STILL"},
-    {DeviceStatusDataUtils::DeviceStatusType::TYPE_CAR_BLUETOOTH, "TYPE_CAR_BLUETOOTH"},
-    {DeviceStatusDataUtils::DeviceStatusType::TYPE_STAND, "TYPE_STAND"},
-    {DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, "TYPE_LID_OPEN"}
+    {Type::TYPE_STILL, "STILL"},
+    {Type::TYPE_HORIZONTAL_POSITION, "HORIZONTAL_POSITION"},
+    {Type::TYPE_VERTICAL_POSITION, "VERTICAL_POSITION"},
+    {Type::TYPE_LID_OPEN, "LID_OPEN"},
+    {Type::TYPE_MAX, "MAX"}
 };
 } // namespace DeviceStatus
 } // namespace Msdp
