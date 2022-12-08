@@ -18,6 +18,7 @@
 
 #include "singleton.h"
 
+#include "devicestatus_define.h"
 #include "device_manager_callback.h"
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
@@ -51,15 +52,15 @@ enum class CooperateMsg {
 };
 
 struct InputDevCooperateCallback : public MMI::IInputEventConsumer {
-    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
     {
         monitor_(pointerEvent);
         lastPointerEvent_ = pointerEvent;
     }
 
-    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const {}
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {}
 
-    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
 
     inline std::shared_ptr<MMI::PointerEvent> GetLastPointerEvent() const
     {
@@ -78,9 +79,10 @@ struct PointerFilter : public MMI::IInputEventFilter {
 
     bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
     {
-        // FI_HILOGI("PointerFilter::OnInputEvent enter,pid: %{public}d", getpid());
+        CHKPF(pointerEvent);
         if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
             InputMgr->RemoveInputEventFilter(filterId_);
+            filterId_ = -1;
             return true;
         }
         return false;
@@ -91,7 +93,7 @@ struct PointerFilter : public MMI::IInputEventFilter {
         filterId_ = filterId;
     }
 private:
-    int32_t filterId_ { 0 };
+    int32_t filterId_ { -1 };
 };
 
 class InputDeviceCooperateSM final {
@@ -171,8 +173,8 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
     DelegateTasksCallback delegateTasksCallback_ { nullptr };
-    int32_t monitorId_ { 0 };
-    int32_t filterId_ { 0 };
+    int32_t monitorId_ { -1 };
+    int32_t filterId_ { -1 };
     std::shared_ptr<InputDevCooperateCallback> inputDevCooperateCb_ { nullptr };
 };
 

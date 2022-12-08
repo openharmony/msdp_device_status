@@ -24,7 +24,6 @@
 #include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "device_profile_adapter.h"
-#include "devicestatus_define.h"
 #include "display_info.h"
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
@@ -163,7 +162,9 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
-        monitorId_ = StartInputDeviceCooperateMonitor();
+        if (0 > monitorId_ = StartInputDeviceCooperateMonitor()) {
+            FI_HILOGE("Add Monitor Failed.");
+        }
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
     } else {
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
@@ -221,6 +222,10 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
         FI_HILOGE("Stop input device cooperate fail");
         isStopping_ = false;
     }
+    if (monitorId_ > 0) {
+        InputMgr->RemoveMonitor(monitorId_);
+        monitorId_ = -1;
+    }
     return ret;
 }
 
@@ -237,7 +242,7 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
         FI_HILOGE("Posting async task failed");
     }
     isStarting_ = true;
-    if (buttonIsPressed == true) {
+    if (buttonIsPressed) {
         StartPointerEventFilter();
     }
 }
@@ -248,6 +253,9 @@ void InputDeviceCooperateSM::StartPointerEventFilter()
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
     filterId_ = InputMgr->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
+    if (0 > filterId_) {
+        FI_HILOGE("Add Event Filter Failed.");
+    }
     filter->UpdateCurrentFilterId(filterId_);
 }
 
