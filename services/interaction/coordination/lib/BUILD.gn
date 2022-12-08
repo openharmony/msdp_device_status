@@ -64,6 +64,8 @@ ohos_source_set("coordination_lib") {
     "hiviewdfx_hilog_native:libhilog",
     "input:libmmi-client",
     "ipc:ipc_core",
+    "window_manager:libdm",
+    "multimedia_image_framework:image_native",
   ]
 
   subsystem_name = "msdp"
