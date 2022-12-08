@@ -29,9 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class IDInput {
 public:
-    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
-    virtual void Init(DelegateTasksCallback delegateTasksCallback) = 0;
+    virtual void Init() = 0;
     virtual void RegisterEventCallback(SimulateEventCallback callback) = 0;
     virtual void EnableInputDeviceCooperate(bool enabled) = 0;
     virtual int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,

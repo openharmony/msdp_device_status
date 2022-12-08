@@ -26,7 +26,7 @@ public:
     DInput();
     virtual ~DInput();
 
-    void Init(DelegateTasksCallback delegateTasksCallback);
+    void Init();
     void RegisterEventCallback(SimulateEventCallback callback);
     void EnableInputDeviceCooperate(bool enabled);
     int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
