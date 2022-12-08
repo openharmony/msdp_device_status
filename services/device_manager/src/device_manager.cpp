@@ -357,6 +357,7 @@ bool DeviceManager::IsRemote(int32_t id) const
 
 bool DeviceManager::OnIsRemote(int32_t id) const
 {
+    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
             return devIter->second->IsRemote();
@@ -375,6 +376,7 @@ int32_t DeviceManager::RunIsRemote(std::packaged_task<bool(int32_t)> &task, int3
 
 std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return std::vector<std::string>();
@@ -394,6 +396,7 @@ std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) cons
 
 std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     std::vector<std::string> dhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
@@ -485,6 +488,7 @@ int32_t DeviceManager::RunGetCooperateDhids(
 
 std::string DeviceManager::GetOriginNetworkId(int32_t id) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -504,6 +508,7 @@ std::string DeviceManager::GetOriginNetworkId(int32_t id) const
 
 std::string DeviceManager::OnGetOriginNetId(int32_t id) const
 {
+    CALL_INFO_TRACE;
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
         FI_HILOGE("Failed to search for the device: id %{public}d", id);
@@ -528,6 +533,7 @@ int32_t DeviceManager::RunGetOriginNetId(std::packaged_task<std::string(int32_t)
 
 std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -547,6 +553,7 @@ std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 
 std::string DeviceManager::OnGetOriginNetworkId(const std::string &dhid) const
 {
+    CALL_INFO_TRACE;
     if (dhid.empty()) {
         return EMPTYSTR;
     }
@@ -571,6 +578,7 @@ int32_t DeviceManager::RunGetOriginNetworkId(std::packaged_task<std::string(cons
 
 std::string DeviceManager::GetDhid(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -590,6 +598,7 @@ std::string DeviceManager::GetDhid(int32_t deviceId) const
 
 std::string DeviceManager::OnGetDhid(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
             return devIter->second->GetDhid();
