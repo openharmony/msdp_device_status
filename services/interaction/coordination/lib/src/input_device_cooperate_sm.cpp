@@ -676,7 +676,7 @@ bool InputDeviceCooperateSM::IsNeedFilterOut(const std::string &deviceId,
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
     businessEvent.pressedKeys = KeyItemsForDInput;
-    FI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
+    FI_HILOGI("businessEvent.keyCode:%{public}d, keyAction:%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);
     for (const auto &item : businessEvent.pressedKeys) {
         FI_HILOGI("pressedKeys :%{public}d", item);
@@ -720,7 +720,7 @@ void InputDeviceCooperateSM::SetAbsolutionLocation(double xPercent, double yPerc
     CALL_INFO_TRACE;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
     if (display == nullptr) {
-        FI_HILOGD("display is nullptr");
+        FI_HILOGE("display is nullptr");
         return;
     }
     int32_t width = display->GetWidth();
@@ -763,7 +763,6 @@ void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<M
         return;
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
-    FI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
         auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
@@ -782,7 +781,6 @@ void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<M
             MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
     }
-    return;
 }
 
 void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
