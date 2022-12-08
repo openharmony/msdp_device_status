@@ -46,10 +46,8 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
 InputDeviceCooperateSM::InputDeviceCooperateSM() {}
 InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
 
-void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
+void InputDeviceCooperateSM::Init()
 {
-    CHKPL(delegateTasksCallback);
-    delegateTasksCallback_ = delegateTasksCallback;
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     DevCooperateSoftbusAdapter->Init();
@@ -110,7 +108,13 @@ void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bo
 {
     CALL_DEBUG_ENTER;
     CooperationMessage msg = isOpen ? CooperationMessage::STATE_ON : CooperationMessage::STATE_OFF;
-    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, networkId));
+    auto *context = CooperateEventMgr->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, networkId));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
     if (!isOpen) {
         OnCloseCooperation(networkId, false);
     }
@@ -224,9 +228,14 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    CHKPV(delegateTasksCallback_);
-    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage,
-        CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
+    auto *context = CooperateEventMgr->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr,
+                  CooperationMessage::INFO_START, remoteNetworkId));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
     isStarting_ = true;
     if (buttonIsPressed == true) {
         StartPointerEventFilter();
@@ -254,14 +263,18 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     startDhid_ = startDhid;
     CooperationMessage msg =
             isSuccess ? CooperationMessage::INFO_SUCCESS : CooperationMessage::INFO_FAIL;
-    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, ""));
+    auto *context = CooperateEventMgr->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, ""));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
 
     if (!isSuccess || cooperateState_ == CooperateState::STATE_IN) {
         isStarting_ = false;
         return;
     }
-    auto* context = CooperateEventMgr->GetIContext();
-    CHKPV(context);
     if (cooperateState_ == CooperateState::STATE_FREE) {
         context->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CooperateState::STATE_IN);

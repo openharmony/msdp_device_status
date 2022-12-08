@@ -114,9 +114,8 @@ class InputDeviceCooperateSM final {
     };
 
 public:
-    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
-    void Init(DelegateTasksCallback delegateTasksCallback);
+    void Init();
     void EnableInputDeviceCooperate(bool enabled);
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();

@@ -174,16 +174,6 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Create epoll failed");
         return false;
     }
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CooperateEventMgr->SetIContext(this);
-    if (devMgr_.Init(this) != RET_OK) {
-        FI_HILOGE("DevMgr init failed");
-        goto INIT_FAIL;
-    }
-    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
     if (InitDelegateTasks() != RET_OK) {
         FI_HILOGE("Delegate tasks init failed");
         goto INIT_FAIL;
@@ -192,6 +182,15 @@ bool DeviceStatusService::Init()
         FI_HILOGE("TimerMgr init failed");
         goto INIT_FAIL;
     }
+    if (devMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("DevMgr init failed");
+        goto INIT_FAIL;
+    }
+
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    CooperateEventMgr->SetIContext(this);
+    InputDevCooSM->Init();
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
 INIT_FAIL:
