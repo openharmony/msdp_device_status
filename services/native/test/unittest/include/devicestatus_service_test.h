@@ -31,7 +31,7 @@ public:
     public:
         DeviceStatusServiceTestCallback() {};
         virtual ~DeviceStatusServiceTestCallback() {};
-        virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
+        virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus
