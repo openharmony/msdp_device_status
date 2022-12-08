@@ -16,7 +16,7 @@
 #ifndef OHOS_MSDP_DEVICE_STATUS_I_CONTEXT_H
 #define OHOS_MSDP_DEVICE_STATUS_I_CONTEXT_H
 
-#include "display_info.h"
+#include "window_info.h"
 #include "key_event.h"
 #include "pointer_event.h"
 
