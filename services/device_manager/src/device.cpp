@@ -30,7 +30,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Device" };
-const std::string INPUT_VIRTUAL_DEVICE_NAME { "Hos Distributed Virtual Device " };
+const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
+// const std::string INPUT_VIRTUAL_DEVICE_NAME { "Hos Distributed Virtual Device " };
+
 const std::string SPLIT_SYMBOL { "|" };
 const std::string DH_ID_PREFIX { "Input_" };
 } // namespace
@@ -63,6 +65,7 @@ void Device::Populate()
 
 bool Device::IsRemote() const
 {
+    FI_HILOGE("###devicename:%{public}s, ID:%{public}d###", GetName().c_str(), GetId());
     return (GetName().find(INPUT_VIRTUAL_DEVICE_NAME) != std::string::npos);
 }
 

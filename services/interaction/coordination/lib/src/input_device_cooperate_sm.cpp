@@ -18,7 +18,9 @@
 #include <unistd.h>
 
 #include "device_manager.h"
+#include "display_manager.h"
 #include "hitrace_meter.h"
+#include "input_manager.h"
 
 #include "cooperate_event_manager.h"
 #include "coordination_message.h"
@@ -30,6 +32,7 @@
 #include "input_device_cooperate_state_in.h"
 #include "input_device_cooperate_state_out.h"
 #include "input_device_cooperate_util.h"
+#include "input_manager.h"
 #include "stub.h"
 
 namespace OHOS {
@@ -38,13 +41,19 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateSM" };
 constexpr int32_t INTERVAL_MS = 2000;
+constexpr double PERCENT_CONST = 100.0;
 constexpr int32_t MOUSE_ABS_LOCATION = 100;
 constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
 constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
+constexpr int32_t COORDINATION_PRIORITY = 499;
+constexpr int32_t MIN_HANDLER_ID = 1;
 } // namespace
 
 InputDeviceCooperateSM::InputDeviceCooperateSM() {}
-InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
+InputDeviceCooperateSM::~InputDeviceCooperateSM()
+{
+    RemoveMonitor();
+}
 
 void InputDeviceCooperateSM::Init()
 {
@@ -59,6 +68,16 @@ void InputDeviceCooperateSM::Init()
 
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
+
+    auto monitor = std::make_shared<MonitorConsumer>();
+    monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
+    // if (monitorId_ <= 0) {
+    //     // isStopping_ = true;
+    //     // std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
+    //     // currentStateSM_->StopInputDeviceCooperate(sink);
+    //     // StopInputDeviceCooperate();
+    //     return;
+    // }
 }
 
 void InputDeviceCooperateSM::Reset(const std::string &networkId)
@@ -96,12 +115,15 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     CHKPV(context);
     bool hasPointer = context->GetDeviceManager().HasLocalPointerDevice();
     if (hasPointer && adjustAbsolutionLocation) {
-        context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
+        SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     } else {
-        context->SetPointerVisible(getpid(), hasPointer);
+        InputMgr->SetPointerVisible(hasPointer);
     }
     isStarting_ = false;
     isStopping_ = false;
+    // 关掉监听，拦截
+    // RemoveMonitor();
+    RemoveInterceptor();
 }
 
 void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bool isOpen)
@@ -126,6 +148,15 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     std::lock_guard<std::mutex> guard(mutex_);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
+            if (cooperateState_ != CooperateState::STATE_FREE) {
+                auto* context = CooperateEventMgr->GetIContext();
+                CHKPV(context);
+                auto dhids = context->GetDeviceManager().GetCooperateDhids(startDhid_);
+                DistributedAdapter->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+                    dhids, [](bool isSuccess) {
+                    FI_HILOGI("Failed to stop remote");
+                });
+            }
             DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [](bool isSuccess) {});
         }
@@ -169,6 +200,7 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
+    FI_HILOGI("---- remoteNetworkId:[%{public}s],startInputDeviceId", remoteNetworkId.c_str());
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         FI_HILOGE("In transition state, not process");
@@ -201,6 +233,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStopping_ = true;
     std::string stopNetworkId = "";
+    FI_HILOGI("---- startDhid_:[%{public}s]", startDhid_.c_str());
     if (cooperateState_ == CooperateState::STATE_IN) {
         auto* context = CooperateEventMgr->GetIContext();
         CHKPR(context, ERROR_NULL_POINTER);
@@ -209,6 +242,7 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     if (cooperateState_ == CooperateState::STATE_OUT) {
         stopNetworkId = srcNetworkId_;
     }
+    FI_HILOGI("---- stopNetworkId:[%{public}s], srcNetworkId_:[%{public}s]", stopNetworkId.c_str(), srcNetworkId_.c_str());
     int32_t ret = currentStateSM_->StopInputDeviceCooperate(stopNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device cooperate fail");
@@ -236,6 +270,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     const std::string& startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_INFO_TRACE;
+    FI_HILOGD("---xh1--In StartRemoteCooperateResult : xPercent:%{public}d, xPercent:%{public}d", xPercent, yPercent);
     std::lock_guard<std::mutex> guard(mutex_);
     if (!isStarting_) {
         FI_HILOGI("Not in starting");
@@ -257,11 +292,11 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
         return;
     }
     if (cooperateState_ == CooperateState::STATE_FREE) {
-        context->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CooperateState::STATE_IN);
     }
     if (cooperateState_ == CooperateState::STATE_OUT) {
-        context->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CooperateState::STATE_FREE);
     }
     isStarting_ = false;
@@ -341,7 +376,7 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
         auto* context = CooperateEventMgr->GetIContext();
         CHKPV(context);
         if (context->GetDeviceManager().HasLocalPointerDevice()) {
-            context->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
+            SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         if (cooperateState_ == CooperateState::STATE_IN || cooperateState_ == CooperateState::STATE_OUT) {
             UpdateState(CooperateState::STATE_FREE);
@@ -382,31 +417,21 @@ void InputDeviceCooperateSM::NotifyRemoteStopFinish(bool isSuccess, const std::s
 bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIContext();
-    CHKPF(context);
-    auto pointerEvent = context->GetPointerEvent();
-    CHKPF(pointerEvent);
-    int32_t displayId = pointerEvent->GetTargetDisplayId();
-    auto displayGroupInfo = context->GetDisplayGroupInfo();
-    MMI::DisplayInfo physicalDisplayInfo;
-    for (auto &it : displayGroupInfo.displaysInfo) {
-        if (it.id == displayId) {
-            physicalDisplayInfo = it;
-            break;
-        }
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    if (display == nullptr) {
+        return false;
     }
-    int32_t displayWidth = physicalDisplayInfo.width;
-    int32_t displayHeight = physicalDisplayInfo.height;
-    if (displayWidth == 0 || displayHeight == 0) {
+    int32_t width = display->GetWidth();
+    int32_t height = display->GetHeight();
+    if (width == 0 || height == 0) {
         FI_HILOGE("display width or height is 0");
         return false;
     }
-    auto mouseInfo = context->GetMouseInfo();
-    int32_t xPercent = mouseInfo.physicalX * MOUSE_ABS_LOCATION / displayWidth;
-    int32_t yPercent = mouseInfo.physicalY * MOUSE_ABS_LOCATION / displayHeight;
+    int32_t xPercent = x_ * MOUSE_ABS_LOCATION / width;
+    int32_t yPercent = y_ * MOUSE_ABS_LOCATION / height;
     FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, "
         "physicalX: %{public}d, physicalY: %{public}d,",
-        displayWidth, displayHeight, mouseInfo.physicalX, mouseInfo.physicalY);
+        width, height, x_, y_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;
 }
@@ -419,15 +444,35 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
             Reset();
             break;
         }
-        case CooperateState::STATE_IN: {
+        case CooperateState::STATE_IN: {    // 添加监听器（鼠标）, 还没写 RemoveMonitor
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(startDhid_);
+            auto interceptor = std::make_shared<InterceptorConsumer>();
+            interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD)); // interceptorId_是-2，标识拦截裁减掉了，需要处理，穿越失败
+            if (interceptorId_ <= 0) {
+                // RemoveMonitor();
+                // isStopping_ = true;
+                // std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
+                // currentStateSM_->StopInputDeviceCooperate(sink);
+                StopInputDeviceCooperate();
+                return;
+            }
             break;
         }
-        case CooperateState::STATE_OUT: {
+        case CooperateState::STATE_OUT: {   // 添加拦截器（鼠标）, 还没写 RemoveInterceptor
             auto* context = CooperateEventMgr->GetIContext();
             CHKPV(context);
-            context->SetPointerVisible(getpid(), false);
+            InputMgr->SetPointerVisible(false);
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
+            auto interceptor = std::make_shared<InterceptorConsumer>();
+            interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER)); // interceptorId_是-2，标识拦截裁减掉了，需要处理，穿越失败
+            if (interceptorId_ <= 0) {
+                // isStopping_ = true;
+                // currentStateSM_->StopInputDeviceCooperate(srcNetworkId_);
+                StopInputDeviceCooperate();
+                return;
+            }
             break;
         }
         default:
@@ -535,6 +580,7 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
     IDeviceManager &devMgr = context->GetDeviceManager();
 
     if (cooperateState_ == CooperateState::STATE_IN) {
+        // 本端使用拦截（隐藏鼠标前添加拦截器），只拦截鼠标事件，远端使用监听
         if (!context->IsRemote(inputDevice)) {
             CHKPF(currentStateSM_);
             isStopping_ = true;
@@ -547,6 +593,7 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
             return false;
         }
     } else if (cooperateState_ == CooperateState::STATE_OUT) {
+        // 移动本端另外一个鼠标，事件被拦截，不用注入回去
         int32_t deviceId = context->FindInputDeviceId(inputDevice);
         std::string dhid = devMgr.GetDhid(deviceId);
         if (startDhid_ != dhid) {
@@ -561,6 +608,7 @@ bool InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
         }
         return false;
     } else {
+        // 不用考虑，可以先去使能分布式创建的节点，再切换为STATE_FREE
         if (context->IsRemote(inputDevice)) {
             return false;
         }
@@ -622,6 +670,44 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
     dprintf(fd, "Run successfully");
 }
 
+void InputDeviceCooperateSM::RemoveMonitor()
+{
+    if ((monitorId_ >= MIN_HANDLER_ID) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
+        MMI::InputManager::GetInstance()->RemoveMonitor(monitorId_);
+        monitorId_ = -1;
+    }
+}
+
+void InputDeviceCooperateSM::RemoveInterceptor()
+{
+    if ((interceptorId_ >= MIN_HANDLER_ID) && (interceptorId_ < std::numeric_limits<int32_t>::max())) {
+        MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
+        interceptorId_ = -1;
+    }
+}
+
+bool InputDeviceCooperateSM::IsNeedFilterOut(const std::string &deviceId,
+    const std::shared_ptr<MMI::KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    std::vector<int32_t> KeyItemsForDInput;
+    KeyItemsForDInput.reserve(KeyItems.size());
+    for (const auto& item : KeyItems) {
+        KeyItemsForDInput.push_back(item.GetKeyCode());
+    }
+    OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
+    businessEvent.keyCode = keyEvent->GetKeyCode();
+    businessEvent.keyAction = keyEvent->GetKeyAction();
+    businessEvent.pressedKeys = KeyItemsForDInput;
+    FI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
+        businessEvent.keyCode, businessEvent.keyAction);
+    for (const auto &item : businessEvent.pressedKeys) {
+        FI_HILOGI("pressedKeys :%{public}d", item);
+    }
+    return DistributedAdapter->IsNeedFilterOut(deviceId, businessEvent);
+}
+
 void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()
 {
     CALL_INFO_TRACE;
@@ -653,6 +739,23 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     CALL_INFO_TRACE;
 }
 
+void InputDeviceCooperateSM::SetAbsolutionLocation(double xPercent, double yPercent)
+{
+    CALL_INFO_TRACE;
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    if (display == nullptr) {
+        FI_HILOGD("display is nullptr");
+        return;
+    }
+    int32_t width = display->GetWidth();
+    int32_t height = display->GetHeight();
+    int32_t physicalX = static_cast<int32_t>(width * xPercent / PERCENT_CONST);
+    int32_t physicalY = static_cast<int32_t>(height * yPercent / PERCENT_CONST);
+    FI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d,"
+        "physicalX:%{public}d, x_:%{public}d, y_:%{public}d",width,height,physicalX,physicalY,x_,y_);
+    InputMgr->SetPointerLocation(physicalX, physicalY);
+}
+
 void InputDeviceCooperateSM::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
 {
     CHKPV(device);
@@ -670,6 +773,115 @@ void InputDeviceCooperateSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDe
         InputDevCooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
                                         context->GetDeviceManager().GetCooperateDhids(device->GetId()));
     }
+}
+
+void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
+{
+    // 注入回去要在KeyEvent中标识不拦截
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    int32_t keyCode = keyEvent->GetKeyCode();
+    if (keyCode == MMI::KeyEvent::KEYCODE_BACK || keyCode == MMI::KeyEvent::KEYCODE_VOLUME_UP
+        || keyCode == MMI::KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == MMI::KeyEvent::KEYCODE_POWER) {
+        keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
+        MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+        return;
+    }
+    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    FI_HILOGI("Get current cooperate state:%{public}d", state);
+    if (state == CooperateState::STATE_IN) {
+        auto* context = CooperateEventMgr->GetIContext();
+        CHKPV(context);
+        int32_t deviceId = keyEvent->GetDeviceId();
+        FI_HILOGE("###IsRemote begin###");
+        if (context->GetDeviceManager().IsRemote(deviceId)) {
+            FI_HILOGE("###IsRemote true###");
+            auto networkId = context->GetDeviceManager().GetOriginNetworkId(deviceId);
+            if (!InputDevCooSM->IsNeedFilterOut(networkId, keyEvent)) {
+                FI_HILOGE("###IsNeedFilterOut###");
+                keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
+                MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+            }
+        }
+    } else if (state == CooperateState::STATE_OUT) {
+        std::string networkId = COOPERATE::GetLocalDeviceId();
+        if (InputDevCooSM->IsNeedFilterOut(networkId, keyEvent)) {
+            keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
+            MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+        }
+    }
+    return;
+}
+
+void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
+    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    if (state == CooperateState::STATE_OUT) {
+        // 移动本端另外一个鼠标，事件被拦截，不用注入回去
+        auto* context = CooperateEventMgr->GetIContext();
+        CHKPV(context);
+        int32_t deviceId = pointerEvent->GetDeviceId();
+        std::string dhid = context->GetDeviceManager().GetDhid(deviceId);
+        if (InputDevCooSM->startDhid_ != dhid) {
+            FI_HILOGI("Move other mouse, stop input device cooperate");
+            CHKPV(InputDevCooSM->currentStateSM_);
+            // InputDevCooSM->isStopping_ = true;
+            // int32_t ret = InputDevCooSM->currentStateSM_->StopInputDeviceCooperate(InputDevCooSM->srcNetworkId_);
+            // if (ret != RET_OK) {
+            //     FI_HILOGE("Stop input device cooperate fail");
+            //     InputDevCooSM->isStopping_ = false;
+            // }
+            InputDevCooSM->StopInputDeviceCooperate();
+        }
+    }
+}
+
+void InputDeviceCooperateSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
+{
+}
+
+void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
+{
+}
+
+void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        MMI::PointerEvent::PointerItem pointerItem;
+        pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+        InputDevCooSM->x_ = pointerItem.GetDisplayX();
+        InputDevCooSM->y_ = pointerItem.GetDisplayY();
+    }
+    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
+    if (state == CooperateState::STATE_IN) {
+        // 本端使用拦截（隐藏鼠标前添加拦截器），只拦截鼠标事件，远端使用监听
+        auto* context = CooperateEventMgr->GetIContext();
+        CHKPV(context);
+        int32_t deviceId = pointerEvent->GetDeviceId();
+        FI_HILOGE("###IsRemote begin###,ID:%{public}d",deviceId);
+        if (!context->GetDeviceManager().IsRemote(deviceId)) {
+            FI_HILOGE("###IsRemote true###");
+            CHKPV(InputDevCooSM->currentStateSM_);
+            // InputDevCooSM->isStopping_ = true;
+            // std::string sink = context->GetDeviceManager().GetOriginNetworkId(InputDevCooSM->startDhid_);
+            // int32_t ret = InputDevCooSM->currentStateSM_->StopInputDeviceCooperate(sink);
+            // if (ret != RET_OK) {
+            //     FI_HILOGE("Stop input device cooperate fail");
+            //     InputDevCooSM->isStopping_ = false;
+            // }
+            InputDevCooSM->StopInputDeviceCooperate();
+        } else {
+            FI_HILOGE("###IsRemote false###");
+        }
+    }
+}
+
+void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
+{
 }
 } // namespace DeviceStatus
 } // namespace Msdp

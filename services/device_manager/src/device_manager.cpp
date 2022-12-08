@@ -357,8 +357,10 @@ bool DeviceManager::IsRemote(int32_t id) const
 
 bool DeviceManager::OnIsRemote(int32_t id) const
 {
+    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
+            FI_HILOGI("isremote: %{public}s", devIter->second->IsRemote() ? "true" : "false");
             return devIter->second->IsRemote();
         } else {
             FI_HILOGW("Device is unsynchronized");
@@ -375,6 +377,7 @@ int32_t DeviceManager::RunIsRemote(std::packaged_task<bool(int32_t)> &task, int3
 
 std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return std::vector<std::string>();
@@ -394,6 +397,7 @@ std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) cons
 
 std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     std::vector<std::string> dhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
@@ -428,6 +432,10 @@ std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
             dhids.push_back(dev->GetDhid());
             FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
+    }
+
+    for (const auto &dhid : dhids) {
+        FI_HILOGI("dhid: %{public}s", dhid.c_str());
     }
     return dhids;
 }
@@ -485,6 +493,7 @@ int32_t DeviceManager::RunGetCooperateDhids(
 
 std::string DeviceManager::GetOriginNetworkId(int32_t id) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -504,6 +513,8 @@ std::string DeviceManager::GetOriginNetworkId(int32_t id) const
 
 std::string DeviceManager::OnGetOriginNetId(int32_t id) const
 {
+    CALL_INFO_TRACE;
+    FI_HILOGI("id:%{public}d", id);
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
         FI_HILOGE("Failed to search for the device: id %{public}d", id);
@@ -517,6 +528,7 @@ std::string DeviceManager::OnGetOriginNetId(int32_t id) const
     if (networkId.empty()) {
         networkId = COOPERATE::GetLocalDeviceId();
     }
+    FI_HILOGI("OriginNetworkId:%{public}s", networkId.c_str());
     return networkId;
 }
 
@@ -528,6 +540,7 @@ int32_t DeviceManager::RunGetOriginNetId(std::packaged_task<std::string(int32_t)
 
 std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -547,6 +560,8 @@ std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 
 std::string DeviceManager::OnGetOriginNetworkId(const std::string &dhid) const
 {
+    CALL_INFO_TRACE;
+    FI_HILOGI("----------dhid:%{public}s", dhid.c_str());
     if (dhid.empty()) {
         return EMPTYSTR;
     }
@@ -556,6 +571,7 @@ std::string DeviceManager::OnGetOriginNetworkId(const std::string &dhid) const
             continue;
         }
         if (dev->IsRemote() && dev->GetDhid() == dhid) {
+            FI_HILOGI("tOriginNetworkId:%{public}s", dev->GetNetworkId().c_str());
             return dev->GetNetworkId();
         }
     }
@@ -571,6 +587,7 @@ int32_t DeviceManager::RunGetOriginNetworkId(std::packaged_task<std::string(cons
 
 std::string DeviceManager::GetDhid(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return EMPTYSTR;
@@ -590,8 +607,11 @@ std::string DeviceManager::GetDhid(int32_t deviceId) const
 
 std::string DeviceManager::OnGetDhid(int32_t deviceId) const
 {
+    CALL_INFO_TRACE;
+    FI_HILOGI("deviceId: %{public}d", deviceId);
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
+            FI_HILOGI("dhid: %{public}s", devIter->second->GetDhid().c_str());
             return devIter->second->GetDhid();
         } else {
             FI_HILOGW("Device is unsynchronized");
