@@ -79,7 +79,9 @@ struct PointerFilter : public MMI::IInputEventFilter {
 
     bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
     {
-        CHKPF(pointerEvent);
+        if (pointerEvent == nullptr) {
+            return false;
+        }
         if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
             InputMgr->RemoveInputEventFilter(filterId_);
             filterId_ = -1;
@@ -93,7 +95,7 @@ struct PointerFilter : public MMI::IInputEventFilter {
         filterId_ = filterId;
     }
 private:
-    int32_t filterId_ { -1 };
+    mutable int32_t filterId_ { -1 };
 };
 
 class InputDeviceCooperateSM final {
