@@ -65,10 +65,8 @@ void InputDeviceCooperateSM::Init()
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
     });
-
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
-
     auto monitor = std::make_shared<MonitorConsumer>();
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
 }
@@ -114,7 +112,6 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     }
     isStarting_ = false;
     isStopping_ = false;
-    // 关掉监听，拦截
     RemoveInterceptor();
 }
 
