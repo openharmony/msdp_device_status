@@ -27,6 +27,7 @@
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
+#include "input_manager.h"
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"

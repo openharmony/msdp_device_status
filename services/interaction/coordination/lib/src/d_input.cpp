@@ -36,9 +36,9 @@ DInput::~DInput()
 {
 }
 
-void DInput::Init(DelegateTasksCallback delegateTasksCallback)
+void DInput::Init()
 {
-    InputDevCooSM->Init(delegateTasksCallback);
+    InputDevCooSM->Init();
 }
 
 void DInput::RegisterEventCallback(SimulateEventCallback callback)

@@ -19,7 +19,6 @@
 #include <mutex>
 
 #include "devicestatus_define.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "distributed_device_profile_client.h"
 #include "input_device_cooperate_util.h"
 #include "service_characteristic_profile.h"
@@ -67,7 +66,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) {
                       syncOptions.AddDevice(deviceId);
-                      DEV_HILOGD(SERVICE, "Add device success");
+                      FI_HILOGD("Add device success");
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
@@ -215,7 +214,7 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
 {
     std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        DEV_HILOGD(SERVICE, "Sync result:%{public}d", syncResult.second);
+        FI_HILOGD("Sync result:%{public}d", syncResult.second);
     });
 }
 } // namespace DeviceStatus

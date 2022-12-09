@@ -117,7 +117,22 @@ class InputDeviceCooperateSM final {
         virtual void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
     };
 
+    class InterceptorConsumer : public MMI::IInputEventConsumer {
+    public:
+        void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
+    };
+
+    class MonitorConsumer : public MMI::IInputEventConsumer {
+    public:
+        void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
+    };
+
 public:
+    void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
     void EnableInputDeviceCooperate(bool enabled);
@@ -150,6 +165,10 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     std::shared_ptr<InputDevCooperateCallback> GetCooperateCallback();
     
+    void RemoveMonitor();
+    void RemoveInterceptor();
+    bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
+
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     bool CheckPointerEvent(struct libinput_event *event);
@@ -178,6 +197,10 @@ private:
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
     std::shared_ptr<InputDevCooperateCallback> inputDevCooperateCb_ { nullptr };
+    int32_t x_ { -1 };
+    int32_t y_ { -1 };
+    int32_t interceptorId_ { -1 };
+    int32_t monitorId_ { -1 };
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()

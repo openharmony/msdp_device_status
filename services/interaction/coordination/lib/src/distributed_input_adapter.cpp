@@ -20,7 +20,6 @@
 #include <mutex>
 
 #include "cooperate_event_manager.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -178,7 +177,7 @@ void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback cal
 
 void DistributedInputAdapter::AddTimer(const CallbackType &type)
 {
-    DEV_HILOGD(SERVICE, "AddTimer type:%{public}d", type);
+    FI_HILOGD("AddTimer type:%{public}d", type);
     auto context = CooperateEventMgr->GetIContext();
     CHKPV(context);
     int32_t timerId = context->GetTimerManager().AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
@@ -204,7 +203,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
 
 void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
-    DEV_HILOGD(SERVICE, "RemoveTimer type:%{public}d", type);
+    FI_HILOGD("RemoveTimer type:%{public}d", type);
     if (watchingMap_.find(type) != watchingMap_.end()) {
         auto context = CooperateEventMgr->GetIContext();
         CHKPV(context);
