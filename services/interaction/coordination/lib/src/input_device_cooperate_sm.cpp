@@ -66,7 +66,7 @@ void InputDeviceCooperateSM::Init()
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
-    auto monitor = std::make_shared<MonitorConsumer>();
+    auto monitor = std::make_shared<MonitorConsumer>(&InputDeviceCooperateSM::UpdateLastPointerEventCallback);
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
 }
 
@@ -172,19 +172,10 @@ void InputDeviceCooperateSM::GetCooperateState(const std::string &deviceId)
     CooperateEventMgr->OnGetState(state);
 }
 
-int32_t InputDeviceCooperateSM::StartInputDeviceCooperateMonitor()
-{
-    inputDevCooperateCb_ = std::make_shared<InputDevCooperateCallback>();
-    return InputMgr->AddMonitor(inputDevCooperateCb_);
-}
-
 void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
-        if (0 > monitorId_ = StartInputDeviceCooperateMonitor()) {
-            FI_HILOGE("Add Monitor Failed.");
-        }
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
     } else {
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
@@ -673,6 +664,16 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
     dprintf(fd, "Run successfully");
 }
 
+void InputDeviceCooperateSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    lastPointerEvent_ = pointerEvent;
+}
+
+std::shared_ptr<MMI::PointerEvent> InputDeviceCooperateSM::GetLastPointerEvent() const
+{
+    return lastPointerEvent_;
+}
+
 void InputDeviceCooperateSM::RemoveMonitor()
 {
     if ((monitorId_ >= MIN_HANDLER_ID) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
@@ -740,11 +741,6 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
-}
-
-std::shared_ptr<InputDevCooperateCallback> InputDeviceCooperateSM::GetCooperateCallback()
-{
-    return inputDevCooperateCb_;
 }
 
 void InputDeviceCooperateSM::SetAbsolutionLocation(double xPercent, double yPercent)
@@ -845,6 +841,9 @@ void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (callback_) {
+        callback_(pointerEvent);
+    }
     if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);

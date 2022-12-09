@@ -257,9 +257,8 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
-    auto inputDevCooperateCb = InputDevCooSM->GetCooperateCallback();
-    CHKPR(inputDevCooperateCb, RET_ERR);
-    auto pointerEvent = inputDevCooperateCb->GetLastPointerEvent();
+    auto pointerEvent = InputDevCooSM->GetLastPointerEvent();
+    CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed = (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
