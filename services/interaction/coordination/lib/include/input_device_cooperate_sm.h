@@ -16,6 +16,8 @@
 #ifndef INPUT_DEVICE_COOPERATE_SM_H
 #define INPUT_DEVICE_COOPERATE_SM_H
 
+#include <functional>
+
 #include "singleton.h"
 
 #include "devicestatus_define.h"
@@ -106,12 +108,12 @@ class InputDeviceCooperateSM final {
 
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
-        explicit MonitorConsumer(std::fuction<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
+        explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        std::fuction<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 
 public:
@@ -175,7 +177,6 @@ private:
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
-    DelegateTasksCallback delegateTasksCallback_ { nullptr };
     std::shared_ptr<MMI::PointerEvent> lastPointerEvent_ { nullptr };
     std::shared_ptr<InputDevCooperateCallback> inputDevCooperateCb_ { nullptr };
     int32_t x_ { -1 };

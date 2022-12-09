@@ -66,7 +66,8 @@ void InputDeviceCooperateSM::Init()
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
-    auto monitor = std::make_shared<MonitorConsumer>(&InputDeviceCooperateSM::UpdateLastPointerEventCallback);
+    auto monitor = std::make_shared<MonitorConsumer>(
+        std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
 }
 
