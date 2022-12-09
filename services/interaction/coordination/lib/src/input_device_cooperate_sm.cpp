@@ -26,7 +26,6 @@
 #include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "device_profile_adapter.h"
-#include "devicestatus_define.h"
 #include "display_info.h"
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
@@ -67,7 +66,8 @@ void InputDeviceCooperateSM::Init()
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
-    auto monitor = std::make_shared<MonitorConsumer>();
+    auto monitor = std::make_shared<MonitorConsumer>(
+        std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
 }
 
@@ -234,10 +234,14 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
         FI_HILOGE("Stop input device cooperate fail");
         isStopping_ = false;
     }
+    if (monitorId_ > 0) {
+        InputMgr->RemoveMonitor(monitorId_);
+        monitorId_ = -1;
+    }
     return ret;
 }
 
-void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId)
+void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId, bool buttonIsPressed)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -250,6 +254,21 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
         FI_HILOGE("Posting async task failed");
     }
     isStarting_ = true;
+    if (buttonIsPressed) {
+        StartPointerEventFilter();
+    }
+}
+
+void InputDeviceCooperateSM::StartPointerEventFilter()
+{
+    CALL_INFO_TRACE;
+    int32_t POINTER_DEFAULT_PRIORITY = 220;
+    auto filter = std::make_shared<PointerFilter>();
+    filterId_ = InputMgr->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
+    if (0 > filterId_) {
+        FI_HILOGE("Add Event Filter Failed.");
+    }
+    filter->UpdateCurrentFilterId(filterId_);
 }
 
 void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
@@ -646,6 +665,16 @@ void InputDeviceCooperateSM::Dump(int32_t fd, const std::vector<std::string> &ar
     dprintf(fd, "Run successfully");
 }
 
+void InputDeviceCooperateSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    lastPointerEvent_ = pointerEvent;
+}
+
+std::shared_ptr<MMI::PointerEvent> InputDeviceCooperateSM::GetLastPointerEvent() const
+{
+    return lastPointerEvent_;
+}
+
 void InputDeviceCooperateSM::RemoveMonitor()
 {
     if ((monitorId_ >= MIN_HANDLER_ID) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
@@ -813,6 +842,9 @@ void InputDeviceCooperateSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (callback_) {
+        callback_(pointerEvent);
+    }
     if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
