@@ -178,7 +178,6 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
     std::shared_ptr<MMI::PointerEvent> lastPointerEvent_ { nullptr };
-    std::shared_ptr<InputDevCooperateCallback> inputDevCooperateCb_ { nullptr };
     int32_t x_ { -1 };
     int32_t y_ { -1 };
     int32_t interceptorId_ { -1 };
