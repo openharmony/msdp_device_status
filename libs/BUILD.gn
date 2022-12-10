@@ -39,7 +39,7 @@ ohos_shared_library("devicestatus_sensorhdi") {
 
   public_configs = [ ":devicestatus_srv_public_config" ]
 
-  deps = [ "//third_party/cJSON:cjson_static" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
@@ -59,7 +59,7 @@ ohos_shared_library("devicestatus_msdp") {
 
   public_configs = [ ":devicestatus_srv_public_config" ]
 
-  deps = [ "//third_party/cJSON:cjson_static" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
