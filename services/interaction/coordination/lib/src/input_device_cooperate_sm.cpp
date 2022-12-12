@@ -175,13 +175,15 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
-        auto monitor = std::make_shared<MonitorConsumer>(
-            std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
-        monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
         if (monitorId_ <= 0) {
-            FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
-            monitorId_ = -1;
-            return;
+            auto monitor = std::make_shared<MonitorConsumer>(
+                std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
+            monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
+            if (monitorId_ <= 0) {
+                FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
+                monitorId_ = -1;
+                return;
+            }
         }
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
     } else {
