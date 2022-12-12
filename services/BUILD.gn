@@ -74,7 +74,7 @@ ohos_shared_library("devicestatus_service") {
     "//third_party/openssl:libcrypto_shared",
   ]
 
-  if (device_status_feature_coordination) {
+  if (fusion_interaction_coordination) {
     deps += [
       "interaction/coordination/lib:coordination_lib",
       "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
