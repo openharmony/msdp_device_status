@@ -52,6 +52,7 @@ InputDeviceCooperateSM::InputDeviceCooperateSM() {}
 InputDeviceCooperateSM::~InputDeviceCooperateSM()
 {
     RemoveMonitor();
+    RemoveInterceptor();
 }
 
 void InputDeviceCooperateSM::Init()
@@ -66,9 +67,6 @@ void InputDeviceCooperateSM::Init()
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
-    auto monitor = std::make_shared<MonitorConsumer>(
-        std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
-    monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor); 
 }
 
 void InputDeviceCooperateSM::Reset(const std::string &networkId)
@@ -177,11 +175,20 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
+        auto monitor = std::make_shared<MonitorConsumer>(
+            std::bind(&InputDeviceCooperateSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
+        monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
+        if (monitorId_ <= 0) {
+            FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
+            monitorId_ = -1;
+            return;
+        }
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
     } else {
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
         std::string localNetworkId = COOPERATE::GetLocalDeviceId();
         OnCloseCooperation(localNetworkId, true);
+        RemoveMonitor();
     }
 }
 
@@ -233,10 +240,6 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device cooperate fail");
         isStopping_ = false;
-    }
-    if (monitorId_ > 0) {
-        InputMgr->RemoveMonitor(monitorId_);
-        monitorId_ = -1;
     }
     return ret;
 }
@@ -454,6 +457,7 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
+                FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
                 StopInputDeviceCooperate();
                 return;
             }
@@ -468,6 +472,7 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));
             if (interceptorId_ <= 0) {
+                FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
                 StopInputDeviceCooperate();
                 return;
             }
