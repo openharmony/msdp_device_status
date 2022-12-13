@@ -264,7 +264,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localDeviceId.c_str()));
     cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS, cJSON_CreateNumber(isPointerButtonPressed));
+    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS, cJSON_CreateBool(isPointerButtonPressed));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
