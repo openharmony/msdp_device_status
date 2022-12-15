@@ -213,7 +213,7 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     READSTRING(data, clientName, E_DEVICESTATUS_READ_PARCEL_ERROR);
 
     int32_t clientFd = -1;
-    int32_t tokenId = GetCallingTokenID();
+    uint32_t tokenId = GetCallingTokenID();
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     int32_t ret = AllocSocketFd(clientName, moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
