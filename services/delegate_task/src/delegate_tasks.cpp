@@ -117,9 +117,6 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
     CHKPR(callback, ERROR_NULL_POINTER);
-    if (IsCallFromWorkerThread()) {
-        return callback();
-    }
     auto task = PostTask(callback);
     if (task == nullptr) {
         FI_HILOGE("Post async task failed");
@@ -146,10 +143,6 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 
 DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
-    if (IsCallFromWorkerThread()) {
-        FI_HILOGE("This interface cannot be called from a worker thread.");
-        return nullptr;
-    }
     std::lock_guard<std::mutex> guard(mux_);
     FI_HILOGD("tasks_ size %{public}d", static_cast<int32_t>(tasks_.size()));
     static constexpr int32_t maxTasksLimit = 1000;

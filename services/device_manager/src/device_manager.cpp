@@ -33,7 +33,6 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
-constexpr int32_t DEFAULT_DELAY_FOR_ASYNC_TASK { 1 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 } // namespace
 
@@ -131,17 +130,16 @@ void DeviceManager::OnGetDeviceIds(std::vector<int32_t> &deviceIds)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    int32_t timerId;
 
     for (const int32_t id : deviceIds) {
-        timerId = context_->GetTimerManager().AddTimer(DEFAULT_DELAY_FOR_ASYNC_TASK,
-            WAIT_FOR_ONCE, std::bind(&DeviceManager::GetDeviceAsync, this, id));
-        if (timerId < 0) {
-            FI_HILOGE("Add timer failed");
+        int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+            std::bind(&DeviceManager::GetDeviceAsync, this, id));
+        if (ret != RET_OK) {
+            FI_HILOGE("PostAsyncTask failed");
         }
     }
 
-    timerId = context_->GetTimerManager().AddTimer(DEFAULT_WAIT_TIME_MS,
+    int32_t timerId = context_->GetTimerManager().AddTimer(DEFAULT_WAIT_TIME_MS,
         WAIT_FOR_ONCE, std::bind(&DeviceManager::Synchronize, this));
     if (timerId < 0) {
         FI_HILOGE("Add timer failed");
