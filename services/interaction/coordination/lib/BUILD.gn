@@ -51,7 +51,7 @@ ohos_source_set("coordination_lib") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
     "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
