@@ -15,16 +15,10 @@
 
 #include <gtest/gtest.h>
 
-//#include "event_log_helper.h"
-//#include "event_util_test.h"
-//#include "input_handler_type.h"
 #include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
-//#include "multimodal_event_handler.h"
-//#include "system_info.h"
-//#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -33,12 +27,6 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
-//constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-//constexpr int32_t DEFAULT_POINTER_ID = 0;
-//constexpr int32_t DEFAULT_DEVICE_ID = 0;
-//constexpr int32_t INDEX_FIRST = 1;
-//constexpr int32_t INDEX_SECOND = 2;
-//constexpr int32_t INDEX_THIRD = 3;
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
