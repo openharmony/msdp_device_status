@@ -57,7 +57,7 @@ void InteractionManagerTest::TearDown()
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCooperateListener_001, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
     int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -107,7 +107,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCooperateListene
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCooperateListener, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
     int32_t ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -125,7 +125,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCooperateListe
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableInputDeviceCooperate, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     bool enabled = false;
     auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
         FI_HILOGD("Enable input device cooperate success");
@@ -146,7 +146,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableInputDeviceCoopera
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartInputDeviceCooperate, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     std::string sinkDeviceId("");
     int32_t srcInputDeviceId = -1;
     auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
@@ -168,7 +168,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartInputDeviceCooperat
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDeviceCooperate, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
         FI_HILOGD("Start input device cooperate success");
     };
@@ -188,7 +188,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDeviceCooperate, Tes
  */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetInputDeviceCooperateState, TestSize.Level1)
 {
-    //CALL_TEST_DEBUG;
+    CALL_TEST_DEBUG;
     const std::string deviceId("");
     auto fun = [](bool state) {
         FI_HILOGD("Get inputdevice state success");
