@@ -11,7 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("fuzztest") {
+import("//base/msdp/device_status/device_status.gni")
+
+group("device_status_fuzztest") {
   testonly = true
   deps = []
 
@@ -19,4 +21,13 @@ group("fuzztest") {
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
   ]
+  if (fusion_interaction_coordination) {
+    deps += [
+      "enableinputdevicecooperate_fuzzer:fuzztest",
+      "getinputdevicecooperatestate_fuzzer:fuzztest",
+      "registercooperatelistener_fuzzer:fuzztest",
+      "startinputdevicecooperate_fuzzer:fuzztest",
+      "stopdevicecooperate_fuzzer:fuzztest",
+    ]
+  }
 }

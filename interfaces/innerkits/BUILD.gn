@@ -11,7 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+import("//build/test.gni")
 import("//base/msdp/device_status/device_status.gni")
+module_output_path = "device_status/unit_out"
 
 config("devicestatus_private_config") {
   include_dirs = [ "//utils/system/safwk/native/include" ]
@@ -71,4 +74,25 @@ ohos_shared_library("devicestatus_client") {
   ]
 
   part_name = "${device_status_part_name}"
+}
+
+ohos_unittest("InteractionManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "//base/msdp/device_status/interfaces/innerkits/interaction/include",
+    "//base/msdp/device_status/utils/common/include",
+  ]
+
+  defines = []
+
+  sources = [
+    "${device_status_frameworks_path}/native/interaction/test/interaction_manager_test.cpp",
+  ]
+
+  configs = []
+
+  deps = [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }
