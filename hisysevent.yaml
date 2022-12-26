@@ -14,13 +14,13 @@
 domain: MSDP
 
 SUBSCRIBE:
-  __BASE: {type: STATISTIC, level: MINOR, tag: deviceStatus, desc: subscribe}
-  UID: {type: INT32, desc: subscribe uid}
+  __BASE: {type: STATISTIC, level: MINOR, tag: deviceStatus, desc: subscribes to the device status}
+  UID: {type: INT32, desc: subscribes to the device status uid}
   PACKAGE_NAME: {type: STRING, desc: devicestatus pkgname}
   TYPE: {type: INT32, desc: deviceStatus type}
 
 UNSUBSCRIBE:
-  __BASE: {type: STATISTIC, level: MINOR, tag: deviceStatus, desc: unSubscribe}
-  UID: {type: INT32, desc: unSubscribe uid}
+  __BASE: {type: STATISTIC, level: MINOR, tag: deviceStatus, desc: unsubscribes from the device status}
+  UID: {type: INT32, desc: unsubscribes from the device status uid}
   PACKAGE_NAME: {type: STRING, desc: devicestatus pkgname}
   TYPE: {type: INT32, desc: deviceStatus type}
