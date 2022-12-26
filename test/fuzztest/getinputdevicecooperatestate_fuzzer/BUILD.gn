@@ -11,10 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/msdp/device_status/device_status.gni")
+
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//base/msdp/device_status/device_status.gni")
 module_output_path = "device_status/device_status_native"
 
 ##############################fuzztest##########################################
@@ -34,7 +35,8 @@ ohos_fuzztest("GetInputDeviceCooperateStateFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "getinputdevicecooperatestate_fuzzer.cpp" ]
-  deps = [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
+  deps =
+      [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
