@@ -85,16 +85,15 @@ int32_t DeviceManager::Enable()
 int32_t DeviceManager::OnEnable()
 {
     CALL_INFO_TRACE;
-    CHKPR(InputMgr, RET_ERR);
-    int32_t ret = InputMgr->RegisterDevListener(CHANGED_TYPE, inputDevListener_);
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener(CHANGED_TYPE, inputDevListener_);
     if (ret != RET_OK) {
         FI_HILOGE("RegisterDevListener failed");
         return ret;
     }
-    ret = InputMgr->GetDeviceIds(std::bind(&DeviceManager::OnGetDeviceIds, this, std::placeholders::_1));
+    ret = OHOS::MMI::InputManager::GetInstance()->GetDeviceIds(std::bind(&DeviceManager::OnGetDeviceIds, this, std::placeholders::_1));
     if (ret != RET_OK) {
         FI_HILOGE("GetDeviceIds failed");
-        int32_t r = InputMgr->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
+        int32_t r = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
         if (r != RET_OK) {
             FI_HILOGE("UnregisterDevListener failed");
         }
@@ -117,7 +116,7 @@ void DeviceManager::Disable()
 int32_t DeviceManager::OnDisable()
 {
     CALL_INFO_TRACE;
-    int32_t ret = InputMgr->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
     if (ret != RET_OK) {
         FI_HILOGE("UnregisterDevListener failed");
         return ret;
@@ -157,8 +156,7 @@ int32_t DeviceManager::Synchronize()
             continue;
         }
         needSync = true;
-        CHKPR(InputMgr, RET_ERR);
-        int32_t ret = InputMgr->GetDevice(id,
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(id,
             std::bind(&DeviceManager::AddDevice, this, std::placeholders::_1));
         if (ret != 0) {
             FI_HILOGE("GetDevice failed");
@@ -203,8 +201,7 @@ int32_t DeviceManager::GetDeviceAsync(int32_t deviceId)
         devices_.emplace(deviceId, nullptr);
     }
 
-    CHKPR(InputMgr, RET_ERR);
-    int32_t ret = InputMgr->GetDevice(deviceId,
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
         std::bind(&DeviceManager::AddDevice, this, std::placeholders::_1));
     if (ret != 0) {
         FI_HILOGE("GetDevice failed");
