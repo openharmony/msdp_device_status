@@ -51,7 +51,7 @@ void Device::Populate()
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
     if (IsKeyboard()) {
-        int32_t ret = InputMgr->GetKeyboardType(GetId(),
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetKeyboardType(GetId(),
             std::bind(&Device::onKeyboardTypeObtained, this, std::placeholders::_1));
         if (ret != 0) {
             FI_HILOGE("GetKeyboardType failed");

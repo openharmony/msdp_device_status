@@ -106,7 +106,7 @@ void InputDeviceCooperateSM::Reset(bool adjustAbsolutionLocation)
     if (hasPointer && adjustAbsolutionLocation) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     } else {
-        InputMgr->SetPointerVisible(hasPointer);
+        OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
     }
     isStarting_ = false;
     isStopping_ = false;
@@ -269,7 +269,7 @@ void InputDeviceCooperateSM::StartPointerEventFilter()
     CALL_INFO_TRACE;
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
-    filterId_ = InputMgr->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
+    filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
     if (0 > filterId_) {
         FI_HILOGE("Add Event Filter Failed.");
     }
@@ -468,7 +468,7 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
         case CooperateState::STATE_OUT: {
             auto* context = CooperateEventMgr->GetIContext();
             CHKPV(context);
-            InputMgr->SetPointerVisible(false);
+            OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
@@ -765,7 +765,7 @@ void InputDeviceCooperateSM::SetAbsolutionLocation(double xPercent, double yPerc
     int32_t physicalY = static_cast<int32_t>(height * yPercent / PERCENT_CONST);
     FI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d,"
         "physicalX:%{public}d, x_:%{public}d, y_:%{public}d",width,height,physicalX,physicalY,x_,y_);
-    InputMgr->SetPointerLocation(physicalX, physicalY);
+    OHOS::MMI::InputManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
 }
 
 void InputDeviceCooperateSM::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
