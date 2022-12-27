@@ -33,14 +33,12 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 
-void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusChanged(const \
-    DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
+void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL && \
-        devicestatusData.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_ENTER) << \
-        "DeviceStatusServiceTestCallback failed";
+    EXPECT_TRUE(devicestatusData.type == Type::TYPE_STILL &&
+        devicestatusData.value == OnChangedValue::VALUE_ENTER) << "DeviceStatusServiceTestCallback failed";
 }
 
 /**
@@ -50,14 +48,14 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
  */
 HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest, TestSize.Level0)
 {
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL;
+    Type type = Type::TYPE_STILL;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    sptr<IdevicestatusCallback> cb = new (std::nothrow) DeviceStatusServiceTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusServiceTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    devicestatusClient.SubscribeCallback(type, cb);
+    devicestatusClient.SubscribeCallback(type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
     GTEST_LOG_(INFO) << "Cancel register";
-    devicestatusClient.UnsubscribeCallback(type, cb);
+    devicestatusClient.UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
 /**
@@ -68,13 +66,13 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest001, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 Enter");
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL;
+    Type type = Type::TYPE_HORIZONTAL_POSITION;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+    EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 end");
 }
 
@@ -86,13 +84,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest001, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL;
+    Type type = Type::TYPE_STILL;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_FINE_STILL && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+    EXPECT_TRUE(data.type == Type::TYPE_STILL &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 end");
 }
 
@@ -104,52 +102,52 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 Enter");
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_CAR_BLUETOOTH;
+    Type type = Type::TYPE_VERTICAL_POSITION;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_CAR_BLUETOOTH && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+    EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 end");
 }
 
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest004 Enter";
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN;
+    Type type = Type::TYPE_LID_OPEN;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusDataTest004 failed";
+    EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusDataTest004 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest004 end";
 }
 
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest005 Enter";
-    DeviceStatusDataUtils::DeviceStatusType type = DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID;
+    Type type = Type::TYPE_INVALID;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusDataTest005 failed";
+    EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusDataTest005 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest005 end";
 }
 
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest006 Enter";
-    DeviceStatusDataUtils::DeviceStatusType type = static_cast<DeviceStatusDataUtils::DeviceStatusType>(10);
+    Type type = static_cast<Type>(10);
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
-    DeviceStatusDataUtils::DeviceStatusData data = devicestatusClient.GetDeviceStatusData(type);
+    Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusDataTest006 failed";
+    EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest006 end";
 }
 
@@ -213,9 +211,9 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
     auto devicestatusManager = std::make_shared<DeviceStatusManager>(devicestatusService);
     bool result = devicestatusManager->Init();
     EXPECT_TRUE(result);
-    int32_t ret = devicestatusManager->LoadAlgorithm(false);
+    int32_t ret = devicestatusManager->LoadAlgorithm();
     EXPECT_TRUE(ret == RET_OK);
-    ret = devicestatusManager->UnloadAlgorithm(false);
+    ret = devicestatusManager->UnloadAlgorithm();
     EXPECT_TRUE(ret == RET_OK);
     DelayedSpSingleton<DeviceStatusService>::DestroyInstance();
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";

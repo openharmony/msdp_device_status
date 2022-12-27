@@ -97,9 +97,8 @@ HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest002, TestSize.Level1)
         return;
     }
     callbackProxy_ = std::make_shared<DeviceStatusCallbackProxy>(remoteObject_);
-    DeviceStatusDataUtils::DeviceStatusData devicestatusData = {
-        DeviceStatusDataUtils::DeviceStatusType::TYPE_HIGH_STILL,
-        DeviceStatusDataUtils::DeviceStatusValue::VALUE_ENTER
+    Data devicestatusData = {
+        Type::TYPE_HORIZONTAL_POSITION, OnChangedValue::VALUE_ENTER
     };
     DEV_HILOGE(INNERKIT, "test OnDeviceStatusChanged start");
     callbackProxy_->OnDeviceStatusChanged(devicestatusData);
@@ -115,12 +114,12 @@ HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest002, TestSize.Level1)
 HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusClientTest003 start";
-    sptr<IdevicestatusCallback> callback =
-        sptr<IdevicestatusCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
+    sptr<IRemoteDevStaCallback> callback =
+        sptr<IRemoteDevStaCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
     auto& client = DeviceStatusClient::GetInstance();
     client.devicestatusProxy_ = nullptr;
     DEV_HILOGE(INNERKIT, "test SubscribeCallback start");
-    client.SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, callback);
+    client.SubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, callback);
     DEV_HILOGE(INNERKIT, "test SubscribeCallback end");
     GTEST_LOG_(INFO) << "DeviceStatusClientTest003 end";
 }
@@ -133,12 +132,12 @@ HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest003, TestSize.Level1)
 HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusClientTest004 start";
-    sptr<IdevicestatusCallback> callback =
-        sptr<IdevicestatusCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
+    sptr<IRemoteDevStaCallback> callback =
+        sptr<IRemoteDevStaCallback>(new DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
     auto& client = DeviceStatusClient::GetInstance();
     client.devicestatusProxy_ = nullptr;
     DEV_HILOGE(INNERKIT, "test UnsubscribeCallback start");
-    client.UnsubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, callback);
+    client.UnsubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, callback);
     DEV_HILOGE(INNERKIT, "test UnsubscribeCallback end");
     GTEST_LOG_(INFO) << "DeviceStatusClientTest004 end";
 }
@@ -154,10 +153,10 @@ HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest005, TestSize.Level1)
     auto& client = DeviceStatusClient::GetInstance();
     client.devicestatusProxy_ = nullptr;
     DEV_HILOGE(INNERKIT, "test GetDeviceStatusData start");
-    auto data = client.GetDeviceStatusData(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN);
+    auto data = client.GetDeviceStatusData(Type::TYPE_LID_OPEN);
     DEV_HILOGE(INNERKIT, "test GetDeviceStatusData end");
-    EXPECT_TRUE(data.type == DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN && \
-        data.value == DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+    EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     GTEST_LOG_(INFO) << "DeviceStatusClientTest005 end";
 }
 
@@ -206,12 +205,12 @@ HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest007, TestSize.Level1)
 HWTEST_F (DeviceStatusClientTest, DeviceStatusClientTest008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusClientTest008 start";
-    sptr<IdevicestatusCallback> callback =
-        sptr<IdevicestatusCallback>(new (std::nothrow) DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
+    sptr<IRemoteDevStaCallback> callback =
+        sptr<IRemoteDevStaCallback>(new (std::nothrow) DeviceStatusAgent::DeviceStatusAgentCallback(agent_));
     auto& client = DeviceStatusClient::GetInstance();
     DEV_HILOGE(INNERKIT, "test SubscribeCallback start");
-    client.SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, callback);
-    client.SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, callback);
+    client.SubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, callback);
+    client.SubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, callback);
     DEV_HILOGE(INNERKIT, "test SubscribeCallback end");
     GTEST_LOG_(INFO) << "DeviceStatusClientTest008 end";
 }

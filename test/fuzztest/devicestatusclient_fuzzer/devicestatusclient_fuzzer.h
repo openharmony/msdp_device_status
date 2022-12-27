@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-    
+
 #ifndef DEVICESTATUSCLIENT_FUZZER_H
 #define DEVICESTATUSCLIENT_FUZZER_H
 
@@ -43,7 +43,7 @@ public:
     public:
         DeviceStatusTestCallback() {};
         virtual ~DeviceStatusTestCallback() {};
-        virtual void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
+        virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
     };
 };
 } // namespace DeviceStatus

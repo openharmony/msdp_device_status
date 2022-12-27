@@ -24,8 +24,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 auto &client_ = DeviceStatusClient::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb = new DeviceStatusClientFuzzer::DeviceStatusTestCallback();
 const int WAIT_TIME = 1000;
-void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const \
-    DeviceStatusDataUtils::DeviceStatusData& devicestatusData)
+void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     std::cout << "DeviceStatusTestCallback type: " << devicestatusData.type << std::endl;
     std::cout << "DeviceStatusTestCallback value: " << devicestatusData.value << std::endl;
@@ -34,8 +33,8 @@ void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(c
 void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 {
     std::cout << "TestSubscribeCallback: Enter " << std::endl;
-    
-    client_.SubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, cb);
+
+    client_.SubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestGetDeviceStatusData();
@@ -44,8 +43,8 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 void DeviceStatusClientFuzzer::TestGetDeviceStatusData()
 {
     std::cout << "TestGetDeviceStatusData: Enter " << std::endl;
-    client_.GetDeviceStatusData(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN);
-    
+    client_.GetDeviceStatusData(Type::TYPE_LID_OPEN);
+
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestUnsubscribeCallback();
 }
@@ -53,8 +52,8 @@ void DeviceStatusClientFuzzer::TestGetDeviceStatusData()
 void DeviceStatusClientFuzzer::TestUnsubscribeCallback()
 {
     std::cout << "TestUnsubscribeCallback: Enter " << std::endl;
-    
-    client_.UnsubscribeCallback(DeviceStatusDataUtils::DeviceStatusType::TYPE_LID_OPEN, cb);
+
+    client_.UnsubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
