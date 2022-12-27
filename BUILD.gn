@@ -11,10 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
+import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
 
-#group("systemtest") {
-#  testonly = true
-#  deps = [ "systemtest/:systemtest" ]
-#}
-
+group("device_status_tests") {
+  testonly = true
+  deps = [
+    "interfaces/innerkits:InteractionManagerTest",
+    "services/native/test:devicestatussrv_test",
+    "test/fuzztest:device_status_fuzztest",
+  ]
+}
