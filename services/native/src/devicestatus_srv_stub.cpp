@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#include "devicestatus_srv_stub.h"
-
 #include "message_parcel.h"
 
-#include "devicestatus_srv_proxy.h"
-#include "devicestatus_common.h"
-#include "idevicestatus_callback.h"
-#include "devicestatus_data_utils.h"
-#include "devicestatus_service.h"
 #include "fi_log.h"
 #include "util.h"
+
+#include "devicestatus_common.h"
+#include "devicestatus_data_utils.h"
+#include "devicestatus_define.h"
+#include "devicestatus_service.h"
+#include "devicestatus_srv_stub.h"
+#include "devicestatus_srv_proxy.h"
+#include "idevicestatus_callback.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -32,7 +33,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
 } // namespace
 
-int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, \
+int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
     DEV_HILOGD(SERVICE, "cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
@@ -78,7 +79,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
-    return ERR_OK;
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data)
@@ -87,14 +88,21 @@ int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data)
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Read type successfully");
+    int32_t event = -1;
+    READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    DEV_HILOGD(SERVICE, "Read event successfully");
+    DEV_HILOGD(SERVICE, "event:%{public}d", event);
+    int32_t latency = -1;
+    READINT32(data, latency, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    DEV_HILOGD(SERVICE, "Read latency successfully");
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
-    DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Read remote obj successfully");
-    sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
-    DEVICESTATUS_RETURN_IF_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Read callback successfully");
-    Subscribe(DeviceStatusDataUtils::DeviceStatusType(type), callback);
-    return ERR_OK;
+    DEV_RET_IF_NULL_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    DEV_HILOGI(SERVICE, "Read remote obj successfully");
+    sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
+    DEV_RET_IF_NULL_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    DEV_HILOGI(SERVICE, "Read callback successfully");
+    Subscribe(Type(type), ActivityEvent(event), ReportLatencyNs(latency), callback);
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data)
@@ -102,12 +110,15 @@ int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data)
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t event = -1;
+    READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    DEV_HILOGE(SERVICE, "UNevent: %{public}d", event);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
-    DEVICESTATUS_RETURN_IF_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    sptr<IdevicestatusCallback> callback = iface_cast<IdevicestatusCallback>(obj);
-    DEVICESTATUS_RETURN_IF_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Unsubscribe(DeviceStatusDataUtils::DeviceStatusType(type), callback);
-    return ERR_OK;
+    DEV_RET_IF_NULL_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
+    DEV_RET_IF_NULL_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    Unsubscribe(Type(type), ActivityEvent(event), callback);
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply)
@@ -115,13 +126,14 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DeviceStatusDataUtils::DeviceStatusData devicestatusData = GetCache(DeviceStatusDataUtils::DeviceStatusType(type));
+    Data devicestatusData = GetCache(Type(type));
     DEV_HILOGD(SERVICE, "devicestatusData.type: %{public}d", devicestatusData.type);
     DEV_HILOGD(SERVICE, "devicestatusData.value: %{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Exit");
-    return ERR_OK;
+return RET_OK;
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
@@ -235,7 +247,6 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     close(clientFd);
     return RET_OK;
 }
-
 } // namespace DeviceStatus
 } // Msdp
 } // OHOS
