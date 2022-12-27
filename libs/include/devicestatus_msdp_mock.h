@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusMsdpMock final : public DeviceStatusMsdpInterface {
+class DeviceStatusMsdpMock final : public IMsdp {
 public:
     DeviceStatusMsdpMock() = default;
     ~DeviceStatusMsdpMock() = default;
@@ -47,14 +47,14 @@ public:
     int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
-    void Enable(DeviceStatusDataUtils::DeviceStatusType type) override;
-    void Disable(DeviceStatusDataUtils::DeviceStatusType type) override;
-    void DisableCount(DeviceStatusDataUtils::DeviceStatusType type) override;
-    void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) override;
-    void UnregisterCallback() override;
-    ErrCode NotifyMsdpImpl(const DeviceStatusDataUtils::DeviceStatusData& data);
+    ErrCode Enable(Type type) override;
+    ErrCode Disable(Type type) override;
+    ErrCode DisableCount(Type type) override;
+    ErrCode RegisterCallback(std::shared_ptr<IMsdp::MsdpAlgoCallback> callback) override;
+    ErrCode UnregisterCallback() override;
+    ErrCode NotifyMsdpImpl(const Data& data);
     void GetDeviceStatusData();
-    std::shared_ptr<MsdpAlgorithmCallback> GetCallbackImpl()
+    std::shared_ptr<MsdpAlgoCallback> GetCallbackImpl() const
     {
         std::unique_lock lock(mutex_);
         return callback_;
@@ -62,7 +62,8 @@ public:
 
 private:
     using Callback = std::function<void(DeviceStatusMsdpMock*)>;
-    std::shared_ptr<MsdpAlgorithmCallback> callback_;
+    std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
+
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<DeviceStatusDataParse> dataParse_;
     bool scFlag_ {true};
