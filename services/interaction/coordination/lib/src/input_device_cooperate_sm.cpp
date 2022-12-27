@@ -59,11 +59,11 @@ void InputDeviceCooperateSM::Init()
 {
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
-    DevCooperateSoftbusAdapter->Init();
     auto* context = CooperateEventMgr->GetIContext();
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
+        DevCooperateSoftbusAdapter->Init();
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);

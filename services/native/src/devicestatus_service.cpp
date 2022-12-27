@@ -679,6 +679,20 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     event->sess = sess;
     event->msgId = MmiMessageId::COOPERATION_MESSAGE;
     event->userData = userData;
+    if (InputDevCooSM->GetCurrentCooperateState() == CooperateState::STATE_OUT) {
+        FI_HILOGW("It is currently worn out");
+        NetPacket pkt(event->msgId);
+        pkt << userData << "" << static_cast<int32_t>(CooperationMessage::INFO_SUCCESS);
+        if (pkt.ChkRWError()) {
+            FI_HILOGE("Packet write data failed");
+            return RET_ERR;
+        }
+        if (!sess->SendMsg(pkt)) {
+            FI_HILOGE("Sending failed");
+            return RET_ERR;
+        }
+        return RET_OK;
+    }
     CooperateEventMgr->AddCooperationEvent(event);
     int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
