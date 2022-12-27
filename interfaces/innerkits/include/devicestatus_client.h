@@ -16,7 +16,9 @@
 #ifndef DEVICESTATUS_CLIENT_H
 #define DEVICESTATUS_CLIENT_H
 
+#include <functional>
 #include <singleton.h>
+#include <map>
 
 #include "idevicestatus.h"
 #include "idevicestatus_callback.h"
@@ -31,13 +33,17 @@ class DeviceStatusClient final : public DelayedRefSingleton<DeviceStatusClient> 
     DECLARE_DELAYED_REF_SINGLETON(DeviceStatusClient)
 
 public:
+    std::map<Type, int32_t> GetTypeMap()
+    {
+        return typeMap_;
+    }
     DISALLOW_COPY_AND_MOVE(DeviceStatusClient);
 
-    void SubscribeCallback(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback);
-    void UnsubscribeCallback(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback);
-    DeviceStatusDataUtils::DeviceStatusData GetDeviceStatusData(const DeviceStatusDataUtils::DeviceStatusType& type);
+    void SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
+        sptr<IRemoteDevStaCallback> callback);
+    void UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
+    Data GetDeviceStatusData(const Type type);
+    void RegisterDeathListener(std::function<void()> deathListener);
 
     int32_t RegisterCoordinationListener();
     int32_t UnregisterCoordinationListener();
@@ -63,10 +69,12 @@ private:
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
     void ResetProxy(const wptr<IRemoteObject>& remote);
     std::mutex mutex_;
-    int32_t tokenType_ { -1 };
+        int32_t tokenType_ { -1 };
     int32_t socketFd_ { -1 };
+    std::map<Type, int32_t> typeMap_ = {};
+    std::function<void()> deathListener_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_H
+#endif // DEVICESTATUS_CLIENT_H

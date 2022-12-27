@@ -13,29 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_CALLBACK_STUB_H
-#define DEVICESTATUS_CALLBACK_STUB_H
+#ifndef DEVICE_STATUS_CALLBACK_STUB_H
+#define DEVICE_STATUS_CALLBACK_STUB_H
 
 #include <iremote_stub.h>
 #include <nocopyable.h>
 
-#include "devicestatus_data_utils.h"
-#include "idevicestatus_callback.h"
 #include "message_option.h"
 #include "message_parcel.h"
+
+#include "devicestatus_data_utils.h"
+#include "idevicestatus_callback.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusCallbackStub : public IRemoteStub<IdevicestatusCallback> {
+class DeviceStatusCallbackStub : public IRemoteStub<IRemoteDevStaCallback> {
 public:
     DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackStub);
     DeviceStatusCallbackStub() = default;
     virtual ~DeviceStatusCallbackStub() = default;
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
-    void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& __attribute__((unused))value) override {}
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    void OnDeviceStatusChanged(const Data &value) override {}
 
 private:
-    int32_t OnDeviceStatusChangedStub(MessageParcel& data);
+    int32_t OnDeviceStatusChangedStub(MessageParcel &data);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

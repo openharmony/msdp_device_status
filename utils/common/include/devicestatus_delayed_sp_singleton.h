@@ -55,7 +55,7 @@ sptr<T> DelayedSpSingleton<T>::GetInstance()
     if (!instance_) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
-            instance_ = new (std::nothrow) T();
+            instance_ = new T();
         }
     }
 

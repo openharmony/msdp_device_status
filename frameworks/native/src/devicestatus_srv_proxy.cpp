@@ -18,12 +18,14 @@
 #include <message_option.h>
 #include <message_parcel.h>
 
-#include "devicestatus_define.h"
-#include "devicestatus_common.h"
-#include "devicestatus_data_utils.h"
 #include "hitrace_meter.h"
 #include "idevicestatus_callback.h"
 #include "iremote_object.h"
+
+#include "devicestatus_common.h"
+#include "devicestatus_data_utils.h"
+#include "devicestatus_define.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -32,13 +34,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
 } // namespace
 
-void DeviceStatusSrvProxy::Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
-    const sptr<IdevicestatusCallback>& callback)
+void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
+    sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientSubscribeStart");
+    DEV_HILOGI(INNERKIT, "Enter event:%{public}d, latency:%{public}d", event, latency);
     sptr<IRemoteObject> remote = Remote();
-    DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
+    DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
 
     MessageParcel data;
     MessageParcel reply;
@@ -50,57 +51,56 @@ void DeviceStatusSrvProxy::Subscribe(const DeviceStatusDataUtils::DeviceStatusTy
     }
 
     WRITEINT32(data, type);
+    WRITEINT32(data, event);
+    WRITEINT32(data, latency);
     WRITEREMOTEOBJECT(data, callback->AsObject());
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
-    if (ret != ERR_OK) {
+    if (ret != RET_OK) {
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    FinishTrace(HITRACE_TAG_MSDP);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-void DeviceStatusSrvProxy::Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type,
-    const sptr<IdevicestatusCallback>& callback)
+void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
-    StartTrace(HITRACE_TAG_MSDP, "clientUnsubscribeStart");
+    DEV_HILOGD(INNERKIT, "Enter, event:%{public}d", event);
+    StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
     sptr<IRemoteObject> remote = Remote();
-    DEVICESTATUS_RETURN_IF((remote == nullptr) || (callback == nullptr));
+    DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
 
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return;
     }
 
     WRITEINT32(data, type);
+    WRITEINT32(data, event);
     WRITEREMOTEOBJECT(data, callback->AsObject());
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
-    if (ret != ERR_OK) {
+    if (ret != RET_OK) {
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    FinishTrace(HITRACE_TAG_MSDP);
     DEV_HILOGD(INNERKIT, "Exit");
 }
 
-DeviceStatusDataUtils::DeviceStatusData DeviceStatusSrvProxy::GetCache(const \
-    DeviceStatusDataUtils::DeviceStatusType& type)
+Data DeviceStatusSrvProxy::GetCache(const Type& type)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    DeviceStatusDataUtils::DeviceStatusData devicestatusData;
-    devicestatusData.type = DeviceStatusDataUtils::DeviceStatusType::TYPE_INVALID;
-    devicestatusData.value = DeviceStatusDataUtils::DeviceStatusValue::VALUE_INVALID;
+    Data devicestatusData;
+    devicestatusData.type = Type::TYPE_INVALID;
+    devicestatusData.value = OnChangedValue::VALUE_INVALID;
 
     sptr<IRemoteObject> remote = Remote();
-    DEVICESTATUS_RETURN_IF_WITH_RET((remote == nullptr), devicestatusData);
+    DEV_RET_IF_NULL_WITH_RET((remote == nullptr), devicestatusData);
 
     MessageParcel data;
     MessageParcel reply;
@@ -114,7 +114,7 @@ DeviceStatusDataUtils::DeviceStatusData DeviceStatusSrvProxy::GetCache(const \
     WRITEINT32(data, type, devicestatusData);
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
-    if (ret != ERR_OK) {
+    if (ret != RET_OK) {
         DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
         return devicestatusData;
     }
@@ -123,8 +123,8 @@ DeviceStatusDataUtils::DeviceStatusData DeviceStatusSrvProxy::GetCache(const \
     int32_t devicestatusValue = -1;
     READINT32(reply, devicestatusType, devicestatusData);
     READINT32(reply, devicestatusValue, devicestatusData);
-    devicestatusData.type = DeviceStatusDataUtils::DeviceStatusType(devicestatusType);
-    devicestatusData.value = DeviceStatusDataUtils::DeviceStatusValue(devicestatusValue);
+    devicestatusData.type = Type(devicestatusType);
+    devicestatusData.value = OnChangedValue(devicestatusValue);
     DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;

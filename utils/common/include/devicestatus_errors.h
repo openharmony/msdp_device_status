@@ -69,6 +69,13 @@ enum {
     ERROR_UNSUPPORT,
     ERROR_NULL_POINTER,
 };
+
+enum {
+    DEVICESTATUS_OK = 0,
+    DEVICESTATUS_FAILED = -1,
+    DEVICESTATUS_INVALID_FD = -2,
+    DEVICESTATUS_NOT_FIND_JSON_ITEM = -3,
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

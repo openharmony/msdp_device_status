@@ -31,26 +31,27 @@ public:
     class DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentEvent() = default;
-        virtual bool OnEventResult(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) = 0;
+        virtual bool OnEventResult(const Data& devicestatusData) = 0;
     };
 
     class DeviceStatusAgentCallback : public DeviceStatusCallbackStub {
     public:
         explicit DeviceStatusAgentCallback(std::shared_ptr<DeviceStatusAgent> agent) : agent_(agent) {};
         virtual ~DeviceStatusAgentCallback() {};
-        void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData& devicestatusData) override;
+        void OnDeviceStatusChanged(const Data& devicestatusData) override;
+
     private:
         std::weak_ptr<DeviceStatusAgent> agent_;
     };
 
-    int32_t SubscribeAgentEvent(const DeviceStatusDataUtils::DeviceStatusType& type,
+    int32_t SubscribeAgentEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency,
         const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
-    int32_t UnsubscribeAgentEvent(const DeviceStatusDataUtils::DeviceStatusType& type);
+    int32_t UnsubscribeAgentEvent(const Type& type, const ActivityEvent& event);
     friend class DeviceStatusAgentCallback;
 private:
-    void RegisterServiceEvent(const DeviceStatusDataUtils::DeviceStatusType& type);
-    void UnRegisterServiceEvent(const DeviceStatusDataUtils::DeviceStatusType& type);
-    sptr<IdevicestatusCallback> callback_;
+    void RegisterServiceEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency);
+    void UnRegisterServiceEvent(const Type& type, const ActivityEvent& event);
+    sptr<IRemoteDevStaCallback> callback_;
     std::shared_ptr<DeviceStatusAgentEvent> agentEvent_;
 };
 } // namespace DeviceStatus

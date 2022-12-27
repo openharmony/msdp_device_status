@@ -31,12 +31,11 @@ public:
     ~DeviceStatusSrvProxy() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvProxy);
 
-    virtual void Subscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback) override;
-    virtual void Unsubscribe(const DeviceStatusDataUtils::DeviceStatusType& type, \
-        const sptr<IdevicestatusCallback>& callback) override;
-    virtual DeviceStatusDataUtils::DeviceStatusData GetCache(const \
-        DeviceStatusDataUtils::DeviceStatusType& type) override;
+    virtual void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
+        sptr<IRemoteDevStaCallback> callback) override;
+    virtual void Unsubscribe(Type type, ActivityEvent event,
+        sptr<IRemoteDevStaCallback> callback) override;
+    virtual Data GetCache(const Type& type) override;
 
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;

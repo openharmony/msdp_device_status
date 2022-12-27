@@ -33,12 +33,12 @@ class DeviceStatusCallback : public DeviceStatusCallbackStub {
 public:
     explicit DeviceStatusCallback(napi_env env) : env_(env) {}
     virtual ~DeviceStatusCallback() {};
-    void OnDeviceStatusChanged(const DeviceStatusDataUtils::DeviceStatusData &devicestatusData) override;
+    void OnDeviceStatusChanged(const Data &devicestatusData) override;
     static void EmitOnEvent(uv_work_t *work, int status);
 private:
     napi_env env_ = { nullptr };
     std::mutex mutex_;
-    DeviceStatusDataUtils::DeviceStatusData data_;
+    Data data_;
 };
 
 class DeviceStatusNapi : public DeviceStatusEvent {
@@ -56,7 +56,7 @@ public:
     static int32_t ConvertTypeToInt(const std::string &type);
     void OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce);
     static DeviceStatusNapi* GetDeviceStatusNapi();
-    static std::map<int32_t, sptr<IdevicestatusCallback>> callbackMap_;
+    static std::map<int32_t, sptr<IRemoteDevStaCallback>> callbackMap_;
 
 private:
     static bool CheckArguments(napi_env env, napi_callback_info info);

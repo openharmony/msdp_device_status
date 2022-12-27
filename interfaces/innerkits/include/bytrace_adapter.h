@@ -12,27 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_MSDP_BYTRACE_ADAPTER_H
+#define OHOS_MSDP_BYTRACE_ADAPTER_H
 
-#ifndef IDEVICESTATUS_ALGORITHM_H
-#define IDEVICESTATUS_ALGORITHM_H
+#include <string.h>
 
-#include <iremote_broker.h>
-
-#include "idevicestatus_algorithm_callback.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IdevicestatusAlgorithm : public IRemoteBroker {
+class BytraceAdapter {
 public:
-    virtual bool Enable() = 0;
-    virtual bool Disable() = 0;
-    virtual bool Subscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
-    virtual bool Unsubscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
+    enum TraceBtn {
+        TRACE_STOP = 0,
+        TRACE_START = 1
+    };
+    enum SubscribeType {
+        SUBSCRIBE,
+        UNSUBSCRIBE
+    };
+    enum SubscribeObject {
+        CLIENT,
+        SERVICE
+    };
 
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithm");
+    static void StartBytrace(TraceBtn traceBtn, SubscribeType subscribeType, SubscribeObject subscribeObject);
 };
 } // namespace DeviceStatus
-} // namespace Msdp
+} // namespace MSDP
 } // namespace OHOS
-#endif // IDEVICESTATUS_ALGORITHM_H
+#endif // BYTRACE_ADAPTER_H
