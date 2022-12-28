@@ -133,7 +133,7 @@ bool SensorDataCallback::PushData(int32_t sensorTypeId, uint8_t* data)
     return true;
 }
 
-bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData data)
+bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData& data)
 {
     DEV_HILOGD(SERVICE, "enter");
     if (sensorTypeId != SENSOR_TYPE_ID_ACCELEROMETER) {

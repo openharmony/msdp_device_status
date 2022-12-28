@@ -54,7 +54,7 @@ public:
     bool PushData(int32_t sensorTypeId, uint8_t* data);
 
 private:
-    bool PopData(int32_t sensorTypeId, AccelData data);
+    bool PopData(int32_t sensorTypeId, AccelData& data);
     void AlgorithmLoop();
     void HandleSensorEvent();
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
