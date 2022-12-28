@@ -52,8 +52,9 @@
             }
           }
       ],
-      "test": []
+      "test": [
+        "//base/msdp/device_status/services/native/test:devicestatussrv_test"
+      ]
     }
   }
 }
-
