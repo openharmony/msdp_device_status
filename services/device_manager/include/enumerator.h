@@ -13,25 +13,35 @@
  * limitations under the License.
  */
 
-#ifndef I_DELEGATE_TASKS_H
-#define I_DELEGATE_TASKS_H
+#ifndef ENUMERATOR_H
+#define ENUMERATOR_H
 
-#include <functional>
+#include <set>
+
+#include "nocopyable.h"
+
+#include "i_input_dev_mgr.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using DTaskCallback = std::function<int32_t()>;
-
-class IDelegateTasks {
+class Enumerator {
 public:
-    IDelegateTasks() = default;
-    virtual ~IDelegateTasks() = default;
+    Enumerator() = default;
+    ~Enumerator() = default;
+    DISALLOW_COPY_AND_MOVE(Enumerator);
 
-    virtual int32_t PostSyncTask(DTaskCallback callback) = 0;
-    virtual int32_t PostAsyncTask(DTaskCallback callback) = 0;
+    void SetInputDevMgr(IInputDevMgr *devMgr);
+    void ScanInputDevices();
+
+private:
+    void ScanAndAddInputDevices();
+    void AddInputDevice(const std::string &devNode) const;
+
+private:
+    IInputDevMgr *devMgr_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_DELEGATE_TASKS_H
+#endif // ENUMERATOR_H

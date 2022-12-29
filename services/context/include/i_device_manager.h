@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_I_DEVICE_MANAGER_H
-#define OHOS_MSDP_DEVICE_STATUS_I_DEVICE_MANAGER_H
+#ifndef I_DEVICE_MANAGER_H
+#define I_DEVICE_MANAGER_H
 
 #include <memory>
 #include <string>
@@ -31,21 +31,21 @@ public:
     IDeviceManager() = default;
     virtual ~IDeviceManager() = default;
 
-    virtual std::shared_ptr<IDevice> GetDevice(int32_t) const = 0;
-    virtual int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver>) = 0;
-    virtual void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver>) = 0;
+    virtual std::shared_ptr<IDevice> GetDevice(int32_t id) const = 0;
+    virtual int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
+    virtual void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    virtual bool IsRemote(int32_t) const = 0;
-    virtual std::vector<std::string> GetCooperateDhids(int32_t) const = 0;
-    virtual std::vector<std::string> GetCooperateDhids(const std::string &) const = 0;
-    virtual std::string GetOriginNetworkId(int32_t) const = 0;
-    virtual std::string GetOriginNetworkId(const std::string &) const = 0;
-    virtual std::string GetDhid(int32_t) const = 0;
+    virtual bool IsRemote(int32_t id) const = 0;
+    virtual std::vector<std::string> GetCooperateDhids(int32_t deviceId) const = 0;
+    virtual std::vector<std::string> GetCooperateDhids(const std::string &dhid) const = 0;
+    virtual std::string GetOriginNetworkId(int32_t id) const = 0;
+    virtual std::string GetOriginNetworkId(const std::string &dhid) const = 0;
+    virtual std::string GetDhid(int32_t deviceId) const = 0;
     virtual bool HasLocalPointerDevice() const = 0;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_I_DEVICE_MANAGER_H
+#endif // I_DEVICE_MANAGER_H

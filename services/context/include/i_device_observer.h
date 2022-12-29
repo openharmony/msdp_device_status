@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H
-#define OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H
+#ifndef I_DEVICE_OBSERVER_H
+#define I_DEVICE_OBSERVER_H
 
 #include <memory>
 
@@ -34,4 +34,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_I_DEVICE_OBSERVER_H
+#endif // I_DEVICE_OBSERVER_H

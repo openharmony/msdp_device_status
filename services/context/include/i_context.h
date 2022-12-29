@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_I_CONTEXT_H
-#define OHOS_MSDP_DEVICE_STATUS_I_CONTEXT_H
+#ifndef I_CONTEXT_H
+#define I_CONTEXT_H
 
 #include "window_info.h"
 #include "key_event.h"
@@ -57,4 +57,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_I_CONTEXT_H
+#endif // I_CONTEXT_H

@@ -13,25 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef I_DELEGATE_TASKS_H
-#define I_DELEGATE_TASKS_H
+#ifndef I_INPUT_DEV_MAR_H
+#define I_INPUT_DEV_MAR_H
 
-#include <functional>
-
-namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-using DTaskCallback = std::function<int32_t()>;
-
-class IDelegateTasks {
+class IInputDevMgr {
 public:
-    IDelegateTasks() = default;
-    virtual ~IDelegateTasks() = default;
+    IInputDevMgr() = default;
+    virtual ~IInputDevMgr() = default;
 
-    virtual int32_t PostSyncTask(DTaskCallback callback) = 0;
-    virtual int32_t PostAsyncTask(DTaskCallback callback) = 0;
+    virtual void AddInputDevice(const std::string &devNode) = 0;
+    virtual void RemoveInputDevice(const std::string &devNode) = 0;
 };
-} // namespace DeviceStatus
-} // namespace Msdp
-} // namespace OHOS
-#endif // I_DELEGATE_TASKS_H
+
+#endif // I_INPUT_DEV_MAR_H

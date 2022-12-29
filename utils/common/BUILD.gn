@@ -27,6 +27,7 @@ ohos_shared_library("devicestatus_util") {
     "src/util.cpp",
     "src/util_napi.cpp",
     "src/util_napi_error.cpp",
+    "src/utility.cpp",
   ]
 
   configs = [ ":devicestatus_util_private_config" ]
@@ -34,6 +35,7 @@ ohos_shared_library("devicestatus_util") {
   public_configs = [ ":devicestatus_util_public_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]

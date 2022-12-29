@@ -13,28 +13,79 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_DEVICE_H
-#define OHOS_MSDP_DEVICE_STATUS_DEVICE_H
+#ifndef DEVICE_H
+#define DEVICE_H
 
+#include <bitset>
+#include <filesystem>
 #include <string>
 #include <vector>
+
+#include <linux/input.h>
 
 #include "nocopyable.h"
 
 #include "i_device.h"
+#include "i_epoll_event_source.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class Device final : public IDevice {
+inline constexpr size_t BITS_PER_UINT8 { 8 };
+
+inline constexpr size_t OFFSET(size_t bit)
+{
+    return (bit % BITS_PER_UINT8);
+}
+
+inline constexpr size_t BYTE(size_t bit)
+{
+    return (bit / BITS_PER_UINT8);
+}
+
+inline bool TestBit(size_t bit, const uint8_t *array)
+{
+    return ((array)[BYTE(bit)] & (1 << OFFSET(bit)));
+}
+
+inline constexpr size_t NBYTES(size_t nbits)
+{
+    return (nbits + BITS_PER_UINT8 - 1) / BITS_PER_UINT8;
+}
+
+class Device final : public IDevice,
+                     public IEpollEventSource {
 public:
-    Device(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev);
+    enum Capability {
+        INPUT_DEV_CAP_KEYBOARD,
+        INPUT_DEV_CAP_POINTER,
+        INPUT_DEV_CAP_TOUCH,
+        INPUT_DEV_CAP_TABLET_TOOL,
+        INPUT_DEV_CAP_TABLET_PAD,
+        INPUT_DEV_CAP_GESTURE,
+        INPUT_DEV_CAP_SWITCH,
+        INPUT_DEV_CAP_JOYSTICK,
+        INPUT_DEV_CAP_MAX
+    };
+
+public:
+    explicit Device(int32_t deviceId);
     ~Device() = default;
     DISALLOW_COPY_AND_MOVE(Device);
 
+    int32_t Open() override;
+    void Close() override;
+
+    int32_t GetFd() const override;
+    void Dispatch(const struct epoll_event &ev) override;
+
+    void SetDevPath(const std::string &devPath) override;
+    void SetSysPath(const std::string &sysPath) override;
+
     int32_t GetId() const override;
+    std::string GetDevPath() const override;
+    std::string GetSysPath() const override;
     std::string GetName() const override;
-    int32_t GetType() const override;
     int32_t GetBus() const override;
     int32_t GetVersion() const override;
     int32_t GetProduct() const override;
@@ -48,69 +99,118 @@ public:
     bool IsRemote() const override;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-    ::OHOS::MMI::KeyboardType GetKeyboardType() const override;
+    IDevice::KeyboardType GetKeyboardType() const override;
     bool IsPointerDevice() const override;
     bool IsKeyboard() const override;
 
 private:
+    void QueryDeviceInfo();
+    void QuerySupportedEvents();
     void Populate();
+    void UpdateCapability();
+    void CheckPointers();
+    void CheckKeys();
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::string MakeNetworkId(const std::string &phys) const;
     std::string GenerateDescriptor() const;
     std::string Sha256(const std::string &in) const;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    void onKeyboardTypeObtained(int32_t keyboardType);
+
+    void RemoveSpace(std::string &str) const;
+    std::string MakeConfigFileName() const;
+    int32_t ReadConfigFile(const std::filesystem::path &filePath);
+    int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value);
+    int32_t ReadTomlFile(const std::string &filePath);
+    void JudgeKeyboardType();
+    void LoadDeviceConfig();
 
 private:
-    std::shared_ptr<::OHOS::MMI::InputDevice> inputDev_;
+    int32_t fd_ { -1 };
+    int32_t deviceId_ { -1 };
+    int32_t bus_ { 0 };
+    int32_t version_ { 0 };
+    int32_t product_ { 0 };
+    int32_t vendor_ { 0 };
+    std::string devPath_;
+    std::string sysPath_;
+    std::string name_;
+    std::string phys_;
+    std::string uniq_;
     std::string dhid_;
     std::string networkId_;
-    ::OHOS::MMI::KeyboardType keyboardType_ { ::OHOS::MMI::KEYBOARD_TYPE_NONE };
+    std::bitset<INPUT_DEV_CAP_MAX> caps_;
+    uint8_t evBitmask_[NBYTES(EV_MAX)] {};
+    uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
+    uint8_t absBitmask_[NBYTES(ABS_MAX)] {};
+    uint8_t relBitmask_[NBYTES(REL_MAX)] {};
+    uint8_t propBitmask_[NBYTES(INPUT_PROP_MAX)] {};
+    IDevice::KeyboardType keyboardType_ { IDevice::KEYBOARD_TYPE_NONE };
 };
+
+inline int32_t Device::GetFd() const
+{
+    return fd_;
+}
+
+inline void Device::SetDevPath(const std::string &devPath)
+{
+    devPath_ = devPath;
+}
+
+inline void Device::SetSysPath(const std::string &sysPath)
+{
+    sysPath_ = sysPath;
+}
 
 inline int32_t Device::GetId() const
 {
-    return inputDev_->GetId();
+    return deviceId_;
+}
+
+inline std::string Device::GetDevPath() const
+{
+    return devPath_;
+}
+
+inline std::string Device::GetSysPath() const
+{
+    return sysPath_;
 }
 
 inline std::string Device::GetName() const
 {
-    return inputDev_->GetName();
-}
-
-inline int32_t Device::GetType() const
-{
-    return inputDev_->GetType();
+    return name_;
 }
 
 inline int32_t Device::GetBus() const
 {
-    return inputDev_->GetBus();
+    return bus_;
 }
 
 inline int32_t Device::GetVersion() const
 {
-    return inputDev_->GetVersion();
+    return version_;
 }
 
 inline int32_t Device::GetProduct() const
 {
-    return inputDev_->GetProduct();
+    return product_;
 }
 
 inline int32_t Device::GetVendor() const
 {
-    return inputDev_->GetVendor();
+    return vendor_;
 }
 
 inline std::string Device::GetPhys() const
 {
-    return inputDev_->GetPhys();
+    return phys_;
 }
 
 inline std::string Device::GetUniq() const
 {
-    return inputDev_->GetUniq();
+    return uniq_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -127,21 +227,21 @@ inline std::string Device::GetNetworkId() const
 
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-inline ::OHOS::MMI::KeyboardType Device::GetKeyboardType() const
+inline IDevice::KeyboardType Device::GetKeyboardType() const
 {
-    return (IsKeyboard() ? keyboardType_ : ::OHOS::MMI::KEYBOARD_TYPE_NONE);
+    return keyboardType_;
 }
 
 inline bool Device::IsPointerDevice() const
 {
-    return inputDev_->HasCapability(::OHOS::MMI::INPUT_DEV_CAP_POINTER);
+    return caps_.test(INPUT_DEV_CAP_POINTER);
 }
 
 inline bool Device::IsKeyboard() const
 {
-    return inputDev_->HasCapability(::OHOS::MMI::INPUT_DEV_CAP_KEYBOARD);
+    return caps_.test(INPUT_DEV_CAP_KEYBOARD);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_DEVICE_H
+#endif // DEVICE_H

@@ -13,76 +13,89 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_DEVICE_MANAGER_H
-#define OHOS_MSDP_DEVICE_STATUS_DEVICE_MANAGER_H
+#ifndef DEVICE_MANAGER_H
+#define DEVICE_MANAGER_H
 
 #include <future>
+#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
-#include "i_input_device_listener.h"
 #include "nocopyable.h"
 
-#include "device.h"
+#include "enumerator.h"
 #include "i_context.h"
+#include "i_epoll_event_source.h"
+#include "i_input_dev_mgr.h"
+#include "monitor.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceManager final : public IDeviceManager {
+class DeviceManager final : public IDeviceManager,
+                            public IEpollEventSource {
 public:
-    class InputDeviceListener : public ::OHOS::MMI::IInputDeviceListener {
+    DeviceManager();
+    ~DeviceManager() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceManager);
+
+    int32_t GetFd() const override;
+    void Dispatch(const struct epoll_event &ev) override;
+
+    int32_t Init(IContext *context);
+    int32_t Enable();
+    int32_t Disable();
+
+    int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
+    void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
+
+    std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
+
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    virtual bool IsRemote(int32_t id) const override;
+    virtual std::vector<std::string> GetCooperateDhids(int32_t deviceId) const override;
+    virtual std::vector<std::string> GetCooperateDhids(const std::string &dhid) const override;
+    virtual std::string GetOriginNetworkId(int32_t id) const override;
+    virtual std::string GetOriginNetworkId(const std::string &dhid) const override;
+    virtual std::string GetDhid(int32_t deviceId) const override;
+    virtual bool HasLocalPointerDevice() const override;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+
+private:
+    class HotplugHandler final : public IInputDevMgr
+    {
     public:
-        InputDeviceListener(DeviceManager &devMgr);
-        void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
-        void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
+        explicit HotplugHandler(DeviceManager &devMgr);
+        ~HotplugHandler() = default;
+
+        void AddInputDevice(const std::string &devNode) override;
+        void RemoveInputDevice(const std::string &devNode) override;
 
     private:
         DeviceManager &devMgr_;
     };
 
-public:
-    DeviceManager() = default;
-    ~DeviceManager() = default;
-    DISALLOW_COPY_AND_MOVE(DeviceManager);
-
-    int32_t Init(IContext *context);
-    int32_t Enable();
-    void Disable();
-    std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
-
-    int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
-    void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    bool IsRemote(int32_t id) const override;
-    std::vector<std::string> GetCooperateDhids(int32_t deviceId) const override;
-    std::vector<std::string> GetCooperateDhids(const std::string &dhid) const override;
-    std::string GetOriginNetworkId(int32_t id) const override;
-    std::string GetOriginNetworkId(const std::string &dhid) const override;
-    std::string GetDhid(int32_t deviceId) const override;
-    bool HasLocalPointerDevice() const override;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
 private:
     int32_t OnInit(IContext *context);
     int32_t OnEnable();
     int32_t OnDisable();
-    void OnDeviceAdded(int32_t deviceId, const std::string &type);
-    void OnDeviceRemoved(int32_t deviceId, const std::string &type);
+    int32_t OnEpollDispatch();
 
-    int32_t GetDeviceAsync(int32_t deviceId);
-    void AddDevice(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev);
-    int32_t OnAddDevice(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev);
-    int32_t OnRemoveDevice(int32_t deviceId);
+    std::shared_ptr<IDevice> AddInputDevice(const std::string &devNode);
+    std::shared_ptr<IDevice> RemoveInputDevice(const std::string &devNode);
 
-    void OnGetDeviceIds(std::vector<int32_t> &deviceIds);
-    int32_t Synchronize();
+    std::shared_ptr<IDevice> FindInputDevice(const std::string &devPath);
+    void OnInputDeviceAdded(std::shared_ptr<IDevice> dev);
+    void OnInputDeviceRemoved(std::shared_ptr<IDevice> dev);
 
     int32_t OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
+
+    int32_t EpollCreate();
+    int32_t EpollAdd(IEpollEventSource *source);
+    void EpollDel(IEpollEventSource *source);
+    void EpollClose();
 
     std::shared_ptr<IDevice> OnGetDevice(int32_t id) const;
     int32_t RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(int32_t)> &task, int32_t id) const;
@@ -116,11 +129,20 @@ private:
 
 private:
     IContext *context_ { nullptr };
-    std::shared_ptr<::OHOS::MMI::IInputDeviceListener> inputDevListener_ { nullptr };
+    int32_t idSeed_ { 1 };
+    int32_t epollFd_ { -1 };
+    Enumerator enumerator_;
+    Monitor monitor_;
+    HotplugHandler hotplug_;
     std::set<std::shared_ptr<IDeviceObserver>> observers_;
-    std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
+    std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
+
+inline int32_t DeviceManager::GetFd() const
+{
+    return epollFd_;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_DEVICE_MANAGER_H
+#endif // DEVICE_MANAGER_H
