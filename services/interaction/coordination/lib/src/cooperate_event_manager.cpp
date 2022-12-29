@@ -58,7 +58,7 @@ int32_t CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const 
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (remoteCooperateCallbacks_.empty()) {
-        FI_HILOGW("No listener, send cooperate message failed");
+        FI_HILOGW("The current listener is empty, unable to invoke the listening interface");
         return RET_ERR;
     }
     for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
