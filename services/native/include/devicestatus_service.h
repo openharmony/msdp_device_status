@@ -20,9 +20,6 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "coordination_event_handler.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
@@ -125,9 +122,11 @@ private:
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
-    void OnDelegateTask(epoll_event &ev);
-    void OnTimeout(epoll_event &ev);
+    void OnDelegateTask(const epoll_event &ev);
+    void OnTimeout(const epoll_event &ev);
+    void OnInputDevMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
+    void DisableDevMgr();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);

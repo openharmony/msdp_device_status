@@ -15,39 +15,43 @@
 
 #include "device_manager.h"
 
-#include <algorithm>
+#include <cstring>
+#include <unistd.h>
 
-#include <linux/input.h>
-
-#include "input_manager.h"
+#include <sys/epoll.h>
+#include <sys/stat.h>
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
+#include "device.h"
 #include "input_device_cooperate_util.h"
 #include "napi_constants.h"
-#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
-constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
-constexpr int32_t WAIT_FOR_ONCE { 1 };
+constexpr int32_t MAX_N_EVENTS { 64 };
 } // namespace
 
-DeviceManager::InputDeviceListener::InputDeviceListener(DeviceManager &devMgr)
-    : devMgr_(devMgr) {}
+DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)
+    : devMgr_(devMgr)
+{}
 
-void DeviceManager::InputDeviceListener::OnDeviceAdded(int32_t deviceId, const std::string &type)
+void DeviceManager::HotplugHandler::AddInputDevice(const std::string &devNode)
 {
-    devMgr_.OnDeviceAdded(deviceId, type);
+    devMgr_.AddInputDevice(devNode);
 }
 
-void DeviceManager::InputDeviceListener::OnDeviceRemoved(int32_t deviceId, const std::string &type)
+void DeviceManager::HotplugHandler::RemoveInputDevice(const std::string &devNode)
 {
-    devMgr_.OnDeviceRemoved(deviceId, type);
+    devMgr_.RemoveInputDevice(devNode);
 }
+
+DeviceManager::DeviceManager()
+    : hotplug_(*this)
+{}
 
 int32_t DeviceManager::Init(IContext *context)
 {
@@ -66,7 +70,8 @@ int32_t DeviceManager::OnInit(IContext *context)
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
-    inputDevListener_ = std::make_shared<InputDeviceListener>(*this);
+    monitor_.SetInputDevMgr(&hotplug_);
+    enumerator_.SetInputDevMgr(&hotplug_);
     return RET_OK;
 }
 
@@ -84,200 +89,236 @@ int32_t DeviceManager::Enable()
 
 int32_t DeviceManager::OnEnable()
 {
-    CALL_INFO_TRACE;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener(CHANGED_TYPE, inputDevListener_);
+    CALL_DEBUG_ENTER;
+    int32_t ret = EpollCreate();
     if (ret != RET_OK) {
-        FI_HILOGE("RegisterDevListener failed");
+        FI_HILOGE("EpollCreate failed");
         return ret;
     }
-    ret = OHOS::MMI::InputManager::GetInstance()->GetDeviceIds(std::bind(&DeviceManager::OnGetDeviceIds, this, std::placeholders::_1));
+    ret = monitor_.Enable();
     if (ret != RET_OK) {
-        FI_HILOGE("GetDeviceIds failed");
-        int32_t r = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
-        if (r != RET_OK) {
-            FI_HILOGE("UnregisterDevListener failed");
-        }
-        return ret;
+        FI_HILOGE("Failed to enable monitor");
+        goto CLOSE_EPOLL;
     }
+    ret = EpollAdd(&monitor_);
+    if (ret != RET_OK) {
+        FI_HILOGE("EpollAdd failed");
+        goto DISABLE_MONITOR;
+    }
+    enumerator_.ScanInputDevices();
     return RET_OK;
+
+DISABLE_MONITOR:
+    monitor_.Disable();
+
+CLOSE_EPOLL:
+    EpollClose();
+    return ret;
 }
 
-void DeviceManager::Disable()
-{
-    CALL_INFO_TRACE;
-    CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::OnDisable, this));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post sync task failed");
-    }
-}
-
-int32_t DeviceManager::OnDisable()
-{
-    CALL_INFO_TRACE;
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener(CHANGED_TYPE, inputDevListener_);
-    if (ret != RET_OK) {
-        FI_HILOGE("UnregisterDevListener failed");
-        return ret;
-    }
-    devices_.clear();
-    return RET_OK;
-}
-
-void DeviceManager::OnGetDeviceIds(std::vector<int32_t> &deviceIds)
-{
-    CALL_INFO_TRACE;
-    CHKPV(context_);
-
-    for (const int32_t id : deviceIds) {
-        int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-            std::bind(&DeviceManager::GetDeviceAsync, this, id));
-        if (ret != RET_OK) {
-            FI_HILOGE("PostAsyncTask failed");
-        }
-    }
-
-    int32_t timerId = context_->GetTimerManager().AddTimer(DEFAULT_WAIT_TIME_MS,
-        WAIT_FOR_ONCE, std::bind(&DeviceManager::Synchronize, this));
-    if (timerId < 0) {
-        FI_HILOGE("Add timer failed");
-    }
-}
-
-int32_t DeviceManager::Synchronize()
+int32_t DeviceManager::Disable()
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    bool needSync { false };
-
-    for (const auto &[id, dev] : devices_) {
-        if (dev != nullptr) {
-            continue;
-        }
-        needSync = true;
-        int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(id,
-            std::bind(&DeviceManager::AddDevice, this, std::placeholders::_1));
-        if (ret != 0) {
-            FI_HILOGE("GetDevice failed");
-        }
-    }
-    if (needSync) {
-        int32_t ret = context_->GetTimerManager().AddTimer(DEFAULT_WAIT_TIME_MS,
-            WAIT_FOR_ONCE, std::bind(&DeviceManager::Synchronize, this));
-        if (ret != RET_OK) {
-            FI_HILOGE("Add timer failed");
-        }
-    }
-    return RET_OK;
-}
-
-void DeviceManager::OnDeviceAdded(int32_t deviceId, const std::string &type)
-{
-    CALL_INFO_TRACE;
-    CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DeviceManager::GetDeviceAsync, this, deviceId));
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
+        std::bind(&DeviceManager::OnDisable, this));
     if (ret != RET_OK) {
-        FI_HILOGE("Post async task failed");
-    }
-}
-
-void DeviceManager::OnDeviceRemoved(int32_t deviceId, const std::string &type)
-{
-    CALL_INFO_TRACE;
-    CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DeviceManager::OnRemoveDevice, this, deviceId));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post async task failed");
-    }
-}
-
-int32_t DeviceManager::GetDeviceAsync(int32_t deviceId)
-{
-    CALL_INFO_TRACE;
-    if (devices_.find(deviceId) == devices_.end()) {
-        devices_.emplace(deviceId, nullptr);
-    }
-
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
-        std::bind(&DeviceManager::AddDevice, this, std::placeholders::_1));
-    if (ret != 0) {
-        FI_HILOGE("GetDevice failed");
+        FI_HILOGE("PostSyncTask failed");
     }
     return ret;
 }
 
-void DeviceManager::AddDevice(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev)
+int32_t DeviceManager::OnDisable()
 {
-    CALL_INFO_TRACE;
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DeviceManager::OnAddDevice, this, inputDev));
-    if (ret != RET_OK) {
-        FI_HILOGE("PostAsyncTask failed");
-    }
+    EpollDel(&monitor_);
+    monitor_.Disable();
+    EpollClose();
+    return RET_OK;
 }
 
-int32_t DeviceManager::OnAddDevice(std::shared_ptr<::OHOS::MMI::InputDevice> inputDev)
+std::shared_ptr<IDevice> DeviceManager::FindInputDevice(const std::string &devPath)
 {
-    CALL_INFO_TRACE;
-    CHKPR(inputDev, RET_ERR);
-    std::shared_ptr<Device> dev = std::make_shared<Device>(inputDev);
-
-    auto devIter = devices_.find(dev->GetId());
-    bool needNotify { (devIter == devices_.end()) || (devIter->second == nullptr) };
-
-    auto [tIter, isOk] = devices_.insert_or_assign(dev->GetId(), dev);
-    if (isOk || needNotify) {
-        FI_HILOGI("Add \'%{public}s\'", dev->GetName().c_str());
-    } else {
-        FI_HILOGW("There exists \'%{public}s\'", dev->GetName().c_str());
-    }
-
-    if (needNotify) {
-        for (auto observer : observers_) {
-            observer->OnDeviceAdded(dev);
+    for (const auto &[id, dev] : devices_) {
+        if (dev->GetDevPath() == devPath) {
+            return dev;
         }
     }
-    return RET_OK;
+    return nullptr;
 }
 
-int32_t DeviceManager::OnRemoveDevice(int32_t deviceId)
+std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNode)
 {
     CALL_INFO_TRACE;
-    if (auto devIter = devices_.find(deviceId); devIter != devices_.cend()) {
-        std::shared_ptr<Device> dev = devIter->second;
-        devices_.erase(devIter);
+    const std::string devPath { DEV_INPUT_PATH + devNode };
+    struct stat statbuf;
 
-        if (dev != nullptr) {
-            FI_HILOGI("Device(\'%{public}s\') removed", dev->GetName().c_str());
-            for (auto observer : observers_) {
-                observer->OnDeviceRemoved(dev);
-            }
+    if (stat(devPath.c_str(), &statbuf) != 0) {
+        FI_HILOGD("Invalid device path: %{public}s", devPath.c_str());
+        return nullptr;
+    }
+    if (!S_ISCHR(statbuf.st_mode)) {
+        FI_HILOGD("Not character device: %{public}s", devPath.c_str());
+        return nullptr;
+    }
+
+    std::shared_ptr<IDevice> dev = FindInputDevice(devPath);
+    if (dev != nullptr) {
+        FI_HILOGD("Already exists: %{public}s", devPath.c_str());
+        return dev;
+    }
+
+    const std::string lSysPath { SYS_INPUT_PATH + devNode };
+    char rpath[PATH_MAX];
+    if (realpath(lSysPath.c_str(), rpath) == nullptr) {
+        FI_HILOGD("Invalid sysPath: %{public}s", lSysPath.c_str());
+        return nullptr;
+    }
+
+    dev = std::make_shared<Device>(idSeed_++);
+    dev->SetDevPath(devPath);
+    dev->SetSysPath(std::string(rpath));
+
+    if (dev->Open() != RET_OK) {
+        FI_HILOGE("Unable to open \'%{public}s\'", devPath.c_str());
+        return nullptr;
+    }
+    auto ret = devices_.emplace(dev->GetId(), dev);
+    if (ret.second) {
+        FI_HILOGD("\'%{public}s\' added", dev->GetName().c_str());
+        OnInputDeviceAdded(dev);
+        return dev;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<IDevice> DeviceManager::RemoveInputDevice(const std::string &devNode)
+{
+    CALL_INFO_TRACE;
+    const std::string devPath { DEV_INPUT_PATH + devNode };
+
+    for (auto devIter = devices_.begin(); devIter != devices_.end(); ++devIter) {
+        std::shared_ptr<IDevice> dev = devIter->second;
+        CHKPC(dev);
+        if (dev->GetDevPath() == devPath) {
+            devices_.erase(devIter);
+            FI_HILOGD("\'%{public}s\' removed", dev->GetName().c_str());
+            dev->Close();
+            OnInputDeviceRemoved(dev);
+            return dev;
         }
-    } else {
-        FI_HILOGD("Device not found");
+    }
+    return nullptr;
+}
+
+void DeviceManager::OnInputDeviceAdded(std::shared_ptr<IDevice> dev)
+{
+    FI_HILOGI("add device %{public}d: %{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGI("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
+    FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
+    FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
+    FI_HILOGI("  product:       %{public}04x", dev->GetProduct());
+    FI_HILOGI("  version:       %{public}04x", dev->GetVersion());
+    FI_HILOGI("  name:          \"%{public}s\"", dev->GetName().c_str());
+    FI_HILOGI("  location:      \"%{public}s\"", dev->GetPhys().c_str());
+    FI_HILOGI("  unique id:     \"%{public}s\"", dev->GetUniq().c_str());
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    FI_HILOGI("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
+    FI_HILOGI("  Network id:    \"%{public}s\"", dev->GetNetworkId().c_str());
+    FI_HILOGI("  local/remote:  \"%{public}s\"", dev->IsRemote() ? "Remote Device" : "Local Device");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    FI_HILOGI("  is pointer:    %{public}s", dev->IsPointerDevice() ? "True" : "False");
+    FI_HILOGI("  is keyboard:   %{public}s", dev->IsKeyboard() ? "True" : "False");
+
+    for (auto observer : observers_) {
+        observer->OnDeviceAdded(dev);
+    }
+}
+
+void DeviceManager::OnInputDeviceRemoved(std::shared_ptr<IDevice> dev)
+{
+    for (auto observer : observers_) {
+        observer->OnDeviceRemoved(dev);
+    }
+}
+
+int32_t DeviceManager::EpollCreate()
+{
+    CALL_DEBUG_ENTER;
+    epollFd_ = epoll_create1(EPOLL_CLOEXEC);
+    if (epollFd_ < 0) {
+        FI_HILOGE("epoll_create1 failed");
+        return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::EpollAdd(IEpollEventSource *source)
 {
-    CALL_INFO_TRACE;
-    CHKPR(observer, RET_ERR);
-    auto ret = observers_.insert(observer);
-    if (!ret.second) {
-        FI_HILOGW("Observer added already");
+    CALL_DEBUG_ENTER;
+    CHKPR(source, RET_ERR);
+    struct epoll_event ev {
+        .events = EPOLLIN | EPOLLHUP | EPOLLERR,
+        .data.ptr = source,
+    };
+    int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, source->GetFd(), &ev);
+    if (ret != 0) {
+        FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));
+        return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t DeviceManager::OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+void DeviceManager::EpollDel(IEpollEventSource *source)
 {
-    CALL_INFO_TRACE;
-    CHKPR(observer, RET_ERR);
-    observers_.erase(observer);
+    CALL_DEBUG_ENTER;
+    CHKPV(source);
+    int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_DEL, source->GetFd(), nullptr);
+    if (ret != 0) {
+        FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));
+    }
+}
+
+void DeviceManager::EpollClose()
+{
+    CALL_DEBUG_ENTER;
+    if (epollFd_ >= 0) {
+        close(epollFd_);
+        epollFd_ = -1;
+    }
+}
+
+void DeviceManager::Dispatch(const struct epoll_event &ev)
+{
+    CALL_DEBUG_ENTER;
+    if ((ev.events & EPOLLIN) == EPOLLIN) {
+        CHKPV(context_);
+        int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+            std::bind(&DeviceManager::OnEpollDispatch, this));
+        if (ret != RET_OK) {
+            FI_HILOGE("PostAsyncTask failed");
+        }
+    } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
+        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+    }
+}
+
+int32_t DeviceManager::OnEpollDispatch()
+{
+    struct epoll_event evs[MAX_N_EVENTS];
+    int32_t cnt = epoll_wait(epollFd_, evs, MAX_N_EVENTS, 0);
+    if (cnt < 0) {
+        FI_HILOGE("epoll_wait failed");
+        return RET_ERR;
+    }
+    for (int32_t index = 0; index < cnt; ++index) {
+        IEpollEventSource *source = reinterpret_cast<IEpollEventSource *>(evs[index].data.ptr);
+        CHKPC(source);
+        if ((evs[index].events & EPOLLIN) == EPOLLIN) {
+            source->Dispatch(evs[index]);
+        } else if ((evs[index].events & (EPOLLHUP | EPOLLERR)) != 0) {
+            FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+        }
+    }
     return RET_OK;
 }
 
@@ -324,6 +365,17 @@ int32_t DeviceManager::AddDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     return ret;
 }
 
+int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+{
+    CALL_INFO_TRACE;
+    CHKPR(observer, RET_ERR);
+    auto ret = observers_.insert(observer);
+    if (!ret.second) {
+        FI_HILOGW("Observer is duplicated");
+    }
+    return RET_OK;
+}
+
 void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
@@ -333,6 +385,14 @@ void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
     }
+}
+
+int32_t DeviceManager::OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+{
+    CALL_INFO_TRACE;
+    CHKPR(observer, RET_ERR);
+    observers_.erase(observer);
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -404,7 +464,7 @@ std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
         FI_HILOGW("Device is unsynchronized");
         return dhids;
     }
-    std::shared_ptr<Device> dev = devIter->second;
+    std::shared_ptr<IDevice> dev = devIter->second;
     if (!dev->IsPointerDevice()) {
         FI_HILOGI("Not pointer device");
         return dhids;
@@ -424,7 +484,7 @@ std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (dev->GetKeyboardType() == ::OHOS::MMI::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+        if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(dev->GetDhid());
             FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }

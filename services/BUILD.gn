@@ -53,6 +53,8 @@ ohos_shared_library("devicestatus_service") {
     "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/device.cpp",
     "device_manager/src/device_manager.cpp",
+    "device_manager/src/enumerator.cpp",
+    "device_manager/src/monitor.cpp",
     "native/src/devicestatus_dumper.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
@@ -87,10 +89,13 @@ ohos_shared_library("devicestatus_service") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input:libmmi-client",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]
+
+  if (fusion_interaction_coordination) {
+    external_deps += [ "input:libmmi-client" ]
+  }
 
   part_name = "${device_status_part_name}"
 }

@@ -13,24 +13,40 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_I_DEVICE_H
-#define OHOS_MSDP_DEVICE_STATUS_I_DEVICE_H
+#ifndef I_DEVICE_H
+#define I_DEVICE_H
 
 #include <string>
-
-#include "input_device.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class IDevice {
 public:
+    enum KeyboardType {
+        KEYBOARD_TYPE_NONE,
+        KEYBOARD_TYPE_UNKNOWN,
+        KEYBOARD_TYPE_ALPHABETICKEYBOARD,
+        KEYBOARD_TYPE_DIGITALKEYBOARD,
+        KEYBOARD_TYPE_HANDWRITINGPEN,
+        KEYBOARD_TYPE_REMOTECONTROL,
+        KEYBOARD_TYPE_MAX
+    };
+
+public:
     IDevice() = default;
     virtual ~IDevice() = default;
 
+    virtual int32_t Open() = 0;
+    virtual void Close() = 0;
+
+    virtual void SetDevPath(const std::string &devPath) = 0;
+    virtual void SetSysPath(const std::string &sysPath) = 0;
+
     virtual int32_t GetId() const = 0;
+    virtual std::string GetDevPath() const = 0;
+    virtual std::string GetSysPath() const = 0;
     virtual std::string GetName() const = 0;
-    virtual int32_t GetType() const = 0;
     virtual int32_t GetBus() const = 0;
     virtual int32_t GetVersion() const = 0;
     virtual int32_t GetProduct() const = 0;
@@ -44,11 +60,11 @@ public:
     virtual bool IsRemote() const = 0;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-    virtual ::OHOS::MMI::KeyboardType GetKeyboardType() const = 0;
+    virtual KeyboardType GetKeyboardType() const = 0;
     virtual bool IsPointerDevice() const = 0;
     virtual bool IsKeyboard() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_I_DEVICE_H
+#endif // I_DEVICE_H

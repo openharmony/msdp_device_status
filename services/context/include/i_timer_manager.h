@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_I_TIMER_MANAGER_H
-#define OHOS_MSDP_DEVICE_STATUS_I_TIMER_MANAGER_H
+#ifndef I_TIMER_MANAGER_H
+#define I_TIMER_MANAGER_H
 
 #include <cstdint>
 
@@ -34,4 +34,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_I_TIMER_MANAGER_H
+#endif // I_TIMER_MANAGER_H

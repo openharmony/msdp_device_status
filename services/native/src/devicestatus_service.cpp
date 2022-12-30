@@ -36,6 +36,11 @@
 #include "devicestatus_permission.h"
 #include "devicestatus_service.h"
 
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "cooperate_event_manager.h"
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -170,15 +175,6 @@ bool DeviceStatusService::Init()
         return false;
     }
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CooperateEventMgr->SetIContext(this);
-    if (devMgr_.Init(this) != RET_OK) {
-        FI_HILOGE("DevMgr init failed");
-        goto INIT_FAIL;
-    }
-    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
     if (InitDelegateTasks() != RET_OK) {
         FI_HILOGE("Delegate tasks init failed");
         goto INIT_FAIL;
@@ -187,6 +183,15 @@ bool DeviceStatusService::Init()
         FI_HILOGE("TimerMgr init failed");
         goto INIT_FAIL;
     }
+    if (devMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("DevMgr init failed");
+        goto INIT_FAIL;
+    }
+
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    CooperateEventMgr->SetIContext(this);
+    InputDevCooSM->Init();
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
 INIT_FAIL:
@@ -422,6 +427,8 @@ void DeviceStatusService::OnThread()
                 OnDelegateTask(ev[i]);
             } else if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
                 OnTimeout(ev[i]);
+            } else if (epollEvent->event_type == EPOLL_EVENT_INPUT_DEV_MGR) {
+                OnInputDevMgr(ev[i]);
             } else {
                 FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->event_type);
             }
@@ -460,7 +467,7 @@ void DeviceStatusService::OnSignalEvent(int32_t signalFd)
     }
 }
 
-void DeviceStatusService::OnDelegateTask(epoll_event &ev)
+void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
         FI_HILOGW("Not epollin");
@@ -476,7 +483,7 @@ void DeviceStatusService::OnDelegateTask(epoll_event &ev)
     delegateTasks_.ProcessTasks();
 }
 
-void DeviceStatusService::OnTimeout(epoll_event &ev)
+void DeviceStatusService::OnTimeout(const epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
@@ -487,7 +494,17 @@ void DeviceStatusService::OnTimeout(epoll_event &ev)
         }
         timerMgr_.ProcessTimers();
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup : %{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+    }
+}
+
+void DeviceStatusService::OnInputDevMgr(const epoll_event &ev)
+{
+    CALL_INFO_TRACE;
+    if ((ev.events & EPOLLIN) == EPOLLIN) {
+        devMgr_.Dispatch(ev);
+    } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
+        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
     }
 }
 
@@ -507,10 +524,20 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
         } else {
             FI_HILOGE("Maximum number of retries exceeded, Failed to enable device manager");
         }
-    } else if (timerId >= 0) {
-        timerMgr_.RemoveTimer(timerId);
+    } else {
+        AddEpoll(EPOLL_EVENT_INPUT_DEV_MGR, devMgr_.GetFd());
+        if (timerId >= 0) {
+            timerMgr_.RemoveTimer(timerId);
+            timerId = -1;
+        }
     }
     return ret;
+}
+
+void DeviceStatusService::DisableDevMgr()
+{
+    DelEpoll(EPOLL_EVENT_INPUT_DEV_MGR, devMgr_.GetFd());
+    devMgr_.Disable();
 }
 
 int32_t DeviceStatusService::RegisterCoordinationListener()

@@ -24,6 +24,8 @@ namespace Msdp {
 namespace DeviceStatus {
 inline const std::string EMPTYSTR { "" };
 inline const std::string CHANGED_TYPE { "change" };
+inline const std::string DEV_INPUT_PATH { "/dev/input/" };
+inline const std::string SYS_INPUT_PATH { "/sys/class/input/" };
 
 inline constexpr std::string_view CALL_FUNCTION { "napi_call_function" };
 inline constexpr std::string_view CREATE_OBJECT { "napi_create_object" };

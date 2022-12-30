@@ -13,25 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef I_DELEGATE_TASKS_H
-#define I_DELEGATE_TASKS_H
+#ifndef I_EPOLL_EVENT_SOURCE_H
+#define I_EPOLL_EVENT_SOURCE_H
 
-#include <functional>
+#include <sys/epoll.h>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using DTaskCallback = std::function<int32_t()>;
-
-class IDelegateTasks {
+class IEpollEventSource {
 public:
-    IDelegateTasks() = default;
-    virtual ~IDelegateTasks() = default;
+    IEpollEventSource() = default;
+    virtual ~IEpollEventSource() = default;
 
-    virtual int32_t PostSyncTask(DTaskCallback callback) = 0;
-    virtual int32_t PostAsyncTask(DTaskCallback callback) = 0;
+    virtual int32_t GetFd() const = 0;
+    virtual void Dispatch(const struct epoll_event &ev) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_DELEGATE_TASKS_H
+#endif // I_EPOLL_EVENT_SOURCE_H
