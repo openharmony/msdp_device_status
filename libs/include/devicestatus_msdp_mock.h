@@ -54,7 +54,7 @@ public:
     ErrCode UnregisterCallback() override;
     ErrCode NotifyMsdpImpl(const Data& data);
     void GetDeviceStatusData();
-    std::shared_ptr<MsdpAlgoCallback> GetCallbackImpl() const
+    std::shared_ptr<MsdpAlgoCallback> GetCallbackImpl()
     {
         std::unique_lock lock(mutex_);
         return callback_;
