@@ -16,6 +16,7 @@
 #include "device_manager.h"
 
 #include <cstring>
+#include <regex>
 #include <unistd.h>
 
 #include <sys/epoll.h>
@@ -33,6 +34,8 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
 constexpr int32_t MAX_N_EVENTS { 64 };
+constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
+constexpr size_t EXPECTED_SUBMATCH { 1 };
 } // namespace
 
 DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)
@@ -146,6 +149,20 @@ std::shared_ptr<IDevice> DeviceManager::FindInputDevice(const std::string &devPa
     return nullptr;
 }
 
+int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
+{
+    CALL_DEBUG_ENTER;
+    std::regex pattern("^event(\\d+)$");
+    std::smatch mr;
+
+    if (std::regex_match(devNode, mr, pattern)) {
+        if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
+            return std::stoi(mr[EXPECTED_SUBMATCH].str());
+        }
+    }
+    return -1;
+}
+
 std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNode)
 {
     CALL_INFO_TRACE;
@@ -158,6 +175,12 @@ std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNod
     }
     if (!S_ISCHR(statbuf.st_mode)) {
         FI_HILOGD("Not character device: %{public}s", devPath.c_str());
+        return nullptr;
+    }
+
+    int32_t deviceId = ParseDeviceId(devNode);
+    if (deviceId < 0) {
+        FI_HILOGE("Parsing device name failed: %{public}s", devNode.c_str());
         return nullptr;
     }
 
@@ -174,7 +197,7 @@ std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNod
         return nullptr;
     }
 
-    dev = std::make_shared<Device>(idSeed_++);
+    dev = std::make_shared<Device>(deviceId);
     dev->SetDevPath(devPath);
     dev->SetSysPath(std::string(rpath));
 

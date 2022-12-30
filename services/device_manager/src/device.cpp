@@ -233,7 +233,7 @@ void Device::CheckKeys()
     for (size_t block { 0U }; block < (sizeof(KEY_BLOCKS) / sizeof(struct range)); ++block) {
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
-                FI_HILOGD("Found key %{public}x", key);
+                FI_HILOGD("Found key %{public}zx", key);
                 caps_.set(INPUT_DEV_CAP_KEYBOARD);
                 return;
             }
