@@ -144,9 +144,6 @@ private:
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    CoordinationEventHandler coordinationHandler;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
