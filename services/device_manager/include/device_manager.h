@@ -82,6 +82,7 @@ private:
     int32_t OnDisable();
     int32_t OnEpollDispatch();
 
+    int32_t ParseDeviceId(const std::string &devNode);
     std::shared_ptr<IDevice> AddInputDevice(const std::string &devNode);
     std::shared_ptr<IDevice> RemoveInputDevice(const std::string &devNode);
 
@@ -129,7 +130,6 @@ private:
 
 private:
     IContext *context_ { nullptr };
-    int32_t idSeed_ { 1 };
     int32_t epollFd_ { -1 };
     Enumerator enumerator_;
     Monitor monitor_;
