@@ -31,29 +31,10 @@ config("devicestatus_srv_public_config") {
   ]
 }
 
-ohos_shared_library("devicestatus_msdp_mock") {
+ohos_shared_library("devicestatus_mock") {
   sources = [
     "src/devicestatus_data_parse.cpp",
     "src/devicestatus_msdp_mock.cpp",
-  ]
-
-  configs = [
-    "${device_status_utils_path}:devicestatus_utils_config",
-    ":devicestatus_private_config",
-  ]
-
-  public_configs = [ ":devicestatus_srv_public_config" ]
-
-  deps = [ "//third_party/cJSON:cjson_static" ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-
-  part_name = "${device_status_part_name}"
-}
-
-ohos_shared_library("devicestatus_sensor_mock") {
-  sources = [
-    "src/devicestatus_data_parse.cpp",
     "src/devicestatus_sensor_mock.cpp",
   ]
 
@@ -94,6 +75,7 @@ ohos_shared_library("devicestatus_algo") {
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
+    "//third_party/jsoncpp",
   ]
 
   external_deps = [
