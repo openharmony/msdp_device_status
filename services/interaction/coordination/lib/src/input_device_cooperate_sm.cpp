@@ -269,7 +269,9 @@ void InputDeviceCooperateSM::StartPointerEventFilter()
     CALL_INFO_TRACE;
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
-    filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY);
+    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_MAX);
+    filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY,
+        touchTags);
     if (0 > filterId_) {
         FI_HILOGE("Add Event Filter Failed.");
     }
