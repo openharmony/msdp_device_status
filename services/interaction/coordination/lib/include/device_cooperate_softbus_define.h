@@ -31,18 +31,18 @@ constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND = 5;
 constexpr int32_t SESSION_SIDE_SERVER = 0;
 constexpr int32_t SESSION_SIDE_CLIENT = 1;
 
-const std::string SESSION_NAME = "ohos.mmi.";
-const std::string GROUP_ID = "mmi_softbus_group_id";
+const std::string SESSION_NAME = "ohos.msdp.device_status.";
+const std::string GROUP_ID = "fi_softbus_group_id";
 
-#define MMI_SOFTBUS_KEY_CMD_TYPE "mmi_softbus_key_cmd_type"
-#define MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID "mmi_softbus_key_local_device_id"
-#define MMI_SOFTBUS_KEY_START_DHID "mmi_softbus_key_start_dhid"
-#define MMI_SOFTBUS_KEY_POINTER_X "mmi_softbus_key_pointer_x"
-#define MMI_SOFTBUS_KEY_POINTER_Y "mmi_softbus_key_pointer_y"
-#define MMI_SOFTBUS_KEY_RESULT "mmi_softbus_key_result"
-#define MMI_SOFTBUS_KEY_OTHER_DEVICE_ID "mmi_softbus_key_other_device_id"
-#define MMI_SOFTBUS_KEY_SESSION_ID "mmi_softbus_key_session_id"
-#define MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS "mmi_softbus_pointer_button_is_press"
+#define FI_SOFTBUS_KEY_CMD_TYPE "fi_softbus_key_cmd_type"
+#define FI_SOFTBUS_KEY_LOCAL_DEVICE_ID "fi_softbus_key_local_device_id"
+#define FI_SOFTBUS_KEY_START_DHID "fi_softbus_key_start_dhid"
+#define FI_SOFTBUS_KEY_POINTER_X "fi_softbus_key_pointer_x"
+#define FI_SOFTBUS_KEY_POINTER_Y "fi_softbus_key_pointer_y"
+#define FI_SOFTBUS_KEY_RESULT "fi_softbus_key_result"
+#define FI_SOFTBUS_KEY_OTHER_DEVICE_ID "fi_softbus_key_other_device_id"
+#define FI_SOFTBUS_KEY_SESSION_ID "fi_softbus_key_session_id"
+#define FI_SOFTBUS_POINTER_BUTTON_IS_PRESS "fi_softbus_pointer_button_is_press"
 
 enum {
     REMOTE_COOPERATE_START = 1,

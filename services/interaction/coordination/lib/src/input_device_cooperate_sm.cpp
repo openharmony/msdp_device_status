@@ -57,6 +57,7 @@ InputDeviceCooperateSM::~InputDeviceCooperateSM()
 
 void InputDeviceCooperateSM::Init()
 {
+    CALL_INFO_TRACE;
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     auto* context = CooperateEventMgr->GetIContext();
@@ -624,13 +625,13 @@ bool InputDeviceCooperateSM::InitDeviceManager()
 {
     CALL_DEBUG_ENTER;
     initCallback_ = std::make_shared<DeviceInitCallBack>();
-    int32_t ret = DisHardware.InitDeviceManager(MMI_DINPUT_PKG_NAME, initCallback_);
+    int32_t ret = DisHardware.InitDeviceManager(FI_PKG_NAME, initCallback_);
     if (ret != 0) {
         FI_HILOGE("Init device manager failed, ret:%{public}d", ret);
         return false;
     }
     stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
-    ret = DisHardware.RegisterDevStateCallback(MMI_DINPUT_PKG_NAME, "", stateCallback_);
+    ret = DisHardware.RegisterDevStateCallback(FI_PKG_NAME, "", stateCallback_);
     if (ret != 0) {
         FI_HILOGE("Register devStateCallback failed, ret:%{public}d", ret);
         return false;

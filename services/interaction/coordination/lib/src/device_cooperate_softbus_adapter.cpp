@@ -47,8 +47,8 @@ const SessionAttribute g_sessionAttr = {
 void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
-    cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
+    cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
     if (!cJSON_IsString(deviceId) || !cJSON_IsBool(buttonIsPressed)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
@@ -59,10 +59,10 @@ void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser& parser)
 void ResponseStartRemoteCooperateResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_RESULT);
-    cJSON* dhid = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_START_DHID);
-    cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_POINTER_X);
-    cJSON* y = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_POINTER_Y);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+    cJSON* dhid = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_START_DHID);
+    cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_POINTER_X);
+    cJSON* y = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_POINTER_Y);
     if (!cJSON_IsBool(result) || !cJSON_IsString(dhid) || !cJSON_IsNumber(x) || !cJSON_IsNumber(y)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
@@ -78,7 +78,7 @@ void ResponseStopRemoteCooperate(int32_t sessionId, const JsonParser& parser)
 void ResponseStopRemoteCooperateResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_RESULT);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
@@ -90,7 +90,7 @@ void ResponseStopRemoteCooperateResult(int32_t sessionId, const JsonParser& pars
 void ResponseStartCooperateOtherResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_OTHER_DEVICE_ID);
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
 
     if (!cJSON_IsString(deviceId)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
@@ -147,7 +147,7 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
         return RET_ERR;
     }
     localSessionName_ = SESSION_NAME + networkId.substr(0, INTERCEPT_STRING_LENGTH);
-    int32_t ret = CreateSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str(), &sessListener_);
+    int32_t ret = CreateSessionServer(FI_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
         FI_HILOGE("Create session server failed, error code:%{public}d", ret);
         return RET_ERR;
@@ -168,7 +168,7 @@ void DeviceCooperateSoftbusAdapter::Release()
         CloseSession(item.second);
         FI_HILOGD("Close session success");
     });
-    int32_t ret = RemoveSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str());
+    int32_t ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
     FI_HILOGD("RemoveSessionServer ret:%{public}d", ret);
     sessionDevMap_.clear();
     channelStatusMap_.clear();
@@ -261,10 +261,10 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed = (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localDeviceId.c_str()));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_POINTER_BUTTON_IS_PRESS, cJSON_CreateBool(isPointerButtonPressed));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localDeviceId.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_POINTER_BUTTON_IS_PRESS, cJSON_CreateBool(isPointerButtonPressed));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
@@ -287,12 +287,12 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperateResult(const std::str
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START_RES));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDhid.c_str()));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_POINTER_X, cJSON_CreateNumber(xPercent));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_POINTER_Y, cJSON_CreateNumber(yPercent));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START_RES));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDhid.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_X, cJSON_CreateNumber(xPercent));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_Y, cJSON_CreateNumber(yPercent));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
@@ -314,8 +314,8 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperate(const std::string &re
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
@@ -337,9 +337,9 @@ int32_t DeviceCooperateSoftbusAdapter::StopRemoteCooperateResult(const std::stri
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_RES));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_RES));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
@@ -362,9 +362,9 @@ int32_t DeviceCooperateSoftbusAdapter::StartCooperateOtherResult(const std::stri
     }
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_OTHER_RES));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_OTHER_DEVICE_ID, cJSON_CreateString(srcNetworkId.c_str()));
-    cJSON_AddItemToObject(jsonStr, MMI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_OTHER_RES));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_OTHER_DEVICE_ID, cJSON_CreateString(srcNetworkId.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, smsg);
@@ -384,7 +384,7 @@ void DeviceCooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const s
         FI_HILOGE("Parser.json_ is not object");
         return;
     }
-    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, MMI_SOFTBUS_KEY_CMD_TYPE);
+    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_CMD_TYPE);
     if (!cJSON_IsNumber(comType)) {
         FI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
