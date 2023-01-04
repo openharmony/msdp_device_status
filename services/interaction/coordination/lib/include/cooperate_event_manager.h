@@ -42,7 +42,7 @@ public:
     struct EventInfo : public RefBase {
         EventType type;
         SessionPtr sess;
-        MmiMessageId msgId;
+        MessageId msgId;
         int32_t userData;
         std::string deviceId;
         CooperationMessage msg;
@@ -62,9 +62,9 @@ public:
     IContext* GetIContext() const;
 
 private:
-    void NotifyCooperateMessage(SessionPtr sess, MmiMessageId msgId, int32_t userData,
+    void NotifyCooperateMessage(SessionPtr sess, MessageId msgId, int32_t userData,
         const std::string &deviceId, CooperationMessage msg);
-    void NotifyCooperateState(SessionPtr sess, MmiMessageId msgId, int32_t userData, bool state);
+    void NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
 
 private:
     std::mutex lock_;

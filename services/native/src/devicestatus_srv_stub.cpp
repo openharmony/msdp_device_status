@@ -217,7 +217,7 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
         FI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
-        return MMISERVICE_NOT_RUNNING;
+        return SERVICE_NOT_RUNNING;
     }
     int32_t moduleId;
     READINT32(data, moduleId, E_DEVICESTATUS_READ_PARCEL_ERROR);

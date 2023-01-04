@@ -655,7 +655,7 @@ int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_ADD_LISTENER;
+    event->msgId = MessageId::COOPERATION_ADD_LISTENER;
     CooperateEventMgr->AddCooperationEvent(event);
     return RET_OK;
 }
@@ -679,7 +679,7 @@ int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_
     std::string deviceId =  "";
     CooperationMessage msg =
         enabled ? CooperationMessage::OPEN_SUCCESS : CooperationMessage::CLOSE_SUCCESS;
-    NetPacket pkt(MmiMessageId::COOPERATION_MESSAGE);
+    NetPacket pkt(MessageId::COOPERATION_MESSAGE);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
@@ -704,7 +704,7 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::START;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COOPERATION_MESSAGE;
     event->userData = userData;
     if (InputDevCooSM->GetCurrentCooperateState() == CooperateState::STATE_OUT) {
         FI_HILOGW("It is currently worn out");
@@ -739,7 +739,7 @@ int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STOP;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COOPERATION_MESSAGE;
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
@@ -761,7 +761,7 @@ int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STATE;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_GET_STATE;
+    event->msgId = MessageId::COOPERATION_GET_STATE;
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     InputDevCooSM->GetCooperateState(deviceId);

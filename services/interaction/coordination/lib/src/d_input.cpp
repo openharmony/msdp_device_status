@@ -58,7 +58,7 @@ int32_t DInput::OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::START;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COOPERATION_MESSAGE;
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
@@ -76,7 +76,7 @@ int32_t DInput::OnStopDeviceCooperate(SessionPtr sess, int32_t userData)
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STOP;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COOPERATION_MESSAGE;
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
@@ -95,7 +95,7 @@ int32_t DInput::OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STATE;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_GET_STATE;
+    event->msgId = MessageId::COOPERATION_GET_STATE;
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     InputDevCooSM->GetCooperateState(deviceId);
@@ -108,7 +108,7 @@ int32_t DInput::OnRegisterCooperateListener(SessionPtr sess)
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    event->msgId = MmiMessageId::COOPERATION_ADD_LISTENER;
+    event->msgId = MessageId::COOPERATION_ADD_LISTENER;
     CooperateEventMgr->AddCooperationEvent(event);
     return RET_OK;
 }
