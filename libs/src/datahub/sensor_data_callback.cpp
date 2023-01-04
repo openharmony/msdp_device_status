@@ -15,6 +15,7 @@
 
 #include "sensor_data_callback.h"
 
+#include <cmath>
 #include <cstdio>
 
 #include "devicestatus_common.h"
@@ -25,8 +26,6 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t RATE_MILLISEC  = 100100100;
 } // namespace
-
-std::shared_ptr<SensorDataCallback> SensorDataCallback::instance_ = nullptr;
 
 SensorDataCallback::~SensorDataCallback()
 {
@@ -160,7 +159,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
         return;
     }
     DEV_HILOGI(SERVICE, "SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
-    SensorDataCallback::GetInstance()->PushData(event->sensorTypeId, event->data);
+    SensorDataCallback::GetInstance().PushData(event->sensorTypeId, event->data);
 }
 
 bool SensorDataCallback::RegisterCallbackSensor(int32_t sensorTypeId)

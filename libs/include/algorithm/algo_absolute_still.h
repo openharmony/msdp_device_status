@@ -23,7 +23,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class AlgoAbsoluteStill : public AlgoBase {
 public:
-    explicit AlgoAbsoluteStill(const std::shared_ptr<SensorDataCallback> sensorCallback) : AlgoBase(sensorCallback) {};
+    AlgoAbsoluteStill() {};
     ~AlgoAbsoluteStill() = default;
 
     bool Init(Type type) override;

@@ -44,12 +44,9 @@ bool AlgoMgr::StartSensor(Type type)
         DEV_HILOGE(SERVICE, "Sensor type mismatch");
         return false;
     }
-    if (sensorEventCb_ == nullptr) {
-        sensorEventCb_ = SensorDataCallback::GetInstance();
-        sensorEventCb_->Init();
-    }
 
-    if (!sensorEventCb_->RegisterCallbackSensor(sensorType)) {
+    SensorDataCallback::GetInstance().Init();
+    if (!SensorDataCallback::GetInstance().RegisterCallbackSensor(sensorType)) {
         DEV_HILOGE(SERVICE, "Failed to register callback sensor");
         return false;
     }
@@ -139,7 +136,7 @@ ErrCode AlgoMgr::Enable(Type type)
         case Type::TYPE_STILL: {
             if (!still_) {
                 DEV_HILOGE(SERVICE, "still_ is nullptr");
-                still_ = std::make_shared<AlgoAbsoluteStill>(sensorEventCb_);
+                still_ = std::make_shared<AlgoAbsoluteStill>();
                 still_->Init(type);
                 callAlgoNum_[type] = 0;
             }
@@ -149,7 +146,7 @@ ErrCode AlgoMgr::Enable(Type type)
         case Type::TYPE_HORIZONTAL_POSITION: {
             if (!horizontalPosition_) {
                 DEV_HILOGE(SERVICE, "horizontalPosition_ is nullptr");
-                horizontalPosition_ = std::make_shared<AlgoHorizontal>(sensorEventCb_);
+                horizontalPosition_ = std::make_shared<AlgoHorizontal>();
                 horizontalPosition_->Init(type);
                 callAlgoNum_[type] = 0;
             }
@@ -159,7 +156,7 @@ ErrCode AlgoMgr::Enable(Type type)
         case Type::TYPE_VERTICAL_POSITION: {
             if (!verticalPosition_) {
                 DEV_HILOGE(SERVICE, "verticalPosition_ is nullptr");
-                verticalPosition_ = std::make_shared<AlgoVertical>(sensorEventCb_);
+                verticalPosition_ = std::make_shared<AlgoVertical>();
                 verticalPosition_->Init(type);
                 callAlgoNum_[type] = 0;
             }
@@ -234,11 +231,10 @@ ErrCode AlgoMgr::UnregisterSensor(Type type)
         DEV_HILOGE(SERVICE, "Failed to get sensorType");
         return false;
     }
-    if (!sensorEventCb_->UnregisterCallbackSensor(sensorType)) {
+    if (!SensorDataCallback::GetInstance().UnregisterCallbackSensor(sensorType)) {
         DEV_HILOGE(SERVICE, "Failed to unregister callback sensor");
         return RET_ERR;
     }
-    sensorEventCb_ = nullptr;
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
 }

@@ -25,7 +25,7 @@ void AlgoBase::Unsubscribe(int32_t sensorTypeId)
         DEV_HILOGE(SERVICE, "algoCallback is nullptr");
         return;
     }
-    sensorCallback_->UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
+    SensorDataCallback::GetInstance().UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
 }
 
 bool AlgoBase::GetData(int32_t sensorTypeId, AccelData* sensorData)
