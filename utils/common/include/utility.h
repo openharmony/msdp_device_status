@@ -51,7 +51,9 @@ public:
         return ss.str();
     }
 
-    static bool IsNum(const std::string &str);
+    static bool IsInteger(const std::string &target);
+    static bool DoesFileExist(const char *path);
+    static size_t GetFileSize(const char *path);
 };
 
 inline bool Utility::IsEmpty(const char *str)

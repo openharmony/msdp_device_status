@@ -17,7 +17,6 @@
 #define DEVICE_H
 
 #include <bitset>
-#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -119,7 +118,7 @@ private:
 
     void RemoveSpace(std::string &str) const;
     std::string MakeConfigFileName() const;
-    int32_t ReadConfigFile(const std::filesystem::path &filePath);
+    int32_t ReadConfigFile(const std::string &filePath);
     int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value);
     int32_t ReadTomlFile(const std::string &filePath);
     void JudgeKeyboardType();

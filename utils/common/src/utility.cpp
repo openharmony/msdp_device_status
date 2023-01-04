@@ -15,6 +15,13 @@
 
 #include "utility.h"
 
+#include <errno.h>
+#include <unistd.h>
+
+#include <regex>
+
+#include <sys/stat.h>
+
 #include "securec.h"
 
 #include "devicestatus_define.h"
@@ -80,11 +87,32 @@ void Utility::RemoveTrailingChars(std::string &path, const std::string &toRemove
     }
 }
 
-bool Utility::IsNum(const std::string &str)
+bool Utility::IsInteger(const std::string &target)
 {
-    std::istringstream sin(str);
-    double num;
-    return (sin >> num) && sin.eof();
+    std::regex pattern("^\\s*-?(0|([1-9]\\d*))\\s*$");
+    return std::regex_match(target, pattern);
+}
+
+bool Utility::DoesFileExist(const char *path)
+{
+    return (access(path, F_OK) == 0);
+}
+
+size_t Utility::GetFileSize(const char *path)
+{
+    struct stat buf {};
+    size_t sz { 0 };
+
+    if (stat(path, &buf) == 0) {
+        if (S_ISREG(buf.st_mode)) {
+            sz = buf.st_size;
+        } else {
+            FI_HILOGE("Not regular file: \'%{public}s\'", path);
+        }
+    } else {
+        FI_HILOGE("stat(\'%{public}s\') failed: %{public}s", path, strerror(errno));
+    }
+    return sz;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
