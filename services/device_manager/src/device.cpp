@@ -15,6 +15,7 @@
 
 #include "device.h"
 
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <cstring>
@@ -334,7 +335,7 @@ std::string Device::MakeConfigFileName() const
     return sp.str();
 }
 
-int32_t Device::ReadConfigFile(const std::filesystem::path &filePath)
+int32_t Device::ReadConfigFile(const std::string &filePath)
 {
     CALL_DEBUG_ENTER;
     std::ifstream cfgFile(filePath);
@@ -379,7 +380,7 @@ int32_t Device::ConfigItemSwitch(const std::string &configItem, const std::strin
         FI_HILOGE("Invalid configuration encountered");
         return RET_ERR;
     }
-    if (!Utility::IsNum(value)) {
+    if (!Utility::IsInteger(value)) {
         FI_HILOGE("Invalid configuration encountered");
         return RET_ERR;
     }
@@ -397,18 +398,17 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         FI_HILOGE("Not real path: %{public}s", filePath.c_str());
         return RET_ERR;
     }
-    std::filesystem::path realPath { temp };
-    FI_HILOGD("config file path: %{public}s", realPath.c_str());
+    FI_HILOGD("config file path: %{public}s", temp);
 
-    if (!std::filesystem::exists(realPath)) {
-        FI_HILOGE("File does not exist");
+    if (!Utility::DoesFileExist(temp)) {
+        FI_HILOGE("File does not exist: %{public}s", temp);
         return RET_ERR;
     }
-    if (std::filesystem::file_size(realPath) > MAX_FILE_SIZE_ALLOWED) {
+    if (Utility::GetFileSize(temp) > MAX_FILE_SIZE_ALLOWED) {
         FI_HILOGE("File size is out of range");
         return RET_ERR;
     }
-    if (ReadConfigFile(realPath) != RET_OK) {
+    if (ReadConfigFile(std::string(temp)) != RET_OK) {
         FI_HILOGE("ReadConfigFile failed");
         return RET_ERR;
     }
