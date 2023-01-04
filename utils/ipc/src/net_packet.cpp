@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace Msdp {
-NetPacket::NetPacket(MmiMessageId msgId) : msgId_(msgId) {}
+NetPacket::NetPacket(MessageId msgId) : msgId_(msgId) {}
 
 NetPacket::NetPacket(const NetPacket &pkt) : NetPacket(pkt.GetMsgId())
 {

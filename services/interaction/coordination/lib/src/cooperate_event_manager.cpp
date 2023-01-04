@@ -129,7 +129,7 @@ IContext* CooperateEventManager::GetIContext() const
 }
 
 void CooperateEventManager::NotifyCooperateMessage(
-    SessionPtr sess, MmiMessageId msgId, int32_t userData, const std::string &deviceId, CooperationMessage msg)
+    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
@@ -145,7 +145,7 @@ void CooperateEventManager::NotifyCooperateMessage(
     }
 }
 
-void CooperateEventManager::NotifyCooperateState(SessionPtr sess, MmiMessageId msgId, int32_t userData, bool state)
+void CooperateEventManager::NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);

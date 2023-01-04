@@ -630,7 +630,7 @@ bool InputDeviceCooperateSM::InitDeviceManager()
         FI_HILOGE("Init device manager failed, ret:%{public}d", ret);
         return false;
     }
-    stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
+    stateCallback_ = std::make_shared<DmDeviceStateCallback>();
     ret = DisHardware.RegisterDevStateCallback(FI_PKG_NAME, "", stateCallback_);
     if (ret != 0) {
         FI_HILOGE("Register devStateCallback failed, ret:%{public}d", ret);
@@ -728,27 +728,27 @@ void InputDeviceCooperateSM::DeviceInitCallBack::OnRemoteDied()
     CALL_INFO_TRACE;
 }
 
-void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
+void InputDeviceCooperateSM::DmDeviceStateCallback::OnDeviceOnline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
     InputDevCooSM->OnDeviceOnline(deviceInfo.deviceId);
 }
 
-void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
+void InputDeviceCooperateSM::DmDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
     InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
 }
 
-void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(
+void InputDeviceCooperateSM::DmDeviceStateCallback::OnDeviceChanged(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
 }
 
-void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceReady(
+void InputDeviceCooperateSM::DmDeviceStateCallback::OnDeviceReady(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;

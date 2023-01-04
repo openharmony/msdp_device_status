@@ -87,7 +87,7 @@ class InputDeviceCooperateSM final {
         void OnRemoteDied() override;
     };
 
-    class MmiDeviceStateCallback : public DistributedHardware::DeviceStateCallback {
+    class DmDeviceStateCallback : public DistributedHardware::DeviceStateCallback {
         void OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
         void OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
         void OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
