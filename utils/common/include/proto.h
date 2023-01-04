@@ -33,13 +33,13 @@ static const int32_t MAKE_SHARED_FAIL = 10;
 static const int32_t ADD_SESSION_FAIL = 11;
 static const int32_t MAX_SESSON_ALARM = 12;
 static const int32_t MAX_RECV_LIMIT = 13;
-static const int32_t MMISERVICE_NOT_RUNNING = 14;
+static const int32_t SERVICE_NOT_RUNNING = 14;
 #define CONNECT_MODULE_TYPE_MMI_CLIENT 0
 #define CLIENT_RECONNECT_COOLING_TIME 800
 #define SEND_RETRY_LIMIT 32
 #define SEND_RETRY_SLEEP_TIME 10000
 
-enum class MmiMessageId : int32_t {
+enum class MessageId : int32_t {
     INVALID,
     INPUT_DEVICE,
     INPUT_DEVICE_IDS,

@@ -38,7 +38,7 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     CHKPR(listener, RET_ERR);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     for (const auto &item : devCoordinationListener_) {
@@ -61,7 +61,7 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     if (listener == nullptr) {
@@ -88,7 +88,7 @@ int32_t CoordinationManagerImpl::EnableInputDeviceCoordination(bool enabled, Fun
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     CoordinationEvent event;
@@ -107,7 +107,7 @@ int32_t CoordinationManagerImpl::StartInputDeviceCoordination(const std::string 
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     CoordinationEvent event;
@@ -126,7 +126,7 @@ int32_t CoordinationManagerImpl::StopDeviceCoordination(FuncCoordinationMessage 
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     CoordinationEvent event;
@@ -145,7 +145,7 @@ int32_t CoordinationManagerImpl::GetInputDeviceCoordinationState(
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!InitClient()) {
-        FI_HILOGE("Get mmi client is nullptr");
+        FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
     CoordinationEvent event;

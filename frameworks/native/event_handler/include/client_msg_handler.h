@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler final : public MsgHandler<MmiMessageId, ClientMsgFun> {
+class ClientMsgHandler final : public MsgHandler<MessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);

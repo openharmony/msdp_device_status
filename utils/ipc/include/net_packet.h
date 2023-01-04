@@ -20,7 +20,7 @@
 
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
-    MmiMessageId idMsg;
+    MessageId idMsg;
     int32_t size;
 };
 #pragma pack()
@@ -30,7 +30,7 @@ namespace Msdp {
 class NetPacket : public StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "NetPacket" };
 public:
-    explicit NetPacket(MmiMessageId msgId);
+    explicit NetPacket(MessageId msgId);
     NetPacket(const NetPacket &pkt);
     NetPacket &operator = (const NetPacket &pkt);
     DISALLOW_MOVE(NetPacket);
@@ -50,13 +50,13 @@ public:
     {
         return Data();
     }
-    MmiMessageId GetMsgId() const
+    MessageId GetMsgId() const
     {
         return msgId_;
     }
 
 protected:
-    MmiMessageId msgId_ = MmiMessageId::INVALID;
+    MessageId msgId_ = MessageId::INVALID;
 };
 } // namespace Msdp
 } // namespace OHOS
