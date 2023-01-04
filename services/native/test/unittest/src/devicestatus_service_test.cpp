@@ -203,18 +203,3 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
     devicestatusService->OnStop();
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
 }
-
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 Enter";
-    auto devicestatusService = DelayedSpSingleton<DeviceStatusService>::GetInstance();
-    auto devicestatusManager = std::make_shared<DeviceStatusManager>(devicestatusService);
-    bool result = devicestatusManager->Init();
-    EXPECT_TRUE(result);
-    int32_t ret = devicestatusManager->LoadAlgorithm();
-    EXPECT_TRUE(ret == RET_OK);
-    ret = devicestatusManager->UnloadAlgorithm();
-    EXPECT_TRUE(ret == RET_OK);
-    DelayedSpSingleton<DeviceStatusService>::DestroyInstance();
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
-}

@@ -10,3 +10,59 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import("//base/msdp/device_status/device_status.gni")
+import("//build/test.gni")
+
+module_output_path = "${device_status_part_name}/"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "//utils/system/safwk/native/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/rdb/include",
+  ]
+}
+
+ohos_systemtest("DeviceStatusClientTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./src/devicestatus_client_test.cpp" ]
+
+  configs = [
+    "${device_status_utils_path}:devicestatus_utils_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
+    "${device_status_frameworks_path}/js/napi:stationary",
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
+group("systemtest") {
+  testonly = true
+  deps = []
+
+  deps += [ ":DeviceStatusClientTest" ]
+}

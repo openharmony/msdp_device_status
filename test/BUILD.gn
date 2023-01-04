@@ -13,8 +13,9 @@
 
 import("//build/test.gni")
 
-#group("systemtest") {
-#  testonly = true
-#  deps = [ "systemtest/:systemtest" ]
-#}
+group("devicestatussystem_test") {
+  testonly = true
+  deps = []
 
+  deps += [ "systemtest:systemtest" ]
+}
