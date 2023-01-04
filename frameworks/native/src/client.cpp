@@ -29,7 +29,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Client" };
-const std::string THREAD_NAME = "mmi_EventHdr";
+const std::string THREAD_NAME = "ClientEventHandler";
 } // namespace
 
 using namespace AppExecFwk;
@@ -256,7 +256,7 @@ void Client::OnConnected()
 int32_t Client::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = DeviceStatusClient::GetInstance().AllocSocketPair(CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret = DeviceStatusClient::GetInstance().AllocSocketPair(CONNECT_MODULE_TYPE_FI_CLIENT);
     if (ret != RET_OK) {
         FI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;

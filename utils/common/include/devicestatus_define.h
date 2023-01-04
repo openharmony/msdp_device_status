@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-#define MMI_DINPUT_PKG_NAME "ohos.multimodalinput.dinput"
+#define FI_PKG_NAME "ohos.msdp.fusioninteraction"
 
 #ifndef RET_OK
     #define RET_OK (0)
