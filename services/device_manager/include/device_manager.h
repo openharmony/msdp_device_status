@@ -54,8 +54,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     virtual bool IsRemote(int32_t id) const override;
-    virtual std::vector<std::string> GetCooperateDhids(int32_t deviceId) const override;
-    virtual std::vector<std::string> GetCooperateDhids(const std::string &dhid) const override;
+    virtual std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const override;
+    virtual std::vector<std::string> GetCoordinationDhids(const std::string &dhid) const override;
     virtual std::string GetOriginNetworkId(int32_t id) const override;
     virtual std::string GetOriginNetworkId(const std::string &dhid) const override;
     virtual std::string GetDhid(int32_t deviceId) const override;
@@ -109,8 +109,8 @@ private:
     int32_t RunGetGetCoopDhids(std::packaged_task<std::vector<std::string>(int32_t)> &task,
                                int32_t deviceId) const;
 
-    std::vector<std::string> OnGetCooperateDhids(const std::string &dhid) const;
-    int32_t RunGetCooperateDhids(std::packaged_task<std::vector<std::string>(const std::string &)> &task,
+    std::vector<std::string> OnGetCoordinationDhids(const std::string &dhid) const;
+    int32_t RunGetCoordinationDhids(std::packaged_task<std::vector<std::string>(const std::string &)> &task,
                                  const std::string &dhid) const;
 
     std::string OnGetOriginNetId(int32_t id) const;

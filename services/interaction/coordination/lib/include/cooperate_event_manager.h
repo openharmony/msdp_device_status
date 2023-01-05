@@ -45,31 +45,31 @@ public:
         MessageId msgId;
         int32_t userData;
         std::string deviceId;
-        CooperationMessage msg;
+        CoordinationMessage msg;
         bool state;
     };
 
-    void AddCooperationEvent(sptr<EventInfo> event);
-    void RemoveCooperationEvent(sptr<EventInfo> event);
-    int32_t OnCooperateMessage(CooperationMessage msg, const std::string &deviceId = "");
-    void OnEnable(CooperationMessage msg, const std::string &deviceId = "");
-    void OnStart(CooperationMessage msg, const std::string &deviceId = "");
-    void OnStop(CooperationMessage msg, const std::string &deviceId = "");
+    void AddCoordinationEvent(sptr<EventInfo> event);
+    void RemoveCoordinationEvent(sptr<EventInfo> event);
+    int32_t OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId = "");
+    void OnEnable(CoordinationMessage msg, const std::string &deviceId = "");
+    void OnStart(CoordinationMessage msg, const std::string &deviceId = "");
+    void OnStop(CoordinationMessage msg, const std::string &deviceId = "");
     void OnGetState(bool state);
-    void OnErrorMessage(EventType type, CooperationMessage msg);
+    void OnErrorMessage(EventType type, CoordinationMessage msg);
 
     void SetIContext(IContext *context);
     IContext* GetIContext() const;
 
 private:
-    void NotifyCooperateMessage(SessionPtr sess, MessageId msgId, int32_t userData,
-        const std::string &deviceId, CooperationMessage msg);
-    void NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
+    void NotifyCoordinationMessage(SessionPtr sess, MessageId msgId, int32_t userData,
+        const std::string &deviceId, CoordinationMessage msg);
+    void NotifyCoordinationState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
 
 private:
     std::mutex lock_;
-    std::list<sptr<EventInfo>> remoteCooperateCallbacks_;
-    std::map<EventType, sptr<EventInfo>> cooperateCallbacks_ {
+    std::list<sptr<EventInfo>> remoteCoordinationCallbacks_;
+    std::map<EventType, sptr<EventInfo>> coordinationCallbacks_{
         {EventType::ENABLE, nullptr},
         {EventType::START, nullptr},
         {EventType::STOP, nullptr},
@@ -78,7 +78,7 @@ private:
     IContext *context_ { nullptr };
 };
 
-#define CooperateEventMgr ::OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
+#define CoordinationEventMgr ::OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

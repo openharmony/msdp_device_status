@@ -32,12 +32,12 @@ class DeviceCooperateSoftbusAdapter {
 public:
     virtual ~DeviceCooperateSoftbusAdapter();
     static std::shared_ptr<DeviceCooperateSoftbusAdapter> GetInstance();
-    int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
-    int32_t StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,
+    int32_t StartRemoteCoordination(const std::string &localDeviceId, const std::string &remoteDeviceId);
+    int32_t StartRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess,
         const std::string &startDhid, int32_t xPercent, int32_t yPercent);
-    int32_t StopRemoteCooperate(const std::string &remoteDeviceId);
-    int32_t StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess);
-    int32_t StartCooperateOtherResult(const std::string &remoteDeviceId, const std::string &srcNetworkId);
+    int32_t StopRemoteCoordination(const std::string &remoteDeviceId);
+    int32_t StopRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess);
+    int32_t StartCoordinationOtherResult(const std::string &remoteDeviceId, const std::string &srcNetworkId);
 
     int32_t Init();
     void Release();
@@ -66,5 +66,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define DevCooperateSoftbusAdapter DeviceCooperateSoftbusAdapter::GetInstance()
+#define DevCoordinationSoftbusAdapter DeviceCooperateSoftbusAdapter::GetInstance()
 #endif // DEVICE_COOPERATE_SOFTBUS_ADAPTER_H

@@ -454,7 +454,7 @@ int32_t DeviceManager::RunIsRemote(std::packaged_task<bool(int32_t)> &task, int3
     return RET_OK;
 }
 
-std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) const
+std::vector<std::string> DeviceManager::GetCoordinationDhids(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
     if (context_ == nullptr) {
@@ -495,7 +495,7 @@ std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
     dhids.push_back(dev->GetDhid());
     FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
 
-    const std::string localNetworkId { COOPERATE::GetLocalDeviceId() };
+    const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
     const auto pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
     for (const auto &[id, dev]: devices_) {
@@ -523,18 +523,18 @@ int32_t DeviceManager::RunGetGetCoopDhids(
     return RET_OK;
 }
 
-std::vector<std::string> DeviceManager::GetCooperateDhids(const std::string &dhid) const
+std::vector<std::string> DeviceManager::GetCoordinationDhids(const std::string &dhid) const
 {
     if (context_ == nullptr) {
         FI_HILOGE("context_ is nullptr");
         return std::vector<std::string>();
     }
     std::packaged_task<std::vector<std::string>(const std::string &)> task {
-        std::bind(&DeviceManager::OnGetCooperateDhids, this, std::placeholders::_1) };
+        std::bind(&DeviceManager::OnGetCoordinationDhids, this, std::placeholders::_1) };
     auto fu = task.get_future();
 
     int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetCooperateDhids, this, std::ref(task), std::cref(dhid)));
+        std::bind(&DeviceManager::RunGetCoordinationDhids, this, std::ref(task), std::cref(dhid)));
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
         return std::vector<std::string>();
@@ -542,7 +542,7 @@ std::vector<std::string> DeviceManager::GetCooperateDhids(const std::string &dhi
     return fu.get();
 }
 
-std::vector<std::string> DeviceManager::OnGetCooperateDhids(const std::string &dhid) const
+std::vector<std::string> DeviceManager::OnGetCoordinationDhids(const std::string &dhid) const
 {
     int32_t inputDeviceId { -1 };
     for (const auto &[id, dev] : devices_) {
@@ -555,10 +555,10 @@ std::vector<std::string> DeviceManager::OnGetCooperateDhids(const std::string &d
             break;
         }
     }
-    return GetCooperateDhids(inputDeviceId);
+    return GetCoordinationDhids(inputDeviceId);
 }
 
-int32_t DeviceManager::RunGetCooperateDhids(
+int32_t DeviceManager::RunGetCoordinationDhids(
     std::packaged_task<std::vector<std::string>(const std::string &)> &task,
     const std::string &dhid) const
 {
@@ -600,7 +600,7 @@ std::string DeviceManager::OnGetOriginNetId(int32_t id) const
     }
     auto networkId = devIter->second->GetNetworkId();
     if (networkId.empty()) {
-        networkId = COOPERATE::GetLocalDeviceId();
+        networkId = COORDINATION::GetLocalDeviceId();
     }
     return networkId;
 }

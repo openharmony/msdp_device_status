@@ -34,13 +34,13 @@ class IInputDeviceCooperateState {
 public:
     IInputDeviceCooperateState();
     virtual ~IInputDeviceCooperateState() = default;
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+    virtual int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId)
     {
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    virtual int32_t StopInputDeviceCooperate(const std::string &networkId)
+    virtual int32_t StopInputDeviceCoordination(const std::string &networkId)
     {
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     virtual void OnKeyboardOnline(const std::string &dhid) {}
     virtual void UpdateSinkDeviceInfo(const std::map<std::string, std::set<std::string>> &sinkDeviceInfo) {}

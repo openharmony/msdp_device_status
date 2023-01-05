@@ -189,7 +189,7 @@ bool DeviceStatusService::Init()
     }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CooperateEventMgr->SetIContext(this);
+    CoordinationEventMgr->SetIContext(this);
     InputDevCooSM->Init();
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
@@ -640,7 +640,7 @@ int32_t DeviceStatusService::GetInputDeviceCoordinationState(int32_t userData, c
 #else
     (void)(userData);
     (void)(deviceId);
-    FI_HILOGW("Get input device cooperate state does not support");
+    FI_HILOGW("Get input device coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
@@ -655,8 +655,8 @@ int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_ADD_LISTENER;
-    CooperateEventMgr->AddCooperationEvent(event);
+    event->msgId = MessageId::COORDINATION_ADD_LISTENER;
+    CoordinationEventMgr->AddCoordinationEvent(event);
     return RET_OK;
 }
 
@@ -668,18 +668,18 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    CooperateEventMgr->RemoveCooperationEvent(event);
+    CoordinationEventMgr->RemoveCoordinationEvent(event);
     return RET_OK;
 }
 
 int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    InputDevCooSM->EnableInputDeviceCooperate(enabled);
+    InputDevCooSM->EnableInputDeviceCoordination(enabled);
     std::string deviceId =  "";
-    CooperationMessage msg =
-        enabled ? CooperationMessage::OPEN_SUCCESS : CooperationMessage::CLOSE_SUCCESS;
-    NetPacket pkt(MessageId::COOPERATION_MESSAGE);
+    CoordinationMessage msg =
+        enabled ? CoordinationMessage::OPEN_SUCCESS : CoordinationMessage::CLOSE_SUCCESS;
+    NetPacket pkt(MessageId::COORDINATION_MESSAGE);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
@@ -704,12 +704,12 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::START;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    if (InputDevCooSM->GetCurrentCooperateState() == CooperateState::STATE_OUT) {
+    if (InputDevCooSM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
-        pkt << userData << "" << static_cast<int32_t>(CooperationMessage::INFO_SUCCESS);
+        pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::INFO_SUCCESS);
         if (pkt.ChkRWError()) {
             FI_HILOGE("Packet write data failed");
             return RET_ERR;
@@ -720,11 +720,11 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
         }
         return RET_OK;
     }
-    CooperateEventMgr->AddCooperationEvent(event);
-    int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    int32_t ret = InputDevCooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -739,13 +739,13 @@ int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STOP;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CooperateEventMgr->AddCooperationEvent(event);
-    int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    int32_t ret = InputDevCooSM->StopInputDeviceCoordination();
     if (ret != RET_OK) {
         FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -761,10 +761,10 @@ int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STATE;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_GET_STATE;
+    event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
-    CooperateEventMgr->AddCooperationEvent(event);
-    InputDevCooSM->GetCooperateState(deviceId);
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    InputDevCooSM->GetCoordinationState(deviceId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION

@@ -41,7 +41,7 @@ public:
         bool enableResult { false };
         bool startResult { false };
         bool stopResult { false };
-        bool cooperateOpened { false };
+        bool coordinationOpened { false };
         std::string deviceDescriptor;
         int32_t errCode { 0 };
         CoordinationMessage msg = CoordinationMessage::OPEN_SUCCESS;

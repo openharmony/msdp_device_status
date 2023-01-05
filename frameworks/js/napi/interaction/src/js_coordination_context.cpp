@@ -24,8 +24,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
-constexpr const char *INPUT_DEVICE_CLASS = "coordination_class";
-constexpr const char *INPUT_DEVICE_COOPERATE = "Coordination";
+constexpr const char *COORDINATION_CLASS = "coordination_class";
+constexpr const char *COORDINATION = "Coordination";
 } // namespace
 
 JsCoordinationContext::JsCoordinationContext()
@@ -210,7 +210,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    if (std::strcmp(type, "cooperation") != 0) {
+    if (std::strcmp(type, "coordination") != 0) {
         THROWERR(env, "Register listener failed, the first parameter is invalid");
         FI_HILOGE("Register listener failed, the first parameter is invalid");
         return nullptr;
@@ -284,12 +284,12 @@ napi_value JsCoordinationContext::CreateInstance(napi_env env)
         JsCoordinationContext::JsConstructor, nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, INPUT_DEVICE_CLASS, jsClass);
+    status = napi_set_named_property(env, global, COORDINATION_CLASS, jsClass);
     CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(napi_set_named_property(env, global, INPUT_DEVICE_COOPERATE, jsInstance),
+    CHKRP(napi_set_named_property(env, global, COORDINATION, jsInstance),
         SET_NAMED_PROPERTY);
 
     JsCoordinationContext *jsContext = nullptr;
@@ -338,14 +338,14 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
     CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, INPUT_DEVICE_COOPERATE, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, COORDINATION, &result), HAS_NAMED_PROPERTY);
     if (!result) {
-        FI_HILOGE("multimodal_input_device_cooperate was not found");
+        FI_HILOGE("Coordination was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(napi_get_named_property(env, global, INPUT_DEVICE_COOPERATE, &object), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, global, COORDINATION, &object), GET_NAMED_PROPERTY);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         return nullptr;
@@ -379,11 +379,11 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_START", infoStart),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_SUCCESS", infoSuccess),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_FAIL", infoFail),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_START", infoStart),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_SUCCESS", infoSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_FAIL", infoFail),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_STATE_ON", stateOn),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_STATE_OFF", stateOff),
     };
 
     napi_value eventMsg = nullptr;

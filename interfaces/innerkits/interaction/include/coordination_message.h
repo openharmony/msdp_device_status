@@ -32,8 +32,8 @@ enum class CoordinationMessage {
     STATE_ON = 500,
     STATE_OFF = 501,
     INPUT_DEVICE_ID_ERROR = 4400001,
-    COOPERATE_FAIL = 4400002,
-    COOPERATION_DEVICE_ERROR = 4400003,
+    COORDINATION_FAIL = 4400002,
+    COORDINATION_DEVICE_ERROR = 4400003,
 };
 } // namespace Msdp
 } // namespace OHOS

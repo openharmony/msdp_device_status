@@ -37,8 +37,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     virtual bool IsRemote(int32_t id) const = 0;
-    virtual std::vector<std::string> GetCooperateDhids(int32_t deviceId) const = 0;
-    virtual std::vector<std::string> GetCooperateDhids(const std::string &dhid) const = 0;
+    virtual std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const = 0;
+    virtual std::vector<std::string> GetCoordinationDhids(const std::string &dhid) const = 0;
     virtual std::string GetOriginNetworkId(int32_t id) const = 0;
     virtual std::string GetOriginNetworkId(const std::string &dhid) const = 0;
     virtual std::string GetDhid(int32_t deviceId) const = 0;

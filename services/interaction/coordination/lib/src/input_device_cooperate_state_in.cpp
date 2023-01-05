@@ -31,23 +31,23 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Input
 
 InputDeviceCooperateStateIn::InputDeviceCooperateStateIn(const std::string &startDhid) : startDhid_(startDhid) {}
 
-int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string &remoteNetworkId,
+int32_t InputDeviceCooperateStateIn::StartInputDeviceCoordination(const std::string &remoteNetworkId,
     int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         FI_HILOGE("RemoteNetworkId is empty");
-        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    std::string localNetworkId = COOPERATE::GetLocalDeviceId();
+    std::string localNetworkId = COORDINATION::GetLocalDeviceId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         FI_HILOGE("Input Parameters error");
-        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    int32_t ret = DevCooperateSoftbusAdapter->StartRemoteCooperate(localNetworkId, remoteNetworkId);
+    int32_t ret = DevCoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Start input device cooperate fail");
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        FI_HILOGE("Start input device coordination fail");
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
@@ -60,7 +60,7 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
 int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
     std::string originNetworkId = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
     if (remoteNetworkId == originNetworkId) {
@@ -71,12 +71,12 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
     }
 }
 
-int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string &networkId)
+int32_t InputDeviceCooperateStateIn::StopInputDeviceCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = DevCooperateSoftbusAdapter->StopRemoteCooperate(networkId);
+    int32_t ret = DevCoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop input device cooperate fail");
+        FI_HILOGE("Stop input device coordination fail");
         return ret;
     }
     std::string taskName = "process_stop_task";
@@ -89,11 +89,11 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string 
 int32_t InputDeviceCooperateStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
     IDeviceManager &devMgr = context->GetDeviceManager();
 
-    std::vector<std::string> dhids = devMgr.GetCooperateDhids(startDhid_);
+    std::vector<std::string> dhids = devMgr.GetCoordinationDhids(startDhid_);
     std::string sink = devMgr.GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
@@ -111,12 +111,12 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
         IInputDeviceCooperateState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
         return;
     }
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     IDeviceManager &devMgr = context->GetDeviceManager();
 
     std::string sinkNetworkId = devMgr.GetOriginNetworkId(startInputDeviceId);
-    std::vector<std::string> dhid = devMgr.GetCooperateDhids(startInputDeviceId);
+    std::vector<std::string> dhid = devMgr.GetCoordinationDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
     std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
@@ -159,9 +159,9 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
 void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCooperateDhids(startInputDeviceId);
+    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }

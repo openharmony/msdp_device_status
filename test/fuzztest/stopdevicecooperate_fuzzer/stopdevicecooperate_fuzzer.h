@@ -16,6 +16,6 @@
 #ifndef STOPDEVICECOOPERATE_FUZZER_H
 #define STOPDEVICECOOPERATE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "stopdevicecooperate_fuzzer_fuzzer"
+#define FUZZ_PROJECT_NAME "stopdeviceCoordination_fuzzer_fuzzer"
 
 #endif // STOPDEVICECOOPERATE_FUZZER_H

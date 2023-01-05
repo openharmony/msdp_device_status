@@ -45,11 +45,11 @@ const std::string GROUP_ID = "fi_softbus_group_id";
 #define FI_SOFTBUS_POINTER_BUTTON_IS_PRESS "fi_softbus_pointer_button_is_press"
 
 enum {
-    REMOTE_COOPERATE_START = 1,
-    REMOTE_COOPERATE_START_RES = 2,
-    REMOTE_COOPERATE_STOP = 3,
-    REMOTE_COOPERATE_STOP_RES = 4,
-    REMOTE_COOPERATE_STOP_OTHER_RES = 5
+    REMOTE_COORDINATION_START = 1,
+    REMOTE_COORDINATION_START_RES = 2,
+    REMOTE_COORDINATION_STOP = 3,
+    REMOTE_COORDINATION_STOP_RES = 4,
+    REMOTE_COORDINATION_STOP_OTHER_RES = 5
 };
 } // namespace DeviceStatus
 } // namespace Msdp

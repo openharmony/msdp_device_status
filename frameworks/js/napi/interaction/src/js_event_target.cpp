@@ -26,14 +26,14 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
-constexpr std::string_view COOPERATION = "cooperation";
+constexpr std::string_view COORDINATION = "coordination";
 std::mutex mutex_;
 } // namespace
 
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListener_.insert({ COORDINATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, DeviceStatus::VAL_NOT_EXP);
 }
 
@@ -182,7 +182,7 @@ void JsEventTarget::EmitJsGetState(int32_t userData, bool state)
         FI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.cooperateOpened = state;
+    iter->second->data.coordinationOpened = state;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -213,8 +213,8 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = cooperateListener_.find(type);
-    if (iter == cooperateListener_.end()) {
+    auto iter = coordinationListener_.find(type);
+    if (iter == coordinationListener_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -242,8 +242,8 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = cooperateListener_.find(type);
-    if (iter == cooperateListener_.end()) {
+    auto iter = coordinationListener_.find(type);
+    if (iter == coordinationListener_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -297,7 +297,7 @@ void JsEventTarget::ResetEnv()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
-    cooperateListener_.clear();
+    coordinationListener_.clear();
     InteractionMgr->UnregisterCoordinationListener(shared_from_this());
 }
 
@@ -305,9 +305,9 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = cooperateListener_.find(COOPERATION);
-    if (changeEvent == cooperateListener_.end()) {
-        FI_HILOGE("Find %{public}s failed", std::string(COOPERATION).c_str());
+    auto changeEvent = coordinationListener_.find(COORDINATION);
+    if (changeEvent == coordinationListener_.end()) {
+        FI_HILOGE("Find %{public}s failed", std::string(COORDINATION).c_str());
         return;
     }
 
@@ -581,8 +581,8 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     JsUtil::DeletePtr<uv_work_t*>(work);
 
-    auto messageEvent = cooperateListener_.find(COOPERATION);
-    if (messageEvent == cooperateListener_.end()) {
+    auto messageEvent = coordinationListener_.find(COORDINATION);
+    if (messageEvent == coordinationListener_.end()) {
         FI_HILOGE("Find messageEvent failed");
         return;
     }

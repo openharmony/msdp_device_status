@@ -23,7 +23,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class InputDeviceCooperateStateFree final : public IInputDeviceCooperateState {
 public:
-    int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
+    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
 
 private:
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
