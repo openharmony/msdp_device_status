@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_SM_H
-#define INPUT_DEVICE_COOPERATE_SM_H
+#ifndef COORDINATION_SM_H
+#define COORDINATION_SM_H
 
 #include <functional>
 
@@ -25,11 +25,10 @@
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
 #include "input_manager.h"
-#include "i_input_device_cooperate_state.h"
+#include "i_coordination_state.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
 
-struct libinput_event;
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -80,8 +79,8 @@ private:
     mutable int32_t filterId_ { -1 };
 };
 
-class InputDeviceCooperateSM final {
-    DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
+class CoordinationSM final {
+    DECLARE_DELAYED_SINGLETON(CoordinationSM);
 
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
@@ -118,7 +117,7 @@ class InputDeviceCooperateSM final {
 
 public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
-    DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
+    DISALLOW_COPY_AND_MOVE(CoordinationSM);
     void Init();
     void EnableInputDeviceCoordination(bool enabled);
     int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId);
@@ -131,7 +130,6 @@ public:
     void StopRemoteCoordination();
     void StopRemoteCoordinationResult(bool isSuccess);
     void StartCoordinationOtherResult(const std::string &srcNetworkId);
-    bool HandleEvent(struct libinput_event *event);
     void UpdateState(CoordinationState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
@@ -157,7 +155,6 @@ public:
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
-    bool CheckPointerEvent(struct libinput_event *event);
     void OnCloseCoordination(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
@@ -166,7 +163,7 @@ private:
 
 private:
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
-    std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
+    std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
     std::string srcNetworkId_;
@@ -187,8 +184,8 @@ private:
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()
-#define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
+#define InputDevCooSM ::OHOS::DelayedSingleton<CoordinationSM>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_SM_H
+#endif // COORDINATION_SM_H

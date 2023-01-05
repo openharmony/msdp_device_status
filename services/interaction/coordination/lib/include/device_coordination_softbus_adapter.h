@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
-#define DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
+#ifndef DEVICE_COORDINATION_SOFTBUS_ADAPTER_H
+#define DEVICE_COORDINATION_SOFTBUS_ADAPTER_H
 
 #include <condition_variable>
 #include <map>
@@ -28,10 +28,10 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceCooperateSoftbusAdapter {
+class DeviceCoordinationSoftbusAdapter {
 public:
-    virtual ~DeviceCooperateSoftbusAdapter();
-    static std::shared_ptr<DeviceCooperateSoftbusAdapter> GetInstance();
+    virtual ~DeviceCoordinationSoftbusAdapter();
+    static std::shared_ptr<DeviceCoordinationSoftbusAdapter> GetInstance();
     int32_t StartRemoteCoordination(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess,
         const std::string &startDhid, int32_t xPercent, int32_t yPercent);
@@ -49,8 +49,8 @@ public:
     void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
 
 private:
-    DeviceCooperateSoftbusAdapter() = default;
-    DISALLOW_COPY_AND_MOVE(DeviceCooperateSoftbusAdapter);
+    DeviceCoordinationSoftbusAdapter() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceCoordinationSoftbusAdapter);
     std::string FindDevice(int32_t sessionId);
     int32_t SendMsg(int32_t sessionId, const std::string &message);
     bool CheckDeviceSessionState(const std::string &remoteDevId);
@@ -66,5 +66,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define DevCoordinationSoftbusAdapter DeviceCooperateSoftbusAdapter::GetInstance()
-#endif // DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
+#define DevCoordinationSoftbusAdapter DeviceCoordinationSoftbusAdapter::GetInstance()
+#endif // DEVICE_COORDINATION_SOFTBUS_ADAPTER_H

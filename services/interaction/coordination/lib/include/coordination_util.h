@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef INPUT_DEVICE_COOPERATE_UTIL_H
-#define INPUT_DEVICE_COOPERATE_UTIL_H
+#ifndef COORDINATION_UTIL_H
+#define COORDINATION_UTIL_H
 
 #include <string>
 
@@ -43,4 +43,4 @@ std::string GetLocalDeviceId();
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_UTIL_H
+#endif // COORDINATION_UTIL_H

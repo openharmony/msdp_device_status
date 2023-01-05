@@ -13,22 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_FREE_H
-#define INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#include "coordination_util.h"
 
-#include "i_input_device_cooperate_state.h"
+#include "softbus_bus_center.h"
+
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateFree final : public IInputDeviceCooperateState {
-public:
-    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-
-private:
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
-};
+namespace COORDINATION {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationUtil" };
+} // namespace
+std::string GetLocalDeviceId()
+{
+    auto localNode = std::make_unique<NodeBasicInfo>();
+    int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
+    if (ret != RET_OK) {
+        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        return {};
+    }
+    return localNode->networkId;
+}
+} // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_FREE_H

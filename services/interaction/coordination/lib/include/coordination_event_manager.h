@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_EVENT_MANAGER_H
-#define COOPERATE_EVENT_MANAGER_H
+#ifndef COORDINATION_EVENT_MANAGER_H
+#define COORDINATION_EVENT_MANAGER_H
 
 #include <list>
 #include <mutex>
@@ -32,10 +32,10 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateEventManager final {
-    DECLARE_DELAYED_SINGLETON(CooperateEventManager);
+class CoordinationEventManager final {
+    DECLARE_DELAYED_SINGLETON(CoordinationEventManager);
 public:
-    DISALLOW_COPY_AND_MOVE(CooperateEventManager);
+    DISALLOW_COPY_AND_MOVE(CoordinationEventManager);
 
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
 
@@ -78,8 +78,8 @@ private:
     IContext *context_ { nullptr };
 };
 
-#define CoordinationEventMgr ::OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
+#define CoordinationEventMgr ::OHOS::DelayedSingleton<CoordinationEventManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COOPERATE_EVENT_MANAGER_H
+#endif // COORDINATION_EVENT_MANAGER_H

@@ -15,10 +15,10 @@
 
 #include "d_input.h"
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_sm.h"
+#include "coordination_util.h"
 #include "proto.h"
 
 namespace OHOS {
@@ -54,9 +54,9 @@ void DInput::EnableInputDeviceCoordination(bool enabled)
 int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
     const std::string& sinkDeviceId, int32_t srcInputDeviceId)
 {
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::START;
+    event->type = CoordinationEventManager::EventType::START;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
@@ -72,9 +72,9 @@ int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData
 
 int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
 {
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::STOP;
+    event->type = CoordinationEventManager::EventType::STOP;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
@@ -91,9 +91,9 @@ int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
 int32_t DInput::OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
     const std::string& deviceId)
 {
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::STATE;
+    event->type = CoordinationEventManager::EventType::STATE;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
@@ -104,9 +104,9 @@ int32_t DInput::OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userD
 
 int32_t DInput::OnRegisterCoordinationListener(SessionPtr sess)
 {
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::LISTENER;
+    event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_ADD_LISTENER;
     CoordinationEventMgr->AddCoordinationEvent(event);
@@ -115,9 +115,9 @@ int32_t DInput::OnRegisterCoordinationListener(SessionPtr sess)
 
 int32_t DInput::OnUnregisterCoordinationListener(SessionPtr sess)
 {
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::LISTENER;
+    event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     CoordinationEventMgr->RemoveCoordinationEvent(event);
     return RET_OK;
@@ -132,11 +132,6 @@ void DInput::OnPointerOffline(const std::string& dhid, const std::string& sinkNe
     const std::vector<std::string>& keyboards)
 {
     InputDevCooSM->OnPointerOffline(dhid, sinkNetworkId, keyboards);
-}
-
-bool DInput::HandleEvent(libinput_event* event)
-{
-    return InputDevCooSM->HandleEvent(event);
 }
 
 bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)

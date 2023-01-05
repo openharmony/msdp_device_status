@@ -37,8 +37,8 @@
 #include "devicestatus_service.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-#include "cooperate_event_manager.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_event_manager.h"
+#include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 namespace OHOS {
@@ -651,9 +651,9 @@ int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::LISTENER;
+    event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_ADD_LISTENER;
     CoordinationEventMgr->AddCoordinationEvent(event);
@@ -664,9 +664,9 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::LISTENER;
+    event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     CoordinationEventMgr->RemoveCoordinationEvent(event);
     return RET_OK;
@@ -700,9 +700,9 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::START;
+    event->type = CoordinationEventManager::EventType::START;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
@@ -735,9 +735,9 @@ int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::STOP;
+    event->type = CoordinationEventManager::EventType::STOP;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
@@ -757,9 +757,9 @@ int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
-    event->type = CooperateEventManager::EventType::STATE;
+    event->type = CoordinationEventManager::EventType::STATE;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;

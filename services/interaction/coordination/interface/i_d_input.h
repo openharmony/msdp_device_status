@@ -44,7 +44,6 @@ public:
     virtual void OnKeyboardOnline(const std::string& dhid) = 0;
     virtual void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,
         const std::vector<std::string>& keyboards) = 0;
-    virtual bool HandleEvent(libinput_event* event) = 0;
     virtual bool CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent) = 0;
     virtual std::string GetLocalDeviceId() = 0;
 

@@ -24,9 +24,6 @@
 #include "i_device_manager.h"
 #include "i_timer_manager.h"
 
-struct libinput_event;
-struct libinput_device;
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -44,13 +41,11 @@ public:
     virtual IDeviceManager& GetDeviceManager() = 0;
     virtual ITimerManager& GetTimerManager() = 0;
 
-    virtual int32_t FindInputDeviceId(struct libinput_device* inputDevice) = 0;
     virtual std::shared_ptr<::OHOS::MMI::PointerEvent> GetPointerEvent() = 0;
     virtual MouseLocation GetMouseInfo() = 0;
     virtual int32_t SetPointerVisible(int32_t pid, bool visible) = 0;
     virtual void SelectAutoRepeat(std::shared_ptr<MMI::KeyEvent>& keyEvent) = 0;
     virtual void SetJumpInterceptState(bool isJump) = 0;
-    virtual bool IsRemote(struct libinput_device *inputDevice) = 0;
     virtual const ::OHOS::MMI::DisplayGroupInfo GetDisplayGroupInfo() = 0;
     virtual void SetAbsolutionLocation(double xPercent, double yPercent) = 0;
 };
