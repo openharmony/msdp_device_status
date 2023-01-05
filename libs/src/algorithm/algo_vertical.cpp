@@ -34,7 +34,7 @@ bool AlgoVertical::Init(Type type)
         DEV_HILOGE(SERVICE, "algoCallback is nullptr");
         return false;
     }
-    sensorCallback_->SubscribeSensorEvent(type, algoCallback_);
+    SensorDataCallback::GetInstance().SubscribeSensorEvent(type, algoCallback_);
     return true;
 }
 

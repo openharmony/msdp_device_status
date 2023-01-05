@@ -22,29 +22,20 @@
 #include <mutex>
 #include <thread>
 
+#include "semaphore.h"
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
+#include "singleton.h"
 
 #include "devicestatus_data_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class SensorDataCallback {
+class SensorDataCallback : public Singleton<SensorDataCallback> {
 public:
     SensorDataCallback() = default;
     ~SensorDataCallback();
-    static std::shared_ptr<SensorDataCallback> GetInstance()
-    {
-        static std::mutex getInstanceMutex;
-        if (instance_ == nullptr) {
-            std::lock_guard lock(getInstanceMutex);
-            if (instance_ == nullptr) {
-                instance_ = std::make_shared<SensorDataCallback>();
-            }
-        }
-        return instance_;
-    };
     bool RegisterCallbackSensor(int32_t sensorTypeId);
     bool UnregisterCallbackSensor(int32_t sensorTypeId);
     void Init();
@@ -58,7 +49,6 @@ private:
     void AlgorithmLoop();
     void HandleSensorEvent();
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
-    static std::shared_ptr<SensorDataCallback> instance_;
     SensorUser user_;
     std::list<AccelData> accelDataList_;
     std::unique_ptr<std::thread> algorithmThread_ { nullptr };

@@ -23,7 +23,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class AlgoVertical : public AlgoBase {
 public:
-    explicit AlgoVertical(const std::shared_ptr<SensorDataCallback> sensorCallback) : AlgoBase(sensorCallback) {};
+    AlgoVertical() {};
     virtual ~AlgoVertical() = default;
     bool Init(Type type) override;
 

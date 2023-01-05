@@ -58,7 +58,6 @@ private:
     int32_t type_[Type::TYPE_MAX] = { 0 };
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
     std::mutex mutex_;
-    std::shared_ptr<SensorDataCallback> sensorEventCb_ { nullptr };
     std::shared_ptr<AlgoAbsoluteStill> still_ { nullptr };
     std::shared_ptr<AlgoHorizontal> horizontalPosition_ { nullptr };
     std::shared_ptr<AlgoVertical> verticalPosition_ { nullptr };

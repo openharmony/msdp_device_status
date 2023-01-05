@@ -31,7 +31,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class AlgoBase {
 public:
-    AlgoBase(const std::shared_ptr<SensorDataCallback> sensorCallback) : sensorCallback_(sensorCallback) {};
+    AlgoBase() {};
     virtual ~AlgoBase() = default;
 
     virtual bool Init(Type type) = 0;
@@ -73,7 +73,6 @@ protected:
                       0.0};
 
     SensorCallback algoCallback_;
-    std::shared_ptr<SensorDataCallback> sensorCallback_ { nullptr };
     std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ { nullptr };
 };
 } // namespace DeviceStatus

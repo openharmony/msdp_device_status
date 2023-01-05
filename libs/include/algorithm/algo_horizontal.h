@@ -23,7 +23,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class AlgoHorizontal : public AlgoBase {
 public:
-    explicit AlgoHorizontal(const std::shared_ptr<SensorDataCallback> sensorCallback) : AlgoBase(sensorCallback) {};
+    AlgoHorizontal() {};
     virtual ~AlgoHorizontal() = default;
 
     bool Init(Type type) override;
