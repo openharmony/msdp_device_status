@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_OUT_H
-#define INPUT_DEVICE_COOPERATE_STATE_OUT_H
+#ifndef COORDINATION_EVENT_HANDLER_H
+#define COORDINATION_EVENT_HANDLER_H
 
-#include "i_coordination_state.h"
+#include <memory>
+
+#include "event_handler.h"
+#include "event_runner.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateOut final : public ICoordinationState {
+class CoordinationEventHandler final : public AppExecFwk::EventHandler {
 public:
-    explicit InputDeviceCooperateStateOut(const std::string &startDhid);
-    int32_t StopInputDeviceCoordination(const std::string &networkId) override;
-    void OnKeyboardOnline(const std::string &dhid) override;
-
-private:
-    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
-    void ProcessStop(const std::string &srcNetworkId);
-    std::string startDhid_;
+    explicit CoordinationEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    ~CoordinationEventHandler() override = default;
+    bool ProxyPostTask(const Callback &callback, int64_t delayTime);
+    bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
+    void ProxyRemoveTask(const std::string &name);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_OUT_H
+#endif // COORDINATION_EVENT_HANDLER_H

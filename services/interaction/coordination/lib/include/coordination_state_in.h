@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_IN_H
-#define INPUT_DEVICE_COOPERATE_STATE_IN_H
+#ifndef COORDINATION_STATE_IN_H
+#define COORDINATION_STATE_IN_H
 
 #include "i_coordination_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateIn final : public ICoordinationState {
+class CoordinationStateIn final : public ICoordinationState {
 public:
-    explicit InputDeviceCooperateStateIn(const std::string &startDhid);
+    explicit CoordinationStateIn(const std::string &startDhid);
     int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
     int32_t StopInputDeviceCoordination(const std::string &networkId) override;
 
@@ -41,4 +41,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_IN_H
+#endif // COORDINATION_STATE_IN_H

@@ -13,30 +13,26 @@
  * limitations under the License.
  */
 
-#include "input_device_cooperate_util.h"
+#ifndef COORDINATION_STATE_OUT_H
+#define COORDINATION_STATE_OUT_H
 
-#include "softbus_bus_center.h"
-
-#include "devicestatus_define.h"
+#include "i_coordination_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace COORDINATION {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateUtil" };
-} // namespace
-std::string GetLocalDeviceId()
-{
-    auto localNode = std::make_unique<NodeBasicInfo>();
-    int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
-    if (ret != RET_OK) {
-        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
-        return {};
-    }
-    return localNode->networkId;
-}
-} // namespace COORDINATION
+class CoordinationStateOut final : public ICoordinationState {
+public:
+    explicit CoordinationStateOut(const std::string &startDhid);
+    int32_t StopInputDeviceCoordination(const std::string &networkId) override;
+    void OnKeyboardOnline(const std::string &dhid) override;
+
+private:
+    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
+    void ProcessStop(const std::string &srcNetworkId);
+    std::string startDhid_;
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // COORDINATION_STATE_OUT_H

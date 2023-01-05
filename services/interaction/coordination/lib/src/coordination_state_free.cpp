@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#include "input_device_cooperate_state_free.h"
+#include "coordination_state_free.h"
 
-#include "device_cooperate_softbus_adapter.h"
+#include "device_coordination_softbus_adapter.h"
 #include "coordination_sm.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateFree" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
 } // namespace
 
-int32_t InputDeviceCooperateStateFree::StartInputDeviceCoordination(
+int32_t CoordinationStateFree::StartInputDeviceCoordination(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
@@ -46,13 +46,13 @@ int32_t InputDeviceCooperateStateFree::StartInputDeviceCoordination(
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
+        std::bind(&CoordinationStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     return PrepareAndStart(remoteNetworkId, startInputDeviceId);

@@ -13,26 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_EVENT_HANDLER_H
-#define COOPERATE_EVENT_HANDLER_H
+#ifndef COORDINATION_STATE_FREE_H
+#define COORDINATION_STATE_FREE_H
 
-#include <memory>
-
-#include "event_handler.h"
-#include "event_runner.h"
+#include "i_coordination_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateEventHandler final : public AppExecFwk::EventHandler {
+class CoordinationStateFree final : public ICoordinationState {
 public:
-    explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-    ~CooperateEventHandler() override = default;
-    bool ProxyPostTask(const Callback &callback, int64_t delayTime);
-    bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
-    void ProxyRemoveTask(const std::string &name);
+    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
+
+private:
+    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COOPERATE_EVENT_HANDLER_H
+#endif // COORDINATION_STATE_FREE_H

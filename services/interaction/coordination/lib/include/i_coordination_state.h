@@ -22,8 +22,8 @@
 #include <set>
 #include <string>
 
-#include "cooperate_event_handler.h"
-#include "cooperate_event_manager.h"
+#include "coordination_event_handler.h"
+#include "coordination_event_manager.h"
 #include "devicestatus_define.h"
 #include "devicestatus_hilog_wrapper.h"
 
@@ -54,7 +54,7 @@ protected:
 
 protected:
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
-    std::shared_ptr<CooperateEventHandler> eventHandler_ { nullptr };
+    std::shared_ptr<CoordinationEventHandler> eventHandler_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -19,7 +19,7 @@
 #include <map>
 #include <mutex>
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {

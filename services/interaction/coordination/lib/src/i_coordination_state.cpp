@@ -15,7 +15,7 @@
 
 #include "i_coordination_state.h"
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "devicestatus_define.h"
 #include "distributed_input_adapter.h"
 #include "coordination_sm.h"
@@ -31,7 +31,7 @@ ICoordinationState::ICoordinationState()
 {
     runner_ = AppExecFwk::EventRunner::Create(true);
     CHKPL(runner_);
-    eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
+    eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
 
 int32_t ICoordinationState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)

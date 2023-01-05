@@ -29,18 +29,18 @@ ohos_source_set("coordination_lib") {
   ]
 
   sources = [
-    "src/cooperate_event_handler.cpp",
-    "src/cooperate_event_manager.cpp",
+    "src/coordination_event_handler.cpp",
+    "src/coordination_event_manager.cpp",
     "src/d_input.cpp",
-    "src/device_cooperate_softbus_adapter.cpp",
+    "src/device_coordination_softbus_adapter.cpp",
     "src/device_profile_adapter.cpp",
     "src/distributed_input_adapter.cpp",
     "src/i_coordination_state.cpp",
     "src/coordination_sm.cpp",
-    "src/input_device_cooperate_state_free.cpp",
-    "src/input_device_cooperate_state_in.cpp",
-    "src/input_device_cooperate_state_out.cpp",
-    "src/input_device_cooperate_util.cpp",
+    "src/coordination_state_free.cpp",
+    "src/coordination_state_in.cpp",
+    "src/coordination_state_out.cpp",
+    "src/coordination_util.cpp",
   ]
 
   public_configs = [ ":coordination_lib_public_config" ]

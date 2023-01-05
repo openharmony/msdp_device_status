@@ -22,15 +22,15 @@
 #include "hitrace_meter.h"
 #include "input_manager.h"
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_cooperate_softbus_adapter.h"
+#include "device_coordination_softbus_adapter.h"
 #include "device_profile_adapter.h"
 #include "display_info.h"
-#include "input_device_cooperate_state_free.h"
-#include "input_device_cooperate_state_in.h"
-#include "input_device_cooperate_state_out.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_state_free.h"
+#include "coordination_state_in.h"
+#include "coordination_state_out.h"
+#include "coordination_util.h"
 #include "input_manager.h"
 
 namespace OHOS {
@@ -58,7 +58,7 @@ void CoordinationSM::Init()
 {
     CALL_INFO_TRACE;
     preparedNetworkId_ = std::make_pair("", "");
-    currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
+    currentStateSM_ = std::make_shared<CoordinationStateFree>();
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
@@ -98,7 +98,7 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
     CALL_INFO_TRACE;
     startDhid_ = "";
     srcNetworkId_ = "";
-    currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
+    currentStateSM_ = std::make_shared<CoordinationStateFree>();
     coordinationState_ = CoordinationState::STATE_FREE;
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
@@ -120,7 +120,7 @@ void CoordinationSM::OnCoordinationChanged(const std::string &networkId, bool is
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(
-        std::bind(&CooperateEventManager::OnCoordinationMessage, CoordinationEventMgr, msg, networkId));
+        std::bind(&CoordinationEventManager::OnCoordinationMessage, CoordinationEventMgr, msg, networkId));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
     }
@@ -253,7 +253,7 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(
-        std::bind(&CooperateEventManager::OnCoordinationMessage, CoordinationEventMgr,
+        std::bind(&CoordinationEventManager::OnCoordinationMessage, CoordinationEventMgr,
                   CoordinationMessage::INFO_START, remoteNetworkId));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
@@ -293,7 +293,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(
-        std::bind(&CooperateEventManager::OnCoordinationMessage, CoordinationEventMgr, msg, ""));
+        std::bind(&CoordinationEventManager::OnCoordinationMessage, CoordinationEventMgr, msg, ""));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
     }
@@ -456,7 +456,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             break;
         }
         case CoordinationState::STATE_IN: {
-            currentStateSM_ = std::make_shared<InputDeviceCooperateStateIn>(startDhid_);
+            currentStateSM_ = std::make_shared<CoordinationStateIn>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
@@ -471,7 +471,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             auto* context = CoordinationEventMgr->GetIContext();
             CHKPV(context);
             OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
-            currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
+            currentStateSM_ = std::make_shared<CoordinationStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));

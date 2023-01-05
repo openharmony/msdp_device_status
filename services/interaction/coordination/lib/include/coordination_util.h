@@ -12,23 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef COORDINATION_UTIL_H
+#define COORDINATION_UTIL_H
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_FREE_H
-#define INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#include <string>
 
-#include "i_coordination_state.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateFree final : public ICoordinationState {
-public:
-    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-
-private:
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+            json_ = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
 };
+namespace COORDINATION {
+std::string GetLocalDeviceId();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#endif // COORDINATION_UTIL_H

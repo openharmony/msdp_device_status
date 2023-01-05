@@ -12,35 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef INPUT_DEVICE_COOPERATE_UTIL_H
-#define INPUT_DEVICE_COOPERATE_UTIL_H
 
-#include <string>
+#include "coordination_util.h"
 
-#include "cJSON.h"
+#include "softbus_bus_center.h"
+
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-            json_ = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ { nullptr };
-};
 namespace COORDINATION {
-std::string GetLocalDeviceId();
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationUtil" };
+} // namespace
+std::string GetLocalDeviceId()
+{
+    auto localNode = std::make_unique<NodeBasicInfo>();
+    int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
+    if (ret != RET_OK) {
+        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        return {};
+    }
+    return localNode->networkId;
 }
+} // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_UTIL_H
