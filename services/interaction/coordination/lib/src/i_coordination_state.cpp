@@ -97,7 +97,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startInputDeviceId)
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    return RET_OK; 
+    return RET_OK;
 }
 
 void ICoordinationState::OnStartRemoteInput(

@@ -53,8 +53,8 @@ enum class CoordinationMsg {
 };
 
 struct PointerFilter : public MMI::IInputEventFilter {
-    bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override 
-    { 
+    bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
         return false;
     }
 

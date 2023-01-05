@@ -698,7 +698,7 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
     int32_t physicalX = static_cast<int32_t>(width * xPercent / PERCENT_CONST);
     int32_t physicalY = static_cast<int32_t>(height * yPercent / PERCENT_CONST);
     FI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d,"
-        "physicalX:%{public}d, x_:%{public}d, y_:%{public}d",width,height,physicalX,physicalY,x_,y_);
+        "physicalX:%{public}d, x_:%{public}d, y_:%{public}d", width, height, physicalX, physicalY, x_, y_);
     OHOS::MMI::InputManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
 }
 

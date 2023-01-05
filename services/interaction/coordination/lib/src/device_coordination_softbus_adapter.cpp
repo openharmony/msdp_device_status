@@ -259,7 +259,8 @@ int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordination(const std::str
     int32_t sessionId = sessionDevMap_[remoteDeviceId];
     auto pointerEvent = InputDevCooSM->GetLastPointerEvent();
     CHKPR(pointerEvent, RET_ERR);
-    bool isPointerButtonPressed = (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
+    bool isPointerButtonPressed =
+        (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localDeviceId.c_str()));
@@ -276,8 +277,8 @@ int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordination(const std::str
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess,
-    const std::string &startDhid, int32_t xPercent, int32_t yPercent)
+int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::string &remoteDeviceId,
+    bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -327,7 +328,8 @@ int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordination(const std::stri
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess)
+int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::string &remoteDeviceId,
+    bool isSuccess)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);

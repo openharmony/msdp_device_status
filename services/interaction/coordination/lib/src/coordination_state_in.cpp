@@ -163,7 +163,7 @@ void CoordinationStateIn::ComeBack(const std::string &sinkNetworkId, int32_t sta
     CHKPV(context);
     std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
-       InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhids,
         [this, sinkNetworkId, startInputDeviceId](bool isSuccess) {
