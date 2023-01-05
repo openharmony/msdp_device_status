@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MMI_CLIENT_H
-#define MMI_CLIENT_H
+#ifndef CLIENT_H
+#define CLIENT_H
 
 #include "nocopyable.h"
 
@@ -72,4 +72,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // MMI_CLIENT_H
+#endif // CLIENT_H

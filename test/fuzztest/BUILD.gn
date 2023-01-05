@@ -23,11 +23,11 @@ group("device_status_fuzztest") {
   ]
   if (fusion_interaction_coordination) {
     deps += [
-      "enableinputdevicecooperate_fuzzer:fuzztest",
-      "getinputdevicecooperatestate_fuzzer:fuzztest",
-      "registercooperatelistener_fuzzer:fuzztest",
-      "startinputdevicecooperate_fuzzer:fuzztest",
-      "stopdevicecooperate_fuzzer:fuzztest",
+      "enablecoordination_fuzzer:fuzztest",
+      "getcoordinationstate_fuzzer:fuzztest",
+      "registercoordinationlistener_fuzzer:fuzztest",
+      "startcoordination_fuzzer:fuzztest",
+      "stopcoordination_fuzzer:fuzztest",
     ]
   }
 }

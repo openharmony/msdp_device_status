@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MMI_FD_LISTENER_H
-#define MMI_FD_LISTENER_H
+#ifndef FD_LISTENER_H
+#define FD_LISTENER_H
 
 #include "file_descriptor_listener.h"
 
@@ -38,4 +38,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // MMI_FD_LISTENER_H
+#endif // FD_LISTENER_H

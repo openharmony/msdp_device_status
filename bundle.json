@@ -53,7 +53,10 @@
             }
           }
       ],
-      "test": []
+      "test": [
+        "//base/msdp/device_status:device_status_tests",
+	      "//base/msdp/device_status/test/fuzztest:device_status_fuzztest"
+      ]
     }
   }
 }
