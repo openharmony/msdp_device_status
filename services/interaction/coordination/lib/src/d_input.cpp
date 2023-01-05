@@ -17,7 +17,7 @@
 
 #include "cooperate_event_manager.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #include "input_device_cooperate_util.h"
 #include "proto.h"
 
@@ -132,11 +132,6 @@ void DInput::OnPointerOffline(const std::string& dhid, const std::string& sinkNe
     const std::vector<std::string>& keyboards)
 {
     InputDevCooSM->OnPointerOffline(dhid, sinkNetworkId, keyboards);
-}
-
-bool DInput::HandleEvent(libinput_event* event)
-{
-    return InputDevCooSM->HandleEvent(event);
 }
 
 bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)

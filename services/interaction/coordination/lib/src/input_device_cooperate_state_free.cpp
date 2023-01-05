@@ -16,7 +16,7 @@
 #include "input_device_cooperate_state_free.h"
 
 #include "device_cooperate_softbus_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #include "input_device_cooperate_util.h"
 
 namespace OHOS {

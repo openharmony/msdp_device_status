@@ -19,7 +19,7 @@
 #include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #include "input_device_cooperate_util.h"
 
 namespace OHOS {
@@ -77,7 +77,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
+        std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }

@@ -51,11 +51,6 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
 
-    int32_t FindInputDeviceId(struct libinput_device* inputDevice) override
-    {
-        return -1;
-    }
-
     std::shared_ptr<MMI::PointerEvent> GetPointerEvent() override
     {
         return nullptr;
@@ -76,11 +71,6 @@ public:
 
     void SetJumpInterceptState(bool isJump) override
     {}
-
-    bool IsRemote(struct libinput_device *inputDevice) override
-    {
-        return false;
-    }
 
     const ::OHOS::MMI::DisplayGroupInfo GetDisplayGroupInfo() override
     {

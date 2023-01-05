@@ -19,7 +19,7 @@
 #include "coordination_message.h"
 #include "device_cooperate_softbus_adapter.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #include "input_device_cooperate_util.h"
 
 namespace OHOS {
@@ -108,7 +108,7 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
 {
     CALL_DEBUG_ENTER;
     if (!isSuccess) {
-        IInputDeviceCooperateState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
+        ICoordinationState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
         return;
     }
     auto* context = CoordinationEventMgr->GetIContext();
@@ -143,14 +143,14 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
     CALL_DEBUG_ENTER;
     if (InputDevCooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
-        std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
+        std::function<void()> handleStartFinishFunc = std::bind(&CoordinationSM::OnStartFinish,
             InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
+            std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
     }

@@ -38,7 +38,7 @@
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "cooperate_event_manager.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 namespace OHOS {

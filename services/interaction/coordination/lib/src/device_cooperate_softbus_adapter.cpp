@@ -21,9 +21,9 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
-#include "device_cooperate_softbus_define.h"
+#include "device_coordination_softbus_define.h"
 #include "devicestatus_define.h"
-#include "input_device_cooperate_sm.h"
+#include "coordination_sm.h"
 #include "input_device_cooperate_util.h"
 
 namespace OHOS {

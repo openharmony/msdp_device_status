@@ -16,12 +16,12 @@
 #ifndef INPUT_DEVICE_COOPERATE_STATE_OUT_H
 #define INPUT_DEVICE_COOPERATE_STATE_OUT_H
 
-#include "i_input_device_cooperate_state.h"
+#include "i_coordination_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateOut final : public IInputDeviceCooperateState {
+class InputDeviceCooperateStateOut final : public ICoordinationState {
 public:
     explicit InputDeviceCooperateStateOut(const std::string &startDhid);
     int32_t StopInputDeviceCoordination(const std::string &networkId) override;

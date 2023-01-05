@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_COOPERATE_SOFTBUS_DEFINE_H
-#define DEVICE_COOPERATE_SOFTBUS_DEFINE_H
+#ifndef DEVICE_COORDINATION_SOFTBUS_DEFINE_H
+#define DEVICE_COORDINATION_SOFTBUS_DEFINE_H
 
 #include <string>
 #include <unistd.h>
@@ -54,4 +54,4 @@ enum {
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif  // DEVICE_COOPERATE_SOFTBUS_DEFINE_H
+#endif  // DEVICE_COORDINATION_SOFTBUS_DEFINE_H
