@@ -32,14 +32,14 @@ public:
     using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     virtual void Init() = 0;
     virtual void RegisterEventCallback(SimulateEventCallback callback) = 0;
-    virtual void EnableInputDeviceCooperate(bool enabled) = 0;
-    virtual int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
+    virtual void EnableInputDeviceCoordination(bool enabled) = 0;
+    virtual int32_t OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
         const std::string &sinkDeviceId, int32_t srcInputDeviceId) = 0;
-    virtual int32_t OnStopDeviceCooperate(SessionPtr sess, int32_t userData) = 0;
-    virtual int32_t OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
+    virtual int32_t OnStopDeviceCoordination(SessionPtr sess, int32_t userData) = 0;
+    virtual int32_t OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
         const std::string& deviceId) = 0;
-    virtual int32_t OnRegisterCooperateListener(SessionPtr sess) = 0;
-    virtual int32_t OnUnregisterCooperateListener(SessionPtr sess) = 0;
+    virtual int32_t OnRegisterCoordinationListener(SessionPtr sess) = 0;
+    virtual int32_t OnUnregisterCoordinationListener(SessionPtr sess) = 0;
 
     virtual void OnKeyboardOnline(const std::string& dhid) = 0;
     virtual void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,

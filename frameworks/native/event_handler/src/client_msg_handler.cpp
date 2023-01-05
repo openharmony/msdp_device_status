@@ -37,9 +37,9 @@ void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this)},
-        {MessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
-        {MessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
+        {MessageId::COORDINATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCoordinationListener, this)},
+        {MessageId::COORDINATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCoordinationMessage, this)},
+        {MessageId::COORDINATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCoordinationState, this)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     };
     for (auto &it : funs) {
@@ -68,7 +68,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationListener(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -83,7 +83,7 @@ int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPack
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationMessage(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -91,21 +91,21 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
     int32_t nType;
     pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read cooperate msg failed");
+        FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
     CoordinationMgrImpl.OnCoordinationMessageEvent(userData, deviceId, CoordinationMessage(nType));
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationState(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     bool state;
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read cooperate msg failed");
+        FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
     CoordinationMgrImpl.OnCoordinationState(userData, state);

@@ -37,7 +37,7 @@ struct JsonParser {
     }
     cJSON *json_ { nullptr };
 };
-namespace COOPERATE {
+namespace COORDINATION {
 std::string GetLocalDeviceId();
 }
 } // namespace DeviceStatus

@@ -33,24 +33,24 @@ struct libinput_event;
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-enum class CooperateState {
+enum class CoordinationState {
     STATE_FREE = 0,
     STATE_IN = 1,
     STATE_OUT = 2,
 };
 
-enum class CooperateMsg {
-    COOPERATE_ON_SUCCESS = 0,
-    COOPERATE_ON_FAIL = 1,
-    COOPERATE_OFF_SUCCESS = 2,
-    COOPERATE_OFF_FAIL = 3,
-    COOPERATE_START = 4,
-    COOPERATE_START_SUCCESS = 5,
-    COOPERATE_START_FAIL = 6,
-    COOPERATE_STOP = 7,
-    COOPERATE_STOP_SUCCESS = 8,
-    COOPERATE_STOP_FAIL = 9,
-    COOPERATE_NULL = 10,
+enum class CoordinationMsg {
+    COORDINATION_ON_SUCCESS = 0,
+    COORDINATION_ON_FAIL = 1,
+    COORDINATION_OFF_SUCCESS = 2,
+    COORDINATION_OFF_FAIL = 3,
+    COORDINATION_START = 4,
+    COORDINATION_START_SUCCESS = 5,
+    COORDINATION_START_FAIL = 6,
+    COORDINATION_STOP = 7,
+    COORDINATION_STOP_SUCCESS = 8,
+    COORDINATION_STOP_FAIL = 9,
+    COORDINATION_NULL = 10,
 };
 
 struct PointerFilter : public MMI::IInputEventFilter {
@@ -120,22 +120,23 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
-    void EnableInputDeviceCooperate(bool enabled);
-    int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
-    int32_t StopInputDeviceCooperate();
-    void GetCooperateState(const std::string &deviceId);
-    void StartRemoteCooperate(const std::string &remoteNetworkId, bool buttonIsPressed);
+    void EnableInputDeviceCoordination(bool enabled);
+    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+    int32_t StopInputDeviceCoordination();
+    void GetCoordinationState(const std::string &deviceId);
+    void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
-    void StartRemoteCooperateResult(bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
-    void StopRemoteCooperate();
-    void StopRemoteCooperateResult(bool isSuccess);
-    void StartCooperateOtherResult(const std::string &srcNetworkId);
+    void StartRemoteCoordinationResult(bool isSuccess,
+        const std::string &startDhid, int32_t xPercent, int32_t yPercent);
+    void StopRemoteCoordination();
+    void StopRemoteCoordinationResult(bool isSuccess);
+    void StartCoordinationOtherResult(const std::string &srcNetworkId);
     bool HandleEvent(struct libinput_event *event);
-    void UpdateState(CooperateState state);
+    void UpdateState(CoordinationState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
-    CooperateState GetCurrentCooperateState() const;
-    void OnCooperateChanged(const std::string &networkId, bool isOpen);
+    CoordinationState GetCurrentCoordinationState() const;
+    void OnCoordinationChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
         const std::vector<std::string> &keyboards);
@@ -157,7 +158,7 @@ public:
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     bool CheckPointerEvent(struct libinput_event *event);
-    void OnCloseCooperation(const std::string &networkId, bool isLocal);
+    void OnCloseCoordination(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
@@ -169,7 +170,7 @@ private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
     std::string srcNetworkId_;
-    CooperateState cooperateState_ { CooperateState::STATE_FREE };
+    CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
     std::vector<std::string> onlineDevice_;

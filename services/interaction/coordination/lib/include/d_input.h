@@ -28,14 +28,14 @@ public:
 
     void Init();
     void RegisterEventCallback(SimulateEventCallback callback);
-    void EnableInputDeviceCooperate(bool enabled);
-    int32_t OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
+    void EnableInputDeviceCoordination(bool enabled);
+    int32_t OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
         const std::string& sinkDeviceId, int32_t srcInputDeviceId);
-    int32_t OnStopDeviceCooperate(SessionPtr sess, int32_t userData);
-    int32_t OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
+    int32_t OnStopDeviceCoordination(SessionPtr sess, int32_t userData);
+    int32_t OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
         const std::string& deviceId);
-    int32_t OnRegisterCooperateListener(SessionPtr sess);
-    int32_t OnUnregisterCooperateListener(SessionPtr sess);
+    int32_t OnRegisterCoordinationListener(SessionPtr sess);
+    int32_t OnUnregisterCoordinationListener(SessionPtr sess);
 
     void OnKeyboardOnline(const std::string& dhid);
     void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,

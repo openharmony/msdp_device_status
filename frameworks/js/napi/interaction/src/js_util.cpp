@@ -62,7 +62,7 @@ napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
     CHKPP(cb->env);
     napi_value ret = nullptr;
     napi_value state = nullptr;
-    CHKRP(napi_create_int32(cb->env, cb->data.cooperateOpened ? 1 : 0, &ret),
+    CHKRP(napi_create_int32(cb->env, cb->data.coordinationOpened ? 1 : 0, &ret),
         CREATE_INT32);
     CHKRP(napi_coerce_to_bool(cb->env, ret, &state), COERCE_TO_BOOL);
     return state;

@@ -16,6 +16,6 @@
 #ifndef GETINPUTDEVICECOOPERATESTATE_FUZZER_H
 #define GETINPUTDEVICECOOPERATESTATE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "getinputdevicecooperatestate_fuzzer"
+#define FUZZ_PROJECT_NAME "getinputdevicecoordinationstate_fuzzer"
 
 #endif // GETINPUTDEVICECOOPERATESTATE_FUZZER_H

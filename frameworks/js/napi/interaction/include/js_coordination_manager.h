@@ -45,4 +45,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // JS_INPUT_DEVICE_COOPERATE_MANAGER_H
+#endif // JS_COORDINATION_MANAGER_H

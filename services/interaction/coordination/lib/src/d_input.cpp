@@ -46,80 +46,80 @@ void DInput::RegisterEventCallback(SimulateEventCallback callback)
     DistributedAdapter->RegisterEventCallback(callback);
 }
 
-void DInput::EnableInputDeviceCooperate(bool enabled)
+void DInput::EnableInputDeviceCoordination(bool enabled)
 {
-    InputDevCooSM->EnableInputDeviceCooperate(enabled);
+    InputDevCooSM->EnableInputDeviceCoordination(enabled);
 }
 
-int32_t DInput::OnStartInputDeviceCooperate(SessionPtr sess, int32_t userData,
+int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
     const std::string& sinkDeviceId, int32_t srcInputDeviceId)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::START;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CooperateEventMgr->AddCooperationEvent(event);
-    int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    int32_t ret = InputDevCooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
+        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DInput::OnStopDeviceCooperate(SessionPtr sess, int32_t userData)
+int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STOP;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_MESSAGE;
+    event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CooperateEventMgr->AddCooperationEvent(event);
-    int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    int32_t ret = InputDevCooSM->StopInputDeviceCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        FI_HILOGE("OnStopDeviceCoordination failed, ret:%{public}d", ret);
+        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DInput::OnGetInputDeviceCooperateState(SessionPtr sess, int32_t userData,
+int32_t DInput::OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
     const std::string& deviceId)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::STATE;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_GET_STATE;
+    event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
-    CooperateEventMgr->AddCooperationEvent(event);
-    InputDevCooSM->GetCooperateState(deviceId);
+    CoordinationEventMgr->AddCoordinationEvent(event);
+    InputDevCooSM->GetCoordinationState(deviceId);
     return RET_OK;
 }
 
-int32_t DInput::OnRegisterCooperateListener(SessionPtr sess)
+int32_t DInput::OnRegisterCoordinationListener(SessionPtr sess)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    event->msgId = MessageId::COOPERATION_ADD_LISTENER;
-    CooperateEventMgr->AddCooperationEvent(event);
+    event->msgId = MessageId::COORDINATION_ADD_LISTENER;
+    CoordinationEventMgr->AddCoordinationEvent(event);
     return RET_OK;
 }
 
-int32_t DInput::OnUnregisterCooperateListener(SessionPtr sess)
+int32_t DInput::OnUnregisterCoordinationListener(SessionPtr sess)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CooperateEventManager::EventType::LISTENER;
     event->sess = sess;
-    CooperateEventMgr->RemoveCooperationEvent(event);
+    CoordinationEventMgr->RemoveCoordinationEvent(event);
     return RET_OK;
 }
 
@@ -141,20 +141,20 @@ bool DInput::HandleEvent(libinput_event* event)
 
 bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPF(context);
     IDeviceManager &devMgr = context->GetDeviceManager();
-    CooperateState state = InputDevCooSM->GetCurrentCooperateState();
-    FI_HILOGI("Get current cooperate state:%{public}d", state);
+    CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
+    FI_HILOGI("Get current coordination state:%{public}d", state);
 
-    if (state == CooperateState::STATE_IN) {
+    if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
         if (devMgr.IsRemote(deviceId)) {
             auto networkId = devMgr.GetOriginNetworkId(deviceId);
             return !IsNeedFilterOut(networkId, keyEvent);
         }
-    } else if (state == CooperateState::STATE_OUT) {
-        std::string networkId = COOPERATE::GetLocalDeviceId();
+    } else if (state == CoordinationState::STATE_OUT) {
+        std::string networkId = COORDINATION::GetLocalDeviceId();
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == MMI::KeyEvent::KEY_ACTION_UP) {
                 context->SelectAutoRepeat(keyEvent);
@@ -163,7 +163,7 @@ bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)
         }
         context->SetJumpInterceptState(true);
     } else {
-        FI_HILOGW("Get current cooperate state:STATE_FREE(%{public}d)", state);
+        FI_HILOGW("Get current coordination state:STATE_FREE(%{public}d)", state);
     }
     return true;
 }
@@ -191,7 +191,7 @@ bool DInput::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<
 
 std::string DInput::GetLocalDeviceId()
 {
-    return COOPERATE::GetLocalDeviceId();
+    return COORDINATION::GetLocalDeviceId();
 }
 
 void DInput::Dump(int32_t fd, const std::vector<std::string>& args)
@@ -205,7 +205,7 @@ IDInput* CreateIDInpt(IContext *context)
         FI_HILOGE("Parameter error");
         return nullptr;
     }
-    CooperateEventMgr->SetIContext(context);
+    CoordinationEventMgr->SetIContext(context);
     IDInput* input = new (std::nothrow) DInput();
     if (input == nullptr) {
         FI_HILOGE("Create IDInpt failed");

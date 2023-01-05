@@ -26,23 +26,23 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateFree" };
 } // namespace
 
-int32_t InputDeviceCooperateStateFree::StartInputDeviceCooperate(
+int32_t InputDeviceCooperateStateFree::StartInputDeviceCoordination(
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         FI_HILOGE("RemoteNetworkId is empty");
-        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    std::string localNetworkId = COOPERATE::GetLocalDeviceId();
+    std::string localNetworkId = COORDINATION::GetLocalDeviceId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         FI_HILOGE("Input Parameters error");
-        return static_cast<int32_t>(CooperationMessage::COOPERATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    int32_t ret = DevCooperateSoftbusAdapter->StartRemoteCooperate(localNetworkId, remoteNetworkId);
+    int32_t ret = DevCoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Start input device cooperate fail");
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        FI_HILOGE("Start input device coordination fail");
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =

@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "RegisterCooperateListenerFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "RegisterCoordinationListenerFuzzTest" };
 } // namespace
 
 class InputDeviceCooperateListenerTest : public ICoordinationListener {
@@ -38,7 +38,7 @@ public:
     };
 };
 
-void RegisterCooperateListenerFuzzTest(const uint8_t* data, size_t size)
+void RegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
     InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
@@ -52,6 +52,6 @@ void RegisterCooperateListenerFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::RegisterCooperateListenerFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::RegisterCoordinationListenerFuzzTest(data, size);
     return 0;
 }

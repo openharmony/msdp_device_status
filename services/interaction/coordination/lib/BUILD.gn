@@ -21,6 +21,7 @@ config("coordination_lib_public_config") {
 ohos_source_set("coordination_lib") {
   include_dirs = [
     "stub",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/interaction/coordination/interface",
     "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",

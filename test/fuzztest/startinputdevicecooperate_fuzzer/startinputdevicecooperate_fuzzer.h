@@ -16,6 +16,6 @@
 #ifndef STARTINPUTDEVICECOOPERATE_FUZZER_H
 #define STARTINPUTDEVICECOOPERATE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "startinputdevicecooperate_fuzzer"
+#define FUZZ_PROJECT_NAME "startinputdevicecoordination_fuzzer"
 
 #endif // STARTINPUTDEVICECOOPERATE_FUZZER_H

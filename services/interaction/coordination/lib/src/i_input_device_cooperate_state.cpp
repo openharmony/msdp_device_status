@@ -37,7 +37,7 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
     std::string sinkNetworkId = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
     int32_t ret = RET_ERR;
@@ -82,12 +82,12 @@ int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
-    auto* context = CooperateEventMgr->GetIContext();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCooperateDhids(startInputDeviceId);
+    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
-        return static_cast<int32_t>(CooperationMessage::INPUT_DEVICE_ID_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::INPUT_DEVICE_ID_ERROR);
     }
     int32_t ret = DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSuccess) {
@@ -95,7 +95,7 @@ int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
         });
     if (ret != RET_OK) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     return RET_OK; 
 }

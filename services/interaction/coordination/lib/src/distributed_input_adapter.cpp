@@ -178,7 +178,7 @@ void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback cal
 void DistributedInputAdapter::AddTimer(const CallbackType &type)
 {
     FI_HILOGD("AddTimer type:%{public}d", type);
-    auto context = CooperateEventMgr->GetIContext();
+    auto context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     int32_t timerId = context->GetTimerManager().AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
         if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
@@ -205,7 +205,7 @@ void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
     FI_HILOGD("RemoveTimer type:%{public}d", type);
     if (watchingMap_.find(type) != watchingMap_.end()) {
-        auto context = CooperateEventMgr->GetIContext();
+        auto context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
         context->GetTimerManager().RemoveTimer(watchingMap_[type].timerId);
         watchingMap_.erase(type);

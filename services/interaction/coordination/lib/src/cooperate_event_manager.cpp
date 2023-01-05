@@ -27,95 +27,95 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Coope
 CooperateEventManager::CooperateEventManager() {}
 CooperateEventManager::~CooperateEventManager() {}
 
-void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
+void CooperateEventManager::AddCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (event->type == EventType::LISTENER) {
-        remoteCooperateCallbacks_.emplace_back(event);
+        remoteCoordinationCallbacks_.emplace_back(event);
     } else {
-        cooperateCallbacks_[event->type] = event;
+        coordinationCallbacks_[event->type] = event;
     }
 }
 
-void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
+void CooperateEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
-    if (remoteCooperateCallbacks_.empty() || event == nullptr) {
+    if (remoteCoordinationCallbacks_.empty() || event == nullptr) {
         FI_HILOGE("Remove listener failed");
         return;
     }
-    for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
+    for (auto it = remoteCoordinationCallbacks_.begin(); it != remoteCoordinationCallbacks_.end(); ++it) {
         if ((*it)->sess == event->sess) {
-            remoteCooperateCallbacks_.erase(it);
+            remoteCoordinationCallbacks_.erase(it);
             return;
         }
     }
 }
 
-int32_t CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std::string &deviceId)
+int32_t CooperateEventManager::OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    if (remoteCooperateCallbacks_.empty()) {
+    if (remoteCoordinationCallbacks_.empty()) {
         FI_HILOGW("The current listener is empty, unable to invoke the listening interface");
         return RET_ERR;
     }
-    for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
+    for (auto it = remoteCoordinationCallbacks_.begin(); it != remoteCoordinationCallbacks_.end(); ++it) {
         sptr<EventInfo> info = *it;
         CHKPC(info);
-        NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+        NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     }
     return RET_OK;
 }
 
-void CooperateEventManager::OnEnable(CooperationMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnEnable(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    sptr<EventInfo> info = cooperateCallbacks_[EventType::ENABLE];
+    sptr<EventInfo> info = coordinationCallbacks_[EventType::ENABLE];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
-    cooperateCallbacks_[EventType::ENABLE] =  nullptr;
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    coordinationCallbacks_[EventType::ENABLE] =  nullptr;
 }
 
-void CooperateEventManager::OnStart(CooperationMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnStart(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    sptr<EventInfo> info = cooperateCallbacks_[EventType::START];
+    sptr<EventInfo> info = coordinationCallbacks_[EventType::START];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
-    cooperateCallbacks_[EventType::START] =  nullptr;
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    coordinationCallbacks_[EventType::START] =  nullptr;
 }
 
-void CooperateEventManager::OnStop(CooperationMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnStop(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
+    sptr<EventInfo> info = coordinationCallbacks_[EventType::STOP];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
-    cooperateCallbacks_[EventType::STOP] =  nullptr;
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    coordinationCallbacks_[EventType::STOP] =  nullptr;
 }
 
 void CooperateEventManager::OnGetState(bool state)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    sptr<EventInfo> info = cooperateCallbacks_[EventType::STATE];
+    sptr<EventInfo> info = coordinationCallbacks_[EventType::STATE];
     CHKPV(info);
-    NotifyCooperateState(info->sess, info->msgId, info->userData, state);
-    cooperateCallbacks_[EventType::STATE] =  nullptr;
+    NotifyCoordinationState(info->sess, info->msgId, info->userData, state);
+    coordinationCallbacks_[EventType::STATE] =  nullptr;
 }
 
-void CooperateEventManager::OnErrorMessage(EventType type, CooperationMessage msg)
+void CooperateEventManager::OnErrorMessage(EventType type, CoordinationMessage msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
-    sptr<EventInfo> info = cooperateCallbacks_[type];
+    sptr<EventInfo> info = coordinationCallbacks_[type];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, "", msg);
-    cooperateCallbacks_[type] =  nullptr;
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, "", msg);
+    coordinationCallbacks_[type] =  nullptr;
 }
 
 void CooperateEventManager::SetIContext(IContext *context)
@@ -128,8 +128,8 @@ IContext* CooperateEventManager::GetIContext() const
     return context_;
 }
 
-void CooperateEventManager::NotifyCooperateMessage(
-    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CooperationMessage msg)
+void CooperateEventManager::NotifyCoordinationMessage(
+    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
@@ -145,7 +145,7 @@ void CooperateEventManager::NotifyCooperateMessage(
     }
 }
 
-void CooperateEventManager::NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
+void CooperateEventManager::NotifyCoordinationState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);

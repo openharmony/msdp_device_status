@@ -16,6 +16,6 @@
 #ifndef REGISTERCOOPERATELISTENER_FUZZER_H
 #define REGISTERCOOPERATELISTENER_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "registercooperatelistener_fuzzer"
+#define FUZZ_PROJECT_NAME "registercoordinationlistener_fuzzer"
 
 #endif // REGISTERCOOPERATELISTENER_FUZZER_H

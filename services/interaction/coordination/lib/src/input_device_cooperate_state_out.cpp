@@ -33,7 +33,7 @@ InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& st
     : startDhid_(startDhid)
 {}
 
-int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string &networkId)
+int32_t InputDeviceCooperateStateOut::StopInputDeviceCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::string srcNetworkId = networkId;
@@ -41,10 +41,10 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
         std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = DevCooperateSoftbusAdapter->StopRemoteCooperate(networkId);
+    int32_t ret = DevCoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop input device cooperate fail");
-        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+        FI_HILOGE("Stop input device coordination fail");
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
@@ -57,10 +57,10 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
 void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string sink = COOPERATE::GetLocalDeviceId();
-    auto* context = CooperateEventMgr->GetIContext();
+    std::string sink = COORDINATION::GetLocalDeviceId();
+    auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCooperateDhids(startDhid_);
+    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startDhid_);
     if (dhids.empty()) {
         InputDevCooSM->OnStopFinish(false, srcNetworkId);
     }
