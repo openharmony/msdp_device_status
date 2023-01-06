@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "enableinputdevicecoordination_fuzzer.h"
+#include "enablecoordination_fuzzer.h"
 #include "securec.h"
 
 #include "coordination_message.h"
@@ -24,15 +24,15 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "EnableInputDeviceCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "EnableCoordinationFuzzTest" };
 } // namespace
 
-void EnableInputDeviceCoordinationFuzzTest(const uint8_t* data, size_t size)
+void EnableCoordinationFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t random = 0;
     bool enabled = (random % 2) ? false : true;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("EnableInputDeviceCoordinationFuzzTest");
+        FI_HILOGD("EnableCoordinationFuzzTest");
     };
     InteractionManager::GetInstance()->EnableInputDeviceCoordination(enabled, fun);
 }
@@ -44,7 +44,7 @@ void EnableInputDeviceCoordinationFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::EnableInputDeviceCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::EnableCoordinationFuzzTest(data, size);
     return 0;
 }
 

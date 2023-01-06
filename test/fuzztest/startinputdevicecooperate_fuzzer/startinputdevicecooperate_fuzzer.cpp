@@ -23,20 +23,20 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartInputDeviceCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartCoordinationFuzzTest" };
 } // namespace
 
-void StartInputDeviceCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
 {
     if (data == nullptr) {
         return;
     }
     const std::string sinkDeviceId(reinterpret_cast<const char*>(data), size);
-    const int32_t srcInputDeviceId = *(reinterpret_cast<const int32_t*>(data));
-    auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("StartInputDeviceCoordinationFuzzTest");
+    const int32_t srcDeviceId = *(reinterpret_cast<const int32_t*>(data));
+    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+        FI_HILOGD("StartCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId, fun);
+    InteractionManager::GetInstance()->StartInputDeviceCoordination(sinkDeviceId, srcDeviceId, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
@@ -51,7 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::StartInputDeviceCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::StartCoordinationFuzzTest(data, size);
     return 0;
 }
 
