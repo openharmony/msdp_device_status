@@ -16,10 +16,6 @@
 #ifndef ENABLECOORDINATION_FUZZER_H
 #define ENABLECOORDINATION_FUZZER_H
 
-<<<<<<< Updated upstream
 #define FUZZ_PROJECT_NAME "enablecoordination_fuzzer"
-=======
-#define FUZZ_PROJECT_NAME "EnableCoordination_fuzzer_fuzzer"
->>>>>>> Stashed changes
 
 #endif // ENABLECOORDINATION_FUZZER_H

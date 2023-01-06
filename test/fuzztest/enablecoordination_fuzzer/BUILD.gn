@@ -21,7 +21,8 @@ module_output_path = "device_status/device_status_native"
 ##############################fuzztest##########################################
 ohos_fuzztest("EnableCoordinationFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//base/msdp/device_status/test/fuzztest/enablecoordination_fuzzer"
+  fuzz_config_file =
+      "//base/msdp/device_status/test/fuzztest/enablecoordination_fuzzer"
   include_dirs = [
     "//base/msdp/device_status/interfaces/innerkits/interaction/include",
     "//base/msdp/device_status/utils/common/include",
