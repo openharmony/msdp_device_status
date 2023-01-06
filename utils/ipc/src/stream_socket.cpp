@@ -62,9 +62,8 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
         ret = epoll_ctl(epollFd, op, fd, &event);
     }
     if (ret < 0) {
-        FI_HILOGE("epoll_ctl return %{public}d,epollFd_:%{public}d,"
-                   "op:%{public}d,fd:%{public}d,errno:%{public}d",
-                   ret, epollFd, op, fd, errno);
+        FI_HILOGE("epoll_ctl return %{public}d,epollFd_:%{public}d, op:%{public}d,fd:%{public}d,errno:%{public}d",
+            ret, epollFd, op, fd, errno);
     }
     return ret;
 }

@@ -717,7 +717,7 @@ void CoordinationSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> de
         auto *context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
         CooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
-                                        context->GetDeviceManager().GetCoordinationDhids(device->GetId()));
+            context->GetDeviceManager().GetCoordinationDhids(device->GetId()));
     }
 }
 
