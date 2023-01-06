@@ -91,11 +91,11 @@ public:
 
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
-    int32_t EnableInputDeviceCoordination(int32_t userData, bool enable) override;
-    int32_t StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcInputDeviceId) override;
-    int32_t StopDeviceCoordination(int32_t userData) override;
-    int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) override;
+    int32_t EnableCoordination(int32_t userData, bool enable) override;
+    int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcDeviceId) override;
+    int32_t StopCoordination(int32_t userData) override;
+    int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -114,18 +114,18 @@ private:
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(const epoll_event &ev);
     void OnTimeout(const epoll_event &ev);
-    void OnInputDevMgr(const epoll_event &ev);
+    void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
-    int32_t OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled);
-    int32_t OnStartInputDeviceCoordination(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcInputDeviceId);
-    int32_t OnStopInputDeviceCoordination(int32_t pid, int32_t userData);
-    int32_t OnGetInputDeviceCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
+    int32_t OnEnableCoordination(int32_t pid, int32_t userData, bool enabled);
+    int32_t OnStartCoordination(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcDeviceId);
+    int32_t OnStopCoordination(int32_t pid, int32_t userData);
+    int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:

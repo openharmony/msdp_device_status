@@ -34,7 +34,7 @@ void EnableCoordinationFuzzTest(const uint8_t* data, size_t size)
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("EnableCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->EnableInputDeviceCoordination(enabled, fun);
+    InteractionManager::GetInstance()->EnableCoordination(enabled, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

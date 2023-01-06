@@ -54,12 +54,12 @@ int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoor
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManager::EnableInputDeviceCoordination(bool enabled,
+int32_t InteractionManager::EnableCoordination(bool enabled,
     std::function<void(std::string, CoordinationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.EnableInputDeviceCoordination(enabled, callback);
+    return CoordinationMgrImpl.EnableCoordination(enabled, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(enabled);
@@ -68,26 +68,26 @@ int32_t InteractionManager::EnableInputDeviceCoordination(bool enabled,
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManager::StartInputDeviceCoordination(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+int32_t InteractionManager::StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
     std::function<void(std::string, CoordinationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId, callback);
+    return CoordinationMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(sinkDeviceId);
-    (void)(srcInputDeviceId);
+    (void)(srcDeviceId);
     (void)(callback);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManager::StopDeviceCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManager::StopCoordination(std::function<void(std::string, CoordinationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.StopDeviceCoordination(callback);
+    return CoordinationMgrImpl.StopCoordination(callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
@@ -95,12 +95,12 @@ int32_t InteractionManager::StopDeviceCoordination(std::function<void(std::strin
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManager::GetInputDeviceCoordinationState(
+int32_t InteractionManager::GetCoordinationState(
     const std::string &deviceId, std::function<void(bool)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.GetInputDeviceCoordinationState(deviceId, callback);
+    return CoordinationMgrImpl.GetCoordinationState(deviceId, callback);
 #else
     (void)(deviceId);
     (void)(callback);

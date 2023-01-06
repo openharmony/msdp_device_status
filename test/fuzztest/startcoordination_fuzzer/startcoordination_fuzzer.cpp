@@ -33,10 +33,10 @@ void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
     }
     const std::string sinkDeviceId(reinterpret_cast<const char*>(data), size);
     const int32_t srcDeviceId = *(reinterpret_cast<const int32_t*>(data));
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
+    auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
         FI_HILOGD("StartCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->StartInputDeviceCoordination(sinkDeviceId, srcDeviceId, fun);
+    InteractionManager::GetInstance()->StartCoordination(sinkDeviceId, srcDeviceId, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

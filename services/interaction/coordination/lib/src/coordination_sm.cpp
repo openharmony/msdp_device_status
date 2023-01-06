@@ -171,7 +171,7 @@ void CoordinationSM::GetCoordinationState(const std::string &deviceId)
     CoordinationEventMgr->OnGetState(state);
 }
 
-void CoordinationSM::EnableInputDeviceCoordination(bool enabled)
+void CoordinationSM::EnableCoordination(bool enabled)
 {
     CALL_INFO_TRACE;
     if (enabled) {
@@ -194,8 +194,8 @@ void CoordinationSM::EnableInputDeviceCoordination(bool enabled)
     }
 }
 
-int32_t CoordinationSM::StartInputDeviceCoordination(
-    const std::string &remoteNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationSM::StartCoordination(
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -206,7 +206,7 @@ int32_t CoordinationSM::StartInputDeviceCoordination(
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStarting_ = true;
     DevCoordinationSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
-    int32_t ret = currentStateSM_->StartInputDeviceCoordination(remoteNetworkId, startInputDeviceId);
+    int32_t ret = currentStateSM_->StartCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Start remote input fail");
         isStarting_ = false;
@@ -219,7 +219,7 @@ int32_t CoordinationSM::StartInputDeviceCoordination(
     return ret;
 }
 
-int32_t CoordinationSM::StopInputDeviceCoordination()
+int32_t CoordinationSM::StopCoordination()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -238,7 +238,7 @@ int32_t CoordinationSM::StopInputDeviceCoordination()
     if (coordinationState_ == CoordinationState::STATE_OUT) {
         stopNetworkId = srcNetworkId_;
     }
-    int32_t ret = currentStateSM_->StopInputDeviceCoordination(stopNetworkId);
+    int32_t ret = currentStateSM_->StopCoordination(stopNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination fail");
         isStopping_ = false;
@@ -269,7 +269,7 @@ void CoordinationSM::StartPointerEventFilter()
     CALL_INFO_TRACE;
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
-    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_MAX);
+    uint32_t touchTags = CapabilityToTags(MMI::DEVICE_CAP_MAX);
     filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY,
         touchTags);
     if (0 > filterId_) {
@@ -342,7 +342,7 @@ void CoordinationSM::StartCoordinationOtherResult(const std::string& srcNetworkI
 }
 
 void CoordinationSM::OnStartFinish(bool isSuccess,
-    const std::string &remoteNetworkId, int32_t startInputDeviceId)
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -352,17 +352,17 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
     }
 
     if (!isSuccess) {
-        FI_HILOGE("Start distributed fail, startInputDevice: %{public}d", startInputDeviceId);
+        FI_HILOGE("Start distributed fail, startDevice: %{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         auto* context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
-        startDhid_ = context->GetDeviceManager().GetDhid(startInputDeviceId);
+        startDhid_ = context->GetDeviceManager().GetDhid(startDeviceId);
         NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             UpdateState(CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
-            std::string sink = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
+            std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDeviceId);
             if (!sink.empty() && remoteNetworkId != sink) {
                 DevCoordinationSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
             }
@@ -459,10 +459,10 @@ void CoordinationSM::UpdateState(CoordinationState state)
             currentStateSM_ = std::make_shared<CoordinationStateIn>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
+                CapabilityToTags(MMI::DEVICE_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
-                StopInputDeviceCoordination();
+                StopCoordination();
                 return;
             }
             break;
@@ -474,10 +474,10 @@ void CoordinationSM::UpdateState(CoordinationState state)
             currentStateSM_ = std::make_shared<CoordinationStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));
+                CapabilityToTags(MMI::DEVICE_CAP_KEYBOARD) | CapabilityToTags(MMI::DEVICE_CAP_POINTER));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
-                StopInputDeviceCoordination();
+                StopCoordination();
                 return;
             }
             break;
@@ -766,7 +766,7 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
         if (InputDevCooSM->startDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
             CHKPV(InputDevCooSM->currentStateSM_);
-            InputDevCooSM->StopInputDeviceCoordination();
+            InputDevCooSM->StopCoordination();
         }
     }
 }
@@ -799,7 +799,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!context->GetDeviceManager().IsRemote(deviceId)) {
             CHKPV(InputDevCooSM->currentStateSM_);
-            InputDevCooSM->StopInputDeviceCoordination();
+            InputDevCooSM->StopCoordination();
         }
     }
 }

@@ -23,16 +23,16 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDeviceCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopCoordinationFuzzTest" };
 } // namespace
 
-void StopDeviceCoordinationFuzzTest(size_t  size)
+void StopCoordinationFuzzTest(size_t  size)
 {
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("StopDeviceCoordinationFuzzTest");
+        FI_HILOGD("StopCoordinationFuzzTest");
     };
 
-    InteractionManager::GetInstance()->StopDeviceCoordination(fun);
+    InteractionManager::GetInstance()->StopCoordination(fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
@@ -42,6 +42,6 @@ void StopDeviceCoordinationFuzzTest(size_t  size)
 extern "C" int LLVMFuzzerTestOneInput(size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::StopDeviceCoordinationFuzzTest(size);
+    OHOS::Msdp::DeviceStatus::StopCoordinationFuzzTest(size);
     return 0;
 }

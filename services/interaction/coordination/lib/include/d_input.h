@@ -28,11 +28,11 @@ public:
 
     void Init();
     void RegisterEventCallback(SimulateEventCallback callback);
-    void EnableInputDeviceCoordination(bool enabled);
-    int32_t OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
-        const std::string& sinkDeviceId, int32_t srcInputDeviceId);
-    int32_t OnStopDeviceCoordination(SessionPtr sess, int32_t userData);
-    int32_t OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
+    void EnableCoordination(bool enabled);
+    int32_t OnStartCoordination(SessionPtr sess, int32_t userData,
+        const std::string& sinkDeviceId, int32_t srcDeviceId);
+    int32_t OnStopCoordination(SessionPtr sess, int32_t userData);
+    int32_t OnGetCoordinationState(SessionPtr sess, int32_t userData,
         const std::string& deviceId);
     int32_t OnRegisterCoordinationListener(SessionPtr sess);
     int32_t OnUnregisterCoordinationListener(SessionPtr sess);

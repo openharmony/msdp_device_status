@@ -56,15 +56,15 @@ class Device final : public IDevice,
                      public IEpollEventSource {
 public:
     enum Capability {
-        INPUT_DEV_CAP_KEYBOARD,
-        INPUT_DEV_CAP_POINTER,
-        INPUT_DEV_CAP_TOUCH,
-        INPUT_DEV_CAP_TABLET_TOOL,
-        INPUT_DEV_CAP_TABLET_PAD,
-        INPUT_DEV_CAP_GESTURE,
-        INPUT_DEV_CAP_SWITCH,
-        INPUT_DEV_CAP_JOYSTICK,
-        INPUT_DEV_CAP_MAX
+        DEVICE_CAP_KEYBOARD,
+        DEVICE_CAP_POINTER,
+        DEVICE_CAP_TOUCH,
+        DEVICE_CAP_TABLET_TOOL,
+        DEVICE_CAP_TABLET_PAD,
+        DEVICE_CAP_GESTURE,
+        DEVICE_CAP_SWITCH,
+        DEVICE_CAP_JOYSTICK,
+        DEVICE_CAP_MAX
     };
 
 public:
@@ -138,7 +138,7 @@ private:
     std::string uniq_;
     std::string dhid_;
     std::string networkId_;
-    std::bitset<INPUT_DEV_CAP_MAX> caps_;
+    std::bitset<DEVICE_CAP_MAX> caps_;
     uint8_t evBitmask_[NBYTES(EV_MAX)] {};
     uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
     uint8_t absBitmask_[NBYTES(ABS_MAX)] {};
@@ -233,12 +233,12 @@ inline IDevice::KeyboardType Device::GetKeyboardType() const
 
 inline bool Device::IsPointerDevice() const
 {
-    return caps_.test(INPUT_DEV_CAP_POINTER);
+    return caps_.test(DEVICE_CAP_POINTER);
 }
 
 inline bool Device::IsKeyboard() const
 {
-    return caps_.test(INPUT_DEV_CAP_KEYBOARD);
+    return caps_.test(DEVICE_CAP_KEYBOARD);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

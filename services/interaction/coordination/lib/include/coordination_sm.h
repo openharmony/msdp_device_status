@@ -119,9 +119,9 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(CoordinationSM);
     void Init();
-    void EnableInputDeviceCoordination(bool enabled);
-    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId);
-    int32_t StopInputDeviceCoordination();
+    void EnableCoordination(bool enabled);
+    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
+    int32_t StopCoordination();
     void GetCoordinationState(const std::string &deviceId);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
@@ -141,7 +141,7 @@ public:
     bool InitDeviceManager();
     void OnDeviceOnline(const std::string &networkId);
     void OnDeviceOffline(const std::string &networkId);
-    void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
+    void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId);
     void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool IsStarting() const;
     bool IsStopping() const;

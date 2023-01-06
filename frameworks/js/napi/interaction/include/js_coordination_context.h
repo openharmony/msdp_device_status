@@ -38,7 +38,7 @@ public:
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
 
-    std::shared_ptr<JsCoordinationManager> GetJsInputDeviceCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:
     std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };

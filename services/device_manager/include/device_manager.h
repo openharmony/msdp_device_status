@@ -27,7 +27,7 @@
 #include "enumerator.h"
 #include "i_context.h"
 #include "i_epoll_event_source.h"
-#include "i_input_dev_mgr.h"
+#include "i_device_mgr.h"
 #include "monitor.h"
 
 namespace OHOS {
@@ -63,14 +63,14 @@ public:
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:
-    class HotplugHandler final : public IInputDevMgr
+    class HotplugHandler final : public IDeviceMgr
     {
     public:
         explicit HotplugHandler(DeviceManager &devMgr);
         ~HotplugHandler() = default;
 
-        void AddInputDevice(const std::string &devNode) override;
-        void RemoveInputDevice(const std::string &devNode) override;
+        void AddDevice(const std::string &devNode) override;
+        void RemoveDevice(const std::string &devNode) override;
 
     private:
         DeviceManager &devMgr_;
@@ -83,12 +83,12 @@ private:
     int32_t OnEpollDispatch();
 
     int32_t ParseDeviceId(const std::string &devNode);
-    std::shared_ptr<IDevice> AddInputDevice(const std::string &devNode);
-    std::shared_ptr<IDevice> RemoveInputDevice(const std::string &devNode);
+    std::shared_ptr<IDevice> AddDevice(const std::string &devNode);
+    std::shared_ptr<IDevice> RemoveDevice(const std::string &devNode);
 
-    std::shared_ptr<IDevice> FindInputDevice(const std::string &devPath);
-    void OnInputDeviceAdded(std::shared_ptr<IDevice> dev);
-    void OnInputDeviceRemoved(std::shared_ptr<IDevice> dev);
+    std::shared_ptr<IDevice> FindDevice(const std::string &devPath);
+    void OnDeviceAdded(std::shared_ptr<IDevice> dev);
+    void OnDeviceRemoved(std::shared_ptr<IDevice> dev);
 
     int32_t OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer);

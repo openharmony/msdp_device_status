@@ -168,7 +168,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusSrvProxy::EnableCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -189,8 +189,8 @@ int32_t DeviceStatusSrvProxy::EnableInputDeviceCoordination(int32_t userData, bo
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
-    int32_t srcInputDeviceId)
+int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::string &sinkDeviceId,
+    int32_t srcDeviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -200,7 +200,7 @@ int32_t DeviceStatusSrvProxy::StartInputDeviceCoordination(int32_t userData, con
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITESTRING(data, sinkDeviceId, ERR_INVALID_VALUE);
-    WRITEINT32(data, srcInputDeviceId, ERR_INVALID_VALUE);
+    WRITEINT32(data, srcDeviceId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -212,7 +212,7 @@ int32_t DeviceStatusSrvProxy::StartInputDeviceCoordination(int32_t userData, con
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDeviceCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::StopCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -232,7 +232,7 @@ int32_t DeviceStatusSrvProxy::StopDeviceCoordination(int32_t userData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

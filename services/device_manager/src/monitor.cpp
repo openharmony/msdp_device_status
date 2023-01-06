@@ -43,7 +43,7 @@ void Monitor::Dispatch(const struct epoll_event &ev)
     }
 }
 
-void Monitor::SetInputDevMgr(IInputDevMgr *devMgr)
+void Monitor::SetDeviceMgr(IDeviceMgr *devMgr)
 {
     CALL_DEBUG_ENTER;
     CHKPV(devMgr);
@@ -66,12 +66,12 @@ int32_t Monitor::Enable()
 void Monitor::Disable()
 {
     CALL_INFO_TRACE;
-    if (devInputWd_ >= 0) {
-        int32_t ret = inotify_rm_watch(inotifyFd_, devInputWd_);
+    if (devWd_ >= 0) {
+        int32_t ret = inotify_rm_watch(inotifyFd_, devWd_);
         if (ret != 0) {
             FI_HILOGE("inotify_rm_watch failed");
         }
-        devInputWd_ = -1;
+        devWd_ = -1;
     }
     if (inotifyFd_ >= 0) {
         close(inotifyFd_);
@@ -93,8 +93,8 @@ int32_t Monitor::OpenConnection()
 int32_t Monitor::EnableReceiving()
 {
     CALL_DEBUG_ENTER;
-    devInputWd_ = inotify_add_watch(inotifyFd_, DEV_INPUT_PATH.c_str(), IN_CREATE | IN_DELETE);
-    if (devInputWd_ < 0) {
+    devWd_ = inotify_add_watch(inotifyFd_, DEV_INPUT_PATH.c_str(), IN_CREATE | IN_DELETE);
+    if (devWd_ < 0) {
         FI_HILOGE("Watching (\'%{public}s\') failed: %{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
         return RET_ERR;
     }
@@ -150,14 +150,14 @@ void Monitor::AddDevice(const std::string &devNode) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(devMgr_);
-    devMgr_->AddInputDevice(devNode);
+    devMgr_->AddDevice(devNode);
 }
 
 void Monitor::RemoveDevice(const std::string &devNode) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(devMgr_);
-    devMgr_->RemoveInputDevice(devNode);
+    devMgr_->RemoveDevice(devNode);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

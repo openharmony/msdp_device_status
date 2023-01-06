@@ -26,8 +26,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
 } // namespace
 
-int32_t CoordinationStateFree::StartInputDeviceCoordination(
-    const std::string &remoteNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationStateFree::StartCoordination(
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
@@ -46,16 +46,16 @@ int32_t CoordinationStateFree::StartInputDeviceCoordination(
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&CoordinationStateFree::ProcessStart, this, remoteNetworkId, startInputDeviceId);
+        std::bind(&CoordinationStateFree::ProcessStart, this, remoteNetworkId, startDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }
 
-int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    return PrepareAndStart(remoteNetworkId, startInputDeviceId);
+    return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

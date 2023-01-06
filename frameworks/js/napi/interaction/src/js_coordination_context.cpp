@@ -34,10 +34,10 @@ JsCoordinationContext::JsCoordinationContext()
 JsCoordinationContext::~JsCoordinationContext()
 {
     std::lock_guard<std::mutex> guard(mutex_);
-    auto jsInputDeviceMgr = mgr_;
+    auto jsCoordinationMgr = mgr_;
     mgr_.reset();
-    if (jsInputDeviceMgr != nullptr) {
-        jsInputDeviceMgr->ResetEnv();
+    if (jsCoordinationMgr != nullptr) {
+        jsCoordinationMgr->ResetEnv();
     }
 }
 
@@ -76,16 +76,16 @@ napi_value JsCoordinationContext::Enable(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 1) {
-        return jsInputDeviceMgr->Enable(env, enable);
+        return jsCoordinationMgr->Enable(env, enable);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         FI_HILOGE("The second parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsInputDeviceMgr->Enable(env, enable, argv[1]);
+    return jsCoordinationMgr->Enable(env, enable, argv[1]);
 }
 
 napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
@@ -107,29 +107,29 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_number)) {
         FI_HILOGE("The second parameter is not number");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "srcInputDeviceId", "number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "srcDeviceId", "number");
         return nullptr;
     }
     char sinkDeviceDescriptor[MAX_STRING_LEN] = {};
-    int32_t srcInputDeviceId = 0;
+    int32_t srcDeviceId = 0;
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
         sizeof(sinkDeviceDescriptor), &length), GET_VALUE_STRING_UTF8);
     std::string sinkDeviceDescriptor_ = sinkDeviceDescriptor;
-    CHKRP(napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_VALUE_INT32);
+    CHKRP(napi_get_value_int32(env, argv[1], &srcDeviceId), GET_VALUE_INT32);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 2) {
-        return jsInputDeviceMgr->Start(env, sinkDeviceDescriptor, srcInputDeviceId);
+        return jsCoordinationMgr->Start(env, sinkDeviceDescriptor, srcDeviceId);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
         FI_HILOGE("Thr third parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsInputDeviceMgr->Start(env, std::string(sinkDeviceDescriptor), srcInputDeviceId, argv[2]);
+    return jsCoordinationMgr->Start(env, std::string(sinkDeviceDescriptor), srcDeviceId, argv[2]);
 }
 
 napi_value JsCoordinationContext::Stop(napi_env env, napi_callback_info info)
@@ -141,16 +141,16 @@ napi_value JsCoordinationContext::Stop(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 0) {
-        return jsInputDeviceMgr->Stop(env);
+        return jsCoordinationMgr->Stop(env);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         FI_HILOGE("The first parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsInputDeviceMgr->Stop(env, argv[0]);
+    return jsCoordinationMgr->Stop(env, argv[0]);
 }
 
 napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info)
@@ -178,16 +178,16 @@ napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 1) {
-        return jsInputDeviceMgr->GetState(env, deviceDescriptor_);
+        return jsCoordinationMgr->GetState(env, deviceDescriptor_);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         FI_HILOGE("The second parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsInputDeviceMgr->GetState(env, deviceDescriptor_, argv[1]);
+    return jsCoordinationMgr->GetState(env, deviceDescriptor_, argv[1]);
 }
 
 napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
@@ -217,13 +217,13 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         FI_HILOGE("The second parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsInputDeviceMgr->RegisterListener(env, type, argv[1]);
+    jsCoordinationMgr->RegisterListener(env, type, argv[1]);
     return nullptr;
 }
 
@@ -251,9 +251,9 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCoordinationMgr();
+    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 1) {
-        jsInputDeviceMgr->UnregisterListener(env, type_);
+        jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
@@ -261,11 +261,11 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsInputDeviceMgr->UnregisterListener(env, type_, argv[1]);
+    jsCoordinationMgr->UnregisterListener(env, type_, argv[1]);
     return nullptr;
 }
 
-std::shared_ptr<JsCoordinationManager> JsCoordinationContext::GetJsInputDeviceCoordinationMgr()
+std::shared_ptr<JsCoordinationManager> JsCoordinationContext::GetJsCoordinationMgr()
 {
     std::lock_guard<std::mutex> guard(mutex_);
     return mgr_;

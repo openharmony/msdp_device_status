@@ -16,6 +16,10 @@
 #ifndef GETCOORDINATIONSTATE_FUZZER_H
 #define GETCOORDINATIONSTATE_FUZZER_H
 
+<<<<<<< Updated upstream
 #define FUZZ_PROJECT_NAME "getcoordinationstate_fuzzer"
+=======
+#define FUZZ_PROJECT_NAME "GetCoordinationState_fuzzer"
+>>>>>>> Stashed changes
 
 #endif // GETCOORDINATIONSTATE_FUZZER_H

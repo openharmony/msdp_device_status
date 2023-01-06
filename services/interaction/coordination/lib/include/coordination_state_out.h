@@ -24,7 +24,7 @@ namespace DeviceStatus {
 class CoordinationStateOut final : public ICoordinationState {
 public:
     explicit CoordinationStateOut(const std::string &startDhid);
-    int32_t StopInputDeviceCoordination(const std::string &networkId) override;
+    int32_t StopCoordination(const std::string &networkId) override;
     void OnKeyboardOnline(const std::string &dhid) override;
 
 private:

@@ -36,7 +36,7 @@ void GetCoordinationStateFuzzTest(const uint8_t* data, size_t size)
     auto fun = [](bool state) {
         FI_HILOGD("Get device state success");
     };
-    InteractionManager::GetInstance()->GetInputDeviceCoordinationState(deviceId, fun);
+    InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

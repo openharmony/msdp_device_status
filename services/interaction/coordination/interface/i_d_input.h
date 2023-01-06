@@ -32,11 +32,11 @@ public:
     using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     virtual void Init() = 0;
     virtual void RegisterEventCallback(SimulateEventCallback callback) = 0;
-    virtual void EnableInputDeviceCoordination(bool enabled) = 0;
-    virtual int32_t OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
-        const std::string &sinkDeviceId, int32_t srcInputDeviceId) = 0;
-    virtual int32_t OnStopDeviceCoordination(SessionPtr sess, int32_t userData) = 0;
-    virtual int32_t OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
+    virtual void EnableCoordination(bool enabled) = 0;
+    virtual int32_t OnStartCoordination(SessionPtr sess, int32_t userData,
+        const std::string &sinkDeviceId, int32_t srcDeviceId) = 0;
+    virtual int32_t OnStopCoordination(SessionPtr sess, int32_t userData) = 0;
+    virtual int32_t OnGetCoordinationState(SessionPtr sess, int32_t userData,
         const std::string& deviceId) = 0;
     virtual int32_t OnRegisterCoordinationListener(SessionPtr sess) = 0;
     virtual int32_t OnUnregisterCoordinationListener(SessionPtr sess) = 0;
