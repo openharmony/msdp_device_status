@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "uds_server.h"
+#include "stream_server.h"
 
 #include <cinttypes>
 #include <list>
@@ -26,16 +26,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UDSServer" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
 } // namespace
 
-UDSServer::~UDSServer()
+StreamServer::~StreamServer()
 {
     CALL_DEBUG_ENTER;
     UdsStop();
 }
 
-void UDSServer::UdsStop()
+void StreamServer::UdsStop()
 {
     if (epollFd_ != -1) {
         close(epollFd_);
@@ -48,7 +48,7 @@ void UDSServer::UdsStop()
     sessionsMap_.clear();
 }
 
-int32_t UDSServer::GetClientFd(int32_t pid) const
+int32_t StreamServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
@@ -57,7 +57,7 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
     return it->second;
 }
 
-int32_t UDSServer::GetClientPid(int32_t fd) const
+int32_t StreamServer::GetClientPid(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
@@ -66,7 +66,7 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
     return it->second->GetPid();
 }
 
-bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
+bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     if (fd < 0) {
         FI_HILOGE("The fd is less than 0");
@@ -81,14 +81,14 @@ bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
     return ses->SendMsg(pkt);
 }
 
-void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
+void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
     for (const auto &item : fdList) {
         SendMsg(item, pkt);
     }
 }
 
-int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
+int32_t StreamServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
 {
@@ -139,7 +139,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         FI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
         goto CLOSE_SOCK;
     }
-    sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
+    sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
         FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
@@ -147,8 +147,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
-    
-    CLOSE_SOCK:
+
+CLOSE_SOCK:
     close(serverFd);
     serverFd = -1;
     close(toReturnClientFd);
@@ -156,35 +156,35 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_ERR;
 }
 
-void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
+void StreamServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
 }
 
-void UDSServer::OnConnected(SessionPtr sess)
+void StreamServer::OnConnected(SessionPtr sess)
 {
     CHKPV(sess);
     FI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-void UDSServer::OnDisconnected(SessionPtr sess)
+void StreamServer::OnDisconnected(SessionPtr sess)
 {
     CHKPV(sess);
     FI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
+int32_t StreamServer::AddEpoll(EpollEventType type, int32_t fd)
 {
     FI_HILOGE("This information should not exist. Subclasses should implement this function.");
     return RET_ERR;
 }
 
-void UDSServer::SetRecvFun(MsgServerFunCallback fun)
+void StreamServer::SetRecvFun(MsgServerFunCallback fun)
 {
     recvFun_ = fun;
 }
 
-void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
+void StreamServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
@@ -203,14 +203,14 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     DeviceStatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
 }
 
-void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+void StreamServer::OnPacket(int32_t fd, NetPacket& pkt)
 {
     auto sess = GetSession(fd);
     CHKPV(sess);
     recvFun_(sess, pkt);
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
+void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
         FI_HILOGE("Invalid input param fd:%{public}d", fd);
@@ -224,7 +224,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             if (!buf.Write(szBuf, size)) {
                 FI_HILOGW("Write data failed. size:%{public}zu", size);
             }
-            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+            OnReadPackets(buf, std::bind(&StreamServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
@@ -244,7 +244,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     }
 }
 
-void UDSServer::OnEpollEvent(epoll_event& ev)
+void StreamServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
@@ -260,7 +260,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
     }
 }
 
-void UDSServer::DumpSession(const std::string &title)
+void StreamServer::DumpSession(const std::string &title)
 {
     FI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
@@ -271,7 +271,7 @@ void UDSServer::DumpSession(const std::string &title)
     }
 }
 
-SessionPtr UDSServer::GetSession(int32_t fd) const
+SessionPtr StreamServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
@@ -282,7 +282,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
     return it->second->GetSharedPtr();
 }
 
-SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
+SessionPtr StreamServer::GetSessionByPid(int32_t pid) const
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
@@ -292,7 +292,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
     return GetSession(fd);
 }
 
-bool UDSServer::AddSession(SessionPtr ses)
+bool StreamServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
     FI_HILOGI("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
@@ -317,7 +317,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     return true;
 }
 
-void UDSServer::DelSession(int32_t fd)
+void StreamServer::DelSession(int32_t fd)
 {
     CALL_DEBUG_ENTER;
     FI_HILOGI("fd:%{public}d", fd);
@@ -337,13 +337,13 @@ void UDSServer::DelSession(int32_t fd)
     DumpSession("DelSession");
 }
 
-void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+void StreamServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
     CALL_DEBUG_ENTER;
     callbacks_.push_back(callback);
 }
 
-void UDSServer::NotifySessionDeleted(SessionPtr ses)
+void StreamServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
     for (const auto &callback : callbacks_) {

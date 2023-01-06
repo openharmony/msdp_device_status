@@ -38,7 +38,7 @@ DInput::~DInput()
 
 void DInput::Init()
 {
-    InputDevCooSM->Init();
+    CooSM->Init();
 }
 
 void DInput::RegisterEventCallback(SimulateEventCallback callback)
@@ -48,7 +48,7 @@ void DInput::RegisterEventCallback(SimulateEventCallback callback)
 
 void DInput::EnableInputDeviceCoordination(bool enabled)
 {
-    InputDevCooSM->EnableInputDeviceCoordination(enabled);
+    CooSM->EnableInputDeviceCoordination(enabled);
 }
 
 int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
@@ -61,7 +61,7 @@ int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = InputDevCooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
+    int32_t ret = CooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
@@ -79,7 +79,7 @@ int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = InputDevCooSM->StopInputDeviceCoordination();
+    int32_t ret = CooSM->StopInputDeviceCoordination();
     if (ret != RET_OK) {
         FI_HILOGE("OnStopDeviceCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
@@ -98,7 +98,7 @@ int32_t DInput::OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userD
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    InputDevCooSM->GetCoordinationState(deviceId);
+    CooSM->GetCoordinationState(deviceId);
     return RET_OK;
 }
 
@@ -125,13 +125,13 @@ int32_t DInput::OnUnregisterCoordinationListener(SessionPtr sess)
 
 void DInput::OnKeyboardOnline(const std::string& dhid)
 {
-    InputDevCooSM->OnKeyboardOnline(dhid);
+    CooSM->OnKeyboardOnline(dhid);
 }
 
 void DInput::OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,
     const std::vector<std::string>& keyboards)
 {
-    InputDevCooSM->OnPointerOffline(dhid, sinkNetworkId, keyboards);
+    CooSM->OnPointerOffline(dhid, sinkNetworkId, keyboards);
 }
 
 bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)
@@ -139,7 +139,7 @@ bool DInput::CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent)
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPF(context);
     IDeviceManager &devMgr = context->GetDeviceManager();
-    CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
+    CoordinationState state = CooSM->GetCurrentCoordinationState();
     FI_HILOGI("Get current coordination state:%{public}d", state);
 
     if (state == CoordinationState::STATE_IN) {
@@ -191,7 +191,7 @@ std::string DInput::GetLocalDeviceId()
 
 void DInput::Dump(int32_t fd, const std::vector<std::string>& args)
 {
-    InputDevCooSM->Dump(fd, args);
+    CooSM->Dump(fd, args);
 }
 
 IDInput* CreateIDInpt(IContext *context)

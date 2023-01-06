@@ -27,9 +27,9 @@ ohos_shared_library("devicestatus_ipc") {
     "src/circle_stream_buffer.cpp",
     "src/net_packet.cpp",
     "src/stream_buffer.cpp",
-    "src/uds_client.cpp",
-    "src/uds_session.cpp",
-    "src/uds_socket.cpp",
+    "src/stream_client.cpp",
+    "src/stream_session.cpp",
+    "src/stream_socket.cpp",
   ]
 
   configs = [ ":devicestatus_ipc_private_config" ]

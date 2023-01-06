@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#include "uds_socket.h"
+#include "stream_socket.h"
 
 #include <cinttypes>
 
 namespace OHOS {
 namespace Msdp {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UDSSocket" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
 } // namespace
 
-UDSSocket::UDSSocket() {}
+StreamSocket::StreamSocket() {}
 
-UDSSocket::~UDSSocket()
+StreamSocket::~StreamSocket()
 {
     Close();
     EpollClose();
 }
 
-int32_t UDSSocket::EpollCreate(int32_t size)
+int32_t StreamSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
@@ -42,7 +42,7 @@ int32_t UDSSocket::EpollCreate(int32_t size)
     return epollFd_;
 }
 
-int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
+int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
 {
     if (fd < 0) {
         FI_HILOGE("Invalid fd");
@@ -69,7 +69,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, i
     return ret;
 }
 
-int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -85,7 +85,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int3
     return ret;
 }
 
-void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)
+void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
@@ -127,7 +127,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCall
     }
 }
 
-void UDSSocket::EpollClose()
+void StreamSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
         close(epollFd_);
@@ -135,7 +135,7 @@ void UDSSocket::EpollClose()
     }
 }
 
-void UDSSocket::Close()
+void StreamSocket::Close()
 {
     if (fd_ >= 0) {
         auto rf = close(fd_);

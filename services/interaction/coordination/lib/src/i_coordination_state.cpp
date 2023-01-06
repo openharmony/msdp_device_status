@@ -42,21 +42,21 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &srcNetworkId, int
     std::string sinkNetworkId = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
     int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
-        InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
+        CooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
             srcNetworkId, sinkNetworkId, [this, srcNetworkId, startInputDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
             FI_HILOGE("Prepare remote input fail");
-            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
-            InputDevCooSM->UpdatePreparedDevices("", "");
+            CooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+            CooSM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartRemoteInput(startInputDeviceId);
         if (ret != RET_OK) {
             FI_HILOGE("Start remoteNetworkId input fail");
-            InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+            CooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
         }
     }
     return ret;
@@ -67,8 +67,8 @@ void ICoordinationState::OnPrepareDistributedInput(
 {
     FI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
-        InputDevCooSM->UpdatePreparedDevices("", "");
-        InputDevCooSM->OnStartFinish(false, srcNetworkId, startInputDeviceId);
+        CooSM->UpdatePreparedDevices("", "");
+        CooSM->OnStartFinish(false, srcNetworkId, startInputDeviceId);
     } else {
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
@@ -81,12 +81,12 @@ void ICoordinationState::OnPrepareDistributedInput(
 int32_t ICoordinationState::StartRemoteInput(int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> networkIds = CooSM->GetPreparedDevices();
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
     std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
-        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
+        CooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return static_cast<int32_t>(CoordinationMessage::INPUT_DEVICE_ID_ERROR);
     }
     int32_t ret = DistributedAdapter->StartRemoteInput(
@@ -94,7 +94,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startInputDeviceId)
             this->OnStartRemoteInput(isSuccess, src, startInputDeviceId);
         });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
+        CooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     return RET_OK;
@@ -106,7 +106,7 @@ void ICoordinationState::OnStartRemoteInput(
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";
     std::function<void()> handleStartFinishFunc =
-        std::bind(&CoordinationSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
+        std::bind(&CoordinationSM::OnStartFinish, CooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
 }
@@ -114,7 +114,7 @@ void ICoordinationState::OnStartRemoteInput(
 bool ICoordinationState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
     bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
     FI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;

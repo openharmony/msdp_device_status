@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDS_CLIENT_H
-#define UDS_CLIENT_H
+#ifndef STREAM_CLIENT_H
+#define STREAM_CLIENT_H
 
 #include <functional>
 #include <future>
@@ -21,18 +21,18 @@
 
 #include "net_packet.h"
 #include "nocopyable.h"
-#include "uds_socket.h"
+#include "stream_socket.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class UDSClient;
-using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
-class UDSClient : public UDSSocket {
+class StreamClient;
+using MsgClientFunCallback = std::function<void(const StreamClient&, NetPacket&)>;
+class StreamClient : public StreamSocket {
 public:
-    UDSClient();
-    DISALLOW_COPY_AND_MOVE(UDSClient);
-    virtual ~UDSClient();
+    StreamClient();
+    DISALLOW_COPY_AND_MOVE(StreamClient);
+    virtual ~StreamClient();
 
     virtual int32_t Socket() = 0;
     virtual void Stop();
@@ -60,4 +60,4 @@ protected:
 } //
 } // namespace Msdp
 } // namespace OHOS
-#endif // UDS_CLIENT_H
+#endif // STREAM_CLIENT_H

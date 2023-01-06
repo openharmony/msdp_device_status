@@ -577,7 +577,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
     onlineDevice_.push_back(networkId);
     DProfileAdapter->RegisterCrossingStateListener(networkId,
         std::bind(&CoordinationSM::OnCoordinationChanged,
-        InputDevCooSM, std::placeholders::_1, std::placeholders::_2));
+        CooSM, std::placeholders::_1, std::placeholders::_2));
 }
 
 void CoordinationSM::OnDeviceOffline(const std::string &networkId)
@@ -663,14 +663,14 @@ void CoordinationSM::DmDeviceStateCallback::OnDeviceOnline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
-    InputDevCooSM->OnDeviceOnline(deviceInfo.deviceId);
+    CooSM->OnDeviceOnline(deviceInfo.deviceId);
 }
 
 void CoordinationSM::DmDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
-    InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
+    CooSM->OnDeviceOffline(deviceInfo.deviceId);
 }
 
 void CoordinationSM::DmDeviceStateCallback::OnDeviceChanged(
@@ -706,7 +706,7 @@ void CoordinationSM::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> devi
 {
     CHKPV(device);
     if (device->IsKeyboard()) {
-        InputDevCooSM->OnKeyboardOnline(device->GetDhid());
+        CooSM->OnKeyboardOnline(device->GetDhid());
     }
 }
 
@@ -716,7 +716,7 @@ void CoordinationSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> de
     if (device->IsPointerDevice()) {
         auto *context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
-        InputDevCooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
+        CooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
                                         context->GetDeviceManager().GetCoordinationDhids(device->GetId()));
     }
 }
@@ -732,21 +732,21 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
         MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         return;
     }
-    CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
+    CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
         auto* context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = keyEvent->GetDeviceId();
         if (context->GetDeviceManager().IsRemote(deviceId)) {
             auto networkId = context->GetDeviceManager().GetOriginNetworkId(deviceId);
-            if (!InputDevCooSM->IsNeedFilterOut(networkId, keyEvent)) {
+            if (!CooSM->IsNeedFilterOut(networkId, keyEvent)) {
                 keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
                 MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
             }
         }
     } else if (state == CoordinationState::STATE_OUT) {
         std::string networkId = COORDINATION::GetLocalDeviceId();
-        if (InputDevCooSM->IsNeedFilterOut(networkId, keyEvent)) {
+        if (CooSM->IsNeedFilterOut(networkId, keyEvent)) {
             keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
             MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
@@ -757,16 +757,16 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
+    CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_OUT) {
         auto* context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
         std::string dhid = context->GetDeviceManager().GetDhid(deviceId);
-        if (InputDevCooSM->startDhid_ != dhid) {
+        if (CooSM->startDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
-            CHKPV(InputDevCooSM->currentStateSM_);
-            InputDevCooSM->StopInputDeviceCoordination();
+            CHKPV(CooSM->currentStateSM_);
+            CooSM->StopInputDeviceCoordination();
         }
     }
 }
@@ -789,17 +789,17 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
     if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-        InputDevCooSM->x_ = pointerItem.GetDisplayX();
-        InputDevCooSM->y_ = pointerItem.GetDisplayY();
+        CooSM->x_ = pointerItem.GetDisplayX();
+        CooSM->y_ = pointerItem.GetDisplayY();
     }
-    CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
+    CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
         auto* context = CoordinationEventMgr->GetIContext();
         CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!context->GetDeviceManager().IsRemote(deviceId)) {
-            CHKPV(InputDevCooSM->currentStateSM_);
-            InputDevCooSM->StopInputDeviceCoordination();
+            CHKPV(CooSM->currentStateSM_);
+            CooSM->StopInputDeviceCoordination();
         }
     }
 }

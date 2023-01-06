@@ -60,7 +60,7 @@ ohos_shared_library("devicestatus_service") {
     "native/src/devicestatus_msdp_client_impl.cpp",
     "native/src/devicestatus_service.cpp",
     "native/src/devicestatus_srv_stub.cpp",
-    "native/src/uds_server.cpp",
+    "native/src/stream_server.cpp",
     "timer_manager/src/timer_manager.cpp",
   ]
 
