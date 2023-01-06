@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_EVENT_HANDLER_H
-#define COOPERATE_EVENT_HANDLER_H
+#ifndef COORDINATION_EVENT_HANDLER_H
+#define COORDINATION_EVENT_HANDLER_H
 
 #include <memory>
 
@@ -24,10 +24,10 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateEventHandler final : public AppExecFwk::EventHandler {
+class CoordinationEventHandler final : public AppExecFwk::EventHandler {
 public:
-    explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-    ~CooperateEventHandler() override = default;
+    explicit CoordinationEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    ~CoordinationEventHandler() override = default;
     bool ProxyPostTask(const Callback &callback, int64_t delayTime);
     bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
     void ProxyRemoveTask(const std::string &name);
@@ -35,4 +35,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COOPERATE_EVENT_HANDLER_H
+#endif // COORDINATION_EVENT_HANDLER_H

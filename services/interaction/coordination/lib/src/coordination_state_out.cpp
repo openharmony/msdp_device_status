@@ -13,27 +13,27 @@
  * limitations under the License.
  */
 
-#include "input_device_cooperate_state_out.h"
+#include "coordination_state_out.h"
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_cooperate_softbus_adapter.h"
+#include "device_coordination_softbus_adapter.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_sm.h"
+#include "coordination_util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateOut" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateOut" };
 } // namespace
 
-InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& startDhid)
+CoordinationStateOut::CoordinationStateOut(const std::string& startDhid)
     : startDhid_(startDhid)
 {}
 
-int32_t InputDeviceCooperateStateOut::StopInputDeviceCoordination(const std::string &networkId)
+int32_t CoordinationStateOut::StopInputDeviceCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::string srcNetworkId = networkId;
@@ -48,13 +48,13 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCoordination(const std::str
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
-        std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, srcNetworkId);
+        std::bind(&CoordinationStateOut::ProcessStop, this, srcNetworkId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
 
-void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
+void CoordinationStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = COORDINATION::GetLocalDeviceId();
@@ -72,17 +72,17 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
     }
 }
 
-void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
+void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
+        std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
 
-void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)
+void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid)
 {
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
     std::vector<std::string> dhids;

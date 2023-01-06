@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_OUT_H
-#define INPUT_DEVICE_COOPERATE_STATE_OUT_H
+#ifndef COORDINATION_STATE_OUT_H
+#define COORDINATION_STATE_OUT_H
 
-#include "i_input_device_cooperate_state.h"
+#include "i_coordination_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class InputDeviceCooperateStateOut final : public IInputDeviceCooperateState {
+class CoordinationStateOut final : public ICoordinationState {
 public:
-    explicit InputDeviceCooperateStateOut(const std::string &startDhid);
+    explicit CoordinationStateOut(const std::string &startDhid);
     int32_t StopInputDeviceCoordination(const std::string &networkId) override;
     void OnKeyboardOnline(const std::string &dhid) override;
 
@@ -35,4 +35,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_OUT_H
+#endif // COORDINATION_STATE_OUT_H

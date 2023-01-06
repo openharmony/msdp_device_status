@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "devicestatus_hilog_wrapper.h"
 #include "devicestatus_define.h"
 
@@ -21,13 +21,13 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CooperateEventManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationEventManager" };
 } // namespace
 
-CooperateEventManager::CooperateEventManager() {}
-CooperateEventManager::~CooperateEventManager() {}
+CoordinationEventManager::CoordinationEventManager() {}
+CoordinationEventManager::~CoordinationEventManager() {}
 
-void CooperateEventManager::AddCoordinationEvent(sptr<EventInfo> event)
+void CoordinationEventManager::AddCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -38,7 +38,7 @@ void CooperateEventManager::AddCoordinationEvent(sptr<EventInfo> event)
     }
 }
 
-void CooperateEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
+void CoordinationEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
     if (remoteCoordinationCallbacks_.empty() || event == nullptr) {
@@ -53,7 +53,7 @@ void CooperateEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
     }
 }
 
-int32_t CooperateEventManager::OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId)
+int32_t CoordinationEventManager::OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -69,7 +69,7 @@ int32_t CooperateEventManager::OnCoordinationMessage(CoordinationMessage msg, co
     return RET_OK;
 }
 
-void CooperateEventManager::OnEnable(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnEnable(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -79,7 +79,7 @@ void CooperateEventManager::OnEnable(CoordinationMessage msg, const std::string 
     coordinationCallbacks_[EventType::ENABLE] =  nullptr;
 }
 
-void CooperateEventManager::OnStart(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnStart(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -89,7 +89,7 @@ void CooperateEventManager::OnStart(CoordinationMessage msg, const std::string &
     coordinationCallbacks_[EventType::START] =  nullptr;
 }
 
-void CooperateEventManager::OnStop(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -99,7 +99,7 @@ void CooperateEventManager::OnStop(CoordinationMessage msg, const std::string &d
     coordinationCallbacks_[EventType::STOP] =  nullptr;
 }
 
-void CooperateEventManager::OnGetState(bool state)
+void CoordinationEventManager::OnGetState(bool state)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -109,7 +109,7 @@ void CooperateEventManager::OnGetState(bool state)
     coordinationCallbacks_[EventType::STATE] =  nullptr;
 }
 
-void CooperateEventManager::OnErrorMessage(EventType type, CoordinationMessage msg)
+void CoordinationEventManager::OnErrorMessage(EventType type, CoordinationMessage msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = coordinationCallbacks_[type];
@@ -118,17 +118,17 @@ void CooperateEventManager::OnErrorMessage(EventType type, CoordinationMessage m
     coordinationCallbacks_[type] =  nullptr;
 }
 
-void CooperateEventManager::SetIContext(IContext *context)
+void CoordinationEventManager::SetIContext(IContext *context)
 {
     context_ = context;
 }
 
-IContext* CooperateEventManager::GetIContext() const
+IContext* CoordinationEventManager::GetIContext() const
 {
     return context_;
 }
 
-void CooperateEventManager::NotifyCoordinationMessage(
+void CoordinationEventManager::NotifyCoordinationMessage(
     SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
@@ -145,7 +145,7 @@ void CooperateEventManager::NotifyCoordinationMessage(
     }
 }
 
-void CooperateEventManager::NotifyCoordinationState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
+void CoordinationEventManager::NotifyCoordinationState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);

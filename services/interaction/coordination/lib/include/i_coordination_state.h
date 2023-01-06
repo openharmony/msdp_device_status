@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IINPUT_DEVICE_COOPERATE_STATE_H
-#define IINPUT_DEVICE_COOPERATE_STATE_H
+#ifndef I_COORDINATION_STATE_H
+#define I_COORDINATION_STATE_H
 
 #include <atomic>
 #include <map>
@@ -22,18 +22,18 @@
 #include <set>
 #include <string>
 
-#include "cooperate_event_handler.h"
-#include "cooperate_event_manager.h"
+#include "coordination_event_handler.h"
+#include "coordination_event_manager.h"
 #include "devicestatus_define.h"
 #include "devicestatus_hilog_wrapper.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IInputDeviceCooperateState {
+class ICoordinationState {
 public:
-    IInputDeviceCooperateState();
-    virtual ~IInputDeviceCooperateState() = default;
+    ICoordinationState();
+    virtual ~ICoordinationState() = default;
     virtual int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
@@ -54,9 +54,9 @@ protected:
 
 protected:
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
-    std::shared_ptr<CooperateEventHandler> eventHandler_ { nullptr };
+    std::shared_ptr<CoordinationEventHandler> eventHandler_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IINPUT_DEVICE_COOPERATE_STATE_H
+#endif // I_COORDINATION_STATE_H

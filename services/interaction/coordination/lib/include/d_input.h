@@ -40,7 +40,6 @@ public:
     void OnKeyboardOnline(const std::string& dhid);
     void OnPointerOffline(const std::string& dhid, const std::string& sinkNetworkId,
         const std::vector<std::string>& keyboards);
-    bool HandleEvent(libinput_event* event);
     bool CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent);
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
     std::string GetLocalDeviceId();

@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#include "input_device_cooperate_state_in.h"
+#include "coordination_state_in.h"
 
-#include "cooperate_event_manager.h"
+#include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_cooperate_softbus_adapter.h"
+#include "device_coordination_softbus_adapter.h"
 #include "distributed_input_adapter.h"
-#include "input_device_cooperate_sm.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_sm.h"
+#include "coordination_util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InputDeviceCooperateStateIn" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateIn" };
 } // namespace
 
-InputDeviceCooperateStateIn::InputDeviceCooperateStateIn(const std::string &startDhid) : startDhid_(startDhid) {}
+CoordinationStateIn::CoordinationStateIn(const std::string &startDhid) : startDhid_(startDhid) {}
 
-int32_t InputDeviceCooperateStateIn::StartInputDeviceCoordination(const std::string &remoteNetworkId,
+int32_t CoordinationStateIn::StartInputDeviceCoordination(const std::string &remoteNetworkId,
     int32_t startInputDeviceId)
 {
     CALL_INFO_TRACE;
@@ -51,13 +51,13 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCoordination(const std::str
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
-        std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remoteNetworkId, startInputDeviceId);
+        std::bind(&CoordinationStateIn::ProcessStart, this, remoteNetworkId, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     auto* context = CoordinationEventMgr->GetIContext();
@@ -71,7 +71,7 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
     }
 }
 
-int32_t InputDeviceCooperateStateIn::StopInputDeviceCoordination(const std::string &networkId)
+int32_t CoordinationStateIn::StopInputDeviceCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = DevCoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
@@ -80,13 +80,13 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCoordination(const std::stri
         return ret;
     }
     std::string taskName = "process_stop_task";
-    std::function<void()> handleProcessStopFunc = std::bind(&InputDeviceCooperateStateIn::ProcessStop, this);
+    std::function<void()> handleProcessStopFunc = std::bind(&CoordinationStateIn::ProcessStop, this);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
 
-int32_t InputDeviceCooperateStateIn::ProcessStop()
+int32_t CoordinationStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
     auto* context = CoordinationEventMgr->GetIContext();
@@ -103,12 +103,12 @@ int32_t InputDeviceCooperateStateIn::ProcessStop()
     return RET_OK;
 }
 
-void InputDeviceCooperateStateIn::OnStartRemoteInput(
+void CoordinationStateIn::OnStartRemoteInput(
     bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (!isSuccess) {
-        IInputDeviceCooperateState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
+        ICoordinationState::OnStartRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
         return;
     }
     auto* context = CoordinationEventMgr->GetIContext();
@@ -119,13 +119,13 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
     std::vector<std::string> dhid = devMgr.GetCoordinationDhids(startInputDeviceId);
 
     std::string taskName = "relay_stop_task";
-    std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
+    std::function<void()> handleRelayStopFunc = std::bind(&CoordinationStateIn::StopRemoteInput,
         this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleRelayStopFunc, taskName, 0);
 }
 
-void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetworkId,
+void CoordinationStateIn::StopRemoteInput(const std::string &sinkNetworkId,
     const std::string &srcNetworkId, const std::vector<std::string> &dhid, int32_t startInputDeviceId)
 {
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhid,
@@ -137,33 +137,33 @@ void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetwork
     }
 }
 
-void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
+void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (InputDevCooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
-        std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
+        std::function<void()> handleStartFinishFunc = std::bind(&CoordinationSM::OnStartFinish,
             InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
+            std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
     }
 }
 
-void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId)
+void CoordinationStateIn::ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
-       InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhids,
         [this, sinkNetworkId, startInputDeviceId](bool isSuccess) {
@@ -174,7 +174,7 @@ void InputDeviceCooperateStateIn::ComeBack(const std::string &sinkNetworkId, int
     }
 }
 
-int32_t InputDeviceCooperateStateIn::RelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId)
+int32_t CoordinationStateIn::RelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     return PrepareAndStart(srcNetworkId, startInputDeviceId);

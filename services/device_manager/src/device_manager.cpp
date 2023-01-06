@@ -25,7 +25,7 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 #include "device.h"
-#include "input_device_cooperate_util.h"
+#include "coordination_util.h"
 #include "napi_constants.h"
 
 namespace OHOS {
