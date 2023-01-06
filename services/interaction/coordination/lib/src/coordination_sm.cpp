@@ -269,7 +269,7 @@ void CoordinationSM::StartPointerEventFilter()
     CALL_INFO_TRACE;
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
-    uint32_t touchTags = CapabilityToTags(MMI::DEVICE_CAP_MAX);
+    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_MAX);
     filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY,
         touchTags);
     if (0 > filterId_) {
@@ -438,11 +438,11 @@ bool CoordinationSM::UpdateMouseLocation()
         FI_HILOGE("display width or height is 0");
         return false;
     }
-    int32_t xPercent = x_ * MOUSE_ABS_LOCATION / width;
-    int32_t yPercent = y_ * MOUSE_ABS_LOCATION / height;
+    int32_t xPercent = displayX_ * MOUSE_ABS_LOCATION / width;
+    int32_t yPercent = displayY_ * MOUSE_ABS_LOCATION / height;
     FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, "
         "physicalX: %{public}d, physicalY: %{public}d,",
-        width, height, x_, y_);
+        width, height, displayX_, displayY_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;
 }
@@ -459,7 +459,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             currentStateSM_ = std::make_shared<CoordinationStateIn>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::DEVICE_CAP_KEYBOARD));
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
                 StopCoordination();
@@ -474,7 +474,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             currentStateSM_ = std::make_shared<CoordinationStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
-                CapabilityToTags(MMI::DEVICE_CAP_KEYBOARD) | CapabilityToTags(MMI::DEVICE_CAP_POINTER));
+                CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
                 StopCoordination();
@@ -697,8 +697,8 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
     int32_t height = display->GetHeight();
     int32_t physicalX = static_cast<int32_t>(width * xPercent / PERCENT_CONST);
     int32_t physicalY = static_cast<int32_t>(height * yPercent / PERCENT_CONST);
-    FI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d,"
-        "physicalX:%{public}d, x_:%{public}d, y_:%{public}d", width, height, physicalX, physicalY, x_, y_);
+    FI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+        width, height, physicalX, physicalY);
     OHOS::MMI::InputManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
 }
 
@@ -789,8 +789,8 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
     if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-        InputDevCooSM->x_ = pointerItem.GetDisplayX();
-        InputDevCooSM->y_ = pointerItem.GetDisplayY();
+        InputDevCooSM->displayX_ = pointerItem.GetDisplayX();
+        InputDevCooSM->displayY_ = pointerItem.GetDisplayY();
     }
     CoordinationState state = InputDevCooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
