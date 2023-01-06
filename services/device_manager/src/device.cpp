@@ -69,14 +69,29 @@ int32_t Device::Open()
         FI_HILOGE("Not real path: %{public}s", devPath_.c_str());
         return RET_ERR;
     }
-    fd_ = open(buf, O_RDWR | O_NONBLOCK | O_CLOEXEC);
-    if (fd_ < 0) {
-        FI_HILOGE("Unable to open device \'%{public}s\': %{public}s", buf, strerror(errno));
-        return RET_ERR;
+
+    int32_t nRetries { 6 };
+    for (;;) {
+        Utility::ShowUserAndGroup();
+        Utility::ShowFileAttributes(buf);
+
+        fd_ = open(buf, O_RDWR | O_NONBLOCK | O_CLOEXEC);
+        if (fd_ < 0) {
+            FI_HILOGE("Unable to open device \'%{public}s\': %{public}s", buf, strerror(errno));
+            if (nRetries-- > 0) {
+                static constexpr int32_t DEFAULT_WAIT_TIME { 500 };
+                std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME));
+                FI_HILOGI("Retry opening device \'%{public}s\'", buf);
+            } else {
+                return RET_ERR;
+            }
+        } else {
+            FI_HILOGD("Opening \'%{public}s\' successfully", buf);
+            break;
+        }
     }
     QueryDeviceInfo();
     QuerySupportedEvents();
-    FI_HILOGD("Opening \'%{public}s\'", name_.c_str());
     UpdateCapability();
     Populate();
     LoadDeviceConfig();
@@ -395,7 +410,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
     CALL_DEBUG_ENTER;
     char temp[PATH_MAX] {};
     if (realpath(filePath.c_str(), temp) == nullptr) {
-        FI_HILOGE("Not real path: %{public}s", filePath.c_str());
+        FI_HILOGE("Not real path (\'%{public}s\'): %{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
     FI_HILOGD("config file path: %{public}s", temp);
