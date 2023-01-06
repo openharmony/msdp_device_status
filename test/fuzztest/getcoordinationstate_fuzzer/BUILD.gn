@@ -19,13 +19,14 @@ import("//build/test.gni")
 module_output_path = "device_status/device_status_native"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StartInputDeviceCooperateFuzzTest") {
+ohos_fuzztest("GetCoordinationStateFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/msdp/device_status/test/fuzztest/startinputdevicecooperate_fuzzer"
+  fuzz_config_file = "//base/msdp/device_status/test/fuzztest/getcoordinationstate_fuzzer"
   include_dirs = [
     "//base/msdp/device_status/interfaces/innerkits/interaction/include",
     "//base/msdp/device_status/utils/common/include",
+    "//foundation/window/window_manager/previewer/mock",
+    "//foundation/bundlemanager/bundle_framework/services/bundlemgr/test/mock/include",
   ]
   cflags = [
     "-g",
@@ -33,7 +34,7 @@ ohos_fuzztest("StartInputDeviceCooperateFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "startinputdevicecooperate_fuzzer.cpp" ]
+  sources = [ "getcoordinationstate_fuzzer.cpp" ]
   deps =
       [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
   external_deps = [
@@ -48,7 +49,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":StartInputDeviceCooperateFuzzTest",
+    ":GetCoordinationStateFuzzTest",
   ]
 }
 ###############################################################################

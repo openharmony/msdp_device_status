@@ -13,30 +13,36 @@
  * limitations under the License.
  */
 
-#include "getinputdevicecooperatestate_fuzzer.h"
+#include "registercoordinationlistener_fuzzer.h"
 
 #include "securec.h"
 
+#include "coordination_message.h"
 #include "interaction_manager.h"
 #include "fi_log.h"
+#include "i_coordination_listener.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "GetInputDeviceCoordinationStateFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "RegisterCoordinationListenerFuzzTest" };
 } // namespace
 
-void GetInputDeviceCoordinationStateFuzzTest(const uint8_t* data, size_t size)
-{
-    if (data == nullptr) {
-        return;
-    }
-    const std::string deviceId(reinterpret_cast<const char*>(data), size);
-    auto fun = [](bool inputdevice) {
-        FI_HILOGD("Get inputdevice state success");
+class CoordinationListenerTest : public ICoordinationListener {
+public:
+    InputDeviceCooperateListenerTest() : ICoordinationListener() {}
+    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
+    {
+        FI_HILOGD("RegisterCooperateListenerFuzzTest");
     };
-    InteractionManager::GetInstance()->GetInputDeviceCoordinationState(deviceId, fun);
+};
+
+void RegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
+{
+    std::shared_ptr<CoordinationListenerTest> consumer = std::make_shared<CoordinationListenerTest>();
+    InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
+    InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
@@ -46,6 +52,6 @@ void GetInputDeviceCoordinationStateFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::GetInputDeviceCoordinationStateFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::RegisterCoordinationListenerFuzzTest(data, size);
     return 0;
 }

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef MMI_FUNC_CALLBACK_H
-#define MMI_FUNC_CALLBACK_H
+#ifndef DEVICESTATUS_FUNC_CALLBACK_H
+#define DEVICESTATUS_FUNC_CALLBACK_H
 
 #include <functional>
 
@@ -35,4 +35,4 @@ auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // MMI_FUNC_CALLBACK_H
+#endif // DEVICESTATUS_FUNC_CALLBACK_H

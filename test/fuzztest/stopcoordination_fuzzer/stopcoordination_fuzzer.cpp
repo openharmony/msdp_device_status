@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "startinputdevicecooperate_fuzzer.h"
+#include "stopcoordination_fuzzer.h"
 
 #include "coordination_message.h"
 #include "interaction_manager.h"
@@ -23,35 +23,25 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartInputDeviceCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDeviceCoordinationFuzzTest" };
 } // namespace
 
-void StartInputDeviceCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void StopDeviceCoordinationFuzzTest(size_t  size)
 {
-    if (data == nullptr) {
-        return;
-    }
-    const std::string sinkDeviceId(reinterpret_cast<const char*>(data), size);
-    const int32_t srcInputDeviceId = *(reinterpret_cast<const int32_t*>(data));
     auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("StartInputDeviceCoordinationFuzzTest");
+        FI_HILOGD("StopDeviceCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId, fun);
+
+    InteractionManager::GetInstance()->StopDeviceCoordination(fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(size_t size)
 {
-    if (data == nullptr) {
-        return 0;
-    }
-    if (size < sizeof(int32_t)) {
-        return 0;
-    }
-    OHOS::Msdp::DeviceStatus::StartInputDeviceCoordinationFuzzTest(data, size);
+    /* Run your code on data */
+    OHOS::Msdp::DeviceStatus::StopDeviceCoordinationFuzzTest(size);
     return 0;
 }
-
