@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopD
 
 void StopDeviceCoordinationFuzzTest(size_t  size)
 {
-    auto fun = [](std::string listener, CoordinationMessage cooperateMessages) {
+    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("StopDeviceCoordinationFuzzTest");
     };
 
