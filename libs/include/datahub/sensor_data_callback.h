@@ -23,9 +23,9 @@
 #include <thread>
 
 #include "semaphore.h"
+#include "singleton.h"
 #include "sensor_agent.h"
 #include "sensor_agent_type.h"
-#include "singleton.h"
 
 #include "devicestatus_data_define.h"
 
@@ -58,7 +58,6 @@ private:
     std::mutex initMutex_;
     std::mutex sensorMutex_;
     std::atomic<bool> alive_ { true };
-    std::map<int32_t, SensorCallback> algoMap_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

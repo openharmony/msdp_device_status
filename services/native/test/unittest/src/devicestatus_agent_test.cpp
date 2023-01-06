@@ -40,9 +40,7 @@ void DeviceStatusAgentTest::SetUp()
     agent2_ = std::make_shared<DeviceStatusAgent>();
 }
 
-void DeviceStatusAgentTest::TearDown()
-{
-}
+void DeviceStatusAgentTest::TearDown() {}
 
 bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
     const Data& devicestatusData)

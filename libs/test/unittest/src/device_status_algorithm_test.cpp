@@ -66,8 +66,7 @@ void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest001 start";
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoAbsoluteStill* still = new (std::nothrow) AlgoAbsoluteStill(callback);
+    AlgoAbsoluteStill* still = new (std::nothrow) AlgoAbsoluteStill();
     bool ret = still->Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
@@ -87,8 +86,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest002 start";
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoHorizontal* horizontal = new (std::nothrow) AlgoHorizontal(callback);
+    AlgoHorizontal* horizontal = new (std::nothrow) AlgoHorizontal();
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal->Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
@@ -108,8 +106,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest003 start";
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoVertical* vertical = new (std::nothrow) AlgoVertical(callback);
+    AlgoVertical* vertical = new (std::nothrow) AlgoVertical();
     bool ret = vertical->Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     ASSERT_TRUE(ret);
@@ -172,8 +169,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_STILL);
     ret += 1;
     ASSERT_TRUE(ret);
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoAbsoluteStill* still = new AlgoAbsoluteStill(callback);
+    AlgoAbsoluteStill* still = new AlgoAbsoluteStill();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     still->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
@@ -196,8 +192,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoHorizontal* horizontal = new AlgoHorizontal(callback);
+    AlgoHorizontal* horizontal = new AlgoHorizontal();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     horizontal->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
@@ -220,8 +215,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    std::shared_ptr<SensorDataCallback> callback = SensorDataCallback::GetInstance();
-    AlgoVertical* vertical = new AlgoVertical(callback);
+    AlgoVertical* vertical = new AlgoVertical();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     vertical->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
