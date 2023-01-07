@@ -33,7 +33,8 @@
         "base_group":[],
         "fwk_group":[
           "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
-          "//base/msdp/device_status/frameworks/js/napi:stationary"
+          "//base/msdp/device_status/frameworks/js/napi:stationary",
+          "//base/msdp/device_status/frameworks/js/napi:device_status_jsapi_group"
         ],
         "service_group":[
           "//base/msdp/device_status/libs:devicestatus_algo",
