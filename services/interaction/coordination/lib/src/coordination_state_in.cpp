@@ -17,7 +17,7 @@
 
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_coordination_softbus_adapter.h"
+#include "coordination_softbus_adapter.h"
 #include "distributed_input_adapter.h"
 #include "coordination_sm.h"
 #include "coordination_util.h"
@@ -44,7 +44,7 @@ int32_t CoordinationStateIn::StartInputDeviceCoordination(const std::string &rem
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    int32_t ret = DevCoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = CoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start input device coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
@@ -74,7 +74,7 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
 int32_t CoordinationStateIn::StopInputDeviceCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = DevCoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination fail");
         return ret;

@@ -24,7 +24,7 @@
 
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_coordination_softbus_adapter.h"
+#include "coordination_softbus_adapter.h"
 #include "device_profile_adapter.h"
 #include "display_info.h"
 #include "coordination_state_free.h"
@@ -63,7 +63,7 @@ void CoordinationSM::Init()
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
-        DevCoordinationSoftbusAdapter->Init();
+        CoordinationSoftbusAdapter->Init();
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
@@ -205,7 +205,7 @@ int32_t CoordinationSM::StartInputDeviceCoordination(
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStarting_ = true;
-    DevCoordinationSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
+    CoordinationSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
     int32_t ret = currentStateSM_->StartInputDeviceCoordination(remoteNetworkId, startInputDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Start remote input fail");
@@ -364,7 +364,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string sink = context->GetDeviceManager().GetOriginNetworkId(startInputDeviceId);
             if (!sink.empty() && remoteNetworkId != sink) {
-                DevCoordinationSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
+                CoordinationSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CoordinationState::STATE_FREE);
         } else {
@@ -395,21 +395,21 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
             FI_HILOGI("Current state is free");
         }
     }
-    DevCoordinationSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
+    CoordinationSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
     isStopping_ = false;
 }
 
 void CoordinationSM::NotifyRemoteStartFail(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    DevCoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId, false, "",  0, 0);
+    CoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId, false, "",  0, 0);
     CoordinationEventMgr->OnStart(CoordinationMessage::INFO_FAIL);
 }
 
 void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string& startDhid)
 {
     CALL_DEBUG_ENTER;
-    DevCoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId,
+    CoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId,
         true, startDhid, mouseLocation_.first, mouseLocation_.second);
     CoordinationEventMgr->OnStart(CoordinationMessage::INFO_SUCCESS);
 }
@@ -417,7 +417,7 @@ void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId
 void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    DevCoordinationSoftbusAdapter->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
+    CoordinationSoftbusAdapter->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
         CoordinationEventMgr->OnStop(CoordinationMessage::COORDINATION_FAIL);
     } else {

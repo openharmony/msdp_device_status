@@ -17,7 +17,7 @@
 
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "device_coordination_softbus_adapter.h"
+#include "coordination_softbus_adapter.h"
 #include "distributed_input_adapter.h"
 #include "coordination_sm.h"
 #include "coordination_util.h"
@@ -41,7 +41,7 @@ int32_t CoordinationStateOut::StopInputDeviceCoordination(const std::string &net
         std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = DevCoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
