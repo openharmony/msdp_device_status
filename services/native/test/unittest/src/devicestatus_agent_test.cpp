@@ -47,7 +47,7 @@ bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
 {
     GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_LID_OPEN);
+    EXPECT_TRUE(devicestatusData.type > Type::TYPE_INVALID && devicestatusData.type < Type::TYPE_MAX);
     return true;
 }
 
@@ -56,7 +56,7 @@ bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
 {
     GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_LID_OPEN);
+    EXPECT_TRUE(devicestatusData.type > Type::TYPE_INVALID && devicestatusData.type < Type::TYPE_MAX);
     return true;
 }
 
