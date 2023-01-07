@@ -92,7 +92,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
 {
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest003 Enter");
-    Type type = Type::TYPE_STILL;
+    Type type = Type::TYPE_ABSOLUTE_STILL;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
@@ -172,13 +172,13 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
 {
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 Enter");
-    Type type = Type::TYPE_STILL;
+    Type type = Type::TYPE_ABSOLUTE_STILL;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == Type::TYPE_STILL &&
-        data.value == OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
+    EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
+        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 end");
 }
 

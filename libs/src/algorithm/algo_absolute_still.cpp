@@ -54,14 +54,14 @@ void AlgoAbsoluteStill::ExecuteOperation()
         counter_--;
         if (counter_ == 0) {
             counter_ = COUNTER_THRESHOLD;
-            UpdateStateAndReport(VALUE_ENTER, STILL, TYPE_STILL);
+            UpdateStateAndReport(VALUE_ENTER, STILL, TYPE_ABSOLUTE_STILL);
         }
     } else {
         counter_ = COUNTER_THRESHOLD;
         if (state_ == UNSTILL) {
             return;
         }
-        UpdateStateAndReport(VALUE_EXIT, UNSTILL, TYPE_STILL);
+        UpdateStateAndReport(VALUE_EXIT, UNSTILL, TYPE_ABSOLUTE_STILL);
     }
 }
 } // namespace DeviceStatus

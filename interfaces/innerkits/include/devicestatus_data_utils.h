@@ -24,9 +24,12 @@ namespace DeviceStatus {
 constexpr double MOVEMENT_THRESHOLD = 0.001;
 enum Type {
     TYPE_INVALID = -1,
-    TYPE_STILL,
+    TYPE_ABSOLUTE_STILL,
     TYPE_HORIZONTAL_POSITION,
     TYPE_VERTICAL_POSITION,
+    TYPE_STILL,
+    TYPE_RELATIVE_STILL,
+    TYPE_CAR_BLUETOOTH,
     TYPE_LID_OPEN,
     TYPE_MAX
 };
@@ -96,9 +99,12 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {Type::TYPE_STILL, "STILL"},
+    {Type::TYPE_ABSOLUTE_STILL, "ABSOLUTE_STILL"},
     {Type::TYPE_HORIZONTAL_POSITION, "HORIZONTAL_POSITION"},
     {Type::TYPE_VERTICAL_POSITION, "VERTICAL_POSITION"},
+    {Type::TYPE_STILL, "STILL"},
+    {Type::TYPE_RELATIVE_STILL, "RELATIVE_STILL"},
+    {Type::TYPE_CAR_BLUETOOTH, "CAR_BLUETOOTH"},
     {Type::TYPE_LID_OPEN, "LID_OPEN"},
     {Type::TYPE_MAX, "MAX"}
 };
