@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "device_coordination_softbus_adapter.h"
+#include "coordination_softbus_adapter.h"
 
 #include <chrono>
 #include <thread>
@@ -30,8 +30,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceCoordinationSoftbusAdapter" };
-std::shared_ptr<DeviceCoordinationSoftbusAdapter> g_instance = nullptr;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
+std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr int32_t DINPUT_LINK_TYPE_MAX = 4;
 const SessionAttribute g_sessionAttr = {
     .dataType = SessionType::TYPE_BYTES,
@@ -102,17 +102,17 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& p
 
 static int32_t SessionOpened(int32_t sessionId, int32_t result)
 {
-    return DevCoordinationSoftbusAdapter->OnSessionOpened(sessionId, result);
+    return CoordinationSoftbusAdapter->OnSessionOpened(sessionId, result);
 }
 
 static void SessionClosed(int32_t sessionId)
 {
-    DevCoordinationSoftbusAdapter->OnSessionClosed(sessionId);
+    CoordinationSoftbusAdapter->OnSessionClosed(sessionId);
 }
 
 static void BytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
-    DevCoordinationSoftbusAdapter->OnBytesReceived(sessionId, data, dataLen);
+    CoordinationSoftbusAdapter->OnBytesReceived(sessionId, data, dataLen);
 }
 
 static void MessageReceived(int32_t sessionId, const void *data, uint32_t dataLen)
@@ -131,7 +131,7 @@ static void StreamReceived(int32_t sessionId, const StreamData *data, const Stre
     (void)param;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::Init()
+int32_t CoordinationSoftbusAdapter::Init()
 {
     CALL_INFO_TRACE;
     sessListener_ = {
@@ -155,12 +155,12 @@ int32_t DeviceCoordinationSoftbusAdapter::Init()
     return RET_OK;
 }
 
-DeviceCoordinationSoftbusAdapter::~DeviceCoordinationSoftbusAdapter()
+CoordinationSoftbusAdapter::~CoordinationSoftbusAdapter()
 {
     Release();
 }
 
-void DeviceCoordinationSoftbusAdapter::Release()
+void CoordinationSoftbusAdapter::Release()
 {
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -174,7 +174,7 @@ void DeviceCoordinationSoftbusAdapter::Release()
     channelStatusMap_.clear();
 }
 
-bool DeviceCoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &devId)
+bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &devId)
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(devId) == sessionDevMap_.end()) {
@@ -184,7 +184,7 @@ bool DeviceCoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string
     return true;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteDevId)
+int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteDevId)
 {
     CALL_INFO_TRACE;
     if (CheckDeviceSessionState(remoteDevId)) {
@@ -208,7 +208,7 @@ int32_t DeviceCoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &re
     return WaitSessionOpend(remoteDevId, sessionId);
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteDevId, int32_t sessionId)
+int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteDevId, int32_t sessionId)
 {
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> waitLock(operationMutex_);
@@ -223,7 +223,7 @@ int32_t DeviceCoordinationSoftbusAdapter::WaitSessionOpend(const std::string &re
     return RET_OK;
 }
 
-void DeviceCoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteDevId)
+void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteDevId)
 {
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -238,16 +238,16 @@ void DeviceCoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remo
     channelStatusMap_.erase(remoteDevId);
 }
 
-std::shared_ptr<DeviceCoordinationSoftbusAdapter> DeviceCoordinationSoftbusAdapter::GetInstance()
+std::shared_ptr<CoordinationSoftbusAdapter> CoordinationSoftbusAdapter::GetInstance()
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {
-        g_instance.reset(new (std::nothrow) DeviceCoordinationSoftbusAdapter());
+        g_instance.reset(new (std::nothrow) CoordinationSoftbusAdapter());
     });
     return g_instance;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &localDeviceId,
+int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &localDeviceId,
     const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -277,7 +277,7 @@ int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordination(const std::str
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::string &remoteDeviceId,
+int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::string &remoteDeviceId,
     bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
@@ -305,7 +305,7 @@ int32_t DeviceCoordinationSoftbusAdapter::StartRemoteCoordinationResult(const st
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteDeviceId)
+int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -328,7 +328,7 @@ int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordination(const std::stri
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::string &remoteDeviceId,
+int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::string &remoteDeviceId,
     bool isSuccess)
 {
     CALL_DEBUG_ENTER;
@@ -353,7 +353,7 @@ int32_t DeviceCoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std
     return RET_OK;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::string &remoteDeviceId,
+int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::string &remoteDeviceId,
     const std::string &srcNetworkId)
 {
     CALL_DEBUG_ENTER;
@@ -378,7 +378,7 @@ int32_t DeviceCoordinationSoftbusAdapter::StartCoordinationOtherResult(const std
     return RET_OK;
 }
 
-void DeviceCoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string& message)
+void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string& message)
 {
     JsonParser parser;
     parser.json_ = cJSON_Parse(message.c_str());
@@ -420,7 +420,7 @@ void DeviceCoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, cons
     }
 }
 
-void DeviceCoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void CoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
     FI_HILOGD("dataLen:%{public}d", dataLen);
     if (sessionId < 0 || data == nullptr || dataLen <= 0) {
@@ -431,7 +431,7 @@ void DeviceCoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const 
     HandleSessionData(sessionId, message);
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
+int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
@@ -441,7 +441,7 @@ int32_t DeviceCoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
 }
 
-std::string DeviceCoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
+std::string CoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     auto find_item = std::find_if(sessionDevMap_.begin(), sessionDevMap_.end(),
@@ -455,7 +455,7 @@ std::string DeviceCoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
     return find_item->first;
 }
 
-int32_t DeviceCoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t result)
+int32_t CoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t result)
 {
     CALL_INFO_TRACE;
     char peerDevId[DEVICE_ID_SIZE_MAX] = {};
@@ -492,7 +492,7 @@ int32_t DeviceCoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int
     return RET_OK;
 }
 
-void DeviceCoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
+void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
 {
     CALL_DEBUG_ENTER;
     std::string deviceId = FindDevice(sessionId);
