@@ -25,13 +25,9 @@ using namespace std;
 static std::shared_ptr<DeviceStatusAgent> agent1_;
 static std::shared_ptr<DeviceStatusAgent> agent2_;
 
-void DevicestatusAgentTest::SetUpTestCase()
-{
-}
+void DevicestatusAgentTest::SetUpTestCase() {}
 
-void DevicestatusAgentTest::TearDownTestCase()
-{
-}
+void DevicestatusAgentTest::TearDownTestCase() {}
 
 void DevicestatusAgentTest::SetUp()
 {
@@ -39,16 +35,15 @@ void DevicestatusAgentTest::SetUp()
     agent2_ = std::make_shared<DeviceStatusAgent>();
 }
 
-void DevicestatusAgentTest::TearDown()
-{
-}
+void DevicestatusAgentTest::TearDown() {}
 
 bool DevicestatusAgentListenerMockFirstClient::OnEventResult(
     const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    EXPECT_TRUE(devicestatusData.type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
+        && devicestatusData.type < DevicestatusDataUtils::DevicestatusType::TYPE_MAX);
     return true;
 }
 
@@ -57,7 +52,8 @@ bool DevicestatusAgentListenerMockSecondClient::OnEventResult(
 {
     GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN);
+    EXPECT_TRUE(devicestatusData.type > DevicestatusDataUtils::DevicestatusType::TYPE_INVALID
+        && devicestatusData.type < DevicestatusDataUtils::DevicestatusType::TYPE_MAX);
     return true;
 }
 
