@@ -38,7 +38,7 @@ int32_t CoordinationStateOut::StopInputDeviceCoordination(const std::string &net
     CALL_DEBUG_ENTER;
     std::string srcNetworkId = networkId;
     if (srcNetworkId.empty()) {
-        std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
+        std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
     int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
@@ -62,13 +62,13 @@ void CoordinationStateOut::ProcessStop(const std::string& srcNetworkId)
     CHKPV(context);
     std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startDhid_);
     if (dhids.empty()) {
-        InputDevCooSM->OnStopFinish(false, srcNetworkId);
+        CooSM->OnStopFinish(false, srcNetworkId);
     }
     int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
         this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStopFinish(false, srcNetworkId);
+        CooSM->OnStopFinish(false, srcNetworkId);
     }
 }
 
@@ -77,14 +77,14 @@ void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
+        std::bind(&CoordinationSM::OnStopFinish, CooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
 
 void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid)
 {
-    std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
+    std::pair<std::string, std::string> networkIds = CooSM->GetPreparedDevices();
     std::vector<std::string> dhids;
     dhids.push_back(dhid);
     DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSuccess) {});

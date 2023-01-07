@@ -30,14 +30,14 @@
 #include "timer_manager.h"
 #include "i_context.h"
 #include "idevicestatus_callback.h"
-#include "uds_server.h"
+#include "stream_server.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class DeviceStatusService final : public IContext,
-                                  public UDSServer,
+                                  public StreamServer,
                                   public SystemAbility,
                                   public DeviceStatusSrvStub {
     DECLARE_SYSTEM_ABILITY(DeviceStatusService)

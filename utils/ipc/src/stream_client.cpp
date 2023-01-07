@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "uds_client.h"
+#include "stream_client.h"
 
 #include "util.h"
 
@@ -20,20 +20,20 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UDSClient" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamClient" };
 } // namespace
 
-UDSClient::UDSClient()
+StreamClient::StreamClient()
 {
     CALL_DEBUG_ENTER;
 }
 
-UDSClient::~UDSClient()
+StreamClient::~StreamClient()
 {
     CALL_DEBUG_ENTER;
 }
 
-int32_t UDSClient::ConnectTo()
+int32_t StreamClient::ConnectTo()
 {
     CALL_DEBUG_ENTER;
     if (Socket() < 0) {
@@ -44,7 +44,7 @@ int32_t UDSClient::ConnectTo()
     return RET_OK;
 }
 
-bool UDSClient::SendMsg(const char *buf, size_t size) const
+bool StreamClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
@@ -85,7 +85,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
     return true;
 }
 
-bool UDSClient::SendMsg(const NetPacket &pkt) const
+bool StreamClient::SendMsg(const NetPacket &pkt) const
 {
     if (pkt.ChkRWError()) {
         FI_HILOGE("Read and write status is error");
@@ -96,7 +96,7 @@ bool UDSClient::SendMsg(const NetPacket &pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-bool UDSClient::StartClient(MsgClientFunCallback fun)
+bool StreamClient::StartClient(MsgClientFunCallback fun)
 {
     CALL_DEBUG_ENTER;
     if (isRunning_ || isConnected_) {
@@ -111,7 +111,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
     return true;
 }
 
-void UDSClient::Stop()
+void StreamClient::Stop()
 {
     CALL_DEBUG_ENTER;
     isExit = true;

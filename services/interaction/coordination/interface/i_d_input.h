@@ -22,7 +22,7 @@
 
 #include "i_context.h"
 #include "key_event.h"
-#include "uds_session.h"
+#include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {

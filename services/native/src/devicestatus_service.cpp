@@ -190,7 +190,7 @@ bool DeviceStatusService::Init()
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     CoordinationEventMgr->SetIContext(this);
-    InputDevCooSM->Init();
+    CooSM->Init();
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
@@ -292,7 +292,7 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const
     int32_t serverFd = -1;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&StreamServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     if (ret != RET_OK) {
         FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
@@ -675,7 +675,7 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
 int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    InputDevCooSM->EnableInputDeviceCoordination(enabled);
+    CooSM->EnableInputDeviceCoordination(enabled);
     std::string deviceId =  "";
     CoordinationMessage msg =
         enabled ? CoordinationMessage::OPEN_SUCCESS : CoordinationMessage::CLOSE_SUCCESS;
@@ -706,7 +706,7 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    if (InputDevCooSM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
+    if (CooSM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::INFO_SUCCESS);
@@ -721,7 +721,7 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
         return RET_OK;
     }
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = InputDevCooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
+    int32_t ret = CooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
@@ -742,7 +742,7 @@ int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = InputDevCooSM->StopInputDeviceCoordination();
+    int32_t ret = CooSM->StopInputDeviceCoordination();
     if (ret != RET_OK) {
         FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
@@ -764,7 +764,7 @@ int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    InputDevCooSM->GetCoordinationState(deviceId);
+    CooSM->GetCoordinationState(deviceId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION

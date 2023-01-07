@@ -23,7 +23,7 @@
 #include "nocopyable.h"
 #include "refbase.h"
 #include "singleton.h"
-#include "uds_session.h"
+#include "stream_session.h"
 
 #include "coordination_message.h"
 #include "fi_log.h"

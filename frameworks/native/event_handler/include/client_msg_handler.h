@@ -18,12 +18,12 @@
 #include "nocopyable.h"
 
 #include "msg_handler.h"
-#include "uds_client.h"
+#include "stream_client.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
+typedef std::function<int32_t(const StreamClient&, NetPacket&)> ClientMsgFun;
 class ClientMsgHandler final : public MsgHandler<MessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
@@ -31,13 +31,13 @@ public:
     ~ClientMsgHandler() override = default;
 
     void Init();
-    void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
+    void OnMsgHandler(const StreamClient& client, NetPacket& pkt);
 
 protected:
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    int32_t OnCoordinationListener(const UDSClient& client, NetPacket& pkt);
-    int32_t OnCoordinationMessage(const UDSClient& client, NetPacket& pkt);
-    int32_t OnCoordinationState(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCoordinationListener(const StreamClient& client, NetPacket& pkt);
+    int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
+    int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:

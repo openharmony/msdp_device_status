@@ -98,7 +98,7 @@ int32_t CoordinationStateIn::ProcessStop()
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStopFinish(false, sink);
+        CooSM->OnStopFinish(false, sink);
     }
     return RET_OK;
 }
@@ -133,7 +133,7 @@ void CoordinationStateIn::StopRemoteInput(const std::string &sinkNetworkId,
             this->OnStopRemoteInput(isSuccess, srcNetworkId, startInputDeviceId);
     });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        CooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 
@@ -141,16 +141,16 @@ void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
-    if (InputDevCooSM->IsStarting()) {
+    if (CooSM->IsStarting()) {
         std::string taskName = "start_finish_task";
         std::function<void()> handleStartFinishFunc = std::bind(&CoordinationSM::OnStartFinish,
-            InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
+            CooSM, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
-    } else if (InputDevCooSM->IsStopping()) {
+    } else if (CooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
-            std::bind(&CoordinationSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
+            std::bind(&CoordinationSM::OnStopFinish, CooSM, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
     }
@@ -163,14 +163,14 @@ void CoordinationStateIn::ComeBack(const std::string &sinkNetworkId, int32_t sta
     CHKPV(context);
     std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startInputDeviceId);
     if (dhids.empty()) {
-        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        CooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
     int32_t ret = DistributedAdapter->StopRemoteInput(sinkNetworkId, dhids,
         [this, sinkNetworkId, startInputDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, sinkNetworkId, startInputDeviceId);
             });
     if (ret != RET_OK) {
-        InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
+        CooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
     }
 }
 

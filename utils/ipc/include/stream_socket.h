@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDS_SOCKET_H
-#define UDS_SOCKET_H
+#ifndef STREAM_SOCKET_H
+#define STREAM_SOCKET_H
 
 #include <atomic>
 #include <string>
@@ -33,11 +33,11 @@
 
 namespace OHOS {
 namespace Msdp {
-class UDSSocket {
+class StreamSocket {
 public:
-    UDSSocket();
-    DISALLOW_COPY_AND_MOVE(UDSSocket);
-    virtual ~UDSSocket();
+    StreamSocket();
+    DISALLOW_COPY_AND_MOVE(StreamSocket);
+    virtual ~StreamSocket();
     using PacketCallBackFun = std::function<void(NetPacket&)>;
 
     int32_t EpollCreate(int32_t size);
@@ -62,4 +62,4 @@ protected:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // UDS_SOCKET_H
+#endif // STREAM_SOCKET_H
