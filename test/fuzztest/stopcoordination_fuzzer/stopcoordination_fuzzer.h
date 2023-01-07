@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef STOPDEVICECOOPERATE_FUZZER_H
-#define STOPDEVICECOOPERATE_FUZZER_H
+#ifndef STOPCOORDINATION_FUZZER_H
+#define STOPCOORDINATION_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "stopdeviceCoordination_fuzzer_fuzzer"
+#define FUZZ_PROJECT_NAME "stopcoordination_fuzzer"
 
-#endif // STOPDEVICECOOPERATE_FUZZER_H
+#endif // STOPCOORDINATION_FUZZER_H

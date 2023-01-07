@@ -427,8 +427,8 @@ void DeviceStatusService::OnThread()
                 OnDelegateTask(ev[i]);
             } else if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
                 OnTimeout(ev[i]);
-            } else if (epollEvent->event_type == EPOLL_EVENT_INPUT_DEV_MGR) {
-                OnInputDevMgr(ev[i]);
+            } else if (epollEvent->event_type == EPOLL_EVENT_DEVICE_MGR) {
+                OnDeviceMgr(ev[i]);
             } else {
                 FI_HILOGW("Unknown epoll event type:%{public}d", epollEvent->event_type);
             }
@@ -498,7 +498,7 @@ void DeviceStatusService::OnTimeout(const epoll_event &ev)
     }
 }
 
-void DeviceStatusService::OnInputDevMgr(const epoll_event &ev)
+void DeviceStatusService::OnDeviceMgr(const epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
@@ -525,7 +525,7 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
             FI_HILOGE("Maximum number of retries exceeded, Failed to enable device manager");
         }
     } else {
-        AddEpoll(EPOLL_EVENT_INPUT_DEV_MGR, devMgr_.GetFd());
+        AddEpoll(EPOLL_EVENT_DEVICE_MGR, devMgr_.GetFd());
         if (timerId >= 0) {
             timerMgr_.RemoveTimer(timerId);
             timerId = -1;
@@ -536,7 +536,7 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
 
 void DeviceStatusService::DisableDevMgr()
 {
-    DelEpoll(EPOLL_EVENT_INPUT_DEV_MGR, devMgr_.GetFd());
+    DelEpoll(EPOLL_EVENT_DEVICE_MGR, devMgr_.GetFd());
     devMgr_.Disable();
 }
 
@@ -570,15 +570,15 @@ int32_t DeviceStatusService::UnregisterCoordinationListener()
     return RET_OK;
 }
 
-int32_t DeviceStatusService::EnableInputDeviceCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusService::EnableCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnEnableInputDeviceCoordination, this, pid, userData, enabled));
+        std::bind(&DeviceStatusService::OnEnableCoordination, this, pid, userData, enabled));
     if (ret != RET_OK) {
-        FI_HILOGE("OnEnableInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnEnableCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -588,36 +588,36 @@ int32_t DeviceStatusService::EnableInputDeviceCoordination(int32_t userData, boo
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StartInputDeviceCoordination(int32_t userData,
-    const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+int32_t DeviceStatusService::StartCoordination(int32_t userData,
+    const std::string &sinkDeviceId, int32_t srcDeviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStartInputDeviceCoordination,
-        this, pid, userData, sinkDeviceId, srcInputDeviceId));
+        std::bind(&DeviceStatusService::OnStartCoordination,
+        this, pid, userData, sinkDeviceId, srcDeviceId));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
     (void)(sinkDeviceId);
-    (void)(srcInputDeviceId);
+    (void)(srcDeviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StopDeviceCoordination(int32_t userData)
+int32_t DeviceStatusService::StopCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopInputDeviceCoordination, this, pid, userData));
+        std::bind(&DeviceStatusService::OnStopCoordination, this, pid, userData));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStopCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -626,21 +626,21 @@ int32_t DeviceStatusService::StopDeviceCoordination(int32_t userData)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnGetInputDeviceCoordinationState, this, pid, userData, deviceId));
+        std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, deviceId));
     if (ret != RET_OK) {
-        FI_HILOGE("OnGetInputDeviceCoordinationState failed, ret:%{public}d", ret);
+        FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
         return RET_ERR;
     }
 #else
     (void)(userData);
     (void)(deviceId);
-    FI_HILOGW("Get input device coordination state does not support");
+    FI_HILOGW("Get coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
@@ -672,10 +672,10 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_t userData, bool enabled)
+int32_t DeviceStatusService::OnEnableCoordination(int32_t pid, int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
-    CooSM->EnableInputDeviceCoordination(enabled);
+    CooSM->EnableCoordination(enabled);
     std::string deviceId =  "";
     CoordinationMessage msg =
         enabled ? CoordinationMessage::OPEN_SUCCESS : CoordinationMessage::CLOSE_SUCCESS;
@@ -694,8 +694,8 @@ int32_t DeviceStatusService::OnEnableInputDeviceCoordination(int32_t pid, int32_
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
-    int32_t userData, const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
+    int32_t userData, const std::string &sinkDeviceId, int32_t srcDeviceId)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -721,16 +721,16 @@ int32_t DeviceStatusService::OnStartInputDeviceCoordination(int32_t pid,
         return RET_OK;
     }
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
+    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t userData)
+int32_t DeviceStatusService::OnStopCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -742,16 +742,16 @@ int32_t DeviceStatusService::OnStopInputDeviceCoordination(int32_t pid, int32_t 
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StopInputDeviceCoordination();
+    int32_t ret = CooSM->StopCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStopCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnGetInputDeviceCoordinationState(
+int32_t DeviceStatusService::OnGetCoordinationState(
     int32_t pid, int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;

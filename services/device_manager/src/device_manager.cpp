@@ -42,14 +42,14 @@ DeviceManager::HotplugHandler::HotplugHandler(DeviceManager &devMgr)
     : devMgr_(devMgr)
 {}
 
-void DeviceManager::HotplugHandler::AddInputDevice(const std::string &devNode)
+void DeviceManager::HotplugHandler::AddDevice(const std::string &devNode)
 {
-    devMgr_.AddInputDevice(devNode);
+    devMgr_.AddDevice(devNode);
 }
 
-void DeviceManager::HotplugHandler::RemoveInputDevice(const std::string &devNode)
+void DeviceManager::HotplugHandler::RemoveDevice(const std::string &devNode)
 {
-    devMgr_.RemoveInputDevice(devNode);
+    devMgr_.RemoveDevice(devNode);
 }
 
 DeviceManager::DeviceManager()
@@ -73,8 +73,8 @@ int32_t DeviceManager::OnInit(IContext *context)
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
-    monitor_.SetInputDevMgr(&hotplug_);
-    enumerator_.SetInputDevMgr(&hotplug_);
+    monitor_.SetDeviceMgr(&hotplug_);
+    enumerator_.SetDeviceMgr(&hotplug_);
     return RET_OK;
 }
 
@@ -108,7 +108,7 @@ int32_t DeviceManager::OnEnable()
         FI_HILOGE("EpollAdd failed");
         goto DISABLE_MONITOR;
     }
-    enumerator_.ScanInputDevices();
+    enumerator_.ScanDevices();
     return RET_OK;
 
 DISABLE_MONITOR:
@@ -139,7 +139,7 @@ int32_t DeviceManager::OnDisable()
     return RET_OK;
 }
 
-std::shared_ptr<IDevice> DeviceManager::FindInputDevice(const std::string &devPath)
+std::shared_ptr<IDevice> DeviceManager::FindDevice(const std::string &devPath)
 {
     for (const auto &[id, dev] : devices_) {
         if (dev->GetDevPath() == devPath) {
@@ -163,7 +163,7 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
     return -1;
 }
 
-std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNode)
+std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 {
     CALL_INFO_TRACE;
     const std::string devPath { DEV_INPUT_PATH + devNode };
@@ -184,7 +184,7 @@ std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNod
         return nullptr;
     }
 
-    std::shared_ptr<IDevice> dev = FindInputDevice(devPath);
+    std::shared_ptr<IDevice> dev = FindDevice(devPath);
     if (dev != nullptr) {
         FI_HILOGD("Already exists: %{public}s", devPath.c_str());
         return dev;
@@ -208,13 +208,13 @@ std::shared_ptr<IDevice> DeviceManager::AddInputDevice(const std::string &devNod
     auto ret = devices_.emplace(dev->GetId(), dev);
     if (ret.second) {
         FI_HILOGD("\'%{public}s\' added", dev->GetName().c_str());
-        OnInputDeviceAdded(dev);
+        OnDeviceAdded(dev);
         return dev;
     }
     return nullptr;
 }
 
-std::shared_ptr<IDevice> DeviceManager::RemoveInputDevice(const std::string &devNode)
+std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 {
     CALL_INFO_TRACE;
     const std::string devPath { DEV_INPUT_PATH + devNode };
@@ -226,14 +226,14 @@ std::shared_ptr<IDevice> DeviceManager::RemoveInputDevice(const std::string &dev
             devices_.erase(devIter);
             FI_HILOGD("\'%{public}s\' removed", dev->GetName().c_str());
             dev->Close();
-            OnInputDeviceRemoved(dev);
+            OnDeviceRemoved(dev);
             return dev;
         }
     }
     return nullptr;
 }
 
-void DeviceManager::OnInputDeviceAdded(std::shared_ptr<IDevice> dev)
+void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     FI_HILOGI("add device %{public}d: %{public}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
@@ -257,7 +257,7 @@ void DeviceManager::OnInputDeviceAdded(std::shared_ptr<IDevice> dev)
     }
 }
 
-void DeviceManager::OnInputDeviceRemoved(std::shared_ptr<IDevice> dev)
+void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
     for (auto observer : observers_) {
         observer->OnDeviceRemoved(dev);
@@ -544,18 +544,18 @@ std::vector<std::string> DeviceManager::GetCoordinationDhids(const std::string &
 
 std::vector<std::string> DeviceManager::OnGetCoordinationDhids(const std::string &dhid) const
 {
-    int32_t inputDeviceId { -1 };
+    int32_t deviceId { -1 };
     for (const auto &[id, dev] : devices_) {
         if (dev == nullptr) {
             FI_HILOGW("Device is unsynchronized");
             continue;
         }
         if (dev->GetDhid() == dhid) {
-            inputDeviceId = id;
+            deviceId = id;
             break;
         }
     }
-    return GetCoordinationDhids(inputDeviceId);
+    return GetCoordinationDhids(deviceId);
 }
 
 int32_t DeviceManager::RunGetCoordinationDhids(

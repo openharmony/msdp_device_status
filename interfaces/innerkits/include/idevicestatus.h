@@ -51,11 +51,11 @@ public:
 
     virtual int32_t RegisterCoordinationListener() = 0;
     virtual int32_t UnregisterCoordinationListener() = 0;
-    virtual int32_t EnableInputDeviceCoordination(int32_t userData, bool enabled) = 0;
-    virtual int32_t StartInputDeviceCoordination(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcInputDeviceId) = 0;
-    virtual int32_t StopDeviceCoordination(int32_t userData) = 0;
-    virtual int32_t GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId) = 0;
+    virtual int32_t EnableCoordination(int32_t userData, bool enabled) = 0;
+    virtual int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcDeviceId) = 0;
+    virtual int32_t StopCoordination(int32_t userData) = 0;
+    virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;

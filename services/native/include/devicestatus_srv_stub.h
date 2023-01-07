@@ -41,10 +41,10 @@ private:
 
     int32_t StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply);
-    int32_t StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply);
-    int32_t StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply);
-    int32_t StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopCoordination(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetCoordinationState(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

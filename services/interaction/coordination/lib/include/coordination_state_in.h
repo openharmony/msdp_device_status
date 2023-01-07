@@ -24,17 +24,17 @@ namespace DeviceStatus {
 class CoordinationStateIn final : public ICoordinationState {
 public:
     explicit CoordinationStateIn(const std::string &startDhid);
-    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-    int32_t StopInputDeviceCoordination(const std::string &networkId) override;
+    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t StopCoordination(const std::string &networkId) override;
 
 private:
-    void ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId);
-    int32_t RelayComeBack(const std::string &srcNetworkId, int32_t startInputDeviceId);
-    void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId) override;
+    void ComeBack(const std::string &sinkNetworkId, int32_t startDeviceId);
+    int32_t RelayComeBack(const std::string &srcNetworkId, int32_t startDeviceId);
+    void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId) override;
     void StopRemoteInput(const std::string &sinkNetworkId, const std::string &srcNetworkId,
-        const std::vector<std::string> &dhid, int32_t startInputDeviceId);
-    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+        const std::vector<std::string> &dhid, int32_t startDeviceId);
+    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId);
+    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t ProcessStop();
     std::string startDhid_;
 };

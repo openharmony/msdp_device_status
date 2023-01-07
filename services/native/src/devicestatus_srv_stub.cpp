@@ -61,16 +61,16 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return StubUnregisterCoordinationMonitor(data, reply);
         }
         case ENABLE_COORDINATION: {
-            return StubEnableInputDeviceCoordination(data, reply);
+            return StubEnableCoordination(data, reply);
         }
         case START_COORDINATION: {
-            return StubStartInputDeviceCoordination(data, reply);
+            return StubStartCoordination(data, reply);
         }
         case STOP_COORDINATION: {
-            return StubStopDeviceCoordination(data, reply);
+            return StubStopCoordination(data, reply);
         }
         case GET_COORDINATION_STATE: {
-            return StubGetInputDeviceCoordinationState(data, reply);
+            return StubGetCoordinationState(data, reply);
         }
         case ALLOC_SOCKET_FD : {
             return StubHandleAllocSocketFd(data, reply);
@@ -156,56 +156,56 @@ int32_t DeviceStatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& da
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubEnableInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubEnableCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     bool enabled;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, enabled, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = EnableInputDeviceCoordination(userData, enabled);
+    int32_t ret = EnableCoordination(userData, enabled);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubStartInputDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubStartCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string sinkDeviceId;
     READSTRING(data, sinkDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t srcInputDeviceId;
-    READINT32(data, srcInputDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StartInputDeviceCoordination(userData, sinkDeviceId, srcInputDeviceId);
+    int32_t srcDeviceId;
+    READINT32(data, srcDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StartCoordination(userData, sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartInputDeviceCoordination failed ret:%{public}d", ret);
+        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubStopDeviceCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubStopCoordination(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StopDeviceCoordination(userData);
+    int32_t ret = StopCoordination(userData);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubGetInputDeviceCoordinationState(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StubGetCoordinationState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string deviceId;
     READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = GetInputDeviceCoordinationState(userData, deviceId);
+    int32_t ret = GetCoordinationState(userData, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
     }

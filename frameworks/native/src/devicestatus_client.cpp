@@ -183,33 +183,33 @@ int32_t DeviceStatusClient::UnregisterCoordinationListener()
     return devicestatusProxy_->UnregisterCoordinationListener();
 }
 
-int32_t DeviceStatusClient::EnableInputDeviceCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusClient::EnableCoordination(int32_t userData, bool enabled)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->EnableInputDeviceCoordination(userData, enabled);
+    return devicestatusProxy_->EnableCoordination(userData, enabled);
 }
 
-int32_t DeviceStatusClient::StartInputDeviceCoordination(int32_t userData,
-    const std::string &sinkDeviceId, int32_t srcInputDeviceId)
+int32_t DeviceStatusClient::StartCoordination(int32_t userData,
+    const std::string &sinkDeviceId, int32_t srcDeviceId)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->StartInputDeviceCoordination(userData, sinkDeviceId, srcInputDeviceId);
+    return devicestatusProxy_->StartCoordination(userData, sinkDeviceId, srcDeviceId);
 }
 
-int32_t DeviceStatusClient::StopDeviceCoordination(int32_t userData)
+int32_t DeviceStatusClient::StopCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->StopDeviceCoordination(userData);
+    return devicestatusProxy_->StopCoordination(userData);
 }
 
-int32_t DeviceStatusClient::GetInputDeviceCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetInputDeviceCoordinationState(userData, deviceId);
+    return devicestatusProxy_->GetCoordinationState(userData, deviceId);
 }
 
 

@@ -24,7 +24,7 @@
 #include "nocopyable.h"
 
 #include "i_context.h"
-#include "i_input_dev_mgr.h"
+#include "i_device_mgr.h"
 #include "i_epoll_event_source.h"
 
 namespace OHOS {
@@ -39,7 +39,7 @@ public:
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
 
-    void SetInputDevMgr(IInputDevMgr *devMgr);
+    void SetDeviceMgr(IDeviceMgr *devMgr);
     int32_t Enable();
     void Disable();
 
@@ -53,8 +53,8 @@ private:
 
 private:
     int32_t inotifyFd_ { -1 };
-    int32_t devInputWd_ { -1 };
-    IInputDevMgr *devMgr_ { nullptr };
+    int32_t devWd_ { -1 };
+    IDeviceMgr *devMgr_ { nullptr };
 };
 
 inline int32_t Monitor::GetFd() const
