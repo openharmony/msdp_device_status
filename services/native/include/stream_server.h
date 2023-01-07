@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDS_SERVER_H
-#define UDS_SERVER_H
+#ifndef STREAM_SERVER_H
+#define STREAM_SERVER_H
 
 #include <functional>
 #include <list>
@@ -23,8 +23,8 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "uds_socket.h"
-#include "i_uds_server.h"
+#include "stream_socket.h"
+#include "i_stream_server.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -40,11 +40,11 @@ enum EpollEventType {
 };
 
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
-class UDSServer : public UDSSocket, public IUdsServer {
+class StreamServer : public StreamSocket, public IStreamServer {
 public:
-    UDSServer() = default;
-    DISALLOW_COPY_AND_MOVE(UDSServer);
-    virtual ~UDSServer();
+    StreamServer() = default;
+    DISALLOW_COPY_AND_MOVE(StreamServer);
+    virtual ~StreamServer();
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
@@ -82,4 +82,4 @@ protected:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // UDS_SERVER_H
+#endif // STREAM_SERVER_H

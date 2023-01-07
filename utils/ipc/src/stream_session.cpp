@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "uds_session.h"
+#include "stream_session.h"
 
 #include <cinttypes>
 #include <sstream>
@@ -23,17 +23,17 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "uds_socket.h"
+#include "stream_socket.h"
 #include "proto.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UDSSession" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamSession" };
 const std::string FOUNDATION = "foundation";
 } // namespace
 
-UDSSession::UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
+StreamSession::StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
@@ -44,7 +44,7 @@ UDSSession::UDSSession(const std::string &programName, const int32_t moduleType,
     UpdateDescript();
 }
 
-bool UDSSession::SendMsg(const char *buf, size_t size) const
+bool StreamSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
@@ -86,7 +86,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     return true;
 }
 
-void UDSSession::Close()
+void StreamSession::Close()
 {
     CALL_DEBUG_ENTER;
     FI_HILOGD("Enter fd_:%{public}d.", fd_);
@@ -97,7 +97,7 @@ void UDSSession::Close()
     }
 }
 
-void UDSSession::UpdateDescript()
+void StreamSession::UpdateDescript()
 {
     std::ostringstream oss;
     oss << "fd = " << fd_
@@ -111,7 +111,7 @@ void UDSSession::UpdateDescript()
     descript_ = oss.str().c_str();
 }
 
-bool UDSSession::SendMsg(NetPacket &pkt) const
+bool StreamSession::SendMsg(NetPacket &pkt) const
 {
     if (pkt.ChkRWError()) {
         FI_HILOGE("Read and write status is error");

@@ -272,7 +272,7 @@ int32_t Client::Socket()
 void Client::Stop()
 {
     CALL_DEBUG_ENTER;
-    UDSClient::Stop();
+    StreamClient::Stop();
     if (eventHandler_ != nullptr) {
         auto runner = eventHandler_->GetEventRunner();
         CHKPV(runner);

@@ -18,7 +18,7 @@
 
 #include "fi_log.h"
 #include "stream_buffer.h"
-#include "uds_socket.h"
+#include "stream_socket.h"
 
 namespace OHOS {
 namespace Msdp {

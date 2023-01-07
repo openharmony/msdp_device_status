@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDS_SESSION_H
-#define UDS_SESSION_H
+#ifndef STREAM_SESSION_H
+#define STREAM_SESSION_H
 
 #include <list>
 #include <memory>
@@ -29,14 +29,14 @@
 
 namespace OHOS {
 namespace Msdp {
-class UDSSession;
-using SessionPtr = std::shared_ptr<UDSSession>;
-class UDSSession : public std::enable_shared_from_this<UDSSession> {
+class StreamSession;
+using SessionPtr = std::shared_ptr<StreamSession>;
+class StreamSession : public std::enable_shared_from_this<StreamSession> {
 public:
-    UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+    StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
-    DISALLOW_COPY_AND_MOVE(UDSSession);
-    virtual ~UDSSession() = default;
+    DISALLOW_COPY_AND_MOVE(StreamSession);
+    virtual ~StreamSession() = default;
 
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(NetPacket &pkt) const;
@@ -105,4 +105,4 @@ protected:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // UDS_SESSION_H
+#endif // STREAM_SESSION_H

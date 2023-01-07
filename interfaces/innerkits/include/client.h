@@ -20,12 +20,12 @@
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
 #include "i_client.h"
-#include "uds_client.h"
+#include "stream_client.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class Client final : public UDSClient, public IClient, public std::enable_shared_from_this<IClient> {
+class Client final : public StreamClient, public IClient, public std::enable_shared_from_this<IClient> {
 public:
     Client() = default;
     DISALLOW_COPY_AND_MOVE(Client);

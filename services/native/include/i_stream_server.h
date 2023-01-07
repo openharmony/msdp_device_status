@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef I_UDS_SERVER_H
-#define I_UDS_SERVER_H
+#ifndef I_STREAM_SERVER_H
+#define I_STREAM_SERVER_H
 
 #include "refbase.h"
-#include "uds_session.h"
+#include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {
-class IUdsServer : public virtual RefBase {
+class IStreamServer : public virtual RefBase {
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
                                       const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
@@ -30,4 +30,4 @@ public:
 };
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_UDS_SERVER_H
+#endif // I_STREAM_SERVER_H

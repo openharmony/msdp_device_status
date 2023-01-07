@@ -50,7 +50,7 @@ void ClientMsgHandler::Init()
     }
 }
 
-void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
+void ClientMsgHandler::OnMsgHandler(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     auto id = pkt.GetMsgId();
@@ -68,7 +68,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-int32_t ClientMsgHandler::OnCoordinationListener(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationListener(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -83,7 +83,7 @@ int32_t ClientMsgHandler::OnCoordinationListener(const UDSClient& client, NetPac
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnCoordinationMessage(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationMessage(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -98,7 +98,7 @@ int32_t ClientMsgHandler::OnCoordinationMessage(const UDSClient& client, NetPack
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnCoordinationState(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCoordinationState(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
