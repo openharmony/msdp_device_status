@@ -23,10 +23,10 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationStateFree final : public ICoordinationState {
 public:
-    int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
+    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
 
 private:
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

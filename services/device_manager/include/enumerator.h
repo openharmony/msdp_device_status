@@ -20,7 +20,7 @@
 
 #include "nocopyable.h"
 
-#include "i_input_dev_mgr.h"
+#include "i_device_mgr.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -31,15 +31,15 @@ public:
     ~Enumerator() = default;
     DISALLOW_COPY_AND_MOVE(Enumerator);
 
-    void SetInputDevMgr(IInputDevMgr *devMgr);
-    void ScanInputDevices();
+    void SetDeviceMgr(IDeviceMgr *devMgr);
+    void ScanDevices();
 
 private:
-    void ScanAndAddInputDevices();
-    void AddInputDevice(const std::string &devNode) const;
+    void ScanAndAddDevices();
+    void AddDevice(const std::string &devNode) const;
 
 private:
-    IInputDevMgr *devMgr_ { nullptr };
+    IDeviceMgr *devMgr_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef STARTINPUTDEVICECOOPERATE_FUZZER_H
-#define STARTINPUTDEVICECOOPERATE_FUZZER_H
+#ifndef STARTCOORDINATION_FUZZER_H
+#define STARTCOORDINATION_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "startinputdevicecoordination_fuzzer"
+#define FUZZ_PROJECT_NAME "startcoordination_fuzzer"
 
-#endif // STARTINPUTDEVICECOOPERATE_FUZZER_H
+#endif // STARTCOORDINATION_FUZZER_H

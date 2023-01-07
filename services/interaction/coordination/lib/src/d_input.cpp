@@ -46,13 +46,13 @@ void DInput::RegisterEventCallback(SimulateEventCallback callback)
     DistributedAdapter->RegisterEventCallback(callback);
 }
 
-void DInput::EnableInputDeviceCoordination(bool enabled)
+void DInput::EnableCoordination(bool enabled)
 {
-    CooSM->EnableInputDeviceCoordination(enabled);
+    CooSM->EnableCoordination(enabled);
 }
 
-int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData,
-    const std::string& sinkDeviceId, int32_t srcInputDeviceId)
+int32_t DInput::OnStartCoordination(SessionPtr sess, int32_t userData,
+    const std::string& sinkDeviceId, int32_t srcDeviceId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -61,16 +61,16 @@ int32_t DInput::OnStartInputDeviceCoordination(SessionPtr sess, int32_t userData
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId);
+    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartInputDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
+int32_t DInput::OnStopCoordination(SessionPtr sess, int32_t userData)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -79,16 +79,16 @@ int32_t DInput::OnStopDeviceCoordination(SessionPtr sess, int32_t userData)
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StopInputDeviceCoordination();
+    int32_t ret = CooSM->StopCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopDeviceCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnStopCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DInput::OnGetInputDeviceCoordinationState(SessionPtr sess, int32_t userData,
+int32_t DInput::OnGetCoordinationState(SessionPtr sess, int32_t userData,
     const std::string& deviceId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();

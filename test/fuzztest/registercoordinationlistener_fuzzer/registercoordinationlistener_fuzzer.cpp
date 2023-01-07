@@ -31,10 +31,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Regis
 
 class CoordinationListenerTest : public ICoordinationListener {
 public:
-    InputDeviceCooperateListenerTest() : ICoordinationListener() {}
+    CoordinationListenerTest() : ICoordinationListener() {}
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
     {
-        FI_HILOGD("RegisterCooperateListenerFuzzTest");
+        FI_HILOGD("RegisterCoordinationListenerFuzzTest");
     };
 };
 

@@ -76,16 +76,16 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationListener_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    class InputDeviceCoordinationListenerTest : public ICoordinationListener {
+    class CoordinationListenerTest : public ICoordinationListener {
     public:
-        InputDeviceCoordinationListenerTest() : ICoordinationListener() {}
+        CoordinationListenerTest() : ICoordinationListener() {}
         void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
         {
             FI_HILOGD("RegisterCoordinationListenerTest");
         };
     };
-    std::shared_ptr<InputDeviceCoordinationListenerTest> consumer =
-        std::make_shared<InputDeviceCoordinationListenerTest>();
+    std::shared_ptr<CoordinationListenerTest> consumer =
+        std::make_shared<CoordinationListenerTest>();
     int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
@@ -119,19 +119,19 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
 }
 
 /**
- * @tc.name: InteractionManagerTest_EnableInputDeviceCoordination
- * @tc.desc: Enable input device coordination
+ * @tc.name: InteractionManagerTest_EnableCoordination
+ * @tc.desc: Enable coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableInputDeviceCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     bool enabled = false;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Enable input device coordination success");
+        FI_HILOGD("Enable coordination success");
     };
-    int32_t ret = InteractionManager::GetInstance()->EnableInputDeviceCoordination(enabled, fun);
+    int32_t ret = InteractionManager::GetInstance()->EnableCoordination(enabled, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -140,20 +140,20 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableInputDeviceCoordin
 }
 
 /**
- * @tc.name: InteractionManagerTest_StartInputDeviceCoordination
- * @tc.desc: Start input device coordination
+ * @tc.name: InteractionManagerTest_StartCoordination
+ * @tc.desc: Start coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartInputDeviceCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string sinkDeviceId("");
-    int32_t srcInputDeviceId = -1;
+    int32_t srcDeviceId = -1;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Start input device coordination success");
+        FI_HILOGD("Start coordination success");
     };
-    int32_t ret = InteractionManager::GetInstance()->StartInputDeviceCoordination(sinkDeviceId, srcInputDeviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->StartCoordination(sinkDeviceId, srcDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -162,18 +162,18 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartInputDeviceCoordina
 }
 
 /**
- * @tc.name: InteractionManagerTest_StopDeviceCoordination
- * @tc.desc: Stop device coordination
+ * @tc.name: InteractionManagerTest_StopCoordination
+ * @tc.desc: Stop coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDeviceCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Start input device coordination success");
+        FI_HILOGD("Stop coordination success");
     };
-    int32_t ret = InteractionManager::GetInstance()->StopDeviceCoordination(fun);
+    int32_t ret = InteractionManager::GetInstance()->StopCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, ERROR_UNSUPPORT);
 #else
@@ -182,19 +182,19 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDeviceCoordination, 
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetInputDeviceCoordinationState
- * @tc.desc: Get input device coordination state
+ * @tc.name: InteractionManagerTest_GetCoordinationState
+ * @tc.desc: Get coordination state
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetInputDeviceCoordinationState, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const std::string deviceId("");
     auto fun = [](bool state) {
-        FI_HILOGD("Get inputdevice state success");
+        FI_HILOGD("Get coordination state success");
     };
-    int32_t ret = InteractionManager::GetInstance()->GetInputDeviceCoordinationState(deviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else

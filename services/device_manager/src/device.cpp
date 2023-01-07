@@ -221,19 +221,19 @@ void Device::CheckPointers()
     if (hasAbs) {
         if (hasAbsCoords) {
             if (hasKeys && stylusOrPen) {
-                caps_.set(INPUT_DEV_CAP_TABLET_TOOL);
+                caps_.set(DEVICE_CAP_TABLET_TOOL);
                 FI_HILOGD("This is tablet tool");
             }
         }
         if (hasMtCoords) {
             if (hasTouch || isDirect) {
-                caps_.set(INPUT_DEV_CAP_TOUCH);
+                caps_.set(DEVICE_CAP_TOUCH);
                 FI_HILOGD("This is touch device");
             }
         }
     } else if (hasRels) {
         if (hasRelCoords) {
-            caps_.set(INPUT_DEV_CAP_POINTER);
+            caps_.set(DEVICE_CAP_POINTER);
             FI_HILOGD("This is pointer device");
         }
     }
@@ -250,7 +250,7 @@ void Device::CheckKeys()
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
                 FI_HILOGD("Found key %{public}zx", key);
-                caps_.set(INPUT_DEV_CAP_KEYBOARD);
+                caps_.set(DEVICE_CAP_KEYBOARD);
                 return;
             }
         }

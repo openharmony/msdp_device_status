@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ENABLEINPUTDEVICECOOPERATE_FUZZER_H
-#define ENABLEINPUTDEVICECOOPERATE_FUZZER_H
+#ifndef ENABLECOORDINATION_FUZZER_H
+#define ENABLECOORDINATION_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "enableinputdevicecoordination_fuzzer_fuzzer"
+#define FUZZ_PROJECT_NAME "enablecoordination_fuzzer"
 
-#endif // ENABLEINPUTDEVICECOOPERATE_FUZZER_H
+#endif // ENABLECOORDINATION_FUZZER_H

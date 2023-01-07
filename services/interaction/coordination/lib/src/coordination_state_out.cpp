@@ -33,7 +33,7 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDhid)
     : startDhid_(startDhid)
 {}
 
-int32_t CoordinationStateOut::StopInputDeviceCoordination(const std::string &networkId)
+int32_t CoordinationStateOut::StopCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::string srcNetworkId = networkId;
@@ -41,9 +41,9 @@ int32_t CoordinationStateOut::StopInputDeviceCoordination(const std::string &net
         std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop input device coordination fail");
+        FI_HILOGE("Stop coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_stop_task";

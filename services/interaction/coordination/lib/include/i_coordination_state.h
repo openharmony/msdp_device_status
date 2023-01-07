@@ -34,11 +34,11 @@ class ICoordinationState {
 public:
     ICoordinationState();
     virtual ~ICoordinationState() = default;
-    virtual int32_t StartInputDeviceCoordination(const std::string &remoteNetworkId, int32_t startInputDeviceId)
+    virtual int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    virtual int32_t StopInputDeviceCoordination(const std::string &networkId)
+    virtual int32_t StopCoordination(const std::string &networkId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
@@ -46,11 +46,11 @@ public:
     virtual void UpdateSinkDeviceInfo(const std::map<std::string, std::set<std::string>> &sinkDeviceInfo) {}
 
 protected:
-    int32_t PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId);
+    int32_t PrepareAndStart(const std::string &srcNetworkId, int32_t startDeviceId);
     bool NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId);
-    void OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    int32_t StartRemoteInput(int32_t startInputDeviceId);
-    virtual void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
+    void OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId);
+    int32_t StartRemoteInput(int32_t startDeviceId);
+    virtual void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId);
 
 protected:
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };

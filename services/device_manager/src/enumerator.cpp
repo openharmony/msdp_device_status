@@ -30,20 +30,20 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Enumerator" };
 }
 
-void Enumerator::SetInputDevMgr(IInputDevMgr *devMgr)
+void Enumerator::SetDeviceMgr(IDeviceMgr *devMgr)
 {
     CALL_DEBUG_ENTER;
     CHKPV(devMgr);
     devMgr_ = devMgr;
 }
 
-void Enumerator::ScanInputDevices()
+void Enumerator::ScanDevices()
 {
     CALL_DEBUG_ENTER;
-    ScanAndAddInputDevices();
+    ScanAndAddDevices();
 }
 
-void Enumerator::ScanAndAddInputDevices()
+void Enumerator::ScanAndAddDevices()
 {
     CALL_DEBUG_ENTER;
     DIR *dir = opendir(DEV_INPUT_PATH.c_str());
@@ -61,17 +61,17 @@ void Enumerator::ScanAndAddInputDevices()
         if (!S_ISCHR(statbuf.st_mode)) {
             continue;
         }
-        AddInputDevice(devNode);
+        AddDevice(devNode);
     }
 
     closedir(dir);
 }
 
-void Enumerator::AddInputDevice(const std::string &devNode) const
+void Enumerator::AddDevice(const std::string &devNode) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(devMgr_);
-    devMgr_->AddInputDevice(devNode);
+    devMgr_->AddDevice(devNode);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_DEV_MAR_H
-#define I_INPUT_DEV_MAR_H
+#ifndef I_DEVICE_MAR_H
+#define I_DEVICE_MAR_H
 
-class IInputDevMgr {
+class IDeviceMgr {
 public:
-    IInputDevMgr() = default;
-    virtual ~IInputDevMgr() = default;
+    IDeviceMgr() = default;
+    virtual ~IDeviceMgr() = default;
 
-    virtual void AddInputDevice(const std::string &devNode) = 0;
-    virtual void RemoveInputDevice(const std::string &devNode) = 0;
+    virtual void AddDevice(const std::string &devNode) = 0;
+    virtual void RemoveDevice(const std::string &devNode) = 0;
 };
 
-#endif // I_INPUT_DEV_MAR_H
+#endif // I_DEVICE_MAR_H

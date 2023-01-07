@@ -54,17 +54,17 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t EnableInputDeviceCoordination(bool enabled, std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t EnableCoordination(bool enabled, std::function<void(std::string, CoordinationMessage)> callback);
 
     /**
      * @brief 启动跨设备键鼠穿越。
      * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
-     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @param srcDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
      * @param callback 启动跨设备键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StartInputDeviceCoordination(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+    int32_t StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
         std::function<void(std::string, CoordinationMessage)> callback);
 
     /**
@@ -73,7 +73,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StopDeviceCoordination(std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t StopCoordination(std::function<void(std::string, CoordinationMessage)> callback);
 
     /**
      * @brief 获取指定设备键鼠穿越状态。
@@ -82,7 +82,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t GetInputDeviceCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
+    int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
 private:
     InteractionManager() = default;

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef GETINPUTDEVICECOOPERATESTATE_FUZZER_H
-#define GETINPUTDEVICECOOPERATESTATE_FUZZER_H
+#ifndef GETCOORDINATIONSTATE_FUZZER_H
+#define GETCOORDINATIONSTATE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "getinputdevicecoordinationstate_fuzzer"
+#define FUZZ_PROJECT_NAME "getcoordinationstate_fuzzer"
 
-#endif // GETINPUTDEVICECOOPERATESTATE_FUZZER_H
+#endif // GETCOORDINATIONSTATE_FUZZER_H
