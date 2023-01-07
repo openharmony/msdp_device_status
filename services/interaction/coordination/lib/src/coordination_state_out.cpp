@@ -41,7 +41,7 @@ int32_t CoordinationStateOut::StopCoordination(const std::string &networkId)
         std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);

@@ -39,7 +39,7 @@ int32_t CoordinationStateFree::StartCoordination(
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    int32_t ret = CoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = CooSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start input device coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);

@@ -61,7 +61,7 @@ int32_t DInput::OnStartCoordination(SessionPtr sess, int32_t userData,
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcInputDeviceId);
+    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));

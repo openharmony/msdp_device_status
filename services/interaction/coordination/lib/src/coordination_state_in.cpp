@@ -44,7 +44,7 @@ int32_t CoordinationStateIn::StartCoordination(const std::string &remoteNetworkI
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    int32_t ret = CoordinationSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = CooSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
@@ -74,7 +74,7 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
 int32_t CoordinationStateIn::StopCoordination(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = CoordinationSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return ret;

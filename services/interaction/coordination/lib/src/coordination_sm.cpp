@@ -63,7 +63,7 @@ void CoordinationSM::Init()
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
-        CoordinationSoftbusAdapter->Init();
+        CooSoftbusAdapter->Init();
     });
     devObserver_ = std::make_shared<DeviceObserver>();
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
@@ -205,7 +205,7 @@ int32_t CoordinationSM::StartCoordination(
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStarting_ = true;
-    CoordinationSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
+    CooSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
     int32_t ret = currentStateSM_->StartCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Start remote input fail");
@@ -364,7 +364,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDeviceId);
             if (!sink.empty() && remoteNetworkId != sink) {
-                CoordinationSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
+                CooSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CoordinationState::STATE_FREE);
         } else {
@@ -395,21 +395,21 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
             FI_HILOGI("Current state is free");
         }
     }
-    CoordinationSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
+    CooSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
     isStopping_ = false;
 }
 
 void CoordinationSM::NotifyRemoteStartFail(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    CoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId, false, "",  0, 0);
+    CooSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId, false, "",  0, 0);
     CoordinationEventMgr->OnStart(CoordinationMessage::INFO_FAIL);
 }
 
 void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string& startDhid)
 {
     CALL_DEBUG_ENTER;
-    CoordinationSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId,
+    CooSoftbusAdapter->StartRemoteCoordinationResult(remoteNetworkId,
         true, startDhid, mouseLocation_.first, mouseLocation_.second);
     CoordinationEventMgr->OnStart(CoordinationMessage::INFO_SUCCESS);
 }
@@ -417,7 +417,7 @@ void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId
 void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    CoordinationSoftbusAdapter->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
+    CooSoftbusAdapter->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
         CoordinationEventMgr->OnStop(CoordinationMessage::COORDINATION_FAIL);
     } else {
@@ -789,8 +789,8 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
     if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-        CooSM->x_ = pointerItem.GetDisplayX();
-        CooSM->y_ = pointerItem.GetDisplayY();
+        CooSM->displayX_ = pointerItem.GetDisplayX();
+        CooSM->displayY_ = pointerItem.GetDisplayY();
     }
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
