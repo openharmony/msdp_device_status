@@ -154,7 +154,7 @@ ErrCode DeviceStatusMsdpClientImpl::GetSensorHdi(Type type)
 
 ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 {
-    if (type == Type::TYPE_STILL ||type == Type::TYPE_HORIZONTAL_POSITION ||
+    if (type == Type::TYPE_ABSOLUTE_STILL ||type == Type::TYPE_HORIZONTAL_POSITION ||
         type == Type::TYPE_VERTICAL_POSITION) {
         return RET_OK;
     }

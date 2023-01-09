@@ -199,8 +199,8 @@ std::string DeviceStatusDumper::GetStatusType(Type type) const
 {
     std::string stateType;
     switch (type) {
-        case TYPE_STILL: {
-            stateType = "still";
+        case TYPE_ABSOLUTE_STILL: {
+            stateType = "absolute still";
             break;
         }
         case TYPE_HORIZONTAL_POSITION: {

@@ -99,8 +99,8 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest003, TestSize.Level1)
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
-    EXPECT_TRUE(g_testMock->Enable(Type::TYPE_STILL) == ERR_OK);
-    EXPECT_TRUE(g_testMock->Disable(Type::TYPE_STILL) == ERR_OK);
+    EXPECT_TRUE(g_testMock->Enable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
+    EXPECT_TRUE(g_testMock->Disable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest003 end";
 }

@@ -140,7 +140,7 @@ int32_t DeviceStatusManager::MsdpDataCallback(const Data& data)
 int32_t DeviceStatusManager::SensorDataCallback(struct SensorEvents *event)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    Data data = {Type::TYPE_STILL, OnChangedValue::VALUE_ENTER};
+    Data data = {Type::TYPE_ABSOLUTE_STILL, OnChangedValue::VALUE_ENTER};
     if (!NotifyDeviceStatusChange(data)) {
         DEV_HILOGE(SERVICE, "NotifyDeviceStatusChange is failed");
         return RET_ERR;

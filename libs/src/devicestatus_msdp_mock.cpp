@@ -180,7 +180,7 @@ void DeviceStatusMsdpMock::TimerCallback()
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
     Data data;
-    for (int32_t n = int(Type::TYPE_STILL); n < Type::TYPE_MAX; ++n) {
+    for (int32_t n = int(Type::TYPE_ABSOLUTE_STILL); n < Type::TYPE_MAX; ++n) {
         if (enabledType_[n] == TypeValue::VALID) {
             Type type = Type(n);
             if (dataParse_ != nullptr) {
