@@ -243,10 +243,6 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     }
 
     auto appInfo = std::make_shared<AppInfo>();
-    if (appInfo == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is nullptr");
-        return;
-    }
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();
     appInfo->tokenId = IPCSkeleton::GetCallingTokenID();

@@ -115,7 +115,6 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
         sizeof(sinkDeviceDescriptor), &length), GET_VALUE_STRING_UTF8);
-    std::string sinkDeviceDescriptor_ = sinkDeviceDescriptor;
     CHKRP(napi_get_value_int32(env, argv[1], &srcDeviceId), GET_VALUE_INT32);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);

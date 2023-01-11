@@ -145,8 +145,8 @@ void DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, spt
     if (event > ActivityEvent::EVENT_INVALID && event <= ActivityEvent::ENTER_EXIT) {
         DEV_HILOGE(SERVICE, "event is failed");
     }
-    return;
     DEV_HILOGD(INNERKIT, "Exit");
+    return;
 }
 
 Data DeviceStatusClient::GetDeviceStatusData(Type type)
