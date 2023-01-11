@@ -382,9 +382,9 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
         return RET_ERR;
     }
     DEV_HILOGI(SERVICE, "start create pointer");
-    mock_.create = (IMsdp* (*)()) dlsym(mock_.handle, "Create");
+    mock_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(mock_.handle, "Create"));
     DEV_HILOGI(SERVICE, "start destroy pointer");
-    mock_.destroy = (void *(*)(IMsdp*))dlsym(mock_.handle, "Destroy");
+    mock_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(mock_.handle, "Destroy"));
     if (mock_.create == nullptr || mock_.destroy == nullptr) {
         DEV_HILOGE(SERVICE, "%{public}s dlsym Create or Destroy failed",
             static_cast<std::string>(DEVICESTATUS_MOCK_LIB_PATH).c_str());
@@ -443,9 +443,9 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
         return RET_ERR;
     }
     DEV_HILOGI(SERVICE, "start create pointer");
-    algo_.create = (IMsdp* (*)()) dlsym(algo_.handle, "Create");
+    algo_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(algo_.handle, "Create"));
     DEV_HILOGI(SERVICE, "start destroy pointer");
-    algo_.destroy = (void *(*)(IMsdp*))dlsym(algo_.handle, "Destroy");
+    algo_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(algo_.handle, "Destroy"));
     if (algo_.create == nullptr || algo_.destroy == nullptr) {
         DEV_HILOGE(SERVICE, "%{public}s dlsym Create or Destroy failed",
             static_cast<std::string>(DEVICESTATUS_ALGO_LIB_PATH).c_str());

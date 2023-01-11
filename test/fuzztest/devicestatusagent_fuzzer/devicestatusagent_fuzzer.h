@@ -43,7 +43,7 @@ class DeviceStatusAgentFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
-    static void TestUnsubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent);
+    static void TestUnsubscribeAgentEvent(std::shared_ptr<DeviceStatusAgent> agent);
     static void TestSubscribeAgentEventIsNullptr(const uint8_t* data);
     static void TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data);
     static void TestUnsubscribeAgentEventTypeIsNullptr(const std::shared_ptr<DeviceStatusAgent>& agent_);
