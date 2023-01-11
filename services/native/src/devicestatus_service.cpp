@@ -33,6 +33,7 @@
 #include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
+#include "devicestatus_hisysevent.h"
 #include "devicestatus_permission.h"
 #include "devicestatus_service.h"
 
@@ -218,7 +219,6 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
         DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
         return;
     }
-
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
@@ -226,12 +226,12 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-
     DeviceStatusDumper::GetInstance().SaveAppInfo(type, callback);
     devicestatusManager_->Subscribe(type, event, latency, callback);
     DEV_HILOGD(SERVICE, "Exit");
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
+    WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
@@ -243,10 +243,6 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     }
 
     auto appInfo = std::make_shared<AppInfo>();
-    if (appInfo == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is nullptr");
-        return;
-    }
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();
     appInfo->tokenId = IPCSkeleton::GetCallingTokenID();
@@ -258,6 +254,7 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     devicestatusManager_->Unsubscribe(type, event, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, false);
+    WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
 
 Data DeviceStatusService::GetCache(const Type& type)

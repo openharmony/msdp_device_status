@@ -34,6 +34,8 @@ namespace DeviceStatus {
 class DeviceStatusMsdpClientImpl : public IMsdp::MsdpAlgoCallback {
 public:
     using CallbackManager = std::function<int32_t(const Data&)>;
+    using LoadMockLibraryFunc = IMsdp* (*)();
+    using LoadMockLibraryPtr = void *(*)(IMsdp*);
     DeviceStatusMsdpClientImpl();
     ErrCode InitMsdpImpl(Type type);
     ErrCode Disable(Type type);
