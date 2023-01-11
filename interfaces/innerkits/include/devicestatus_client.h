@@ -25,6 +25,7 @@
 #include "devicestatus_data_utils.h"
 #include "devicestatus_common.h"
 #include "i_coordination_listener.h"
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -51,6 +52,9 @@ public:
     int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId, int32_t srcDeviceId);
     int32_t StopCoordination(int32_t userData);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
+
+    int32_t StartDrag(const DragData &dragData);
+    int32_t StopDrag(int32_t &dragResult);
 
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;

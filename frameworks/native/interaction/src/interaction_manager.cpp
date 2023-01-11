@@ -14,6 +14,8 @@
  */
 
 #include "coordination_manager_impl.h"
+#include "drag_manager_impl.h"
+#include "drag_data.h"
 #include "devicestatus_define.h"
 #include "interaction_manager.h"
 
@@ -108,5 +110,21 @@ int32_t InteractionManager::GetCoordinationState(
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
+
+/**
+ * buffer 里边是啥在整个框架中是不需要关注的，我们只需要将buffer往下传传到服务端
+ * StartDrag 接口传入的参数较多，之后考虑将某几个整合成一个结构体
+*/
+int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
+{
+    CALL_DEBUG_ENTER;
+    return DragMgrImpl.StartDrag(dragData, callback);
+}
+
+int32_t InteractionManager::StopDrag(int32_t &dragResult)
+{
+    return DragMgrImpl.StopDrag(dragResult);
+}
+
 } // namespace Msdp
 } // namespace OHOS

@@ -90,7 +90,13 @@ namespace DeviceStatus {
             return __VA_ARGS__; \
         } \
     } while (0)
-
+#define WRITEUInt8Vector(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteUInt8Vector(data)) { \
+                DEV_HILOGE(COMMON, "WriteUInt8Vector "#data" failed"); \
+                return __VA_ARGS__; \
+            } \
+    } while (0)
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
@@ -139,6 +145,13 @@ namespace DeviceStatus {
         } \
     } while (0)
 
+#define READUInt8Vector(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadUInt8Vector(data)) { \
+                DEV_HILOGE(COMMON, "ReadUInt8Vector "#data" failed"); \
+                return __VA_ARGS__; \
+            } \
+    } while (0)
 template<typename E>
 constexpr auto DeviceStatusToUnderlying(E e) noexcept
 {

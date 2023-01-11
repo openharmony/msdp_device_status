@@ -31,6 +31,7 @@
 #include "i_context.h"
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -97,6 +98,8 @@ public:
     int32_t StopCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    int32_t StartDrag(const DragData &dragData) override;
+    int32_t StopDrag(int32_t &dragResult) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
 
@@ -128,6 +131,8 @@ private:
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
+    int32_t OnStartDrag();
+    int32_t OnStopDrag();
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
     std::thread t_;

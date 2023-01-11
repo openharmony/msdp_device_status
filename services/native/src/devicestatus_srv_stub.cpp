@@ -25,6 +25,7 @@
 #include "devicestatus_srv_stub.h"
 #include "devicestatus_srv_proxy.h"
 #include "idevicestatus_callback.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -74,6 +75,12 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         }
         case ALLOC_SOCKET_FD : {
             return StubHandleAllocSocketFd(data, reply);
+        }
+        case START_DRAG : {
+            return StubStartDrag(data, reply);
+        }
+        case STOP_DRAG : {
+            return StubStartDrag(data, reply);
         }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -247,6 +254,38 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     close(clientFd);
     return RET_OK;
 }
+
+int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& reply)
+{
+    // TODO 解包, 调用service对应的函数
+    CALL_DEBUG_ENTER;
+    DragData dragData;
+    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
+    READINT32(data, dragData.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUInt8Vector(data, &dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+
+    int32_t ret = StartDrag(dragData);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
+{
+    // TODO 解包， 调用service对应的函数
+    CALL_DEBUG_ENTER;
+    int32_t dragResult;
+    READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StopDrag(dragResult);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 } // namespace DeviceStatus
 } // Msdp
 } // OHOS

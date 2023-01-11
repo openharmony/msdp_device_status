@@ -45,6 +45,9 @@ private:
     int32_t StubStartCoordination(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopCoordination(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetCoordinationState(MessageParcel& data, MessageParcel& reply);
+
+    int32_t StubStartDrag(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopDrag(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

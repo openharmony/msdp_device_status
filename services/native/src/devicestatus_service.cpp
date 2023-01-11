@@ -768,6 +768,32 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+
+int32_t DeviceStatusService::StartDrag(const DragData &dragData)
+{
+    int32_t pid = GetCallingPid();
+    pid += 1;
+    return RET_OK;
+}
+int32_t DeviceStatusService::StopDrag(int32_t &dragResult)
+{
+    return RET_OK;
+
+}
+
+int32_t DeviceStatusService::OnStartDrag()
+{
+    return RET_OK;
+
+}
+
+int32_t DeviceStatusService::OnStopDrag()
+{
+    return RET_OK;
+
+}
+
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

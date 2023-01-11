@@ -17,7 +17,9 @@ import("//build/test.gni")
 module_output_path = "device_status/unit_out"
 
 config("devicestatus_private_config") {
-  include_dirs = [ "//utils/system/safwk/native/include" ]
+  include_dirs = [ 
+    "//utils/system/safwk/native/include",
+  ]
 }
 
 config("devicestatus_public_config") {
@@ -31,6 +33,7 @@ config("devicestatus_public_config") {
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_root_path}/utils/ipc/include",
+    "//foundation/multimedia/image_framework/interfaces/innerkits/include",
   ]
 
   defines = device_status_default_defines
@@ -45,6 +48,7 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
     "${device_status_frameworks_path}/native/src/fd_listener.cpp",
+    "${device_status_frameworks_path}/native/interaction/src/drag_manager_impl.cpp"
   ]
 
   if (fusion_interaction_coordination) {
@@ -71,6 +75,7 @@ ohos_shared_library("devicestatus_client") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "multimedia_image_framework:image_native",
   ]
 
   part_name = "${device_status_part_name}"

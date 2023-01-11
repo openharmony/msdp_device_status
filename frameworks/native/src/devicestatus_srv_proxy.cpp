@@ -26,6 +26,7 @@
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
 #include "bytrace_adapter.h"
+#include "pixel_map_parcel.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -247,6 +248,53 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_COORDINATION_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    // TODO 打包数据如何打包
+    if (!dragData.pixelMap->Marshalling(data)) {
+        FI_HILOGE("Failed to marshall pixelMap");
+    }
+    WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
+    WRITEUInt8Vector(data, dragData.buffer, ERR_INVALID_VALUE); // 这个为啥找不到
+    WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(START_DRAG, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::StopDrag(int32_t &dragResult)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, dragResult, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(STOP_DRAG, data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }

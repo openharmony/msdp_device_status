@@ -21,6 +21,7 @@
 #include "iremote_object.h"
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,7 +38,9 @@ public:
         START_COORDINATION = 33,
         STOP_COORDINATION = 34,
         GET_COORDINATION_STATE = 35,
-        ALLOC_SOCKET_FD = 40
+        ALLOC_SOCKET_FD = 40,
+        START_DRAG,
+        STOP_DRAG
     };
 
     virtual void Subscribe(Type type,
@@ -56,7 +59,8 @@ public:
         int32_t srcDeviceId) = 0;
     virtual int32_t StopCoordination(int32_t userData) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
-
+    virtual int32_t StartDrag(const DragData &dragData) = 0;
+    virtual int32_t StopDrag(int32_t &dragResult) = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual bool IsRunning() const
