@@ -16,15 +16,16 @@
 #ifndef INTERACTION_MANAGER_H
 #define INTERACTION_MANAGER_H
 
+#include <functional>
 #include <memory>
 
 #include "nocopyable.h"
 
-#include "coordination_message.h"
 #include "i_coordination_listener.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class InteractionManager {
 public:
 
@@ -84,12 +85,31 @@ public:
      */
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
+    /**
+     * @brief 更新拖拽中的光标样式。
+     * @param style 指定光标样式。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 10
+     */
+    int32_t UpdateDragStyle(int32_t style);
+
+    /**
+     * @brief 更新拖拽中的角标文本信息。
+     * @param message 角标文本信息。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 10
+     */
+    int32_t UpdateDragMessage(const std::u16string &message);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);
     static InteractionManager *instance_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define InteractionMgr OHOS::Msdp::InteractionManager::GetInstance()
+
+#define InteractionMgr OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()
+
 #endif // INTERACTION_MANAGER_H

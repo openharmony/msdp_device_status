@@ -97,6 +97,9 @@ public:
     int32_t StopCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    int32_t UpdateDragStyle(int32_t style) override;
+    int32_t UpdateDragMessage(const std::u16string &message) override;
+
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
 

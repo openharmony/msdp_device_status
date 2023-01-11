@@ -212,6 +212,19 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
     return devicestatusProxy_->GetCoordinationState(userData, deviceId);
 }
 
+int32_t DeviceStatusClient::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->UpdateDragStyle(style);
+}
+
+int32_t DeviceStatusClient::UpdateDragMessage(const std::u16string &message)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->UpdateDragMessage(message);
+}
 
 int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
 {

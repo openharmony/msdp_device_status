@@ -31,12 +31,14 @@ public:
         DEVICESTATUS_SUBSCRIBE = 0,
         DEVICESTATUS_UNSUBSCRIBE,
         DEVICESTATUS_GETCACHE,
-        REGISTER_COORDINATION_MONITOR = 30,
-        UNREGISTER_COORDINATION_MONITOR = 31,
-        ENABLE_COORDINATION = 32,
-        START_COORDINATION = 33,
-        STOP_COORDINATION = 34,
-        GET_COORDINATION_STATE = 35,
+        REGISTER_COORDINATION_MONITOR = 10,
+        UNREGISTER_COORDINATION_MONITOR,
+        ENABLE_COORDINATION,
+        START_COORDINATION,
+        STOP_COORDINATION,
+        GET_COORDINATION_STATE,
+        UPDATED_DRAG_STYLE = 20,
+        UPDATED_DRAG_MESSAGE,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -56,6 +58,9 @@ public:
         int32_t srcDeviceId) = 0;
     virtual int32_t StopCoordination(int32_t userData) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
+
+    virtual int32_t UpdateDragStyle(int32_t style) = 0;
+    virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;

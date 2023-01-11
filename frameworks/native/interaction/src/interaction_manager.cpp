@@ -13,16 +13,17 @@
  * limitations under the License.
  */
 
-#include "coordination_manager_impl.h"
-#include "devicestatus_define.h"
 #include "interaction_manager.h"
+
+#include <string>
+
+#include "devicestatus_define.h"
+#include "interaction_manager_impl.h"
 
 namespace OHOS {
 namespace Msdp {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManager" };
-} // namespace
-using namespace DeviceStatus;
+namespace DeviceStatus {
+
 InteractionManager *InteractionManager::instance_ = new (std::nothrow) InteractionManager();
 
 InteractionManager *InteractionManager::GetInstance()
@@ -32,81 +33,46 @@ InteractionManager *InteractionManager::GetInstance()
 
 int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.RegisterCoordinationListener(listener);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(listener);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.RegisterCoordinationListener(listener);
 }
 
 int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.UnregisterCoordinationListener(listener);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(listener);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.UnregisterCoordinationListener(listener);
 }
 
 int32_t InteractionManager::EnableCoordination(bool enabled,
     std::function<void(std::string, CoordinationMessage)> callback)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.EnableCoordination(enabled, callback);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(enabled);
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.EnableCoordination(enabled, callback);
 }
 
 int32_t InteractionManager::StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
     std::function<void(std::string, CoordinationMessage)> callback)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(sinkDeviceId);
-    (void)(srcDeviceId);
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
 }
 
 int32_t InteractionManager::StopCoordination(std::function<void(std::string, CoordinationMessage)> callback)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.StopCoordination(callback);
-#else
-    FI_HILOGW("Coordination does not support");
-    (void)(callback);
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.StopCoordination(callback);
 }
 
 int32_t InteractionManager::GetCoordinationState(
     const std::string &deviceId, std::function<void(bool)> callback)
 {
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    return CoordinationMgrImpl.GetCoordinationState(deviceId, callback);
-#else
-    (void)(deviceId);
-    (void)(callback);
-    FI_HILOGW("Coordination does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return InteractionMgrImpl.GetCoordinationState(deviceId, callback);
 }
+
+int32_t InteractionManager::UpdateDragStyle(int32_t style)
+{
+    return InteractionMgrImpl.UpdateDragStyle(style);
+}
+
+int32_t InteractionManager::UpdateDragMessage(const std::u16string &message)
+{
+    return InteractionMgrImpl.UpdateDragMessage(message);
+}
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

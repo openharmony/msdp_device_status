@@ -83,6 +83,14 @@ namespace DeviceStatus {
         } \
     } while (0)
 
+#define WRITESTRING16(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteString16(data)) { \
+            DEV_HILOGE(COMMON, "WriteString16 "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
 #define WRITEREMOTEOBJECT(parcel, data, ...) \
     do { \
         if (!(parcel).WriteRemoteObject(data)) { \
@@ -135,6 +143,14 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadString(data)) { \
             DEV_HILOGE(COMMON, "ReadString "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READSTRING16(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadString16(data)) { \
+            DEV_HILOGE(COMMON, "ReadString16 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)

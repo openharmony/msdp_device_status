@@ -642,6 +642,18 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     return RET_OK;
 }
 
+int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {
