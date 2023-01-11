@@ -189,7 +189,10 @@ bool SensorDataCallback::UnregisterCallbackSensor(int32_t sensorTypeId)
 {
     DEV_HILOGD(SERVICE, "enter");
     std::lock_guard lock(sensorMutex_);
-    user_.callback = SensorDataCallbackImpl;
+    if (user_.callback == nullptr) {
+        DEV_HILOGE(SERVICE, "callback_ is nullptr");
+        return false;
+    }
     int32_t ret = DeactivateSensor(sensorTypeId, &user_);
     if (ret != 0) {
         DEV_HILOGE(SERVICE, "DeactivateSensor failed");
