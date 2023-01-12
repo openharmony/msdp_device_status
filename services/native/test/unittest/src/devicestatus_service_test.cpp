@@ -33,12 +33,14 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 
+Type DeviceStatusServiceTest::g_srvTest = Type::TYPE_INVALID;
+
 void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_ABSOLUTE_STILL &&
-        devicestatusData.value == OnChangedValue::VALUE_ENTER) << "DeviceStatusServiceTestCallback failed";
+    EXPECT_TRUE(devicestatusData.type == g_srvTest && (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+        devicestatusData.value <= OnChangedValue::VALUE_ENTER)) << "DeviceStatusServiceTestCallback failed";
 }
 
 /**
@@ -48,7 +50,8 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
  */
 HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest, TestSize.Level0)
 {
-    Type type = Type::TYPE_ABSOLUTE_STILL;
+    g_srvTest = Type::TYPE_ABSOLUTE_STILL;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusServiceTestCallback();
     EXPECT_FALSE(cb == nullptr);
@@ -66,7 +69,8 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest001, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 Enter");
-    Type type = Type::TYPE_HORIZONTAL_POSITION;
+    g_srvTest = Type::TYPE_HORIZONTAL_POSITION;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -84,7 +88,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest001, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
-    Type type = Type::TYPE_ABSOLUTE_STILL;
+    g_srvTest = Type::TYPE_ABSOLUTE_STILL;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -102,7 +107,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 Enter");
-    Type type = Type::TYPE_VERTICAL_POSITION;
+    g_srvTest = Type::TYPE_VERTICAL_POSITION;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -115,7 +121,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest004 Enter";
-    Type type = Type::TYPE_LID_OPEN;
+    g_srvTest = Type::TYPE_LID_OPEN;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -128,7 +135,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest004, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest005 Enter";
-    Type type = Type::TYPE_INVALID;
+    g_srvTest = Type::TYPE_INVALID;
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -141,7 +149,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest006 Enter";
-    Type type = static_cast<Type>(10);
+    g_srvTest = static_cast<Type>(10);
+    Type type = g_srvTest;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;

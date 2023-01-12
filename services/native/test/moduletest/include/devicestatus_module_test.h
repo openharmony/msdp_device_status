@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "devicestatus_callback_stub.h"
+#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -32,6 +33,7 @@ public:
         virtual ~DeviceStatusModuleTestCallback() {};
         virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
     };
+    static Type g_moduleTest;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
