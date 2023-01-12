@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DATA_H
-#define DRAG_DATA_H
+#ifndef DEVICESTATUS_HISYSEVENT_H
+#define DEVICESTATUS_HISYSEVENT_H
 
-#include <memory>
-#include <functional>
-#include <vector>
-#include "pixel_map.h"
+#include <string>
 
 namespace OHOS {
 namespace Msdp {
-
-struct DragData {
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap;
-    int32_t x { -1 };
-    int32_t y { -1 };
-    std::vector<uint8_t> buffer;
-    int32_t sourceType { -1 };
-};
-
+namespace DeviceStatus {
+void WriteSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type);
+void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type);
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DATA_H
+#endif // DEVICESTATUS_HISYSEVENT_H

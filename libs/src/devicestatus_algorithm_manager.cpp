@@ -58,7 +58,7 @@ ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
 {
     DEV_HILOGD(SERVICE, "Enter");
     switch (algoType_) {
-        case Type::TYPE_STILL: {
+        case Type::TYPE_ABSOLUTE_STILL: {
             if (still_ != nullptr) {
                 still_->RegisterCallback(callback);
             }
@@ -108,7 +108,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
 int32_t AlgoMgr::GetSensorTypeId(Type type)
 {
     switch (type) {
-        case Type::TYPE_STILL: {
+        case Type::TYPE_ABSOLUTE_STILL: {
             return SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
@@ -133,7 +133,7 @@ ErrCode AlgoMgr::Enable(Type type)
         return RET_ERR;
     }
     switch (type) {
-        case Type::TYPE_STILL: {
+        case Type::TYPE_ABSOLUTE_STILL: {
             if (!still_) {
                 DEV_HILOGE(SERVICE, "still_ is nullptr");
                 still_ = std::make_shared<AlgoAbsoluteStill>();
@@ -183,7 +183,7 @@ ErrCode AlgoMgr::Disable(Type type)
         return RET_ERR;
     }
     switch (type) {
-        case Type::TYPE_STILL: {
+        case Type::TYPE_ABSOLUTE_STILL: {
             if (still_) {
                 DEV_HILOGE(SERVICE, "still_ is not nullptr");
                 still_->Unsubscribe(type);

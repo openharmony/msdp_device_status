@@ -55,6 +55,8 @@ public:
 
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(int32_t &dragResult);
+    int32_t UpdateDragStyle(int32_t style);
+    int32_t UpdateDragMessage(const std::u16string &message);
 
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;

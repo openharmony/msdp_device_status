@@ -14,6 +14,7 @@
  */
 
 #include "devicestatusagent_fuzzer.h"
+#include "devicestatus_hilog_wrapper.h"
 
 using namespace std;
 using namespace OHOS;
@@ -41,10 +42,14 @@ void DeviceStatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
     TestUnsubscribeAgentEvent(agent_);
 }
 
-void DeviceStatusAgentFuzzer::TestUnsubscribeAgentEvent(const std::shared_ptr<DeviceStatusAgent>& agent_)
+void DeviceStatusAgentFuzzer::TestUnsubscribeAgentEvent(std::shared_ptr<DeviceStatusAgent> agent)
 {
     std::cout << "TestUnsubscribeAgentEvent: Enter " << std::endl;
-    agent_->UnsubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT);
+    if (agent == nullptr) {
+    DEV_HILOGE(SERVICE, "Agent is nullptr");
+    return;
+    }
+    agent->UnsubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT);
 }
 
 void DeviceStatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)

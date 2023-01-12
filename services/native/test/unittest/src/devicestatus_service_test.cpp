@@ -37,7 +37,7 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
 {
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusServiceTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_STILL &&
+    EXPECT_TRUE(devicestatusData.type == Type::TYPE_ABSOLUTE_STILL &&
         devicestatusData.value == OnChangedValue::VALUE_ENTER) << "DeviceStatusServiceTestCallback failed";
 }
 
@@ -48,7 +48,7 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
  */
 HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest, TestSize.Level0)
 {
-    Type type = Type::TYPE_STILL;
+    Type type = Type::TYPE_ABSOLUTE_STILL;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusServiceTestCallback();
     EXPECT_FALSE(cb == nullptr);
@@ -84,12 +84,12 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest001, TestSize.Level0)
 HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
-    Type type = Type::TYPE_STILL;
+    Type type = Type::TYPE_ABSOLUTE_STILL;
     auto& devicestatusClient = DeviceStatusClient::GetInstance();
     Data data = devicestatusClient.GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == Type::TYPE_STILL &&
+    EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
         data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 end");
 }

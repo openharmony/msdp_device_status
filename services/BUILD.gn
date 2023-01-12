@@ -58,6 +58,7 @@ ohos_shared_library("devicestatus_service") {
     "device_manager/src/enumerator.cpp",
     "device_manager/src/monitor.cpp",
     "native/src/devicestatus_dumper.cpp",
+    "native/src/devicestatus_hisysevent.cpp",
     "native/src/devicestatus_manager.cpp",
     "native/src/devicestatus_msdp_client_impl.cpp",
     "native/src/devicestatus_service.cpp",

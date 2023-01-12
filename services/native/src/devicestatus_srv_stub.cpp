@@ -73,7 +73,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case GET_COORDINATION_STATE: {
             return StubGetCoordinationState(data, reply);
         }
-        case ALLOC_SOCKET_FD : {
+        case ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
         }
         case START_DRAG : {
@@ -81,6 +81,12 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         }
         case STOP_DRAG : {
             return StubStartDrag(data, reply);
+        }
+        case UPDATED_DRAG_STYLE: {
+            return StubUpdateDragStyle(data, reply);
+        }
+        case UPDATED_DRAG_MESSAGE: {
+            return StubUpdateDragMessage(data, reply);
         }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -139,7 +145,6 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     DEV_HILOGD(SERVICE, "Exit");
-return RET_OK;
     return RET_OK;
 }
 
@@ -215,6 +220,30 @@ int32_t DeviceStatusSrvStub::StubGetCoordinationState(MessageParcel& data, Messa
     int32_t ret = GetCoordinationState(userData, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::StubUpdateDragStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t style;
+    READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = UpdateDragStyle(style);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call UpdateDragStyle failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::StubUpdateDragMessage(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::u16string message;
+    READSTRING16(data, message, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = UpdateDragMessage(message);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call UpdateDragMessage failed ret:%{public}d", ret);
     }
     return ret;
 }

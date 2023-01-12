@@ -131,12 +131,18 @@ void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bo
 
 int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 {
-    if (type == "still") {
-        return Type::TYPE_STILL;
+    if (type == "absoluteStill") {
+        return Type::TYPE_ABSOLUTE_STILL;
     } else if (type == "horizontalPosition") {
         return Type::TYPE_HORIZONTAL_POSITION;
     } else if (type == "verticalPosition") {
         return Type::TYPE_VERTICAL_POSITION;
+    } else if (type == "still") {
+        return Type::TYPE_STILL;
+    } else if (type == "relativeStill") {
+        return Type::TYPE_RELATIVE_STILL;
+    } else if (type == "carBluetooth") {
+        return Type::TYPE_CAR_BLUETOOTH;
     } else {
         return Type::TYPE_INVALID;
     }
@@ -316,7 +322,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     int32_t latency = latencyMode;
     DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
 
-    NAPI_ASSERT(env, (type >= Type::TYPE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
     NAPI_ASSERT(env, (event >= ActivityEvent::ENTER) && (event <= ActivityEvent::ENTER_EXIT), "event is illegal");
     NAPI_ASSERT(env, (latency >= ReportLatencyNs::SHORT) && (latency <= ReportLatencyNs::LONG), "latency is illegal");
     return SubscribeDeviceStatusCallback(env, info, args, type, event, latency);
@@ -346,7 +352,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= Type::TYPE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
     int32_t eventMode = 0;
     status = napi_get_value_int32(env, args[ARG_1], &eventMode);
     if (status != napi_ok) {
@@ -396,7 +402,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= Type::TYPE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
+    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
         if (g_obj == nullptr) {

@@ -33,6 +33,7 @@
 #include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
+#include "devicestatus_hisysevent.h"
 #include "devicestatus_permission.h"
 #include "devicestatus_service.h"
 
@@ -147,7 +148,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
     });
 
     std::vector<Data> datas;
-    for (auto type = TYPE_STILL;type <= TYPE_LID_OPEN;
+    for (auto type = TYPE_ABSOLUTE_STILL;type <= TYPE_LID_OPEN;
         type = (Type)(type+1)) {
         Data data = GetCache(type);
         if (data.value != OnChangedValue::VALUE_INVALID) {
@@ -218,7 +219,6 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
         DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
         return;
     }
-
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
@@ -226,12 +226,12 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-
     DeviceStatusDumper::GetInstance().SaveAppInfo(type, callback);
     devicestatusManager_->Subscribe(type, event, latency, callback);
     DEV_HILOGD(SERVICE, "Exit");
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
+    WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
@@ -243,10 +243,6 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     }
 
     auto appInfo = std::make_shared<AppInfo>();
-    if (appInfo == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is nullptr");
-        return;
-    }
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();
     appInfo->tokenId = IPCSkeleton::GetCallingTokenID();
@@ -258,6 +254,7 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     devicestatusManager_->Unsubscribe(type, event, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, false);
+    WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
 
 Data DeviceStatusService::GetCache(const Type& type)
@@ -643,6 +640,18 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     FI_HILOGW("Get coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
+}
+
+int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION

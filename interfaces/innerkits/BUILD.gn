@@ -43,8 +43,10 @@ ohos_shared_library("devicestatus_client") {
   sources = [
     "${device_status_frameworks_path}/native/event_handler/src/client_msg_handler.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
+    "${device_status_frameworks_path}/native/interaction/src/interaction_manager_impl.cpp",
     "${device_status_frameworks_path}/native/src/client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
+    "${device_status_frameworks_path}/native/src/devicestatus_callback_stub.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
     "${device_status_frameworks_path}/native/src/fd_listener.cpp",
