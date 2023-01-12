@@ -80,11 +80,12 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
         return RET_ERR;
     }
     g_IMock->Enable(type);
-    if (mockCallCount_.find(type) == mockCallCount_.end()) {
-        DEV_HILOGE(SERVICE, "Mock enable failed");
-        return RET_ERR;
+    auto iter = mockCallCount_.find(type);
+    if (iter == mockCallCount_.end()) {
+        mockCallCount_.emplace(type, 0);
+    } else {
+        iter->second++;
     }
-    mockCallCount_[type]++;
     RegisterMock();
     DEV_HILOGI(SERVICE, "mockCallCount_ %{public}d", mockCallCount_[type]);
     return RET_OK;
@@ -108,11 +109,13 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         DEV_HILOGE(SERVICE, "Enable algo Library failed");
         return RET_ERR;
     }
-    if (algoCallCount_.find(type) == algoCallCount_.end()) {
-        DEV_HILOGE(SERVICE, "algo enable failed");
-        return RET_ERR;
+
+    auto iter = algoCallCount_.find(type);
+    if (iter == algoCallCount_.end()) {
+        algoCallCount_.emplace(type, 0);
+    } else {
+        iter->second++;
     }
-    algoCallCount_[type]++;
     RegisterAlgo();
     DEV_HILOGI(SERVICE, "algoCallCount_ %{public}d", algoCallCount_[type]);
     return RET_OK;
@@ -185,21 +188,23 @@ ErrCode DeviceStatusMsdpClientImpl::SensorHdiDisable(Type type)
 
 ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 {
+    DEV_HILOGD(SERVICE, "Enter");
     if (g_IAlgo == nullptr) {
         DEV_HILOGE(SERVICE, "Algo disable failed, g_IAlgo is nullptr");
         return RET_ERR;
     }
-    if (algoCallCount_[type] == 0) {
-        DEV_HILOGE(SERVICE, "Algo not start");
+    auto iter = algoCallCount_.find(type);
+    if (iter == algoCallCount_.end()) {
+        DEV_HILOGE(SERVICE, "Failed to find record type");
         return RET_ERR;
     }
-    algoCallCount_[type]--;
-    if (algoCallCount_[type] != 0) {
-        DEV_HILOGE(SERVICE, "The number of subscriptions is greater than 1");
-        return RET_ERR;
+    if (iter->second == 0) {
+        algoCallCount_.erase(type);
+    } else {
+        g_IAlgo->Disable(type);
+        UnregisterAlgo();
     }
-    g_IAlgo->Disable(type);
-    UnregisterAlgo();
+    iter->second--;
     algoCallCount_.erase(type);
     if (algoCallCount_.empty()) {
         if (UnloadAlgoLibrary() == RET_ERR) {
@@ -209,30 +214,31 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
         DEV_HILOGI(SERVICE, "Close algorithm library");
         g_IAlgo = nullptr;
         g_callbacksMgr = nullptr;
-        return RET_OK;
     }
     DEV_HILOGI(SERVICE, "algoCallCount_ %{public}d", algoCallCount_[type]);
-    return RET_ERR;
+    return RET_OK;
 }
 
 ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 {
+    DEV_HILOGD(SERVICE, "Enter");
     if (g_IMock == nullptr) {
         DEV_HILOGE(SERVICE, "Mock disable failed, g_IMock is nullptr");
         return RET_ERR;
     }
-    if (mockCallCount_[type] == 0) {
-        DEV_HILOGE(SERVICE, "Mock not start");
+    auto iter = mockCallCount_.find(type);
+    if (iter == mockCallCount_.end()) {
+        DEV_HILOGE(SERVICE, "Failed to find record type");
         return RET_ERR;
     }
-    mockCallCount_[type]--;
-    if (mockCallCount_[type] != 0) {
-        DEV_HILOGE(SERVICE, "The number of subscriptions is greater than 1");
-        return RET_ERR;
+    if (iter->second == 0) {
+        mockCallCount_.erase(type);
+    } else {
+        g_IMock->DisableCount(type);
+        g_IMock->Disable(type);
+        UnregisterMock();
     }
-    mockCallCount_.erase(type);
-    g_IMock->Disable(type);
-    UnregisterMock();
+    iter->second--;
     if (mockCallCount_.empty()) {
         if (UnloadMockLibrary() == RET_ERR) {
             DEV_HILOGE(SERVICE, "Failed to close library");
@@ -251,7 +257,6 @@ ErrCode DeviceStatusMsdpClientImpl::ImplCallback(const Data& data)
         return RET_ERR;
     }
     g_callbacksMgr(data);
-
     return RET_OK;
 }
 
@@ -264,6 +269,7 @@ ErrCode DeviceStatusMsdpClientImpl::RegisterImpl(const CallbackManager& callback
 
 void DeviceStatusMsdpClientImpl::OnResult(const Data& data)
 {
+    DEV_HILOGD(SERVICE, "type:%{public}d,value:%{public}d", data.type, data.value);
     MsdpCallback(data);
 }
 
@@ -282,12 +288,10 @@ ErrCode DeviceStatusMsdpClientImpl::RegisterMock()
 ErrCode DeviceStatusMsdpClientImpl::UnregisterMock()
 {
     DEV_HILOGD(SERVICE, "Enter");
-
     if (g_IMock == nullptr) {
         DEV_HILOGE(SERVICE, "Unregister mock callback failed");
         return RET_ERR;
     }
-
     g_IMock->UnregisterCallback();
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -374,6 +378,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (mock_.handle != nullptr) {
+        DEV_HILOGE(SERVICE, "mock handle is not nullptr");
         return RET_OK;
     }
     mock_.handle = dlopen(static_cast<std::string>(DEVICESTATUS_MOCK_LIB_PATH).c_str(), RTLD_LAZY);
@@ -396,7 +401,6 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
         DEV_HILOGE(SERVICE, "Load mock failed");
         return RET_ERR;
     }
-    mock_.pAlgorithm = mock_.create();
     return RET_OK;
 }
 
@@ -404,7 +408,7 @@ ErrCode DeviceStatusMsdpClientImpl::UnloadMockLibrary()
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (mock_.handle == nullptr) {
-        DEV_HILOGE(SERVICE, "Unload mock failed");
+        DEV_HILOGE(SERVICE, "mock handle is nullptr");
         return RET_ERR;
     }
     if (mock_.pAlgorithm != nullptr) {
@@ -435,6 +439,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (algo_.handle != nullptr) {
+        DEV_HILOGE(SERVICE, "algo handle has exists");
         return RET_OK;
     }
     algo_.handle = dlopen(static_cast<std::string>(DEVICESTATUS_ALGO_LIB_PATH).c_str(), RTLD_LAZY);
@@ -457,7 +462,6 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
         DEV_HILOGE(SERVICE, "Load algo failed");
         return RET_ERR;
     }
-    algo_.pAlgorithm = algo_.create();
     return RET_OK;
 }
 
@@ -486,10 +490,8 @@ IMsdp* DeviceStatusMsdpClientImpl::GetAlgoInst(Type type)
     }
     if (algo_.pAlgorithm == nullptr) {
         std::unique_lock<std::mutex> lock(mMutex_);
-        algoCallCount_[type] = 0;
         algo_.pAlgorithm = algo_.create();
     }
-
     return algo_.pAlgorithm;
 }
 } // namespace DeviceStatus

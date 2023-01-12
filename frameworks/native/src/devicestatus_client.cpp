@@ -139,12 +139,15 @@ void DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, spt
         DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
         return;
     }
-    if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN) {
-        devicestatusProxy_->Unsubscribe(type, event, callback);
+    if ((type < TYPE_INVALID) || (type > TYPE_MAX)) {
+        DEV_HILOGE(INNERKIT, "type out of range");
+        return;
     }
-    if (event > ActivityEvent::EVENT_INVALID && event <= ActivityEvent::ENTER_EXIT) {
-        DEV_HILOGE(SERVICE, "event is failed");
+    if (event < ActivityEvent::EVENT_INVALID || event > ActivityEvent::ENTER_EXIT) {
+        DEV_HILOGE(INNERKIT, "event out of range");
+        return;
     }
+    devicestatusProxy_->Unsubscribe(type, event, callback);
     DEV_HILOGD(INNERKIT, "Exit");
     return;
 }

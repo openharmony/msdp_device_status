@@ -29,7 +29,6 @@ void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusDa
 {
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL(remote == nullptr);
-    DEV_HILOGE(INNERKIT, "remote is nullptr");
 
     std::map<Type, int32_t>::iterator typeHandler =
         DeviceStatusClient::GetInstance().GetTypeMap().find(devicestatusData.type);
