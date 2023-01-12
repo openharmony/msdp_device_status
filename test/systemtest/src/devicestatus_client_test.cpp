@@ -178,7 +178,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
-        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+        data.value == OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 end");
 }
 
