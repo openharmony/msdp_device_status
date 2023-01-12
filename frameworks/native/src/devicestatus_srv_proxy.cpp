@@ -232,6 +232,46 @@ int32_t DeviceStatusSrvProxy::StopCoordination(int32_t userData)
     return ret;
 }
 
+int32_t DeviceStatusSrvProxy::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, style, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UPDATED_DRAG_STYLE, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::UpdateDragMessage(const std::u16string &message)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING16(data, message, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UPDATED_DRAG_MESSAGE, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
