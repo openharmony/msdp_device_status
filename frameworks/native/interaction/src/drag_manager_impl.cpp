@@ -25,9 +25,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManagerImpl" };
 } // namespace
 
-DragManagerImpl::DragManagerImpl() {}
-DragManagerImpl::~DragManagerImpl() {}
-
 int32_t DragManagerImpl::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
