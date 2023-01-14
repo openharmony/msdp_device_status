@@ -165,6 +165,12 @@ int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
     CALL_DEBUG_ENTER;
     return DragMgrImpl.UpdateDragMessage(message);
 }
+
+int32_t InteractionManagerImpl::GetDragTargetPid()
+{
+    CALL_DEBUG_ENTER;
+    return DragMgrImpl.GetDragTargetPid();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

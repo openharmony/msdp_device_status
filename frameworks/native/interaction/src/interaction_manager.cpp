@@ -73,6 +73,11 @@ int32_t InteractionManager::UpdateDragMessage(const std::u16string &message)
 {
     return InteractionMgrImpl.UpdateDragMessage(message);
 }
+
+int32_t InteractionManager::GetDragTargetPid()
+{
+    return InteractionMgrImpl.GetDragTargetPid();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
