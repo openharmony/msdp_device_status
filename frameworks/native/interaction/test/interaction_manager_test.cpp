@@ -203,8 +203,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetCoordinationState
- * @tc.desc: Get coordination state
+ * @tc.name: InteractionManagerTest_GetDragTargetPid
+ * @tc.desc: Get Drag Target Pid
  * @tc.type: FUNC
  * @tc.require:
  */
