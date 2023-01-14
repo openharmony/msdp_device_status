@@ -30,6 +30,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static Type g_agentTest;
 };
 class DeviceStatusAgentListenerMockFirstClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
 public:

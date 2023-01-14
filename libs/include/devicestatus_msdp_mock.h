@@ -16,6 +16,7 @@
 #ifndef DEVICESTATUS_MSDP_MOCK_H
 #define DEVICESTATUS_MSDP_MOCK_H
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -31,8 +32,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusMsdpMock final : public IMsdp {
 public:
-    DeviceStatusMsdpMock() = default;
-    ~DeviceStatusMsdpMock() = default;
+    DeviceStatusMsdpMock();
+    ~DeviceStatusMsdpMock();
 
     enum EventType {
         EVENT_UEVENT_FD,
@@ -66,13 +67,13 @@ private:
 
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<DeviceStatusDataParse> dataParse_;
-    bool scFlag_ {true};
     int32_t timerInterval_ {-1};
     int32_t timerFd_ {-1};
     int32_t epFd_ {-1};
     std::mutex mutex_;
-    static std::vector<int32_t> enabledType_;
-    bool alive_ {true};
+    std::vector<int32_t> enabledType_;
+    std::atomic<bool> alive_ {false};
+    std::shared_ptr<std::thread> thread_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

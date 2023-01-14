@@ -15,17 +15,15 @@
 #ifndef DRAG_MANAGER_IMPL_H
 #define DRAG_MANAGER_IMPL_H
 
-#include "singleton.h"
+#include <string>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManagerImpl final {
-    DECLARE_SINGLETON(DragManagerImpl);
-
+class DragManagerImpl  {
 public:
-    DISALLOW_MOVE(DragManagerImpl);
-
+    DragManagerImpl() = default;
+    ~DragManagerImpl() = default;
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();
@@ -33,7 +31,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#define DragMgrImpl ::OHOS::Singleton<DragManagerImpl>::GetInstance()
-
 #endif // DRAG_MANAGER_IMPL_H

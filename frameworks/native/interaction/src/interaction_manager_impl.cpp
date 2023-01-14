@@ -17,7 +17,6 @@
 
 #include "coordination_manager_impl.h"
 #include "devicestatus_define.h"
-#include "drag_manager_impl.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -157,13 +156,13 @@ int32_t InteractionManagerImpl::GetCoordinationState(
 int32_t InteractionManagerImpl::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.UpdateDragStyle(style);
+    return dragManagerImpl_.UpdateDragStyle(style);
 }
 
 int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.UpdateDragMessage(message);
+    return dragManagerImpl_.UpdateDragMessage(message);
 }
 
 int32_t InteractionManagerImpl::GetDragTargetPid()
