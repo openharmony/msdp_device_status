@@ -168,7 +168,7 @@ int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t InteractionManagerImpl::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.GetDragTargetPid();
+    return dragManagerImpl_.GetDragTargetPid();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

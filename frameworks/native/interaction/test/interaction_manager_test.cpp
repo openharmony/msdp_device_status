@@ -201,6 +201,20 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
+
+/**
+ * @tc.name: InteractionManagerTest_GetCoordinationState
+ * @tc.desc: Get coordination state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragTargetPid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    ASSERT_TRUE(pid >= -1);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
