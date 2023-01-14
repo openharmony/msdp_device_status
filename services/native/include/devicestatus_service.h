@@ -32,6 +32,7 @@
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
 #include "drag_data.h"
+#include "drag_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -124,6 +125,9 @@ private:
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
 
+    int32_t OnStartDrag(const DragData &dragData, int32_t pid);
+    int32_t OnStopDrag(int32_t &dragResult);
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
@@ -134,8 +138,6 @@ private:
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-    int32_t OnStartDrag();
-    int32_t OnStopDrag();
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
     std::thread t_;
@@ -145,6 +147,7 @@ private:
     std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
+    DragManager dragManager_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

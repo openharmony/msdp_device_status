@@ -88,6 +88,8 @@ ohos_unittest("InteractionManagerTest") {
   include_dirs = [
     "//base/msdp/device_status/interfaces/innerkits/interaction/include",
     "//base/msdp/device_status/utils/common/include",
+    "//foundation/multimedia/image_framework/interfaces/innerkits/include",
+    # "//foundation/multimedia/image_framework/mock/native/include"
   ]
 
   defines = []
@@ -96,7 +98,12 @@ ohos_unittest("InteractionManagerTest") {
 
   configs = []
 
-  deps =
-      [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  deps = [ 
+    "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" 
+  ]
+  external_deps = [ 
+    "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_framework:image_native",
+    "c_utils:utils"
+  ]
 }

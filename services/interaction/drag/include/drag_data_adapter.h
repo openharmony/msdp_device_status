@@ -12,39 +12,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DRAG_MANAGER_IMPL_H
-#define DRAG_MANAGER_IMPL_H
 
-#include <functional>
-#include <mutex>
+#ifndef DRAG_DATA_ADAPTER_H
+#define DRAG_DATA_ADAPTER_H
+#include <string>
 
-#include "singleton.h"
 #include "drag_data.h"
+#include "hitrace_meter.h"
+#include "pointer_style.h"
+#include "singleton.h"
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManagerImpl final {
-    DECLARE_SINGLETON(DragManagerImpl);
+class DragDataAdapter final {
+    DECLARE_SINGLETON(DragDataAdapter);
 
 public:
-    DISALLOW_MOVE(DragManagerImpl);
+    DISALLOW_MOVE(DragDataAdapter);
 
+    void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
-    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
-    int32_t StopDrag(int32_t &dragResult);
-private:
-    void SetCallback(std::function<void(int32_t&)> callback);
+    const DragData& GetDragData();
+    int32_t GetDragStyle() const;
+    const std::u16string& GetDragMessage() const;
 
 private:
-    std::mutex mtx_;
-    std::function<void(int32_t&)> stopCallback_;
+    DragData dragData_;
+    int32_t dragStyle_ { -1 };
+    std::u16string dragMessage_;
+
 };
-} // namespace DeviceStatus
+
+#define  DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()
+} // namespace DragDataAdapter
 } // namespace Msdp
 } // namespace OHOS
-
-#define DragMgrImpl ::OHOS::Singleton<DragManagerImpl>::GetInstance()
-
-#endif // DRAG_MANAGER_IMPL_H
+#endif // DRAG_DATA_ADAPTER_H

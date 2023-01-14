@@ -56,15 +56,9 @@ int32_t DragManagerImpl::StopDrag(int32_t &dragResult)
 void DragManagerImpl::SetCallback(std::function<void(int32_t&)> callback)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     CHKPV(callback);
     stopCallback_ = callback;
-}
-
-std::function<void(int32_t&)> DragManagerImpl::GetCallback()
-{
-    CALL_DEBUG_ENTER;
-    CHKPP(stopCallback_);
-    return stopCallback_;
 }
 
 } // namespace DeviceStatus

@@ -29,6 +29,7 @@ config("devicestatus_services_private_config") {
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
     "${device_status_service_path}/interaction/coordination/lib/include",
+    "${device_status_service_path}//interaction/drag/include",
     "//utils/system/safwk/native/include",
     "//foundation/multimedia/image_framework/interfaces/innerkits/include",
   ]
@@ -43,6 +44,7 @@ config("devicestatus_services_public_config") {
     "native/include",
     "timer_manager/include",
     "device_manager/include",
+    "${device_status_service_path}//interaction/drag/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
@@ -77,6 +79,7 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_utils_path}:devicestatus_util",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/openssl:libcrypto_shared",
+    "interaction/drag:drag_part"
   ]
 
   if (fusion_interaction_coordination) {
@@ -95,6 +98,7 @@ ohos_shared_library("devicestatus_service") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "multimedia_image_framework:image_native",
+    "input:libmmi-client"
   ]
 
   if (fusion_interaction_coordination) {

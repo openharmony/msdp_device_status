@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 
-#include "message_parcel.h"
+#include "devicestatus_srv_stub.h"
 
+#include "message_parcel.h"
 #include "fi_log.h"
 #include "util.h"
-
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
-#include "devicestatus_srv_stub.h"
 #include "devicestatus_srv_proxy.h"
 #include "idevicestatus_callback.h"
 #include "pixel_map.h"
@@ -286,7 +285,6 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
 
 int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& reply)
 {
-    // TODO 解包, 调用service对应的函数
     CALL_DEBUG_ENTER;
     DragData dragData;
     dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
@@ -297,7 +295,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
 
     int32_t ret = StartDrag(dragData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
+        FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
     }
     return ret;
 }

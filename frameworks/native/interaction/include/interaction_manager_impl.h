@@ -33,7 +33,6 @@ public:
     DISALLOW_MOVE(InteractionManagerImpl);
     
     bool InitClient();
-
     int32_t RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener);
     int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
     int32_t EnableCoordination(bool enabled, std::function<void(std::string, CoordinationMessage)> callback);
@@ -41,7 +40,6 @@ public:
         std::function<void(std::string, CoordinationMessage)> callback);
     int32_t StopCoordination(std::function<void(std::string, CoordinationMessage)> callback);
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
-
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,76 +13,63 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_H
-#define DRAG_H
+#ifndef DRAG_MANAGER_H
+#define DRAG_MANAGER_H
+
 #include <functional>
 #include <memory>
+#include <vector>
+
 #include "drag_data.h"
 #include "pixel_map.h"
 #include "input_manager.h"
+#include "drag_drawing.h"
+#include "devicestatus_define.h"
+#include "i_input_event_consumer.h"
 
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class Drag {
+class DragManager {
 public:
-    enum class DragState{
-        NORMAL = -1,
-        START_DRAG = 0,
-        DRAGGING = 1,
-        STOP_DRAG = 2,
-    };
-
-    enum class DragResult {
-        DRAG_SUCCESS = 0,
-        DRAG_FAIL = 1,
-        DRAG_CANCEL = 2,
-    };
-
-    using FuncDragCallback = std::function<void(int32_t)>;
-
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
         explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
+        void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 
 public:
-    Drag();
-    virtual ~Drag();
+    DragManager() {
+        monitorConsumer_ = std::make_shared<MonitorConsumer>(nullptr);
+    }
+    ~DragManager() = default;
 
-    void Init();
-
-    int32_t StartDrag(const DragData &dragData);
-
+    int32_t StartDrag(const DragData &dragData, int32_t pid);
     int32_t StopDrag(int32_t &dragResult);
-
-    void OnStop();
-
-private:
-    bool IsStarting() const;
-
-    bool IsStopping() const;
-
-    bool IsDragging() const;
-
-    bool IsNormal() const;
-
-    void SetExtraData(ExtraData &extraData);
-
+    int32_t GetDragTargetPid();
+    int32_t AddMonitor(int32_t pid);
+    int32_t RemoveMonitor(int32_t monitorId);
 
 private:
-    DragState dragState_ { DragState::NORMAL };
-    bool isStarting_ { false };
-    bool isSTopping_ { false };
+    int32_t NotifyMonitor(DragState dragState);
+    MMI::ExtraData ConstructExtraData(const DragData &dragData, bool appended);
+    void TestStartDrag(const DragData &dragData, int32_t pid);
+
+private:
+    DragState dragState_ { DragState::FREE };
     int32_t monitorId_ { -1 };
-    int32_t callingPid_ { -1 };
-    DragData dragData_;
+    int32_t dragOutPid_ { -1 };
+    int32_t dragTargetPid_ { -1 };
+    std::vector<int32_t> monitors_;
+    std::shared_ptr<MonitorConsumer> monitorConsumer_;
+    DragDrawing dragDrawing_;
 };
-} // namespace Drag
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_H
+#endif // DRAG_MANAGER_H
