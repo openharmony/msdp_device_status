@@ -17,26 +17,23 @@
 
 #include <functional>
 #include <mutex>
+#include <string>
 
-#include "singleton.h"
 #include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManagerImpl final {
-    DECLARE_SINGLETON(DragManagerImpl);
-
+class DragManagerImpl  {
 public:
-    DISALLOW_MOVE(DragManagerImpl);
-
+    DragManagerImpl() = default;
+    ~DragManagerImpl() = default;
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
     int32_t StopDrag(int32_t &dragResult);
 private:
     void SetCallback(std::function<void(int32_t&)> callback);
-
 private:
     std::mutex mtx_;
     std::function<void(int32_t&)> stopCallback_;
@@ -44,7 +41,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#define DragMgrImpl ::OHOS::Singleton<DragManagerImpl>::GetInstance()
-
 #endif // DRAG_MANAGER_IMPL_H

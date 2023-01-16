@@ -28,10 +28,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-AlgoMgr* g_algo;
-} // namespace
-
 bool AlgoMgr::StartSensor(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
@@ -97,7 +93,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
     }
     SensorInfo *pt = sensorInfo + count;
     for (SensorInfo *ps = sensorInfo; ps < pt; ++ps) {
-        if (sensorInfo -> sensorTypeId == sensorTypeId) {
+        if (sensorInfo->sensorTypeId == sensorTypeId) {
             return true;
         }
     }
@@ -242,9 +238,7 @@ ErrCode AlgoMgr::UnregisterSensor(Type type)
 extern "C" IMsdp *Create(void)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    g_algo = new (std::nothrow) AlgoMgr();
-    DEV_HILOGD(SERVICE, "Exit");
-    return g_algo;
+    return new (std::nothrow) AlgoMgr();
 }
 
 extern "C" void Destroy(const IMsdp* algorithm)

@@ -70,8 +70,8 @@ private:
     IMsdp* GetMockInst(Type type);
     MsdpAlgoHandle mock_;
     MsdpAlgoHandle algo_;
-    std::map<Type, int32_t> algoCallCount_;
-    std::map<Type, int32_t> mockCallCount_;
+    std::map<Type, uint32_t> algoCallCount_;
+    std::map<Type, uint32_t> mockCallCount_;
 
     std::mutex mMutex_;
     bool notifyManagerFlag_ = false;

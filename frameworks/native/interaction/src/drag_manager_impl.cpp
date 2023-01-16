@@ -25,9 +25,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManagerImpl" };
 } // namespace
 
-DragManagerImpl::DragManagerImpl() {}
-DragManagerImpl::~DragManagerImpl() {}
-
 int32_t DragManagerImpl::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
@@ -60,7 +57,6 @@ void DragManagerImpl::SetCallback(std::function<void(int32_t&)> callback)
     CHKPV(callback);
     stopCallback_ = callback;
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

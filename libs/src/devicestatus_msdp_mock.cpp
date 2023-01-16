@@ -34,26 +34,26 @@ constexpr int32_t TIMER_INTERVAL = 3;
 constexpr int32_t ERR_INVALID_FD = -1;
 DeviceStatusMsdpMock* g_msdpMock = nullptr;
 } // namespace
+DeviceStatusMsdpMock::DeviceStatusMsdpMock()
+{
+    if (dataParse_ == nullptr) {
+        dataParse_ = std::make_unique<DeviceStatusDataParse>();
+    }
+}
 
-std::vector<int32_t> DeviceStatusMsdpMock::enabledType_ =
-    std::vector<int32_t> (static_cast<int32_t>(Type::TYPE_MAX),
-    static_cast<int32_t>(TypeValue::INVALID));
+DeviceStatusMsdpMock::~DeviceStatusMsdpMock()
+{
+    callbacks_.clear();
+}
 
 bool DeviceStatusMsdpMock::Init()
 {
     DEV_HILOGD(SERVICE, "DeviceStatusMsdpMock: Enter");
-    if (dataParse_ == nullptr) {
-        dataParse_ = std::make_unique<DeviceStatusDataParse>();
-        dataParse_->CreateJsonFile();
-    }
-    InitMockStore();
     InitTimer();
     StartThread();
     DEV_HILOGD(SERVICE, "DeviceStatusMsdpMock: Exit");
     return true;
 }
-
-void DeviceStatusMsdpMock::InitMockStore() {}
 
 ErrCode DeviceStatusMsdpMock::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
 {
@@ -72,8 +72,7 @@ ErrCode DeviceStatusMsdpMock::UnregisterCallback()
 ErrCode DeviceStatusMsdpMock::Enable(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    int32_t item = int32_t(type);
-    enabledType_[item] = int32_t(TypeValue::VALID);
+    alive_ = true;
     Init();
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -82,7 +81,7 @@ ErrCode DeviceStatusMsdpMock::Enable(Type type)
 ErrCode DeviceStatusMsdpMock::Disable(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    scFlag_ = false;
+    alive_ = false;
     CloseTimer();
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -91,7 +90,6 @@ ErrCode DeviceStatusMsdpMock::Disable(Type type)
 ErrCode DeviceStatusMsdpMock::DisableCount(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    enabledType_[type] = int32_t(TypeValue::INVALID);
     dataParse_->DisableCount(type);
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -143,11 +141,10 @@ void DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
         DEV_HILOGE(SERVICE, "create timer fd failed");
         return;
     }
-    if (interval != 0) {
-        timerInterval_ = interval;
-    }
+
     if (interval < 0) {
-        interval = 0;
+        DEV_HILOGE(SERVICE, "Illegal time interval");
+        return;
     }
     struct itimerspec itval;
     itval.it_interval.tv_sec = interval;
@@ -179,15 +176,16 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    Data data;
     for (int32_t n = int(Type::TYPE_ABSOLUTE_STILL); n < Type::TYPE_MAX; ++n) {
-        if (enabledType_[n] == TypeValue::VALID) {
-            Type type = Type(n);
-            if (dataParse_ != nullptr) {
-                dataParse_->ParseDeviceStatusData(data, type);
-            }
-            NotifyMsdpImpl(data);
+        Type type = Type(n);
+        if (dataParse_ == nullptr) {
+            DEV_HILOGE(SERVICE, "dataParse_ is nullptr");
+            return;
         }
+        Data data;
+        dataParse_->ParseDeviceStatusData(data, type);
+        DEV_HILOGD(SERVICE, "mock type: %{public}d,value: %{public}d", data.type, data.value);
+        NotifyMsdpImpl(data);
     }
 }
 
@@ -213,7 +211,8 @@ int32_t DeviceStatusMsdpMock::RegisterTimerCallback(const int32_t fd, const Even
 void DeviceStatusMsdpMock::StartThread()
 {
     DEV_HILOGD(SERVICE, "Enter");
-    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, this)->detach();
+    thread_ = std::make_shared<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, this);
+    thread_ ->detach();
 }
 
 void DeviceStatusMsdpMock::LoopingThreadEntry()
@@ -225,10 +224,11 @@ void DeviceStatusMsdpMock::LoopingThreadEntry()
     size_t cbct = callbacks_.size();
     struct epoll_event events[cbct];
     while (alive_) {
-        int32_t timeout = -1;
+        int32_t timeout = 200;
         int32_t nevents = epoll_wait(epFd_, events, cbct, timeout);
         if (nevents == -1) {
-            continue;
+            DEV_HILOGE(SERVICE, "No events available");
+            return;
         }
         for (int32_t n = 0; n < nevents; ++n) {
             if (events[n].data.ptr) {

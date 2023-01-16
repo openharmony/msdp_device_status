@@ -19,6 +19,7 @@
 #include <mutex>
 
 #include "client.h"
+#include "drag_manager_impl.h"
 #include "interaction_manager.h"
 #include "singleton.h"
 #include "drag_data.h"
@@ -48,6 +49,7 @@ public:
 private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
+    DragManagerImpl dragManagerImpl_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -194,10 +194,6 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     sptr<IRemoteDevStaCallback> callback)
 {
     DEV_RET_IF_NULL(callback == nullptr);
-    if (!Enable(type)) {
-        DEV_HILOGE(SERVICE, "Enable failed!");
-        return;
-    }
     event_ = event;
     type_ = type;
     arrs_ [type_] = event_;
@@ -225,6 +221,10 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
     }
+    if (!Enable(type)) {
+        DEV_HILOGE(SERVICE, "Enable failed!");
+        return;
+    }
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
@@ -239,6 +239,7 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     std::lock_guard lock(mutex_);
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
+        DEV_HILOGE(SERVICE, "Failed to find listener for type");
         return;
     }
     DEV_HILOGI(SERVICE, "callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());

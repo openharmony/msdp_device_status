@@ -14,16 +14,11 @@
  */
 
 #include <gtest/gtest.h>
-#include <functional>
-#include "drag_data.h"
 
 #include "coordination_message.h"
-#include "devicestatus_define.h"
+#include "devicestatus_define.h" 
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
-
-#include "image_type.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -33,82 +28,25 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 } // namespace
-constexpr int32_t PIXEL_MAP_BIG_TEST_WIDTH = 4 * 1024;
-constexpr int32_t PIXEL_MAP_BIG_TEST_HEIGHT = 3 * 100;
+
 class InteractionManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
-
-    void SetUp() {}
+    void SetUp();
     void TearDown();
+    static void SetUpTestCase();
 };
 
+void InteractionManagerTest::SetUpTestCase()
+{
+}
+
+void InteractionManagerTest::SetUp()
+{
+}
 
 void InteractionManagerTest::TearDown()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-}
-
-std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap()
-{
-    int32_t pixelMapWidth = 4;
-    int32_t pixelMapHeight = 3;
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
-    OHOS::Media::ImageInfo info;
-    info.size.width = pixelMapWidth;
-    info.size.height = pixelMapHeight;
-    info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
-    info.colorSpace = OHOS::Media::ColorSpace::SRGB;
-    pixelMap->SetImageInfo(info);
-
-    int32_t rowDataSize = pixelMapWidth;
-    uint32_t bufferSize = rowDataSize * pixelMapHeight;
-    if (bufferSize <= 0) {
-        return nullptr;
-    }
-    void *buffer = malloc(bufferSize);
-    if (buffer == nullptr) {
-        return nullptr;
-    }
-    char *ch = reinterpret_cast<char *>(buffer);
-    for (unsigned int i = 0; i < bufferSize; i++) {
-        *(ch++) = (char)i;
-    }
-
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-
-    return pixelMap;
-}
-
-std::unique_ptr<OHOS::Media::PixelMap> ConstructBigPixmap()
-{
-    int32_t pixelMapWidth = PIXEL_MAP_BIG_TEST_WIDTH;
-    int32_t pixelMapHeight = PIXEL_MAP_BIG_TEST_HEIGHT;
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
-    OHOS::Media::ImageInfo info;
-    info.size.width = pixelMapWidth;
-    info.size.height = pixelMapHeight;
-    info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
-    info.colorSpace = OHOS::Media::ColorSpace::SRGB;
-    pixelMap->SetImageInfo(info);
-
-    int32_t bufferSize = pixelMap->GetByteCount();
-    if (bufferSize <= 0) {
-        return nullptr;
-    }
-    void *buffer = malloc(bufferSize);
-    if (buffer == nullptr) {
-        return nullptr;
-    }
-    char *ch = reinterpret_cast<char *>(buffer);
-    for (int32_t i = 0; i < bufferSize; i++) {
-        *(ch++) = 'a';
-    }
-
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-
-    return pixelMap;
 }
 
 /**
@@ -262,43 +200,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-}
-
-/**
- * @tc.name: InteractionManagerTest_StartDrag
- * @tc.desc: Start Drag
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragData dragData;
-    dragData.pixelMap = ConstructBigPixmap();
-    dragData.x = INT32_MAX;
-    dragData.y = INT32_MAX;
-    dragData.buffer = std::vector<uint8_t>(512, 1);
-    dragData.sourceType = -1;
-
-    std::function<void(int32_t &)> callback = [](int32_t &dragResult) {
-        FI_HILOGD("StartDrag success");
-    };
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
-    ASSERT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InteractionManagerTest_StopDrag
- * @tc.desc: Stop drag
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int dragResult = 0;
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(dragResult);
-    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -158,25 +158,25 @@ int32_t InteractionManagerImpl::GetCoordinationState(
 int32_t InteractionManagerImpl::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.UpdateDragStyle(style);
+    return dragManagerImpl_.UpdateDragStyle(style);
 }
 
 int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.UpdateDragMessage(message);
+    return dragManagerImpl_.UpdateDragMessage(message);
 }
 
 int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.StartDrag(dragData, callback);
+    return dragManagerImpl_.StartDrag(dragData, callback);
 }
 
 int32_t InteractionManagerImpl::StopDrag(int32_t &dragResult)
 {
     CALL_DEBUG_ENTER;
-    return DragMgrImpl.StopDrag(dragResult);
+    return dragManagerImpl_.StopDrag(dragResult);
 }
 
 } // namespace DeviceStatus
