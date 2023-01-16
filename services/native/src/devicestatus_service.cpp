@@ -22,18 +22,17 @@
 
 #include <ipc_skeleton.h>
 
-#include "hitrace_meter.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "string_ex.h"
-#include "system_ability_definition.h"
-#include "hisysevent.h"
-
 #include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_hisysevent.h"
 #include "devicestatus_permission.h"
+#include "hitrace_meter.h"
+#include "hisysevent.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "string_ex.h"
+#include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
