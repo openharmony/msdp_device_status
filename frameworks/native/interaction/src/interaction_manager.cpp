@@ -21,8 +21,6 @@
 #include "drag_data.h"
 #include "devicestatus_define.h"
 
-
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

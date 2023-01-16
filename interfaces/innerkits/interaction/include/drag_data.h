@@ -42,8 +42,6 @@ enum class DragResult {
     DRAG_FAIL = 1,
     DRAG_CANCEL = 2,
 };
-
-
 } // namespace Msdp
 } // namespace OHOS
 #endif // DRAG_DATA_H

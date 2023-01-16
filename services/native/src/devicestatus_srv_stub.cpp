@@ -302,7 +302,6 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
 
 int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
 {
-    // TODO 解包， 调用service对应的函数
     CALL_DEBUG_ENTER;
     int32_t dragResult;
     READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);

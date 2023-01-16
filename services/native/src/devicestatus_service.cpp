@@ -645,7 +645,6 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    // 编译不通过，主要似乎是DragData里边的 unique_ptr 导致的, 加std::ref之后编译ok，但是大概率不work
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
     if (ret != RET_OK) {
@@ -806,7 +805,6 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    // 把Session是不是也要传下去
     dragManager_.StartDrag(dragData, pid);
     return RET_OK;
 }

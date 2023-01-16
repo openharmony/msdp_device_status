@@ -302,13 +302,12 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    // TODO 打包数据如何打包
     if (!dragData.pixelMap->Marshalling(data)) {
         FI_HILOGE("Failed to marshall pixelMap");
     }
     WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
-    WRITEUInt8Vector(data, dragData.buffer, ERR_INVALID_VALUE); // 这个为啥找不到
+    WRITEUInt8Vector(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;

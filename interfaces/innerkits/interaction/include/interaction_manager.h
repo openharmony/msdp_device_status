@@ -87,7 +87,7 @@ public:
      */
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
-        /**
+    /**
      * @brief 开始拖拽接口。
      * @param dragData 拖拽传入数据
      * @param dragData 拖拽结束回调

@@ -21,7 +21,6 @@
 #include "hitrace_meter.h"
 #include "pointer_style.h"
 #include "singleton.h"
-#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {

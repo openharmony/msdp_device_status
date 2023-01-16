@@ -17,15 +17,15 @@
 #define DEVICESTATUS_CLIENT_H
 
 #include <functional>
-#include <singleton.h>
 #include <map>
+#include <singleton.h>
 
-#include "idevicestatus.h"
-#include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_common.h"
-#include "i_coordination_listener.h"
 #include "drag_data.h"
+#include "i_coordination_listener.h"
+#include "idevicestatus.h"
+#include "idevicestatus_callback.h"
 
 namespace OHOS {
 namespace Msdp {

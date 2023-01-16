@@ -18,7 +18,6 @@
 
 #include "pixel_map.h"
 
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
