@@ -54,13 +54,6 @@ namespace Msdp {
         } \
     } while (0)
 
-#define THROWERR(env, desc) \
-    do { \
-        FI_HILOGE("%{public}s", (#desc)); \
-        auto infoTemp = std::string(__FUNCTION__)+ ": " + #desc; \
-        napi_throw_error(env, nullptr, infoTemp.c_str()); \
-    } while (0)
-
 namespace UtilNapi {
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 } // namespace UtilNapi

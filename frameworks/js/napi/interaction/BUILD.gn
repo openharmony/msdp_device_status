@@ -15,40 +15,23 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("interaction_config") {
-  visibility = [ ":coordination" ]
+  visibility = [
+    ":coordination",
+    ":drag",
+  ]
 
   include_dirs = [
-    "include",
+    "./coordination/include",
+    "./drag/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_frameworks_path}/native/interaction/include",
   ]
 }
 
-ohos_shared_library("coordination") {
-  sources = [
-    "src/js_coordination_context.cpp",
-    "src/js_coordination_manager.cpp",
-    "src/js_event_target.cpp",
-    "src/js_util.cpp",
-    "src/native_register_module.cpp",
-  ]
-
-  configs = [ ":interaction_config" ]
-
-  deps = [
-    "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-    "//third_party/libuv:uv",
-  ]
-
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "napi:ace_napi",
-  ]
-
-  relative_install_dir = "module/device_status"
-  subsystem_name = "msdp"
-  part_name = "${device_status_part_name}"
+group("interaction_jsapi_group") {
+  deps = [ "${device_status_frameworks_path}/js/napi/interaction/drag:drag" ]
+  if (fusion_interaction_coordination) {
+    deps += [ "${device_status_frameworks_path}/js/napi/interaction/coordination:coordination" ]
+  }
 }
