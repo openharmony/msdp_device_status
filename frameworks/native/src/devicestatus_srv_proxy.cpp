@@ -282,11 +282,12 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     }
     MessageParcel reply;
     MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
+    sptr<IRemoteObject> remote = Remote(); 
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DRAG_TARGET_PID, data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
     }
     int32_t pid;
     READINT32(reply, pid, IPC_PROXY_DEAD_OBJECT_ERR);
