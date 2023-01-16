@@ -22,17 +22,12 @@ ohos_shared_library("drag_part") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}/include",
     "${device_status_service_path}/context/include",
-    "//foundation/multimedia/image_framework/interfaces/innerkits/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
   ]
 
   sources = [
+    "src/drag_data_adapter.cpp",
     "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
-    "src/drag_data_adapter.cpp"
   ]
 
   public_configs = [ ":drag_public_config" ]
