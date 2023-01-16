@@ -57,7 +57,6 @@ public:
 private:
     int32_t NotifyMonitor(DragState dragState);
     MMI::ExtraData ConstructExtraData(const DragData &dragData, bool appended);
-    void TestStartDrag(const DragData &dragData, int32_t pid);
 
 private:
     DragState dragState_ { DragState::FREE };

@@ -42,7 +42,6 @@ private:
     DragData dragData_;
     int32_t dragStyle_ { -1 };
     std::u16string dragMessage_;
-
 };
 
 #define  DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()

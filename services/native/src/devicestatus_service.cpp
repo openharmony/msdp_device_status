@@ -815,7 +815,6 @@ int32_t DeviceStatusService::OnStopDrag(int32_t &dragResult)
     dragManager_.StopDrag(dragResult);
     return RET_OK;
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

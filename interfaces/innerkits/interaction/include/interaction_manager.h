@@ -103,6 +103,7 @@ public:
      * @since 9
      */
     int32_t StopDrag(int32_t &dragResult);
+    
     /**
      * @brief 更新拖拽中的光标样式。
      * @param style 指定光标样式。

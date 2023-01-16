@@ -39,7 +39,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragM
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    TestStartDrag(dragData, pid);
+    int32_t pixelBytes = dragData.pixelMap->GetPixelBytes(); 
+    FI_HILOGD("pixelBytes: %{public}d, x: %{public}d, y: %{public}d", pixelBytes, dragData.x, dragData.y);
+    std::ostringstream ostream;
+    for (const auto& elem : dragData.buffer) {
+        ostream << elem << ", ";
+    }
+    FI_HILOGD("buffer: %{public}s, sourceType: %{public}d, clientPid: %{public}d", 
+        ostream.str().c_str(),  dragData.sourceType, pid);
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     if (dragState_ == DragState::DRAGGING) {
         FI_HILOGE("Drag instance is running, can not start drag again");
@@ -102,20 +109,6 @@ MMI::ExtraData DragManager::ConstructExtraData(const DragData &dragData, bool ap
         extraData.sourceType = dragData.sourceType;
     }
     return extraData;
-}
-
-void DragManager::TestStartDrag(const DragData &dragData, int32_t pid)
-{
-    int32_t pixelBytes = dragData.pixelMap->GetPixelBytes(); 
-    FI_HILOGD("pixelBytes: %{public}d", pixelBytes);
-    FI_HILOGD("x: %{public}d, y: %{public}d", dragData.x, dragData.y);
-    std::ostringstream ostream;
-    for (const auto& elem : dragData.buffer) {
-        ostream << elem << ", ";
-    }
-    FI_HILOGD("buffer: %{public}s", ostream.str().c_str());
-    FI_HILOGD("sourceType: %{public}d", dragData.sourceType);
-    FI_HILOGD("clientPid: %{public}d", pid);
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
