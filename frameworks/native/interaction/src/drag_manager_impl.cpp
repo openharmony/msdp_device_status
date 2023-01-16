@@ -42,7 +42,6 @@ int32_t DragManagerImpl::GetDragTargetPid()
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
