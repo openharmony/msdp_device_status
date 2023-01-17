@@ -247,8 +247,8 @@ int32_t DeviceStatusSrvStub::StubUpdateDragMessage(MessageParcel& data, MessageP
 int32_t DeviceStatusSrvStub::StubGetDragTargetPid(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = GetDragTargetPid();
-    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    int32_t pid = GetDragTargetPid();
+    WRITEINT32(reply, pid, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 
