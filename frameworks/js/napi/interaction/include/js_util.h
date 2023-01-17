@@ -25,6 +25,8 @@
 
 #include "coordination_message.h"
 
+#include "refbase.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -47,7 +49,7 @@ public:
         CoordinationMessage msg = CoordinationMessage::OPEN_SUCCESS;
     };
 
-    struct CallbackInfo {
+    struct CallbackInfo : RefBase {
         CallbackInfo() = default;
         ~CallbackInfo();
         napi_env env { nullptr };
@@ -55,7 +57,6 @@ public:
         napi_deferred deferred { nullptr };
         int32_t errCode { 0 };
         CallbackData data;
-        UserData uData;
     };
 
     static napi_value GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb);
