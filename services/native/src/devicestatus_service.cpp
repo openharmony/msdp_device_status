@@ -276,8 +276,16 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
     devicestatusManager_->GetPackageName(callerToken, packageName);
     auto uid = GetCallingUid();
     std::string str = enable ? "Subscribe" : "Unsubscribe";
-    HiSysEvent::Write(HiSysEvent::Domain::MSDP, str, HiSysEvent::EventType::STATISTIC,
-        "UID", uid, "PKGNAME", packageName, "TYPE", type);
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
+        str,
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "UID", uid,
+        "PKGNAME", packageName,
+        "TYPE", type);
+    if (ret != 0) {
+        DEV_HILOGE(SERVICE, "HiviewDFX write failed, ret:%{public}d", ret);
+    }
 }
 
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
