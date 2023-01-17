@@ -59,10 +59,10 @@ public:
         CallbackData data;
     };
 
-    static napi_value GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStartInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStopInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStateInfo(const std::unique_ptr<CallbackInfo> &cb);
+    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
     static napi_value GetStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
