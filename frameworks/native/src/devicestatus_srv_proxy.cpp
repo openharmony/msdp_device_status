@@ -282,7 +282,7 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     }
     MessageParcel reply;
     MessageOption option;
-    sptr<IRemoteObject> remote = Remote(); 
+    sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DRAG_TARGET_PID, data, reply, option);
     if (ret != RET_OK) {
