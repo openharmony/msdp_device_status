@@ -654,6 +654,12 @@ int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
     return RET_ERR;
 }
 
+int32_t DeviceStatusService::GetDragTargetPid()
+{
+    CALL_DEBUG_ENTER;
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {

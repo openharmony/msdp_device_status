@@ -44,7 +44,7 @@ public:
 
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
-
+    int32_t GetDragTargetPid();
 private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
