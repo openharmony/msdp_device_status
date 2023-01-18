@@ -83,6 +83,8 @@ int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<vo
 int32_t InteractionManager::StopDrag(int32_t &dragResult)
 {
     return InteractionMgrImpl.StopDrag(dragResult);
+}
+
 int32_t InteractionManager::GetDragTargetPid()
 {
     return InteractionMgrImpl.GetDragTargetPid();
