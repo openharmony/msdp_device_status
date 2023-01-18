@@ -155,7 +155,7 @@ namespace DeviceStatus {
 
 #define READUInt8Vector(parcel, data, ...) \
     do { \
-        if (!(parcel).ReadUInt8Vector(data)) { \
+        if (!(parcel).ReadUInt8Vector(&data)) { \
                 DEV_HILOGE(COMMON, "ReadUInt8Vector "#data" failed"); \
                 return __VA_ARGS__; \
             } \

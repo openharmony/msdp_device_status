@@ -79,7 +79,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return StubStartDrag(data, reply);
         }
         case STOP_DRAG : {
-            return StubStartDrag(data, reply);
+            return StubStopDrag(data, reply);
         }
         case UPDATED_DRAG_STYLE: {
             return StubUpdateDragStyle(data, reply);
@@ -290,7 +290,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
     READINT32(data, dragData.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READUInt8Vector(data, &dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUInt8Vector(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
 
     int32_t ret = StartDrag(dragData);
@@ -307,11 +307,10 @@ int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& re
     READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(dragResult);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
+        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }
     return ret;
 }
-
 } // namespace DeviceStatus
 } // Msdp
 } // OHOS

@@ -39,33 +39,23 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragM
 int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    int32_t pixelBytes = dragData.pixelMap->GetPixelBytes(); 
-    FI_HILOGD("pixelBytes: %{public}d, x: %{public}d, y: %{public}d", pixelBytes, dragData.x, dragData.y);
-    std::ostringstream ostream;
+    int32_t pixelBytes = dragData.pixelMap->GetPixelBytes();
+    int32_t byteCount = dragData.pixelMap->GetByteCount();
+    FI_HILOGD("pixelBytes: %{public}d, byteCount: %{public}d, x: %{public}d, y: %{public}d",
+        pixelBytes, byteCount, dragData.x, dragData.y);
+    FI_HILOGD("bufferSize: %{public}d", dragData.buffer.size());
+    FI_HILOGD("ByteCount of pixelMap: %{public}d", dragData.pixelMap->GetByteCount());
     for (const auto& elem : dragData.buffer) {
-        ostream << elem << ", ";
-    }
-    FI_HILOGD("buffer: %{public}s, sourceType: %{public}d, clientPid: %{public}d", 
-        ostream.str().c_str(),  dragData.sourceType, pid);
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    if (dragState_ == DragState::DRAGGING) {
-        FI_HILOGE("Drag instance is running, can not start drag again");
-        return RET_ERR;
-    }
-    dragOutPid_ = pid;
-    if (monitorId_ < 0) {
-        monitorId_ = inputMgr->AddMonitor(monitorConsumer_);
-        if (monitorId_ < 0) {
-            FI_HILOGE("AddMonitor failed, Error code:%{public}d", monitorId_);
+        if (elem != 11) {
+            FI_HILOGD("%{public}d != 11, parcel wrong ",elem);
             return RET_ERR;
         }
-    } else {
-        FI_HILOGE("Can not add monitor again");
-        return RET_ERR;
     }
-    inputMgr->AppendExtraData(ConstructExtraData(dragData, true));
-    dragDrawing_.Draw(0, 0);
-    dragState_ = DragState::DRAGGING;
+    (void) pid;
+    (void) dragState_;
+    (void) dragOutPid_;
+    (void) monitorId_;
+    (void) dragDrawing_;
     return RET_OK;
 }
 
