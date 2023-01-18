@@ -230,6 +230,13 @@ int32_t DeviceStatusClient::UpdateDragMessage(const std::u16string &message)
     return devicestatusProxy_->UpdateDragMessage(message);
 }
 
+int32_t DeviceStatusClient::GetDragTargetPid()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetDragTargetPid();
+}
+
 int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;

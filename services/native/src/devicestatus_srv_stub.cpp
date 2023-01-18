@@ -87,6 +87,9 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case UPDATED_DRAG_MESSAGE: {
             return StubUpdateDragMessage(data, reply);
         }
+        case GET_DRAG_TARGET_PID: {
+            return StubGetDragTargetPid(data, reply);
+        }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
@@ -245,6 +248,14 @@ int32_t DeviceStatusSrvStub::StubUpdateDragMessage(MessageParcel& data, MessageP
         FI_HILOGE("Call UpdateDragMessage failed ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvStub::StubGetDragTargetPid(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetDragTargetPid();
+    WRITEINT32(reply, pid, IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)

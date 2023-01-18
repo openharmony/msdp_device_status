@@ -56,6 +56,10 @@ void DragManagerImpl::SetCallback(std::function<void(int32_t&)> callback)
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPV(callback);
     stopCallback_ = callback;
+int32_t DragManagerImpl::GetDragTargetPid()
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

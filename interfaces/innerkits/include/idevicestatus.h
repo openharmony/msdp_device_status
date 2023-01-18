@@ -42,6 +42,7 @@ public:
         UPDATED_DRAG_MESSAGE,
         START_DRAG,
         STOP_DRAG,
+        GET_DRAG_TARGET_PID,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -65,7 +66,7 @@ public:
     virtual int32_t StopDrag(int32_t &dragResult) = 0;
     virtual int32_t UpdateDragStyle(int32_t style) = 0;
     virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
-
+    virtual int32_t GetDragTargetPid() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual bool IsRunning() const

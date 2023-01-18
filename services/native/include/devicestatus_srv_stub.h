@@ -50,6 +50,7 @@ private:
     int32_t StubStopDrag(MessageParcel& data, MessageParcel& reply);
     int32_t StubUpdateDragStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubUpdateDragMessage(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetDragTargetPid(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

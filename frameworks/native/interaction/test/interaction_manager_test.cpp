@@ -344,6 +344,18 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_001, TestSize.
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
 }
+ * @tc.name: InteractionManagerTest_GetDragTargetPid
+ * @tc.desc: Get Drag Target Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragTargetPid, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    ASSERT_TRUE(pid >= -1);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

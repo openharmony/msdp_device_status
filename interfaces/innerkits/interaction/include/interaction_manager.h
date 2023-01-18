@@ -120,6 +120,13 @@ public:
      */
     int32_t UpdateDragMessage(const std::u16string &message);
 
+    /**
+     * @brief 获取拖拽目标窗口PID
+     * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
+     * @since 10
+     */
+    int32_t GetDragTargetPid();
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

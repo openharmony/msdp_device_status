@@ -179,6 +179,11 @@ int32_t InteractionManagerImpl::StopDrag(int32_t &dragResult)
     return dragManagerImpl_.StopDrag(dragResult);
 }
 
+int32_t InteractionManagerImpl::GetDragTargetPid()
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetDragTargetPid();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
