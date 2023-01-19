@@ -45,12 +45,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
         pixelBytes, byteCount, dragData.x, dragData.y);
     FI_HILOGD("bufferSize: %{public}d", dragData.buffer.size());
     FI_HILOGD("ByteCount of pixelMap: %{public}d", dragData.pixelMap->GetByteCount());
-    for (const auto& elem : dragData.buffer) {
-        if (elem != 11) {
-            FI_HILOGD("%{public}d != 11, parcel wrong ",elem);
-            return RET_ERR;
-        }
-    }
     (void) pid;
     (void) dragState_;
     (void) dragOutPid_;

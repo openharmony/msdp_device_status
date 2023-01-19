@@ -43,7 +43,8 @@ public:
     };
 
 public:
-    DragManager() {
+    DragManager()
+    {
         monitorConsumer_ = std::make_shared<MonitorConsumer>(nullptr);
     }
     ~DragManager() = default;

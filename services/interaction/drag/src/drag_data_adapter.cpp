@@ -46,7 +46,7 @@ int32_t DragDataAdapter::UpdateDragMessage(const std::u16string &message)
     return RET_ERR;
 }
 
-const DragData& DragDataAdapter::GetDragData()
+const DragData &DragDataAdapter::GetDragData()
 {
     return dragData_;
 }
@@ -56,7 +56,7 @@ int32_t DragDataAdapter::GetDragStyle() const
     return RET_ERR;
 }
 
-const std::u16string & DragDataAdapter::GetDragMessage() const
+const std::u16string &DragDataAdapter::GetDragMessage() const
 {
     return dragMessage_;
 }

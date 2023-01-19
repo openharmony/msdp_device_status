@@ -33,7 +33,7 @@ struct DragData {
     int32_t sourceType { -1 };
 };
 
-enum class DragState{
+enum class DragState {
     FREE = 0,
     DRAGGING = 1,
 };

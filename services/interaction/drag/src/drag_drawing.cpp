@@ -33,32 +33,26 @@ void DragDrawing::InitPicture(OHOS::Media::PixelMap pixelMap, int32_t x, int32_t
 
 void DragDrawing::Draw(int32_t x, int32_t y)
 {
-
 }
 
 void DragDrawing::UpdateDragMessage(uint8_t message[])
 {
-
 }
 
 void DragDrawing::UpdateDragStyle(int32_t dragStyle)
 {
-
 }
 
 void DragDrawing::DrawMessage()
 {
-
 }
 
 void DragDrawing::DrawStyle()
 {
-
 }
 
 void DragDrawing::DrawPicture()
 {
-    
 }
 
 } // namespace DeviceStatus

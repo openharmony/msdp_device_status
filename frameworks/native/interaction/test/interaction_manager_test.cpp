@@ -27,6 +27,7 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
+const std::vector<uint8_t> DEFAULT_BUFFER = std::vector<uint8_t>(512, 100);
 } // namespace
 class InteractionManagerTest : public testing::Test {
 public:
@@ -85,7 +86,7 @@ void SetParam(int32_t width, int32_t height,  DragData& dragData)
     dragData.pixelMap = ConstructPixmap(width, height);
     dragData.x = INT32_MAX;
     dragData.y = INT32_MAX;
-    dragData.buffer = std::vector<uint8_t>(512, 11);
+    dragData.buffer = DEFAULT_BUFFER;
     dragData.sourceType = -1;
 }
 
