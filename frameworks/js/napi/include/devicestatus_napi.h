@@ -52,6 +52,8 @@ public:
         int32_t type, int32_t event, int32_t latency);
     static napi_value UnsubscribeDeviceStatus(napi_env env, napi_callback_info info);
     static napi_value GetDeviceStatus(napi_env env, napi_callback_info info);
+    static napi_value EnumActivityEventConstructor(napi_env env, napi_callback_info info);
+    static napi_value DeclareEventTypeInterface(napi_env env, napi_value exports);
 
     static int32_t ConvertTypeToInt(const std::string &type);
     void OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce);
