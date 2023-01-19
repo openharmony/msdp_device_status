@@ -31,7 +31,7 @@ config("devicestatus_public_config") {
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_root_path}/utils/ipc/include",
-    "//foundation/multimedia/image_framework/interfaces/innerkits/include",
+    "//foundation/multimedia/image_framework/interfaces/innerkits/include"
   ]
 
   defines = device_status_default_defines
@@ -58,7 +58,6 @@ ohos_shared_library("devicestatus_client") {
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
-    ":devicestatus_public_config",
   ]
 
   deps = [

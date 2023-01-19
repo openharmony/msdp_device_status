@@ -14,11 +14,13 @@
  */
 #ifndef DRAG_MANAGER_IMPL_H
 #define DRAG_MANAGER_IMPL_H
+
 #include <functional>
 #include <mutex>
 #include <string>
 
 #include "drag_data.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
