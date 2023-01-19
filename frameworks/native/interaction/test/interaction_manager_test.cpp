@@ -15,9 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
-#include <cmath>
-
 #include "coordination_message.h"
 #include "devicestatus_define.h" 
 #include "devicestatus_errors.h"

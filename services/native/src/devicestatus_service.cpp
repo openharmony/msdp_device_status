@@ -15,10 +15,10 @@
 
 #include "devicestatus_service.h"
 
-#include <vector>
 #include <csignal>
 #include <sys/signalfd.h>
 #include <unistd.h>
+#include <vector>
 
 #include <ipc_skeleton.h>
 

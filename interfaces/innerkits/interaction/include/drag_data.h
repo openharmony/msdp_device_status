@@ -16,9 +16,10 @@
 #ifndef DRAG_DATA_H
 #define DRAG_DATA_H
 
-#include <memory>
 #include <functional>
+#include <memory>
 #include <vector>
+
 #include "pixel_map.h"
 
 namespace OHOS {

@@ -20,9 +20,9 @@
 
 #include "client.h"
 #include "drag_manager_impl.h"
+#include "drag_data.h"
 #include "interaction_manager.h"
 #include "singleton.h"
-#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {

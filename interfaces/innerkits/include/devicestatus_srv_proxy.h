@@ -18,9 +18,10 @@
 
 #include <nocopyable.h>
 
+#include "drag_data.h"
 #include "iremote_proxy.h"
 #include "idevicestatus.h"
-#include "drag_data.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

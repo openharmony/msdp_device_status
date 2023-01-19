@@ -18,6 +18,7 @@
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

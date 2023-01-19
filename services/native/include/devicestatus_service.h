@@ -17,6 +17,7 @@
 #define DEVICESTATUS_SERVICE_H
 
 #include <memory>
+
 #include <iremote_object.h>
 #include <system_ability.h>
 
@@ -27,12 +28,12 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
-#include "timer_manager.h"
+#include "drag_data.h"
+#include "drag_manager.h"
 #include "i_context.h"
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
-#include "drag_data.h"
-#include "drag_manager.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {

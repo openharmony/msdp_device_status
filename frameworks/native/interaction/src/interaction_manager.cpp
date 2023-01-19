@@ -17,9 +17,9 @@
 
 #include <string>
 
-#include "interaction_manager_impl.h"
 #include "drag_data.h"
 #include "devicestatus_define.h"
+#include "interaction_manager_impl.h"
 
 namespace OHOS {
 namespace Msdp {

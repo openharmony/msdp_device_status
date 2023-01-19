@@ -19,11 +19,10 @@
 #include <functional>
 #include <memory>
 
-#include "nocopyable.h"
-#include "drag_data.h"
 #include "coordination_message.h"
-
+#include "drag_data.h"
 #include "i_coordination_listener.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace Msdp {

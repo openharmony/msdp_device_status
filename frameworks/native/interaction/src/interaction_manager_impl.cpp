@@ -15,8 +15,8 @@
 
 #include "interaction_manager_impl.h"
 
-#include "devicestatus_define.h"
 #include "coordination_manager_impl.h"
+#include "devicestatus_define.h"
 #include "drag_manager_impl.h"
 #include "drag_data.h"
 
