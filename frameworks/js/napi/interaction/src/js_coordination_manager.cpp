@@ -29,15 +29,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoo
 napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = CoordinationMgrImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value result = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->EnableCoordination(enable, callback);
     HandleExecuteResult(env, errCode);
-    if (errCode != RET_OK) {
-        RemoveCallbackInfo(userData);
-    }
     return result;
 }
 
@@ -45,45 +42,36 @@ napi_value JsCoordinationManager::Start(napi_env env, const std::string &sinkDev
     int32_t srcDeviceId, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = CoordinationMgrImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value result = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->StartCoordination(sinkDeviceDescriptor, srcDeviceId, callback);
     HandleExecuteResult(env, errCode);
-    if (errCode != RET_OK) {
-        RemoveCallbackInfo(userData);
-    }
     return result;
 }
 
 napi_value JsCoordinationManager::Stop(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = CoordinationMgrImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value result = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->StopCoordination(callback);
     HandleExecuteResult(env, errCode);
-    if (errCode != RET_OK) {
-        RemoveCallbackInfo(userData);
-    }
     return result;
 }
 
 napi_value JsCoordinationManager::GetState(napi_env env, const std::string &deviceDescriptor, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = CoordinationMgrImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value result = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
     int32_t errCode = InteractionMgr->GetCoordinationState(deviceDescriptor, callback);
     HandleExecuteResult(env, errCode);
-    if (errCode != RET_OK) {
-        RemoveCallbackInfo(userData);
-    }
     return result;
 }
 
