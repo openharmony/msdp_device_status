@@ -20,12 +20,13 @@
 #include <memory>
 #include <vector>
 
-#include "drag_data.h"
-#include "drag_drawing.h"
-#include "devicestatus_define.h"
 #include "input_manager.h"
 #include "i_input_event_consumer.h"
 #include "pixel_map.h"
+
+#include "devicestatus_define.h"
+#include "drag_data.h"
+#include "drag_drawing.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -50,13 +51,10 @@ public:
     ~DragManager() = default;
 
     int32_t StartDrag(const DragData &dragData, int32_t pid);
-    int32_t StopDrag(int32_t &dragResult);
+    int32_t StopDrag(int32_t dragResult);
     int32_t GetDragTargetPid();
-    int32_t AddMonitor(int32_t pid);
-    int32_t RemoveMonitor(int32_t monitorId);
 
 private:
-    int32_t NotifyMonitor(DragState dragState);
     MMI::ExtraData ConstructExtraData(const DragData &dragData, bool appended);
 
 private:
@@ -64,7 +62,6 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragOutPid_ { -1 };
     int32_t dragTargetPid_ { -1 };
-    std::vector<int32_t> monitors_;
     std::shared_ptr<MonitorConsumer> monitorConsumer_;
     DragDrawing dragDrawing_;
 };

@@ -17,8 +17,8 @@
 
 #include <string>
 
-#include "drag_data.h"
 #include "devicestatus_define.h"
+#include "drag_data.h"
 #include "interaction_manager_impl.h"
 
 namespace OHOS {
@@ -80,7 +80,7 @@ int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<vo
     return InteractionMgrImpl.StartDrag(dragData, callback);
 }
 
-int32_t InteractionManager::StopDrag(int32_t &dragResult)
+int32_t InteractionManager::StopDrag(int32_t dragResult)
 {
     return InteractionMgrImpl.StopDrag(dragResult);
 }

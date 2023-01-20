@@ -15,8 +15,9 @@
 
 #include "drag_drawing.h"
 
-#include "fi_log.h"
 #include "hitrace_meter.h"
+
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {

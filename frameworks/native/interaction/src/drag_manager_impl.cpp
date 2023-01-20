@@ -41,22 +41,28 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
 {
     CALL_DEBUG_ENTER;
-    SetCallback(callback);
+    if (dragData.buffer.size() != VerifyBound::BUFFER_SIZE) {
+        FI_HILOGE("Invalid bufferSize");
+        return RET_ERR;
+    }
+    if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
+        dragData.pixelMap->GetHeight() > VerifyBound::MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Too big pixelMap");
+        return RET_ERR;
+    }
+    if (callback == nullptr) {
+        FI_HILOGE("callback is null");
+        return RET_ERR;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    stopCallback_ = callback;
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t &dragResult)
+int32_t DragManagerImpl::StopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().StopDrag(dragResult);
-}
-
-void DragManagerImpl::SetCallback(std::function<void(int32_t&)> callback)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    CHKPV(callback);
-    stopCallback_ = callback;
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()

@@ -33,6 +33,12 @@ struct DragData {
     int32_t sourceType { -1 };
 };
 
+struct VerifyBound {
+    static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
+    static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
+    static const int32_t BUFFER_SIZE = 512;
+};
+
 enum class DragState {
     FREE = 0,
     DRAGGING = 1,

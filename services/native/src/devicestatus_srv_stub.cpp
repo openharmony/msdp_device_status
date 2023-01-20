@@ -15,6 +15,9 @@
 
 #include "devicestatus_srv_stub.h"
 
+#include "message_parcel.h"
+#include "pixel_map.h"
+
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
@@ -22,8 +25,6 @@
 #include "devicestatus_srv_proxy.h"
 #include "fi_log.h"
 #include "idevicestatus_callback.h"
-#include "message_parcel.h"
-#include "pixel_map.h"
 #include "util.h"
 
 namespace OHOS {
@@ -299,9 +300,18 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     CALL_DEBUG_ENTER;
     DragData dragData;
     dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
+    if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
+        dragData.pixelMap->GetHeight() > VerifyBound::MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Too big pixelMap");
+        return RET_ERR;
+    }
     READINT32(data, dragData.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READUInt8Vector(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (dragData.buffer.size() != VerifyBound::BUFFER_SIZE) {
+        FI_HILOGE("Invalid buffer");
+        return RET_ERR;
+    }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
 
     int32_t ret = StartDrag(dragData);

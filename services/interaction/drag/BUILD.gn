@@ -17,7 +17,7 @@ config("drag_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_shared_library("drag_part") {
+ohos_shared_library("interaction_drag") {
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}/include",

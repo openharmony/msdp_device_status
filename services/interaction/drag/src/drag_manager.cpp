@@ -18,16 +18,17 @@
 #include <iostream>
 #include <sstream>
 
-#include "drag_data_adapter.h"
-#include "devicestatus_define.h"
-#include "drag_data.h"
 #include "extra_data.h"
-#include "fi_log.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
-#include "proto.h"
 #include "pixel_map.h"
 #include "pointer_style.h"
+
+#include "devicestatus_define.h"
+#include "drag_data_adapter.h"
+#include "drag_data.h"
+#include "fi_log.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -53,7 +54,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     return RET_OK;
 }
 
-int32_t DragManager::StopDrag(int32_t &dragResult)
+int32_t DragManager::StopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
@@ -67,21 +68,6 @@ int32_t DragManager::StopDrag(int32_t &dragResult)
 int32_t DragManager::GetDragTargetPid()
 {
     return dragTargetPid_;
-}
-
-int32_t DragManager::AddMonitor(int32_t pid)
-{
-    return RET_ERR;
-}
-
-int32_t DragManager::RemoveMonitor(int32_t monitorId)
-{
-    return RET_ERR;
-}
-
-int32_t DragManager::NotifyMonitor(DragState dragState)
-{
-    return RET_ERR;
 }
 
 MMI::ExtraData DragManager::ConstructExtraData(const DragData &dragData, bool appended)

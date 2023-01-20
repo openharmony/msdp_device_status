@@ -19,8 +19,8 @@
 #include <mutex>
 
 #include "client.h"
-#include "drag_manager_impl.h"
 #include "drag_data.h"
+#include "drag_manager_impl.h"
 #include "interaction_manager.h"
 #include "singleton.h"
 
@@ -42,7 +42,7 @@ public:
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
-    int32_t StopDrag(int32_t &dragResult);
+    int32_t StopDrag(int32_t dragResult);
     int32_t GetDragTargetPid();
 private:
     std::mutex mutex_;

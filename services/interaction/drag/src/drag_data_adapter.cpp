@@ -15,11 +15,12 @@
 
 #include "drag_data_adapter.h"
 
+#include "hitrace_meter.h"
+#include "pointer_style.h"
+
 #include "drag_data.h"
 #include "devicestatus_define.h"
 #include "fi_log.h"
-#include "hitrace_meter.h"
-#include "pointer_style.h"
 
 namespace OHOS {
 namespace Msdp {

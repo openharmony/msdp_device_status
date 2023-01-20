@@ -19,10 +19,11 @@
 #include <functional>
 #include <memory>
 
+#include "nocopyable.h"
+
 #include "coordination_message.h"
 #include "drag_data.h"
 #include "i_coordination_listener.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -101,7 +102,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StopDrag(int32_t &dragResult);
+    int32_t StopDrag(int32_t dragResult);
     
     /**
      * @brief 更新拖拽中的光标样式。

@@ -47,7 +47,7 @@ public:
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     virtual int32_t StartDrag(const DragData &dragData) override;
-    virtual int32_t StopDrag(int32_t &dragResult) override;
+    virtual int32_t StopDrag(int32_t dragResult) override;
     virtual int32_t UpdateDragStyle(int32_t style) override;
     virtual int32_t UpdateDragMessage(const std::u16string &message) override;
     virtual int32_t GetDragTargetPid() override;

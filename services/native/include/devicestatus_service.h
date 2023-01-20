@@ -101,7 +101,7 @@ public:
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     int32_t StartDrag(const DragData &dragData) override;
-    int32_t StopDrag(int32_t &dragResult) override;
+    int32_t StopDrag(int32_t dragResult) override;
     int32_t UpdateDragStyle(int32_t style) override;
     int32_t UpdateDragMessage(const std::u16string &message) override;
     int32_t GetDragTargetPid() override;
@@ -127,7 +127,7 @@ private:
     void DisableDevMgr();
 
     int32_t OnStartDrag(const DragData &dragData, int32_t pid);
-    int32_t OnStopDrag(int32_t &dragResult);
+    int32_t OnStopDrag(int32_t dragResult);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);

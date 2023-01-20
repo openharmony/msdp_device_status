@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <iostream>
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
@@ -27,7 +28,6 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
-const std::vector<uint8_t> DEFAULT_BUFFER = std::vector<uint8_t>(512, 100);
 } // namespace
 class InteractionManagerTest : public testing::Test {
 public:
@@ -50,10 +50,8 @@ void InteractionManagerTest::TearDown()
 }
 
 
-std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t width, int32_t height)
+std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
-    int32_t pixelMapWidth = width;
-    int32_t pixelMapHeight = height;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
@@ -61,9 +59,11 @@ std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t width, int32_t he
     info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
-
-    int32_t rowDataSize = pixelMapWidth;
-    uint32_t bufferSize = rowDataSize * pixelMapHeight;
+    if (INT32_MAX / pixelMapWidth < pixelMapHeight) {
+        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
+        return nullptr;
+    }
+    int32_t bufferSize = pixelMapWidth * pixelMapHeight;
     if (bufferSize <= 0) {
         return nullptr;
     }
@@ -71,9 +71,9 @@ std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t width, int32_t he
     if (buffer == nullptr) {
         return nullptr;
     }
-    char *ch = reinterpret_cast<char *>(buffer);
+    char *character = reinterpret_cast<char *>(buffer);
     for (unsigned int i = 0; i < bufferSize; i++) {
-        *(ch++) = (char)i;
+        *(character++) = static_cast<char> (i);
     }
 
     pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
@@ -81,12 +81,12 @@ std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t width, int32_t he
     return pixelMap;
 }
 
-void SetParam(int32_t width, int32_t height,  DragData& dragData)
+void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
     dragData.pixelMap = ConstructPixmap(width, height);
     dragData.x = INT32_MAX;
     dragData.y = INT32_MAX;
-    dragData.buffer = DEFAULT_BUFFER;
+    dragData.buffer = std::vector<uint8_t>(VerifyBound::BUFFER_SIZE, 0);
     dragData.sourceType = -1;
 }
 

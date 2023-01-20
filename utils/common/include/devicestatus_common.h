@@ -98,7 +98,7 @@ namespace DeviceStatus {
             return __VA_ARGS__; \
         } \
     } while (0)
-#define WRITEUInt8Vector(parcel, data, ...) \
+#define WRITEUINT8VECTOR(parcel, data, ...) \
     do { \
         if (!(parcel).WriteUInt8Vector(data)) { \
                 DEV_HILOGE(COMMON, "WriteUInt8Vector "#data" failed"); \
@@ -153,7 +153,7 @@ namespace DeviceStatus {
         } \
     } while (0)
 
-#define READUInt8Vector(parcel, data, ...) \
+#define READUINT8VECTOR(parcel, data, ...) \
     do { \
         if (!(parcel).ReadUInt8Vector(&data)) { \
                 DEV_HILOGE(COMMON, "ReadUInt8Vector "#data" failed"); \

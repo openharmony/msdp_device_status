@@ -276,7 +276,7 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
     return devicestatusProxy_->StartDrag(dragData);
 }
 
-int32_t DeviceStatusClient::StopDrag(int32_t &dragResult)
+int32_t DeviceStatusClient::StopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);

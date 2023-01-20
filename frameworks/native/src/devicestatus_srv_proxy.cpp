@@ -25,7 +25,6 @@
 #include "hitrace_meter.h"
 #include "idevicestatus_callback.h"
 #include "iremote_object.h"
-#include "pixel_map_parcel.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -329,7 +328,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     }
     WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
-    WRITEUInt8Vector(data, dragData.buffer, ERR_INVALID_VALUE);
+    WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
@@ -342,7 +341,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDrag(int32_t &dragResult)
+int32_t DeviceStatusSrvProxy::StopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

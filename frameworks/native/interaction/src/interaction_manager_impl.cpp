@@ -17,8 +17,8 @@
 
 #include "coordination_manager_impl.h"
 #include "devicestatus_define.h"
-#include "drag_manager_impl.h"
 #include "drag_data.h"
+#include "drag_manager_impl.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -170,10 +170,15 @@ int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
     return dragManagerImpl_.StartDrag(dragData, callback);
 }
 
-int32_t InteractionManagerImpl::StopDrag(int32_t &dragResult)
+int32_t InteractionManagerImpl::StopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.StopDrag(dragResult);

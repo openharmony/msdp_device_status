@@ -17,10 +17,11 @@
 #define DRAG_DATA_ADAPTER_H
 #include <string>
 
-#include "drag_data.h"
 #include "hitrace_meter.h"
 #include "pointer_style.h"
 #include "singleton.h"
+
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
