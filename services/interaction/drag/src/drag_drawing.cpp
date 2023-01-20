@@ -16,7 +16,6 @@
 #include "drag_drawing.h"
 
 #include "hitrace_meter.h"
-
 #include "fi_log.h"
 
 namespace OHOS {
@@ -33,14 +32,6 @@ void DragDrawing::InitPicture(OHOS::Media::PixelMap pixelMap, int32_t x, int32_t
 }
 
 void DragDrawing::Draw(int32_t x, int32_t y)
-{
-}
-
-void DragDrawing::UpdateDragMessage(uint8_t message[])
-{
-}
-
-void DragDrawing::UpdateDragStyle(int32_t dragStyle)
 {
 }
 

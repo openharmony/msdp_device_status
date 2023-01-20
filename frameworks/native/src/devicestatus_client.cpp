@@ -26,9 +26,9 @@
 #include "util.h"
 
 #include "coordination_manager_impl.h"
-#include "drag_manager_impl.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
+#include "drag_manager_impl.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -25,8 +25,6 @@ class DragDrawing {
 public:
     void InitPicture(OHOS::Media::PixelMap pixelMap, int32_t x, int32_t y);
     void Draw(int32_t x, int32_t y);
-    void UpdateDragMessage(uint8_t message[]);
-    void UpdateDragStyle(int32_t dragStyle);
 private:
     void DrawMessage();
     void DrawStyle();
