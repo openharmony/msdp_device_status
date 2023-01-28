@@ -29,10 +29,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUti
 JsUtil::CallbackInfo::~CallbackInfo()
 {
     CALL_DEBUG_ENTER;
-    if (ref != nullptr && env != nullptr) {
-        CHKRV(napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
-    }
 }
 
 napi_value JsUtil::GetEnableInfo(sptr<CallbackInfo> cb)

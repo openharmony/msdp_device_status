@@ -27,9 +27,19 @@
 
 #include "refbase.h"
 
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
+#define RELEASE_CALLBACKINFO(env, ref) \
+    do { \
+        if (ref != nullptr && env != nullptr) { \
+            napi_delete_reference(env, ref); \
+            env = nullptr; \
+        } \
+    } while (0)
+
 class JsUtil {
 public:
     struct UserData {

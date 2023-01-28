@@ -85,8 +85,13 @@ int32_t CoordinationManagerImpl::EnableCoordination(bool enabled, FuncCoordinati
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    devCoordinationEvent_[userData_] = event;
-    return DeviceStatusClient::GetInstance().EnableCoordination(userData_++, enabled);
+    auto ret = DeviceStatusClient::GetInstance().EnableCoordination(userData_++, enabled);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get Coordination State failed");
+    } else {
+        devCoordinationEvent_[userData_] = event;
+    }
+    return ret;
 }
 
 int32_t CoordinationManagerImpl::StartCoordination(const std::string &sinkDeviceId,
@@ -100,9 +105,14 @@ int32_t CoordinationManagerImpl::StartCoordination(const std::string &sinkDevice
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    devCoordinationEvent_[userData_] = event;
-    return DeviceStatusClient::GetInstance().StartCoordination(
+    auto ret = DeviceStatusClient::GetInstance().StartCoordination(
         userData_++, sinkDeviceId, srcDeviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get Coordination State failed");
+    } else {
+        devCoordinationEvent_[userData_] = event;
+    }
+    return ret;
 }
 
 int32_t CoordinationManagerImpl::StopCoordination(FuncCoordinationMessage callback)
@@ -115,8 +125,13 @@ int32_t CoordinationManagerImpl::StopCoordination(FuncCoordinationMessage callba
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    devCoordinationEvent_[userData_] = event;
-    return DeviceStatusClient::GetInstance().StopCoordination(userData_++);
+    auto ret = DeviceStatusClient::GetInstance().StopCoordination(userData_++);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get Coordination State failed");
+    } else {
+        devCoordinationEvent_[userData_] = event;
+    }
+    return ret;
 }
 
 int32_t CoordinationManagerImpl::GetCoordinationState(
@@ -130,8 +145,13 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    devCoordinationEvent_[userData_] = event;
-    return DeviceStatusClient::GetInstance().GetCoordinationState(userData_++, deviceId);
+    auto ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_++, deviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get Coordination State failed");
+    } else {
+        devCoordinationEvent_[userData_] = event;
+    }
+    return ret;
 }
 
 void CoordinationManagerImpl::OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg)
@@ -149,8 +169,15 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto event = GetCoordinationMessageEvent(userData);
+    CoordinationMsg* event;
+    auto iter = devCoordinationEvent_.find(userData);
+    if (iter == devCoordinationEvent_.end()) {
+        event = nullptr;
+    } else {
+        event = &iter->second.msg;
+    }
     CHKPV(event);
+    devCoordinationEvent_.erase(iter);
     (*event)(deviceId, msg);
 }
 
@@ -159,9 +186,16 @@ void CoordinationManagerImpl::OnCoordinationState(int32_t userData, bool state)
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto event = GetCoordinationStateEvent(userData);
+    CoordinationState* event;
+    auto iter = devCoordinationEvent_.find(userData);
+    if (iter == devCoordinationEvent_.end()) {
+        event = nullptr;
+    } else {
+        event = &iter->second.state;
+    }
     CHKPV(event);
     (*event)(state);
+    devCoordinationEvent_.erase(iter);
     FI_HILOGD("Coordination state event callback userData:%{public}d state:(%{public}d)", userData, state);
 }
 

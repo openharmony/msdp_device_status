@@ -34,6 +34,9 @@ napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value h
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->EnableCoordination(enable, callback);
+    if (errCode != 0) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref);
+    }
     HandleExecuteResult(env, errCode);
     return result;
 }
@@ -47,6 +50,9 @@ napi_value JsCoordinationManager::Start(napi_env env, const std::string &sinkDev
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->StartCoordination(sinkDeviceDescriptor, srcDeviceId, callback);
+    if (errCode != 0) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref);
+    }
     HandleExecuteResult(env, errCode);
     return result;
 }
@@ -59,6 +65,9 @@ napi_value JsCoordinationManager::Stop(napi_env env, napi_value handle)
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = InteractionMgr->StopCoordination(callback);
+    if (errCode != 0) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref);
+    }
     HandleExecuteResult(env, errCode);
     return result;
 }
@@ -71,6 +80,9 @@ napi_value JsCoordinationManager::GetState(napi_env env, const std::string &devi
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
     int32_t errCode = InteractionMgr->GetCoordinationState(deviceDescriptor, callback);
+    if (errCode != 0) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref);
+    }
     HandleExecuteResult(env, errCode);
     return result;
 }
