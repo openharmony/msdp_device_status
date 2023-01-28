@@ -21,7 +21,6 @@
 
 #include "idevicestatus_callback.h"
 #include "devicestatus_data_utils.h"
-#include "devicestatus_client.h"
 
 namespace OHOS {
 namespace Msdp {

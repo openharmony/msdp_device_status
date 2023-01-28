@@ -316,7 +316,7 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
 }
 
 int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &socketFd, int32_t &tokenType)
+    int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

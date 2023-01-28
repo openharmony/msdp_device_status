@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "message_parcel.h"
+#include "devicestatus_srv_stub.h"
 
+#include "message_parcel.h"
 #include "fi_log.h"
 #include "util.h"
 
@@ -22,8 +23,6 @@
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
-#include "devicestatus_srv_stub.h"
-#include "devicestatus_srv_proxy.h"
 #include "idevicestatus_callback.h"
 
 namespace OHOS {

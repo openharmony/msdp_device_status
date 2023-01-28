@@ -31,6 +31,8 @@ config("devicestatus_public_config") {
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_root_path}/utils/ipc/include",
+    "${device_status_root_path}/services/communication/base/",
+    "${device_status_root_path}/services/communication/client/include",
   ]
 
   defines = device_status_default_defines
@@ -46,8 +48,8 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_stub.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_client.cpp",
-    "${device_status_frameworks_path}/native/src/devicestatus_srv_proxy.cpp",
     "${device_status_frameworks_path}/native/src/fd_listener.cpp",
+    "${device_status_root_path}/services/communication/client/src/devicestatus_srv_proxy.cpp",
   ]
 
   if (fusion_interaction_coordination) {
