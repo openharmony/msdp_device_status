@@ -362,7 +362,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t dragResult)
 }
 
 int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &socketFd, int32_t &tokenType)
+    int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
