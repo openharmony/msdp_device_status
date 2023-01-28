@@ -130,7 +130,6 @@ void JsEventTarget::EmitJsGetState(sptr<JsUtil::CallbackInfo> cb, bool state)
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    // uv_queue_work 如果第三个参数不为空  则不会失败
     int32_t result;
     if (cb->ref == nullptr) {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetStatePromiseWork);
