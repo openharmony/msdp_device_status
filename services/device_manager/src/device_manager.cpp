@@ -15,6 +15,7 @@
 
 #include "device_manager.h"
 
+#include <algorithm>
 #include <cstring>
 #include <regex>
 #include <unistd.h>
@@ -141,12 +142,12 @@ int32_t DeviceManager::OnDisable()
 
 std::shared_ptr<IDevice> DeviceManager::FindDevice(const std::string &devPath)
 {
-    for (const auto &[id, dev] : devices_) {
-        if (dev->GetDevPath() == devPath) {
-            return dev;
+    auto tIter = std::find_if(devices_.cbegin(), devices_.cend(),
+        [devPath](const auto &item) {
+            return ((item.second != nullptr) && (item.second->GetDevPath() == devPath));
         }
-    }
-    return nullptr;
+    );
+    return (tIter != devices_.cend() ? tIter->second : nullptr);
 }
 
 int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
@@ -498,17 +499,17 @@ std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
     const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
     const auto pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
-    for (const auto &[id, dev]: devices_) {
-        if (dev == nullptr) {
+    for (const auto &[id, d]: devices_) {
+        if (d == nullptr) {
             FI_HILOGW("Device is unsynchronized");
             continue;
         }
-        const auto networkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
+        const auto networkId { d->IsRemote() ? d->GetNetworkId() : localNetworkId };
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            dhids.push_back(dev->GetDhid());
+        if (d->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+            dhids.push_back(d->GetDhid());
             FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }

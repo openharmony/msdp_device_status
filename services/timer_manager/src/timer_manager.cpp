@@ -15,6 +15,8 @@
 
 #include "timer_manager.h"
 
+#include <numeric>
+
 #include <sys/timerfd.h>
 
 #include "devicestatus_define.h"
@@ -144,15 +146,13 @@ int32_t TimerManager::OnProcessTimers()
 
 int32_t TimerManager::TakeNextTimerId()
 {
-    uint64_t timerSlot = 0;
-    uint64_t one = 1;
-
-    for (const auto &timer : timers_) {
-        timerSlot |= (one << timer->id);
-    }
-
+    uint64_t timerSlot = std::accumulate(timers_.cbegin(), timers_.cend(), uint64_t(0U),
+        [](uint64_t s, const auto &timer) {
+            return (s |= (uint64_t(1U) << timer->id));
+        }
+    );
     for (int32_t i = 0; i < MAX_TIMER_COUNT; ++i) {
-        if ((timerSlot & (one << i)) == 0) {
+        if ((timerSlot & (uint64_t(1U) << i)) == 0) {
             return i;
         }
     }
