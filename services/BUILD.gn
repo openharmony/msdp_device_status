@@ -31,7 +31,6 @@ config("devicestatus_services_private_config") {
     "${device_status_service_path}/interaction/coordination/lib/include",
     "${device_status_service_path}//interaction/drag/include",
     "//utils/system/safwk/native/include",
-    "//foundation/multimedia/image_framework/interfaces/innerkits/include",
     "communication/base",
     "communication/service/include",
   ]

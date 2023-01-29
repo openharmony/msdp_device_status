@@ -55,6 +55,7 @@ ohos_shared_library("stationary") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
   ]
 
   relative_install_dir = "module"
