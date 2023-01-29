@@ -169,16 +169,14 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    CoordinationMsg* event;
     auto iter = devCoordinationEvent_.find(userData);
     if (iter == devCoordinationEvent_.end()) {
-        event = nullptr;
-    } else {
-        event = &iter->second.msg;
+        return;
     }
+    CoordinationMsg event = iter->second.msg;
     CHKPV(event);
+    event(deviceId, msg);
     devCoordinationEvent_.erase(iter);
-    (*event)(deviceId, msg);
 }
 
 void CoordinationManagerImpl::OnCoordinationState(int32_t userData, bool state)
@@ -186,15 +184,13 @@ void CoordinationManagerImpl::OnCoordinationState(int32_t userData, bool state)
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    CoordinationState* event;
     auto iter = devCoordinationEvent_.find(userData);
     if (iter == devCoordinationEvent_.end()) {
-        event = nullptr;
-    } else {
-        event = &iter->second.state;
+        return;
     }
+    CoordinationState event = iter->second.state;
     CHKPV(event);
-    (*event)(state);
+    event(state);
     devCoordinationEvent_.erase(iter);
     FI_HILOGD("Coordination state event callback userData:%{public}d state:(%{public}d)", userData, state);
 }
