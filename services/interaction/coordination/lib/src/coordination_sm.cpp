@@ -594,16 +594,37 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     }
 }
 
-void CoordinationSM::Dump(int32_t fd, const std::vector<std::string> &args)
+std::string CoordinationSM::getEnumName(CoordinationState state)
+{
+    std::map<int32_t, std::string> CoordinationStateNameMap;
+    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
+                                    int32_t(CoordinationState::STATE_FREE), std::string("STATE_FREE")));
+    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
+                                    int32_t(CoordinationState::STATE_IN), std::string("STATE_IN")));
+    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
+                                    int32_t(CoordinationState::STATE_OUT), std::string("STATE_OUT")));
+
+    return CoordinationStateNameMap.at(int32_t(state));
+}
+
+void CoordinationSM::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    dprintf(fd, "Keyboard and mouse crossing information:");
-    dprintf(fd, "State machine status: %d\t", coordinationState_);
-    dprintf(fd, "Peripheral keyboard and mouse information: startDhid_  srcNetworkId_:\t");
-    dprintf(fd, "%s", startDhid_.c_str());
-    dprintf(fd, "%s", srcNetworkId_.c_str());
-    dprintf(fd, "Run successfully");
+    dprintf(fd, "Coordination information:\n");
+    dprintf(fd,
+            "status:%s | Dhid:%s | NetworkId:%s | isStarting:%s | isStopping:%s\n"
+            "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d\n",
+            getEnumName(coordinationState_).c_str(), startDhid_.c_str(), srcNetworkId_.c_str(),
+            isStarting_ ? "true" : "false", isStopping_ ? "true" : "false",
+            mouseLocation_.first, mouseLocation_.second, displayX_, displayY_);
+    if (onlineDevice_.empty()) {
+        dprintf(fd, "onlineDevice:%s\n", "None");
+        return;
+    }
+    for (auto it = onlineDevice_.begin(); it != onlineDevice_.end(); it++) {
+        dprintf(fd, "onlineDevice:%s\n", (*it).c_str());
+    }
 }
 
 void CoordinationSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
