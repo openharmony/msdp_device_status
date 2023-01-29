@@ -37,7 +37,7 @@ JsEventTarget::JsEventTarget()
     CK(ret.second, DeviceStatus::VAL_NOT_EXP);
 }
 
-void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, std::string deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -64,7 +64,7 @@ void JsEventTarget::EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, std::string devi
     }
 }
 
-void JsEventTarget::EmitJsStart(sptr<JsUtil::CallbackInfo> cb, std::string deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsStart(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -91,7 +91,7 @@ void JsEventTarget::EmitJsStart(sptr<JsUtil::CallbackInfo> cb, std::string devic
     }
 }
 
-void JsEventTarget::EmitJsStop(sptr<JsUtil::CallbackInfo> cb, std::string deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsStop(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
