@@ -26,37 +26,28 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
 } // namespace
 
-JsUtil::CallbackInfo::~CallbackInfo()
-{
-    CALL_DEBUG_ENTER;
-    if (ref != nullptr && env != nullptr) {
-        CHKRV(napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
-    }
-}
-
-napi_value JsUtil::GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetEnableInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStartInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStartInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStopInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
     return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
