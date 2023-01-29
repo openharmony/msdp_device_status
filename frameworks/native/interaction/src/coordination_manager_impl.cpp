@@ -85,11 +85,12 @@ int32_t CoordinationManagerImpl::EnableCoordination(bool enabled, FuncCoordinati
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().EnableCoordination(userData_++, enabled);
+    auto ret = DeviceStatusClient::GetInstance().EnableCoordination(userData_, enabled);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
         devCoordinationEvent_[userData_] = event;
+        userData_++;
     }
     return ret;
 }
@@ -106,11 +107,12 @@ int32_t CoordinationManagerImpl::StartCoordination(const std::string &sinkDevice
         return RET_ERR;
     }
     auto ret = DeviceStatusClient::GetInstance().StartCoordination(
-        userData_++, sinkDeviceId, srcDeviceId);
+        userData_, sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
         devCoordinationEvent_[userData_] = event;
+        userData_++;
     }
     return ret;
 }
@@ -125,11 +127,12 @@ int32_t CoordinationManagerImpl::StopCoordination(FuncCoordinationMessage callba
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().StopCoordination(userData_++);
+    auto ret = DeviceStatusClient::GetInstance().StopCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
         devCoordinationEvent_[userData_] = event;
+        userData_++;
     }
     return ret;
 }
@@ -145,11 +148,12 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_++, deviceId);
+    auto ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
         devCoordinationEvent_[userData_] = event;
+        userData_++;
     }
     return ret;
 }
