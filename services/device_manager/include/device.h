@@ -69,7 +69,7 @@ public:
 
 public:
     explicit Device(int32_t deviceId);
-    ~Device() = default;
+    ~Device();
     DISALLOW_COPY_AND_MOVE(Device);
 
     int32_t Open() override;

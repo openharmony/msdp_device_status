@@ -15,6 +15,7 @@
 
 #include "stream_buffer.h"
 
+#include <algorithm>
 #include <vector>
 
 namespace OHOS {
@@ -183,13 +184,14 @@ const std::string &StreamBuffer::GetErrorStatusRemark() const
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
         {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"},
     };
-    for (const auto &it : remark) {
-        if (it.first == rwErrorStatus_) {
-            return it.second;
+    static const std::string invalidStatus { "UNKNOWN" };
+
+    auto tIter = std::find_if(remark.cbegin(), remark.cend(),
+        [this](const auto &item) {
+            return (item.first == rwErrorStatus_);
         }
-    }
-    static const std::string invalidStatus = "UNKNOWN";
-    return invalidStatus;
+    );
+    return (tIter != remark.cend() ? tIter->second : invalidStatus);
 }
 
 const char *StreamBuffer::Data() const

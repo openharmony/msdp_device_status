@@ -61,6 +61,11 @@ Device::Device(int32_t deviceId)
     : deviceId_(deviceId)
 {}
 
+Device::~Device()
+{
+    Close();
+}
+
 int32_t Device::Open()
 {
     CALL_DEBUG_ENTER;
@@ -119,11 +124,9 @@ void Device::Dispatch(const struct epoll_event &ev)
 void Device::QueryDeviceInfo()
 {
     CALL_DEBUG_ENTER;
-    int32_t rc;
     char buffer[PATH_MAX];
-
     memset(buffer, 0, sizeof(buffer));
-    rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
+    int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get device name: %{public}s", strerror(errno));
     } else {
