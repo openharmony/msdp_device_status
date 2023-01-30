@@ -594,17 +594,28 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     }
 }
 
-std::string CoordinationSM::getEnumName(CoordinationState state)
+std::string CoordinationSM::GetDeviceCoordinationState(CoordinationState value) const
 {
-    std::map<int32_t, std::string> CoordinationStateNameMap;
-    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
-                                    int32_t(CoordinationState::STATE_FREE), std::string("STATE_FREE")));
-    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
-                                    int32_t(CoordinationState::STATE_IN), std::string("STATE_IN")));
-    CoordinationStateNameMap.insert(std::pair<int32_t, std::string>(
-                                    int32_t(CoordinationState::STATE_OUT), std::string("STATE_OUT")));
-
-    return CoordinationStateNameMap.at(int32_t(state));
+    std::string state;
+    switch (value) {
+        case CoordinationState::STATE_FREE: {
+            state = "free";
+            break;
+        }
+        case CoordinationState::STATE_IN: {
+            state = "in";
+            break;
+        }
+        case CoordinationState::STATE_OUT: {
+            state = "out";
+            break;
+        }
+        default: {
+            state = "unknown";
+            break;
+        }
+    }
+    return state;
 }
 
 void CoordinationSM::Dump(int32_t fd)
@@ -615,15 +626,15 @@ void CoordinationSM::Dump(int32_t fd)
     dprintf(fd,
             "status:%s | Dhid:%s | NetworkId:%s | isStarting:%s | isStopping:%s\n"
             "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d\n",
-            getEnumName(coordinationState_).c_str(), startDhid_.c_str(), srcNetworkId_.c_str(),
+            GetDeviceCoordinationState(coordinationState_).c_str(), startDhid_.c_str(), srcNetworkId_.c_str(),
             isStarting_ ? "true" : "false", isStopping_ ? "true" : "false",
             mouseLocation_.first, mouseLocation_.second, displayX_, displayY_);
     if (onlineDevice_.empty()) {
         dprintf(fd, "onlineDevice:%s\n", "None");
         return;
     }
-    for (auto it = onlineDevice_.begin(); it != onlineDevice_.end(); it++) {
-        dprintf(fd, "onlineDevice:%s\n", (*it).c_str());
+    for (const auto &item : onlineDevice_) {
+        dprintf(fd, "onlineDevice:%s\n", item.c_str());
     }
 }
 
