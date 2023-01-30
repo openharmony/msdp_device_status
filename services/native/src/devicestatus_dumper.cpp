@@ -116,7 +116,7 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
             CooSM->Dump(fd);
 #else
-            dprintf(fd, "Device Coordination is not supported\n");
+            dprintf(fd, "Device coordination is not supported\n");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
             break;
         }
