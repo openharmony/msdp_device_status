@@ -341,7 +341,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDrag(int32_t dragResult)
+int32_t DeviceStatusSrvProxy::StopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -349,7 +349,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t dragResult)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, dragResult, ERR_INVALID_VALUE);
+    WRITEINT32(data, result, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

@@ -41,18 +41,22 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (dragData.buffer.size() > VerifyBound::BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize: %{public}zu", dragData.buffer.size());
+    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
         return RET_ERR;
     }
-    if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
-        dragData.pixelMap->GetHeight() > VerifyBound::MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width: %{public}d, height: %{public}d",
+    if (dragData.pixelMap == nullptr) {
+        FI_HILOGE("dragData.pixelMap is nullptr");
+        return RET_ERR;
+    }
+    if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
             dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
         return RET_ERR;
     }
     if (callback == nullptr) {
-        FI_HILOGE("Callback is null");
+        FI_HILOGE("Callback is nullptr");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
@@ -60,10 +64,10 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t dragResult)
+int32_t DragManagerImpl::StopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().StopDrag(dragResult);
+    return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()

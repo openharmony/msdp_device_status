@@ -659,11 +659,11 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StopDrag(int32_t dragResult)
+int32_t DeviceStatusService::StopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopDrag, this, dragResult));
+        std::bind(&DeviceStatusService::OnStopDrag, this, result));
     if (ret != RET_OK) {
         FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
         return ret;
@@ -819,7 +819,7 @@ int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStopDrag(int32_t dragResult)
+int32_t DeviceStatusService::OnStopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
     return RET_OK;

@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <iostream>
+
+#include <gtest/gtest.h>
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
@@ -50,8 +51,12 @@ void InteractionManagerTest::TearDown()
 }
 
 
-std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t pixelMapWidth, int32_t pixelMapHeight)
+std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
+    if (pixelMapWidth <= 0 || pixelMapHeight <= 0 || (INT32_MAX / pixelMapWidth <= pixelMapHeight)) {
+        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
+        return nullptr;
+    }
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
@@ -59,20 +64,13 @@ std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t pixelMapWidth, in
     info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
-    if (INT32_MAX / pixelMapWidth < pixelMapHeight) {
-        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
-        return nullptr;
-    }
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
-    if (bufferSize <= 0) {
-        return nullptr;
-    }
     void *buffer = malloc(bufferSize);
     if (buffer == nullptr) {
         return nullptr;
     }
     char *character = reinterpret_cast<char *>(buffer);
-    for (unsigned int i = 0; i < bufferSize; i++) {
+    for (uint32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
 
@@ -83,10 +81,10 @@ std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t pixelMapWidth, in
 
 void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
-    dragData.pixelMap = ConstructPixmap(width, height);
+    dragData.pixelMap = CreatePixelMap(width, height);
     dragData.x = INT32_MAX;
     dragData.y = INT32_MAX;
-    dragData.buffer = std::vector<uint8_t>(VerifyBound::BUFFER_SIZE, 0);
+    dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = -1;
 }
 

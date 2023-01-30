@@ -300,17 +300,17 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     CALL_DEBUG_ENTER;
     DragData dragData;
     dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
-    if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
-        dragData.pixelMap->GetHeight() > VerifyBound::MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width: %{public}d, height: %{public}d",
+    if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
             dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
         return RET_ERR;
     }
     READINT32(data, dragData.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (dragData.buffer.size() > VerifyBound::BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize: %{public}zu", dragData.buffer.size());
+    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
         return RET_ERR;
     }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);

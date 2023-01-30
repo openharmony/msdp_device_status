@@ -63,7 +63,7 @@ public:
     virtual int32_t StopCoordination(int32_t userData) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
-    virtual int32_t StopDrag(int32_t dragResult) = 0;
+    virtual int32_t StopDrag(int32_t result) = 0;
     virtual int32_t UpdateDragStyle(int32_t style) = 0;
     virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
     virtual int32_t GetDragTargetPid() = 0;

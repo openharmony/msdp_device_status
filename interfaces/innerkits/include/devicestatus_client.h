@@ -18,6 +18,7 @@
 
 #include <functional>
 #include <map>
+
 #include <singleton.h>
 
 #include "devicestatus_common.h"
@@ -54,7 +55,7 @@ public:
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
     int32_t StartDrag(const DragData &dragData);
-    int32_t StopDrag(int32_t dragResult);
+    int32_t StopDrag(int32_t result);
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();

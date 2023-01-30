@@ -24,19 +24,16 @@
 
 namespace OHOS {
 namespace Msdp {
-
+namespace DeviceStatus {
+static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
+static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
+static const int32_t MAX_BUFFER_SIZE = 512;
 struct DragData {
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap;
     int32_t x { -1 };
     int32_t y { -1 };
     std::vector<uint8_t> buffer;
     int32_t sourceType { -1 };
-};
-
-struct VerifyBound {
-    static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
-    static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
-    static const int32_t BUFFER_SIZE = 512;
 };
 
 enum class DragState {
@@ -49,6 +46,7 @@ enum class DragResult {
     DRAG_FAIL = 1,
     DRAG_CANCEL = 2,
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DRAG_DATA_H
