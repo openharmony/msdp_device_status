@@ -44,7 +44,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, int32_t pid)
     int32_t byteCount = dragData.pixelMap->GetByteCount();
     FI_HILOGD("pixelBytes: %{public}d, byteCount: %{public}d, x: %{public}d, y: %{public}d",
         pixelBytes, byteCount, dragData.x, dragData.y);
-    FI_HILOGD("bufferSize: %{public}d", dragData.buffer.size());
+    FI_HILOGD("bufferSize: %{public}zu", dragData.buffer.size());
     FI_HILOGD("ByteCount of pixelMap: %{public}d", dragData.pixelMap->GetByteCount());
     (void) pid;
     (void) dragState_;

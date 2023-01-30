@@ -42,7 +42,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
 {
     CALL_DEBUG_ENTER;
     if (dragData.buffer.size() > VerifyBound::BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize: %{public}d", dragData.buffer.size());
+        FI_HILOGE("Invalid buffer, bufferSize: %{public}zu", dragData.buffer.size());
         return RET_ERR;
     }
     if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
