@@ -78,7 +78,6 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "interaction/drag:interaction_drag",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/openssl:libcrypto_shared",
   ]

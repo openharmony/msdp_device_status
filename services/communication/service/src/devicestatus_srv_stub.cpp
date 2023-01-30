@@ -314,12 +314,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
         return RET_ERR;
     }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
-
-    int32_t ret = StartDrag(dragData);
-    if (ret != RET_OK) {
-        FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
-    }
-    return ret;
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
@@ -327,11 +322,7 @@ int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& re
     CALL_DEBUG_ENTER;
     int32_t dragResult;
     READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StopDrag(dragResult);
-    if (ret != RET_OK) {
-        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
-    }
-    return ret;
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // Msdp
