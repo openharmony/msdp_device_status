@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <iostream>
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
@@ -28,7 +29,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 } // namespace
-
 class InteractionManagerTest : public testing::Test {
 public:
     void SetUp();
@@ -47,6 +47,47 @@ void InteractionManagerTest::SetUp()
 void InteractionManagerTest::TearDown()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+
+std::unique_ptr<OHOS::Media::PixelMap> ConstructPixmap(int32_t pixelMapWidth, int32_t pixelMapHeight)
+{
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
+    OHOS::Media::ImageInfo info;
+    info.size.width = pixelMapWidth;
+    info.size.height = pixelMapHeight;
+    info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
+    info.colorSpace = OHOS::Media::ColorSpace::SRGB;
+    pixelMap->SetImageInfo(info);
+    if (INT32_MAX / pixelMapWidth < pixelMapHeight) {
+        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
+        return nullptr;
+    }
+    int32_t bufferSize = pixelMapWidth * pixelMapHeight;
+    if (bufferSize <= 0) {
+        return nullptr;
+    }
+    void *buffer = malloc(bufferSize);
+    if (buffer == nullptr) {
+        return nullptr;
+    }
+    char *character = reinterpret_cast<char *>(buffer);
+    for (unsigned int i = 0; i < bufferSize; i++) {
+        *(character++) = static_cast<char>(i);
+    }
+
+    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
+
+    return pixelMap;
+}
+
+void SetParam(int32_t width, int32_t height, DragData& dragData)
+{
+    dragData.pixelMap = ConstructPixmap(width, height);
+    dragData.x = INT32_MAX;
+    dragData.y = INT32_MAX;
+    dragData.buffer = std::vector<uint8_t>(VerifyBound::BUFFER_SIZE, 0);
+    dragData.sourceType = -1;
 }
 
 /**
@@ -203,7 +244,39 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragTargetPid
+ * @tc.name: InteractionManagerTest_StopDrag
+ * @tc.desc: Stop drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int dragResult = 0;
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(dragResult);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StartDrag
+ * @tc.desc: Start Drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragData dragData;
+    SetParam(3, 4, dragData);
+    std::function<void(int32_t &)> callback = [](int32_t &dragResult) {
+        FI_HILOGD("StartDrag success");
+    };
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+ /**
+*  @tc.name: InteractionManagerTest_GetDragTargetPid
  * @tc.desc: Get Drag Target Pid
  * @tc.type: FUNC
  * @tc.require:

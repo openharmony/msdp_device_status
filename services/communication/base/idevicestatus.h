@@ -18,9 +18,10 @@
 
 #include <iremote_broker.h>
 
+#include "devicestatus_data_utils.h"
+#include "drag_data.h"
 #include "iremote_object.h"
 #include "idevicestatus_callback.h"
-#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -39,6 +40,8 @@ public:
         GET_COORDINATION_STATE,
         UPDATED_DRAG_STYLE = 20,
         UPDATED_DRAG_MESSAGE,
+        START_DRAG,
+        STOP_DRAG,
         GET_DRAG_TARGET_PID,
         ALLOC_SOCKET_FD = 40
     };
@@ -59,7 +62,8 @@ public:
         int32_t srcDeviceId) = 0;
     virtual int32_t StopCoordination(int32_t userData) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
-
+    virtual int32_t StartDrag(const DragData &dragData) = 0;
+    virtual int32_t StopDrag(int32_t dragResult) = 0;
     virtual int32_t UpdateDragStyle(int32_t style) = 0;
     virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
     virtual int32_t GetDragTargetPid() = 0;

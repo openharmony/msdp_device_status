@@ -17,14 +17,15 @@
 #define DEVICESTATUS_CLIENT_H
 
 #include <functional>
-#include <singleton.h>
 #include <map>
+#include <singleton.h>
 
+#include "devicestatus_common.h"
+#include "devicestatus_data_utils.h"
+#include "drag_data.h"
+#include "i_coordination_listener.h"
 #include "idevicestatus.h"
 #include "idevicestatus_callback.h"
-#include "devicestatus_data_utils.h"
-#include "devicestatus_common.h"
-#include "i_coordination_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -52,6 +53,8 @@ public:
     int32_t StopCoordination(int32_t userData);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
+    int32_t StartDrag(const DragData &dragData);
+    int32_t StopDrag(int32_t dragResult);
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();

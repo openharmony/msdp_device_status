@@ -16,14 +16,16 @@
 #include "devicestatus_srv_stub.h"
 
 #include "message_parcel.h"
-#include "fi_log.h"
-#include "util.h"
+#include "pixel_map.h"
 
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
+#include "devicestatus_srv_proxy.h"
+#include "fi_log.h"
 #include "idevicestatus_callback.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -73,6 +75,12 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         }
         case ALLOC_SOCKET_FD: {
             return StubHandleAllocSocketFd(data, reply);
+        }
+        case START_DRAG : {
+            return StubStartDrag(data, reply);
+        }
+        case STOP_DRAG : {
+            return StubStopDrag(data, reply);
         }
         case UPDATED_DRAG_STYLE: {
             return StubUpdateDragStyle(data, reply);
@@ -285,6 +293,45 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     FI_HILOGD("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData;
+    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
+    if (dragData.pixelMap->GetWidth() > VerifyBound::MAX_PIXEL_MAP_WIDTH ||
+        dragData.pixelMap->GetHeight() > VerifyBound::MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Too big pixelMap, width: %{public}d, height: %{public}d",
+            dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
+        return RET_ERR;
+    }
+    READINT32(data, dragData.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (dragData.buffer.size() > VerifyBound::BUFFER_SIZE) {
+        FI_HILOGE("Invalid buffer, bufferSize: %{public}zu", dragData.buffer.size());
+        return RET_ERR;
+    }
+    READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+
+    int32_t ret = StartDrag(dragData);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t dragResult;
+    READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StopDrag(dragResult);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // Msdp

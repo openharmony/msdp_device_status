@@ -21,6 +21,8 @@
 
 #include "nocopyable.h"
 
+#include "coordination_message.h"
+#include "drag_data.h"
 #include "i_coordination_listener.h"
 
 namespace OHOS {
@@ -85,6 +87,23 @@ public:
      */
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
+    /**
+     * @brief 开始拖拽接口。
+     * @param dragData 拖拽传入数据
+     * @param dragData 拖拽结束回调
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
+
+    /**
+     * @brief 结束拖拽接口。
+     * @param dragResult 传出参数，标识拖拽调用结果 0-成功,1-失败,2-取消
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StopDrag(int32_t dragResult);
+    
     /**
      * @brief 更新拖拽中的光标样式。
      * @param style 指定光标样式。

@@ -28,6 +28,7 @@ deps_ex = [
   "samgr:samgr_proxy",
   "appspawn:appspawn_socket_client",
   "c_utils:utils",
+  "multimedia_image_framework:image_native",
 ]
 
 ohos_fuzztest("DeviceStatusClientFuzzTest") {

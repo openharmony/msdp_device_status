@@ -18,6 +18,7 @@
 #include <string>
 
 #include "devicestatus_define.h"
+#include "drag_data.h"
 #include "interaction_manager_impl.h"
 
 namespace OHOS {
@@ -72,6 +73,16 @@ int32_t InteractionManager::UpdateDragStyle(int32_t style)
 int32_t InteractionManager::UpdateDragMessage(const std::u16string &message)
 {
     return InteractionMgrImpl.UpdateDragMessage(message);
+}
+
+int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
+{
+    return InteractionMgrImpl.StartDrag(dragData, callback);
+}
+
+int32_t InteractionManager::StopDrag(int32_t dragResult)
+{
+    return InteractionMgrImpl.StopDrag(dragResult);
 }
 
 int32_t InteractionManager::GetDragTargetPid()

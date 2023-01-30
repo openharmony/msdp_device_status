@@ -23,11 +23,13 @@ config("devicestatus_services_private_config") {
     "device_manager/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
     "${device_status_service_path}/interaction/coordination/lib/include",
+    "${device_status_service_path}//interaction/drag/include",
     "//utils/system/safwk/native/include",
     "communication/base",
     "communication/service/include",
@@ -43,6 +45,7 @@ config("devicestatus_services_public_config") {
     "native/include",
     "timer_manager/include",
     "device_manager/include",
+    "${device_status_service_path}//interaction/drag/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
@@ -75,6 +78,7 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
+    "interaction/drag:interaction_drag",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/openssl:libcrypto_shared",
   ]
@@ -92,7 +96,9 @@ ohos_shared_library("devicestatus_service") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "input:libmmi-client",
     "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
   ]
 

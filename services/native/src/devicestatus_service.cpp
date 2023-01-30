@@ -13,29 +13,27 @@
  * limitations under the License.
  */
 
-#include <vector>
+#include "devicestatus_service.h"
 
 #include <csignal>
-
 #include <sys/signalfd.h>
 #include <unistd.h>
+#include <vector>
 
 #include <ipc_skeleton.h>
 
 #include "hitrace_meter.h"
-
+#include "hisysevent.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
-#include "hisysevent.h"
 
 #include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_hisysevent.h"
 #include "devicestatus_permission.h"
-#include "devicestatus_service.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
@@ -647,6 +645,32 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     return RET_OK;
 }
 
+
+int32_t DeviceStatusService::StartDrag(const DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStartDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::StopDrag(int32_t dragResult)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnStopDrag, this, dragResult));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
@@ -788,6 +812,20 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+
+int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    dragManager_.StartDrag(dragData, pid);
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::OnStopDrag(int32_t dragResult)
+{
+    CALL_DEBUG_ENTER;
+    dragManager_.StopDrag(dragResult);
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
