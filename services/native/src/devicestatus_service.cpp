@@ -816,14 +816,12 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    dragManager_.StartDrag(dragData, pid);
     return RET_OK;
 }
 
 int32_t DeviceStatusService::OnStopDrag(int32_t dragResult)
 {
     CALL_DEBUG_ENTER;
-    dragManager_.StopDrag(dragResult);
     return RET_OK;
 }
 } // namespace DeviceStatus
