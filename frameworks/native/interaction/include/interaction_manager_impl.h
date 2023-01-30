@@ -19,6 +19,7 @@
 #include <mutex>
 
 #include "client.h"
+#include "coordination_manager_impl.h"
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 #include "interaction_manager.h"
@@ -44,10 +45,15 @@ public:
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid();
+
+private:
+    void InitMsgHandler();
+
 private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
     DragManagerImpl dragManagerImpl_;
+    CoordinationManagerImpl coordinationManagerImpl_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

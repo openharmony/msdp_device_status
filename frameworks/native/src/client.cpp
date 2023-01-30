@@ -17,12 +17,12 @@
 #include <cinttypes>
 #include <condition_variable>
 
+#include "devicestatus_client.h"
+#include "fd_listener.h"
 #include "fi_log.h"
 #include "proto.h"
+#include "time_cost_chk.h"
 #include "util.h"
-
-#include "fd_listener.h"
-#include "devicestatus_client.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -80,8 +80,7 @@ IClientPtr Client::GetSharedPtr()
 bool Client::Start()
 {
     CALL_DEBUG_ENTER;
-    msgHandler_.Init();
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
+    auto callback = std::bind(&Client::OnMsgHandler, this,
         std::placeholders::_1, std::placeholders::_2);
     if (!StartClient(callback)) {
         FI_HILOGE("Client startup failed");
@@ -282,6 +281,23 @@ void Client::Stop()
             eventHandler_->RemoveAllFileDescriptorListeners();
             FI_HILOGI("Remove all file descriptor listeners success");
         }
+    }
+}
+
+void Client::OnMsgHandler(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto id = pkt.GetMsgId();
+    TimeCostChk chk("Client::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
+    auto callback = GetMsgCallback(id);
+    if (callback == nullptr) {
+        FI_HILOGE("Unknown msg id:%{public}d", id);
+        return;
+    }
+    auto ret = (*callback)(client, pkt);
+    if (ret < 0) {
+        FI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        return;
     }
 }
 

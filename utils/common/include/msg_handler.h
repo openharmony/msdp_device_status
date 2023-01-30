@@ -27,6 +27,12 @@ namespace DeviceStatus {
 template<typename K, typename V>
 class MsgHandler {
 public:
+    struct MsgCallback {
+        K id;
+        V fun;
+    };
+
+public:
     void Clear()
     {
         callbacks_.clear();
@@ -49,11 +55,15 @@ public:
         return std::move(str);
     }
 
-protected:
-    struct MsgCallback {
-        K id;
-        V fun;
-    };
+    bool RegisterEvent(MsgCallback& msg)
+    {
+        auto it = callbacks_.find(msg.id);
+        if (it != callbacks_.end()) {
+            return false;
+        }
+        callbacks_[msg.id] = msg.fun;
+        return true;
+    }
 
 protected:
     virtual ~MsgHandler() = default;
@@ -64,15 +74,6 @@ protected:
             return nullptr;
         }
         return &it->second;
-    }
-    bool RegistrationEvent(MsgCallback& msg)
-    {
-        auto it = callbacks_.find(msg.id);
-        if (it != callbacks_.end()) {
-            return false;
-        }
-        callbacks_[msg.id] = msg.fun;
-        return true;
     }
 
 protected:

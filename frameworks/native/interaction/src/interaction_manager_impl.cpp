@@ -15,8 +15,8 @@
 
 #include "interaction_manager_impl.h"
 
-#include "coordination_manager_impl.h"
 #include "devicestatus_define.h"
+#include "devicestatus_func_callback.h"
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 
@@ -37,6 +37,7 @@ bool InteractionManagerImpl::InitClient()
         return true;
     }
     client_ = std::make_shared<Client>();
+    InitMsgHandler();
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
@@ -44,6 +45,26 @@ bool InteractionManagerImpl::InitClient()
         return false;
     }
     return true;
+}
+
+void InteractionManagerImpl::InitMsgHandler()
+{
+    CALL_DEBUG_ENTER;
+    Client::MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+        {MessageId::COORDINATION_ADD_LISTENER,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationListener, &coordinationManagerImpl_)},
+        {MessageId::COORDINATION_MESSAGE,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationMessage, &coordinationManagerImpl_)},
+        {MessageId::COORDINATION_GET_STATE,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    };
+    for (auto &it : funs) {
+        if (!client_->RegisterEvent(it)) {
+            FI_HILOGI("RegistER event handler msg:%{publid}d already exists", it.id);
+        }
+    }
 }
 
 int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
@@ -55,7 +76,7 @@ int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICo
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.RegisterCoordinationListener(listener);
+    return coordinationManagerImpl_.RegisterCoordinationListener(listener);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
@@ -72,7 +93,7 @@ int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<I
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.UnregisterCoordinationListener(listener);
+    return coordinationManagerImpl_.UnregisterCoordinationListener(listener);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
@@ -90,7 +111,7 @@ int32_t InteractionManagerImpl::EnableCoordination(bool enabled,
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.EnableCoordination(enabled, callback);
+    return coordinationManagerImpl_.EnableCoordination(enabled, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(enabled);
@@ -109,7 +130,7 @@ int32_t InteractionManagerImpl::StartCoordination(const std::string &sinkDeviceI
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
+    return coordinationManagerImpl_.StartCoordination(sinkDeviceId, srcDeviceId, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(sinkDeviceId);
@@ -128,7 +149,7 @@ int32_t InteractionManagerImpl::StopCoordination(std::function<void(std::string,
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.StopCoordination(callback);
+    return coordinationManagerImpl_.StopCoordination(callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
@@ -146,7 +167,7 @@ int32_t InteractionManagerImpl::GetCoordinationState(
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return CoordinationMgrImpl.GetCoordinationState(deviceId, callback);
+    return coordinationManagerImpl_.GetCoordinationState(deviceId, callback);
 #else
     (void)(deviceId);
     (void)(callback);
