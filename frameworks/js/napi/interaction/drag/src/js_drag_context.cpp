@@ -25,27 +25,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
-const char * DRAG_CLASS = "drag_class";
-const char * DRAG = "drag";
+const char* DRAG_CLASS = "drag_class";
+const char* DRAG = "drag";
 } // namespace
-
-JsDragContext::JsDragContext()
-    : mgr_(std::make_shared<JsDragManager>()) {}
-
-JsDragContext::~JsDragContext()
-{
-    std::lock_guard<std::mutex> guard(mutex_);
-    mgr_.reset();
-    if (mgr_ != nullptr) {
-        mgr_->ResetEnv();
-    }
-}
-
-std::shared_ptr<JsDragManager> JsDragContext::GetJsDragMgr()
-{
-    std::lock_guard<std::mutex> guard(mutex_);
-    return mgr_;
-}
 
 napi_value JsDragContext::CreateInstance(napi_env env)
 {
@@ -73,7 +55,8 @@ napi_value JsDragContext::CreateInstance(napi_env env)
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
-    status = napi_reference_ref(env, jsContext->contextRef_, nullptr);
+    uint32_t refCount = 0;
+    status = napi_reference_ref(env, jsContext->contextRef_, &refCount);
     if (status != napi_ok) {
         FI_HILOGE("ref is nullptr");
         napi_delete_reference(env, jsContext->contextRef_);
@@ -142,18 +125,13 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
     napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "function");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
-    JsDragContext *jsDev = JsDragContext::GetInstance(env);
-    CHKPP(jsDev);
-    auto jsDragMgr = jsDev->GetJsDragMgr();
-    CHKPP(jsDragMgr);
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->RegisterListener(env, STATE_TYPE, argv[0]);
     return nullptr;
 }
 
@@ -164,19 +142,10 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    JsDragContext *jsDev = JsDragContext::GetInstance(env);
-    CHKPP(jsDev);
-    auto jsDragMgr = jsDev->GetJsDragMgr();
-    CHKPP(jsDragMgr);
-    if (argc == 0) {
-        jsDragMgr->UnregisterListener(env, STATE_TYPE);
-        return nullptr;
-    }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->UnregisterListener(env, STATE_TYPE, argv[0]);
     return nullptr;
 }
 

@@ -24,8 +24,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
-const char *COORDINATION_CLASS = "Coordination_class";
-const char *COORDINATION = "Coordination";
+const char* COORDINATION_CLASS = "Coordination_class";
+const char* COORDINATION = "Coordination";
 } // namespace
 
 JsCoordinationContext::JsCoordinationContext()
@@ -62,7 +62,7 @@ napi_value JsCoordinationContext::Enable(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
@@ -93,7 +93,7 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc < 2) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -152,7 +152,7 @@ napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -186,7 +186,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -219,7 +219,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {

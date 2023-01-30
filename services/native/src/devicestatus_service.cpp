@@ -413,10 +413,7 @@ void DeviceStatusService::OnThread()
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
-
-    FI_HILOGI("Failed to enable device manager, try again after delay");
     EnableDevMgr(MAX_N_RETRIES);
-    FI_HILOGI("Enter loop ...");
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] {};

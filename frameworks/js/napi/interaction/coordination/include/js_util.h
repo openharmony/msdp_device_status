@@ -25,9 +25,21 @@
 
 #include "coordination_message.h"
 
+#include "refbase.h"
+
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
+#define RELEASE_CALLBACKINFO(env, ref) \
+    do { \
+        if (ref != nullptr && env != nullptr) { \
+            napi_delete_reference(env, ref); \
+            env = nullptr; \
+        } \
+    } while (0)
+
 class JsUtil {
 public:
     struct UserData {
@@ -47,21 +59,20 @@ public:
         CoordinationMessage msg = CoordinationMessage::OPEN_SUCCESS;
     };
 
-    struct CallbackInfo {
+    struct CallbackInfo : RefBase {
         CallbackInfo() = default;
-        ~CallbackInfo();
+        ~CallbackInfo() = default;
         napi_env env { nullptr };
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { 0 };
         CallbackData data;
-        UserData uData;
     };
 
-    static napi_value GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStartInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStopInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStateInfo(const std::unique_ptr<CallbackInfo> &cb);
+    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
     static napi_value GetStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);

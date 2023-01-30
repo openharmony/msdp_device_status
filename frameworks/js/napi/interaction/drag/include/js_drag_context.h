@@ -17,33 +17,33 @@
 #define JS_DRAG_CONTEXT_H
 
 #include <memory>
+#include <mutex>
 
-#include "js_drag_manager.h"
+#include "napi/native_node_api.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class JsDragContext final {
 public:
-    JsDragContext();
-    ~JsDragContext();
+    JsDragContext() = default;
+    ~JsDragContext() = default;
     DISALLOW_COPY_AND_MOVE(JsDragContext);
 
     static napi_value Export(napi_env env, napi_value exports);
-
-private:
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
+
+private:
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static JsDragContext *GetInstance(napi_env env);
     static void DeclareDragData(napi_env env, napi_value exports);
     static void DeclareDragInterface(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
-    std::shared_ptr<JsDragManager> GetJsDragMgr();
 
 private:
-    std::shared_ptr<JsDragManager> mgr_ { nullptr };
     std::mutex mutex_;
     napi_ref contextRef_ { nullptr };
 };

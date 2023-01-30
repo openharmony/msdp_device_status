@@ -35,7 +35,7 @@ public:
     DISALLOW_COPY_AND_MOVE(CoordinationManagerImpl);
     ~CoordinationManagerImpl() = default;
 
-    using FuncCoordinationMessage = std::function<void(std::string, CoordinationMessage)>;
+    using FuncCoordinationMessage = std::function<void(const std::string&, CoordinationMessage)>;
     using FuncCoordinationState = std::function<void(bool)>;
 
     using CoordinationMsg = FuncCoordinationMessage;

@@ -42,18 +42,18 @@ int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoor
 }
 
 int32_t InteractionManager::EnableCoordination(bool enabled,
-    std::function<void(std::string, CoordinationMessage)> callback)
+    std::function<void(const std::string&, CoordinationMessage)> callback)
 {
     return InteractionMgrImpl.EnableCoordination(enabled, callback);
 }
 
 int32_t InteractionManager::StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
-    std::function<void(std::string, CoordinationMessage)> callback)
+    std::function<void(const std::string&, CoordinationMessage)> callback)
 {
     return InteractionMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
 }
 
-int32_t InteractionManager::StopCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManager::StopCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
 {
     return InteractionMgrImpl.StopCoordination(callback);
 }

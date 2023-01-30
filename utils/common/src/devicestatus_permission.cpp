@@ -24,8 +24,7 @@ namespace DeviceStatus {
 bool DeviceStatusPermission::CheckCallingPermission(const string &permissionName)
 {
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
-    int32_t auth = Security::AccessToken::TypePermissionState::PERMISSION_DENIED;
-    auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
+    int32_t auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
     if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return ERR_OK;
     } else {
