@@ -19,6 +19,7 @@
 #include "fi_log.h"
 #include "util.h"
 
+#include "devicestatus_callback_proxy.h"
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
