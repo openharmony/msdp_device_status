@@ -74,9 +74,7 @@ std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
     for (int32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
-
     pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-
     return pixelMap;
 }
 
