@@ -39,25 +39,27 @@ void DeviceStatusAgentTest::SetUp()
 
 void DeviceStatusAgentTest::TearDown() {}
 
-bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
-    const Data& devicestatusData)
-{
-    GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
-    GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest && (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
-    return true;
-}
+    bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
+        const Data& devicestatusData)
+    {
+        GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
+        GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
+        EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
+            (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+            devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+        return true;
+    }
 
-bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
-    const Data& devicestatusData)
-{
-    GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
-    GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest && (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
-    return true;
-}
+    bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
+        const Data& devicestatusData)
+    {
+        GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
+        GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
+        EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
+            (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+            devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+        return true;
+    }
 
 namespace {
 /**
