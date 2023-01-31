@@ -41,8 +41,8 @@ enum TypeValue : bool {
 
 enum OnChangedValue {
     VALUE_INVALID = -1,
-    VALUE_EXIT,
-    VALUE_ENTER
+    VALUE_ENTER = 1,
+    VALUE_EXIT = 2
 };
 
 enum ActivityEvent {
