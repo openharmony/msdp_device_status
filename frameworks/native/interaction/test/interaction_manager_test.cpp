@@ -53,7 +53,8 @@ void InteractionManagerTest::TearDown()
 
 std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
-    if (pixelMapWidth <= 0 || pixelMapHeight <= 0 || (INT32_MAX / pixelMapWidth <= pixelMapHeight)) {
+    if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
+        pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
         std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
         return nullptr;
     }
@@ -70,7 +71,7 @@ std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
         return nullptr;
     }
     char *character = reinterpret_cast<char *>(buffer);
-    for (uint32_t i = 0; i < bufferSize; i++) {
+    for (int32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
 
@@ -250,8 +251,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int dragResult = 0;
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(dragResult);
+    int result = 0;
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_EQ(ret, RET_OK);
 }
 
@@ -266,7 +267,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_001, TestSize.
     CALL_TEST_DEBUG;
     DragData dragData;
     SetParam(3, 4, dragData);
-    std::function<void(int32_t &)> callback = [](int32_t &dragResult) {
+    std::function<void(int32_t &)> callback = [](int32_t &result) {
         FI_HILOGD("StartDrag success");
     };
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);

@@ -324,9 +324,9 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
 int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t dragResult;
-    READINT32(data, dragResult, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StopDrag(dragResult);
+    int32_t result;
+    READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StopDrag(result);
     if (ret != RET_OK) {
         FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }

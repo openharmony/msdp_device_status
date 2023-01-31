@@ -88,10 +88,10 @@ public:
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
-     * @brief 开始拖拽接口。
-     * @param dragData 拖拽传入数据
-     * @param callback 拖拽结束回调
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief 开始拖拽目标。
+     * @param dragData 拖拽附加数据
+     * @param callback 拖拽结果信息回调函数
+     * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
@@ -99,7 +99,7 @@ public:
     /**
      * @brief 结束拖拽接口。
      * @param result 传出参数，标识拖拽调用结果 0-成功,1-失败,2-取消
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */
     int32_t StopDrag(int32_t result);

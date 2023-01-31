@@ -274,7 +274,7 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("Client has not connect server");
+        FI_HILOGE("devicestatusProxy_ is nullptr");
         return RET_ERR;
     }
     return devicestatusProxy_->StartDrag(dragData);
@@ -285,7 +285,7 @@ int32_t DeviceStatusClient::StopDrag(int32_t result)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("Client has not connect server");
+        FI_HILOGE("devicestatusProxy_ is nullptr");
         return RET_ERR;
     }
     return devicestatusProxy_->StopDrag(result);
