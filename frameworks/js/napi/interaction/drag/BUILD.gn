@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 ohos_shared_library("drag") {
   sources = [
     "src/js_drag_context.cpp",
+    "src/js_drag_manager.cpp",
     "src/native_register_module.cpp",
   ]
 
