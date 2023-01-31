@@ -20,7 +20,6 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_callback_proxy.h"
-#include "devicestatus_client.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {

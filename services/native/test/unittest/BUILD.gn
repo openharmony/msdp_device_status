@@ -24,7 +24,6 @@ config("module_private_config") {
     "//utils/system/safwk/native/include",
     "//base/msdp/device_status/libs/interface",
     "//base/msdp/device_status/services/delegate_task/include",
-    "../../../communication/service/include",
   ]
 }
 
