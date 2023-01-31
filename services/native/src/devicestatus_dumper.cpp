@@ -86,6 +86,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         }
     }
     if (!isMove) {
+        DEV_HILOGE(SERVICE, "move to argv error");
         goto RELEASE_RES;
     }
     while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
