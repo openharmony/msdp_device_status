@@ -90,7 +90,7 @@ public:
     /**
      * @brief 开始拖拽接口。
      * @param dragData 拖拽传入数据
-     * @param dragData 拖拽结束回调
+     * @param callback 拖拽结束回调
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
