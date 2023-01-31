@@ -24,8 +24,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
-constexpr const char *COORDINATION_CLASS = "coordination_class";
-constexpr const char *COORDINATION = "Coordination";
+const char* COORDINATION_CLASS = "Coordination_class";
+const char* COORDINATION = "Coordination";
 } // namespace
 
 JsCoordinationContext::JsCoordinationContext()
@@ -62,13 +62,11 @@ napi_value JsCoordinationContext::Enable(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        FI_HILOGE("Wrong number of parameters");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
-        FI_HILOGE("Thr first parameter is not boolean");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
         return nullptr;
     }
     bool enable = false;
@@ -81,8 +79,7 @@ napi_value JsCoordinationContext::Enable(napi_env env, napi_callback_info info)
         return jsCoordinationMgr->Enable(env, enable);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        FI_HILOGE("The second parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsCoordinationMgr->Enable(env, enable, argv[1]);
@@ -96,18 +93,15 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc < 2) {
-        FI_HILOGE("Wrong number of parameters");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        FI_HILOGE("Thr first parameter is not boolean");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_number)) {
-        FI_HILOGE("The second parameter is not number");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "srcDeviceId", "number");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "srcDeviceId", "number");
         return nullptr;
     }
     char sinkDeviceDescriptor[MAX_STRING_LEN] = {};
@@ -124,8 +118,7 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
         return jsCoordinationMgr->Start(env, sinkDeviceDescriptor, srcDeviceId);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
-        FI_HILOGE("Thr third parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsCoordinationMgr->Start(env, std::string(sinkDeviceDescriptor), srcDeviceId, argv[2]);
@@ -145,8 +138,7 @@ napi_value JsCoordinationContext::Stop(napi_env env, napi_callback_info info)
         return jsCoordinationMgr->Stop(env);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
-        FI_HILOGE("The first parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsCoordinationMgr->Stop(env, argv[0]);
@@ -160,13 +152,11 @@ napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        FI_HILOGE("Wrong number of parameters");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        FI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
         return nullptr;
     }
     char deviceDescriptor[MAX_STRING_LEN] = { 0 };
@@ -182,8 +172,7 @@ napi_value JsCoordinationContext::GetState(napi_env env, napi_callback_info info
         return jsCoordinationMgr->GetState(env, deviceDescriptor_);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        FI_HILOGE("The second parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsCoordinationMgr->GetState(env, deviceDescriptor_, argv[1]);
@@ -197,29 +186,25 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        FI_HILOGE("Wrong number of parameters");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        FI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     if (std::strcmp(type, "coordination") != 0) {
-        THROWERR(env, "Register listener failed, the first parameter is invalid");
-        FI_HILOGE("Register listener failed, the first parameter is invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be coordination");
         return nullptr;
     }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        FI_HILOGE("The second parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     jsCoordinationMgr->RegisterListener(env, type, argv[1]);
@@ -234,13 +219,11 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        FI_HILOGE("Wrong number of parameters");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        FI_HILOGE("The first parameter is not string");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = {};
@@ -256,8 +239,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        FI_HILOGE("The second parameter is not function");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     jsCoordinationMgr->UnregisterListener(env, type_, argv[1]);

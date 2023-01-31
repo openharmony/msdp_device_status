@@ -63,18 +63,19 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         napi_create_error(env, nullptr, errorMsg, &businessError); \
         napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
         napi_throw(env, businessError); \
+        FI_HILOGE("Raising exceptions, ErrorCode:%{public}s, ErrorMsg:%{public}s", \
+            (#code), std::string(msg).c_str()); \
     } while (0)
 
-#define THROWERR_API9(env, code, param1, param2) \
+#define THROWERR(env, code, param1, param2) \
     do { \
-        FI_HILOGE("ErrorCode:%{public}s", (#code)); \
         NapiError codeMsg; \
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[300]; \
             if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2) > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \
-                FI_HILOGE("Failed to convert string type to char type"); \
+                FI_HILOGE("Failed to convert string type to char type, ErrorCode:%{public}s", (#code)); \
             } \
         } \
     } while (0)

@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 inline const std::string EMPTYSTR { "" };
-inline const std::string CHANGED_TYPE { "change" };
+inline const std::string STATE_TYPE { "state" };
 inline const std::string DEV_INPUT_PATH { "/dev/input/" };
 inline const std::string SYS_INPUT_PATH { "/sys/class/input/" };
 
