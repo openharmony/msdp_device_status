@@ -429,6 +429,68 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
     return nullptr;
 }
 
+napi_value DeviceStatusNapi::EnumActivityEventConstructor(napi_env env, napi_callback_info info)
+{
+    DEV_HILOGD(JS_NAPI, "Enter");
+    napi_value thisArg = nullptr;
+    void *data = nullptr;
+    napi_status status = napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to get_cb_info item");
+        return nullptr;
+    }
+    napi_value global = nullptr;
+    status = napi_get_global(env, &global);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to get_global item");
+        return nullptr;
+    }
+    DEV_HILOGD(JS_NAPI, "Exit");
+    return thisArg;
+}
+
+napi_value DeviceStatusNapi::DeclareEventTypeInterface(napi_env env, napi_value exports)
+{
+    DEV_HILOGD(JS_NAPI, "Enter");
+    napi_value enter = nullptr;
+    napi_status status = napi_create_int32(env, static_cast<int32_t>(ActivityEvent::ENTER), &enter);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to create ENTER item");
+        return nullptr;
+    }
+    napi_value exit = nullptr;
+    status = napi_create_int32(env, static_cast<int32_t>(ActivityEvent::EXIT), &exit);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to create EXIT item");
+        return nullptr;
+    }
+    napi_value enter_exit = nullptr;
+    status = napi_create_int32(env, static_cast<int32_t>(ActivityEvent::ENTER_EXIT), &enter_exit);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to create ENTER_EXIT item");
+        return nullptr;
+    }
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("ENTER", enter),
+        DECLARE_NAPI_STATIC_PROPERTY("EXIT", exit),
+        DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit),
+    };
+    napi_value result = nullptr;
+    status = napi_define_class(env, "DeviceStatusActivityEvent", NAPI_AUTO_LENGTH,
+        EnumActivityEventConstructor, nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to define_class item");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, exports, "DeviceStatusActivityEvent", result);
+    if (status != napi_ok) {
+        DEV_HILOGE(JS_NAPI, "Failed to set_named_property item");
+        return nullptr;
+    }
+    DEV_HILOGD(JS_NAPI, "Exit");
+    return exports;
+}
+
 napi_value DeviceStatusNapi::Init(napi_env env, napi_value exports)
 {
     DEV_HILOGD(JS_NAPI, "Enter");
@@ -437,6 +499,7 @@ napi_value DeviceStatusNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", UnsubscribeDeviceStatus),
         DECLARE_NAPI_FUNCTION("once", GetDeviceStatus),
     };
+    DeclareEventTypeInterface(env, exports);
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     DEV_HILOGD(JS_NAPI, "Exit");
     return exports;
