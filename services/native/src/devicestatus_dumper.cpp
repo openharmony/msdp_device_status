@@ -47,12 +47,13 @@ void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
 void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
 {
     if (args.empty()) {
-        DEV_HILOGE(SERVICE, "Size of args can't be zero");
+        DEV_HILOGE(SERVICE, "args is empty");
         return;
     }
     int32_t c;
     optind = 1;
     int32_t optionIndex = 0;
+    bool isMove = true;
     struct option dumpOptions[] = {
         { "help", no_argument, 0, 'h' },
         { "subscribe", no_argument, 0, 's' },
@@ -68,20 +69,24 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         return;
     }
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
-        DEV_HILOGE(SERVICE, "Call memset_s failed");
+        DEV_HILOGE(SERVICE, "call memset_s failed");
         delete[] argv;
         return;
     }
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
-            DEV_HILOGE(SERVICE, "pointer is nullptr");
-            goto RELEASE_RES;
+            DEV_HILOGE(SERVICE, "failed to allocate memory");
+            isMove = false;
+            continue;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
             DEV_HILOGE(SERVICE, "strcpy_s error");
-            goto RELEASE_RES;
+            isMove = false;
         }
+    }
+    if (!isMove) {
+        goto RELEASE_RES;
     }
     while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
         ExecutDump(fd, datas, c);
@@ -116,7 +121,7 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
             CooSM->Dump(fd);
 #else
-            dprintf(fd, "Device coordination is not supported\n");
+            dprintf(fd, "device coordination is not supported\n");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
             break;
         }
@@ -165,7 +170,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
         if (record == nullptr) {
-            DEV_HILOGE(SERVICE, "deviceStatusQueue_ is is null");
+            DEV_HILOGE(SERVICE, "deviceStatusQueue is nullptr");
             continue;
         }
         deviceStatusQueue_.push(record);
@@ -268,18 +273,18 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
 {
     dprintf(fd, "Usage:\n");
     dprintf(fd, "      -h: dump help\n");
-    dprintf(fd, "      -s: dump the device_status subscribers\n");
+    dprintf(fd, "      -s: dump the subscribers\n");
     dprintf(fd, "      -l: dump the last 10 device status change\n");
-    dprintf(fd, "      -c: dump the device_status current device status\n");
-    dprintf(fd, "      -o: dump the device_status coordination status\n");
-    dprintf(fd, "      -d: dump the device_status drag status\n");
+    dprintf(fd, "      -c: dump the current device status\n");
+    dprintf(fd, "      -o: dump the coordination status\n");
+    dprintf(fd, "      -d: dump the drag status\n");
 }
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (appInfo == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is null");
+        DEV_HILOGE(SERVICE, "appInfo is nullptr");
         return;
     }
     DumpCurrentTime(appInfo->startTime);
@@ -300,10 +305,10 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (appInfo->callback == nullptr) {
-        DEV_HILOGW(SERVICE, "callback is null");
+        DEV_HILOGW(SERVICE, "callback is nullptr");
         return;
     }
-    DEV_HILOGI(SERVICE, "appInfoMap_ size=%{public}zu", appInfoMap_.size());
+    DEV_HILOGI(SERVICE, "appInfoMap size=%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {

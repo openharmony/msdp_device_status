@@ -612,6 +612,7 @@ std::string CoordinationSM::GetDeviceCoordinationState(CoordinationState value) 
         }
         default: {
             state = "unknown";
+            FI_HILOGW("Coordination status unknown");
             break;
         }
     }
@@ -624,7 +625,7 @@ void CoordinationSM::Dump(int32_t fd)
     std::lock_guard<std::mutex> guard(mutex_);
     dprintf(fd, "Coordination information:\n");
     dprintf(fd,
-            "status:%s | Dhid:%s | NetworkId:%s | isStarting:%s | isStopping:%s\n"
+            "coordinationState:%s | startDhid:%s | srcNetworkId:%s | isStarting:%s | isStopping:%s\n"
             "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d\n",
             GetDeviceCoordinationState(coordinationState_).c_str(), startDhid_.c_str(), srcNetworkId_.c_str(),
             isStarting_ ? "true" : "false", isStopping_ ? "true" : "false",
