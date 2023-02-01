@@ -24,7 +24,8 @@
         "samgr",
         "c_utils",
         "appexecfwk_standard",
-        "napi"
+        "napi",
+        "multimedia_image_framework"
       ],
       "third_party": []
     },

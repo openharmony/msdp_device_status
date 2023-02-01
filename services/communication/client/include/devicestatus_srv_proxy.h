@@ -16,9 +16,10 @@
 #ifndef DEVICESTATUS_SRV_PROXY_H
 #define DEVICESTATUS_SRV_PROXY_H
 
+#include "iremote_proxy.h"
 #include <nocopyable.h>
 
-#include "iremote_proxy.h"
+#include "drag_data.h"
 #include "idevicestatus.h"
 
 namespace OHOS {
@@ -45,6 +46,8 @@ public:
     virtual int32_t StopCoordination(int32_t userData) override;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    virtual int32_t StartDrag(const DragData &dragData) override;
+    virtual int32_t StopDrag(int32_t result) override;
     virtual int32_t UpdateDragStyle(int32_t style) override;
     virtual int32_t UpdateDragMessage(const std::u16string &message) override;
     virtual int32_t GetDragTargetPid() override;
