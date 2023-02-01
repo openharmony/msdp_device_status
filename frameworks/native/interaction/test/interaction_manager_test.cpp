@@ -81,8 +81,8 @@ std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
 void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
     dragData.pixelMap = CreatePixelMap(width, height);
-    dragData.x = INT32_MAX;
-    dragData.y = INT32_MAX;
+    dragData.x = 0;
+    dragData.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = -1;
 }

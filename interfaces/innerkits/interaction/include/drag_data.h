@@ -38,13 +38,13 @@ struct DragData {
 
 enum class DragState {
     FREE = 0,
-    DRAGGING = 1,
+    DRAGGING = 1
 };
 
 enum class DragResult {
     DRAG_SUCCESS = 0,
     DRAG_FAIL = 1,
-    DRAG_CANCEL = 2,
+    DRAG_CANCEL = 2
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -323,7 +323,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         return ERR_INVALID_VALUE;
     }
     if (!dragData.pixelMap->Marshalling(data)) {
-        FI_HILOGE("Failed to marshall pixelMap");
+        FI_HILOGE("Failed to marshalling pixelMap");
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);

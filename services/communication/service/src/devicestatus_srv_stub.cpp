@@ -298,8 +298,10 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
 int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (OHOS::Media::PixelMap::Unmarshalling(data));
+    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (pixelMap);
     if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
         dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
