@@ -224,7 +224,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-    DeviceStatusDumper::GetInstance().SaveAppInfo(type, callback);
+    DeviceStatusDumper::GetInstance().SaveAppInfo(appInfo);
     devicestatusManager_->Subscribe(type, event, latency, callback);
     DEV_HILOGD(SERVICE, "Exit");
     FinishTrace(HITRACE_TAG_MSDP);

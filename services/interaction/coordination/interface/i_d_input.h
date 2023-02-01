@@ -47,7 +47,7 @@ public:
     virtual bool CheckKeyboardWhiteList(std::shared_ptr<MMI::KeyEvent> keyEvent) = 0;
     virtual std::string GetLocalDeviceId() = 0;
 
-    virtual void Dump(int32_t fd, const std::vector<std::string>& args) = 0;
+    virtual void Dump(int32_t fd) = 0;
 };
 
 extern "C" IDInput* CreateIDInpt(IContext* context);

@@ -26,6 +26,9 @@
 #include "string_ex.h"
 #include "unique_fd.h"
 
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "coordination_sm.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "devicestatus_dumper.h"
@@ -43,38 +46,51 @@ void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
 
 void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
 {
+    if (args.empty()) {
+        DEV_HILOGE(SERVICE, "args is empty");
+        return;
+    }
+    int32_t c;
+    optind = 1;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
-        {"help", no_argument, 0, 'h'},
-        {"subscribe", no_argument, 0, 's'},
-        {"list", no_argument, 0, 'l'},
-        {"current", no_argument, 0, 'c'},
-        {NULL, 0, 0, 0}
+        { "help", no_argument, 0, 'h' },
+        { "subscribe", no_argument, 0, 's' },
+        { "list", no_argument, 0, 'l' },
+        { "current", no_argument, 0, 'c' },
+        { "coordination", no_argument, 0, 'o' },
+        { "drag", no_argument, 0, 'd' },
+        { NULL, 0, 0, 0 }
     };
-    int32_t c;
     char **argv = new (std::nothrow) char *[args.size()];
     if (argv == nullptr) {
         DEV_HILOGE(SERVICE, "argv is nullptr");
         return;
     }
+    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+        DEV_HILOGE(SERVICE, "call memset_s failed");
+        delete[] argv;
+        return;
+    }
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
-            DEV_HILOGE(SERVICE, "pointer is nullptr");
+            DEV_HILOGE(SERVICE, "failed to allocate memory");
             goto RELEASE_RES;
-            return;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
             DEV_HILOGE(SERVICE, "strcpy_s error");
-            continue;
+            goto RELEASE_RES;
         }
     }
-    while ((c = getopt_long(args.size(), argv, "hslc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
         ExecutDump(fd, datas, c);
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
-        delete[] argv[i];
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
     }
     delete[] argv;
 }
@@ -96,6 +112,17 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
         }
         case 'c': {
             DumpDeviceStatusCurrentStatus(fd, datas);
+            break;
+        }
+        case 'o': {
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+            CooSM->Dump(fd);
+#else
+            dprintf(fd, "device coordination is not supported\n");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+            break;
+        }
+        case 'd': {
             break;
         }
         default: {
@@ -134,18 +161,18 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
     }
     std::string startTime;
     DumpCurrentTime(startTime);
-    dprintf(fd, "Current time: %s \n", startTime.c_str());
+    dprintf(fd, "Current time:%s\n", startTime.c_str());
     size_t length = deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE ? \
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
         if (record == nullptr) {
-            DEV_HILOGE(SERVICE, "deviceStatusQueue_ is is null");
+            DEV_HILOGE(SERVICE, "deviceStatusQueue is nullptr");
             continue;
         }
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
-        dprintf(fd, "startTime:%s | type:%s | value:%s \n",
+        dprintf(fd, "startTime:%s | type:%s | value:%s\n",
             record->startTime.c_str(), GetStatusType(record->data.type).c_str(),
             GetDeviceState(record->data.value).c_str());
     }
@@ -156,8 +183,8 @@ void DeviceStatusDumper::DumpDeviceStatusCurrentStatus(int32_t fd, const std::ve
     DEV_HILOGI(SERVICE, "start");
     std::string startTime;
     DumpCurrentTime(startTime);
-    dprintf(fd, "Current time: %s \n", startTime.c_str());
-    dprintf(fd, "Current device status: \n");
+    dprintf(fd, "Current time:%s\n", startTime.c_str());
+    dprintf(fd, "Current device status:\n");
     if (datas.empty()) {
         dprintf(fd, "No device status available\n");
         return;
@@ -166,7 +193,7 @@ void DeviceStatusDumper::DumpDeviceStatusCurrentStatus(int32_t fd, const std::ve
         if (it->value == VALUE_INVALID) {
             continue;
         }
-        dprintf(fd, "Device status DeviceStatusType is %s , current type state is %s .\n",
+        dprintf(fd, "type:%s | state:%s\n",
             GetStatusType(it->type).c_str(), GetDeviceState(it->value).c_str());
     }
 }
@@ -243,31 +270,29 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
 {
     dprintf(fd, "Usage:\n");
     dprintf(fd, "      -h: dump help\n");
-    dprintf(fd, "      -s: dump the device_status subscribers\n");
+    dprintf(fd, "      -s: dump the subscribers\n");
     dprintf(fd, "      -l: dump the last 10 device status change\n");
-    dprintf(fd, "      -c: dump the device_status current device status\n");
+    dprintf(fd, "      -c: dump the current device status\n");
+    dprintf(fd, "      -o: dump the coordination status\n");
+    dprintf(fd, "      -d: dump the drag status\n");
 }
 
-void DeviceStatusDumper::SaveAppInfo(Type type, sptr<IRemoteDevStaCallback> callback)
+void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (appInfo_ == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is null");
+    if (appInfo == nullptr) {
+        DEV_HILOGE(SERVICE, "appInfo is nullptr");
         return;
     }
-    appInfo_->uid = IPCSkeleton::GetCallingUid();
-    appInfo_->pid = IPCSkeleton::GetCallingPid();
-    appInfo_->tokenId = IPCSkeleton::GetCallingTokenID();
-
-    DumpCurrentTime(appInfo_->startTime);
+    DumpCurrentTime(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
-    auto iter = appInfoMap_.find(appInfo_->type);
+    auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
-        if (appInfos.insert(appInfo_).second) {
-            appInfoMap_.insert(std::make_pair(appInfo_->type, appInfos));
+        if (appInfos.insert(appInfo).second) {
+            appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
         }
     } else {
-        if (!appInfoMap_[iter->first].insert(appInfo_).second) {
+        if (!appInfoMap_[iter->first].insert(appInfo).second) {
             DEV_HILOGW(SERVICE, "duplicated app info");
         }
     }
@@ -277,10 +302,10 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (appInfo->callback == nullptr) {
-        DEV_HILOGW(SERVICE, "callback is null");
+        DEV_HILOGW(SERVICE, "callback is nullptr");
         return;
     }
-    DEV_HILOGI(SERVICE, "appInfoMap_ size=%{public}zu", appInfoMap_.size());
+    DEV_HILOGI(SERVICE, "appInfoMap size=%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {

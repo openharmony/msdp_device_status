@@ -67,7 +67,7 @@ public:
     void DumpDeviceStatusSubscriber(int32_t fd);
     void DumpDeviceStatusChanges(int32_t fd);
     void DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const;
-    void SaveAppInfo(Type type, sptr<IRemoteDevStaCallback> callback);
+    void SaveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void RemoveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void PushDeviceStatus(const Data &data);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
@@ -80,7 +80,6 @@ private:
     std::map<Type, std::set<std::shared_ptr<AppInfo>>> appInfoMap_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;
-    std::shared_ptr<AppInfo> appInfo_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -594,16 +594,49 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     }
 }
 
-void CoordinationSM::Dump(int32_t fd, const std::vector<std::string> &args)
+std::string CoordinationSM::GetDeviceCoordinationState(CoordinationState value) const
+{
+    std::string state;
+    switch (value) {
+        case CoordinationState::STATE_FREE: {
+            state = "free";
+            break;
+        }
+        case CoordinationState::STATE_IN: {
+            state = "in";
+            break;
+        }
+        case CoordinationState::STATE_OUT: {
+            state = "out";
+            break;
+        }
+        default: {
+            state = "unknown";
+            FI_HILOGW("Coordination status unknown");
+            break;
+        }
+    }
+    return state;
+}
+
+void CoordinationSM::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    dprintf(fd, "Keyboard and mouse crossing information:");
-    dprintf(fd, "State machine status: %d\t", coordinationState_);
-    dprintf(fd, "Peripheral keyboard and mouse information: startDhid_  srcNetworkId_:\t");
-    dprintf(fd, "%s", startDhid_.c_str());
-    dprintf(fd, "%s", srcNetworkId_.c_str());
-    dprintf(fd, "Run successfully");
+    dprintf(fd, "Coordination information:\n");
+    dprintf(fd,
+            "coordinationState:%s | startDhid:%s | srcNetworkId:%s | isStarting:%s | isStopping:%s\n"
+            "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d\n",
+            GetDeviceCoordinationState(coordinationState_).c_str(), startDhid_.c_str(), srcNetworkId_.c_str(),
+            isStarting_ ? "true" : "false", isStopping_ ? "true" : "false",
+            mouseLocation_.first, mouseLocation_.second, displayX_, displayY_);
+    if (onlineDevice_.empty()) {
+        dprintf(fd, "onlineDevice:%s\n", "None");
+        return;
+    }
+    for (const auto &item : onlineDevice_) {
+        dprintf(fd, "onlineDevice:%s\n", item.c_str());
+    }
 }
 
 void CoordinationSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)

@@ -189,9 +189,9 @@ std::string DInput::GetLocalDeviceId()
     return COORDINATION::GetLocalDeviceId();
 }
 
-void DInput::Dump(int32_t fd, const std::vector<std::string>& args)
+void DInput::Dump(int32_t fd)
 {
-    CooSM->Dump(fd, args);
+    CooSM->Dump(fd);
 }
 
 IDInput* CreateIDInpt(IContext *context)

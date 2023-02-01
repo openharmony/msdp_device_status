@@ -146,7 +146,8 @@ public:
     bool IsStarting() const;
     bool IsStopping() const;
     void Reset(const std::string &networkId);
-    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void Dump(int32_t fd);
+    std::string GetDeviceCoordinationState(CoordinationState value) const;
     void UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     std::shared_ptr<MMI::PointerEvent> GetLastPointerEvent() const;
     void RemoveMonitor();
