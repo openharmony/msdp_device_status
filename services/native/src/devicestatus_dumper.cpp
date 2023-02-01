@@ -53,7 +53,6 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
     int32_t c;
     optind = 1;
     int32_t optionIndex = 0;
-    bool isMove = true;
     struct option dumpOptions[] = {
         { "help", no_argument, 0, 'h' },
         { "subscribe", no_argument, 0, 's' },
@@ -77,24 +76,21 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
             DEV_HILOGE(SERVICE, "failed to allocate memory");
-            isMove = false;
-            continue;
+            goto RELEASE_RES;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
             DEV_HILOGE(SERVICE, "strcpy_s error");
-            isMove = false;
+            goto RELEASE_RES;
         }
-    }
-    if (!isMove) {
-        DEV_HILOGE(SERVICE, "move to argv error");
-        goto RELEASE_RES;
     }
     while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
         ExecutDump(fd, datas, c);
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
-        delete[] argv[i];
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
     }
     delete[] argv;
 }
