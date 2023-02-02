@@ -35,11 +35,10 @@ JsDragContext::JsDragContext()
 JsDragContext::~JsDragContext()
 {
     std::lock_guard<std::mutex> guard(mutex_);
-    auto jsDragMgr = mgr_;
-    mgr_.reset();
-    if (jsDragMgr != nullptr) {
-        jsDragMgr->ResetEnv();
-    }
+    if (mgr_ != nullptr) {
+        mgr_->ResetEnv();
+        mgr_ = nullptr;
+     }
 }
 
 std::shared_ptr<JsDragManager> JsDragContext::GetJsDragMgr()
