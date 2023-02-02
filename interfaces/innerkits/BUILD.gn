@@ -59,7 +59,6 @@ ohos_shared_library("devicestatus_client") {
   configs = [
     "${device_status_utils_path}:devicestatus_utils_config",
     ":devicestatus_private_config",
-    ":devicestatus_public_config",
   ]
 
   deps = [
@@ -75,6 +74,7 @@ ohos_shared_library("devicestatus_client") {
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
     "samgr:samgr_proxy",
   ]
 
@@ -84,8 +84,8 @@ ohos_shared_library("devicestatus_client") {
 ohos_unittest("InteractionManagerTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//base/msdp/device_status/interfaces/innerkits/interaction/include",
-    "//base/msdp/device_status/utils/common/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_utils_path}/include",
   ]
 
   defines = []
@@ -94,7 +94,10 @@ ohos_unittest("InteractionManagerTest") {
 
   configs = []
 
-  deps =
-      [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_framework:image_native",
+  ]
 }

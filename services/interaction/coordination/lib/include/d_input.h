@@ -44,7 +44,7 @@ public:
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
     std::string GetLocalDeviceId();
 
-    void Dump(int32_t fd, const std::vector<std::string>& args);
+    void Dump(int32_t fd);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -17,6 +17,7 @@
 #define DEVICESTATUS_SERVICE_H
 
 #include <memory>
+
 #include <iremote_object.h>
 #include <system_ability.h>
 
@@ -27,10 +28,11 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
-#include "timer_manager.h"
+#include "drag_data.h"
 #include "i_context.h"
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -97,6 +99,8 @@ public:
     int32_t StopCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    int32_t StartDrag(const DragData &dragData) override;
+    int32_t StopDrag(int32_t result) override;
     int32_t UpdateDragStyle(int32_t style) override;
     int32_t UpdateDragMessage(const std::u16string &message) override;
     int32_t GetDragTargetPid() override;
@@ -120,6 +124,9 @@ private:
     void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
+
+    int32_t OnStartDrag(const DragData &dragData, int32_t pid);
+    int32_t OnStopDrag(int32_t result);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
