@@ -175,33 +175,31 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest007, TestSize.Level1)
 
 /**
  * @tc.name: DeviceStatusMsdpMockTest
- * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.desc: test devicestatus DisableCount
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest007 start";
-    g_testMock->InitTimer();
-    g_testMock->StartThread();
-    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    g_testMock->CloseTimer();
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest007 end";
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest008 start";
+    EXPECT_TRUE(g_testMock->Init());
+    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
+    EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
+    EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
+    EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
+    EXPECT_TRUE(g_testMock->DisableCount(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest008 end";
 }
 
 /**
  * @tc.name: DeviceStatusMsdpMockTest
- * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.desc: test devicestatus NotifyMsdpImpl
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest009, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest009 start";
-    g_testMock->InitTimer();
-    g_testMock->StartThread();
-    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 3;
-    g_testMock->SetTimerInterval(TIMER_INTERVAL);
-    g_testMock->CloseTimer();
+    EXPECT_FALSE(g_testMock->NotifyMsdpImpl({}) == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest009 end";
 }
 
@@ -216,8 +214,6 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest010, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = -1;
-    g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest010 end";
 }
@@ -233,8 +229,55 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest011, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 0;
+    constexpr int32_t TIMER_INTERVAL = 3;
     g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest011 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest012 start";
+    g_testMock->InitTimer();
+    g_testMock->StartThread();
+    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    constexpr int32_t TIMER_INTERVAL = -1;
+    g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    g_testMock->CloseTimer();
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest012 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 start";
+    g_testMock->InitTimer();
+    g_testMock->StartThread();
+    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    constexpr int32_t TIMER_INTERVAL = 0;
+    g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    g_testMock->CloseTimer();
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 start";
+    g_testMock->TimerCallback();
+    g_testMock->GetDeviceStatusData();
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 end";
 }
