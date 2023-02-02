@@ -476,13 +476,13 @@ napi_value DeviceStatusNapi::DeclareEventTypeInterface(napi_env env, napi_value 
         DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit),
     };
     napi_value result = nullptr;
-    status = napi_define_class(env, "DeviceStatusActivityEvent", NAPI_AUTO_LENGTH,
+    status = napi_define_class(env, "ActivityEvent", NAPI_AUTO_LENGTH,
         EnumActivityEventConstructor, nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to define_class item");
         return nullptr;
     }
-    status = napi_set_named_property(env, exports, "DeviceStatusActivityEvent", result);
+    status = napi_set_named_property(env, exports, "ActivityEvent", result);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to set_named_property item");
         return nullptr;
