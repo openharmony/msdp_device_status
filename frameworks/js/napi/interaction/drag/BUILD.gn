@@ -17,6 +17,7 @@ import("//build/ohos.gni")
 ohos_shared_library("drag") {
   sources = [
     "src/js_drag_context.cpp",
+    "src/js_drag_manager.cpp",
     "src/native_register_module.cpp",
   ]
 
@@ -32,6 +33,7 @@ ohos_shared_library("drag") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_framework:image_native",
     "napi:ace_napi",
   ]
 

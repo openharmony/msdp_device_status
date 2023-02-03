@@ -21,8 +21,8 @@ config("interaction_config") {
   ]
 
   include_dirs = [
-    "./coordination/include",
-    "./drag/include",
+    "coordination/include",
+    "drag/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_frameworks_path}/native/interaction/include",
