@@ -18,7 +18,10 @@
 #include <functional>
 
 #include "event_handler.h"
+#include "msg_handler.h"
 #include "net_packet.h"
+#include "stream_client.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -26,7 +29,8 @@ class IClient;
 using IClientPtr = std::shared_ptr<IClient>;
 using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 typedef std::function<void(const IClient&)> ConnectCallback;
-class IClient {
+typedef std::function<int32_t(const StreamClient&, NetPacket&)> ClientMsgFun;
+class IClient : public MsgHandler<MessageId, ClientMsgFun> {
 public:
     virtual IClientPtr GetSharedPtr() = 0;
     virtual bool GetCurrentConnectedStatus() const = 0;

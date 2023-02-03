@@ -26,12 +26,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
 } // namespace
 
-CoordinationManagerImpl &CoordinationManagerImpl::GetInstance()
-{
-    static CoordinationManagerImpl instance;
-    return instance;
-}
-
 int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
@@ -183,7 +177,7 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     devCoordinationEvent_.erase(iter);
 }
 
-void CoordinationManagerImpl::OnCoordinationState(int32_t userData, bool state)
+void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -217,6 +211,50 @@ const CoordinationManagerImpl::CoordinationState *CoordinationManagerImpl::GetCo
 {
     auto iter = devCoordinationEvent_.find(userData);
     return iter == devCoordinationEvent_.end() ? nullptr : &iter->second.state;
+}
+
+int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    OnDevCoordinationListener(deviceId, CoordinationMessage(nType));
+    return RET_OK;
+}
+
+int32_t CoordinationManagerImpl::OnCoordinationMessage(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    OnCoordinationMessageEvent(userData, deviceId, CoordinationMessage(nType));
+    return RET_OK;
+}
+
+int32_t CoordinationManagerImpl::OnCoordinationState(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool state;
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    OnCoordinationStateEvent(userData, state);
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

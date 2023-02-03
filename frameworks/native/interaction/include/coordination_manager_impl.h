@@ -21,8 +21,6 @@
 #include <mutex>
 #include <optional>
 
-#include "nocopyable.h"
-
 #include "i_coordination_listener.h"
 #include "client.h"
 
@@ -31,8 +29,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationManagerImpl final {
 public:
-    static CoordinationManagerImpl &GetInstance();
-    DISALLOW_COPY_AND_MOVE(CoordinationManagerImpl);
+    CoordinationManagerImpl() = default;
     ~CoordinationManagerImpl() = default;
 
     using FuncCoordinationMessage = std::function<void(const std::string&, CoordinationMessage)>;
@@ -57,15 +54,17 @@ public:
     int32_t GetCoordinationState(const std::string &deviceId, FuncCoordinationState callback);
     void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
-    void OnCoordinationState(int32_t userData, bool state);
+    void OnCoordinationStateEvent(int32_t userData, bool state);
     int32_t GetUserData();
+    int32_t OnCoordinationListener(const StreamClient& client, NetPacket& pkt);
+    int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
+    int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
 
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
 
 private:
-    CoordinationManagerImpl() = default;
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
     std::mutex mtx_;
@@ -76,5 +75,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define CoordinationMgrImpl OHOS::Msdp::DeviceStatus::CoordinationManagerImpl::GetInstance()
 #endif // COORDINATION_MANAGER_IMPL_H

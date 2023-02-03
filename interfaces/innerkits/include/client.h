@@ -18,9 +18,7 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "client_msg_handler.h"
 #include "i_client.h"
-#include "stream_client.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -58,9 +56,9 @@ private:
     const std::string& GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
+    void OnMsgHandler(const StreamClient& client, NetPacket& pkt);
 
 private:
-    ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
