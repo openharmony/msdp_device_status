@@ -34,6 +34,7 @@ struct DragData {
     int32_t y { -1 };
     std::vector<uint8_t> buffer;
     int32_t sourceType { -1 };
+    int32_t dragNum { -1 };
 };
 
 enum class DragState {

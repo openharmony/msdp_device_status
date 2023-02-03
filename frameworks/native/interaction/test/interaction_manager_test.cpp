@@ -84,7 +84,8 @@ void SetParam(int32_t width, int32_t height, DragData& dragData)
     dragData.x = 0;
     dragData.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
-    dragData.sourceType = -1;
+    dragData.sourceType = 0;
+    dragData.dragNum = 0;
 }
 
 /**
@@ -241,6 +242,24 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 }
 
 /**
+ * @tc.name: InteractionManagerTest_StartDrag
+ * @tc.desc: Start Drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragData dragData;
+    SetParam(3, 4, dragData);
+    std::function<void(int32_t &)> callback = [](int32_t &result) {
+        FI_HILOGD("StartDrag success");
+    };
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InteractionManagerTest_StopDrag
  * @tc.desc: Stop drag
  * @tc.type: FUNC
@@ -251,24 +270,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level
     CALL_TEST_DEBUG;
     int result = 0;
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
-    ASSERT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InteractionManagerTest_StartDrag
- * @tc.desc: Start Drag
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragData dragData;
-    SetParam(3, 4, dragData);
-    std::function<void(int32_t &)> callback = [](int32_t &result) {
-        FI_HILOGD("StartDrag success");
-    };
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
 }
 

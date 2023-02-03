@@ -317,6 +317,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
         return RET_ERR;
     }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StartDrag(dragData);
     if (ret != RET_OK) {
         FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
