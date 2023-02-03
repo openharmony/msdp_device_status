@@ -18,8 +18,8 @@
 #include "hitrace_meter.h"
 #include "pointer_style.h"
 
-#include "drag_data.h"
 #include "devicestatus_define.h"
+#include "drag_data.h"
 #include "fi_log.h"
 
 namespace OHOS {
