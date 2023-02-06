@@ -107,6 +107,8 @@ public:
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
 
+    int32_t RegisterThumbnailDraw() override;
+    int32_t UnregisterThumbnailDraw() override;
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;
@@ -128,6 +130,8 @@ private:
     int32_t OnStartDrag(const DragData &dragData, int32_t pid);
     int32_t OnStopDrag(int32_t result);
 
+    int32_t OnRegisterThumbnailDraw(int32_t pid);
+    int32_t OnUnregisterThumbnailDraw(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);

@@ -15,16 +15,17 @@
 
 #include "devicestatus_srv_proxy.h"
 
-#include "hitrace_meter.h"
-#include "iremote_object.h"
 #include <message_option.h>
 #include <message_parcel.h>
 
-#include "bytrace_adapter.h"
+#include "hitrace_meter.h"
+#include "idevicestatus_callback.h"
+#include "iremote_object.h"
+
 #include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
 #include "devicestatus_define.h"
-#include "idevicestatus_callback.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -293,6 +294,46 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     return pid;
 }
 
+int32_t DeviceStatusSrvProxy::RegisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REGISTER_THUMBNAIL_DRAW, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::UnregisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UNREGISTER_THUMBNAIL_DRAW, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return ret;
+}
+
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
@@ -308,53 +349,6 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_COORDINATION_STATE, data, reply, option);
-    if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        FI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    if (!dragData.pixelMap->Marshalling(data)) {
-        FI_HILOGE("Failed to marshalling pixelMap");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
-    WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(START_DRAG, data, reply, option);
-    if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusSrvProxy::StopDrag(int32_t result)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        FI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, result, ERR_INVALID_VALUE);
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(STOP_DRAG, data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }

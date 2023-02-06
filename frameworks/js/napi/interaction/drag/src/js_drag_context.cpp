@@ -181,6 +181,46 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    size_t argc = 3;
+    napi_value argv[3] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    for (auto item : argv) {
+        if (!UtilNapi::TypeOf(env, item, napi_function)) {
+            THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+            return nullptr;
+        }
+    }
+    if (argc != 3) {
+        FI_HILOGE("");
+        return nullptr;
+    }
+    JsDragContext *jsDev = JsDragContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsDragMgr = jsDev->GetJsDragMgr();
+    jsDragMgr->RegisterThumbnailDraw(env, argc, argv);
+    return nullptr;
+}
+
+napi_value JsDragContext::UnregisterThumbnailDraw(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    size_t argc = 1;
+    napi_value argv[1] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
+    JsDragContext *jsDev = JsDragContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsDragMgr = jsDev->GetJsDragMgr();
+    jsDragMgr->UnregisterThumbnailDraw(env);
+    return nullptr;
+}
+
 void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
 {
     napi_value startMsg = nullptr;
@@ -214,6 +254,8 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("registerthumbnaildraw", RegisterThumbnailDraw),
+        DECLARE_NAPI_STATIC_FUNCTION("UnregisterThumbnailDraw", UnregisterThumbnailDraw),
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

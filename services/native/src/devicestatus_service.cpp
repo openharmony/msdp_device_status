@@ -689,6 +689,48 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return RET_OK;
 }
 
+int32_t DeviceStatusService::RegisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnRegisterThumbnailDraw, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::UnregisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnUnregisterThumbnailDraw, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::OnRegisterThumbnailDraw(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::OnUnregisterThumbnailDraw(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {

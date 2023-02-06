@@ -70,6 +70,36 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
+int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+        std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
+{
+    CALL_DEBUG_ENTER;
+    auto ret = DeviceStatusClient::GetInstance().RegisterThumbnailDraw();
+    if (ret == RET_OK) {
+        hasRegisterThumbnailDraw_ = true;
+        thumbnailDrawCallback_.startDrag = startDrag;
+        thumbnailDrawCallback_.notice = notice;
+        thumbnailDrawCallback_.endDrag = endDrag;
+    }
+    return ret;
+}
+
+int32_t DragManagerImpl::UnregisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    if (!hasRegisterThumbnailDraw_) {
+        return RET_ERR;
+    }
+    auto ret = DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
+    if (ret == RET_OK) {
+        hasRegisterThumbnailDraw_ = false;
+        thumbnailDrawCallback_.startDrag = nullptr;
+        thumbnailDrawCallback_.notice = nullptr;
+        thumbnailDrawCallback_.endDrag = nullptr;
+    }
+    return DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
+}
+
 int32_t DragManagerImpl::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;

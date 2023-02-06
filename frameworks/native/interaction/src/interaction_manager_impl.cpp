@@ -210,6 +210,17 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetDragTargetPid();
 }
+
+int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+        std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
+{
+    return dragManagerImpl_.RegisterThumbnailDraw(startDrag, notice, endDrag);
+}
+    
+int32_t InteractionManagerImpl::UnregisterThumbnailDraw()
+{
+    return dragManagerImpl_.UnregisterThumbnailDraw();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

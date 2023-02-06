@@ -61,6 +61,16 @@ void JsDragManager::RegisterListener(napi_env env, const std::string &type, napi
     }
 }
 
+void JsDragManager::RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv)
+{
+
+}
+
+void JsDragManager::UnregisterThumbnailDraw(napi_env env)
+{
+
+}
+
 void JsDragManager::UnregisterListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
