@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,27 +39,27 @@ void DeviceStatusAgentTest::SetUp()
 
 void DeviceStatusAgentTest::TearDown() {}
 
-    bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
-        const Data& devicestatusData)
-    {
-        GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
-        GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-        EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
-            (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-            devicestatusData.value <= OnChangedValue::VALUE_ENTER));
-        return true;
-    }
+bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
+    const Data& devicestatusData)
+{
+    GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
+    GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
+    EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
+        (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+    return true;
+}
 
-    bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
-        const Data& devicestatusData)
-    {
-        GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
-        GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
-        EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
-            (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-            devicestatusData.value <= OnChangedValue::VALUE_ENTER));
-        return true;
-    }
+bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
+    const Data& devicestatusData)
+{
+    GTEST_LOG_(INFO) << "agent type: " << devicestatusData.type;
+    GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
+    EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
+        (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+    return true;
+}
 
 namespace {
 /**
