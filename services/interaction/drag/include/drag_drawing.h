@@ -30,7 +30,7 @@ private:
     void DrawStyle() {}
     void DrawPicture() {}
 };
-} // namespace DragDrawing
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DRAG_DRAWING_H

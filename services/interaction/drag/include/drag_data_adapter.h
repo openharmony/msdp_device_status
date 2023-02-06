@@ -55,7 +55,7 @@ private:
 };
 
 #define DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()
-} // namespace DragDataAdapter
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // DRAG_DATA_ADAPTER_H
