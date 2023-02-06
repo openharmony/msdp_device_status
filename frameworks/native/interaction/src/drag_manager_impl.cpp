@@ -97,7 +97,7 @@ int32_t DragManagerImpl::UnregisterThumbnailDraw()
         thumbnailDrawCallback_.notice = nullptr;
         thumbnailDrawCallback_.endDrag = nullptr;
     }
-    return DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
+    return ret;
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()

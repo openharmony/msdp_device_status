@@ -23,6 +23,7 @@
 
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -39,12 +40,17 @@ public:
     void RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv);
     void UnregisterThumbnailDraw(napi_env env);
 private:
-    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    struct CallbackInfo {
+    struct CallbackInfo : public RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
     };
 
+private:
+    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+    void EmitStartThumbnailDraw(sptr<CallbackInfo> cb, int32_t pid, int32_t num);
+    void EmitNoticeThumbnailDraw(sptr<CallbackInfo> cb, int32_t dragStates);
+    void EmitEndThumbnailDraw(sptr<CallbackInfo> cb);
+    
 private:
     std::mutex mutex_;
     bool hasRegistered_ { false };

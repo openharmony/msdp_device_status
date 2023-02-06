@@ -255,7 +255,7 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("registerthumbnaildraw", RegisterThumbnailDraw),
-        DECLARE_NAPI_STATIC_FUNCTION("UnregisterThumbnailDraw", UnregisterThumbnailDraw),
+        DECLARE_NAPI_STATIC_FUNCTION("unregisterThumbnailDraw", UnregisterThumbnailDraw),
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

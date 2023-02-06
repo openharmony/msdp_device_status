@@ -361,7 +361,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t result)
     return ret;
 }
 
-nt32_t DeviceStatusSrvProxy::RegisterThumbnailDraw()
+int32_t DeviceStatusSrvProxy::RegisterThumbnailDraw()
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

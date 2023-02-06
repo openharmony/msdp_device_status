@@ -61,16 +61,6 @@ void JsDragManager::RegisterListener(napi_env env, const std::string &type, napi
     }
 }
 
-void JsDragManager::RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv)
-{
-
-}
-
-void JsDragManager::UnregisterThumbnailDraw(napi_env env)
-{
-
-}
-
 void JsDragManager::UnregisterListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
@@ -96,6 +86,48 @@ monitorLabel:
     if (hasRegistered_ && iter->second.empty()) {
         hasRegistered_ = false;
     }
+}
+
+void JsDragManager::EmitStartThumbnailDraw(sptr<JsDragManager::CallbackInfo> cb, int32_t pid, int32_t num)
+{
+    (void)cb;
+    (void)pid;
+    (void)num;
+}
+
+void JsDragManager::EmitNoticeThumbnailDraw(sptr<JsDragManager::CallbackInfo> cb, int32_t dragStates)
+{
+    (void)cb;
+    (void)dragStates;
+}
+
+void JsDragManager::EmitEndThumbnailDraw(sptr<JsDragManager::CallbackInfo> cb)
+{
+    (void)cb;
+}
+
+void JsDragManager::RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv)
+{
+    CALL_INFO_TRACE;
+    sptr<CallbackInfo> cb[3];
+    for (int32_t i = 0;i < argc; ++i) {
+        cb[i] = new (std::nothrow) CallbackInfo();
+        CHKPV(cb[i]);
+        napi_ref ref = nullptr;
+        CHKRV(napi_create_reference(env, argv[i], 1, &ref), CREATE_REFERENCE);
+        cb[i]->env = env;
+        cb[i]->ref = ref;
+    }
+    auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this,cb[0], std::placeholders::_1, std::placeholders::_2);
+    auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw, this,cb[1], std::placeholders::_1);
+    auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this, cb[2]);
+    InteractionMgr->RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
+}
+
+void JsDragManager::UnregisterThumbnailDraw(napi_env env)
+{
+    CALL_INFO_TRACE;
+    InteractionMgr->UnregisterThumbnailDraw();
 }
 
 void JsDragManager::ResetEnv()
