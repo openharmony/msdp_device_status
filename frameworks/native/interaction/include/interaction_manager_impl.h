@@ -48,6 +48,8 @@ public:
     int32_t RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
         std::function<void(int32_t)> notice, std::function<void(void)> endDrag);
     int32_t UnregisterThumbnailDraw();
+
+private:
     void InitMsgHandler();
 
 private:

@@ -35,7 +35,6 @@ public:
     static napi_value RegisterThumbnailDraw(napi_env env, napi_callback_info info);
     static napi_value UnregisterThumbnailDraw(napi_env env, napi_callback_info info);
     
-
 private:
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
