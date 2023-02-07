@@ -15,9 +15,6 @@
 
 #include "drag_manager.h"
 
-#include <iostream>
-#include <sstream>
-
 #include "extra_data.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
@@ -46,9 +43,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
     CHKPR(sess, RET_ERR);
     dragOutSession_ = sess;
-    (void) monitorId_;
-    (void) monitorConsumer_;
-    (void) dragDrawing_;
     dragState_ = DragState::DRAGGING;
     return RET_OK;
 }
@@ -77,21 +71,6 @@ int32_t DragManager::UpdateDragMessage(const std::u16string &message)
 int32_t DragManager::GetDragTargetPid()
 {
     return dragTargetPid_;
-}
-
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
-{
-    CALL_DEBUG_ENTER;
-}
-
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
-{
-    CALL_DEBUG_ENTER;
-}
-
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
-{
-    CALL_DEBUG_ENTER;
 }
 
 } // namespace DeviceStatus

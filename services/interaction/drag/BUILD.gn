@@ -26,7 +26,6 @@ ohos_shared_library("interaction_drag") {
 
   sources = [
     "src/drag_data_adapter.cpp",
-    "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
   ]
 

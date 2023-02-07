@@ -29,28 +29,30 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragDataAdapter" };
 } // namespace
 
-DragDataAdapter::DragDataAdapter() {}
-DragDataAdapter::~DragDataAdapter() {}
+DragDataAdapter::DragDataAdapter() = default;
+DragDataAdapter::~DragDataAdapter() = default;
 
 void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
 {
+    CALL_DEBUG_ENTER;
     extraData_.buffer = dragData.buffer;
     extraData_.sourceType = dragData.sourceType;
     extraData_.appended = false;
     coordinate_ = std::make_pair(dragData.x, dragData.y);
     pixelMap_ = *dragData.pixelMap;
     pointerStyle_ = pointerStyle;
-    FI_HILOGD("Init dragDataAdapter");
 }
 
 int32_t DragDataAdapter::UpdateDragStyle(int32_t style)
 {
-    return RET_ERR;
+    dragStyle_ = style;
+    return RET_OK;
 }
 
 int32_t DragDataAdapter::UpdateDragMessage(const std::u16string &message)
 {
-    return RET_ERR;
+    dragMessage_ = message;
+    return RET_OK;
 }
 
 OHOS::MMI::ExtraData DragDataAdapter::GetExtraData() const
