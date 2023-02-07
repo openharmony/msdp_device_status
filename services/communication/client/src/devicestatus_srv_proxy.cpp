@@ -330,6 +330,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
