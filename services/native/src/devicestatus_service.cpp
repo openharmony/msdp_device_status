@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -816,12 +816,16 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
 {
     CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    dragMgr_.StartDrag(dragData, sess);
     return RET_OK;
 }
 
 int32_t DeviceStatusService::OnStopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
+    dragMgr_.StopDrag(result);
     return RET_OK;
 }
 } // namespace DeviceStatus

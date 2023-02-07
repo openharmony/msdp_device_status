@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "drag_data.h"
+#include "drag_manager.h"
 #include "i_context.h"
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
@@ -144,6 +145,7 @@ private:
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
+    DragManager dragMgr_;
     std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
