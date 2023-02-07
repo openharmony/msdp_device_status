@@ -48,7 +48,7 @@ private:
     OHOS::Media::PixelMap pixelMap_;
     OHOS::MMI::ExtraData extraData_;
     std::pair<int, int> coordinate_;
-    int32_t dragNum_;
+    int32_t dragNum_ { -1 };
     int32_t dragStyle_ { -1 };
     std::u16string dragMessage_;
     OHOS::MMI::PointerStyle pointerStyle_;
