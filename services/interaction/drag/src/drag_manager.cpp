@@ -58,7 +58,7 @@ int32_t DragManager::StopDrag(int32_t result)
     return RET_OK;
 }
 
-int32_t DragManager::GetDragTargetPid()
+int32_t DragManager::GetDragTargetPid() const
 {
     return dragTargetPid_;
 }
