@@ -29,6 +29,7 @@
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "drag_data.h"
+#include "drag_manager.h"
 #include "i_context.h"
 #include "idevicestatus_callback.h"
 #include "stream_server.h"
@@ -144,6 +145,7 @@ private:
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
+    DragManager dragMgr_;
     std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
