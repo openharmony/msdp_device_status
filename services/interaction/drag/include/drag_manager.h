@@ -36,10 +36,10 @@ public:
 
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(int32_t result);
-    int32_t GetDragTargetPid();
+    int32_t GetDragTargetPid() const;
 private:
     DragState dragState_ { DragState::FREE };
-    SessionPtr dragOutSession_;
+    SessionPtr dragOutSession_ { nullptr };
     int32_t dragTargetPid_ { -1 };
 };
 } // namespace DeviceStatus
