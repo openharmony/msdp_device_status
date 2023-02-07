@@ -211,7 +211,7 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     return dragManagerImpl_.GetDragTargetPid();
 }
 
-int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
         std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
 {
     return dragManagerImpl_.RegisterThumbnailDraw(startDrag, notice, endDrag);

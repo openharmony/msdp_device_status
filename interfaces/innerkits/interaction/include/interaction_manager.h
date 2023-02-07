@@ -135,7 +135,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
-    int32_t RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+    int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
         std::function<void(int32_t)> notice, std::function<void(void)> endDrag);
 
     /**

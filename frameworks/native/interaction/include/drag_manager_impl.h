@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 struct ThumbnailDrawCallback {
-    std::function<void(int32_t, int32_t)> startDrag;
+    std::function<void(int32_t)> startDrag;
     std::function<void(int32_t)> notice;
     std::function<void(void)> endDrag;
 };
@@ -39,7 +39,7 @@ public:
     int32_t GetDragTargetPid();
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
     int32_t StopDrag(int32_t result);
-    int32_t RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+    int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
         std::function<void(int32_t)> notice, std::function<void(void)> endDrag);
     int32_t UnregisterThumbnailDraw();
 private:

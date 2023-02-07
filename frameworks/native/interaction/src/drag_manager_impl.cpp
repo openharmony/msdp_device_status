@@ -70,7 +70,7 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
-int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startDrag,
+int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
         std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
 {
     CALL_DEBUG_ENTER;

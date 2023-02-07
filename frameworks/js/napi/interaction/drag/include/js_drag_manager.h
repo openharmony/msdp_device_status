@@ -47,16 +47,17 @@ private:
     };
 
 private:
-    void ReleaseReference(sptr<CallbackInfo>* callbackInfos);
+    void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(sptr<CallbackInfo> cb, int32_t pid, int32_t num);
-    void EmitNoticeThumbnailDraw(sptr<CallbackInfo> cb, int32_t dragStates);
-    void EmitEndThumbnailDraw(sptr<CallbackInfo> cb);
+    void EmitStartThumbnailDraw(int32_t num);
+    void EmitNoticeThumbnailDraw(int32_t dragStates);
+    void EmitEndThumbnailDraw();
     
 private:
     std::mutex mutex_;
     bool hasRegistered_ { false };
     inline static std::map<std::string, std::vector<std::unique_ptr<CallbackInfo>>> listeners_ {};
+    inline static std::vector<sptr<CallbackInfo>> thumbnailDrawCb_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
