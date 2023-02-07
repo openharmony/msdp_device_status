@@ -37,8 +37,6 @@ public:
     DISALLOW_MOVE(DragDataAdapter);
 
     void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
-    int32_t UpdateDragStyle(int32_t style);
-    int32_t UpdateDragMessage(const std::u16string &message);
     OHOS::MMI::ExtraData GetExtraData() const;
     std::pair<int, int> GetCoordinate() const;
     OHOS::Media::PixelMap GetPixelMap() const;

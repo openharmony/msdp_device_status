@@ -58,16 +58,6 @@ int32_t DragManager::StopDrag(int32_t result)
     return RET_OK;
 }
 
-int32_t DragManager::UpdateDragStyle(int32_t style)
-{
-    return DataAdapter.UpdateDragStyle(style);
-}
-
-int32_t DragManager::UpdateDragMessage(const std::u16string &message)
-{
-    return DataAdapter.UpdateDragMessage(message);
-}
-
 int32_t DragManager::GetDragTargetPid()
 {
     return dragTargetPid_;
