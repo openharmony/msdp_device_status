@@ -75,12 +75,14 @@ int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32
 {
     CALL_DEBUG_ENTER;
     auto ret = DeviceStatusClient::GetInstance().RegisterThumbnailDraw();
-    if (ret == RET_OK) {
-        hasRegisterThumbnailDraw_ = true;
-        thumbnailDrawCallback_.startDrag = startDrag;
-        thumbnailDrawCallback_.notice = notice;
-        thumbnailDrawCallback_.endDrag = endDrag;
+    if (ret != RET_OK) {
+        FI_HILOGE("Register thumbnail draw failed");
+        return ret;
     }
+    hasRegisterThumbnailDraw_ = true;
+    thumbnailDrawCallback_.startDrag = startDrag;
+    thumbnailDrawCallback_.notice = notice;
+    thumbnailDrawCallback_.endDrag = endDrag;
     return ret;
 }
 
@@ -88,15 +90,18 @@ int32_t DragManagerImpl::UnregisterThumbnailDraw()
 {
     CALL_DEBUG_ENTER;
     if (!hasRegisterThumbnailDraw_) {
+        FI_HILOGE("Have not registered thumbnail draw");
         return RET_ERR;
     }
     auto ret = DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
-    if (ret == RET_OK) {
-        hasRegisterThumbnailDraw_ = false;
-        thumbnailDrawCallback_.startDrag = nullptr;
-        thumbnailDrawCallback_.notice = nullptr;
-        thumbnailDrawCallback_.endDrag = nullptr;
+    if (ret != RET_OK) {
+        FI_HILOGE("Unregister thumbnail draw failed");
+        return ret;
     }
+    hasRegisterThumbnailDraw_ = false;
+    thumbnailDrawCallback_.startDrag = nullptr;
+    thumbnailDrawCallback_.notice = nullptr;
+    thumbnailDrawCallback_.endDrag = nullptr;
     return ret;
 }
 

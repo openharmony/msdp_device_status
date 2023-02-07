@@ -194,7 +194,7 @@ napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info
         }
     }
     if (argc != 3) {
-        FI_HILOGE("");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
     JsDragContext *jsDev = JsDragContext::GetInstance(env);
