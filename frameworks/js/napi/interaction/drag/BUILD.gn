@@ -32,10 +32,10 @@ ohos_shared_library("drag") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_image_framework:image_native",
-    "napi:ace_napi",
-    "c_utils:utils",
+    "napi:ace_napi", 
   ]
 
   relative_install_dir = "module/device_status"
