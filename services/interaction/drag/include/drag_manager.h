@@ -32,7 +32,6 @@ namespace DeviceStatus {
 class DragManager {
 public:
     DragManager() = default;
-
     ~DragManager() = default;
 
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
