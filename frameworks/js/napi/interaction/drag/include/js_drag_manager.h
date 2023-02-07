@@ -37,8 +37,9 @@ public:
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
-    void RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv);
+    void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
     void UnregisterThumbnailDraw(napi_env env);
+    
 private:
     struct CallbackInfo : public RefBase {
         napi_env env { nullptr };
@@ -46,6 +47,7 @@ private:
     };
 
 private:
+    void ReleaseReference(sptr<CallbackInfo>* callbackInfos);
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     void EmitStartThumbnailDraw(sptr<CallbackInfo> cb, int32_t pid, int32_t num);
     void EmitNoticeThumbnailDraw(sptr<CallbackInfo> cb, int32_t dragStates);

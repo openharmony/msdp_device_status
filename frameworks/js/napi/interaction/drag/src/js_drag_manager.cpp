@@ -106,22 +106,41 @@ void JsDragManager::EmitEndThumbnailDraw(sptr<JsDragManager::CallbackInfo> cb)
     (void)cb;
 }
 
-void JsDragManager::RegisterThumbnailDraw(napi_env env, int32_t argc, napi_value* argv)
+void JsDragManager::ReleaseReference(sptr<JsDragManager::CallbackInfo>* callbackInfos)
+{
+    for (size_t i = 0; i < 3; ++i) {
+        if (callbackInfos[i]->env != nullptr && callbackInfos[i]->ref != nullptr) {
+            napi_delete_reference(callbackInfos[i]->env, callbackInfos[i]->ref);
+            callbackInfos[i]->env = nullptr;
+            callbackInfos[i]->ref = nullptr;
+        }   
+    }
+}
+
+void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv)
 {
     CALL_INFO_TRACE;
     sptr<CallbackInfo> cb[3];
-    for (int32_t i = 0;i < argc; ++i) {
+    for (size_t i = 0; i < argc; ++i) {
         cb[i] = new (std::nothrow) CallbackInfo();
         CHKPV(cb[i]);
         napi_ref ref = nullptr;
-        CHKRV(napi_create_reference(env, argv[i], 1, &ref), CREATE_REFERENCE);
+        if (napi_create_reference(env, argv[i], 1, &ref) != napi_ok) {
+            ReleaseReference(cb);
+            FI_HILOGE("create reference failed");
+            return;
+        }
         cb[i]->env = env;
         cb[i]->ref = ref;
     }
-    auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this,cb[0], std::placeholders::_1, std::placeholders::_2);
-    auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw, this,cb[1], std::placeholders::_1);
+    auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this, cb[0],
+        std::placeholders::_1, std::placeholders::_2);
+    auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw, this, cb[1], std::placeholders::_1);
     auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this, cb[2]);
-    InteractionMgr->RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
+    if (InteractionMgr->RegisterThumbnailDraw(startCallback, noticeCallback, endCallback) != RET_OK) {
+        ReleaseReference(cb);
+        FI_HILOGE("call register thumbnail draw failed");
+    }
 }
 
 void JsDragManager::UnregisterThumbnailDraw(napi_env env)
