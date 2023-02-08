@@ -51,14 +51,14 @@ void InteractionManagerTest::TearDown()
 }
 
 
-std::unique_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
+std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
         std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
         return nullptr;
     }
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = std::make_unique<OHOS::Media::PixelMap>();
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
     info.size.height = pixelMapHeight;
