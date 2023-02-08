@@ -36,6 +36,11 @@ DeviceStatusMsdpMock* g_msdpMock = nullptr;
 } // namespace
 DeviceStatusMsdpMock::DeviceStatusMsdpMock()
 {
+    enabledType_ = {
+        TYPE_STILL,
+        TYPE_RELATIVE_STILL,
+        TYPE_CAR_BLUETOOTH,
+    };
     if (dataParse_ == nullptr) {
         dataParse_ = std::make_unique<DeviceStatusDataParse>();
     }
@@ -106,6 +111,7 @@ ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data& data)
         DEV_HILOGE(SERVICE, "callbacksImpl is nullptr");
         return RET_ERR;
     }
+    DEV_HILOGI(SERVICE, "type:%{public}d,value:%{public}d", data.type, data.value);
     g_msdpMock->GetCallbackImpl()->OnResult(data);
 
     return RET_OK;
@@ -176,8 +182,8 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    for (int32_t n = int(Type::TYPE_ABSOLUTE_STILL); n < Type::TYPE_MAX; ++n) {
-        Type type = Type(n);
+    for (auto item : enabledType_) {
+        Type type = item;
         if (dataParse_ == nullptr) {
             DEV_HILOGE(SERVICE, "dataParse_ is nullptr");
             return;

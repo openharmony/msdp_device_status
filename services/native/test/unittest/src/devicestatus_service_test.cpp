@@ -26,7 +26,6 @@
 #include "devicestatus_common.h"
 #include "devicestatus_client.h"
 #include "devicestatus_dumper.h"
-#include "devicestatus_service.h"
 
 using namespace testing::ext;
 using namespace OHOS::Msdp::DeviceStatus;

@@ -57,6 +57,8 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(Data& data, Type type)
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
         DEV_HILOGE(SERVICE, "read json failed, errno is %{public}d", errno);
+        data.type = type;
+        data.value = OnChangedValue::VALUE_INVALID;
         return false;
     }
     return DeviceStatusDataInit(jsonBuf, true, type, data);
