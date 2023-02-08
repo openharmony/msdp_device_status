@@ -42,6 +42,11 @@ enum class DragState {
     DRAGGING = 1
 };
 
+enum class DragCursorStyle {
+    FORBIDDEN,
+    ALLOWABLE
+};
+
 enum class DragResult {
     DRAG_SUCCESS = 0,
     DRAG_FAIL = 1,

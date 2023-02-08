@@ -100,6 +100,8 @@ public:
     int32_t StopCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
+    int32_t RegisterDragListener();
+    int32_t UnregisterDragListener();
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(int32_t result) override;
     int32_t UpdateDragStyle(int32_t style) override;
@@ -117,6 +119,7 @@ private:
     bool Init();
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
+    void InitSessionDeathMonitor();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);

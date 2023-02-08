@@ -60,6 +60,8 @@ enum class MessageId : int32_t {
     COORDINATION_ADD_LISTENER,
     COORDINATION_MESSAGE,
     COORDINATION_GET_STATE,
+
+    DRAG_STATE_LISTENER
 };
 
 enum TokenType : int32_t {
