@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
+#include <random>
 #include <thread>
 
 #include "devicestatus_client.h"
@@ -32,12 +33,13 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
 class DeviceStatusClientFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeCallback(const uint8_t* data);
-    static void TestGetDeviceStatusData();
-    static void TestUnsubscribeCallback();
+    static void TestGetDevicestatusData(Type type);
+    static void TestUnSubscribeCallback(Type type);
 
     class DeviceStatusTestCallback : public DeviceStatusCallbackStub {
     public:
