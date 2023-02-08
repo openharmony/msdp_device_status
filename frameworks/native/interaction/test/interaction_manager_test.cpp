@@ -252,7 +252,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
     CALL_TEST_DEBUG;
     DragData dragData;
     SetParam(3, 4, dragData);
-    std::function<void(int32_t &)> callback = [](int32_t &result) {
+    std::function<void(int32_t)> callback = [](int32_t result) {
         FI_HILOGD("StartDrag success");
     };
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);

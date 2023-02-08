@@ -38,7 +38,7 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
     return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
     if (callback == nullptr) {

@@ -31,11 +31,11 @@ public:
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();
-    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t)> callback);
     int32_t StopDrag(int32_t result);
 private:
     std::mutex mtx_;
-    std::function<void(int32_t&)> stopCallback_;
+    std::function<void(int32_t)> stopCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
