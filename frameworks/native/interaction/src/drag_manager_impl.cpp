@@ -70,8 +70,8 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
-int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
-        std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
+int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startCallback,
+    std::function<void(int32_t, int32_t)> noticeCallback, std::function<void(int32_t)> endCallback)
 {
     CALL_DEBUG_ENTER;
     auto ret = DeviceStatusClient::GetInstance().RegisterThumbnailDraw();
@@ -80,28 +80,32 @@ int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> star
         return ret;
     }
     hasRegisterThumbnailDraw_ = true;
-    thumbnailDrawCallback_.startDrag = startDrag;
-    thumbnailDrawCallback_.notice = notice;
-    thumbnailDrawCallback_.endDrag = endDrag;
+    thumbnailDrawCallback_.startCallback = startCallback;
+    thumbnailDrawCallback_.noticeCallback = noticeCallback;
+    thumbnailDrawCallback_.endCallback = endCallback;
     return ret;
 }
 
-int32_t DragManagerImpl::UnregisterThumbnailDraw()
+int32_t DragManagerImpl::UnregisterThumbnailDraw(std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
+    int32_t ret;
     if (!hasRegisterThumbnailDraw_) {
         FI_HILOGE("Have not registered thumbnail draw");
+        ret = RET_ERR;
+        callback(ret);
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
+    ret = DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
     if (ret != RET_OK) {
         FI_HILOGE("Unregister thumbnail draw failed");
         return ret;
     }
     hasRegisterThumbnailDraw_ = false;
-    thumbnailDrawCallback_.startDrag = nullptr;
-    thumbnailDrawCallback_.notice = nullptr;
-    thumbnailDrawCallback_.endDrag = nullptr;
+    thumbnailDrawCallback_.startCallback = nullptr;
+    thumbnailDrawCallback_.noticeCallback = nullptr;
+    thumbnailDrawCallback_.endCallback = nullptr;
+    callback(ret);
     return ret;
 }
 

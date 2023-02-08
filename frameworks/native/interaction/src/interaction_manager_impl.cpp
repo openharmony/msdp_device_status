@@ -211,15 +211,15 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     return dragManagerImpl_.GetDragTargetPid();
 }
 
-int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
-        std::function<void(int32_t)> notice, std::function<void(void)> endDrag)
+int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startCallback,
+    std::function<void(int32_t, int32_t)> noticeCallback, std::function<void(int32_t)> endCallback)
 {
-    return dragManagerImpl_.RegisterThumbnailDraw(startDrag, notice, endDrag);
+    return dragManagerImpl_.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
 }
     
-int32_t InteractionManagerImpl::UnregisterThumbnailDraw()
+int32_t InteractionManagerImpl::UnregisterThumbnailDraw(std::function<void(int32_t)> callback)
 {
-    return dragManagerImpl_.UnregisterThumbnailDraw();
+    return dragManagerImpl_.UnregisterThumbnailDraw(callback);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

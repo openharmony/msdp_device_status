@@ -88,18 +88,21 @@ monitorLabel:
     }
 }
 
-void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
+void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap, int32_t errCode)
 {
     (void)pixmap;
+    (void)errCode;
 }
 
-void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragStates)
+void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragStates, int32_t errCode)
 {
     (void)dragStates;
+    (void)errCode;
 }
 
-void JsDragManager::EmitEndThumbnailDraw()
+void JsDragManager::EmitEndThumbnailDraw(int32_t errCode)
 {
+    (void)errCode;
 }
 
 void JsDragManager::ReleaseReference()
@@ -139,19 +142,27 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
         thumbnailDrawCb_[i]->ref = ref;
     }
     auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this,
-        std::placeholders::_1);
-    auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw, this, std::placeholders::_1);
-    auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this);
+        std::placeholders::_1, std::placeholders::_2);
+    auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw,
+        this, std::placeholders::_1, std::placeholders::_2);
+    auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this, std::placeholders::_1);
     if (InteractionMgr->RegisterThumbnailDraw(startCallback, noticeCallback, endCallback) != RET_OK) {
         ReleaseReference();
         FI_HILOGE("Call register thumbnail draw failed");
     }
 }
 
+void JsDragManager::EmitUnregisterThumbnailDraw(int32_t errCode)
+{
+
+}
+
 void JsDragManager::UnregisterThumbnailDraw(napi_env env)
 {
     CALL_INFO_TRACE;
-    InteractionMgr->UnregisterThumbnailDraw();
+    auto callback = std::bind(&JsDragManager::EmitUnregisterThumbnailDraw, this, std::placeholders::_1);
+    InteractionMgr->UnregisterThumbnailDraw(callback);
+    ReleaseReference();
 }
 
 void JsDragManager::ResetEnv()

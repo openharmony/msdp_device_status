@@ -135,15 +135,15 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
-    int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startDrag,
-        std::function<void(int32_t)> notice, std::function<void(void)> endDrag);
+    int32_t RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startCallback,
+        std::function<void(int32_t, int32_t)> noticeCallback, std::function<void(int32_t)> endCallback);
 
     /**
      * @brief 取消注册阴影托管
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
-    int32_t UnregisterThumbnailDraw();
+    int32_t UnregisterThumbnailDraw(std::function<void(int32_t)> callback);
 
 private:
     InteractionManager() = default;
