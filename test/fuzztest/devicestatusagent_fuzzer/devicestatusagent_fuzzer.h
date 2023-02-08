@@ -39,14 +39,14 @@ enum class ApiNumber {
     NUM_TWO,
     NUM_THREE
 };
-class DeviceStatusAgentFuzzer {
+class DevicestatusAgentFuzzer {
 public:
     static bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size);
     static void TestSubscribeAgentEvent(const uint8_t* data);
-    static void TestUnsubscribeAgentEvent(std::shared_ptr<DeviceStatusAgent> agent);
+    static void TestUnSubscribeAgentEvent(Type type);
     static void TestSubscribeAgentEventIsNullptr(const uint8_t* data);
     static void TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data);
-    static void TestUnsubscribeAgentEventTypeIsNullptr(const std::shared_ptr<DeviceStatusAgent>& agent_);
+    static void TestUnSubscribeAgentEventTypeIsNullptr(Type type);
     class DeviceStatusAgentClient : public DeviceStatusAgent::DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentClient() {};
