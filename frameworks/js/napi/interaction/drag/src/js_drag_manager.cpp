@@ -154,7 +154,7 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
 
 void JsDragManager::EmitUnregisterThumbnailDraw(int32_t errCode)
 {
-
+    (void)errCode;
 }
 
 void JsDragManager::UnregisterThumbnailDraw(napi_env env)
