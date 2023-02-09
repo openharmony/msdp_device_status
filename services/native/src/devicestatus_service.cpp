@@ -699,9 +699,8 @@ int32_t DeviceStatusService::RegisterThumbnailDraw()
         std::bind(&DragManager::OnRegisterThumbnailDraw, dragMgr_, sess));
     if (ret != RET_OK) {
         FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::UnregisterThumbnailDraw()
@@ -714,9 +713,8 @@ int32_t DeviceStatusService::UnregisterThumbnailDraw()
         std::bind(&DragManager::OnUnregisterThumbnailDraw, dragMgr_, sess));
     if (ret != RET_OK) {
         FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
