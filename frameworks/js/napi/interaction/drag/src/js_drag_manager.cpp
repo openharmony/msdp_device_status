@@ -25,6 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
+constexpr int32_t ARG_THREE = 3;
 } // namespace
 
 JsDragManager::JsDragManager()
@@ -127,7 +128,7 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
         CHKPV(thumbnailDrawCb_);
     }
     thumbnailDrawCb_->env = env;
-    for (size_t i = 0; i < 3; ++i) {
+    for (size_t i = 0; i < ARG_THREE; ++i) {
         if (thumbnailDrawCb_->ref[i] != nullptr) {
             if (napi_delete_reference(thumbnailDrawCb_->env, thumbnailDrawCb_->ref[i]) != napi_ok) {
                 FI_HILOGE("Delete reference failed");
