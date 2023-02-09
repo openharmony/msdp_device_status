@@ -698,7 +698,7 @@ int32_t DeviceStatusService::RegisterThumbnailDraw()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::OnRegisterThumbnailDraw, dragMgr_, sess));
     if (ret != RET_OK) {
-        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        FI_HILOGE("OnRegisterThumbnailDraw failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -712,7 +712,7 @@ int32_t DeviceStatusService::UnregisterThumbnailDraw()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::OnUnregisterThumbnailDraw, dragMgr_, sess));
     if (ret != RET_OK) {
-        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        FI_HILOGE("OnUnregisterThumbnailDraw failed, ret:%{public}d", ret);
     }
     return ret;
 }
