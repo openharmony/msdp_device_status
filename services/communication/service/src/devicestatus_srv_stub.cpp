@@ -93,10 +93,10 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return StubGetDragTargetPid(data, reply);
         }
         case REGISTER_THUMBNAIL_DRAW: {
-            return StubRegisterThumbnailDraw(data,reply);
+            return StubRegisterThumbnailDraw(data, reply);
         }
         case UNREGISTER_THUMBNAIL_DRAW: {
-            return StubUnregisterThumbnailDraw(data,reply);
+            return StubUnregisterThumbnailDraw(data, reply);
         }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
