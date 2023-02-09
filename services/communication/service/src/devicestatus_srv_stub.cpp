@@ -302,7 +302,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (pixelMap);
+    dragData.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
     if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
         dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",

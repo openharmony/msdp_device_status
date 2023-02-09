@@ -29,7 +29,7 @@ static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
 static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
 static const int32_t MAX_BUFFER_SIZE = 512;
 struct DragData {
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap;
     int32_t x { -1 };
     int32_t y { -1 };
     std::vector<uint8_t> buffer;
