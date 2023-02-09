@@ -37,8 +37,8 @@ public:
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
-    void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
-    void UnregisterThumbnailDraw(napi_env env);
+    void RegisterThumbnailDraw(napi_env env, napi_value* argv);
+    void UnregisterThumbnailDraw(napi_env env, napi_value argv);
     
 private:
     struct CallbackInfo : public RefBase {
@@ -46,19 +46,26 @@ private:
         napi_ref ref { nullptr };
     };
 
+    struct ThumbnailDrawCb : public RefBase {
+        napi_env env { nullptr };
+        napi_ref ref[3] { nullptr };
+        int32_t errCode { -1 };
+        napi_deferred deferred { nullptr };
+        bool isApi9 { false };
+    };
 private:
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     void EmitStartThumbnailDraw(int32_t pixmap, int32_t errCode);
     void EmitNoticeThumbnailDraw(int32_t dragStates, int32_t errCode);
     void EmitEndThumbnailDraw(int32_t errCode);
-    void EmitUnregisterThumbnailDraw(int32_t errCode);
+    void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo, int32_t errCode);
     
 private:
     std::mutex mutex_;
     bool hasRegistered_ { false };
     inline static std::map<std::string, std::vector<std::unique_ptr<CallbackInfo>>> listeners_ {};
-    inline static std::vector<sptr<CallbackInfo>> thumbnailDrawCb_;
+    sptr<ThumbnailDrawCb> thumbnailDrawCb_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

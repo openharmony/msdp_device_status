@@ -129,9 +129,9 @@ public:
 
     /**
      * @brief 注册阴影缩略图托管
-     * @param startCallback 回调函数，用于在启动拖拽是调用
-     * @param noticeCallback 回调函数，用于通知拖拽状态
-     * @param endCallback 回调函数，用于就结束拖拽时调用
+     * @param startCallback 回调函数，在启动拖拽时调用
+     * @param noticeCallback 回调函数，拖拽状态变化时调用
+     * @param endCallback 回调函数，结束拖拽时调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */

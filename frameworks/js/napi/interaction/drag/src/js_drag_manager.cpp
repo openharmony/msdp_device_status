@@ -90,56 +90,58 @@ monitorLabel:
 
 void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap, int32_t errCode)
 {
-    (void)pixmap;
-    (void)errCode;
+    CALL_INFO_TRACE;
 }
 
 void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragStates, int32_t errCode)
 {
-    (void)dragStates;
-    (void)errCode;
+    CALL_INFO_TRACE;
 }
 
 void JsDragManager::EmitEndThumbnailDraw(int32_t errCode)
 {
-    (void)errCode;
+    CALL_INFO_TRACE;
 }
 
 void JsDragManager::ReleaseReference()
 {
-    for (auto item : thumbnailDrawCb_) {
+    CHKPV(thumbnailDrawCb_);
+    CHKPV(thumbnailDrawCb_->env);
+    for (auto item : thumbnailDrawCb_->ref) {
         if (item != nullptr) {
-            if (item->env != nullptr && item->ref != nullptr) {
-                napi_delete_reference(item->env, item->ref);
-                item->env = nullptr;
-                item->ref = nullptr;
+            if (napi_delete_reference(thumbnailDrawCb_->env, item) != napi_ok) {
+                FI_HILOGE("Create reference failed");
+                return;
             }
         }
     }
+    thumbnailDrawCb_->env = nullptr;
+    thumbnailDrawCb_ = nullptr;
 }
 
-void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv)
+void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
 {
     CALL_INFO_TRACE;
-    if (thumbnailDrawCb_.empty()) {
-        for (size_t i = 0; i < argc; ++i) {
-            auto cb = new (std::nothrow) CallbackInfo();
-            thumbnailDrawCb_.push_back(cb);
-        }
+    if (thumbnailDrawCb_ == nullptr) {
+        thumbnailDrawCb_ = new (std::nothrow) ThumbnailDrawCb();
+        CHKPV(thumbnailDrawCb_);
     }
-    for (size_t i = 0; i < argc; ++i) {
-        if (thumbnailDrawCb_[i] == nullptr) {
-            thumbnailDrawCb_[i] = new (std::nothrow) CallbackInfo();
+    thumbnailDrawCb_->env = env;
+    for (size_t i = 0; i < 3; ++i) {
+        if (thumbnailDrawCb_->ref[i] != nullptr) {
+            if (napi_delete_reference(thumbnailDrawCb_->env, thumbnailDrawCb_->ref[i]) != napi_ok) {
+                FI_HILOGE("Create reference failed");
+                return;
+            }
+            thumbnailDrawCb_->ref[i] = nullptr;
         }
-        CHKPV(thumbnailDrawCb_[i]);
         napi_ref ref = nullptr;
         if (napi_create_reference(env, argv[i], 1, &ref) != napi_ok) {
             ReleaseReference();
             FI_HILOGE("Create reference failed");
             return;
         }
-        thumbnailDrawCb_[i]->env = env;
-        thumbnailDrawCb_[i]->ref = ref;
+        thumbnailDrawCb_->ref[i] = ref;
     }
     auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this,
         std::placeholders::_1, std::placeholders::_2);
@@ -152,17 +154,28 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
     }
 }
 
-void JsDragManager::EmitUnregisterThumbnailDraw(int32_t errCode)
-{
-    (void)errCode;
-}
-
-void JsDragManager::UnregisterThumbnailDraw(napi_env env)
+void JsDragManager::EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo, int32_t errCode)
 {
     CALL_INFO_TRACE;
-    auto callback = std::bind(&JsDragManager::EmitUnregisterThumbnailDraw, this, std::placeholders::_1);
-    InteractionMgr->UnregisterThumbnailDraw(callback);
+}
+
+void JsDragManager::UnregisterThumbnailDraw(napi_env env, napi_value argv)
+{
+    CALL_INFO_TRACE;
     ReleaseReference();
+    napi_ref ref = nullptr;
+    if (napi_create_reference(env, argv, 1, &ref) != napi_ok) {
+        FI_HILOGE("Create reference failed");
+        return;
+    }
+    sptr<CallbackInfo> callbackInfo = new (std::nothrow) CallbackInfo();
+    CHKPV(callbackInfo);
+    callbackInfo->env = env;
+    callbackInfo->ref = ref;
+    auto callback = std::bind(&JsDragManager::EmitUnregisterThumbnailDraw, this, callbackInfo, std::placeholders::_1);
+    if (InteractionMgr->UnregisterThumbnailDraw(callback) != RET_OK) {
+        FI_HILOGE("Call Unregister thumbnail draw failed");
+    }
 }
 
 void JsDragManager::ResetEnv()
