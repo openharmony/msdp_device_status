@@ -110,7 +110,7 @@ void JsDragManager::ReleaseReference()
     for (auto item : thumbnailDrawCb_->ref) {
         if (item != nullptr) {
             if (napi_delete_reference(thumbnailDrawCb_->env, item) != napi_ok) {
-                FI_HILOGE("Create reference failed");
+                FI_HILOGE("Delete reference failed");
                 return;
             }
         }
@@ -130,7 +130,7 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
     for (size_t i = 0; i < 3; ++i) {
         if (thumbnailDrawCb_->ref[i] != nullptr) {
             if (napi_delete_reference(thumbnailDrawCb_->env, thumbnailDrawCb_->ref[i]) != napi_ok) {
-                FI_HILOGE("Create reference failed");
+                FI_HILOGE("Delete reference failed");
                 return;
             }
             thumbnailDrawCb_->ref[i] = nullptr;
