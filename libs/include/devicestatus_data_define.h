@@ -33,8 +33,10 @@ constexpr double ACC_VALID_THRHD = 160.0;
 constexpr double ANGLE_180_DEGREE = 180.0;
 constexpr double ANGLE_HOR_UP_THRHD = 180.1;
 constexpr double ANGLE_HOR_LOW_THRHD = 160.0;
+constexpr double ANGLE_HOR_FLIPPED_THRHD = 20.0;
 constexpr double ANGLE_VER_UP_THRHD = 110.0;
 constexpr double ANGLE_VER_LOW_THRHD = 80.0;
+constexpr double ANGLE_VER_FLIPPED_THRHD = 20.0;
 
 constexpr int32_t VALID_TIME_THRESHOLD = 500;
 constexpr int32_t ACC_SAMPLE_PERIOD = 100;
