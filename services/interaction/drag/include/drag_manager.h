@@ -37,6 +37,8 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid() const;
+    int32_t OnRegisterThumbnailDraw(SessionPtr sess);
+    int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
 private:
     DragState dragState_ { DragState::FREE };
     SessionPtr dragOutSession_ { nullptr };

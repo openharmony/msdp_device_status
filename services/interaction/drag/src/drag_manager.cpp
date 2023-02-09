@@ -63,6 +63,17 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
+int32_t DragManager::OnRegisterThumbnailDraw(SessionPtr sess)
+{
+    CALL_DEBUG_ENTER;
+    return RET_OK;
+}
+
+int32_t DragManager::OnUnregisterThumbnailDraw(SessionPtr sess)
+{
+    CALL_DEBUG_ENTER;
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

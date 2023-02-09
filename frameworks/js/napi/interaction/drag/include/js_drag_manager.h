@@ -56,10 +56,10 @@ private:
 private:
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(int32_t pixmap, int32_t errCode);
-    void EmitNoticeThumbnailDraw(int32_t dragStates, int32_t errCode);
-    void EmitEndThumbnailDraw(int32_t errCode);
-    void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo, int32_t errCode);
+    void EmitStartThumbnailDraw(int32_t pixmap);
+    void EmitNoticeThumbnailDraw(int32_t dragStates);
+    void EmitEndThumbnailDraw();
+    void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
     
 private:
     std::mutex mutex_;
