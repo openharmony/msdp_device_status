@@ -57,7 +57,7 @@ private:
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     void EmitStartThumbnailDraw(int32_t pixmap);
-    void EmitNoticeThumbnailDraw(int32_t dragStates);
+    void EmitNoticeThumbnailDraw(int32_t dragState);
     void EmitEndThumbnailDraw();
     void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
     

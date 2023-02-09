@@ -94,7 +94,7 @@ void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
     CALL_INFO_TRACE;
 }
 
-void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragStates)
+void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
 {
     CALL_INFO_TRACE;
 }
@@ -109,11 +109,12 @@ void JsDragManager::ReleaseReference()
     CHKPV(thumbnailDrawCb_);
     CHKPV(thumbnailDrawCb_->env);
     for (auto item : thumbnailDrawCb_->ref) {
-        if (item != nullptr) {
-            if (napi_delete_reference(thumbnailDrawCb_->env, item) != napi_ok) {
-                FI_HILOGE("Delete reference failed");
-                return;
-            }
+        if (item == nullptr) {
+            continue;
+        }
+        if (napi_delete_reference(thumbnailDrawCb_->env, item) != napi_ok) {
+            FI_HILOGE("Delete reference failed");
+            return;
         }
     }
     thumbnailDrawCb_->env = nullptr;
@@ -123,19 +124,13 @@ void JsDragManager::ReleaseReference()
 void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
 {
     CALL_INFO_TRACE;
-    if (thumbnailDrawCb_ == nullptr) {
-        thumbnailDrawCb_ = new (std::nothrow) ThumbnailDrawCb();
-        CHKPV(thumbnailDrawCb_);
+    if (thumbnailDrawCb_ != nullptr) {
+        ReleaseReference();
     }
+    thumbnailDrawCb_ = new (std::nothrow) ThumbnailDrawCb();
+    CHKPV(thumbnailDrawCb_);
     thumbnailDrawCb_->env = env;
     for (size_t i = 0; i < ARG_THREE; ++i) {
-        if (thumbnailDrawCb_->ref[i] != nullptr) {
-            if (napi_delete_reference(thumbnailDrawCb_->env, thumbnailDrawCb_->ref[i]) != napi_ok) {
-                FI_HILOGE("Delete reference failed");
-                return;
-            }
-            thumbnailDrawCb_->ref[i] = nullptr;
-        }
         napi_ref ref = nullptr;
         if (napi_create_reference(env, argv[i], 1, &ref) != napi_ok) {
             ReleaseReference();
