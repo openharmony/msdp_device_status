@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -328,7 +328,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.pixelMap = std::unique_ptr<OHOS::Media::PixelMap> (pixelMap);
+    dragData.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
     if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
         dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
@@ -343,6 +343,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
         return RET_ERR;
     }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StartDrag(dragData);
     if (ret != RET_OK) {
         FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);

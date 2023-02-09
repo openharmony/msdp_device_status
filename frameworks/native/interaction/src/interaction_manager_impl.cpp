@@ -188,7 +188,7 @@ int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
     return dragManagerImpl_.UpdateDragMessage(message);
 }
 
-int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback)
+int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);

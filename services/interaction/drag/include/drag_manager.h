@@ -13,41 +13,36 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DATA_H
-#define DRAG_DATA_H
+#ifndef DRAG_MANAGER_H
+#define DRAG_MANAGER_H
 
-#include <functional>
-#include <memory>
-#include <vector>
+#include <string>
 
+#include "i_input_event_consumer.h"
+#include "input_manager.h"
 #include "pixel_map.h"
+
+#include "devicestatus_define.h"
+#include "drag_data.h"
+#include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
-static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
-static const int32_t MAX_BUFFER_SIZE = 512;
-struct DragData {
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap;
-    int32_t x { -1 };
-    int32_t y { -1 };
-    std::vector<uint8_t> buffer;
-    int32_t sourceType { -1 };
-    int32_t dragNum { -1 };
-};
+class DragManager {
+public:
+    DragManager() = default;
+    ~DragManager() = default;
 
-enum class DragState {
-    FREE = 0,
-    DRAGGING = 1
-};
-
-enum class DragResult {
-    DRAG_SUCCESS = 0,
-    DRAG_FAIL = 1,
-    DRAG_CANCEL = 2
+    int32_t StartDrag(const DragData &dragData, SessionPtr sess);
+    int32_t StopDrag(int32_t result);
+    int32_t GetDragTargetPid() const;
+private:
+    DragState dragState_ { DragState::FREE };
+    SessionPtr dragOutSession_ { nullptr };
+    int32_t dragTargetPid_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DATA_H
+#endif // DRAG_MANAGER_H

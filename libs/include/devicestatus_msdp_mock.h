@@ -71,7 +71,7 @@ private:
     int32_t timerFd_ {-1};
     int32_t epFd_ {-1};
     std::mutex mutex_;
-    std::vector<int32_t> enabledType_;
+    std::vector<Type> enabledType_;
     std::atomic<bool> alive_ {false};
     std::shared_ptr<std::thread> thread_;
 };

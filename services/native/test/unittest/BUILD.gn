@@ -42,7 +42,6 @@ ohos_unittest("test_devicestatus_service") {
     "${ability_runtime_path}/frameworks/native/appkit:appkit_native",
     "${device_status_frameworks_path}/js/napi:stationary",
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_service_path}:devicestatus_service",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/googletest:gtest_main",
   ]
@@ -78,7 +77,6 @@ ohos_unittest("DeviceStatusAgentTest") {
 
   deps = [
     "//base/msdp/device_status/frameworks/native/src:deviceagent",
-    "//base/msdp/device_status/services:devicestatus_service",
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [

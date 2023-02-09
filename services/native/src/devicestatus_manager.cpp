@@ -151,6 +151,7 @@ int32_t DeviceStatusManager::SensorDataCallback(struct SensorEvents *event)
 int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusData)
 {
     DEV_HILOGD(SERVICE, "Enter");
+    DEV_HILOGI(SERVICE, "type:%{public}d,value:%{public}d", devicestatusData.type,devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     auto iter = listenerMap_.find(devicestatusData.type);
     if (iter == listenerMap_.end()) {

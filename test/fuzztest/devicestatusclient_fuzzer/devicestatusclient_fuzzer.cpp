@@ -15,16 +15,19 @@
 
 #include "devicestatusclient_fuzzer.h"
 
+#include <cstring>
 #include <stddef.h>
 #include <stdint.h>
+#include "securec.h"
 
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
-auto &client_ = DeviceStatusClient::GetInstance();
+auto& client_ = DeviceStatusClient::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb = new DeviceStatusClientFuzzer::DeviceStatusTestCallback();
 const int WAIT_TIME = 1000;
-void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const Data& devicestatusData)
+void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const \
+    Data& devicestatusData)
 {
     std::cout << "DeviceStatusTestCallback type: " << devicestatusData.type << std::endl;
     std::cout << "DeviceStatusTestCallback value: " << devicestatusData.value << std::endl;
@@ -33,32 +36,40 @@ void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(c
 void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 {
     std::cout << "TestSubscribeCallback: Enter " << std::endl;
+    int32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
 
-    client_.SubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestGetDeviceStatusData();
-}
-
-void DeviceStatusClientFuzzer::TestGetDeviceStatusData()
-{
-    std::cout << "TestGetDeviceStatusData: Enter " << std::endl;
-    client_.GetDeviceStatusData(Type::TYPE_LID_OPEN);
+    client_.SubscribeCallback(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnsubscribeCallback();
+    TestGetDevicestatusData(static_cast<Type>(type[0]));
 }
 
-void DeviceStatusClientFuzzer::TestUnsubscribeCallback()
+void DeviceStatusClientFuzzer::TestGetDevicestatusData(Type type)
 {
-    std::cout << "TestUnsubscribeCallback: Enter " << std::endl;
+    std::cout << "TestGetDevicestatusData: Enter " << std::endl;
+    client_.GetDeviceStatusData(type);
 
-    client_.UnsubscribeCallback(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, cb);
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
+    TestUnSubscribeCallback(type);
+}
+
+void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
+{
+    std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
+
+    client_.UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    DeviceStatusClientFuzzer::TestSubscribeCallback(data);
+    int32_t idSize = 8;
+    if (static_cast<int32_t>(size) > idSize) {
+        DeviceStatusClientFuzzer::TestSubscribeCallback(data);
+    }
     return true;
 }
 

@@ -37,14 +37,14 @@ public:
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();
-    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::function<void(int32_t)> callback);
     int32_t StopDrag(int32_t result);
     int32_t RegisterThumbnailDraw(std::function<void(int32_t, int32_t)> startCallback,
         std::function<void(int32_t, int32_t)> noticeCallback, std::function<void(int32_t)> endCallback);
     int32_t UnregisterThumbnailDraw(std::function<void(int32_t)> callback);
 private:
     std::mutex mtx_;
-    std::function<void(int32_t&)> stopCallback_;
+    std::function<void(int32_t)> stopCallback_;
     bool hasRegisterThumbnailDraw_ { false };
     ThumbnailDrawCallback thumbnailDrawCallback_;
 };

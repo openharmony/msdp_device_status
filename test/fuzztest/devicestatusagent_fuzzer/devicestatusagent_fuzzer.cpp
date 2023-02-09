@@ -14,7 +14,6 @@
  */
 
 #include "devicestatusagent_fuzzer.h"
-#include "devicestatus_hilog_wrapper.h"
 
 using namespace std;
 using namespace OHOS;
@@ -22,11 +21,11 @@ using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 const int WAIT_TIME = 1000;
 }
-static std::shared_ptr<DeviceStatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
-            std::make_shared<DeviceStatusAgentFuzzer::DeviceStatusAgentClient>();
+static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
+            std::make_shared<DevicestatusAgentFuzzer::DeviceStatusAgentClient>();
 static std::shared_ptr<DeviceStatusAgent> agent_ = std::make_shared<DeviceStatusAgent>();
 
-bool DeviceStatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
+bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
     const Data& devicestatusData)
 {
     std::cout << "type: " << devicestatusData.type << std::endl;
@@ -34,54 +33,76 @@ bool DeviceStatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
     return true;
 }
 
-void DeviceStatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
+void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEvent: Enter " << std::endl;
-    agent_->SubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, agentEvent_);
-    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnsubscribeAgentEvent(agent_);
-}
-
-void DeviceStatusAgentFuzzer::TestUnsubscribeAgentEvent(std::shared_ptr<DeviceStatusAgent> agent)
-{
-    std::cout << "TestUnsubscribeAgentEvent: Enter " << std::endl;
-    if (agent == nullptr) {
-    DEV_HILOGE(SERVICE, "Agent is nullptr");
-    return;
+    int32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
     }
-    agent->UnsubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT);
+
+    agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
+        ReportLatencyNs::LONG, agentEvent_);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
+    TestUnSubscribeAgentEvent(static_cast<Type>(type[0]));
 }
 
-void DeviceStatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)
+void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(Type type)
+{
+    std::cout << "TestUnSubscribeAgentEvent: Enter " << std::endl;
+
+    agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
+}
+
+void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEventIsNullptr: Enter " << std::endl;
+    int32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
     agentEvent_ = nullptr;
-    agent_->SubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, agentEvent_);
+
+    agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
+        ReportLatencyNs::LONG, agentEvent_);
+
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnsubscribeAgentEvent(agent_);
+    TestUnSubscribeAgentEvent(static_cast<Type>(type[0]));
 }
 
-void DeviceStatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data)
+void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
-    agent_->SubscribeAgentEvent(Type::TYPE_INVALID, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, agentEvent_);
+    int32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+
+    agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
+        ReportLatencyNs::LONG, agentEvent_);
+
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
-    TestUnsubscribeAgentEventTypeIsNullptr(agent_);
+    TestUnSubscribeAgentEventTypeIsNullptr(static_cast<Type>(type[0]));
 }
 
-void DeviceStatusAgentFuzzer::TestUnsubscribeAgentEventTypeIsNullptr(const std::shared_ptr<DeviceStatusAgent>& agent_)
+void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 {
-    std::cout << "TestUnsubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
-    agent_->UnsubscribeAgentEvent(Type::TYPE_INVALID, ActivityEvent::ENTER_EXIT);
+    std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
+
+    agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 
-bool DeviceStatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     int idSize = 8;
     if (static_cast<int>(size) > idSize) {
-        TestSubscribeAgentEvent(data);
-        TestSubscribeAgentEventIsNullptr(data);
-        TestSubscribeAgentEventTypeIsNullptr(data);
+        DevicestatusAgentFuzzer::TestSubscribeAgentEvent(data);
+        DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(data);
+        DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(data);
     }
     return true;
 }
@@ -90,6 +111,6 @@ bool DeviceStatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* dat
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::DeviceStatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::Msdp::DeviceStatus::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
