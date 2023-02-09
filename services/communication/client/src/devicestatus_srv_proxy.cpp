@@ -396,7 +396,6 @@ int32_t DeviceStatusSrvProxy::UnregisterThumbnailDraw()
     int32_t ret = remote->SendRequest(UNREGISTER_THUMBNAIL_DRAW, data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return RET_ERR;
     }
     return ret;
 }
