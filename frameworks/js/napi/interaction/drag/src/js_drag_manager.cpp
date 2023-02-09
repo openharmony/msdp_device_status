@@ -94,7 +94,7 @@ void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     thumbnailDrawCb_->data = pixmap;
@@ -106,7 +106,7 @@ void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     thumbnailDrawCb_->data = dragState;
@@ -118,7 +118,7 @@ void JsDragManager::EmitEndThumbnailDraw()
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = thumbnailDrawCb_.GetRefPtr();
@@ -175,7 +175,7 @@ void JsDragManager::EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo)
     CALL_INFO_TRACE;
     CHKPV(callbackInfo);
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(callbackInfo->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = callbackInfo.GetRefPtr();
