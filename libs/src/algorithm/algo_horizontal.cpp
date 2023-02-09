@@ -54,8 +54,10 @@ void AlgoHorizontal::ExecuteOperation()
     algoPara_.roll = atan2(algoPara_.x, algoPara_.z) * (ANGLE_180_DEGREE / PI);
     DEV_HILOGD(SERVICE, "pitch:%{public}f, roll:%{public}f", algoPara_.pitch, algoPara_.roll);
 
-    if (((abs(algoPara_.pitch) > ANGLE_HOR_LOW_THRHD) && (abs(algoPara_.pitch) < ANGLE_HOR_UP_THRHD)) &&
-        ((abs(algoPara_.roll) > ANGLE_HOR_LOW_THRHD) && (abs(algoPara_.roll) < ANGLE_HOR_UP_THRHD))) {
+    if ((((abs(algoPara_.pitch) > ANGLE_HOR_LOW_THRHD) && (abs(algoPara_.pitch) < ANGLE_HOR_UP_THRHD)) &&
+        ((abs(algoPara_.roll) > ANGLE_HOR_LOW_THRHD) && (abs(algoPara_.roll) < ANGLE_HOR_UP_THRHD))) ||
+        (((abs(algoPara_.pitch) > 0) && (abs(algoPara_.pitch) < ANGLE_HOR_FLIPPED_THRHD)) &&
+        ((abs(algoPara_.roll) > 0) && (abs(algoPara_.roll) < ANGLE_VER_FLIPPED_THRHD)))) {
         if (state_ == HORIZONTAL) {
             return;
         }

@@ -24,7 +24,7 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
-#include "stream_session.h"
+#include "state_change_notify.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -34,12 +34,16 @@ public:
     DragManager() = default;
     ~DragManager() = default;
 
+    void OnSessionLost(SessionPtr session);
+    int32_t AddListener(SessionPtr session);
+    int32_t RemoveListener(SessionPtr session);
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid() const;
     int32_t OnRegisterThumbnailDraw(SessionPtr sess);
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
 private:
+    StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
     SessionPtr dragOutSession_ { nullptr };
     int32_t dragTargetPid_ { -1 };

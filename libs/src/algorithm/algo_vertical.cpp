@@ -57,9 +57,11 @@ void AlgoVertical::ExecuteOperation()
         return;
     }
     algoPara_.pitch = -atan2(algoPara_.y, algoPara_.z) * (ANGLE_180_DEGREE / PI);
-    DEV_HILOGD(SERVICE, "pitch:%{public}f", algoPara_.pitch);
+    algoPara_.roll = atan2(algoPara_.x, algoPara_.z) * (ANGLE_180_DEGREE / PI);
+    DEV_HILOGD(SERVICE, "pitch:%{public}f, roll:%{public}f", algoPara_.pitch, algoPara_.roll);
 
-    if ((abs(algoPara_.pitch) > ANGLE_VER_LOW_THRHD) && (abs(algoPara_.pitch) < ANGLE_VER_UP_THRHD)) {
+    if (((abs(algoPara_.pitch) > ANGLE_VER_LOW_THRHD) && (abs(algoPara_.pitch) < ANGLE_VER_UP_THRHD)) ||
+        ((abs(algoPara_.roll) > ANGLE_VER_LOW_THRHD) && (abs(algoPara_.roll) < ANGLE_VER_UP_THRHD))) {
         if (state_ == VERTICAL) {
             return;
         }
