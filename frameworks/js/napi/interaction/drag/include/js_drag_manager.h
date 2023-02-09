@@ -51,6 +51,7 @@ private:
         napi_ref ref[3] { nullptr };
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
+        int32_t data;
         bool isApi9 { false };
     };
 private:

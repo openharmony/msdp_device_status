@@ -92,16 +92,36 @@ monitorLabel:
 void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
 {
     CALL_INFO_TRACE;
+    CHKPV(thumbnailDrawCb_);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    thumbnailDrawCb_->data = pixmap;
+    work->data = thumbnailDrawCb_.GetRefPtr();
 }
 
 void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
 {
     CALL_INFO_TRACE;
+    CHKPV(thumbnailDrawCb_);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    thumbnailDrawCb_->data = dragState;
+    work->data = thumbnailDrawCb_.GetRefPtr();
 }
 
 void JsDragManager::EmitEndThumbnailDraw()
 {
     CALL_INFO_TRACE;
+    CHKPV(thumbnailDrawCb_);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = thumbnailDrawCb_.GetRefPtr();
 }
 
 void JsDragManager::ReleaseReference()
@@ -153,6 +173,12 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
 void JsDragManager::EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo)
 {
     CALL_INFO_TRACE;
+    CHKPV(callbackInfo);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    work->data = callbackInfo.GetRefPtr();
 }
 
 void JsDragManager::UnregisterThumbnailDraw(napi_env env, napi_value argv)
