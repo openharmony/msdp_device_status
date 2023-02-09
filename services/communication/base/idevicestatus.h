@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,8 @@ public:
         GET_DRAG_TARGET_PID,
         REGISTER_THUMBNAIL_DRAW,
         UNREGISTER_THUMBNAIL_DRAW,
+        REGISTER_DRAG_MONITOR,
+        UNREGISTER_DRAG_MONITOR,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -71,6 +73,8 @@ public:
     virtual int32_t UpdateDragStyle(int32_t style) = 0;
     virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
     virtual int32_t GetDragTargetPid() = 0;
+    virtual int32_t AddDraglistener() = 0;
+    virtual int32_t RemoveDraglistener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual bool IsRunning() const

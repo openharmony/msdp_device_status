@@ -61,6 +61,8 @@ public:
     int32_t RegisterThumbnailDraw();
     int32_t UnregisterThumbnailDraw();
     int32_t GetDragTargetPid();
+    int32_t AddDraglistener();
+    int32_t RemoveDraglistener();
 
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;

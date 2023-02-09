@@ -26,27 +26,30 @@
 #include "refbase.h"
 #include <uv.h>
 
+#include "i_drag_listener.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class JsDragManager {
+class JsDragManager : public IDragListener, public std::enable_shared_from_this<JsDragManager> {
 public:
-    JsDragManager();
+    JsDragManager() = default;
     ~JsDragManager() = default;
     DISALLOW_COPY_AND_MOVE(JsDragManager);
 
-    void RegisterListener(napi_env env, const std::string &type, napi_value handle);
-    void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
+    void OnDragMessage(DragMessage msg) override;
+    void RegisterListener(napi_env env, napi_value handle);
+    void UnregisterListener(napi_env env, napi_value handle = nullptr);
     void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
     void UnregisterThumbnailDraw(napi_env env, napi_value argv);
-    
+
 private:
     struct CallbackInfo : public RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
+        DragMessage msg;
     };
-
     struct ThumbnailDrawCb : public RefBase {
         napi_env env { nullptr };
         napi_ref ref[3] { nullptr };
@@ -55,19 +58,30 @@ private:
         int32_t data { 0 };
         bool isApi9 { false };
     };
+
 private:
+    static void CallDragMsg(uv_work_t *work, int32_t status);
+    void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     void EmitStartThumbnailDraw(int32_t pixmap);
     void EmitNoticeThumbnailDraw(int32_t dragState);
     void EmitEndThumbnailDraw();
     void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
-    
+    template <typename T>
+    static void DeletePtr(T &ptr)
+    {
+        if (ptr != nullptr) {
+            delete ptr;
+            ptr = nullptr;
+        }
+    }
+
 private:
-    std::mutex mutex_;
-    bool hasRegistered_ { false };
-    inline static std::map<std::string, std::vector<std::unique_ptr<CallbackInfo>>> listeners_ {};
+    std::atomic_bool hasRegistered_ { false };
     sptr<ThumbnailDrawCb> thumbnailDrawCb_ { nullptr };
+    inline static std::mutex mutex_;
+    inline static std::vector<std::unique_ptr<CallbackInfo>> listeners_ {};
 };
 } // namespace DeviceStatus
 } // namespace Msdp
