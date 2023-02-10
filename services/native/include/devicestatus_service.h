@@ -110,6 +110,8 @@ public:
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
 
+    int32_t RegisterThumbnailDraw() override;
+    int32_t UnregisterThumbnailDraw() override;
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;

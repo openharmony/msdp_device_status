@@ -23,6 +23,8 @@
 
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
+#include "refbase.h"
+#include <uv.h>
 
 namespace OHOS {
 namespace Msdp {
@@ -36,18 +38,36 @@ public:
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
-
+    void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
+    void UnregisterThumbnailDraw(napi_env env, napi_value argv);
+    
 private:
-    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    struct CallbackInfo {
+    struct CallbackInfo : public RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
     };
 
+    struct ThumbnailDrawCb : public RefBase {
+        napi_env env { nullptr };
+        napi_ref ref[3] { nullptr };
+        int32_t errCode { -1 };
+        napi_deferred deferred { nullptr };
+        int32_t data { 0 };
+        bool isApi9 { false };
+    };
+private:
+    void ReleaseReference();
+    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+    void EmitStartThumbnailDraw(int32_t pixmap);
+    void EmitNoticeThumbnailDraw(int32_t dragState);
+    void EmitEndThumbnailDraw();
+    void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
+    
 private:
     std::mutex mutex_;
     bool hasRegistered_ { false };
     inline static std::map<std::string, std::vector<std::unique_ptr<CallbackInfo>>> listeners_ {};
+    sptr<ThumbnailDrawCb> thumbnailDrawCb_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

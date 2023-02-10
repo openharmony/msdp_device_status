@@ -722,6 +722,34 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return RET_OK;
 }
 
+int32_t DeviceStatusService::RegisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnRegisterThumbnailDraw, dragMgr_, sess));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnRegisterThumbnailDraw failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::UnregisterThumbnailDraw()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnUnregisterThumbnailDraw, dragMgr_, sess));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnUnregisterThumbnailDraw failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {
