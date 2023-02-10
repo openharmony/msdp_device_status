@@ -61,6 +61,7 @@ enum class MessageId : int32_t {
     COORDINATION_MESSAGE,
     COORDINATION_GET_STATE,
 
+    DRAG_STOP,
     DRAG_STATE_LISTENER
 };
 

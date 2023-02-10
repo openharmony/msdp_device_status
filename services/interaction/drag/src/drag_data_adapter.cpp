@@ -44,6 +44,18 @@ void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &po
     pointerStyle_ = pointerStyle;
 }
 
+int32_t DragDataAdapter::UpdateDragStyle(int32_t style)
+{
+    dragStyle_ = style;
+    return RET_OK;
+}
+
+int32_t DragDataAdapter::UpdateDragMessage(const std::u16string &message)
+{
+    dragMessage_ = message;
+    return RET_OK;
+}
+
 OHOS::MMI::ExtraData DragDataAdapter::GetExtraData() const
 {
     return extraData_;

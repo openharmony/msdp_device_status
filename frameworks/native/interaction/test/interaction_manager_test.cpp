@@ -14,6 +14,7 @@
  */
 
 #include <iostream>
+#include <unistd.h>
 
 #include <gtest/gtest.h>
 
@@ -68,6 +69,7 @@ std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
     void *buffer = malloc(bufferSize);
     if (buffer == nullptr) {
+        std::cout << "Malloc buffer failed" << std::endl;
         return nullptr;
     }
     char *character = reinterpret_cast<char *>(buffer);
@@ -80,12 +82,13 @@ std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
 
 void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
+    std::cout << "height: " << height << "width: " << width << std::endl;
     dragData.pixelMap = CreatePixelMap(width, height);
     dragData.x = 0;
     dragData.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
-    dragData.sourceType = 0;
-    dragData.dragNum = 0;
+    dragData.sourceType = 1;
+    dragData.dragNum = 1;
 }
 
 /**
@@ -251,7 +254,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    SetParam(3, 4, dragData);
+    SetParam(200, 200, dragData);
     std::function<void(int32_t)> callback = [](int32_t result) {
         FI_HILOGD("StartDrag success");
     };

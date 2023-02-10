@@ -41,22 +41,20 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (callback == nullptr) {
-        FI_HILOGE("Callback is nullptr");
-        return RET_ERR;
-    }
-    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
-        return RET_ERR;
-    }
-    if (dragData.pixelMap == nullptr) {
-        FI_HILOGE("dragData.pixelMap is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(callback, RET_ERR);
+    CHKPR(dragData.pixelMap, RET_ERR);
     if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
         dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
             dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
+        return RET_ERR;
+    }
+    if (dragData.x < 0 || dragData.y < 0 || dragData.dragNum < 0) {
+        FI_HILOGE("Invalid x y or dragNum");
+        return RET_ERR;
+    }
+    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
@@ -113,6 +111,27 @@ int32_t DragManagerImpl::GetDragTargetPid()
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
+
+int32_t DragManagerImpl::OnDragMessage(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t result;
+    pkt >> result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read drag msg failed");
+        return RET_ERR;
+    }
+    OnNotifyDragResult(result);
+    return RET_OK;
+}
+
+void DragManagerImpl::OnNotifyDragResult(int32_t result)
+{
+    CALL_DEBUG_ENTER;
+    FI_HILOGI("Get message from StopDrag");
+    stopCallback_(result);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

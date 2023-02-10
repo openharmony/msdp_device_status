@@ -879,14 +879,22 @@ int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    dragMgr_.StartDrag(dragData, sess);
+    int32_t ret = dragMgr_.StartDrag(dragData, sess);
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStartDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
 int32_t DeviceStatusService::OnStopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
-    dragMgr_.StopDrag(result);
+    int32_t ret = dragMgr_.StopDrag(result);
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace DeviceStatus

@@ -150,11 +150,12 @@ private:
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
-    DragManager dragMgr_;
     std::atomic<bool> ready_ = false;
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
+    DragManager dragMgr_;
 };
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
