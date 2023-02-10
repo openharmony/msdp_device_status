@@ -203,7 +203,7 @@ napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info
     CHKPP(jsDev);
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
-    jsDragMgr->RegisterThumbnailDraw(env, argc,argv);
+    jsDragMgr->RegisterThumbnailDraw(env, argc, argv);
     return nullptr;
 }
 
