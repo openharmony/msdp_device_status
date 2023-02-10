@@ -27,7 +27,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
 const char* DRAG_CLASS = "drag_class";
 const char* DRAG = "drag";
-constexpr int32_t ARG_THREE = 3;
 } // namespace
 
 JsDragContext::JsDragContext()
@@ -188,7 +187,7 @@ napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < ARG_THREE) {
+    if (argc < 3) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
