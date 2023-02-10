@@ -25,7 +25,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
-constexpr int32_t ARG_THREE = 3;
 } // namespace
 
 JsDragManager::JsDragManager()
@@ -141,7 +140,7 @@ void JsDragManager::ReleaseReference()
     thumbnailDrawCb_ = nullptr;
 }
 
-void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
+void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv)
 {
     CALL_INFO_TRACE;
     if (thumbnailDrawCb_ != nullptr) {
@@ -150,7 +149,7 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, napi_value* argv)
     thumbnailDrawCb_ = new (std::nothrow) ThumbnailDrawCb();
     CHKPV(thumbnailDrawCb_);
     thumbnailDrawCb_->env = env;
-    for (size_t i = 0; i < ARG_THREE; ++i) {
+    for (size_t i = 0; i < argc; ++i) {
         napi_ref ref = nullptr;
         if (napi_create_reference(env, argv[i], 1, &ref) != napi_ok) {
             ReleaseReference();

@@ -21,11 +21,10 @@
 #include <string>
 #include <vector>
 
-#include <uv.h>
-
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "refbase.h"
+#include <uv.h>
 
 namespace OHOS {
 namespace Msdp {
@@ -39,7 +38,7 @@ public:
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
-    void RegisterThumbnailDraw(napi_env env, napi_value* argv);
+    void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
     void UnregisterThumbnailDraw(napi_env env, napi_value argv);
     
 private:
@@ -53,7 +52,7 @@ private:
         napi_ref ref[3] { nullptr };
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
-        int32_t data;
+        int32_t data { 0 };
         bool isApi9 { false };
     };
 private:
