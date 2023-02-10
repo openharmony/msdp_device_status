@@ -44,7 +44,7 @@ public:
     std::u16string GetDragMessage() const;
 
 private:
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
     OHOS::MMI::ExtraData extraData_;
     OHOS::MMI::PointerStyle pointerStyle_;
     std::pair<int, int> coordinate_;
