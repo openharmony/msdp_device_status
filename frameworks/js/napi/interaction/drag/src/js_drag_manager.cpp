@@ -149,7 +149,7 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
     thumbnailDrawCb_ = new (std::nothrow) ThumbnailDrawCb();
     CHKPV(thumbnailDrawCb_);
     thumbnailDrawCb_->env = env;
-    for (size_t i = 0; i < argc; ++i) {
+    for (size_t i = 0; i < 3; ++i) {
         napi_ref ref = nullptr;
         if (napi_create_reference(env, argv[i], 1, &ref) != napi_ok) {
             ReleaseReference();
