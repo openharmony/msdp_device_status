@@ -191,9 +191,8 @@ napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info
     if (argc < ARG_THREE) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
-    } else {
-        argc = ARG_THREE;
     }
+    argc = ARG_THREE;
     for (auto item : argv) {
         if (!UtilNapi::TypeOf(env, item, napi_function)) {
             THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
