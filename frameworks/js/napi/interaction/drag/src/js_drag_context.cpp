@@ -188,11 +188,10 @@ napi_value JsDragContext::RegisterThumbnailDraw(napi_env env, napi_callback_info
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < ARG_THREE) {
+    if (argc != ARG_THREE) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
-    argc = ARG_THREE;
     for (auto item : argv) {
         if (!UtilNapi::TypeOf(env, item, napi_function)) {
             THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
@@ -213,7 +212,7 @@ napi_value JsDragContext::UnregisterThumbnailDraw(napi_env env, napi_callback_in
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc != 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }

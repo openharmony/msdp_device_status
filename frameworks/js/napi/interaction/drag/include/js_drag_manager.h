@@ -67,7 +67,7 @@ private:
     std::mutex mutex_;
     bool hasRegistered_ { false };
     inline static std::map<std::string, std::vector<std::unique_ptr<CallbackInfo>>> listeners_ {};
-    sptr<ThumbnailDrawCb> thumbnailDrawCb_;
+    sptr<ThumbnailDrawCb> thumbnailDrawCb_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

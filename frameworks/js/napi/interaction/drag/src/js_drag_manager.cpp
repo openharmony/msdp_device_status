@@ -132,7 +132,7 @@ void JsDragManager::ReleaseReference()
             continue;
         }
         if (napi_delete_reference(thumbnailDrawCb_->env, item) != napi_ok) {
-            FI_HILOGE("Delete reference failed");
+            FI_HILOGW("Delete reference failed");
             continue;
         }
     }
