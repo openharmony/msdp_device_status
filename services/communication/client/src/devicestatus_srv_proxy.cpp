@@ -339,6 +339,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
 
@@ -359,6 +360,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t result)
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
 

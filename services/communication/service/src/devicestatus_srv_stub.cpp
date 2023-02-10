@@ -322,7 +322,8 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     if (ret != RET_OK) {
         FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
     }
-    return RET_OK;
+    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
 }
 
 int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
@@ -334,7 +335,8 @@ int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& re
     if (ret != RET_OK) {
         FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }
-    return RET_OK;
+    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
 }
 } // namespace DeviceStatus
 } // Msdp

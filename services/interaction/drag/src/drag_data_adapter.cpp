@@ -39,7 +39,7 @@ void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &po
     extraData_.sourceType = dragData.sourceType;
     extraData_.appended = false;
     coordinate_ = std::make_pair(dragData.x, dragData.y);
-    pixelMap_ = *dragData.pixelMap;
+    pixelMap_ = dragData.pixelMap;
     dragNum_ = dragData.dragNum;
     pointerStyle_ = pointerStyle;
 }
@@ -53,7 +53,7 @@ std::pair<int, int> DragDataAdapter::GetCoordinate() const
     return coordinate_;
 }
 
-OHOS::Media::PixelMap DragDataAdapter::GetPixelMap() const
+std::shared_ptr<OHOS::Media::PixelMap> DragDataAdapter::GetPixelMap() const
 {
     return pixelMap_;
 }
