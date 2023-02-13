@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,8 @@ class DevicestatusDataUtils {
 public:
     enum DevicestatusType {
         TYPE_INVALID = -1,
-        TYPE_HIGH_STILL,
-        TYPE_FINE_STILL,
+        TYPE_STILL,
+        TYPE_RELATIVE_STILL,
         TYPE_CAR_BLUETOOTH,
 		TYPE_STAND,
         TYPE_LID_OPEN,
@@ -44,10 +44,19 @@ public:
     };
 
     struct DevicestatusData {
-        DevicestatusType type;
-        DevicestatusValue value;
+        DevicestatusType type = TYPE_INVALID;
+        DevicestatusValue value = VALUE_INVALID;
+    };
+    struct AlgoData {
+        float x = 0.0;
+        float y = 0.0;
+        float z = 0.0;
+        double resultantAcc = 0.0;
+        double pitch = 0.0;
+        double roll = 0.0;
     };
 };
+
 
 typedef struct DeviceStatusJsonData {
     int32_t type;
@@ -55,8 +64,8 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, "TYPE_HIGH_STILL"},
-    {DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, "TYPE_FINE_STILL"},
+    {DevicestatusDataUtils::DevicestatusType::TYPE_STILL, "TYPE_STILL"},
+    {DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL, "TYPE_RELATIVE_STILL"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH, "TYPE_CAR_BLUETOOTH"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_STAND, "TYPE_STAND"},
     {DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN, "TYPE_LID_OPEN"}

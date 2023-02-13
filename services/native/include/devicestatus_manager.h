@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 
 #include "sensor_if.h"
 #include "devicestatus_data_utils.h"
+#include "death_recipient.h"
 #include "idevicestatus_algorithm.h"
 #include "idevicestatus_callback.h"
 #include "devicestatus_common.h"
@@ -57,10 +58,10 @@ public:
     DevicestatusDataUtils::DevicestatusData GetLatestDevicestatusData(const \
         DevicestatusDataUtils::DevicestatusType& type);
     int32_t MsdpDataCallback(const DevicestatusDataUtils::DevicestatusData& data);
-    int32_t LoadAlgorithm(bool bCreate);
-    int32_t UnloadAlgorithm(bool bCreate);
+    int32_t LoadAlgorithm();
+    int32_t UnloadAlgorithm();
     void GetPackageName(AccessTokenID tokenId, std::string &packageName);
-
+    void ProcessDeathObserver(wptr<IRemoteObject> object);
 private:
     struct classcomp {
         bool operator()(const sptr<IdevicestatusCallback> &l, const sptr<IdevicestatusCallback> &r) const
@@ -73,6 +74,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_;
     std::unique_ptr<DevicestatusMsdpClientImpl> msdpImpl_;
     std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> msdpData_;
+    sptr<IRemoteObject::DeathRecipient> clientDeathObserver_ = nullptr;
     std::map<DevicestatusDataUtils::DevicestatusType, std::set<const sptr<IdevicestatusCallback>, classcomp>> \
         listenerMap_;
 };

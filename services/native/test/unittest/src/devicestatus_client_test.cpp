@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -98,7 +98,7 @@ HWTEST_F (DevicestatusClientTest, DevicestatusClientTest002, TestSize.Level1)
     }
     callbackProxy_ = std::make_shared<DevicestatusCallbackProxy>(remoteObject_);
     DevicestatusDataUtils::DevicestatusData devicestatusData = {
-        DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL,
+        DevicestatusDataUtils::DevicestatusType::TYPE_STILL,
         DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER
     };
     DEV_HILOGE(INNERKIT, "test OnDevicestatusChanged start");

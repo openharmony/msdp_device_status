@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,8 +35,6 @@ const std::string ARG_DUMP_HELP = "-h";
 const std::string ARG_DUMP_DEVICESTATUS_SUBSCRIBER = "-s";
 const std::string ARG_DUMP_DEVICESTATUS_CHANGES = "-l";
 const std::string ARG_DUMP_DEVICESTATUS_CURRENT_STATE = "-c";
-constexpr int32_t RET_OK = 0;
-constexpr int32_t RET_NG = -1;
 constexpr uint32_t MAX_DEVICE_STATUS_SIZE = 10;
 constexpr uint32_t BASE_YEAR = 1900;
 constexpr uint32_t BASE_MON = 1;

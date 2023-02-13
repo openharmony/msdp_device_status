@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,11 @@ enum {
     E_DEVICESTATUS_GET_SERVICE_FAILED,
     E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED,
     E_DEVICESTATUS_INNER_ERR
+};
+
+enum {
+    RET_OK = 0,
+    RET_ERR = -1
 };
 } // namespace Msdp
 } // namespace OHOS

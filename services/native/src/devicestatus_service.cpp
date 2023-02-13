@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,7 +78,7 @@ void DevicestatusService::OnStop()
         DEV_HILOGI(SERVICE, "devicestatusManager_ is null");
         return;
     }
-    devicestatusManager_->UnloadAlgorithm(false);
+    devicestatusManager_->UnloadAlgorithm();
     DEV_HILOGI(SERVICE, "unload algorithm library exit");
 }
 
@@ -87,14 +87,14 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
     DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
     if (fd < 0) {
         DEV_HILOGE(SERVICE, "fd is invalid");
-        return RET_NG;
+        return RET_ERR;
     }
     DevicestatusDumper &deviceStatusDumper = DevicestatusDumper::GetInstance();
     if (args.empty()) {
         DEV_HILOGE(SERVICE, "param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
         deviceStatusDumper.DumpHelpInfo(fd);
-        return RET_NG;
+        return RET_ERR;
     }
     std::vector<std::string> argList = { "" };
     std::transform(args.begin(), args.end(), std::back_inserter(argList),
@@ -104,7 +104,7 @@ int DevicestatusService::Dump(int fd, const std::vector<std::u16string>& args)
 
     DevicestatusDataUtils::DevicestatusType type;
     std::vector<DevicestatusDataUtils::DevicestatusData> datas;
-    for (type = DevicestatusDataUtils::TYPE_HIGH_STILL;
+    for (type = DevicestatusDataUtils::TYPE_STILL;
         type <= DevicestatusDataUtils::TYPE_LID_OPEN;
         type = (DevicestatusDataUtils::DevicestatusType)(type+1)) {
         DevicestatusDataUtils::DevicestatusData data = GetCache(type);

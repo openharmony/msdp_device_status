@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,13 +36,15 @@ public:
         virtual void OnResult(const DevicestatusDataUtils::DevicestatusData& data) = 0;
     };
 
-    virtual void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) = 0;
-    virtual void UnregisterCallback() = 0;
-    virtual void Enable(DevicestatusDataUtils::DevicestatusType type) = 0;
-    virtual void Disable(DevicestatusDataUtils::DevicestatusType type) = 0;
-    virtual void DisableCount(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual ErrCode RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) = 0;
+    virtual ErrCode UnregisterCallback() = 0;
+    virtual ErrCode Enable(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual ErrCode Disable(DevicestatusDataUtils::DevicestatusType type) = 0;
+    virtual ErrCode DisableCount(DevicestatusDataUtils::DevicestatusType type)
+    {
+        return ERR_OK;
+    };
 };
-
 struct MsdpAlgorithmHandle {
     void* handle;
     DevicestatusMsdpInterface* (*create)();

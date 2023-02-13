@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -126,9 +126,9 @@ void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bo
 int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 {
     if (type == "still") {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
+        return DevicestatusDataUtils::DevicestatusType::TYPE_STILL;
     } else if (type == "relativeStill") {
-        return DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+        return DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL;
     } else if (type == "carBluetooth") {
         return DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH;
     } else {
@@ -270,7 +270,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
 
 napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_info info)
 {
-    DEV_HILOGD(JS_NAPI, "Enter");
+    DEV_HILOGD(JS_NAPI, "Subscribe Enter");
     size_t argc = ARG_4;
     napi_value args[ARG_4] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -294,6 +294,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     std::string typeMode = mode;
     int32_t eventMode = 0;
     status = napi_get_value_int32(env, args[ARG_1], &eventMode);
+    DEV_HILOGD(JS_NAPI, "mode:%{public}s,eventMode:%{public}d", typeMode.c_str(), eventMode);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to get event value item");
         return nullptr;
@@ -308,7 +309,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     int32_t event = eventMode;
     int32_t latency = latencyMode;
     DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
+    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_STILL) &&
         (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
     return SubscribeDeviceStatusCallback(env, info, args, type, event, latency);
 }
@@ -337,7 +338,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
+    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_STILL) &&
         (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
     int32_t eventMode = 0;
     status = napi_get_value_int32(env, args[ARG_1], &eventMode);
@@ -388,7 +389,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL) &&
+    NAPI_ASSERT(env, (type >= DevicestatusDataUtils::DevicestatusType::TYPE_STILL) &&
         (type <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN), "type is illegal");
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);

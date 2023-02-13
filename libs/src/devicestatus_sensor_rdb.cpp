@@ -39,11 +39,11 @@ DevicestatusSensorRdb* g_rdb;
 
 bool DevicestatusSensorRdb::Init()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     InitRdbStore();
     InitTimer();
     StartThread();
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
     return true;
 }
 
@@ -62,30 +62,30 @@ void DevicestatusSensorRdb::UnregisterCallback()
 
 void DevicestatusSensorRdb::Enable()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     Init();
     SubscribeHallSensor();
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
 }
 
 void DevicestatusSensorRdb::Disable()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     CloseTimer();
     UnSubscribeHallSensor();
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
 }
 
 
 ErrCode DevicestatusSensorRdb::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     if (g_rdb == nullptr) {
-        DEV_HILOGI(SERVICE, "g_rdb is nullptr");
+        DEV_HILOGD(SERVICE, "g_rdb is nullptr");
         return ERR_NG;
     }
     if (g_rdb->GetCallbacksImpl() == nullptr) {
-        DEV_HILOGI(SERVICE, "callbacksImpl is nullptr");
+        DEV_HILOGD(SERVICE, "callbacksImpl is nullptr");
         return ERR_NG;
     }
     g_rdb->GetCallbacksImpl()->OnSensorHdiResult(data);
@@ -102,7 +102,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSensorRdb::SaveRdbData(
                 notifyFlag_ = true;
                 iter->second = data.value;
             }
-            DEV_HILOGI(SERVICE, "data is not changed");
+            DEV_HILOGD(SERVICE, "data is not changed");
             return data;
         }
     }
@@ -110,7 +110,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusSensorRdb::SaveRdbData(
     rdbDataMap_.insert(std::make_pair(data.type, data.value));
     notifyFlag_ = true;
 
-    DEV_HILOGI(SERVICE, "devicestatusType_ = %{public}d, devicestatusStatus_ = %{public}d",
+    DEV_HILOGD(SERVICE, "devicestatusType_ = %{public}d, devicestatusStatus_ = %{public}d",
         devicestatusType_, devicestatusStatus_);
 
     return data;
@@ -126,26 +126,26 @@ int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::Resul
         return -1;
     }
     int32_t ret = resultSet->GetColumnIndex("ID", columnIndex);
-    DEV_HILOGI(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
+    DEV_HILOGD(SERVICE, "TrigerDatabaseObserver GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckID: GetColumnIndex failed");
         return -1;
     }
     ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, id = %{public}d", ret, intVal);
+    DEV_HILOGD(SERVICE, "ret = %{public}d, id = %{public}d", ret, intVal);
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckID: GetValue failed");
         return -1;
     }
 
     ret = resultSet->GetColumnIndex("DEVICESTATUS_TYPE", columnIndex);
-    DEV_HILOGI(SERVICE, "DEVICESTATUS_TYPE GetColumnIndex = %{public}d", columnIndex);
+    DEV_HILOGD(SERVICE, "DEVICESTATUS_TYPE GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckDevicestatusType: GetColumnIndex failed");
         return -1;
     }
     ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, DevicestatusType = %{public}d", ret, intVal);
+    DEV_HILOGD(SERVICE, "ret = %{public}d, DevicestatusType = %{public}d", ret, intVal);
     devicestatusType_ = intVal;
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckDevicestatusType: GetValue failed");
@@ -153,13 +153,13 @@ int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::Resul
     }
 
     ret = resultSet->GetColumnIndex("DEVICESTATUS_STATUS", columnIndex);
-    DEV_HILOGI(SERVICE, "DEVICESTATUS_STATUS GetColumnIndex = %{public}d", columnIndex);
+    DEV_HILOGD(SERVICE, "DEVICESTATUS_STATUS GetColumnIndex = %{public}d", columnIndex);
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckDevicestatusStatus: GetColumnIndex failed");
         return -1;
     }
     ret = resultSet->GetInt(columnIndex, intVal);
-    DEV_HILOGI(SERVICE, "ret = %{public}d, DevicestatusStatus = %{public}d", ret, intVal);
+    DEV_HILOGD(SERVICE, "ret = %{public}d, DevicestatusStatus = %{public}d", ret, intVal);
     devicestatusStatus_ = intVal;
     if (ret != ERR_OK) {
         DEV_HILOGE(SERVICE, "CheckDevicestatusStatus: GetValue failed");
@@ -171,7 +171,7 @@ int32_t DevicestatusSensorRdb::TrigerData(const std::unique_ptr<NativeRdb::Resul
 
 int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
 
     if (store_ == nullptr) {
         sleep(READ_RDB_WAIT_TIME);
@@ -188,7 +188,7 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
     }
 
     int32_t ret = resultSet->GoToFirstRow();
-    DEV_HILOGI(SERVICE, "GoToFirstRow = %{public}d", ret);
+    DEV_HILOGD(SERVICE, "GoToFirstRow = %{public}d", ret);
     if (ret != ERR_OK) {
         sleep(READ_RDB_WAIT_TIME);
         DEV_HILOGE(SERVICE, "database observer is null");
@@ -211,7 +211,7 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
     data.value = (DevicestatusDataUtils::DevicestatusValue)devicestatusStatus_;
 
     SaveRdbData(data);
-    DEV_HILOGI(SERVICE, "notifyFlag_ is %{public}d", notifyFlag_);
+    DEV_HILOGD(SERVICE, "notifyFlag_ is %{public}d", notifyFlag_);
     if (notifyFlag_) {
         NotifyMsdpImpl(data);
         notifyFlag_ = false;
@@ -222,36 +222,36 @@ int32_t DevicestatusSensorRdb::TrigerDatabaseObserver()
 
 void DevicestatusSensorRdb::SubscribeHallSensor()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
 
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
 }
 
 void DevicestatusSensorRdb::UnSubscribeHallSensor()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
 
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
 }
 
 void DevicestatusSensorRdb::InitTimer()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
     if (epFd_ == -1) {
-        DEV_HILOGI(SERVICE, "create epoll fd failed");
+        DEV_HILOGD(SERVICE, "create epoll fd failed");
         return;
     }
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == ERR_INVALID_FD) {
-        DEV_HILOGI(SERVICE, "create timer fd failed");
+        DEV_HILOGD(SERVICE, "create timer fd failed");
         return;
     }
     SetTimerInterval(TIMER_INTERVAL);
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
     callbacks_.insert(std::make_pair(timerFd_, &DevicestatusSensorRdb::TimerCallback));
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
-        DEV_HILOGI(SERVICE, "register timer fd failed");
+        DEV_HILOGD(SERVICE, "register timer fd failed");
         return;
     }
 }
@@ -277,7 +277,7 @@ void DevicestatusSensorRdb::SetTimerInterval(int32_t interval)
     itval.it_value.tv_nsec = 0;
 
     if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
-        DEV_HILOGI(SERVICE, "set timer failed");
+        DEV_HILOGD(SERVICE, "set timer failed");
         return;
     }
 
@@ -286,16 +286,16 @@ void DevicestatusSensorRdb::SetTimerInterval(int32_t interval)
 
 void DevicestatusSensorRdb::CloseTimer()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     close(timerFd_);
-    DEV_HILOGI(SERVICE, "Exit");
+    DEV_HILOGD(SERVICE, "Exit");
 }
 
 void DevicestatusSensorRdb::TimerCallback()
 {
     unsigned long long timers;
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
-        DEV_HILOGI(SERVICE, "read timer fd failed");
+        DEV_HILOGD(SERVICE, "read timer fd failed");
         return;
     }
     TrigerDatabaseObserver();
@@ -303,7 +303,7 @@ void DevicestatusSensorRdb::TimerCallback()
 
 int32_t DevicestatusSensorRdb::RegisterTimerCallback(const int32_t fd, const EventType et)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     struct epoll_event ev;
 
     ev.events = EPOLLIN;
@@ -314,7 +314,7 @@ int32_t DevicestatusSensorRdb::RegisterTimerCallback(const int32_t fd, const Eve
     ev.data.ptr = reinterpret_cast<void*>(this);
     ev.data.fd = fd;
     if (epoll_ctl(epFd_, EPOLL_CTL_ADD, fd, &ev) == -1) {
-        DEV_HILOGI(SERVICE, "epoll_ctl failed, error num =%{public}d", errno);
+        DEV_HILOGD(SERVICE, "epoll_ctl failed, error num =%{public}d", errno);
         return -1;
     }
 
@@ -323,7 +323,7 @@ int32_t DevicestatusSensorRdb::RegisterTimerCallback(const int32_t fd, const Eve
 
 void DevicestatusSensorRdb::StartThread()
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     std::make_unique<std::thread>(&DevicestatusSensorRdb::LoopingThreadEntry, this)->detach();
 }
 
@@ -350,26 +350,26 @@ void DevicestatusSensorRdb::LoopingThreadEntry()
 
 int32_t HelperCallback::OnCreate(RdbStore &store)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     return ERR_OK;
 }
 
 int32_t HelperCallback::OnUpgrade(RdbStore &store, int32_t oldVersion, int32_t newVersion)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     return ERR_OK;
 }
 
 extern "C" DevicestatusSensorInterface *Create(void)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     g_rdb = new DevicestatusSensorRdb();
     return g_rdb;
 }
 
 extern "C" void Destroy(DevicestatusSensorInterface* algorithm)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     delete algorithm;
 }
 }

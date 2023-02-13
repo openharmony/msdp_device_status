@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -155,10 +155,6 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
-    if (value == 0) {
-        DEV_HILOGE(JS_NAPI, "value is invalid");
-        return;
-    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
@@ -193,6 +189,7 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
         DEV_HILOGE(JS_NAPI, "Failed to create object");
         return;
     }
+    DEV_HILOGD(JS_NAPI, "eventType:%{public}d,value:%{public}d", eventType, value);
     napi_value tmpValue = nullptr;
     status = napi_create_int32(env_, eventType, &tmpValue);
     if (status != napi_ok) {
