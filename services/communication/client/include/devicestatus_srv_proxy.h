@@ -37,6 +37,8 @@ public:
     virtual void Unsubscribe(Type type, ActivityEvent event,
         sptr<IRemoteDevStaCallback> callback) override;
     virtual Data GetCache(const Type& type) override;
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd, int32_t &tokenType) override;
 
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;
@@ -53,8 +55,8 @@ public:
     virtual int32_t GetDragTargetPid() override;
     virtual int32_t RegisterThumbnailDraw() override;
     virtual int32_t UnregisterThumbnailDraw() override;
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &socketFd, int32_t &tokenType) override;
+    virtual int32_t AddDraglistener() override;
+    virtual int32_t RemoveDraglistener() override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

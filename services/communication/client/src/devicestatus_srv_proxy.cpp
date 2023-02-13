@@ -428,8 +428,46 @@ int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, cons
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
+    FI_HILOGD("socketFd:%{public}d, tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
+}
+
+int32_t DeviceStatusSrvProxy::AddDraglistener()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REGISTER_DRAG_MONITOR, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::RemoveDraglistener()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UNREGISTER_DRAG_MONITOR, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // Msdp

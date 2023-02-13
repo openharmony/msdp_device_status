@@ -48,6 +48,8 @@ public:
     int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startCallback,
         std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
     int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
+    int32_t AddDraglistener(DragListenerPtr listener);
+    int32_t RemoveDraglistener(DragListenerPtr listener);
 
 private:
     void InitMsgHandler();

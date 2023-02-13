@@ -113,6 +113,52 @@ int32_t DragManagerImpl::GetDragTargetPid()
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
+
+int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
+{
+    CALL_INFO_TRACE;
+    CHKPR(listener, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!hasRegistered_) {
+        FI_HILOGI("Start monitoring");
+        hasRegistered_ = true;
+        int32_t ret = DeviceStatusClient::GetInstance().AddDraglistener();
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to register");
+            return ret;
+        }
+    }
+    if (std::all_of(dragListener_.cbegin(), dragListener_.cend(),
+                    [listener](DragListenerPtr tListener) {
+                        return (tListener != listener);
+                    })) {
+        dragListener_.push_back(listener);
+    } else {
+        FI_HILOGW("The listener already exists");
+    }
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (listener == nullptr) {
+        dragListener_.clear();
+    } else {
+        dragListener_.erase(std::remove_if(dragListener_.begin(), dragListener_.end(),
+            [listener] (auto iter) {
+                return iter == listener;
+            })
+        );
+    }
+
+    if (hasRegistered_ && dragListener_.empty()) {
+        hasRegistered_ = false;
+        return DeviceStatusClient::GetInstance().RemoveDraglistener();
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

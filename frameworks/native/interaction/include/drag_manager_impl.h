@@ -16,10 +16,12 @@
 #define DRAG_MANAGER_IMPL_H
 
 #include <functional>
+#include <list>
 #include <mutex>
 #include <string>
 
 #include "drag_data.h"
+#include "i_drag_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -42,8 +44,13 @@ public:
     int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startCallback,
         std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
     int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
+    int32_t AddDraglistener(DragListenerPtr listener);
+    int32_t RemoveDraglistener(DragListenerPtr listener);
+
 private:
     std::mutex mtx_;
+    std::atomic_bool hasRegistered_ { false };
+    std::list<DragListenerPtr> dragListener_;
     std::function<void(int32_t)> stopCallback_;
     bool hasRegisterThumbnailDraw_ { false };
     ThumbnailDrawCallback thumbnailDrawCallback_;

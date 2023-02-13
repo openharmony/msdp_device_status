@@ -154,7 +154,7 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->RegisterListener(env, STATE_TYPE, argv[0]);
+    jsDragMgr->RegisterListener(env, argv[0]);
     return nullptr;
 }
 
@@ -170,14 +170,14 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
     if (argc == 0) {
-        jsDragMgr->UnregisterListener(env, STATE_TYPE);
+        jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->UnregisterListener(env, STATE_TYPE, argv[0]);
+    jsDragMgr->UnregisterListener(env, argv[0]);
     return nullptr;
 }
 
