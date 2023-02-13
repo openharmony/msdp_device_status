@@ -172,15 +172,21 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     auto displayX = pointerItem.GetDisplayY();
     auto sourceType = pointerEvent->GetSourceType();
     dragDrawing_.Draw(displayX, displayY, sourceType);
+    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
+    inputMgr->MarkConsumed(monitorId_, pointerEvent->GetId());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
     auto extraData = DataAdapter.GetExtraData();
     extraData.appended = false;
     inputMgr->AppendExtraData(extraData);
+    inputMgr->MarkConsumed(monitorId_, pointerEvent->GetId());
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
