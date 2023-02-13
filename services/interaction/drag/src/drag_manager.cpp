@@ -124,16 +124,6 @@ int32_t DragManager::StopDrag(int32_t result)
     return RET_OK;
 }
 
-int32_t DragManager::UpdateDragStyle(int32_t style)
-{
-    return DataAdapter.UpdateDragStyle(style);
-}
-
-int32_t DragManager::UpdateDragMessage(const std::u16string &message)
-{
-    return DataAdapter.UpdateDragMessage(message);
-}
-
 int32_t DragManager::GetDragTargetPid() const
 {
     return dragTargetPid_;
@@ -149,7 +139,7 @@ int32_t DragManager::NotifyDragResult(MessageId msgId, int32_t result)
         return RET_ERR;
     }
     if (!dragOutSession_->SendMsg(pkt)) {
-        FI_HILOGE("Sending failed");
+        FI_HILOGE("Send message failed");
         return MSG_SEND_FAIL;
     }
     return RET_OK;
@@ -170,7 +160,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragUp(pointerEvent);
         return;
     }
-    FI_HILOGD("UnSupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
+    FI_HILOGD("Unsupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)

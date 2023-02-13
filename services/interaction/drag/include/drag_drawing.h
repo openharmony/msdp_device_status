@@ -25,10 +25,6 @@ class DragDrawing {
 public:
     void InitPicture(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, int32_t x, int32_t y, int32_t sourceType);
     void Draw(int32_t x, int32_t y, int32_t sourceType);
-private:
-    void DrawMessage();
-    void DrawStyle();
-    void DrawPicture();
 };
 } // namespace DeviceStatus
 } // namespace Msdp

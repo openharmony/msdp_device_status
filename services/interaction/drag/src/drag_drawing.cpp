@@ -36,18 +36,6 @@ void DragDrawing::Draw(int32_t x, int32_t y, int32_t sourceType)
 {
 }
 
-void DragDrawing::DrawMessage()
-{
-}
-
-void DragDrawing::DrawStyle()
-{
-}
-
-void DragDrawing::DrawPicture()
-{
-}
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
