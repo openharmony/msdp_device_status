@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,13 @@ public:
         EVENT_UEVENT_FD,
         EVENT_TIMER_FD,
     };
+
+    ErrCode Enable(DevicestatusDataUtils::DevicestatusType type) override;
+    ErrCode Disable(DevicestatusDataUtils::DevicestatusType type) override;
+    ErrCode DisableCount(DevicestatusDataUtils::DevicestatusType type) override;
+    ErrCode RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) override;
+    ErrCode UnregisterCallback() override;
+
     bool Init();
     void InitMockStore();
     void SetTimerInterval(int32_t interval);
@@ -47,11 +54,6 @@ public:
     int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
-    void Enable(DevicestatusDataUtils::DevicestatusType type) override;
-    void Disable(DevicestatusDataUtils::DevicestatusType type) override;
-    void DisableCount(DevicestatusDataUtils::DevicestatusType type) override;
-    void RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback) override;
-    void UnregisterCallback() override;
     ErrCode NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data);
     void GetDeviceStatusData();
     std::shared_ptr<MsdpAlgorithmCallback> GetCallbackImpl()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ bool DevicestatusManager::Init()
     }
 
     msdpImpl_ = std::make_unique<DevicestatusMsdpClientImpl>();
-    LoadAlgorithm(false);
+    LoadAlgorithm();
 
     DEV_HILOGI(SERVICE, "Init success");
     return true;
@@ -51,7 +51,7 @@ DevicestatusDataUtils::DevicestatusData DevicestatusManager::GetLatestDevicestat
     DEV_HILOGI(SERVICE, "Enter");
     DevicestatusDataUtils::DevicestatusData data = {type, DevicestatusDataUtils::DevicestatusValue::VALUE_EXIT};
     if (msdpImpl_ == nullptr) {
-        DEV_HILOGI(SERVICE, "GetObserverData func is nullptr,return default!");
+        DEV_HILOGE(SERVICE, "GetObserverData func is nullptr,return default!");
         data.value = DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID;
         return data;
     }
@@ -112,6 +112,7 @@ bool DevicestatusManager::InitInterface(DevicestatusDataUtils::DevicestatusType 
     }
     if (msdpImpl_->InitMsdpImpl(type) == ERR_NG) {
         DEV_HILOGE(SERVICE, "init msdp impl failed");
+        return false;
     };
     return true;
 }
@@ -137,32 +138,43 @@ int32_t DevicestatusManager::MsdpDataCallback(const DevicestatusDataUtils::Devic
     return ERR_OK;
 }
 
+void DevicestatusManager::ProcessDeathObserver(wptr<IRemoteObject> object)
+{
+    DEV_HILOGI(SERVICE, "Recv death notice");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (object == nullptr) {
+        DEV_HILOGE(SERVICE, "object is nullptr");
+        return;
+    }
+    sptr<IRemoteObject> client = object.promote();
+    for (auto& typeItem : listenerMap_) {
+        DisableMock(typeItem.first);
+        for (auto iter = typeItem.second.begin(); iter != typeItem.second.end();) {
+            if ((*iter)->AsObject() == client) {
+                iter = typeItem.second.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
+}
+
 void DevicestatusManager::NotifyDevicestatusChange(const DevicestatusDataUtils::DevicestatusData& devicestatusData)
 {
     DEV_HILOGI(SERVICE, "Enter");
-
     // Call back for all listeners
-    std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
-    bool isExists = false;
-    for (auto it = listenerMap_.begin(); it != listenerMap_.end(); ++it) {
-        if (it->first == devicestatusData.type) {
-            isExists = true;
-            listeners = (std::set<const sptr<IdevicestatusCallback>, classcomp>)(it->second);
-            break;
-        }
-    }
-    if (!isExists) {
-        DEV_HILOGI(SERVICE, "No listener found for type: %{public}d", \
-            devicestatusData.type);
-        DEV_HILOGI(SERVICE, "Exit");
+    std::lock_guard lock(mutex_);
+    auto iter = listenerMap_.find(devicestatusData.type);
+    if (iter == listenerMap_.end()) {
+        DEV_HILOGI(SERVICE, "type:%{public}d is not exist", devicestatusData.type);
         return;
     }
-    for (auto& listener : listeners) {
-        if (listener == nullptr) {
-            DEV_HILOGI(SERVICE, "Listener is nullptr");
-            return;
+    for (const auto& item : iter->second) {
+        if (item == nullptr) {
+            DEV_HILOGW(SERVICE, "listener is nullptr");
+            continue;
         }
-        listener->OnDevicestatusChanged(devicestatusData);
+        item->OnDevicestatusChanged(devicestatusData);
     }
 }
 
@@ -173,35 +185,40 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
-    std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
-    DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
-
     if (!EnableMock(type)) {
         DEV_HILOGE(SERVICE, "Enable failed!");
         return;
     }
-
     std::lock_guard lock(mutex_);
+    if (clientDeathObserver_ == nullptr) {
+        clientDeathObserver_ = new (std::nothrow) DeathRecipient(*const_cast<DevicestatusManager *>(this));
+        if (clientDeathObserver_ == nullptr) {
+            DEV_HILOGE(SERVICE, "clientDeathObserver_ is nullptr");
+            return;
+        }
+        object->AddDeathRecipient(clientDeathObserver_);
+    }
+    std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
-        if (listeners.insert(callback).second) {
-            DEV_HILOGI(SERVICE, "no found set list of type, insert success");
-            object->AddDeathRecipient(devicestatusCBDeathRecipient_);
+        if (!listeners.insert(callback).second) {
+            DEV_HILOGW(SERVICE, "callback is duplicated");
+            return;
         }
         listenerMap_.insert(std::make_pair(type, listeners));
     } else {
-        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
-            listenerMap_[dtTypeIter->first].size());
+        DEV_HILOGD(SERVICE, "callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
         if (iter != listenerMap_[dtTypeIter->first].end()) {
+            DEV_HILOGW(SERVICE, "Failed to find type");
             return;
-        } else {
-            if (listenerMap_[dtTypeIter->first].insert(callback).second) {
-                DEV_HILOGI(SERVICE, "found set list of type, insert success");
-                object->AddDeathRecipient(devicestatusCBDeathRecipient_);
-            }
+        }
+        if (!listenerMap_[dtTypeIter->first].insert(callback).second) {
+            DEV_HILOGE(SERVICE, "callback is duplicated");
+            return;
         }
     }
+    DEV_HILOGI(SERVICE, "listenerMap_.size:%{public}zu", listenerMap_.size());
     DEV_HILOGI(SERVICE, "Subscribe success,Exit");
 }
 
@@ -209,25 +226,26 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    std::lock_guard lock(mutex_);
+
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
     DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
-
+    std::lock_guard lock(mutex_);
+    if (clientDeathObserver_ != nullptr) {
+        object->RemoveDeathRecipient(clientDeathObserver_);
+    }
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
+        DEV_HILOGE(SERVICE, "Failed to find type");
         return;
-    } else {
-        DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu",
-            listenerMap_[dtTypeIter->first].size());
-        auto iter = listenerMap_[dtTypeIter->first].find(callback);
-        if (iter != listenerMap_[dtTypeIter->first].end()) {
-            if (listenerMap_[dtTypeIter->first].erase(callback) != 0) {
-                object->RemoveDeathRecipient(devicestatusCBDeathRecipient_);
-                if (listenerMap_[dtTypeIter->first].size() == 0) {
-                    listenerMap_.erase(dtTypeIter);
-                }
+    }
+    DEV_HILOGI(SERVICE, "callbacklist.size=%{public}zu", listenerMap_[dtTypeIter->first].size());
+    auto iter = listenerMap_[dtTypeIter->first].find(callback);
+    if (iter != listenerMap_[dtTypeIter->first].end()) {
+        if (listenerMap_[dtTypeIter->first].erase(callback) != 0) {
+            if (listenerMap_[dtTypeIter->first].size() == 0) {
+                listenerMap_.erase(dtTypeIter);
             }
         }
     }
@@ -240,23 +258,29 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     DEV_HILOGI(SERVICE, "UnSubscribe success,Exit");
 }
 
-int32_t DevicestatusManager::LoadAlgorithm(bool bCreate)
+int32_t DevicestatusManager::LoadAlgorithm()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (msdpImpl_ != nullptr) {
-        msdpImpl_->LoadAlgorithmLibrary(bCreate);
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGE(SERVICE, "msdpImpl_  is nullptr");
+        return RET_ERR;
     }
-
+    if (msdpImpl_->LoadAlgoLib() != RET_OK) {
+        msdpImpl_->LoadAlgorithmLibrary();
+    }
     return ERR_OK;
 }
 
-int32_t DevicestatusManager::UnloadAlgorithm(bool bCreate)
+int32_t DevicestatusManager::UnloadAlgorithm()
 {
     DEV_HILOGI(SERVICE, "Enter");
-    if (msdpImpl_ != nullptr) {
-        msdpImpl_->UnloadAlgorithmLibrary(bCreate);
+    if (msdpImpl_ == nullptr) {
+        DEV_HILOGE(SERVICE, "msdpImpl_  is nullptr");
+        return RET_ERR;
     }
-
+    if (msdpImpl_->UnloadAlgoLib() != RET_OK) {
+        msdpImpl_->UnloadAlgorithmLibrary();
+    }
     return ERR_OK;
 }
 

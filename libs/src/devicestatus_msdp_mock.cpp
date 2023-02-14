@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,44 +55,49 @@ bool DeviceStatusMsdpMock::Init()
 
 void DeviceStatusMsdpMock::InitMockStore() {}
 
-void DeviceStatusMsdpMock::RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback)
+ErrCode DeviceStatusMsdpMock::RegisterCallback(std::shared_ptr<MsdpAlgorithmCallback> callback)
 {
     std::lock_guard lock(mutex_);
     callback_ = callback;
+    return RET_OK;
 }
 
-void DeviceStatusMsdpMock::UnregisterCallback()
+ErrCode DeviceStatusMsdpMock::UnregisterCallback()
 {
     std::lock_guard lock(mutex_);
     callback_ = nullptr;
+    return RET_OK;
 }
 
-void DeviceStatusMsdpMock::Enable(DevicestatusDataUtils::DevicestatusType type)
+ErrCode DeviceStatusMsdpMock::Enable(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (type < DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL ||
+    if (type < DevicestatusDataUtils::DevicestatusType::TYPE_STILL ||
         type >= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN) {
         DEV_HILOGE(SERVICE, "Type error");
     }
     enabledType_[type] = static_cast<int32_t>(DevicestatusDataUtils::Value::VALID);
     Init();
     DEV_HILOGD(SERVICE, "Exit");
+    return RET_OK;
 }
 
-void DeviceStatusMsdpMock::Disable(DevicestatusDataUtils::DevicestatusType type)
+ErrCode DeviceStatusMsdpMock::Disable(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
     scFlag_ = false;
     CloseTimer();
     DEV_HILOGD(SERVICE, "Exit");
+    return RET_OK;
 }
 
-void DeviceStatusMsdpMock::DisableCount(DevicestatusDataUtils::DevicestatusType type)
+ErrCode DeviceStatusMsdpMock::DisableCount(DevicestatusDataUtils::DevicestatusType type)
 {
     DEV_HILOGD(SERVICE, "Enter");
     enabledType_[type] = static_cast<int32_t>(DevicestatusDataUtils::Value::INVALID);
     dataParse_->DisableCount(type);
     DEV_HILOGD(SERVICE, "Exit");
+    return RET_OK;
 }
 
 ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const DevicestatusDataUtils::DevicestatusData& data)
@@ -178,7 +183,7 @@ void DeviceStatusMsdpMock::TimerCallback()
 void DeviceStatusMsdpMock::GetDeviceStatusData()
 {
     DevicestatusDataUtils::DevicestatusData data;
-    for (int32_t i = int(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    for (int32_t i = int(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
         i <= DevicestatusDataUtils::DevicestatusType::TYPE_LID_OPEN; ++i) {
         if (enabledType_[i] == static_cast<int32_t>(DevicestatusDataUtils::Value::VALID)) {
             DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType(i);
@@ -242,14 +247,14 @@ void DeviceStatusMsdpMock::LoopingThreadEntry()
 
 extern "C" DevicestatusMsdpInterface *Create(void)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     g_msdpMock = new DeviceStatusMsdpMock();
     return g_msdpMock;
 }
 
 extern "C" void Destroy(const DevicestatusMsdpInterface* algorithm)
 {
-    DEV_HILOGI(SERVICE, "Enter");
+    DEV_HILOGD(SERVICE, "Enter");
     delete algorithm;
 }
 } // namespace DeviceStatus

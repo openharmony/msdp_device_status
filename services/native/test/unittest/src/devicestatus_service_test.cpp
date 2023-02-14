@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ void DevicestatusServiceTest::DevicestatusServiceTestCallback::OnDevicestatusCha
 {
     GTEST_LOG_(INFO) << "DevicestatusServiceTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DevicestatusServiceTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_TRUE(devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
         devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
         "DevicestatusServiceTestCallback failed";
 }
@@ -50,7 +50,7 @@ void DevicestatusServiceTest::DevicestatusServiceTestCallback::OnDevicestatusCha
  */
 HWTEST_F (DevicestatusServiceTest, DevicestatusCallbackTest, TestSize.Level0)
 {
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     sptr<IdevicestatusCallback> cb = new DevicestatusServiceTestCallback();
     GTEST_LOG_(INFO) << "Start register";
@@ -67,12 +67,12 @@ HWTEST_F (DevicestatusServiceTest, DevicestatusCallbackTest, TestSize.Level0)
 HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest001, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 Enter");
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 end");
 }
@@ -85,12 +85,12 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest001, TestSize.Level0)
 HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest002, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 Enter");
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_TRUE(data.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 end");
 }
@@ -166,9 +166,9 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest008, TestSize.Level0)
     auto devicestatusService = DelayedSpSingleton<DevicestatusService>::GetInstance();
     std::vector<std::u16string> args;
     int32_t ret = devicestatusService->Dump(-1, args);
-    EXPECT_TRUE(ret == RET_NG);
+    EXPECT_TRUE(ret == RET_ERR);
     ret = devicestatusService->Dump(1, args);
-    EXPECT_TRUE(ret == RET_NG);
+    EXPECT_TRUE(ret == RET_ERR);
     args.emplace_back(ARGS_H);
     ret = devicestatusService->Dump(1, args);
     EXPECT_TRUE(ret == RET_OK);
@@ -212,9 +212,9 @@ HWTEST_F (DevicestatusServiceTest, GetDevicestatusDataTest012, TestSize.Level0)
     auto devicestatusManager = std::make_shared<DevicestatusManager>(devicestatusService);
     bool result = devicestatusManager->Init();
     EXPECT_TRUE(result);
-    int32_t ret = devicestatusManager->LoadAlgorithm(false);
+    int32_t ret = devicestatusManager->LoadAlgorithm();
     EXPECT_TRUE(ret == RET_OK);
-    ret = devicestatusManager->UnloadAlgorithm(false);
+    ret = devicestatusManager->UnloadAlgorithm();
     EXPECT_TRUE(ret == RET_OK);
     DelayedSpSingleton<DevicestatusService>::DestroyInstance();
     GTEST_LOG_(INFO) << "GetDevicestatusDataTest012 end";

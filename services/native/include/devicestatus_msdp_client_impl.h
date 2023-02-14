@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,18 +45,22 @@ public:
     ErrCode DisableMsdpImpl(DevicestatusDataUtils::DevicestatusType type);
     ErrCode RegisterImpl(const CallbackManager& callback);
     ErrCode UnregisterImpl();
+    std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
+    int32_t LoadAlgorithmLibrary();
+    int32_t UnloadAlgorithmLibrary();
+    int32_t LoadAlgoLib();
+    int32_t UnloadAlgoLib();
+private:
+    ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
     int32_t MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data);
     ErrCode RegisterMsdp();
     ErrCode UnregisterMsdp(void);
     DevicestatusDataUtils::DevicestatusData SaveObserverData(const DevicestatusDataUtils::DevicestatusData& data);
-    std::map<DevicestatusDataUtils::DevicestatusType, DevicestatusDataUtils::DevicestatusValue> GetObserverData() const;
-    int32_t LoadAlgorithmLibrary(bool bCreate);
-    int32_t UnloadAlgorithmLibrary(bool bCreate);
-private:
-    ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
     DevicestatusMsdpInterface* GetAlgorithmInst();
+    DevicestatusMsdpInterface* GetAlgoObj();
     MsdpAlgorithmHandle mAlgorithm_;
-    std::mutex mMutex_;
+    MsdpAlgorithmHandle algoHandler_;
+    std::mutex mutex_;
     bool notifyManagerFlag_ = false;
     void OnResult(const DevicestatusDataUtils::DevicestatusData& data) override;
 };

@@ -34,7 +34,6 @@ ohos_shared_library("deviceagent") {
   ]
 
   deps = [
-    "//base/msdp/device_status/frameworks/js/napi:stationary",
     "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
   ]
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ void DevicestatusModuleTest::DevicestatusModuleTestCallback::OnDevicestatusChang
 {
     GTEST_LOG_(INFO) << "DevicestatusModuleTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DevicestatusModuleTestCallback value: " << devicestatusData.value;
-    EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
         devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
         "DevicestatusModuleTestCallback failed";
 }
@@ -48,7 +48,7 @@ void DevicestatusModuleTest::DevicestatusModuleTestCallback::OnDevicestatusChang
  */
 HWTEST_F (DevicestatusModuleTest, DevicestatusCallbackTest, TestSize.Level0)
 {
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     sptr<IdevicestatusCallback> cb = new DevicestatusModuleTestCallback();
     GTEST_LOG_(INFO) << "Start register";
@@ -65,12 +65,12 @@ HWTEST_F (DevicestatusModuleTest, DevicestatusCallbackTest, TestSize.Level0)
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest001 Enter");
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL && \
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
@@ -82,12 +82,12 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
 HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest002, TestSize.Level0)
 {
     DEV_HILOGI(SERVICE, "GetDevicestatusDataTest002 Enter");
-    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL;
+    DevicestatusDataUtils::DevicestatusType type = DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL;
     auto& devicestatusClient = DevicestatusClient::GetInstance();
     DevicestatusDataUtils::DevicestatusData data = devicestatusClient.GetDevicestatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
-    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL && \
+    EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
         data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 

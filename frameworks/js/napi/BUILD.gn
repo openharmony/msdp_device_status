@@ -35,7 +35,6 @@ config("devicestatus_callback_config") {
 
 ohos_shared_library("stationary") {
   sources = [
-    "${device_status_frameworks_path}/js/napi/src/devicestatus_callback_stub.cpp",
     "${device_status_frameworks_path}/js/napi/src/devicestatus_event.cpp",
     "${device_status_frameworks_path}/js/napi/src/devicestatus_napi.cpp",
   ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -146,11 +146,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest005, TestSize.Level1)
     GTEST_LOG_(INFO) << "DevicestatusAgentTest005 start";
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
-    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, agentEvent);
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest005 end";
 }
 
@@ -159,11 +159,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest006, TestSize.Level1)
     GTEST_LOG_(INFO) << "DevicestatusAgentTest006 start";
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
-    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
-    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest006 end";
 }
 
@@ -202,13 +202,13 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest009, TestSize.Level1)
         std::make_shared<DevicestatusAgentListenerMockFirstClient>();
     int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
     ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest009 end";
 }
@@ -231,11 +231,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest011, TestSize.Level1)
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 = nullptr;
     int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->SubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10), agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL, agentEvent);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH, agentEvent1);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
@@ -245,11 +245,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest011, TestSize.Level1)
     sleep(2);
     ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_CAR_BLUETOOTH);
     EXPECT_TRUE(ret == ERR_OK);
@@ -266,7 +266,7 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest012, TestSize.Level1)
     std::shared_ptr<DevicestatusAgentListenerMockFirstClient> agentEvent1 = nullptr;
     int32_t ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID, agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL, agentEvent);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->SubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10), agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
@@ -276,11 +276,11 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest012, TestSize.Level1)
     sleep(2);
     ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_FINE_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DevicestatusAgentTest012 end";
 }
@@ -295,13 +295,13 @@ HWTEST_F (DevicestatusAgentTest, DevicestatusAgentTest013, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     ret = agent1_->SubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10), agentEvent);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL, agentEvent1);
+    ret = agent1_->SubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL, agentEvent1);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
     GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
     sleep(2);
     ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_INVALID);
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);
-    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_HIGH_STILL);
+    ret = agent1_->UnSubscribeAgentEvent(DevicestatusDataUtils::DevicestatusType::TYPE_STILL);
     EXPECT_TRUE(ret == ERR_OK);
     ret = agent1_->UnSubscribeAgentEvent(static_cast<DevicestatusDataUtils::DevicestatusType>(10));
     EXPECT_TRUE(ret == ERR_INVALID_VALUE);

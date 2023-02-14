@@ -34,6 +34,7 @@
         "fwk_group":[
           "//base/msdp/device_status/libs:devicestatus_sensorhdi",
           "//base/msdp/device_status/libs:devicestatus_msdp",
+          "//base/msdp/device_status/libs:devicestatus_algo",
           "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
           "//base/msdp/device_status/frameworks/js/napi:stationary"
         ],
