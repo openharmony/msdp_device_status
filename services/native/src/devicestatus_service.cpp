@@ -651,7 +651,7 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     return RET_OK;
 }
 
-int32_t DeviceStatusService::RegisterDragListener()
+int32_t DeviceStatusService::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
@@ -665,7 +665,7 @@ int32_t DeviceStatusService::RegisterDragListener()
     return ret;
 }
 
-int32_t DeviceStatusService::UnregisterDragListener()
+int32_t DeviceStatusService::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();

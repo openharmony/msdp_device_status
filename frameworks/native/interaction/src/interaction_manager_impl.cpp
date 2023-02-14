@@ -223,6 +223,23 @@ int32_t InteractionManagerImpl::UnregisterThumbnailDraw(std::function<void(void)
 {
     return dragManagerImpl_.UnregisterThumbnailDraw(callback);
 }
+
+int32_t InteractionManagerImpl::AddDraglistener(DragListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
+    return dragManagerImpl_.AddDraglistener(listener);
+}
+
+int32_t InteractionManagerImpl::RemoveDraglistener(DragListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.RemoveDraglistener(listener);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

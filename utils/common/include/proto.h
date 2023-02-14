@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ static const int32_t SESSION_NOT_FOUND = 8;
 static const int32_t EPOLL_MODIFY_FAIL = 9;
 static const int32_t MAKE_SHARED_FAIL = 10;
 static const int32_t ADD_SESSION_FAIL = 11;
-static const int32_t MAX_SESSON_ALARM = 12;
+static const int32_t MAX_SESSON_ALARM = 100;
 static const int32_t MAX_RECV_LIMIT = 13;
 static const int32_t SERVICE_NOT_RUNNING = 14;
 #define CONNECT_MODULE_TYPE_FI_CLIENT 0

@@ -57,46 +57,52 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
             return GetLatestDeviceStatusDataStub(data, reply);
         }
         case REGISTER_COORDINATION_MONITOR: {
-            return StubRegisterCoordinationMonitor(data, reply);
+            return RegisterCoordinationMonitorStub(data, reply);
         }
         case UNREGISTER_COORDINATION_MONITOR: {
-            return StubUnregisterCoordinationMonitor(data, reply);
+            return UnregisterCoordinationMonitorStub(data, reply);
         }
         case ENABLE_COORDINATION: {
-            return StubEnableCoordination(data, reply);
+            return EnableCoordinationStub(data, reply);
         }
         case START_COORDINATION: {
-            return StubStartCoordination(data, reply);
+            return StartCoordinationStub(data, reply);
         }
         case STOP_COORDINATION: {
-            return StubStopCoordination(data, reply);
+            return StopCoordinationStub(data, reply);
         }
         case GET_COORDINATION_STATE: {
-            return StubGetCoordinationState(data, reply);
+            return GetCoordinationStateStub(data, reply);
         }
         case ALLOC_SOCKET_FD: {
-            return StubHandleAllocSocketFd(data, reply);
+            return HandleAllocSocketFdStub(data, reply);
         }
         case START_DRAG : {
-            return StubStartDrag(data, reply);
+            return StartDragStub(data, reply);
         }
         case STOP_DRAG : {
-            return StubStopDrag(data, reply);
+            return StopDragStub(data, reply);
         }
         case UPDATED_DRAG_STYLE: {
-            return StubUpdateDragStyle(data, reply);
+            return UpdateDragStyleStub(data, reply);
         }
         case UPDATED_DRAG_MESSAGE: {
-            return StubUpdateDragMessage(data, reply);
+            return UpdateDragMessageStub(data, reply);
         }
         case GET_DRAG_TARGET_PID: {
-            return StubGetDragTargetPid(data, reply);
+            return GetDragTargetPidStub(data, reply);
         }
         case REGISTER_THUMBNAIL_DRAW: {
-            return StubRegisterThumbnailDraw(data, reply);
+            return RegisterThumbnailDrawStub(data, reply);
         }
         case UNREGISTER_THUMBNAIL_DRAW: {
-            return StubUnregisterThumbnailDraw(data, reply);
+            return UnregisterThumbnailDrawStub(data, reply);
+        }
+        case REGISTER_DRAG_MONITOR: {
+            return AddDraglistenerStub(data, reply);
+        }
+        case UNREGISTER_DRAG_MONITOR: {
+            return RemoveDraglistenerStub(data, reply);
         }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -158,7 +164,7 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::RegisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterCoordinationListener();
@@ -168,7 +174,7 @@ int32_t DeviceStatusSrvStub::StubRegisterCoordinationMonitor(MessageParcel& data
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterCoordinationListener();
@@ -178,7 +184,7 @@ int32_t DeviceStatusSrvStub::StubUnregisterCoordinationMonitor(MessageParcel& da
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubEnableCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::EnableCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -192,7 +198,7 @@ int32_t DeviceStatusSrvStub::StubEnableCoordination(MessageParcel& data, Message
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubStartCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StartCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -208,7 +214,7 @@ int32_t DeviceStatusSrvStub::StubStartCoordination(MessageParcel& data, MessageP
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubStopCoordination(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StopCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -220,7 +226,7 @@ int32_t DeviceStatusSrvStub::StubStopCoordination(MessageParcel& data, MessagePa
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubGetCoordinationState(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -234,7 +240,7 @@ int32_t DeviceStatusSrvStub::StubGetCoordinationState(MessageParcel& data, Messa
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubUpdateDragStyle(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t style;
@@ -246,7 +252,7 @@ int32_t DeviceStatusSrvStub::StubUpdateDragStyle(MessageParcel& data, MessagePar
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubUpdateDragMessage(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UpdateDragMessageStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     std::u16string message;
@@ -258,7 +264,7 @@ int32_t DeviceStatusSrvStub::StubUpdateDragMessage(MessageParcel& data, MessageP
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubGetDragTargetPid(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::GetDragTargetPidStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetDragTargetPid();
@@ -266,7 +272,7 @@ int32_t DeviceStatusSrvStub::StubGetDragTargetPid(MessageParcel& data, MessagePa
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::StubRegisterThumbnailDraw(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::RegisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterThumbnailDraw();
@@ -276,7 +282,7 @@ int32_t DeviceStatusSrvStub::StubRegisterThumbnailDraw(MessageParcel& data, Mess
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubUnregisterThumbnailDraw(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UnregisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterThumbnailDraw();
@@ -286,7 +292,7 @@ int32_t DeviceStatusSrvStub::StubUnregisterThumbnailDraw(MessageParcel& data, Me
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply)
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
@@ -322,7 +328,7 @@ int32_t DeviceStatusSrvStub::StubHandleAllocSocketFd(MessageParcel& data, Messag
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
@@ -360,7 +366,7 @@ int32_t DeviceStatusSrvStub::StubStartDrag(MessageParcel& data, MessageParcel& r
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t result;
@@ -370,6 +376,26 @@ int32_t DeviceStatusSrvStub::StubStopDrag(MessageParcel& data, MessageParcel& re
         FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = AddDraglistener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call AddDraglistener failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RemoveDraglistener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RemoveDraglistener failed ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus

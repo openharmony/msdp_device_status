@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -135,14 +135,14 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName,
             goto CLOSE_SOCK;
         }
     }
-    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-        FI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
-        goto CLOSE_SOCK;
-    }
     sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
         FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        goto CLOSE_SOCK;
+    }
+    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
+        FI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
         goto CLOSE_SOCK;
     }
     OnConnected(sess);
@@ -306,13 +306,14 @@ bool StreamServer::AddSession(SessionPtr ses)
         FI_HILOGE("Get process failed");
         return false;
     }
+    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+        FI_HILOGE("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
+            MAX_SESSON_ALARM, sessionsMap_.size());
+        return false;
+    }
+    DumpSession("AddSession");
     idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
-    DumpSession("AddSession");
-    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        FI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
-            MAX_SESSON_ALARM, sessionsMap_.size());
-    }
     FI_HILOGI("AddSession end");
     return true;
 }

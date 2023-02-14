@@ -313,6 +313,19 @@ int32_t DeviceStatusClient::StopDrag(int32_t result)
     return devicestatusProxy_->StopDrag(result);
 }
 
+int32_t DeviceStatusClient::AddDraglistener()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->AddDraglistener();
+}
+
+int32_t DeviceStatusClient::RemoveDraglistener()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->RemoveDraglistener();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

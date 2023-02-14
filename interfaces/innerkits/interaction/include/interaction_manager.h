@@ -24,6 +24,7 @@
 #include "coordination_message.h"
 #include "drag_data.h"
 #include "i_coordination_listener.h"
+#include "i_drag_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -145,6 +146,22 @@ public:
      * @since 10
      */
     int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
+
+    /*
+     * @brief 注册拖拽状态监听。。
+     * @param listener 拖拽状态监听。
+     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @since 10
+     */
+    int32_t AddDraglistener(std::shared_ptr<IDragListener> listener);
+
+    /**
+     * @brief 取消注册拖拽状态监听。
+     * @param listener 拖拽状态监听，如果为空，表示取消所有监听。
+     * @return 返返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @since 10
+     */
+    int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
 
 private:
     InteractionManager() = default;

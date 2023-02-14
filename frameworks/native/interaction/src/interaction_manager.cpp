@@ -100,6 +100,16 @@ int32_t InteractionManager::GetDragTargetPid()
 {
     return InteractionMgrImpl.GetDragTargetPid();
 }
+
+int32_t InteractionManager::AddDraglistener(DragListenerPtr listener)
+{
+    return InteractionMgrImpl.AddDraglistener(listener);
+}
+
+int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener)
+{
+    return InteractionMgrImpl.RemoveDraglistener(listener);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
