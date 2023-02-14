@@ -80,9 +80,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("GetPointerStyle failed");
         return RET_ERR;
     }
-    if (IsCollocateAble()) {
-        CollocateStart();
-    }
     DataAdapter.Init(dragData, pointerStyle);
     dragOutSession_ = sess;
     inputMgr->SetPointerVisible(false);
@@ -113,9 +110,6 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    if (IsCollocateAble()) {
-        CollocateStop(result);
-    }
     if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP) != RET_OK) {
         FI_HILOGI("stateNotify failed");
     }
@@ -229,9 +223,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    if (IsCollocateAble()) {
-        CollocateNotice();
-    }
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
