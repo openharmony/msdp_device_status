@@ -168,8 +168,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CALL_DEBUG_ENTER;
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    auto displayY = pointerItem.GetDisplayX();
-    auto displayX = pointerItem.GetDisplayY();
+    auto displayX = pointerItem.GetDisplayX();
+    auto displayY = pointerItem.GetDisplayY();
     auto sourceType = pointerEvent->GetSourceType();
     dragDrawing_.Draw(displayX, displayY, sourceType);
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
