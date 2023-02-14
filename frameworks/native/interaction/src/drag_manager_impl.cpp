@@ -18,6 +18,7 @@
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_message.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -112,7 +113,7 @@ int32_t DragManagerImpl::GetDragTargetPid()
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
 
-int32_t DragManagerImpl::OnDragMessage(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t result;
@@ -121,15 +122,35 @@ int32_t DragManagerImpl::OnDragMessage(const StreamClient& client, NetPacket& pk
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
-    OnNotifyDragResult(result);
+    stopCallback_(result);
     return RET_OK;
 }
 
-void DragManagerImpl::OnNotifyDragResult(int32_t result)
+int32_t DragManagerImpl::OnCollocateStart(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("Get message from StopDrag");
-    stopCallback_(result);
+    thumbnailDrawCallback_.startCallback(static_cast<int32_t>(DragMessage::MSG_DRAG_STATE_START));
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnCollocateNotice(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    thumbnailDrawCallback_.noticeCallback(static_cast<int32_t>(DragMessage::MSG_DRAG_STATE_STOP));
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnCollocateStop(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t result;
+    pkt >> result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read drag msg failed");
+        return RET_ERR;
+    }
+    thumbnailDrawCallback_.endCallback();
+    return RET_OK;
 }
 
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)

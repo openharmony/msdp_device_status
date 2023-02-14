@@ -57,15 +57,20 @@ public:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 private:
-    int32_t NotifyDragResult(MessageId msgId, int32_t result);
+    int32_t NotifyDragResult(int32_t result);
+    int32_t CollocateStart();
+    int32_t CollocateNotice();
+    int32_t CollocateStop(int32_t result);
+    bool IsCollocateAble();
 private:
+    DragDrawing dragDrawing_;
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
     int32_t monitorId_ { -1 };
-    SessionPtr dragOutSession_;
     int32_t dragTargetPid_ { -1 };
-    std::shared_ptr<MonitorConsumer> monitorConsumer_;
-    DragDrawing dragDrawing_;
+    SessionPtr dragOutSession_ { nullptr };
+    SessionPtr collocateSession_ { nullptr };
+    std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

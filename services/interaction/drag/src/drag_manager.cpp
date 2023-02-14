@@ -80,17 +80,20 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("GetPointerStyle failed");
         return RET_ERR;
     }
+    if (IsCollocateAble()) {
+        CollocateStart();
+    }
     DataAdapter.Init(dragData, pointerStyle);
     dragOutSession_ = sess;
+    inputMgr->SetPointerVisible(false);
+    auto extraData = DataAdapter.GetExtraData();
+    extraData.appended = true;
+    inputMgr->AppendExtraData(extraData);
     monitorId_ = inputMgr->AddMonitor(monitorConsumer_);
     if (monitorId_ < 0) {
         FI_HILOGE("AddMonitor failed, Error code:%{public}d", monitorId_);
         return RET_ERR;
     }
-    inputMgr->SetPointerVisible(false);
-    auto extraData = DataAdapter.GetExtraData();
-    extraData.appended = true;
-    inputMgr->AppendExtraData(extraData);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = DataAdapter.GetPixelMap();
     auto coordinate = DataAdapter.GetCoordinate();
     auto sourceType = DataAdapter.GetExtraData().sourceType;
@@ -110,6 +113,9 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
+    if (IsCollocateAble()) {
+        CollocateStop(result);
+    }
     if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP) != RET_OK) {
         FI_HILOGI("stateNotify failed");
     }
@@ -120,7 +126,7 @@ int32_t DragManager::StopDrag(int32_t result)
     }
     inputMgr->RemoveMonitor(monitorId_);
     inputMgr->SetPointerVisible(true);
-    NotifyDragResult(MessageId::DRAG_STOP, result);
+    NotifyDragResult(result);
     return RET_OK;
 }
 
@@ -129,10 +135,10 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::NotifyDragResult(MessageId msgId, int32_t result)
+int32_t DragManager::NotifyDragResult(int32_t result)
 {
     CALL_DEBUG_ENTER;
-    NetPacket pkt(msgId);
+    NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     pkt << result;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
@@ -143,6 +149,50 @@ int32_t DragManager::NotifyDragResult(MessageId msgId, int32_t result)
         return MSG_SEND_FAIL;
     }
     return RET_OK;
+}
+
+int32_t DragManager::CollocateStart()
+{
+    CALL_DEBUG_ENTER;
+    NetPacket pkt(MessageId::DRAG_COLLOCATE_START);
+    if (!collocateSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t DragManager::CollocateNotice()
+{
+    CALL_DEBUG_ENTER;
+    NetPacket pkt(MessageId::DRAG_COLLOCATE_NOTICE);
+    if (!collocateSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+
+}
+
+int32_t DragManager::CollocateStop(int32_t result)
+{
+    CALL_DEBUG_ENTER;
+    NetPacket pkt(MessageId::DRAG_COLLOCATE_STOP);
+    pkt << result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    if (!collocateSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+bool DragManager::IsCollocateAble()
+{
+    return collocateSession_ != nullptr;
 }
 
 void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -179,6 +229,9 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    if (IsCollocateAble()) {
+        CollocateNotice();
+    }
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
