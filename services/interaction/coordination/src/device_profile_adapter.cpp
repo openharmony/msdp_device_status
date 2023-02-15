@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,8 +30,8 @@ namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
-const std::string SERVICE_ID = "FusionInteraction";
-const std::string SERVICE_TYPE = "FusionInteraction";
+const std::string SERVICE_ID = "deviceStatus";
+const std::string SERVICE_TYPE = "deviceStatus";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 } // namespace
 
