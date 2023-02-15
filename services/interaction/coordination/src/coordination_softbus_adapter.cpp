@@ -505,6 +505,23 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
     }
     CooSM->Reset(deviceId);
 }
+
+void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    if (messageId <= MIN_ID || messageId >= MAX_ID) {
+        FI_HILOGE("Message id is invalid:%{public}d", messageId);
+        return;
+    }
+    CHKPV(callback);
+    registerRecvMap_[messageId] = callback;
+}
+
+void CoordinationSoftbusAdapter::SendData(const std::string& deviceId, MessageId messageId,
+    void* data, uint32_t dataLen)
+{
+    CALL_DEBUG_ENTER;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

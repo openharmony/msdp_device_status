@@ -32,6 +32,13 @@ class CoordinationSoftbusAdapter {
 public:
     virtual ~CoordinationSoftbusAdapter();
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
+
+    enum MessageId {
+        MIN_ID = 0,
+        DRAGING_DATA = 1,
+        STOPDRAG_DATA = 2,
+        MAX_ID = 50,
+    };
     int32_t StartRemoteCoordination(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess,
         const std::string &startDhid, int32_t xPercent, int32_t yPercent);
@@ -47,6 +54,8 @@ public:
     int32_t OnSessionOpened(int32_t sessionId, int32_t result);
     void OnSessionClosed(int32_t sessionId);
     void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+    void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
+    void SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
 
 private:
     CoordinationSoftbusAdapter() = default;
@@ -62,6 +71,7 @@ private:
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
+    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvMap_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

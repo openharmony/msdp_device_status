@@ -28,6 +28,7 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
+#include "across_device_drag.h"
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
@@ -125,6 +126,7 @@ private:
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
     DragManager dragMgr_;
+    AcrossDeviceDrag acrossDeviceDrag_;
 };
 
 } // namespace DeviceStatus
