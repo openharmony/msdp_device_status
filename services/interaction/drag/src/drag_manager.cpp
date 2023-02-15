@@ -142,50 +142,6 @@ int32_t DragManager::NotifyDragResult(int32_t result)
     return RET_OK;
 }
 
-int32_t DragManager::CollocateStart()
-{
-    CALL_DEBUG_ENTER;
-    NetPacket pkt(MessageId::DRAG_COLLOCATE_START);
-    if (!collocateSession_->SendMsg(pkt)) {
-        FI_HILOGE("Send message failed");
-        return MSG_SEND_FAIL;
-    }
-    return RET_OK;
-}
-
-int32_t DragManager::CollocateNotice()
-{
-    CALL_DEBUG_ENTER;
-    NetPacket pkt(MessageId::DRAG_COLLOCATE_NOTICE);
-    if (!collocateSession_->SendMsg(pkt)) {
-        FI_HILOGE("Send message failed");
-        return MSG_SEND_FAIL;
-    }
-    return RET_OK;
-
-}
-
-int32_t DragManager::CollocateStop(int32_t result)
-{
-    CALL_DEBUG_ENTER;
-    NetPacket pkt(MessageId::DRAG_COLLOCATE_STOP);
-    pkt << result;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet write data failed");
-        return RET_ERR;
-    }
-    if (!collocateSession_->SendMsg(pkt)) {
-        FI_HILOGE("Send message failed");
-        return MSG_SEND_FAIL;
-    }
-    return RET_OK;
-}
-
-bool DragManager::IsCollocateAble()
-{
-    return collocateSession_ != nullptr;
-}
-
 void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;

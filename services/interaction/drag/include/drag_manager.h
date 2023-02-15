@@ -60,10 +60,6 @@ public:
 private:
     int32_t NotifyDragResult(int32_t result);
     OHOS::MMI::ExtraData GetExtraData(bool appended) const;
-    int32_t CollocateStart();
-    int32_t CollocateNotice();
-    int32_t CollocateStop(int32_t result);
-    bool IsCollocateAble();
 private:
     DragDrawing dragDrawing_;
     StateChangeNotify stateNotify_;

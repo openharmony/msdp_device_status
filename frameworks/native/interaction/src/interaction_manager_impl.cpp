@@ -60,13 +60,7 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
-            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
-        {MessageId::DRAG_COLLOCATE_START,
-            MsgCallbackBind2(&DragManagerImpl::OnCollocateStart, &dragManagerImpl_)},
-        {MessageId::DRAG_COLLOCATE_NOTICE,
-            MsgCallbackBind2(&DragManagerImpl::OnCollocateNotice, &dragManagerImpl_)},
-        {MessageId::DRAG_COLLOCATE_STOP,
-            MsgCallbackBind2(&DragManagerImpl::OnCollocateStop, &dragManagerImpl_)}
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)}
     };
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {

@@ -126,33 +126,6 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     return RET_OK;
 }
 
-int32_t DragManagerImpl::OnCollocateStart(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    thumbnailDrawCallback_.startCallback(static_cast<int32_t>(DragMessage::MSG_DRAG_STATE_START));
-    return RET_OK;
-}
-
-int32_t DragManagerImpl::OnCollocateNotice(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    thumbnailDrawCallback_.noticeCallback(static_cast<int32_t>(DragMessage::MSG_DRAG_STATE_STOP));
-    return RET_OK;
-}
-
-int32_t DragManagerImpl::OnCollocateStop(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t result;
-    pkt >> result;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read drag msg failed");
-        return RET_ERR;
-    }
-    thumbnailDrawCallback_.endCallback();
-    return RET_OK;
-}
-
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
 {
     CALL_INFO_TRACE;
