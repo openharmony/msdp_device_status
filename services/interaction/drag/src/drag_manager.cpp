@@ -106,6 +106,7 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
+    dragOutSession_ = nullptr;
     if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP) != RET_OK) {
         FI_HILOGI("stateNotify failed");
     }

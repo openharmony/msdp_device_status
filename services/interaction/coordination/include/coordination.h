@@ -13,35 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef I_CONTEXT_H
-#define I_CONTEXT_H
+#ifndef COORDINATION_H
+#define COORDINATION_H
 
-#include "window_info.h"
-#include "key_event.h"
-#include "pointer_event.h"
-
-#include "i_delegate_tasks.h"
-#include "i_device_manager.h"
-#include "i_timer_manager.h"
+#include "i_coordination.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct MouseLocation {
-    int32_t physicalX { 0 };
-    int32_t physicalY { 0 };
-};
-
-class IContext {
+class Coordination : public ICoordination {
 public:
-    IContext() = default;
-    virtual ~IContext() = default;
+    Coordination() = default;
+    virtual ~Coordination() = default;
 
-    virtual IDelegateTasks& GetDelegateTasks() = 0;
-    virtual IDeviceManager& GetDeviceManager() = 0;
-    virtual ITimerManager& GetTimerManager() = 0;
+    void EnableCoordination(bool enabled);
+    int32_t StartCoordination(SessionPtr sess, int32_t userData,
+        const std::string &sinkDeviceId, int32_t srcDeviceId);
+    int32_t StopCoordination(SessionPtr sess, int32_t userData);
+    int32_t GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId);
+    int32_t RegisterCoordinationListener(SessionPtr sess);
+    int32_t UnregisterCoordinationListener(SessionPtr sess);
+    void Dump(int32_t fd);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_CONTEXT_H
+#endif // COORDINATION_H

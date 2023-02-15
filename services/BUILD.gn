@@ -28,7 +28,6 @@ config("devicestatus_services_private_config") {
     "//base/msdp/device_status/libs/interface",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "${relational_store_innerapi_path}/appdatafwk/include/",
-    "interaction/coordination/lib/include",
     "interaction/drag/include",
     "//utils/system/safwk/native/include",
     "communication/base",
@@ -85,7 +84,7 @@ ohos_shared_library("devicestatus_service") {
 
   if (fusion_interaction_coordination) {
     deps += [
-      "interaction/coordination/lib:coordination_lib",
+      "interaction/coordination:coordination",
       "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
     ]
   }

@@ -54,35 +54,6 @@ public:
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
 
-    std::shared_ptr<MMI::PointerEvent> GetPointerEvent() override
-    {
-        return nullptr;
-    }
-
-    MouseLocation GetMouseInfo() override
-    {
-        return MouseLocation();
-    }
-
-    int32_t SetPointerVisible(int32_t pid, bool visible) override
-    {
-        return -1;
-    }
-
-    void SelectAutoRepeat(std::shared_ptr<MMI::KeyEvent>& keyEvent) override
-    {}
-
-    void SetJumpInterceptState(bool isJump) override
-    {}
-
-    const ::OHOS::MMI::DisplayGroupInfo GetDisplayGroupInfo() override
-    {
-        return ::OHOS::MMI::DisplayGroupInfo();
-    }
-
-    void SetAbsolutionLocation(double xPercent, double yPercent) override
-    {}
-
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback) override;
