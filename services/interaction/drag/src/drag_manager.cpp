@@ -83,18 +83,14 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     DataAdapter.Init(dragData, pointerStyle);
     dragOutSession_ = sess;
     inputMgr->SetPointerVisible(false);
-    auto extraData = DataAdapter.GetExtraData();
-    extraData.appended = true;
+    auto extraData = GetExtraData(true);
     inputMgr->AppendExtraData(extraData);
     monitorId_ = inputMgr->AddMonitor(monitorConsumer_);
     if (monitorId_ < 0) {
         FI_HILOGE("AddMonitor failed, Error code:%{public}d", monitorId_);
         return RET_ERR;
     }
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = DataAdapter.GetPixelMap();
-    auto coordinate = DataAdapter.GetCoordinate();
-    auto sourceType = DataAdapter.GetExtraData().sourceType;
-    dragDrawing_.InitPicture(pixelMap, coordinate.first, coordinate.second, sourceType);
+    dragDrawing_.InitPicture(dragData.pixelMap, dragData.x, dragData.y, dragData.sourceType);
     dragState_ = DragState::DRAGGING;
     if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START) != RET_OK) {
         FI_HILOGI("stateNotify failed");
@@ -227,8 +223,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
-    auto extraData = DataAdapter.GetExtraData();
-    extraData.appended = false;
+    auto extraData = GetExtraData(false);
     inputMgr->AppendExtraData(extraData);
     inputMgr->MarkConsumed(monitorId_, pointerEvent->GetId());
 }
