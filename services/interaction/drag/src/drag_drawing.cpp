@@ -27,12 +27,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragD
 } // namespace
 
 
-void DragDrawing::InitPicture(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, int32_t x, int32_t y, int32_t sourceType)
+void DragDrawing::InitPicture()
 {
     CALL_DEBUG_ENTER;
 }
 
-void DragDrawing::Draw(int32_t x, int32_t y, int32_t sourceType)
+void DragDrawing::Draw(int32_t displayX, int32_t displayY, int32_t sourceType)
 {
 }
 

@@ -43,15 +43,15 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
-    CHKPR(dragData.pixelMap, RET_ERR);
-    if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
+    if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.pictureResourse.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
+            dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
         return RET_ERR;
     }
-    if (dragData.x < 0 || dragData.y < 0 || dragData.dragNum < 0) {
-        FI_HILOGE("Invalid x y or dragNum");
+    if (dragData.dragNum <= 0) {
+        FI_HILOGE("Invalid dragNum:%{public}d", dragData.dragNum);
         return RET_ERR;
     }
     if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
@@ -122,6 +122,8 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(stopCallback_, RET_ERR);
     stopCallback_(result);
     return RET_OK;
 }

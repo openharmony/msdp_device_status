@@ -72,6 +72,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     CHKPR(sess, RET_ERR);
+    dragOutSession_ = sess;
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
     monitorConsumer_ = std::make_shared<MonitorConsumer>(MonitorConsumer(callback));
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
@@ -81,8 +82,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     DataAdapter.Init(dragData, pointerStyle);
-    dragOutSession_ = sess;
-    inputMgr->SetPointerVisible(false);
     auto extraData = GetExtraData(true);
     inputMgr->AppendExtraData(extraData);
     monitorId_ = inputMgr->AddMonitor(monitorConsumer_);
@@ -90,11 +89,10 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("AddMonitor failed, Error code:%{public}d", monitorId_);
         return RET_ERR;
     }
-    dragDrawing_.InitPicture(dragData.pixelMap, dragData.x, dragData.y, dragData.sourceType);
+    inputMgr->SetPointerVisible(false);
+    dragDrawing_.InitPicture();
     dragState_ = DragState::DRAGGING;
-    if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START) != RET_OK) {
-        FI_HILOGI("stateNotify failed");
-    }
+    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
 }
 
@@ -107,16 +105,13 @@ int32_t DragManager::StopDrag(int32_t result)
     }
     dragState_ = DragState::FREE;
     dragOutSession_ = nullptr;
-    if (stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP) != RET_OK) {
-        FI_HILOGI("stateNotify failed");
-    }
+    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed :%{public}d", monitorId_);
         return RET_ERR;
     }
     inputMgr->RemoveMonitor(monitorId_);
-    inputMgr->SetPointerVisible(true);
     NotifyDragResult(result);
     return RET_OK;
 }
@@ -149,15 +144,13 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     auto pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE && pointerItem.IsPressed()) {
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
-        return;
-    }
-    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         OnDragUp(pointerEvent);
-        return;
+    } else {
+        FI_HILOGW("Unsupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
     }
-    FI_HILOGD("Unsupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -169,8 +162,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     auto displayY = pointerItem.GetDisplayY();
     auto sourceType = pointerEvent->GetSourceType();
     dragDrawing_.Draw(displayX, displayY, sourceType);
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    inputMgr->MarkConsumed(monitorId_, pointerEvent->GetId());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -182,7 +173,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
     auto extraData = GetExtraData(false);
     inputMgr->AppendExtraData(extraData);
-    inputMgr->MarkConsumed(monitorId_, pointerEvent->GetId());
+    inputMgr->SetPointerVisible(true);
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}

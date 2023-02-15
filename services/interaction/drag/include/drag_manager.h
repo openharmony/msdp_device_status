@@ -67,7 +67,6 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
-    SessionPtr collocateSession_ { nullptr };
     std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
 } // namespace DeviceStatus
