@@ -51,6 +51,9 @@ public:
     int32_t LoadAlgoLib();
     int32_t UnloadAlgoLib();
 private:
+    using CreateFunc = DevicestatusMsdpInterface* (*)();
+    using DestroyFunc = void *(*)(DevicestatusMsdpInterface*);
+
     ErrCode ImplCallback(const DevicestatusDataUtils::DevicestatusData& data);
     int32_t MsdpCallback(const DevicestatusDataUtils::DevicestatusData& data);
     ErrCode RegisterMsdp();

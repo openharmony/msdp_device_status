@@ -182,9 +182,6 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
-    DEVICESTATUS_RETURN_IF(callback == nullptr);
-    auto object = callback->AsObject();
-    DEVICESTATUS_RETURN_IF(object == nullptr);
     if (!EnableMock(type)) {
         DEV_HILOGE(SERVICE, "Enable failed!");
         return;
@@ -196,8 +193,11 @@ void DevicestatusManager::Subscribe(const DevicestatusDataUtils::DevicestatusTyp
             DEV_HILOGE(SERVICE, "clientDeathObserver_ is nullptr");
             return;
         }
-        object->AddDeathRecipient(clientDeathObserver_);
     }
+    DEVICESTATUS_RETURN_IF(callback == nullptr);
+    auto object = callback->AsObject();
+    DEVICESTATUS_RETURN_IF(object == nullptr);
+    object->AddDeathRecipient(clientDeathObserver_);
     std::set<const sptr<IdevicestatusCallback>, classcomp> listeners;
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
@@ -226,12 +226,11 @@ void DevicestatusManager::UnSubscribe(const DevicestatusDataUtils::DevicestatusT
     const sptr<IdevicestatusCallback>& callback)
 {
     DEV_HILOGI(SERVICE, "Enter");
-
+    std::lock_guard lock(mutex_);
     DEVICESTATUS_RETURN_IF(callback == nullptr);
     auto object = callback->AsObject();
     DEVICESTATUS_RETURN_IF(object == nullptr);
     DEV_HILOGI(SERVICE, "listenerMap_.size=%{public}zu", listenerMap_.size());
-    std::lock_guard lock(mutex_);
     if (clientDeathObserver_ != nullptr) {
         object->RemoveDeathRecipient(clientDeathObserver_);
     }

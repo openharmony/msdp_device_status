@@ -288,9 +288,8 @@ int32_t DevicestatusMsdpClientImpl::LoadAlgoLib()
         DEV_HILOGE(SERVICE, "Cannot load library error:%{public}s", dlerror());
         return RET_ERR;
     }
-    algoHandler_.create = (DevicestatusMsdpInterface* (*)()) dlsym(algoHandler_.handle, "Create");
-    algoHandler_.destroy = (void *(*)(DevicestatusMsdpInterface*))dlsym(algoHandler_.handle, "Destroy");
-
+    algoHandler_.create = reinterpret_cast<CreateFunc>(dlsym(algoHandler_.handle, "Create"));
+    algoHandler_.destroy = reinterpret_cast<DestroyFunc>(dlsym(algoHandler_.handle, "Destroy"));
     if (algoHandler_.create == nullptr || algoHandler_.destroy == nullptr) {
         dlclose(algoHandler_.handle);
         algoHandler_.Clear();
