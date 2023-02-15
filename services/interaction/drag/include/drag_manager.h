@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "extra_data.h"
 #include "i_input_event_consumer.h"
 #include "input_manager.h"
 #include "pixel_map.h"
@@ -58,6 +59,7 @@ public:
     };
 private:
     int32_t NotifyDragResult(int32_t result);
+    OHOS::MMI::ExtraData GetExtraData(bool appended) const;
     int32_t CollocateStart();
     int32_t CollocateNotice();
     int32_t CollocateStop(int32_t result);

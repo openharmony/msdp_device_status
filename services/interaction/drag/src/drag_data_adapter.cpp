@@ -35,32 +35,8 @@ DragDataAdapter::~DragDataAdapter() = default;
 void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    extraData_.buffer = dragData.buffer;
-    extraData_.sourceType = dragData.sourceType;
-    extraData_.appended = false;
-    coordinate_ = std::make_pair(dragData.x, dragData.y);
-    pixelMap_ = dragData.pixelMap;
-    dragNum_ = dragData.dragNum;
+    dragData_ = dragData;
     pointerStyle_ = pointerStyle;
-}
-
-OHOS::MMI::ExtraData DragDataAdapter::GetExtraData() const
-{
-    return extraData_;
-}
-std::pair<int, int> DragDataAdapter::GetCoordinate() const
-{
-    return coordinate_;
-}
-
-std::shared_ptr<OHOS::Media::PixelMap> DragDataAdapter::GetPixelMap() const
-{
-    return pixelMap_;
-}
-
-int32_t DragDataAdapter::GetDragNum() const
-{
-    return dragNum_;
 }
 
 int32_t DragDataAdapter::GetDragStyle() const
@@ -71,6 +47,11 @@ int32_t DragDataAdapter::GetDragStyle() const
 std::u16string DragDataAdapter::GetDragMessage() const
 {
     return dragMessage_;
+}
+
+DragData DragDataAdapter::GetDragData() const
+{
+    return dragData_;
 }
 
 } // namespace DeviceStatus

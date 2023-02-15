@@ -62,7 +62,7 @@ std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
     info.size.height = pixelMapHeight;
-    info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
+    info.pixelFormat = Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
