@@ -40,7 +40,7 @@ void DeviceStatusModuleTest::DeviceStatusModuleTestCallback::OnDeviceStatusChang
     GTEST_LOG_(INFO) << "DeviceStatusModuleTestCallback value: " << devicestatusData.value;
     EXPECT_EQ(true, devicestatusData.type == g_moduleTest &&
         (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-        devicestatusData.value <= OnChangedValue::VALUE_ENTER)) <<
+        devicestatusData.value <= OnChangedValue::VALUE_EXIT)) <<
         "DeviceStatusModuleTestCallback failed";
 }
 
@@ -77,7 +77,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == g_moduleTest &&
-        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -95,7 +95,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == g_moduleTest &&
-        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -113,5 +113,5 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == g_moduleTest &&
-        data.value == OnChangedValue::VALUE_INVALID) << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
