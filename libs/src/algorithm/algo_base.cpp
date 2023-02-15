@@ -57,15 +57,14 @@ bool AlgoBase::GetData(int32_t sensorTypeId, AccelData* sensorData)
 void AlgoBase::RegisterCallback(std::shared_ptr<DevicestatusMsdpInterface::MsdpAlgorithmCallback> callback)
 {
     DEV_HILOGD(SERVICE, "Enter");
+    state_ = UNKNOWN;
     callback_ = callback;
 }
 
 void AlgoBase::UnregisterCallback()
 {
-    if (callback_ != nullptr) {
-        callback_ = nullptr;
-    }
-    state_ = UNKNOWN;
+    DEV_HILOGD(SERVICE, "Enter");
+    callback_ = nullptr;
 }
 
 void AlgoBase::UpdateStateAndReport(DevicestatusDataUtils::DevicestatusValue value,
