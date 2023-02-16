@@ -66,6 +66,7 @@ private:
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
+    bool isReleasing_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

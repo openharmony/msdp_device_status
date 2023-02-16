@@ -144,10 +144,12 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     auto pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE && !isReleasing_) {
         OnDragMove(pointerEvent);
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        isReleasing_ = true;
         OnDragUp(pointerEvent);
+        isReleasing_ = false;
     } else {
         FI_HILOGW("Unsupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
     }
@@ -163,12 +165,12 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    MMI::PointerEvent::PointerItem pointerItem;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
     auto extraData = GetExtraData(false);
     inputMgr->AppendExtraData(extraData);
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
