@@ -61,7 +61,10 @@ enum class MessageId : int32_t {
     COORDINATION_MESSAGE,
     COORDINATION_GET_STATE,
 
-    DRAG_STATE_LISTENER
+    DRAG_STATE_LISTENER,
+    START_THUMBNAIL_DRAW,
+    NOTICE_THUMBNAIL_DRAW,
+    STOP_THUMBNAIL_DRAW
 };
 
 enum TokenType : int32_t {
@@ -69,6 +72,11 @@ enum TokenType : int32_t {
     TOKEN_HAP = 0,
     TOKEN_NATIVE,
     TOKEN_SHELL,
+};
+
+enum ThumbnailDrawState {
+    START,
+    STOP
 };
 
 enum ANREventType {

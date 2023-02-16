@@ -94,7 +94,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
 }
 
-void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
+void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<OHOS::Media::PixelMap> pixmap)
 {
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
@@ -102,7 +102,7 @@ void JsDragManager::EmitStartThumbnailDraw(int32_t pixmap)
     CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    thumbnailDrawCb_->data = pixmap;
+    // thumbnailDrawCb_->data = pixmap;
     work->data = thumbnailDrawCb_.GetRefPtr();
 }
 

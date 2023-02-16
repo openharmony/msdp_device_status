@@ -23,6 +23,7 @@
 
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
+#include "pixel_map.h"
 #include "refbase.h"
 #include <uv.h>
 
@@ -64,7 +65,7 @@ private:
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(int32_t pixmap);
+    void EmitStartThumbnailDraw(std::shared_ptr<OHOS::Media::PixelMap> pixmap);
     void EmitNoticeThumbnailDraw(int32_t dragState);
     void EmitEndThumbnailDraw();
     void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);

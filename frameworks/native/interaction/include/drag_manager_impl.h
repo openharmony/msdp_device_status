@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 
+#include "client.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
 
@@ -27,7 +28,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 struct ThumbnailDrawCallback {
-    std::function<void(int32_t)> startCallback;
+    std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback;
     std::function<void(int32_t)> noticeCallback;
     std::function<void(void)> endCallback;
 };
@@ -41,11 +42,16 @@ public:
     int32_t GetDragTargetPid();
     int32_t StartDrag(const DragData &dragData, std::function<void(int32_t)> callback);
     int32_t StopDrag(int32_t result);
-    int32_t RegisterThumbnailDraw(std::function<void(int32_t)> startCallback,
+    int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
         std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
     int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
+
+    int32_t OnStartThumbnailDraw(const StreamClient& client, NetPacket& pkt);
+    int32_t OnNoticeThumbnailDraw(const StreamClient& client, NetPacket& pkt);
+    int32_t OnStopThumbnailDraw(const StreamClient& client, NetPacket& pkt);
+    void UnMarshallPixelmap(NetPacket& pkt, std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     std::mutex mtx_;

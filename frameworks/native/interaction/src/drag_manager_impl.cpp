@@ -70,7 +70,7 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
-int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startCallback,
+int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
     CALL_DEBUG_ENTER;
@@ -157,6 +157,58 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         hasRegistered_ = false;
         return DeviceStatusClient::GetInstance().RemoveDraglistener();
     }
+}
+
+void DragManagerImpl::UnMarshallPixelmap(NetPacket& pkt, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    OHOS::Media::ImageInfo imageInfo;
+    OHOS::Media::AllocatorType allocatorType;
+    CHKPV(pixelMap);
+    pkt >> imageInfo.pixelFormat >> imageInfo.alphaType >> imageInfo.size.width
+        >> imageInfo.size.height >> allocatorType;
+    int32_t size;
+    pkt >> size;
+    char* buf = (char*)malloc(sizeof(char) * size);
+    pkt.Read(buf, static_cast<size_t>(size));
+    pixelMap->SetPixelsAddr(reinterpret_cast<void*>(buf), nullptr,
+        static_cast<uint32_t>(size), allocatorType, nullptr);
+    pixelMap->SetImageInfo(imageInfo);
+    
+}
+
+int32_t DragManagerImpl::OnStartThumbnailDraw(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
+    UnMarshallPixelmap(pkt, pixelMap);
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    CHKPR(thumbnailDrawCallback_.startCallback, RET_ERR);
+    thumbnailDrawCallback_.startCallback(pixelMap);
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnNoticeThumbnailDraw(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    ThumbnailDrawState state;
+    pkt >> state;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    CHKPR(thumbnailDrawCallback_.noticeCallback, RET_ERR);
+    thumbnailDrawCallback_.noticeCallback(state);
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnStopThumbnailDraw(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(thumbnailDrawCallback_.endCallback, RET_ERR);
+    thumbnailDrawCallback_.endCallback();
     return RET_OK;
 }
 } // namespace DeviceStatus

@@ -42,10 +42,12 @@ public:
     int32_t GetDragTargetPid() const;
     int32_t OnRegisterThumbnailDraw(SessionPtr sess);
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
+    void MarshallPixelmap(const DragData &dragData, NetPacket& pkt);
 private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
     SessionPtr dragOutSession_ { nullptr };
+    SessionPtr thumbnailDrawSession_ { nullptr };
     int32_t dragTargetPid_ { -1 };
 };
 } // namespace DeviceStatus

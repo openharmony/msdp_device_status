@@ -59,6 +59,12 @@ void InteractionManagerImpl::InitMsgHandler()
         {MessageId::COORDINATION_GET_STATE,
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+        {MessageId::START_THUMBNAIL_DRAW,
+            MsgCallbackBind2(&DragManagerImpl::OnStartThumbnailDraw, &dragManagerImpl_)},
+        {MessageId::NOTICE_THUMBNAIL_DRAW,
+            MsgCallbackBind2(&DragManagerImpl::OnNoticeThumbnailDraw, &dragManagerImpl_)},
+        {MessageId::STOP_THUMBNAIL_DRAW,
+            MsgCallbackBind2(&DragManagerImpl::OnStopThumbnailDraw, &dragManagerImpl_)},
     };
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {
@@ -211,7 +217,8 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     return dragManagerImpl_.GetDragTargetPid();
 }
 
-int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(int32_t)> startCallback,
+int32_t InteractionManagerImpl::RegisterThumbnailDraw(
+    std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
     return dragManagerImpl_.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
