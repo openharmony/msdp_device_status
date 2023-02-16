@@ -25,7 +25,6 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
-#include "drag_drawing.h"
 #include "state_change_notify.h"
 #include "stream_session.h"
 
@@ -61,7 +60,6 @@ private:
     int32_t NotifyDragResult(int32_t result);
     OHOS::MMI::ExtraData GetExtraData(bool appended) const;
 private:
-    DragDrawing dragDrawing_;
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
     int32_t monitorId_ { -1 };

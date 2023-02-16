@@ -90,7 +90,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     inputMgr->SetPointerVisible(false);
-    dragDrawing_.InitPicture();
     dragState_ = DragState::DRAGGING;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
@@ -104,15 +103,16 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    dragOutSession_ = nullptr;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
+    inputMgr->SetPointerVisible(true);
+    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed :%{public}d", monitorId_);
         return RET_ERR;
     }
     inputMgr->RemoveMonitor(monitorId_);
     NotifyDragResult(result);
+    dragOutSession_ = nullptr;
     return RET_OK;
 }
 
@@ -158,22 +158,17 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CALL_DEBUG_ENTER;
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    auto displayX = pointerItem.GetDisplayX();
-    auto displayY = pointerItem.GetDisplayY();
-    auto sourceType = pointerEvent->GetSourceType();
-    dragDrawing_.Draw(displayX, displayY, sourceType);
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
     auto extraData = GetExtraData(false);
     inputMgr->AppendExtraData(extraData);
-    inputMgr->SetPointerVisible(true);
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
