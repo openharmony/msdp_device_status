@@ -103,13 +103,12 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    inputMgr->SetPointerVisible(true);
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed :%{public}d", monitorId_);
         return RET_ERR;
     }
+    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     inputMgr->RemoveMonitor(monitorId_);
     NotifyDragResult(result);
     dragOutSession_ = nullptr;
@@ -166,6 +165,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
+    inputMgr->SetPointerVisible(true);
     auto extraData = GetExtraData(false);
     inputMgr->AppendExtraData(extraData);
     MMI::PointerEvent::PointerItem pointerItem;
