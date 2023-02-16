@@ -157,6 +157,7 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         hasRegistered_ = false;
         return DeviceStatusClient::GetInstance().RemoveDraglistener();
     }
+    return RET_OK;
 }
 
 void DragManagerImpl::UnMarshallPixelmap(NetPacket& pkt, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
