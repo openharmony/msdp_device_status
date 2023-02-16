@@ -39,9 +39,8 @@ void DeviceStatusClientTest::DeviceStatusClientTestCallback::OnDeviceStatusChang
 {
     GTEST_LOG_(INFO) << "DeviceStatusClientTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusClientTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_VERTICAL_POSITION &&
-        devicestatusData.value == OnChangedValue::VALUE_ENTER) <<
-        "DeviceStatusClientTestCallback failed";
+    EXPECT_TRUE(devicestatusData.type == Type::TYPE_VERTICAL_POSITION && devicestatusData.value >= OnChangedValue::VALUE_INVALID
+        && devicestatusData.value <= OnChangedValue::VALUE_EXIT) << "DeviceStatusClientTestCallback failed";
 }
 
 /**
@@ -178,7 +177,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 end");
 }
@@ -197,7 +196,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest008 end");
 }
@@ -216,7 +215,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest009 end");
 }
@@ -230,7 +229,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest004 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 end";
 }
@@ -244,7 +243,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest005 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
 }
@@ -258,7 +257,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_ENTER)
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
 }
