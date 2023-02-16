@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include <gtest/gtest.h>
+#include "pointer_event.h"
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
@@ -80,12 +81,13 @@ std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
 
 void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
-    dragData.pixelMap = CreatePixelMap(width, height);
-    dragData.x = 0;
-    dragData.y = 0;
+    dragData.pictureResourse.pixelMap = CreatePixelMap(width, height);
+    dragData.pictureResourse.x = 0;
+    dragData.pictureResourse.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
-    dragData.sourceType = 0;
+    dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
     dragData.dragNum = 0;
+    dragData.pointerId = 0;
 }
 
 /**

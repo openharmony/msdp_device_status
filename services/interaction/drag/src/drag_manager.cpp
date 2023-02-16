@@ -104,6 +104,17 @@ int32_t DragManager::OnUnregisterThumbnailDraw(SessionPtr sess)
     CALL_DEBUG_ENTER;
     return RET_OK;
 }
+
+OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
+{
+    auto dragData = DataAdapter.GetDragData();
+    OHOS::MMI::ExtraData extraData;
+    extraData.buffer = dragData.buffer;
+    extraData.sourceType = dragData.sourceType;
+    extraData.appended = appended;
+    return extraData;
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

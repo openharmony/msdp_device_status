@@ -49,14 +49,14 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
         FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
         return RET_ERR;
     }
-    if (dragData.pixelMap == nullptr) {
-        FI_HILOGE("dragData.pixelMap is nullptr");
+    if (dragData.pictureResourse.pixelMap == nullptr) {
+        FI_HILOGE("dragData.pictureResourse.pixelMap is nullptr");
         return RET_ERR;
     }
-    if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.pictureResourse.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
+            dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);

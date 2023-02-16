@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "extra_data.h"
 #include "i_input_event_consumer.h"
 #include "input_manager.h"
 #include "pixel_map.h"
@@ -42,6 +43,8 @@ public:
     int32_t GetDragTargetPid() const;
     int32_t OnRegisterThumbnailDraw(SessionPtr sess);
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
+private:
+    OHOS::MMI::ExtraData GetExtraData(bool appended) const;
 private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
