@@ -80,7 +80,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
             iter = listeners_.erase(iter);
         } else {
             if ((*iter)->env == env && IsSameHandle(env, handle, (*iter)->ref)) {
-                FI_HILOGE("Removing monitor successfully");
+                FI_HILOGD("Removing monitor successfully");
                 RELEASE_CALLBACKINFO((*iter)->env, (*iter)->ref);
                 iter = listeners_.erase(iter);
                 break;
