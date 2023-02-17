@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,11 +61,6 @@ Device::Device(int32_t deviceId)
     : deviceId_(deviceId)
 {}
 
-Device::~Device()
-{
-    Close();
-}
-
 int32_t Device::Open()
 {
     CALL_DEBUG_ENTER;
@@ -98,7 +93,6 @@ int32_t Device::Open()
     QueryDeviceInfo();
     QuerySupportedEvents();
     UpdateCapability();
-    Populate();
     LoadDeviceConfig();
     return RET_OK;
 }
@@ -186,17 +180,6 @@ void Device::QuerySupportedEvents()
     }
 }
 
-void Device::Populate()
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    if (IsRemote()) {
-        networkId_ = MakeNetworkId(GetPhys());
-    }
-    dhid_ = GenerateDescriptor();
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-}
-
 void Device::UpdateCapability()
 {
     CALL_DEBUG_ENTER;
@@ -259,82 +242,6 @@ void Device::CheckKeys()
         }
     }
 }
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-
-bool Device::IsRemote() const
-{
-    return (GetName().find(INPUT_VIRTUAL_DEVICE_NAME) != std::string::npos);
-}
-
-std::string Device::MakeNetworkId(const std::string &phys) const
-{
-    std::vector<std::string> strList;
-    StringSplit(phys, SPLIT_SYMBOL, strList);
-    if (strList.size() == 3) {
-        return strList[1];
-    }
-    return EMPTYSTR;
-}
-
-std::string Device::GenerateDescriptor() const
-{
-    const std::string phys = GetPhys();
-    std::string descriptor;
-    if (IsRemote() && !phys.empty()) {
-        FI_HILOGI("physicalPath:%{public}s", phys.c_str());
-        std::vector<std::string> strList;
-        StringSplit(phys.c_str(), SPLIT_SYMBOL, strList);
-        if (strList.size() == 3) {
-            descriptor = strList[2];
-        }
-        return descriptor;
-    }
-
-    int32_t vendor = GetVendor();
-    const std::string name = GetName();
-    const std::string uniq = GetUniq();
-    int32_t product = GetProduct();
-    std::string rawDescriptor = StringPrintf(":%04x:%04x:", vendor, product);
-
-    // add handling for USB devices to not unique kbs that show up twice
-    if (!uniq.empty()) {
-        rawDescriptor += "uniqueId:" + uniq;
-    }
-    if (!phys.empty()) {
-        rawDescriptor += "physicalPath:" + phys;
-    }
-    if (!name.empty()) {
-        rawDescriptor += "name:" + std::regex_replace(name, std::regex(" "), "");
-    }
-    descriptor = DH_ID_PREFIX + Sha256(rawDescriptor);
-    FI_HILOGI("Created descriptor raw: %{public}s", rawDescriptor.c_str());
-    return descriptor;
-}
-
-std::string Device::Sha256(const std::string &in) const
-{
-    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = {0};
-    SHA256_CTX ctx;
-    SHA256_Init(&ctx);
-    SHA256_Update(&ctx, in.data(), in.size());
-    SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
-    // here we translate sha256 hash to hexadecimal. each 8-bit char will be presented by two characters([0-9a-f])
-    constexpr int32_t WIDTH = 4;
-    constexpr unsigned char MASK = 0x0F;
-    const char* hexCode = "0123456789abcdef";
-    constexpr int32_t DOUBLE_TIMES = 2;
-    for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
-        unsigned char value = out[SHA256_DIGEST_LENGTH + i];
-        // uint8_t is 2 digits in hexadecimal.
-        out[i * DOUBLE_TIMES] = hexCode[(value >> WIDTH) & MASK];
-        out[i * DOUBLE_TIMES + 1] = hexCode[value & MASK];
-    }
-    out[SHA256_DIGEST_LENGTH * DOUBLE_TIMES] = 0;
-    return reinterpret_cast<char*>(out);
-}
-
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 void Device::RemoveSpace(std::string &str) const
 {

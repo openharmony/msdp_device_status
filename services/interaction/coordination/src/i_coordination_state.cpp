@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "i_coordination_state.h"
 
+#include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "devicestatus_define.h"
 #include "distributed_input_adapter.h"
@@ -37,9 +38,7 @@ ICoordinationState::ICoordinationState()
 int32_t ICoordinationState::PrepareAndStart(const std::string &srcNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPR(context, RET_ERR);
-    std::string sinkNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDeviceId);
+    std::string sinkNetworkId = CooDevMgr->GetOriginNetworkId(startDeviceId);
     int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
         CooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
@@ -62,8 +61,8 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &srcNetworkId, int
     return ret;
 }
 
-void ICoordinationState::OnPrepareDistributedInput(
-    bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId)
+void ICoordinationState::OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId,
+    int32_t startDeviceId)
 {
     FI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
@@ -82,9 +81,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> networkIds = CooSM->GetPreparedDevices();
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPR(context, RET_ERR);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startDeviceId);
+    std::vector<std::string> dhids = CooDevMgr->GetCoordinationDhids(startDeviceId);
     if (dhids.empty()) {
         CooSM->OnStartFinish(false, networkIds.first, startDeviceId);
         return static_cast<int32_t>(CoordinationMessage::DEVICE_ID_ERROR);

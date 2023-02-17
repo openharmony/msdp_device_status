@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,27 +40,16 @@ public:
     ~DeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(DeviceManager);
 
-    int32_t GetFd() const override;
-    void Dispatch(const struct epoll_event &ev) override;
-
     int32_t Init(IContext *context);
     int32_t Enable();
     int32_t Disable();
-
+    
+    int32_t GetFd() const override;
+    void Dispatch(const struct epoll_event &ev) override;
+    std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
     int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
     void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
-
-    std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    virtual bool IsRemote(int32_t id) const override;
-    virtual std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const override;
-    virtual std::vector<std::string> GetCoordinationDhids(const std::string &dhid) const override;
-    virtual std::string GetOriginNetworkId(int32_t id) const override;
-    virtual std::string GetOriginNetworkId(const std::string &dhid) const override;
-    virtual std::string GetDhid(int32_t deviceId) const override;
-    virtual bool HasLocalPointerDevice() const override;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    void RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer) override;
 
 private:
     class HotplugHandler final : public IDeviceMgr
@@ -92,7 +81,8 @@ private:
 
     int32_t OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
-
+    int32_t OnRetriggerHotplug(std::shared_ptr<IDeviceObserver> observer);
+    
     int32_t EpollCreate();
     int32_t EpollAdd(IEpollEventSource *source);
     void EpollDel(IEpollEventSource *source);
@@ -100,33 +90,6 @@ private:
 
     std::shared_ptr<IDevice> OnGetDevice(int32_t id) const;
     int32_t RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(int32_t)> &task, int32_t id) const;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    bool OnIsRemote(int32_t id) const;
-    int32_t RunIsRemote(std::packaged_task<bool(int32_t)> &task, int32_t id) const;
-
-    std::vector<std::string> OnGetCoopDhids(int32_t deviceId) const;
-    int32_t RunGetGetCoopDhids(std::packaged_task<std::vector<std::string>(int32_t)> &task,
-                               int32_t deviceId) const;
-
-    std::vector<std::string> OnGetCoordinationDhids(const std::string &dhid) const;
-    int32_t RunGetCoordinationDhids(std::packaged_task<std::vector<std::string>(const std::string &)> &task,
-                                 const std::string &dhid) const;
-
-    std::string OnGetOriginNetId(int32_t id) const;
-    int32_t RunGetOriginNetId(std::packaged_task<std::string(int32_t)> &task,
-                              int32_t id) const;
-
-    std::string OnGetOriginNetworkId(const std::string &dhid) const;
-    int32_t RunGetOriginNetworkId(std::packaged_task<std::string(const std::string &)> &task,
-                                  const std::string &dhid) const;
-
-    std::string OnGetDhid(int32_t deviceId) const;
-    int32_t RunGetDhid(std::packaged_task<std::string(int32_t)> &task, int32_t deviceId) const;
-
-    bool OnHasLocalPointerDevice() const;
-    int32_t RunHasLocalPointerDevice(std::packaged_task<bool()> &task) const;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:
     IContext *context_ { nullptr };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <sys/epoll.h>
+
 #include "i_device.h"
 #include "i_device_observer.h"
 
@@ -30,20 +32,10 @@ class IDeviceManager {
 public:
     IDeviceManager() = default;
     virtual ~IDeviceManager() = default;
-
     virtual std::shared_ptr<IDevice> GetDevice(int32_t id) const = 0;
     virtual int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
     virtual void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    virtual bool IsRemote(int32_t id) const = 0;
-    virtual std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const = 0;
-    virtual std::vector<std::string> GetCoordinationDhids(const std::string &dhid) const = 0;
-    virtual std::string GetOriginNetworkId(int32_t id) const = 0;
-    virtual std::string GetOriginNetworkId(const std::string &dhid) const = 0;
-    virtual std::string GetDhid(int32_t deviceId) const = 0;
-    virtual bool HasLocalPointerDevice() const = 0;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    virtual void RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

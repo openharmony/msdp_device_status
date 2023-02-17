@@ -15,6 +15,7 @@
 
 #include "coordination_state_in.h"
 
+#include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
@@ -62,7 +63,7 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
     CALL_DEBUG_ENTER;
     auto* context = CoordinationEventMgr->GetIContext();
     CHKPR(context, RET_ERR);
-    std::string originNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDeviceId);
+    std::string originNetworkId = CooDevMgr->GetOriginNetworkId(startDeviceId);
     if (remoteNetworkId == originNetworkId) {
         ComeBack(remoteNetworkId, startDeviceId);
         return RET_OK;
@@ -89,12 +90,8 @@ int32_t CoordinationStateIn::StopCoordination(const std::string &networkId)
 int32_t CoordinationStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPR(context, RET_ERR);
-    IDeviceManager &devMgr = context->GetDeviceManager();
-
-    std::vector<std::string> dhids = devMgr.GetCoordinationDhids(startDhid_);
-    std::string sink = devMgr.GetOriginNetworkId(startDhid_);
+    std::vector<std::string> dhids = CooDevMgr->GetCoordinationDhids(startDhid_);
+    std::string sink = CooDevMgr->GetOriginNetworkId(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(
         sink, dhids, [this, sink](bool isSuccess) { this->OnStopRemoteInput(isSuccess, sink, -1); });
     if (ret != RET_OK) {
@@ -103,21 +100,15 @@ int32_t CoordinationStateIn::ProcessStop()
     return RET_OK;
 }
 
-void CoordinationStateIn::OnStartRemoteInput(
-    bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId)
+void CoordinationStateIn::OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     if (!isSuccess) {
         ICoordinationState::OnStartRemoteInput(isSuccess, srcNetworkId, startDeviceId);
         return;
     }
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPV(context);
-    IDeviceManager &devMgr = context->GetDeviceManager();
-
-    std::string sinkNetworkId = devMgr.GetOriginNetworkId(startDeviceId);
-    std::vector<std::string> dhid = devMgr.GetCoordinationDhids(startDeviceId);
-
+    std::string sinkNetworkId = CooDevMgr->GetOriginNetworkId(startDeviceId);
+    std::vector<std::string> dhid = CooDevMgr->GetCoordinationDhids(startDeviceId);
     std::string taskName = "relay_stop_task";
     std::function<void()> handleRelayStopFunc = std::bind(&CoordinationStateIn::StopRemoteInput,
         this, sinkNetworkId, srcNetworkId, dhid, startDeviceId);
@@ -159,9 +150,7 @@ void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
 void CoordinationStateIn::ComeBack(const std::string &sinkNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPV(context);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startDeviceId);
+    std::vector<std::string> dhids = CooDevMgr->GetCoordinationDhids(startDeviceId);
     if (dhids.empty()) {
         CooSM->OnStartFinish(false, sinkNetworkId, startDeviceId);
     }
