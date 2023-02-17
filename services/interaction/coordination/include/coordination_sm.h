@@ -119,6 +119,7 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(CoordinationSM);
     void Init();
+    void OnSessionLost(SessionPtr session);
     void EnableCoordination(bool enabled);
     int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t StopCoordination();

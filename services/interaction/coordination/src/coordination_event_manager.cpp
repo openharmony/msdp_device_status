@@ -30,9 +30,18 @@ CoordinationEventManager::~CoordinationEventManager() {}
 void CoordinationEventManager::AddCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(event);
     std::lock_guard<std::mutex> guard(lock_);
     if (event->type == EventType::LISTENER) {
-        remoteCoordinationCallbacks_.emplace_back(event);
+        auto it = std::find_if(remoteCoordinationCallbacks_.begin(), remoteCoordinationCallbacks_.end(),
+            [event] (auto info) {
+                return (*info).sess == event->sess;
+            });
+        if (it != remoteCoordinationCallbacks_.end()) {
+            *it = event;
+        } else {
+            remoteCoordinationCallbacks_.emplace_back(event);
+        }
     } else {
         coordinationCallbacks_[event->type] = event;
     }

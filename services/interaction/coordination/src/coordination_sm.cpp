@@ -69,6 +69,19 @@ void CoordinationSM::Init()
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
 }
 
+void CoordinationSM::OnSessionLost(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(session);
+    sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
+    CHKPV(event);
+    event->type = CoordinationEventManager::EventType::LISTENER;
+    event->sess = session;
+    CoordinationEventMgr->RemoveCoordinationEvent(event);
+    RemoveMonitor();
+    RemoveInterceptor();
+}
+
 void CoordinationSM::Reset(const std::string &networkId)
 {
     CALL_INFO_TRACE;
