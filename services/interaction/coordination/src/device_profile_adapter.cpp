@@ -32,7 +32,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID = "deviceStatus";
 const std::string SERVICE_TYPE = "deviceStatus";
-const std::string CHARACTERISTICS_NAME = "CurrentState";
+const std::string CHARACTERISTICS_NAME = "currentStatus";
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -51,7 +51,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -84,7 +84,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -106,8 +106,8 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
-    if (!cJSON_IsBool(state)) {
-        FI_HILOGE("State is not bool type");
+    if (!cJSON_IsNumber(state)) {
+        FI_HILOGE("State is not number type");
         return false;
     }
     return cJSON_IsTrue(state);

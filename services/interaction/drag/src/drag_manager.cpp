@@ -37,10 +37,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragM
 void DragManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(session);
-    auto info = std::make_shared<StateChangeNotify::MessageInfo>();
-    info->session = session;
-    stateNotify_.RemoveNotifyMsg(info);
+    if (RemoveListener(session) != RET_OK) {
+        FI_HILOGE("Failed to clear client listener");
+    }
 }
 
 int32_t DragManager::AddListener(SessionPtr session)
