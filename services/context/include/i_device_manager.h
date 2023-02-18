@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <sys/epoll.h>
-
 #include "i_device.h"
 #include "i_device_observer.h"
 
