@@ -221,11 +221,19 @@ int32_t InteractionManagerImpl::RegisterThumbnailDraw(
     std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
     return dragManagerImpl_.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
 }
     
 int32_t InteractionManagerImpl::UnregisterThumbnailDraw(std::function<void(void)> callback)
 {
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
     return dragManagerImpl_.UnregisterThumbnailDraw(callback);
 }
 

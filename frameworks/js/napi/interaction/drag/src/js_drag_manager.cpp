@@ -97,13 +97,18 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
 void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<OHOS::Media::PixelMap> pixmap)
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(thumbnailDrawCb_);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    // thumbnailDrawCb_->data = pixmap;
+    thumbnailDrawCb_->pixmap = pixmap;
     work->data = thumbnailDrawCb_.GetRefPtr();
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (result != 0) {
+        FI_HILOGE("uv_queue_work failed");
+    }
 }
 
 void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
@@ -116,6 +121,10 @@ void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
     CHKPV(work);
     thumbnailDrawCb_->data = dragState;
     work->data = thumbnailDrawCb_.GetRefPtr();
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (result != 0) {
+        FI_HILOGE("uv_queue_work failed");
+    }
 }
 
 void JsDragManager::EmitEndThumbnailDraw()
@@ -127,6 +136,10 @@ void JsDragManager::EmitEndThumbnailDraw()
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = thumbnailDrawCb_.GetRefPtr();
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (result != 0) {
+        FI_HILOGE("uv_queue_work failed");
+    }
 }
 
 void JsDragManager::ReleaseReference()
@@ -184,6 +197,10 @@ void JsDragManager::EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = callbackInfo.GetRefPtr();
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (result != 0) {
+        FI_HILOGE("uv_queue_work failed");
+    }
 }
 
 void JsDragManager::UnregisterThumbnailDraw(napi_env env, napi_value argv)

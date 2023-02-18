@@ -57,6 +57,7 @@ private:
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
         int32_t data { 0 };
+        std::shared_ptr<OHOS::Media::PixelMap> pixmap;
         bool isApi9 { false };
     };
 

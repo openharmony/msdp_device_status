@@ -738,7 +738,7 @@ int32_t DeviceStatusService::RegisterThumbnailDraw()
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::OnRegisterThumbnailDraw, dragMgr_, sess));
+        std::bind(&DragManager::OnRegisterThumbnailDraw, &dragMgr_, sess));
     if (ret != RET_OK) {
         FI_HILOGE("OnRegisterThumbnailDraw failed, ret:%{public}d", ret);
     }
@@ -752,7 +752,7 @@ int32_t DeviceStatusService::UnregisterThumbnailDraw()
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::OnUnregisterThumbnailDraw, dragMgr_, sess));
+        std::bind(&DragManager::OnUnregisterThumbnailDraw, &dragMgr_, sess));
     if (ret != RET_OK) {
         FI_HILOGE("OnUnregisterThumbnailDraw failed, ret:%{public}d", ret);
     }
