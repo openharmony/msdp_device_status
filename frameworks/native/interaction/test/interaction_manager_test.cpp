@@ -56,7 +56,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
 {
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
-        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
+        FI_HILOGE("Invalid size, pixelMapWidth:%{public}d, pixelMapHeight:%{public}d", pixelMapWidth, pixelMapHeight);
         return RET_ERR;
     }
     OHOS::Media::ImageInfo info;
@@ -68,7 +68,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
     void *buffer = malloc(bufferSize);
     if (buffer == nullptr) {
-        std::cout << "Malloc buffer failed" << std::endl;
+        FI_HILOGE("Malloc buffer failed");
         return RET_ERR;
     }
     char *character = reinterpret_cast<char *>(buffer);
@@ -79,12 +79,12 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     return RET_OK;
 }
 
-void SetParam(int32_t width, int32_t height, DragData& dragData)
+int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
 {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
-        std::cout << "CreatePixelMap failed" << std::endl;
-        return;
+        FI_HILOGE("CreatePixelMap failed");
+        return RET_ERR;
     }
     dragData.pictureResourse.pixelMap = pixelMap;
     dragData.pictureResourse.x = 0;
@@ -92,6 +92,7 @@ void SetParam(int32_t width, int32_t height, DragData& dragData)
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
     dragData.dragNum = 1;
+    return RET_OK;
 }
 
 /**
@@ -257,11 +258,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    SetParam(200, 200, dragData);
+    int32_t ret = SetParam(200, 200, dragData);
+    ASSERT_EQ(ret, RET_OK);
     std::function<void(int32_t)> callback = [](int32_t result) {
         FI_HILOGD("StartDrag success");
     };
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
 }
 
