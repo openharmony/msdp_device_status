@@ -50,7 +50,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
         return RET_ERR;
     }
     if (dragData.pictureResourse.pixelMap == nullptr) {
-        FI_HILOGE("dragData.pictureResourse.pixelMap is nullptr");
+        FI_HILOGE("pixelMap is nullptr");
         return RET_ERR;
     }
     if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
