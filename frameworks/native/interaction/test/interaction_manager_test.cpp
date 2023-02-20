@@ -276,7 +276,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int result = 0;
+    int32_t result = 0;
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_EQ(ret, RET_OK);
 }
