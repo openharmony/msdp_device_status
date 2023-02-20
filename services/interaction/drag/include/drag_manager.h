@@ -33,7 +33,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragManager {
 public:
-    DragManager() : monitorConsumer_(std::make_shared<MonitorConsumer>(nullptr)) { }
+    DragManager() : monitorConsumer_(std::make_shared<MonitorConsumer>(nullptr))
+    {}
     ~DragManager() = default;
 
     void OnSessionLost(SessionPtr session);
@@ -49,7 +50,8 @@ public:
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
-        explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
+        explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb)
+        {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;

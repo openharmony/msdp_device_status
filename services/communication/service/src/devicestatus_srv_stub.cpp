@@ -347,7 +347,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid argument, dragNum:%{public}d, bufferSize:%{public}zu",
+        FI_HILOGE("Invalid parameters, dragNum:%{public}d, bufferSize:%{public}zu",
             dragData.dragNum, dragData.buffer.size());
         return RET_ERR;
     }

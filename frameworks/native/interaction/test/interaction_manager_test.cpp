@@ -66,12 +66,12 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
-    void *buffer = malloc(bufferSize);
+    char *buffer = static_cast<char *>(malloc(bufferSize));
     if (buffer == nullptr) {
         FI_HILOGE("Malloc buffer failed");
         return RET_ERR;
     }
-    char *character = reinterpret_cast<char *>(buffer);
+    char *character = buffer;
     for (int32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
@@ -81,7 +81,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
 
 int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
 {
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
+    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
         FI_HILOGE("CreatePixelMap failed");
         return RET_ERR;

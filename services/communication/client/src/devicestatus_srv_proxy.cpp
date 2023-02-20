@@ -322,6 +322,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
     if (!dragData.pictureResourse.pixelMap->Marshalling(data)) {
         FI_HILOGE("Failed to marshalling pixelMap");
         return ERR_INVALID_VALUE;
