@@ -108,7 +108,6 @@ int32_t DragManager::StopDrag(int32_t result)
     }
     INPUT_MANAGER->RemoveMonitor(monitorId_);
     NotifyDragResult(result);
-    dragOutSession_ = nullptr;
     return RET_OK;
 }
 
