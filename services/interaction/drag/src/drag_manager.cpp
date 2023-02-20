@@ -107,7 +107,7 @@ int32_t DragManager::OnUnregisterThumbnailDraw(SessionPtr sess)
 
 OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
 {
-    auto dragData = DataAdapter.GetDragData();
+    DragData dragData = DataAdapter.GetDragData();
     OHOS::MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
     extraData.sourceType = dragData.sourceType;
