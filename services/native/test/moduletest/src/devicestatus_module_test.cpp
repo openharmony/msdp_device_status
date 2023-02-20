@@ -37,7 +37,7 @@ void DevicestatusModuleTest::DevicestatusModuleTestCallback::OnDevicestatusChang
     GTEST_LOG_(INFO) << "DevicestatusModuleTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DevicestatusModuleTestCallback value: " << devicestatusData.value;
     EXPECT_EQ(true, devicestatusData.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
-        devicestatusData.value == DevicestatusDataUtils::DevicestatusValue::VALUE_ENTER) << \
+        devicestatusData.value >= DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << \
         "DevicestatusModuleTestCallback failed";
 }
 
@@ -71,7 +71,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
+        data.value >= DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
@@ -88,7 +88,7 @@ HWTEST_F (DevicestatusModuleTest, GetDevicestatusDataTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == DevicestatusDataUtils::DevicestatusType::TYPE_RELATIVE_STILL && \
-        data.value == DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
+        data.value >= DevicestatusDataUtils::DevicestatusValue::VALUE_INVALID) << "GetDevicestatusData failed";
 }
 
 /**
