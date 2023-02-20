@@ -52,14 +52,13 @@ void InteractionManagerTest::TearDown()
 }
 
 
-std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
+int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
         std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
-        return nullptr;
+        return RET_ERR;
     }
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
     info.size.height = pixelMapHeight;
@@ -70,19 +69,24 @@ std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int
     void *buffer = malloc(bufferSize);
     if (buffer == nullptr) {
         std::cout << "Malloc buffer failed" << std::endl;
-        return nullptr;
+        return RET_ERR;
     }
     char *character = reinterpret_cast<char *>(buffer);
     for (int32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
     pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-    return pixelMap;
+    return RET_OK;
 }
 
 void SetParam(int32_t width, int32_t height, DragData& dragData)
 {
-    dragData.pictureResourse.pixelMap = CreatePixelMap(width, height);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
+    if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
+        std::cout << "CreatePixelMap failed" << std::endl;
+        return;
+    }
+    dragData.pictureResourse.pixelMap = pixelMap;
     dragData.pictureResourse.x = 0;
     dragData.pictureResourse.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);

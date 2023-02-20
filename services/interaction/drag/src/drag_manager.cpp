@@ -75,21 +75,20 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     dragOutSession_ = sess;
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
     monitorConsumer_ = std::make_shared<MonitorConsumer>(MonitorConsumer(callback));
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
     MMI::PointerStyle pointerStyle;
-    if (inputMgr->GetPointerStyle(-1, pointerStyle) != RET_OK) {
+    if (INPUT_MANAGER->GetPointerStyle(OHOS::MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
         FI_HILOGE("GetPointerStyle failed");
         return RET_ERR;
     }
     DataAdapter.Init(dragData, pointerStyle);
     auto extraData = GetExtraData(true);
-    inputMgr->AppendExtraData(extraData);
-    monitorId_ = inputMgr->AddMonitor(monitorConsumer_);
+    INPUT_MANAGER->AppendExtraData(extraData);
+    monitorId_ = INPUT_MANAGER->AddMonitor(monitorConsumer_);
     if (monitorId_ < 0) {
-        FI_HILOGE("AddMonitor failed, Error code:%{public}d", monitorId_);
+        FI_HILOGE("AddMonitor failed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
-    inputMgr->SetPointerVisible(false);
+    INPUT_MANAGER->SetPointerVisible(false);
     dragState_ = DragState::DRAGGING;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
@@ -105,11 +104,10 @@ int32_t DragManager::StopDrag(int32_t result)
     dragState_ = DragState::FREE;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
-        FI_HILOGE("Invalid monitor to be removed :%{public}d", monitorId_);
+        FI_HILOGE("Invalid monitor to be removed monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    inputMgr->RemoveMonitor(monitorId_);
+    INPUT_MANAGER->RemoveMonitor(monitorId_);
     NotifyDragResult(result);
     dragOutSession_ = nullptr;
     return RET_OK;
@@ -129,6 +127,7 @@ int32_t DragManager::NotifyDragResult(int32_t result)
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
     }
+    CHKPR(dragOutSession_, RET_ERR);
     if (!dragOutSession_->SendMsg(pkt)) {
         FI_HILOGE("Send message failed");
         return MSG_SEND_FAIL;
@@ -143,12 +142,10 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     auto pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE && !isReleasing_) {
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-        isReleasing_ = true;
         OnDragUp(pointerEvent);
-        isReleasing_ = false;
     } else {
         FI_HILOGW("Unsupported pointerAction:%{public}d", pointerEvent->GetPointerAction());
     }
@@ -157,6 +154,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
 }
@@ -164,13 +162,13 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    auto inputMgr =  OHOS::MMI::InputManager::GetInstance();
-    inputMgr->SetPointerVisible(true);
+    CHKPV(pointerEvent);
+    INPUT_MANAGER->SetPointerVisible(true);
     auto extraData = GetExtraData(false);
-    inputMgr->AppendExtraData(extraData);
+    INPUT_MANAGER->AppendExtraData(extraData);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    dragTargetPid_ = inputMgr->GetWindowPid(pointerItem.GetTargetWindowId());
+    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerItem.GetTargetWindowId());
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
@@ -197,7 +195,7 @@ int32_t DragManager::OnUnregisterThumbnailDraw(SessionPtr sess)
 
 OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
 {
-    auto dragData = DataAdapter.GetDragData();
+    DragData dragData = DataAdapter.GetDragData();
     OHOS::MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
     extraData.sourceType = dragData.sourceType;

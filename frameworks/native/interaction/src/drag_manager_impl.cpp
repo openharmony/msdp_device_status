@@ -50,12 +50,9 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
             dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
         return RET_ERR;
     }
-    if (dragData.dragNum <= 0) {
-        FI_HILOGE("Invalid dragNum:%{public}d", dragData.dragNum);
-        return RET_ERR;
-    }
-    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
+    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu",
+            dragData.dragNum, dragData.buffer.size());
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
