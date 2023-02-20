@@ -392,7 +392,16 @@ int32_t DeviceStatusService::InitDelegateTasks()
 
 void DeviceStatusService::InitSessionDeathMonitor()
 {
-    AddSessionDeletedCallback(std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
+    CALL_INFO_TRACE;
+    std::vector<std::function<void(SessionPtr)>> sessionLostList = {
+        std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1),
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+        std::bind(&CoordinationSM::OnSessionLost, CooSM, std::placeholders::_1)
+#endif
+    };
+    for (const auto &it : sessionLostList) {
+        AddSessionDeletedCallback(it);
+    }
 }
 
 int32_t DeviceStatusService::InitTimerMgr()
