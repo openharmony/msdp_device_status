@@ -46,7 +46,8 @@ public:
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid();
     int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-        std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
+        std::function<void(int32_t, bool, std::u16string)> noticeCallback,
+        std::function<void(int32_t, int32_t)> endCallback);
     int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);

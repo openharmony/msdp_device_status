@@ -57,7 +57,7 @@ private:
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
         int32_t data { 0 };
-        std::shared_ptr<DragData> pixmap;
+        std::shared_ptr<DragData> dragData { nullptr };
         bool isApi9 { false };
     };
 
@@ -66,9 +66,9 @@ private:
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(std::shared_ptr<DragData> pixmap);
-    void EmitNoticeThumbnailDraw(int32_t dragState);
-    void EmitEndThumbnailDraw();
+    void EmitStartThumbnailDraw(std::shared_ptr<DragData> dragData);
+    void EmitNoticeThumbnailDraw(int32_t msgType, bool allowDragIn, std::u16string message);
+    void EmitEndThumbnailDraw(int32_t pid, int32_t result);
     void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
     template <typename T>
     static void DeletePtr(T &ptr)

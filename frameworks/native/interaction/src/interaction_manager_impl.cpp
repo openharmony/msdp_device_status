@@ -217,9 +217,9 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     return dragManagerImpl_.GetDragTargetPid();
 }
 
-int32_t InteractionManagerImpl::RegisterThumbnailDraw(
-    std::function<void(std::shared_ptr<DragData>)> startCallback,
-    std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
+int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
+    std::function<void(int32_t, bool, std::u16string)> noticeCallback,
+    std::function<void(int32_t, int32_t)> endCallback)
 {
     if (!InitClient()) {
         FI_HILOGE("Get client is nullptr");

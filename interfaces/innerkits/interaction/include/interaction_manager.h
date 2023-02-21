@@ -137,7 +137,8 @@ public:
      * @since 10
      */
     int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-        std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
+        std::function<void(int32_t, bool, std::u16string)> noticeCallback,
+        std::function<void(int32_t, int32_t)> endCallback);
 
     /**
      * @brief 取消注册阴影缩略图托管的回调

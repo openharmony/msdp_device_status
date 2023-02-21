@@ -71,7 +71,8 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
 }
 
 int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-    std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
+    std::function<void(int32_t, bool, std::u16string)> noticeCallback,
+    std::function<void(int32_t, int32_t)> endCallback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -199,14 +200,17 @@ int32_t DragManagerImpl::OnStartThumbnailDraw(const StreamClient& client, NetPac
 int32_t DragManagerImpl::OnNoticeThumbnailDraw(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    ThumbnailDrawState state;
-    pkt >> state;
+    int32_t msgType = 0;
+    bool allowDragIn = false;
+    std::string message;
+    pkt >> msgType >> allowDragIn >> message;
+    auto Subscript = to_utf16(message);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
     CHKPR(thumbnailDrawCallback_.noticeCallback, RET_ERR);
-    thumbnailDrawCallback_.noticeCallback(state);
+    thumbnailDrawCallback_.noticeCallback(msgType, allowDragIn, Subscript);
     return RET_OK;
 }
 
@@ -214,7 +218,10 @@ int32_t DragManagerImpl::OnStopThumbnailDraw(const StreamClient& client, NetPack
 {
     CALL_DEBUG_ENTER;
     CHKPR(thumbnailDrawCallback_.endCallback, RET_ERR);
-    thumbnailDrawCallback_.endCallback();
+    int32_t pid = 0;
+    int32_t result = 0;
+    pkt >> pid >> result;
+    thumbnailDrawCallback_.endCallback(pid , result);
     return RET_OK;
 }
 } // namespace DeviceStatus

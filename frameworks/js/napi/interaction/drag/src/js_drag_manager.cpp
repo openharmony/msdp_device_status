@@ -94,7 +94,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
 }
 
-void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<DragData> pixmap)
+void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<DragData> dragData)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -103,15 +103,15 @@ void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<DragData> pixmap)
     CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    thumbnailDrawCb_->pixmap = pixmap;
+    thumbnailDrawCb_->dragData = dragData;
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
-    if (result != 0) {
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
     }
 }
 
-void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
+void JsDragManager::EmitNoticeThumbnailDraw(int32_t msgType, bool allowDragIn, std::u16string message)
 {
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
@@ -119,15 +119,15 @@ void JsDragManager::EmitNoticeThumbnailDraw(int32_t dragState)
     CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    thumbnailDrawCb_->data = dragState;
+    thumbnailDrawCb_->data = msgType;
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
-    if (result != 0) {
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
     }
 }
 
-void JsDragManager::EmitEndThumbnailDraw()
+void JsDragManager::EmitEndThumbnailDraw(int32_t pid, int32_t result)
 {
     CALL_INFO_TRACE;
     CHKPV(thumbnailDrawCb_);
@@ -136,8 +136,8 @@ void JsDragManager::EmitEndThumbnailDraw()
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
-    if (result != 0) {
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
     }
 }
@@ -180,8 +180,9 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
     auto startCallback = std::bind(&JsDragManager::EmitStartThumbnailDraw, this,
         std::placeholders::_1);
     auto noticeCallback = std::bind(&JsDragManager::EmitNoticeThumbnailDraw,
-        this, std::placeholders::_1);
-    auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this);
+        this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    auto endCallback = std::bind(&JsDragManager::EmitEndThumbnailDraw, this,
+        std::placeholders::_1, std::placeholders::_2);
     if (InteractionMgr->RegisterThumbnailDraw(startCallback, noticeCallback, endCallback) != RET_OK) {
         ReleaseReference();
         FI_HILOGE("Call register thumbnail draw failed");
