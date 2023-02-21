@@ -71,9 +71,4 @@ enum TokenType : int32_t {
     TOKEN_NATIVE,
     TOKEN_SHELL,
 };
-
-enum ANREventType {
-    ANR_DISPATCH,
-    ANR_MONITOR,
-};
 #endif // PROTO_H
