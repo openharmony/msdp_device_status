@@ -70,7 +70,7 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
-int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
+int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
     CALL_DEBUG_ENTER;
@@ -186,8 +186,13 @@ int32_t DragManagerImpl::OnStartThumbnailDraw(const StreamClient& client, NetPac
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+    auto dragData = std::make_shared<DragData>();
+    dragData->pixelMap = pixelMap;
+    pkt >> dragData->x >> dragData->y >> dragData->sourceType >> dragData->dragNum;
+    int32_t pid;
+    pkt >> pid;
     CHKPR(thumbnailDrawCallback_.startCallback, RET_ERR);
-    thumbnailDrawCallback_.startCallback(pixelMap);
+    thumbnailDrawCallback_.startCallback(dragData);
     return RET_OK;
 }
 

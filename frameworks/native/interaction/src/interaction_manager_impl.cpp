@@ -218,7 +218,7 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
 }
 
 int32_t InteractionManagerImpl::RegisterThumbnailDraw(
-    std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
+    std::function<void(std::shared_ptr<DragData>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
     if (!InitClient()) {

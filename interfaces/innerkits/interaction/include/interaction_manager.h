@@ -136,7 +136,7 @@ public:
      * @return 返回0表示接口调用成功，否则，表示接口调用失败。
      * @since 10
      */
-    int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
+    int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
         std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback);
 
     /**

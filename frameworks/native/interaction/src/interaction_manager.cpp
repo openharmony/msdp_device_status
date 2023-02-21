@@ -86,7 +86,7 @@ int32_t InteractionManager::StopDrag(int32_t result)
 }
 
 int32_t InteractionManager::RegisterThumbnailDraw(
-    std::function<void(std::shared_ptr<OHOS::Media::PixelMap>)> startCallback,
+    std::function<void(std::shared_ptr<DragData>)> startCallback,
     std::function<void(int32_t)> noticeCallback, std::function<void(void)> endCallback)
 {
     return InteractionMgrImpl.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);

@@ -57,7 +57,7 @@ private:
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
         int32_t data { 0 };
-        std::shared_ptr<OHOS::Media::PixelMap> pixmap;
+        std::shared_ptr<DragData> pixmap;
         bool isApi9 { false };
     };
 
@@ -66,7 +66,7 @@ private:
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(std::shared_ptr<OHOS::Media::PixelMap> pixmap);
+    void EmitStartThumbnailDraw(std::shared_ptr<DragData> pixmap);
     void EmitNoticeThumbnailDraw(int32_t dragState);
     void EmitEndThumbnailDraw();
     void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);

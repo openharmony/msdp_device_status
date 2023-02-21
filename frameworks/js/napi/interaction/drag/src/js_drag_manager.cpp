@@ -94,7 +94,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
 }
 
-void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<OHOS::Media::PixelMap> pixmap)
+void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<DragData> pixmap)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
