@@ -78,7 +78,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     DataAdapter.Init(dragData, pointerStyle);
-    auto extraData = GetExtraData(true);
+    auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
     monitorConsumer_ = std::make_shared<MonitorConsumer>(MonitorConsumer(callback));
@@ -162,7 +162,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     INPUT_MANAGER->SetPointerVisible(true);
-    auto extraData = GetExtraData(false);
+    auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);

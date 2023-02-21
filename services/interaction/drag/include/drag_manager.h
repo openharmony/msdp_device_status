@@ -60,8 +60,6 @@ public:
     };
 private:
     int32_t NotifyDragResult(int32_t result);
-    OHOS::MMI::ExtraData GetExtraData(bool appended) const;
-private:
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
 private:
     StateChangeNotify stateNotify_;
