@@ -52,42 +52,48 @@ void InteractionManagerTest::TearDown()
 }
 
 
-std::shared_ptr<OHOS::Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
+int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
-        std::cout << "Invalid pixelMapWidth or pixelMapHeight" << std::endl;
-        return nullptr;
+        FI_HILOGE("Invalid size, pixelMapWidth:%{public}d, pixelMapHeight:%{public}d", pixelMapWidth, pixelMapHeight);
+        return RET_ERR;
     }
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     OHOS::Media::ImageInfo info;
     info.size.width = pixelMapWidth;
     info.size.height = pixelMapHeight;
-    info.pixelFormat = OHOS::Media::PixelFormat::RGB_888;
+    info.pixelFormat = Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
     int32_t bufferSize = pixelMapWidth * pixelMapHeight;
-    void *buffer = malloc(bufferSize);
+    const char *buffer = static_cast<char *>(malloc(bufferSize));
     if (buffer == nullptr) {
-        return nullptr;
+        FI_HILOGE("Malloc buffer failed");
+        return RET_ERR;
     }
-    char *character = reinterpret_cast<char *>(buffer);
+    char *character = buffer;
     for (int32_t i = 0; i < bufferSize; i++) {
         *(character++) = static_cast<char>(i);
     }
     pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-    return pixelMap;
+    return RET_OK;
 }
 
-void SetParam(int32_t width, int32_t height, DragData& dragData)
+int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
 {
-    dragData.pictureResourse.pixelMap = CreatePixelMap(width, height);
+    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
+    if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
+        FI_HILOGE("CreatePixelMap failed");
+        return RET_ERR;
+    }
+    dragData.pictureResourse.pixelMap = pixelMap;
     dragData.pictureResourse.x = 0;
     dragData.pictureResourse.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
-    dragData.dragNum = 0;
     dragData.pointerId = 0;
+    dragData.dragNum = 1;
+    return RET_OK;
 }
 
 /**
@@ -253,11 +259,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    SetParam(3, 4, dragData);
+    int32_t ret = SetParam(200, 200, dragData);
+    ASSERT_EQ(ret, RET_OK);
     std::function<void(int32_t)> callback = [](int32_t result) {
         FI_HILOGD("StartDrag success");
     };
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
 }
 
@@ -270,7 +277,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int result = 0;
+    int32_t result = 0;
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_EQ(ret, RET_OK);
 }

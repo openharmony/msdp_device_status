@@ -26,13 +26,15 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "state_change_notify.h"
+#include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class DragManager {
 public:
-    DragManager() = default;
+    DragManager() : monitorConsumer_(std::make_shared<MonitorConsumer>(nullptr))
+    {}
     ~DragManager() = default;
 
     void OnSessionLost(SessionPtr session);
@@ -41,16 +43,35 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid() const;
+    void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnRegisterThumbnailDraw(SessionPtr sess);
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
+    class MonitorConsumer : public MMI::IInputEventConsumer {
+    public:
+        explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb)
+        {}
+        void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+        void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
+    private:
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+    };
+private:
+    int32_t NotifyDragResult(int32_t result);
+    OHOS::MMI::ExtraData GetExtraData(bool appended) const;
 private:
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
 private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
-    SessionPtr dragOutSession_ { nullptr };
+    int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
+    SessionPtr dragOutSession_ { nullptr };
+    std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
+#define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

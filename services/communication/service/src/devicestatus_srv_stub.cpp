@@ -344,13 +344,14 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.pictureResourse.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pictureResourse.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
-        return RET_ERR;
-    }
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid parameters, dragNum:%{public}d, bufferSize:%{public}zu",
+            dragData.dragNum, dragData.buffer.size());
+        return RET_ERR;
+    }
     int32_t ret = StartDrag(dragData);
     if (ret != RET_OK) {
         FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
