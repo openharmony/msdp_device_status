@@ -54,8 +54,6 @@ public:
         std::shared_ptr<IDevice> device_ { nullptr };
         std::string dhid_;
         std::string networkId_;
-        std::string phys_;
-        std::string uniq_;
     };
 
 private:

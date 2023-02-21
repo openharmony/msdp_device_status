@@ -136,10 +136,10 @@ bool CoordinationDeviceManager::IsRemote(int32_t id) const
 {
     CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
-        if (devIter->second != nullptr) {
-            return devIter->second->IsRemote();
-        } else {
+        if (devIter->second == nullptr) {
             FI_HILOGW("Device is unsynchronized");
+        } else {
+            return devIter->second->IsRemote();
         }
     }
     return false;
@@ -243,10 +243,10 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
-        if (devIter->second != nullptr) {
-            return devIter->second->GetDhid();
-        } else {
+        if (devIter->second == nullptr) {
             FI_HILOGW("Device is unsynchronized");
+        } else {
+            return devIter->second->GetDhid();
         }
     }
     return EMPTYSTR;
@@ -255,12 +255,12 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
 bool CoordinationDeviceManager::HasLocalPointerDevice() const
 {
     for (const auto &[id, dev] : devices_) {
-        if (dev != nullptr) {
-            if (!dev->IsRemote() && dev->IsPointerDevice()) {
-                return true;
-            }
-        } else {
+        if (dev == nullptr) {
             FI_HILOGW("Device is unsynchronized");
+            continue;
+        }
+        if (!dev->IsRemote() && dev->IsPointerDevice()) {
+            return true;
         }
     }
     return false;
@@ -276,6 +276,10 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     if (dev->IsKeyboard()) {
         CooSM->OnKeyboardOnline(dev->GetDhid());
     }
+    FI_HILOGI("add device %{public}d: %{public}s", device->GetId(), device->GetDevPath().c_str());
+    FI_HILOGI("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
+    FI_HILOGI("  Network id:    \"%{public}s\"", dev->GetNetworkId().c_str());
+    FI_HILOGI("  local/remote:  \"%{public}s\"", dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
@@ -289,7 +293,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     }
 
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), dev->GetNetworkId(), CooDevMgr->GetCoordinationDhids(dev->GetId()));
+        CooSM->OnPointerOffline(dev->GetDhid(), dev->GetNetworkId(), GetCoordinationDhids(dev->GetId()));
     }
 }
 
