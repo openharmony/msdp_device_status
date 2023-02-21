@@ -44,7 +44,7 @@ public:
     int32_t OnRegisterThumbnailDraw(SessionPtr sess);
     int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
 private:
-    OHOS::MMI::ExtraData GetExtraData(bool appended) const;
+    OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
 private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::FREE };
