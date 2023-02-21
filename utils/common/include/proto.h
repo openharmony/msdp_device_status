@@ -61,6 +61,7 @@ enum class MessageId : int32_t {
     COORDINATION_MESSAGE,
     COORDINATION_GET_STATE,
 
+    DRAG_NOTIFY_RESULT,
     DRAG_STATE_LISTENER
 };
 
@@ -69,10 +70,5 @@ enum TokenType : int32_t {
     TOKEN_HAP = 0,
     TOKEN_NATIVE,
     TOKEN_SHELL,
-};
-
-enum ANREventType {
-    ANR_DISPATCH,
-    ANR_MONITOR,
 };
 #endif // PROTO_H
