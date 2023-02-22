@@ -65,11 +65,12 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 
 void DragManager::MarshallPixelmap(const DragData &dragData, NetPacket& pkt)
 {
-    pkt << dragData.pixelMap->GetPixelFormat() << dragData.pixelMap->GetAlphaType() << dragData.pixelMap->GetWidth()
-        << dragData.pixelMap->GetHeight() << dragData.pixelMap->GetAllocatorType();
-    auto size = dragData.pixelMap->GetByteCount();
+    auto pixelMap = dragData.pictureResourse.pixelMap;
+    pkt << pixelMap->GetPixelFormat() << pixelMap->GetAlphaType() << pixelMap->GetWidth()
+        << pixelMap->GetHeight() << pixelMap->GetAllocatorType();
+    auto size = pixelMap->GetByteCount();
     pkt << size;
-    pkt.Write(reinterpret_cast<const char *>(dragData.pixelMap->GetPixels()), static_cast<size_t>(size));
+    pkt.Write(reinterpret_cast<const char *>(pixelMap->GetPixels()), static_cast<size_t>(size));
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)

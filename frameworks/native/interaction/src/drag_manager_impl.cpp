@@ -201,8 +201,8 @@ int32_t DragManagerImpl::OnStartThumbnailDraw(const StreamClient& client, NetPac
         return RET_ERR;
     }
     auto dragData = std::make_shared<DragData>();
-    dragData->pixelMap = pixelMap;
-    pkt >> dragData->x >> dragData->y >> dragData->sourceType >> dragData->dragNum;
+    dragData->pictureResourse.pixelMap = pixelMap;
+    pkt >> dragData->pictureResourse.x >> dragData->pictureResourse.y >> dragData->sourceType >> dragData->dragNum;
     int32_t pid;
     pkt >> pid;
     CHKPR(thumbnailDrawCallback_.startCallback, RET_ERR);
