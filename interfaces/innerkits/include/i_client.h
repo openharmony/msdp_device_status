@@ -21,7 +21,6 @@
 #include "msg_handler.h"
 #include "net_packet.h"
 #include "stream_client.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

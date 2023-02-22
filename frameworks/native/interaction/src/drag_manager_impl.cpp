@@ -18,6 +18,7 @@
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_message.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -41,22 +42,17 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (callback == nullptr) {
-        FI_HILOGE("Callback is nullptr");
-        return RET_ERR;
-    }
-    if (dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid buffer, bufferSize:%{public}zu", dragData.buffer.size());
-        return RET_ERR;
-    }
-    if (dragData.pixelMap == nullptr) {
-        FI_HILOGE("dragData.pixelMap is nullptr");
-        return RET_ERR;
-    }
-    if (dragData.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    CHKPR(callback, RET_ERR);
+    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
+    if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.pictureResourse.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.pixelMap->GetWidth(), dragData.pixelMap->GetHeight());
+            dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
+        return RET_ERR;
+    }
+    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE) {
+        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu",
+            dragData.dragNum, dragData.buffer.size());
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
@@ -113,6 +109,23 @@ int32_t DragManagerImpl::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
+}
+
+int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t result;
+    pkt >> result;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read drag msg failed");
+        return RET_ERR;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(stopCallback_, RET_ERR);
+    stopCallback_(result);
+    StreamClient &streamClient = const_cast<StreamClient &>(client);
+    streamClient.Stop();
+    return RET_OK;
 }
 
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)

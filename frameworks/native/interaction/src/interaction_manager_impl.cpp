@@ -65,6 +65,8 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&DragManagerImpl::OnNoticeThumbnailDraw, &dragManagerImpl_)},
         {MessageId::STOP_THUMBNAIL_DRAW,
             MsgCallbackBind2(&DragManagerImpl::OnStopThumbnailDraw, &dragManagerImpl_)},
+        {MessageId::DRAG_NOTIFY_RESULT,
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)}
     };
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {

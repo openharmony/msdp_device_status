@@ -16,9 +16,7 @@
 #ifndef DRAG_DATA_ADAPTER_H
 #define DRAG_DATA_ADAPTER_H
 #include <string>
-#include <utility>
 
-#include "extra_data.h"
 #include "hitrace_meter.h"
 #include "pixel_map.h"
 #include "pointer_style.h"
@@ -36,19 +34,13 @@ public:
     DISALLOW_MOVE(DragDataAdapter);
 
     void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
-    OHOS::MMI::ExtraData GetExtraData() const;
-    std::pair<int, int> GetCoordinate() const;
-    std::shared_ptr<OHOS::Media::PixelMap> GetPixelMap() const;
-    int32_t GetDragNum() const;
+    DragData GetDragData() const;
     int32_t GetDragStyle() const;
     std::u16string GetDragMessage() const;
 
 private:
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
-    OHOS::MMI::ExtraData extraData_;
+    DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
-    std::pair<int, int> coordinate_;
-    int32_t dragNum_ { -1 };
     int32_t dragStyle_ { -1 };
     std::u16string dragMessage_;
 };

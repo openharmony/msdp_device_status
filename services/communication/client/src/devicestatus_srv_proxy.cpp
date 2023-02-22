@@ -322,15 +322,17 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!dragData.pixelMap->Marshalling(data)) {
+    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
+    if (!dragData.pictureResourse.pixelMap->Marshalling(data)) {
         FI_HILOGE("Failed to marshalling pixelMap");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, dragData.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.y, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.pictureResourse.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.pictureResourse.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
