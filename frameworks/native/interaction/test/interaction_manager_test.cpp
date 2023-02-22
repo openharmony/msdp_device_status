@@ -91,6 +91,7 @@ int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
     dragData.pictureResourse.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
+    dragData.pointerId = 0;
     dragData.dragNum = 1;
     return RET_OK;
 }
