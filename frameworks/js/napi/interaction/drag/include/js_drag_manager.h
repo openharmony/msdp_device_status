@@ -28,6 +28,7 @@
 #include <uv.h>
 
 #include "i_drag_listener.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -51,14 +52,17 @@ private:
         napi_ref ref { nullptr };
         DragMessage msg;
     };
+
     struct ThumbnailDrawCb : public RefBase {
         napi_env env { nullptr };
         napi_ref ref[3] { nullptr };
         int32_t errCode { -1 };
         napi_deferred deferred { nullptr };
-        int32_t data { 0 };
+        int32_t pid { -1 };
+        int32_t msgType { -1 };
+        bool allowDragIn { false };
+        std::u16string message;
         std::shared_ptr<DragData> dragData { nullptr };
-        bool isApi9 { false };
     };
 
 private:
@@ -69,7 +73,15 @@ private:
     void EmitStartThumbnailDraw(std::shared_ptr<DragData> dragData);
     void EmitNoticeThumbnailDraw(int32_t msgType, bool allowDragIn, std::u16string message);
     void EmitEndThumbnailDraw(int32_t pid, int32_t result);
-    void EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo);
+    void EmitUnregisterThumbnailDraw(sptr<ThumbnailDrawCb> callbackInfo);
+    static void CallStartThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
+    static void CallNoticeThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
+    static void CallEndThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
+    static void CallUnregisterThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
+    static int32_t GetErrorCode(napi_env env, int32_t errCode, napi_value* callResult);
+    static napi_value GetDragOption(sptr<ThumbnailDrawCb> cb);
+    static napi_value GetNoticeMsg(sptr<ThumbnailDrawCb> cb);
+    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
@@ -78,7 +90,6 @@ private:
             ptr = nullptr;
         }
     }
-
 private:
     std::atomic_bool hasRegistered_ { false };
     sptr<ThumbnailDrawCb> thumbnailDrawCb_ { nullptr };

@@ -105,9 +105,10 @@ void JsDragManager::EmitStartThumbnailDraw(std::shared_ptr<DragData> dragData)
     CHKPV(work);
     thumbnailDrawCb_->dragData = dragData;
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStartThumbnailDrawAsyncWork);
     if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
+        DeletePtr<uv_work_t*>(work);
     }
 }
 
@@ -119,11 +120,14 @@ void JsDragManager::EmitNoticeThumbnailDraw(int32_t msgType, bool allowDragIn, s
     CHKRV(napi_get_uv_event_loop(thumbnailDrawCb_->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    thumbnailDrawCb_->data = msgType;
+    thumbnailDrawCb_->msgType = msgType;
+    thumbnailDrawCb_->allowDragIn = allowDragIn;
+    thumbnailDrawCb_->message = message;
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallNoticeThumbnailDrawAsyncWork);
     if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
+        DeletePtr<uv_work_t*>(work);
     }
 }
 
@@ -136,9 +140,10 @@ void JsDragManager::EmitEndThumbnailDraw(int32_t pid, int32_t result)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = thumbnailDrawCb_.GetRefPtr();
-    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEndThumbnailDrawAsyncWork);
     if (ret != 0) {
         FI_HILOGE("uv_queue_work failed");
+        DeletePtr<uv_work_t*>(work);
     }
 }
 
@@ -189,18 +194,22 @@ void JsDragManager::RegisterThumbnailDraw(napi_env env, size_t argc, napi_value*
     }
 }
 
-void JsDragManager::EmitUnregisterThumbnailDraw(sptr<CallbackInfo> callbackInfo)
+void JsDragManager::EmitUnregisterThumbnailDraw(sptr<ThumbnailDrawCb> callbackInfo)
 {
     CALL_INFO_TRACE;
     CHKPV(callbackInfo);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(callbackInfo->env, &loop), GET_UV_EVENT_LOOP);
+    callbackInfo->errCode = RET_OK;
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
+    callbackInfo->IncStrongRef(nullptr);
     work->data = callbackInfo.GetRefPtr();
-    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, nullptr);
+    int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallUnregisterThumbnailDrawAsyncWork);
     if (result != 0) {
         FI_HILOGE("uv_queue_work failed");
+        DeletePtr(work);
+        callbackInfo->DecStrongRef(nullptr);
     }
 }
 
@@ -213,15 +222,202 @@ void JsDragManager::UnregisterThumbnailDraw(napi_env env, napi_value argv)
         FI_HILOGE("Create reference failed");
         return;
     }
-    sptr<CallbackInfo> callbackInfo = new (std::nothrow) CallbackInfo();
-    CHKPV(callbackInfo);
-    callbackInfo->env = env;
-    callbackInfo->ref = ref;
-    auto callback = std::bind(&JsDragManager::EmitUnregisterThumbnailDraw, this, callbackInfo);
+    sptr<ThumbnailDrawCb> cb = new (std::nothrow) ThumbnailDrawCb();
+    CHKPV(cb);
+    cb->env = env;
+    cb->ref[0] = ref;
+    auto callback = std::bind(&JsDragManager::EmitUnregisterThumbnailDraw, this, cb);
     if (InteractionMgr->UnregisterThumbnailDraw(callback) != RET_OK) {
         FI_HILOGE("Call Unregister thumbnail draw failed");
     }
 }
+napi_value JsDragManager::GetDragOption(sptr<ThumbnailDrawCb> cb)
+{
+    return nullptr;
+}
+
+napi_value JsDragManager::GetNoticeMsg(sptr<ThumbnailDrawCb> cb)
+{
+    return nullptr;
+}
+
+void JsDragManager::CallStartThumbnailDrawAsyncWork(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr(work);
+        FI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<ThumbnailDrawCb> cb(static_cast<ThumbnailDrawCb *>(work->data));
+    DeletePtr(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    CHKPV(cb->ref[0]);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult[2] = { 0 };
+    if (GetErrorCode(cb->env, cb->errCode, &callResult[0]) != RET_OK){
+        FI_HILOGE("Get error code failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    callResult[1] = GetDragOption(cb);
+    napi_value handler = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref[0], &handler), GET_REFERENCE_VALUE, scope);
+    napi_value result = nullptr;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
+}
+
+void JsDragManager::CallNoticeThumbnailDrawAsyncWork(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr(work);
+        FI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<ThumbnailDrawCb> cb(static_cast<ThumbnailDrawCb *>(work->data));
+    DeletePtr(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    CHKPV(cb->ref[1]);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult[2] = { 0 };
+    if (GetErrorCode(cb->env, cb->errCode, &callResult[0]) != RET_OK){
+        FI_HILOGE("Get error code failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    callResult[1] = GetNoticeMsg(cb);
+    napi_value handler = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref[1], &handler), GET_REFERENCE_VALUE, scope);
+    napi_value result = nullptr;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
+}
+
+void JsDragManager::CallEndThumbnailDrawAsyncWork(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr(work);
+        FI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<ThumbnailDrawCb> cb(static_cast<ThumbnailDrawCb *>(work->data));
+    DeletePtr(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    CHKPV(cb->ref[2]);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult[3] = { 0 };
+    if (GetErrorCode(cb->env, cb->errCode, &callResult[0]) != RET_OK){
+        FI_HILOGE("Get error code failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    
+    napi_value handler = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref[2], &handler), GET_REFERENCE_VALUE, scope);
+    napi_value result = nullptr;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 3, callResult, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
+}
+
+napi_value JsDragManager::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    napi_value resultCode = nullptr;
+    napi_value resultMessage = nullptr;
+    CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+    CHKRP(napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
+    CHKRP(napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
+    CHKRP(napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
+    return result;
+}
+
+int32_t JsDragManager::GetErrorCode(napi_env env, int32_t errCode, napi_value* callResult)
+{
+    if (callResult == nullptr) {
+        FI_HILOGE("callResult is nullptr");
+        return RET_ERR;
+    }
+    if (errCode == RET_OK) {
+        if (napi_get_undefined(env, callResult) != napi_ok) {
+            FI_HILOGE(" get undefined failed");
+            return RET_ERR;
+        }
+        return RET_OK;
+    }
+    if (errCode == RET_ERR) {
+        FI_HILOGE("Other errors");
+        return RET_ERR;
+    }
+    NapiError codeMsg;
+    if (!UtilNapiError::GetApiError(errCode, codeMsg)) {
+        FI_HILOGE("Error code %{public}d not found", errCode);
+        return RET_ERR;
+    }
+    *callResult = GreateBusinessError(env, errCode, codeMsg.msg);
+    if (*callResult == nullptr) {
+        FI_HILOGE("callResult is nullptr");
+    }
+    return RET_ERR;
+}
+
+void JsDragManager::CallUnregisterThumbnailDrawAsyncWork(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr(work);
+        FI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<ThumbnailDrawCb> cb(static_cast<ThumbnailDrawCb *>(work->data));
+    DeletePtr(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    CHKPV(cb->ref[0]);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult = nullptr;
+    if (GetErrorCode(cb->env, cb->errCode, &callResult) != RET_OK){
+        FI_HILOGE("Get error code failed");
+        RELEASE_CALLBACKINFO(cb->env, cb->ref[0]);
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    napi_value handler = nullptr;
+    if (napi_get_reference_value(cb->env, cb->ref[0], &handler) != napi_ok) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref[0]);
+        napi_close_handle_scope(cb->env, scope);
+        FI_HILOGE(" napi_get_reference_value failed");
+        return;
+    }
+    napi_value result = nullptr;
+    if (napi_call_function(cb->env, nullptr, handler, 1, &callResult, &result) != napi_ok) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref[0]);
+        napi_close_handle_scope(cb->env, scope);
+        FI_HILOGE("napi_call_function failed");
+        return;
+    }
+    RELEASE_CALLBACKINFO(cb->env, cb->ref[0]);
+    napi_close_handle_scope(cb->env, scope);
+}
+
 
 void JsDragManager::OnDragMessage(DragMessage msg)
 {
