@@ -202,7 +202,6 @@ int32_t DragManager::OnRegisterThumbnailDraw(SessionPtr sess)
     CALL_DEBUG_ENTER;
     CHKPR(sess, RET_ERR);
     thumbnailDrawSession_ = sess;
-    // FI_HILOGE(" 11111111111 %{public}p", thumbnailDrawSession_);
     return RET_OK;
 }
 

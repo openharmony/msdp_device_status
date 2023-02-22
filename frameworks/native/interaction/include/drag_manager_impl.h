@@ -21,11 +21,8 @@
 #include <string>
 
 #include "client.h"
-<<<<<<< HEAD
-=======
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
->>>>>>> ed113f666217214421eee610c830aae24ff04953
 #include "drag_data.h"
 #include "i_drag_listener.h"
 #include "util.h"
