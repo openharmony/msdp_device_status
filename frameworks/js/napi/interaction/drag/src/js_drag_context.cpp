@@ -18,7 +18,7 @@
 #include "devicestatus_define.h"
 #include "drag_message.h"
 #include "napi_constants.h"
-
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace Msdp {

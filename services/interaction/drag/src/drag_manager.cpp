@@ -49,8 +49,8 @@ int32_t DragManager::AddListener(SessionPtr session)
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgId = MessageId::DRAG_STATE_LISTENER;
-    return RET_OK;
     stateNotify_.AddNotifyMsg(info);
+    return RET_OK;
 }
 
 int32_t DragManager::RemoveListener(SessionPtr session)

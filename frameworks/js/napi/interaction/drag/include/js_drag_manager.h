@@ -23,12 +23,10 @@
 
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
-#include "pixel_map.h"
 #include "refbase.h"
 #include <uv.h>
 
 #include "i_drag_listener.h"
-#include "util_napi_error.h"
 
 namespace OHOS {
 namespace Msdp {

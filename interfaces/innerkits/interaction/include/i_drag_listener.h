@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "drag_data.h"
 #include "drag_message.h"
 
 namespace OHOS {
