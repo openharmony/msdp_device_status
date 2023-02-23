@@ -113,44 +113,48 @@ void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRe
     DEV_HILOGD(INNERKIT, "Recv death notice");
 }
 
-void DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
+int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
     DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
     typeMap_.insert(std::make_pair(type, 1));
     DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
-    DEV_RET_IF_NULL((callback == nullptr) || (Connect() != RET_OK));
+    if ((callback == nullptr) || (Connect() != RET_OK)) {
+        return RET_ERR;
+    }
     if (devicestatusProxy_ == nullptr) {
         DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
-        return;
+        return RET_ERR;
     }
     if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN) {
         devicestatusProxy_->Subscribe(type, event, latency, callback);
     }
-    return;
+    return RET_OK;
 }
 
-void DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
+int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
     DEV_HILOGI(INNERKIT, "UNevent: %{public}d", event);
     typeMap_.erase(type);
     DEV_HILOGD(INNERKIT, "typeMap_ %{public}d", typeMap_[type]);
-    DEV_RET_IF_NULL((callback == nullptr) || (Connect() != RET_OK));
+    if ((callback == nullptr) || (Connect() != RET_OK)) {
+        return RET_ERR;
+    }
     if (devicestatusProxy_ == nullptr) {
         DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
-        return;
+        return RET_ERR;
     }
     if ((type < TYPE_INVALID) || (type > TYPE_MAX)) {
         DEV_HILOGE(INNERKIT, "type out of range");
-        return;
+        return RET_ERR;
     }
     if (event < ActivityEvent::EVENT_INVALID || event > ActivityEvent::ENTER_EXIT) {
         DEV_HILOGE(INNERKIT, "event out of range");
-        return;
+        return RET_ERR;
     }
     devicestatusProxy_->Unsubscribe(type, event, callback);
     DEV_HILOGD(INNERKIT, "Exit");
-    return;
+    return RET_OK;
 }
 
 Data DeviceStatusClient::GetDeviceStatusData(Type type)

@@ -22,6 +22,7 @@
 
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"
+#include "devicestatus_napi_error.h"
 
 using namespace OHOS;
 using namespace OHOS::Msdp;
@@ -236,7 +237,130 @@ bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
     return true;
 }
 
-napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_callback_info info, napi_value *args,
+std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::CheckSubscribeParam(napi_env env,
+    napi_callback_info info)
+{
+    std::tuple<bool, napi_value, std::string, int32_t, int32_t> result{false, nullptr, "", -1, -1};
+    size_t argc = ARG_4;
+    napi_value args[ARG_4] = {};
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if ((status != napi_ok) || (argc < ARG_4)) {
+        ThrowErr(env, PARAM_ERROR, "Bad parameters");
+        return result;
+    }
+    if (!CheckArguments(env, info)) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get arguments");
+        return result;
+    }
+    size_t modLen = 0;
+    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    char mode[NAPI_BUF_LENGTH] = {};
+    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    std::string typeMode = mode;
+    int32_t eventMode = 0;
+    status = napi_get_value_int32(env, args[ARG_1], &eventMode);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get event value item");
+        return result;
+    }
+    int32_t latencyMode = 0;
+    status = napi_get_value_int32(env, args[ARG_2], &latencyMode);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get latency value item");
+        return result;
+    }
+    return std::make_tuple(true, args[ARG_3], typeMode, eventMode, latencyMode);
+}
+
+std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscribeParam(napi_env env,
+    napi_callback_info info)
+{
+    std::tuple<bool, napi_value, int32_t, int32_t> result{false, nullptr, -1, -1};
+    size_t argc = ARG_3;
+    napi_value args[ARG_3] = {};
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if ((status != napi_ok) || (argc < ARG_3)) {
+        ThrowErr(env, PARAM_ERROR, "Bad parameters");
+        return result;
+    }
+    if (!CheckUnsubArguments(env, info)) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get unsub arguments");
+        return result;
+    }
+    size_t len;
+    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    std::vector<char> typeBuf(len + 1);
+    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    int32_t type = DeviceStatusNapi::ConvertTypeToInt(typeBuf.data());
+    if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
+        ThrowErr(env, PARAM_ERROR, "type is illegal");
+        return result;
+    }
+    int32_t event = 0;
+    status = napi_get_value_int32(env, args[ARG_1], &event);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get int32 item");
+        return result;
+    }
+    if ((event < ActivityEvent::ENTER) || (event > ActivityEvent::ENTER_EXIT)) {
+        ThrowErr(env, PARAM_ERROR, "event is illegal");
+        return result;
+    }
+    DEV_HILOGD(JS_NAPI, "type: %{public}d, event: %{public}d", type, event);
+    return std::make_tuple(true, args[ARG_2], type, event);
+}
+
+std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env env, napi_callback_info info)
+{
+    std::tuple<bool, napi_value, int32_t> result{false, nullptr, -1};
+    size_t argc = ARG_2;
+    napi_value args[ARG_2] = {};
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if ((status != napi_ok) || (argc < ARG_2)) {
+        ThrowErr(env, PARAM_ERROR, "Bad parameters");
+        return result;
+    }
+    if (!CheckGetArguments(env, info)) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get once arguments");
+        return result;
+    }
+    size_t len;
+    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    std::vector<char> typeBuf(len + 1);
+    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return result;
+    }
+    int32_t type = ConvertTypeToInt(typeBuf.data());
+    if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
+        ThrowErr(env, PARAM_ERROR, "type is illegal");
+        return result;
+    }
+    return std::make_tuple(true, args[ARG_1], type);
+}
+
+napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_callback_info info, napi_value handler,
     int32_t type, int32_t event, int32_t latency)
 {
     if (g_obj == nullptr) {
@@ -255,7 +379,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
             delete devicestatus;
         },
         nullptr, &(g_obj->callbackRef_));
-    if (!g_obj->On(type, args[ARG_3], false)) {
+    if (!g_obj->On(type, handler, false)) {
         DEV_HILOGE(JS_NAPI, "type:%{public}d already exists", type);
         return nullptr;
     }
@@ -270,8 +394,12 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         DEV_HILOGE(JS_NAPI, "callback is nullptr");
         return nullptr;
     }
-    DeviceStatusClient::GetInstance().SubscribeCallback(Type(type),
+    auto subscribeRet = DeviceStatusClient::GetInstance().SubscribeCallback(Type(type),
         ActivityEvent(event), ReportLatencyNs(latency), callback);
+    if (subscribeRet != RET_OK) {
+        ThrowErr(env, SERVICE_EXCEPTION, "on: Failed to SubscribeCallback");
+        return nullptr;
+    }
     auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         DEV_HILOGE(JS_NAPI, "Failed to insert");
@@ -284,91 +412,45 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
 napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_info info)
 {
     DEV_HILOGD(JS_NAPI, "Enter");
-    size_t argc = ARG_4;
-    napi_value args[ARG_4] = {};
-    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= ARG_4), "Bad parameters");
-    if (!CheckArguments(env, info)) {
-        DEV_HILOGE(JS_NAPI, "Failed to get arguements");
-        return nullptr;
-    }
-    size_t modeLen = 0;
-    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modeLen);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    char mode[NAPI_BUF_LENGTH] = {};
-    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modeLen + 1, &modeLen);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    std::string typeMode = mode;
-    int32_t eventMode = 0;
-    status = napi_get_value_int32(env, args[ARG_1], &eventMode);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get event value item");
-        return nullptr;
-    }
-    int32_t latencyMode = 0;
-    status = napi_get_value_int32(env, args[ARG_2], &latencyMode);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get latency value item");
+    const auto [ret, handler, typeMode, event, latency] = CheckSubscribeParam(env, info);
+    if (!ret) {
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
-    int32_t event = eventMode;
-    int32_t latency = latencyMode;
     DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
-
-    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
-    NAPI_ASSERT(env, (event >= ActivityEvent::ENTER) && (event <= ActivityEvent::ENTER_EXIT), "event is illegal");
-    NAPI_ASSERT(env, (latency >= ReportLatencyNs::SHORT) && (latency <= ReportLatencyNs::LONG), "latency is illegal");
-    return SubscribeDeviceStatusCallback(env, info, args, type, event, latency);
+    if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
+        ThrowErr(env, PARAM_ERROR, "type is illegal");
+        return nullptr;
+    }
+    if ((event < ActivityEvent::ENTER) || (event > ActivityEvent::ENTER_EXIT)) {
+        ThrowErr(env, PARAM_ERROR, "event is illegal");
+        return nullptr;
+    }
+    if ((latency < ReportLatencyNs::SHORT) || (latency > ReportLatencyNs::LONG)) {
+        ThrowErr(env, PARAM_ERROR, "latency is illegal");
+        return nullptr;
+    }
+    return SubscribeDeviceStatusCallback(env, info, handler, type, event, latency);
 }
 
 napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback_info info)
 {
     DEV_HILOGD(JS_NAPI, "Enter");
-    size_t argc = ARG_3;
-    napi_value args[ARG_3] = {};
-    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= ARG_3), "Bad parameters");
-    if (!CheckUnsubArguments(env, info)) {
-        DEV_HILOGE(JS_NAPI, "Failed to get unsub arguements");
+    const auto [ret, handler, type, event] = CheckUnsubscribeParam(env, info);
+    if (!ret) {
         return nullptr;
     }
-    size_t len;
-    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    std::vector<char> typeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
-    int32_t eventMode = 0;
-    status = napi_get_value_int32(env, args[ARG_1], &eventMode);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get int32 item");
-        return nullptr;
-    }
-    int32_t event = eventMode;
-    NAPI_ASSERT(env, (event >= ActivityEvent::ENTER) && (event <= ActivityEvent::ENTER_EXIT), "event is illegal");
-    DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d", type, event);
-    if (!g_obj->Off(type, args[ARG_2])) {
+    if (!g_obj->Off(type, handler)) {
         DEV_HILOGE(JS_NAPI, "Not ready to Unsubscribe for type:%{public}d", type);
         return nullptr;
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        DeviceStatusClient::GetInstance().UnsubscribeCallback(Type(type), ActivityEvent(event), callbackIter->second);
+        auto unsubscribeRet = DeviceStatusClient::GetInstance().UnsubscribeCallback(Type(type),
+            ActivityEvent(event), callbackIter->second);
+        if (unsubscribeRet != RET_OK) {
+            ThrowErr(env, SERVICE_EXCEPTION, "off: Failed to UnsubscribeCallback");
+        }
         callbackMap_.erase(type);
     } else {
         NAPI_ASSERT(env, false, "No existed callback");
@@ -381,28 +463,10 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
 napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info info)
 {
     DEV_HILOGD(JS_NAPI, "Enter");
-    size_t argc = ARG_2;
-    napi_value args[ARG_2] = {};
-    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    NAPI_ASSERT(env, (status == napi_ok) && (argc >= ARG_2), "Bad parameters");
-    if (!CheckGetArguments(env, info)) {
-        DEV_HILOGE(JS_NAPI, "Failed to get once arguements");
+    const auto [ret, handler, type] = CheckGetParam(env, info);
+    if (!ret) {
         return nullptr;
     }
-    size_t len;
-    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    std::vector<char> typeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
-    if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to get string item");
-        return nullptr;
-    }
-    int32_t type = ConvertTypeToInt(typeBuf.data());
-    NAPI_ASSERT(env, (type >= Type::TYPE_ABSOLUTE_STILL) && (type <= Type::TYPE_LID_OPEN), "type is illegal");
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
         if (g_obj == nullptr) {
@@ -418,13 +482,16 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
             },
             nullptr, &(g_obj->callbackRef_));
     }
-    if (!g_obj->On(type, args[ARG_1], true)) {
+    if (!g_obj->On(type, handler, true)) {
         DEV_HILOGE(JS_NAPI, "type:%{public}d already exists", type);
         return nullptr;
     }
     Data devicestatusData = DeviceStatusClient::GetInstance().GetDeviceStatusData(Type(type));
+    if (devicestatusData.type == Type::TYPE_INVALID) {
+        ThrowErr(env, SERVICE_EXCEPTION, "once: Failed to GetDeviceStatusData");
+    }
     g_obj->OnDeviceStatusChangedDone(devicestatusData.type, devicestatusData.value, true);
-    g_obj->OffOnce(devicestatusData.type, args[ARG_1]);
+    g_obj->OffOnce(devicestatusData.type, handler);
     DEV_HILOGD(JS_NAPI, "Exit");
     return nullptr;
 }
