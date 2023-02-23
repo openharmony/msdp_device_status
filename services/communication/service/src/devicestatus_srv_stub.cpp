@@ -69,7 +69,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     if (it != mapConnFunc.end()) {
         return (this->*it->second)(data, reply);
     }
-    DEV_HILOGE(SERVICE, "Unknown code:%{public}u, go switch default", code);
+    DEV_HILOGE(SERVICE, "Unknown code:%{public}u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
