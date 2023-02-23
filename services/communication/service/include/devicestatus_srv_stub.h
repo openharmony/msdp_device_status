@@ -51,8 +51,6 @@ private:
     int32_t UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply);
     int32_t UpdateDragMessageStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDragTargetPidStub(MessageParcel& data, MessageParcel& reply);
-    int32_t RegisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply);
-    int32_t UnregisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply);
     int32_t AddDraglistenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply);
 };
