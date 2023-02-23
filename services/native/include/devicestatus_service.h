@@ -78,8 +78,6 @@ public:
     int32_t GetDragTargetPid() override;
     int32_t AddDraglistener() override;
     int32_t RemoveDraglistener() override;
-    int32_t RegisterThumbnailDraw() override;
-    int32_t UnregisterThumbnailDraw() override;
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;

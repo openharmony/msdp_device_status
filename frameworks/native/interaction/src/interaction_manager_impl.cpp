@@ -59,12 +59,6 @@ void InteractionManagerImpl::InitMsgHandler()
         {MessageId::COORDINATION_GET_STATE,
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::START_THUMBNAIL_DRAW,
-            MsgCallbackBind2(&DragManagerImpl::OnStartThumbnailDraw, &dragManagerImpl_)},
-        {MessageId::NOTICE_THUMBNAIL_DRAW,
-            MsgCallbackBind2(&DragManagerImpl::OnNoticeThumbnailDraw, &dragManagerImpl_)},
-        {MessageId::STOP_THUMBNAIL_DRAW,
-            MsgCallbackBind2(&DragManagerImpl::OnStopThumbnailDraw, &dragManagerImpl_)},
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)}
     };
@@ -217,26 +211,6 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetDragTargetPid();
-}
-
-int32_t InteractionManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-    std::function<void(int32_t, bool, std::u16string)> noticeCallback,
-    std::function<void(int32_t, int32_t)> endCallback)
-{
-    if (!InitClient()) {
-        FI_HILOGE("Get client is nullptr");
-        return RET_ERR;
-    }
-    return dragManagerImpl_.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
-}
-    
-int32_t InteractionManagerImpl::UnregisterThumbnailDraw(std::function<void(void)> callback)
-{
-    if (!InitClient()) {
-        FI_HILOGE("Get client is nullptr");
-        return RET_ERR;
-    }
-    return dragManagerImpl_.UnregisterThumbnailDraw(callback);
 }
 
 int32_t InteractionManagerImpl::AddDraglistener(DragListenerPtr listener)

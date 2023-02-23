@@ -43,8 +43,6 @@ public:
         START_DRAG,
         STOP_DRAG,
         GET_DRAG_TARGET_PID,
-        REGISTER_THUMBNAIL_DRAW,
-        UNREGISTER_THUMBNAIL_DRAW,
         REGISTER_DRAG_MONITOR,
         UNREGISTER_DRAG_MONITOR,
         ALLOC_SOCKET_FD = 40
@@ -68,8 +66,6 @@ public:
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(int32_t result) = 0;
-    virtual int32_t RegisterThumbnailDraw() = 0;
-    virtual int32_t UnregisterThumbnailDraw() = 0;
     virtual int32_t UpdateDragStyle(int32_t style) = 0;
     virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
     virtual int32_t GetDragTargetPid() = 0;

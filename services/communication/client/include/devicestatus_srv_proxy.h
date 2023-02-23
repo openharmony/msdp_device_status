@@ -53,8 +53,6 @@ public:
     virtual int32_t UpdateDragStyle(int32_t style) override;
     virtual int32_t UpdateDragMessage(const std::u16string &message) override;
     virtual int32_t GetDragTargetPid() override;
-    virtual int32_t RegisterThumbnailDraw() override;
-    virtual int32_t UnregisterThumbnailDraw() override;
     virtual int32_t AddDraglistener() override;
     virtual int32_t RemoveDraglistener() override;
 

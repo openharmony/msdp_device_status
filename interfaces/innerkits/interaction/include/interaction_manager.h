@@ -128,26 +128,6 @@ public:
      */
     int32_t GetDragTargetPid();
 
-    /**
-     * @brief 注册阴影缩略图托管的回调
-     * @param startCallback 回调函数，在启动拖拽时调用
-     * @param noticeCallback 回调函数，拖拽状态变化时调用
-     * @param endCallback 回调函数，结束拖拽时调用
-     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
-     * @since 10
-     */
-    int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-        std::function<void(int32_t, bool, std::u16string)> noticeCallback,
-        std::function<void(int32_t, int32_t)> endCallback);
-
-    /**
-     * @brief 取消注册阴影缩略图托管的回调
-     * @param callback 回调函数，用于返回结果
-     * @return 返回0表示接口调用成功，否则，表示接口调用失败
-     * @since 10
-     */
-    int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
-
     /*
      * @brief 注册拖拽状态监听。。
      * @param listener 拖拽状态监听。

@@ -237,28 +237,6 @@ int32_t DeviceStatusClient::GetDragTargetPid()
     return devicestatusProxy_->GetDragTargetPid();
 }
 
-int32_t DeviceStatusClient::RegisterThumbnailDraw()
-{
-    CALL_DEBUG_ENTER;
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("Client has not connect server");
-        return RET_ERR;
-    }
-    return devicestatusProxy_->RegisterThumbnailDraw();
-}
-
-int32_t DeviceStatusClient::UnregisterThumbnailDraw()
-{
-    CALL_DEBUG_ENTER;
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("Client has not connect server");
-        return RET_ERR;
-    }
-    return devicestatusProxy_->UnregisterThumbnailDraw();
-}
-
 int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;

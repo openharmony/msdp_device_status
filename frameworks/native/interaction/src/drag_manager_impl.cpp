@@ -66,45 +66,6 @@ int32_t DragManagerImpl::StopDrag(int32_t result)
     return DeviceStatusClient::GetInstance().StopDrag(result);
 }
 
-int32_t DragManagerImpl::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-    std::function<void(int32_t, bool, std::u16string)> noticeCallback,
-    std::function<void(int32_t, int32_t)> endCallback)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto ret = DeviceStatusClient::GetInstance().RegisterThumbnailDraw();
-    if (ret != RET_OK) {
-        FI_HILOGE("Register thumbnail draw failed");
-        return ret;
-    }
-    hasRegisterThumbnailDraw_ = true;
-    thumbnailDrawCallback_.startCallback = startCallback;
-    thumbnailDrawCallback_.noticeCallback = noticeCallback;
-    thumbnailDrawCallback_.endCallback = endCallback;
-    return ret;
-}
-
-int32_t DragManagerImpl::UnregisterThumbnailDraw(std::function<void(void)> callback)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!hasRegisterThumbnailDraw_) {
-        FI_HILOGI("have not registered");
-        return RET_OK;
-    }
-    auto ret = DeviceStatusClient::GetInstance().UnregisterThumbnailDraw();
-    if (ret != RET_OK) {
-        FI_HILOGE("Unregister thumbnail draw failed");
-        return ret;
-    }
-    hasRegisterThumbnailDraw_ = false;
-    thumbnailDrawCallback_.startCallback = nullptr;
-    thumbnailDrawCallback_.noticeCallback = nullptr;
-    thumbnailDrawCallback_.endCallback = nullptr;
-    callback();
-    return ret;
-}
-
 int32_t DragManagerImpl::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
@@ -171,70 +132,6 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         hasRegistered_ = false;
         return DeviceStatusClient::GetInstance().RemoveDraglistener();
     }
-    return RET_OK;
-}
-
-void DragManagerImpl::UnMarshallPixelmap(NetPacket& pkt, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
-{
-    OHOS::Media::ImageInfo imageInfo;
-    OHOS::Media::AllocatorType allocatorType;
-    CHKPV(pixelMap);
-    pkt >> imageInfo.pixelFormat >> imageInfo.alphaType >> imageInfo.size.width
-        >> imageInfo.size.height >> allocatorType;
-    int32_t size;
-    pkt >> size;
-    char* buf = (char*)malloc(sizeof(char) * size);
-    pkt.Read(buf, static_cast<size_t>(size));
-    pixelMap->SetPixelsAddr(reinterpret_cast<void*>(buf), nullptr,
-        static_cast<uint32_t>(size), allocatorType, nullptr);
-    pixelMap->SetImageInfo(imageInfo);
-    
-}
-
-int32_t DragManagerImpl::OnStartThumbnailDraw(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
-    UnMarshallPixelmap(pkt, pixelMap);
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read coordination msg failed");
-        return RET_ERR;
-    }
-    auto dragData = std::make_shared<DragData>();
-    dragData->pictureResourse.pixelMap = pixelMap;
-    pkt >> dragData->pictureResourse.x >> dragData->pictureResourse.y >> dragData->sourceType >> dragData->dragNum;
-    int32_t pid;
-    pkt >> pid;
-    CHKPR(thumbnailDrawCallback_.startCallback, RET_ERR);
-    thumbnailDrawCallback_.startCallback(dragData);
-    return RET_OK;
-}
-
-int32_t DragManagerImpl::OnNoticeThumbnailDraw(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t msgType = 0;
-    bool allowDragIn = false;
-    std::string message;
-    pkt >> msgType >> allowDragIn >> message;
-    auto Subscript = to_utf16(message);
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read coordination msg failed");
-        return RET_ERR;
-    }
-    CHKPR(thumbnailDrawCallback_.noticeCallback, RET_ERR);
-    thumbnailDrawCallback_.noticeCallback(msgType, allowDragIn, Subscript);
-    return RET_OK;
-}
-
-int32_t DragManagerImpl::OnStopThumbnailDraw(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(thumbnailDrawCallback_.endCallback, RET_ERR);
-    int32_t pid = 0;
-    int32_t result = 0;
-    pkt >> pid >> result;
-    thumbnailDrawCallback_.endCallback(pid , result);
     return RET_OK;
 }
 } // namespace DeviceStatus

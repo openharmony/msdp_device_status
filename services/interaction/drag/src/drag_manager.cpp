@@ -63,16 +63,6 @@ int32_t DragManager::RemoveListener(SessionPtr session)
     return RET_OK;
 }
 
-void DragManager::MarshallPixelmap(const DragData &dragData, NetPacket& pkt)
-{
-    auto pixelMap = dragData.pictureResourse.pixelMap;
-    pkt << pixelMap->GetPixelFormat() << pixelMap->GetAlphaType() << pixelMap->GetWidth()
-        << pixelMap->GetHeight() << pixelMap->GetAllocatorType();
-    auto size = pixelMap->GetByteCount();
-    pkt << size;
-    pkt.Write(reinterpret_cast<const char *>(pixelMap->GetPixels()), static_cast<size_t>(size));
-}
-
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
@@ -111,13 +101,6 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-
-    CHKPR(thumbnailDrawSession_, RET_ERR);
-    NetPacket pkt(MessageId::STOP_THUMBNAIL_DRAW);;
-    if (!thumbnailDrawSession_->SendMsg(pkt)) {
-        FI_HILOGE("Sending failed");
-        return RET_ERR;
-    }
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed, monitorId_:%{public}d", monitorId_);
@@ -196,24 +179,6 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEven
     CHKPV(pointerEvent);
     CHKPV(callback_);
     callback_(pointerEvent);
-}
-
-int32_t DragManager::OnRegisterThumbnailDraw(SessionPtr sess)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, RET_ERR);
-    thumbnailDrawSession_ = sess;
-    return RET_OK;
-}
-
-int32_t DragManager::OnUnregisterThumbnailDraw(SessionPtr sess)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, RET_ERR);
-    if (thumbnailDrawSession_ == sess) {
-        thumbnailDrawSession_ = nullptr;
-    }
-    return RET_OK;
 }
 
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const

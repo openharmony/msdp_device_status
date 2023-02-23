@@ -30,12 +30,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct ThumbnailDrawCallback {
-    std::function<void(std::shared_ptr<DragData>)> startCallback;
-    std::function<void(int32_t, bool, std::u16string)> noticeCallback;
-    std::function<void(int32_t, int32_t)> endCallback;
-};
-
 class DragManagerImpl  {
 public:
     DragManagerImpl() = default;
@@ -47,25 +41,14 @@ public:
     int32_t StopDrag(int32_t result);
 
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
-    int32_t RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-        std::function<void(int32_t, bool, std::u16string)> noticeCallback,
-        std::function<void(int32_t, int32_t)> endCallback);
-    int32_t UnregisterThumbnailDraw(std::function<void(void)> callback);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
-
-    int32_t OnStartThumbnailDraw(const StreamClient& client, NetPacket& pkt);
-    int32_t OnNoticeThumbnailDraw(const StreamClient& client, NetPacket& pkt);
-    int32_t OnStopThumbnailDraw(const StreamClient& client, NetPacket& pkt);
-    void UnMarshallPixelmap(NetPacket& pkt, std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
     std::function<void(int32_t)> stopCallback_;
-    bool hasRegisterThumbnailDraw_ { false };
-    ThumbnailDrawCallback thumbnailDrawCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

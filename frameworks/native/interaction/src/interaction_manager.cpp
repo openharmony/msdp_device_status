@@ -85,18 +85,6 @@ int32_t InteractionManager::StopDrag(int32_t result)
     return InteractionMgrImpl.StopDrag(result);
 }
 
-int32_t InteractionManager::RegisterThumbnailDraw(std::function<void(std::shared_ptr<DragData>)> startCallback,
-    std::function<void(int32_t, bool, std::u16string)> noticeCallback,
-    std::function<void(int32_t, int32_t)> endCallback)
-{
-    return InteractionMgrImpl.RegisterThumbnailDraw(startCallback, noticeCallback, endCallback);
-}
-
-int32_t InteractionManager::UnregisterThumbnailDraw(std::function<void(void)> callback)
-{
-    return InteractionMgrImpl.UnregisterThumbnailDraw(callback);
-}
-
 int32_t InteractionManager::GetDragTargetPid()
 {
     return InteractionMgrImpl.GetDragTargetPid();

@@ -46,9 +46,6 @@ public:
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    int32_t OnRegisterThumbnailDraw(SessionPtr sess);
-    int32_t OnUnregisterThumbnailDraw(SessionPtr sess);
-    void MarshallPixelmap(const DragData &dragData, NetPacket& pkt);
 
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -69,7 +66,6 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
-    SessionPtr thumbnailDrawSession_ { nullptr };
     std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()

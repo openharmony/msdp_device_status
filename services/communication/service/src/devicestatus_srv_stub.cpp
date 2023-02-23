@@ -92,12 +92,6 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case GET_DRAG_TARGET_PID: {
             return GetDragTargetPidStub(data, reply);
         }
-        case REGISTER_THUMBNAIL_DRAW: {
-            return RegisterThumbnailDrawStub(data, reply);
-        }
-        case UNREGISTER_THUMBNAIL_DRAW: {
-            return UnregisterThumbnailDrawStub(data, reply);
-        }
         case REGISTER_DRAG_MONITOR: {
             return AddDraglistenerStub(data, reply);
         }
@@ -270,26 +264,6 @@ int32_t DeviceStatusSrvStub::GetDragTargetPidStub(MessageParcel& data, MessagePa
     int32_t pid = GetDragTargetPid();
     WRITEINT32(reply, pid, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
-}
-
-int32_t DeviceStatusSrvStub::RegisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = RegisterThumbnailDraw();
-    if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterThumbnailDraw failed ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusSrvStub::UnregisterThumbnailDrawStub(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = UnregisterThumbnailDraw();
-    if (ret != RET_OK) {
-        FI_HILOGE("Call UnregisterThumbnailDraw failed ret:%{public}d", ret);
-    }
-    return ret;
 }
 
 int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply)

@@ -43,8 +43,6 @@ public:
     void OnDragMessage(DragMessage msg) override;
     void RegisterListener(napi_env env, napi_value handle);
     void UnregisterListener(napi_env env, napi_value handle = nullptr);
-    void RegisterThumbnailDraw(napi_env env, size_t argc, napi_value* argv);
-    void UnregisterThumbnailDraw(napi_env env, napi_value argv);
 
 private:
     struct CallbackInfo : public RefBase {
@@ -53,35 +51,11 @@ private:
         DragMessage msg;
     };
 
-    struct ThumbnailDrawCb : public RefBase {
-        napi_env env { nullptr };
-        napi_ref ref[3] { nullptr };
-        int32_t errCode { -1 };
-        napi_deferred deferred { nullptr };
-        int32_t pid { -1 };
-        int32_t msgType { -1 };
-        bool allowDragIn { false };
-        std::u16string message;
-        std::shared_ptr<DragData> dragData { nullptr };
-    };
-
 private:
     static void CallDragMsg(uv_work_t *work, int32_t status);
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    void EmitStartThumbnailDraw(std::shared_ptr<DragData> dragData);
-    void EmitNoticeThumbnailDraw(int32_t msgType, bool allowDragIn, std::u16string message);
-    void EmitEndThumbnailDraw(int32_t pid, int32_t result);
-    void EmitUnregisterThumbnailDraw(sptr<ThumbnailDrawCb> callbackInfo);
-    static void CallStartThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
-    static void CallNoticeThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
-    static void CallEndThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
-    static void CallUnregisterThumbnailDrawAsyncWork(uv_work_t *work, int32_t status);
-    static int32_t GetErrorCode(napi_env env, int32_t errCode, napi_value* callResult);
-    static napi_value GetDragOption(sptr<ThumbnailDrawCb> cb);
-    static napi_value GetNoticeMsg(sptr<ThumbnailDrawCb> cb);
-    static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
@@ -92,7 +66,6 @@ private:
     }
 private:
     std::atomic_bool hasRegistered_ { false };
-    sptr<ThumbnailDrawCb> thumbnailDrawCb_ { nullptr };
     inline static std::mutex mutex_;
     inline static std::vector<std::unique_ptr<CallbackInfo>> listeners_ {};
 };
