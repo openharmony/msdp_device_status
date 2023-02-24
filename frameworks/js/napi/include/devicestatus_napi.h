@@ -17,10 +17,11 @@
 #define DEVICE_STATUS_NAPI_H
 
 #include <map>
-#include <uv.h>
+#include <tuple>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include <uv.h>
 
 #include "devicestatus_data_utils.h"
 #include "devicestatus_callback_stub.h"
@@ -48,7 +49,7 @@ public:
 
     static napi_value Init(napi_env env, napi_value exports);
     static napi_value SubscribeDeviceStatus(napi_env env, napi_callback_info info);
-    static napi_value SubscribeDeviceStatusCallback(napi_env env, napi_callback_info info, napi_value *args,
+    static napi_value SubscribeDeviceStatusCallback(napi_env env, napi_callback_info info, napi_value handler,
         int32_t type, int32_t event, int32_t latency);
     static napi_value UnsubscribeDeviceStatus(napi_env env, napi_callback_info info);
     static napi_value GetDeviceStatus(napi_env env, napi_callback_info info);
@@ -64,6 +65,11 @@ private:
     static bool CheckArguments(napi_env env, napi_callback_info info);
     static bool CheckUnsubArguments(napi_env env, napi_callback_info info);
     static bool CheckGetArguments(napi_env env, napi_callback_info info);
+    static std::tuple<bool, napi_value, std::string, int32_t, int32_t> CheckSubscribeParam(napi_env env,
+        napi_callback_info info);
+    static std::tuple<bool, napi_value, int32_t, int32_t> CheckUnsubscribeParam(napi_env env,
+        napi_callback_info info);
+    static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
     napi_ref callbackRef_ = { nullptr };
     static napi_ref devicestatusValueRef_;
     napi_env env_ = { nullptr };

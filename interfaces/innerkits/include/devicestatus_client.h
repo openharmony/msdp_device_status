@@ -41,9 +41,9 @@ public:
     }
     DISALLOW_COPY_AND_MOVE(DeviceStatusClient);
 
-    void SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
+    int32_t SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback);
-    void UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
+    int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetDeviceStatusData(const Type type);
     void RegisterDeathListener(std::function<void()> deathListener);
 
