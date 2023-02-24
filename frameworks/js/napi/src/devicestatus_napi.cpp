@@ -294,19 +294,19 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
         ThrowErr(env, PARAM_ERROR, "Failed to get off arguments");
         return result;
     }
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
+    size_t modLen = 0;
+    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    std::vector<uint8_t> typeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
+    char mode[NAPI_BUF_LENGTH] = {};
+    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    int32_t type = DeviceStatusNapi::ConvertTypeToInt(typeBuf.data());
+    int32_t type = DeviceStatusNapi::ConvertTypeToInt(mode);
     if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
         ThrowErr(env, PARAM_ERROR, "type is illegal");
         return result;
@@ -339,19 +339,19 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
         ThrowErr(env, PARAM_ERROR, "Failed to get once arguments");
         return result;
     }
-    size_t len = 0;
-    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
+    size_t modLen = 0;
+    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    std::vector<uint8_t> typeBuf(len + 1);
-    status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
+    char mode[NAPI_BUF_LENGTH] = {};
+    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    int32_t type = ConvertTypeToInt(typeBuf.data());
+    int32_t type = ConvertTypeToInt(mode);
     if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
         ThrowErr(env, PARAM_ERROR, "type is illegal");
         return result;
