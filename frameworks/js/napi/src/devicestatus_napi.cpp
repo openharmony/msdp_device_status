@@ -441,6 +441,10 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         DEV_HILOGE(JS_NAPI, "off: UnsubscribeDeviceStatus is failed");
         return nullptr;
     }
+    if (g_obj == nullptr) {
+        DEV_HILOGE(JS_NAPI, "g_obj is nullptr");
+        return nullptr;
+    }
     if (!g_obj->Off(type, handler)) {
         DEV_HILOGE(JS_NAPI, "Not ready to Unsubscribe for type:%{public}d", type);
         return nullptr;
