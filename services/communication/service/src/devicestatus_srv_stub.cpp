@@ -33,6 +33,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
+using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -45,67 +46,34 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         DEV_HILOGE(SERVICE, "DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
-
-    switch (code) {
-        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE): {
-            return SubscribeStub(data);
-        }
-        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE): {
-            return UnsubscribeStub(data);
-        }
-        case static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE): {
-            return GetLatestDeviceStatusDataStub(data, reply);
-        }
-        case REGISTER_COORDINATION_MONITOR: {
-            return RegisterCoordinationMonitorStub(data, reply);
-        }
-        case UNREGISTER_COORDINATION_MONITOR: {
-            return UnregisterCoordinationMonitorStub(data, reply);
-        }
-        case ENABLE_COORDINATION: {
-            return EnableCoordinationStub(data, reply);
-        }
-        case START_COORDINATION: {
-            return StartCoordinationStub(data, reply);
-        }
-        case STOP_COORDINATION: {
-            return StopCoordinationStub(data, reply);
-        }
-        case GET_COORDINATION_STATE: {
-            return GetCoordinationStateStub(data, reply);
-        }
-        case ALLOC_SOCKET_FD: {
-            return HandleAllocSocketFdStub(data, reply);
-        }
-        case START_DRAG : {
-            return StartDragStub(data, reply);
-        }
-        case STOP_DRAG : {
-            return StopDragStub(data, reply);
-        }
-        case UPDATED_DRAG_STYLE: {
-            return UpdateDragStyleStub(data, reply);
-        }
-        case UPDATED_DRAG_MESSAGE: {
-            return UpdateDragMessageStub(data, reply);
-        }
-        case GET_DRAG_TARGET_PID: {
-            return GetDragTargetPidStub(data, reply);
-        }
-        case REGISTER_DRAG_MONITOR: {
-            return AddDraglistenerStub(data, reply);
-        }
-        case UNREGISTER_DRAG_MONITOR: {
-            return RemoveDraglistenerStub(data, reply);
-        }
-        default: {
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
+    const static std::map<int32_t, ConnFunc> mapConnFunc = {
+        {Idevicestatus::DEVICESTATUS_SUBSCRIBE, &DeviceStatusSrvStub::SubscribeStub},
+        {Idevicestatus::DEVICESTATUS_UNSUBSCRIBE, &DeviceStatusSrvStub::UnsubscribeStub},
+        {Idevicestatus::DEVICESTATUS_GETCACHE, &DeviceStatusSrvStub::GetLatestDeviceStatusDataStub},
+        {Idevicestatus::REGISTER_COORDINATION_MONITOR, &DeviceStatusSrvStub::RegisterCoordinationMonitorStub},
+        {Idevicestatus::UNREGISTER_COORDINATION_MONITOR, &DeviceStatusSrvStub::UnregisterCoordinationMonitorStub},
+        {Idevicestatus::ENABLE_COORDINATION, &DeviceStatusSrvStub::EnableCoordinationStub},
+        {Idevicestatus::START_COORDINATION, &DeviceStatusSrvStub::StartCoordinationStub},
+        {Idevicestatus::STOP_COORDINATION, &DeviceStatusSrvStub::StopCoordinationStub},
+        {Idevicestatus::GET_COORDINATION_STATE, &DeviceStatusSrvStub::GetCoordinationStateStub},
+        {Idevicestatus::ALLOC_SOCKET_FD, &DeviceStatusSrvStub::HandleAllocSocketFdStub},
+        {Idevicestatus::START_DRAG, &DeviceStatusSrvStub::StartDragStub},
+        {Idevicestatus::STOP_DRAG, &DeviceStatusSrvStub::StopDragStub},
+        {Idevicestatus::UPDATED_DRAG_STYLE, &DeviceStatusSrvStub::UpdateDragStyleStub},
+        {Idevicestatus::UPDATED_DRAG_MESSAGE, &DeviceStatusSrvStub::UpdateDragMessageStub},
+        {Idevicestatus::GET_DRAG_TARGET_PID, &DeviceStatusSrvStub::GetDragTargetPidStub},
+        {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
+        {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
+    };
+    auto it = mapConnFunc.find(code);
+    if (it != mapConnFunc.end()) {
+        return (this->*it->second)(data, reply);
     }
-    return RET_OK;
+    DEV_HILOGE(SERVICE, "Unknown code:%{public}u", code);
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data)
+int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data, MessageParcel& reply)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
@@ -128,7 +96,7 @@ int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data)
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data)
+int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data, MessageParcel& reply)
 {
     DEV_HILOGD(SERVICE, "Enter");
     int32_t type = -1;
