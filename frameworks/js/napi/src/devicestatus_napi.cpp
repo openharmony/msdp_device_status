@@ -240,7 +240,7 @@ bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
 std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::CheckSubscribeParam(napi_env env,
     napi_callback_info info)
 {
-    std::tuple<bool, napi_value, std::string, int32_t, int32_t> result{false, nullptr, "", -1, -1};
+    std::tuple<bool, napi_value, std::string, int32_t, int32_t> result { false, nullptr, "", -1, -1 };
     size_t argc = ARG_4;
     napi_value args[ARG_4] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -261,7 +261,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
     char mode[NAPI_BUF_LENGTH] = {};
     status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        ThrowErr(env, PARAM_ERROR, "Failed to get mode");
         return result;
     }
     int32_t eventMode = 0;
@@ -282,7 +282,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
 std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscribeParam(napi_env env,
     napi_callback_info info)
 {
-    std::tuple<bool, napi_value, int32_t, int32_t> result{false, nullptr, -1, -1};
+    std::tuple<bool, napi_value, int32_t, int32_t> result { false, nullptr, -1, -1 };
     size_t argc = ARG_3;
     napi_value args[ARG_3] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -303,7 +303,7 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
     char mode[NAPI_BUF_LENGTH] = {};
     status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        ThrowErr(env, PARAM_ERROR, "Failed to get mode");
         return result;
     }
     int32_t type = DeviceStatusNapi::ConvertTypeToInt(mode);
@@ -327,7 +327,7 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
 
 std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env env, napi_callback_info info)
 {
-    std::tuple<bool, napi_value, int32_t> result{false, nullptr, -1};
+    std::tuple<bool, napi_value, int32_t> result { false, nullptr, -1 };
     size_t argc = ARG_2;
     napi_value args[ARG_2] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -348,7 +348,7 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
     char mode[NAPI_BUF_LENGTH] = {};
     status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        ThrowErr(env, PARAM_ERROR, "Failed to get mode");
         return result;
     }
     int32_t type = ConvertTypeToInt(mode);
