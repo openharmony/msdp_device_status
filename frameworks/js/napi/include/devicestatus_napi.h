@@ -17,11 +17,11 @@
 #define DEVICE_STATUS_NAPI_H
 
 #include <map>
-#include <uv.h>
 #include <tuple>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include <uv.h>
 
 #include "devicestatus_data_utils.h"
 #include "devicestatus_callback_stub.h"

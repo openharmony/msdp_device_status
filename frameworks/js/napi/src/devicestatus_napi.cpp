@@ -249,7 +249,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         return result;
     }
     if (!CheckArguments(env, info)) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get arguments");
+        ThrowErr(env, PARAM_ERROR, "Failed to get on arguments");
         return result;
     }
     size_t modLen = 0;
@@ -264,7 +264,6 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    std::string typeMode = mode;
     int32_t eventMode = 0;
     status = napi_get_value_int32(env, args[ARG_1], &eventMode);
     if (status != napi_ok) {
@@ -277,7 +276,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         ThrowErr(env, PARAM_ERROR, "Failed to get latency value item");
         return result;
     }
-    return std::make_tuple(true, args[ARG_3], typeMode, eventMode, latencyMode);
+    return std::make_tuple(true, args[ARG_3], std::string(mode), eventMode, latencyMode);
 }
 
 std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscribeParam(napi_env env,
@@ -292,16 +291,16 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
         return result;
     }
     if (!CheckUnsubArguments(env, info)) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get unsub arguments");
+        ThrowErr(env, PARAM_ERROR, "Failed to get off arguments");
         return result;
     }
-    size_t len;
+    size_t len = 0;
     status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    std::vector<char> typeBuf(len + 1);
+    std::vector<uint8_t> typeBuf(len + 1);
     status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
@@ -340,13 +339,13 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
         ThrowErr(env, PARAM_ERROR, "Failed to get once arguments");
         return result;
     }
-    size_t len;
+    size_t len = 0;
     status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &len);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    std::vector<char> typeBuf(len + 1);
+    std::vector<uint8_t> typeBuf(len + 1);
     status = napi_get_value_string_utf8(env, args[0], typeBuf.data(), len + 1, &len);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
@@ -414,6 +413,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     DEV_HILOGD(JS_NAPI, "Enter");
     const auto [ret, handler, typeMode, event, latency] = CheckSubscribeParam(env, info);
     if (!ret) {
+        DEV_HILOGE(JS_NAPI, "on: SubscribeDeviceStatus is failed");
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
@@ -438,6 +438,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     DEV_HILOGD(JS_NAPI, "Enter");
     const auto [ret, handler, type, event] = CheckUnsubscribeParam(env, info);
     if (!ret) {
+        DEV_HILOGE(JS_NAPI, "off: UnsubscribeDeviceStatus is failed");
         return nullptr;
     }
     if (!g_obj->Off(type, handler)) {
@@ -465,6 +466,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
     DEV_HILOGD(JS_NAPI, "Enter");
     const auto [ret, handler, type] = CheckGetParam(env, info);
     if (!ret) {
+        DEV_HILOGE(JS_NAPI, "once: GetDeviceStatus is failed");
         return nullptr;
     }
     if (g_obj == nullptr) {
