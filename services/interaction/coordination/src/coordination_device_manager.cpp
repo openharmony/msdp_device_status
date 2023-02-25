@@ -350,15 +350,17 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
 {
     CALL_INFO_TRACE;
     CHKPV(device);
-    auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
-    auto tIter = devices_.find(dev->GetId());
-    if (tIter != devices_.end()) {
-        devices_.erase(tIter);
+    auto tIter = devices_.find(device->GetId());
+    if (tIter == devices_.end()) {
+        FI_HILOGE("The device corresponding to the current id:%{public}d cannot be found", device->GetId());
+        return;
     }
-
+    CHKPV(tIter->second);
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), dev->GetNetworkId(), GetCoordinationDhids(dev->GetId()));
+        CooSM->OnPointerOffline(tIter->second->GetDhid(), tIter->second->GetNetworkId(),
+            GetCoordinationDhids(tIter->second->GetId()));
     }
+    devices_.erase(tIter);
 }
 
 CoordinationDeviceManager::DeviceObserver::DeviceObserver(CoordinationDeviceManager &cooDevMgr)
