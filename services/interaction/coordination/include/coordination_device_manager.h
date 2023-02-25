@@ -26,40 +26,40 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class CoordinationDeviceManager {
+struct DeviceInfo {
+    int32_t vendor;
+    int32_t product;
+    std::string dhid;
+    std::string name;
+    std::string phys;
+    std::string uniq;
+    std::string networkId;
+}; 
     DECLARE_DELAYED_SINGLETON(CoordinationDeviceManager);
 public:
     class Device {
     public:
-        Device(std::shared_ptr<IDevice> dev);
+        explicit Device(std::shared_ptr<IDevice> dev);
         int32_t GetId() const;
-        std::string GetName() const;
-        std::string GetDhid() const;
-        std::string GetNetworkId() const;
-        bool IsRemote() const;
-        int32_t GetProduct() const;
-        int32_t GetVendor() const;
-        std::string GetPhys() const;
-        std::string GetUniq() const;
+        IDevice::KeyboardType GetKeyboardType() const;
+        bool IsRemote();
         bool IsPointerDevice() const;
         bool IsKeyboard() const;
-        IDevice::KeyboardType GetKeyboardType() const;
 
     private:
         void Populate();
         std::string MakeNetworkId(const std::string &phys) const;
-        std::string GenerateDescriptor() const;
+        std::string GenerateDescriptor();
         std::string Sha256(const std::string &in) const;
-
-    private:
         std::shared_ptr<IDevice> device_ { nullptr };
-        std::string dhid_;
-        std::string networkId_;
+    public:
+        DeviceInfo deviceInfo_;
     };
 
 private:
     class DeviceObserver final : public IDeviceObserver {
     public:
-        DeviceObserver(CoordinationDeviceManager &cooDevMgr);
+        explicit DeviceObserver(CoordinationDeviceManager &cooDevMgr);
         ~DeviceObserver() = default;
         void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
         void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
@@ -71,7 +71,7 @@ private:
 public:
     void Init();
     std::shared_ptr<CoordinationDeviceManager::Device> GetDevice(int32_t id) const;
-    bool IsRemote(int32_t id) const;
+    bool IsRemote(int32_t id);
     std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const;
     std::vector<std::string> GetCoordinationDhids(const std::string &dhid) const;
     std::string GetOriginNetworkId(int32_t id) const;
@@ -83,50 +83,9 @@ private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
 
-private:
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
-
-inline int32_t CoordinationDeviceManager::Device::GetId() const
-{
-    return device_->GetId();
-}
-
-inline std::string CoordinationDeviceManager::Device::GetName() const
-{
-    return device_->GetName();
-}
-
-inline std::string CoordinationDeviceManager::Device::GetDhid() const
-{
-    return dhid_;
-}
-
-inline std::string CoordinationDeviceManager::Device::GetNetworkId() const
-{
-    return networkId_;
-}
-
-inline int32_t CoordinationDeviceManager::Device::GetProduct() const
-{
-    return device_->GetProduct();
-}
-
-inline int32_t CoordinationDeviceManager::Device::GetVendor() const
-{
-    return device_->GetVendor();
-}
-
-inline std::string CoordinationDeviceManager::Device::GetPhys() const
-{
-    return device_->GetPhys();
-}
-
-inline std::string CoordinationDeviceManager::Device::GetUniq() const
-{
-    return device_->GetUniq();
-}
 
 inline bool CoordinationDeviceManager::Device::IsPointerDevice() const
 {
