@@ -26,25 +26,23 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class CoordinationDeviceManager {
-struct DeviceInfo {
-    int32_t vendor;
-    int32_t product;
-    std::string dhid;
-    std::string name;
-    std::string phys;
-    std::string uniq;
-    std::string networkId;
-}; 
     DECLARE_DELAYED_SINGLETON(CoordinationDeviceManager);
 public:
     class Device {
     public:
         explicit Device(std::shared_ptr<IDevice> dev);
         int32_t GetId() const;
-        IDevice::KeyboardType GetKeyboardType() const;
+        std::string GetName() const;
+        std::string GetDhid() const;
+        std::string GetNetworkId() const;
         bool IsRemote();
+        int32_t GetProduct() const;
+        int32_t GetVendor() const;
+        std::string GetPhys() const;
+        std::string GetUniq() const;
         bool IsPointerDevice() const;
         bool IsKeyboard() const;
+        IDevice::KeyboardType GetKeyboardType() const;
 
     private:
         void Populate();
@@ -52,8 +50,8 @@ public:
         std::string GenerateDescriptor();
         std::string Sha256(const std::string &in) const;
         std::shared_ptr<IDevice> device_ { nullptr };
-    public:
-        DeviceInfo deviceInfo_;
+        std::string dhid_;
+        std::string networkId_;
     };
 
 private:
@@ -82,26 +80,9 @@ public:
 private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
-
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
-
-inline bool CoordinationDeviceManager::Device::IsPointerDevice() const
-{
-    return device_->IsPointerDevice();
-}
-
-inline IDevice::KeyboardType CoordinationDeviceManager::Device::GetKeyboardType() const
-{
-    return device_->GetKeyboardType();
-}
-
-inline bool CoordinationDeviceManager::Device::IsKeyboard() const
-{
-    return device_->IsKeyboard();
-}
-
 #define CooDevMgr ::OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
