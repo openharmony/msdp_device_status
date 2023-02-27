@@ -145,9 +145,8 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
             if (coordinationState_ != CoordinationState::STATE_FREE) {
-                auto dhids = CooDevMgr->GetCoordinationDhids(startDhid_);
                 DistributedAdapter->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                    dhids, [](bool isSuccess) {
+                    CooDevMgr->GetCoordinationDhids(startDhid_), [](bool isSuccess) {
                     FI_HILOGI("Failed to stop remote");
                 });
             }
@@ -163,8 +162,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
         Reset(true);
         return;
     }
-    std::string originNetworkId = CooDevMgr->GetOriginNetworkId(startDhid_);
-    if (originNetworkId == networkId) {
+    if (CooDevMgr->GetOriginNetworkId(startDhid_) == networkId) {
         Reset();
     }
 }
