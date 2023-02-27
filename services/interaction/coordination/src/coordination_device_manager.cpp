@@ -14,8 +14,8 @@
  */
 #include "coordination_device_manager.h"
 
-#include <regex>
 #include <openssl/sha.h>
+#include <regex>
 
 #include "coordination_event_manager.h"
 #include "coordination_sm.h"
@@ -32,6 +32,8 @@ const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
 const std::string SPLIT_SYMBOL { "|" };
 const std::string DH_ID_PREFIX { "Input_" };
 const std::string CONFIG_ITEM_KEYBOARD_TYPE { "Key.keyboard.type" };
+constexpr size_t NETWORK_ID_NUMS = 3;
+constexpr size_t DESCRIPTOR_INDEX = 2;
 } // namespace
 
 CoordinationDeviceManager::CoordinationDeviceManager() {}
@@ -125,7 +127,7 @@ std::string CoordinationDeviceManager::Device::MakeNetworkId(const std::string &
 {
     std::vector<std::string> idParts;
     StringSplit(phys, SPLIT_SYMBOL, idParts);
-    if (idParts.size() == 3) {
+    if (idParts.size() == NETWORK_ID_NUMS) {
         return idParts[1];
     }
     return EMPTYSTR;
@@ -139,17 +141,15 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
         FI_HILOGD("physicalPath:%{public}s", phys.c_str());
         std::vector<std::string> idParts;
         StringSplit(phys.c_str(), SPLIT_SYMBOL, idParts);
-        if (idParts.size() == 3) {
-            descriptor = idParts[2];
+        if (idParts.size() == NETWORK_ID_NUMS) {
+            descriptor = idParts[DESCRIPTOR_INDEX];
         }
         return descriptor;
     }
 
-    int32_t vendor = GetVendor();
     const std::string name = GetName();
     const std::string uniq = GetUniq();
-    int32_t product = GetProduct();
-    std::string rawDescriptor = StringPrintf(":%04x:%04x:", vendor, product);
+    std::string rawDescriptor = StringPrintf(":%04x:%04x:", GetVendor(), GetProduct());
 
     if (!uniq.empty()) {
         rawDescriptor += "uniqueId:" + uniq;
@@ -161,7 +161,7 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
         rawDescriptor += "name:" + std::regex_replace(name, std::regex(" "), "");
     }
     descriptor = DH_ID_PREFIX + Sha256(rawDescriptor);
-    FI_HILOGD("Created descriptor raw: %{public}s", rawDescriptor.c_str());
+    FI_HILOGD("Created descriptor raw:%{public}s", rawDescriptor.c_str());
     return descriptor;
 }
 
@@ -200,10 +200,7 @@ bool CoordinationDeviceManager::IsRemote(int32_t id)
 {
     CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
-        if (devIter->second == nullptr) {
-            FI_HILOGW("Device is nullptr");
-            return false;
-        }
+        CHKPF(devIter->second);
         return devIter->second->IsRemote();
     }
     return false;
@@ -215,7 +212,7 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
     std::vector<std::string> dhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
-        FI_HILOGD("Find pointer id failed");
+        FI_HILOGW("Cannot find pointer id:%{public}d", deviceId);
         return dhids;
     }
     if (devIter->second == nullptr) {
@@ -228,23 +225,20 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
         return dhids;
     }
     dhids.push_back(dev->GetDhid());
-    FI_HILOGD("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
+    FI_HILOGD("unq:%{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
 
     const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
     const auto pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
-    for (const auto &[id, dev]: devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("dev is nullptr");
-            continue;
-        }
+    for (const auto &[id, dev] : devices_) {
+        CHKPC(dev);
         const auto networkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
         if (networkId != pointerNetworkId) {
             continue;
         }
         if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(dev->GetDhid());
-            FI_HILOGD("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
+            FI_HILOGD("unq:%{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }
     return dhids;
@@ -254,10 +248,7 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(const s
 {
     int32_t deviceId { -1 };
     for (const auto &[id, dev] : devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("dev is nullptr");
-            continue;
-        }
+        CHKPC(dev);
         if (dev->GetDhid() == dhid) {
             deviceId = id;
             break;
@@ -271,13 +262,10 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     CALL_INFO_TRACE;
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
-        FI_HILOGE("Failed to search for the device: id %{public}d", id);
+        FI_HILOGE("Failed to search for the device:id %{public}d", id);
         return EMPTYSTR;
     }
-    if (devIter->second == nullptr) {
-        FI_HILOGW("Device is nullptr");
-        return EMPTYSTR;
-    }
+    CHKPS(devIter->second);
     auto networkId = devIter->second->GetNetworkId();
     if (networkId.empty()) {
         networkId = COORDINATION::GetLocalDeviceId();
@@ -289,17 +277,16 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
 {
     CALL_INFO_TRACE;
     if (dhid.empty()) {
+        FI_HILOGD("The current netWorkId is an empty string");
         return EMPTYSTR;
     }
     for (const auto &[id, dev] : devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("dev is nullptr");
-            continue;
-        }
+        CHKPC(dev);
         if (dev->IsRemote() && dev->GetDhid() == dhid) {
             return dev->GetNetworkId();
         }
     }
+    FI_HILOGD("The current netWorkId is an empty string");
     return EMPTYSTR;
 }
 
@@ -319,14 +306,13 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
 bool CoordinationDeviceManager::HasLocalPointerDevice() const
 {
     for (const auto &[id, dev] : devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("dev is nullptr");
-            continue;
-        }
+        CHKPC(dev);
         if (!dev->IsRemote() && dev->IsPointerDevice()) {
+            FI_HILOGD("It is currently a mouse device");
             return true;
         }
     }
+    FI_HILOGD("Not currently a mouse device");
     return false;
 }
 
@@ -340,7 +326,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     if (dev->IsKeyboard()) {
         CooSM->OnKeyboardOnline(dev->GetDhid());
     }
-    FI_HILOGD("add device %{public}d: %{public}s", device->GetId(), device->GetDevPath().c_str());
+    FI_HILOGD("add device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
     FI_HILOGD("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
     FI_HILOGD("  Network id:    \"%{public}s\"", dev->GetNetworkId().c_str());
     FI_HILOGD("  local/remote:  \"%{public}s\"", dev->IsRemote() ? "Remote Device" : "Local Device");
@@ -350,17 +336,17 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
 {
     CALL_INFO_TRACE;
     CHKPV(device);
-    auto tIter = devices_.find(device->GetId());
-    if (tIter == devices_.end()) {
+    auto iter = devices_.find(device->GetId());
+    if (iter == devices_.end()) {
         FI_HILOGE("The device corresponding to the current id:%{public}d cannot be found", device->GetId());
         return;
     }
-    CHKPV(tIter->second);
+    std::shared_ptr<Device> dev = iter->second;
+    CHKPV(dev);
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(tIter->second->GetDhid(), tIter->second->GetNetworkId(),
-            GetCoordinationDhids(tIter->second->GetId()));
+        CooSM->OnPointerOffline(dev->GetDhid(), dev->GetNetworkId(), GetCoordinationDhids(dev->GetId()));
     }
-    devices_.erase(tIter);
+    devices_.erase(iter);
 }
 
 CoordinationDeviceManager::DeviceObserver::DeviceObserver(CoordinationDeviceManager &cooDevMgr)
