@@ -50,6 +50,7 @@ public:
 
 private:
     void InitMsgHandler();
+    void DisconnectClient();
 
 private:
     std::mutex mutex_;

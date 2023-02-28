@@ -47,6 +47,15 @@ bool InteractionManagerImpl::InitClient()
     return true;
 }
 
+void InteractionManagerImpl::DisconnectClient()
+{
+    CALL_DEBUG_ENTER;
+    if (client_ != nullptr) {
+        client_->OnDisconnect();
+    }
+    client_ = nullptr;
+}
+
 void InteractionManagerImpl::InitMsgHandler()
 {
     CALL_DEBUG_ENTER;
@@ -204,7 +213,9 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
 int32_t InteractionManagerImpl::StopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.StopDrag(result);
+    int32_t ret = dragManagerImpl_.StopDrag(result);
+    DisconnectClient();
+    return ret;
 }
 
 int32_t InteractionManagerImpl::GetDragTargetPid()

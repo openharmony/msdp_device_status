@@ -65,7 +65,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     info.pixelFormat = Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
-    int32_t bufferSize = pixelMapWidth * pixelMapHeight;
+    int32_t bufferSize = pixelMap->GetByteCount();
     char *buffer = static_cast<char *>(malloc(bufferSize));
     if (buffer == nullptr) {
         FI_HILOGE("Malloc buffer failed");
