@@ -75,7 +75,6 @@ int32_t DragManagerImpl::GetDragTargetPid()
 int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t result;
     DragParam param;
     pkt >> param.displayX >> param.displayY >> param.result >> param.targetPid;
     if (pkt.ChkRWError()) {
