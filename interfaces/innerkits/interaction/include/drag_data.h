@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
-static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
+static const int32_t MAX_PIXEL_MAP_WIDTH = 600;
+static const int32_t MAX_PIXEL_MAP_HEIGHT = 600;
 static const int32_t MAX_BUFFER_SIZE = 512;
 struct PictureResourse {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
