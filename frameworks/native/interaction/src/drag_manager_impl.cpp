@@ -39,7 +39,7 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
     return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragParam &)> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -76,14 +76,15 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
 {
     CALL_DEBUG_ENTER;
     int32_t result;
-    pkt >> result;
+    DragParam param;
+    pkt >> param.displayX >> param.displayY >> param.result >> param.targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(result);
+    stopCallback_(param);
     StreamClient &streamClient = const_cast<StreamClient &>(client);
     streamClient.Stop();
     return RET_OK;

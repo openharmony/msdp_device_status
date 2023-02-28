@@ -75,7 +75,7 @@ int32_t InteractionManager::UpdateDragMessage(const std::u16string &message)
     return InteractionMgrImpl.UpdateDragMessage(message);
 }
 
-int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
+int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(const DragParam&)> callback)
 {
     return InteractionMgrImpl.StartDrag(dragData, callback);
 }

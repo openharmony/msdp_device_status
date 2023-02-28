@@ -93,6 +93,8 @@ int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
     dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
     dragData.pointerId = 0;
     dragData.dragNum = 1;
+    dragData.displayX = 0;
+    dragData.displayY = 0;
     return RET_OK;
 }
 
