@@ -102,13 +102,12 @@ int32_t DragManager::StopDrag(int32_t result)
     }
     dragState_ = DragState::FREE;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    dragParam_.result = result;
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
     INPUT_MANAGER->RemoveMonitor(monitorId_);
-    NotifyDragResult();
+    NotifyDragResult(result);
     return RET_OK;
 }
 
@@ -117,11 +116,13 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::NotifyDragResult()
+int32_t DragManager::NotifyDragResult(int32_t result)
 {
     CALL_DEBUG_ENTER;
+    DragData dragData = DataAdapter.GetDragData();
+    int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
-    pkt << dragParam_.displayX << dragParam_.displayY << dragParam_.result << dragParam_.targetPid;
+    pkt << dragData.displayX << dragData.displayY << result << targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
@@ -168,9 +169,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerItem.GetTargetWindowId());
-    dragParam_.displayX = pointerItem.GetDisplayX();
-    dragParam_.displayX = pointerItem.GetDisplayY();
-    dragParam_.targetPid = dragTargetPid_;
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const

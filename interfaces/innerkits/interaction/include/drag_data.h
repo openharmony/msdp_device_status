@@ -47,8 +47,8 @@ struct DragData {
 struct DragParam {
     int32_t displayX { 0 };
     int32_t displayY { 0 };
-    int32_t result { 0 };
-    int32_t targetPid { 0 };
+    int32_t result { -1 };
+    int32_t targetPid { -1 };
 };
 
 enum class DragState {

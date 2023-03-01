@@ -57,7 +57,7 @@ public:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 private:
-    int32_t NotifyDragResult();
+    int32_t NotifyDragResult(int32_t result);
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
 private:
     StateChangeNotify stateNotify_;
@@ -66,7 +66,6 @@ private:
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
-    DragParam dragParam_;
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
