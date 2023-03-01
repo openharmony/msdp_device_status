@@ -65,7 +65,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     info.pixelFormat = Media::PixelFormat::RGB_888;
     info.colorSpace = OHOS::Media::ColorSpace::SRGB;
     pixelMap->SetImageInfo(info);
-    int32_t bufferSize = pixelMapWidth * pixelMapHeight;
+    int32_t bufferSize = pixelMap->GetByteCount();
     char *buffer = static_cast<char *>(malloc(bufferSize));
     if (buffer == nullptr) {
         FI_HILOGE("Malloc buffer failed");
@@ -259,7 +259,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    int32_t ret = SetParam(200, 200, dragData);
+    int32_t ret = SetParam(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT, dragData);
     ASSERT_EQ(ret, RET_OK);
     std::function<void(int32_t)> callback = [](int32_t result) {
         FI_HILOGD("StartDrag success");
