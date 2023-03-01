@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#include <iostream>
+#include <condition_variable>
+#include <mutex>
 
 #include <gtest/gtest.h>
 #include "pointer_event.h"
@@ -30,6 +31,9 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
+static std::mutex dragMutex;
+static std::condition_variable dragCondition;
+static std::unique_lock<std::mutex> dragLock(dragMutex);
 } // namespace
 class InteractionManagerTest : public testing::Test {
 public:
@@ -266,6 +270,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
     std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
             dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
+        dragCondition.notify_all();
     };
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
@@ -282,6 +287,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level
     CALL_TEST_DEBUG;
     int32_t result = 0;
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
+    dragCondition.wait(dragLock);
     ASSERT_EQ(ret, RET_OK);
 }
 
