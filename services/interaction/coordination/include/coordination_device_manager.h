@@ -80,7 +80,7 @@ public:
 private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
-    std::weak_ptr<DeviceObserver> devObserver_ { nullptr };
+    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
 #define CooDevMgr ::OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
