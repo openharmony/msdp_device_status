@@ -270,6 +270,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
     std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
             dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
+        dragLock.unlock();
         dragCondition.notify_all();
     };
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
