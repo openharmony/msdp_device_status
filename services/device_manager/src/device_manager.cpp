@@ -251,14 +251,16 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
     FI_HILOGI("  is keyboard:   %{public}s", dev->IsKeyboard() ? "True" : "False");
 
     for (auto observer : observers_) {
-        observer->OnDeviceAdded(dev);
+        std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        ptr->OnDeviceAdded(dev);
     }
 }
 
 void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
     for (auto observer : observers_) {
-        observer->OnDeviceRemoved(dev);
+        std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        ptr->OnDeviceRemoved(dev);
     }
 }
 
@@ -374,7 +376,7 @@ int32_t DeviceManager::RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(
     return RET_OK;
 }
 
-void DeviceManager::RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer)
+void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
@@ -385,21 +387,22 @@ void DeviceManager::RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer)
     }
 }
 
-int32_t DeviceManager::OnRetriggerHotplug(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);
+    std::shared_ptr<IDeviceObserver> ptr = observer.lock();
     std::for_each(devices_.cbegin(), devices_.cend(),
-        [observer] (const auto &item) {
+        [ptr] (const auto &item) {
             if (item.second != nullptr) {
-                observer->OnDeviceAdded(item.second);
+                ptr->OnDeviceAdded(item.second);
             }
         }
     );
     return RET_OK;
 }
 
-int32_t DeviceManager::AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
@@ -411,7 +414,7 @@ int32_t DeviceManager::AddDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     return ret;
 }
 
-int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);
@@ -422,7 +425,7 @@ int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> obse
     return RET_OK;
 }
 
-void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
@@ -433,7 +436,7 @@ void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     }
 }
 
-int32_t DeviceManager::OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);

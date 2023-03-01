@@ -31,6 +31,16 @@ public:
     virtual void OnDeviceAdded(std::shared_ptr<IDevice>) = 0;
     virtual void OnDeviceRemoved(std::shared_ptr<IDevice>) = 0;
 };
+
+inline bool operator<(std::weak_ptr<IDeviceObserver> ptr1, std::weak_ptr<IDeviceObserver> ptr2)
+{
+    return (ptr1.lock() < ptr2.lock());
+}
+
+inline bool operator==(const std::weak_ptr<IDeviceObserver> ptr1, std::nullptr_t) noexcept
+{
+    return (ptr1.lock() == nullptr);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

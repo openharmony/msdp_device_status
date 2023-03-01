@@ -47,9 +47,9 @@ public:
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
     std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
-    int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
-    void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) override;
-    void RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer) override;
+    int32_t AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer) override;
+    void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) override;
+    void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) override;
 
 private:
     class HotplugHandler final : public IDeviceMgr
@@ -79,9 +79,9 @@ private:
     void OnDeviceAdded(std::shared_ptr<IDevice> dev);
     void OnDeviceRemoved(std::shared_ptr<IDevice> dev);
 
-    int32_t OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
-    int32_t OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer);
-    int32_t OnRetriggerHotplug(std::shared_ptr<IDeviceObserver> observer);
+    int32_t OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
+    int32_t OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
+    int32_t OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer);
     
     int32_t EpollCreate();
     int32_t EpollAdd(IEpollEventSource *source);
@@ -97,7 +97,7 @@ private:
     Enumerator enumerator_;
     Monitor monitor_;
     HotplugHandler hotplug_;
-    std::set<std::shared_ptr<IDeviceObserver>> observers_;
+    std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
 
