@@ -95,7 +95,7 @@ public:
      * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragParam &)> callback);
+    int32_t StartDrag(const DragData &dragData, std::function<void(const DragParam&)> callback);
 
     /**
      * @brief 结束拖拽。

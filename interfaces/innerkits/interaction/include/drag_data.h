@@ -40,13 +40,13 @@ struct DragData {
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };
-    int32_t displayX { 0 };
-    int32_t displayY { 0 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
 };
 
 struct DragParam {
-    int32_t displayX { 0 };
-    int32_t displayY { 0 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
     int32_t result { -1 };
     int32_t targetPid { -1 };
 };
