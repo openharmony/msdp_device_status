@@ -13,7 +13,11 @@
  * limitations under the License.
  */
 
+#include <utility>
+#include <vector>
+
 #include <gtest/gtest.h>
+#include "input_manager.h"
 #include "pointer_event.h"
 
 #include "coordination_message.h"
@@ -29,6 +33,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 static bool stopCallbackFlag { false };
+static int32_t dragSrcX { 0 };
+static int32_t dragSrcY { 0 };
+static int32_t dragDstX { 50 };
+static int32_t dragDstY { 50 };
+#define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 class InteractionManagerTest : public testing::Test {
 public:
@@ -78,7 +87,7 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     return RET_OK;
 }
 
-int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
+int32_t SetParam(int32_t width, int32_t height, DragData& dragData, int32_t sourceType)
 {
     auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
@@ -89,12 +98,86 @@ int32_t SetParam(int32_t width, int32_t height, DragData& dragData)
     dragData.pictureResourse.x = 0;
     dragData.pictureResourse.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
-    dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
+    dragData.sourceType = sourceType;
     dragData.pointerId = 0;
     dragData.dragNum = 1;
-    dragData.displayX = 0;
-    dragData.displayY = 0;
+    dragData.displayX = dragSrcX;
+    dragData.displayY = dragSrcY;
     return RET_OK;
+}
+
+
+std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
+    std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool pressed)
+{
+    int32_t displayX = displayLoc.first;
+    int32_t displayY = displayLoc.second;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    CHKPP(pointerEvent);
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    item.SetPressure(5);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+
+    item.SetPointerId(1);
+    item.SetDisplayX(623);
+    item.SetDisplayY(823); 
+    item.SetPressure(5);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(action);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetSourceType(sourceType);
+    item.SetPressed(pressed);
+    return pointerEvent;
+}
+
+void SimulateDown(std::pair<int, int> loc, int32_t sourceType, int32_t pointerId)
+{
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = 
+        SetupPointerEvent(loc, MMI::PointerEvent::POINTER_ACTION_DOWN, sourceType, pointerId, true);
+    INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+}
+
+void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc, int32_t sourceType, int32_t pointerId, bool isPressed)
+{
+    int32_t srcX = srcLoc.first;
+    int32_t srcY = srcLoc.second;
+    int32_t dstX = dstLoc.first;
+    int32_t dstY = dstLoc.second;
+    std::vector<std::pair<int32_t, int32_t>> pointers;
+    if (dstX - srcX == 0) {
+        for (int32_t y = srcY; y <= dstY; y++) {
+            pointers.push_back({srcX, y});
+        }
+    } else if (dstY - srcY == 0) {
+        for (int32_t x = srcX; x <= dstX; x++) {
+            pointers.push_back({x, srcY});
+        }
+    } else {
+        double slope = static_cast<double>(dstY - srcY) / (dstX - srcX);
+        for (int32_t x = srcX; x < dstX; x++) {
+            pointers.push_back({x, srcY + static_cast<int32_t>(slope * (x - srcX))});
+        }
+        pointers.push_back({dstX, dstY});
+    }
+    for (const auto& pointer : pointers) {
+        std::shared_ptr<MMI::PointerEvent> pointerEvent = 
+        SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE,sourceType, pointerId, isPressed);
+        INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+        sleep(1);
+    }
+}
+
+void SimulateUp(std::pair<int, int> loc, int32_t sourceType, int32_t pointerId)
+{
+    std::shared_ptr<MMI::PointerEvent> pointerEvent = 
+    SetupPointerEvent(loc, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
+    INPUT_MANAGER->SimulateInputEvent(pointerEvent);
 }
 
 /**
@@ -251,40 +334,86 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 }
 
 /**
- * @tc.name: InteractionManagerTest_StartDrag
+ * @tc.name: InteractionManagerTest_StartDrag_Mouse
  * @tc.desc: Start Drag
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    int32_t ret = SetParam(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT, dragData);
+    int32_t ret = SetParam(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT, dragData, MMI::PointerEvent::SOURCE_TYPE_MOUSE);
     ASSERT_EQ(ret, RET_OK);
+    stopCallbackFlag = false;
     std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
             dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
-            stopCallbackFlag = true;
+        stopCallbackFlag = true;
     };
+    SimulateDown({dragSrcX, dragSrcY}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0);
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    SimulateMove({dragSrcX, dragSrcY}, {dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, true);
     ASSERT_EQ(ret, RET_OK);
 }
 
 /**
- * @tc.name: InteractionManagerTest_StopDrag
+ * @tc.name: InteractionManagerTest_StopDrag_Mouse
  * @tc.desc: Stop drag
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t result = 0;
+    SimulateUp({dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InteractionManagerTest_StartDrag_Touch
+ * @tc.desc: Start Drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragData dragData;
+    int32_t ret = SetParam(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT, dragData,
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_EQ(ret, RET_OK);
+    stopCallbackFlag = false;
+    std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
+            dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
+        stopCallbackFlag = true;
+    };
+    SimulateDown({dragSrcX, dragSrcY}, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, 0);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
+    SimulateMove({dragSrcX, dragSrcY}, {dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, 0, true);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_StopDrag_Touch
+ * @tc.desc: Stop drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t result = 0;
+    SimulateUp({dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, 0);
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
+    ASSERT_TRUE(stopCallbackFlag);
+    ASSERT_EQ(ret, RET_OK);
+}
+
 
  /**
 *  @tc.name: InteractionManagerTest_GetDragTargetPid
