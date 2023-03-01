@@ -173,14 +173,14 @@ std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) con
     SHA256_Update(&ctx, in.data(), in.size());
     SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
     
-    constexpr int32_t WIDTH = 4;
-    constexpr unsigned char MASK = 0x0F;
+    constexpr int32_t width = 4;
+    constexpr unsigned char mask = 0x0F;
     const char* hexCode = "0123456789abcdef";
     constexpr int32_t DOUBLE_TIMES = 2;
     for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
         unsigned char value = out[SHA256_DIGEST_LENGTH + i];
-        out[i * DOUBLE_TIMES] = hexCode[(value >> WIDTH) & MASK];
-        out[i * DOUBLE_TIMES + 1] = hexCode[value & MASK];
+        out[i * DOUBLE_TIMES] = hexCode[(value >> width) & mask];
+        out[i * DOUBLE_TIMES + 1] = hexCode[value & mask];
     }
     out[SHA256_DIGEST_LENGTH * DOUBLE_TIMES] = 0;
     return reinterpret_cast<char*>(out);
@@ -228,11 +228,11 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
     FI_HILOGD("unq:%{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
 
     const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
-    const auto pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
+    const std::string pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
-        const auto networkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
+        const std::string networkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
         if (networkId != pointerNetworkId) {
             continue;
         }
