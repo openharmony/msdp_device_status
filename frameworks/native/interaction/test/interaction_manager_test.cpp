@@ -263,8 +263,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag, TestSize.Leve
     DragData dragData;
     int32_t ret = SetParam(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT, dragData);
     ASSERT_EQ(ret, RET_OK);
-    std::function<void(int32_t)> callback = [](int32_t result) {
-        FI_HILOGD("StartDrag success");
+    std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
+            dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
     };
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
