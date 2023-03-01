@@ -252,6 +252,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 
     for (auto observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        CHKPC(ptr);
         ptr->OnDeviceAdded(dev);
     }
 }
@@ -260,6 +261,7 @@ void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
     for (auto observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        CHKPC(ptr);
         ptr->OnDeviceRemoved(dev);
     }
 }
@@ -392,6 +394,7 @@ int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observe
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);
     std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+    CHKPR(ptr, RET_ERR);
     std::for_each(devices_.cbegin(), devices_.cend(),
         [ptr] (const auto &item) {
             if (item.second != nullptr) {
