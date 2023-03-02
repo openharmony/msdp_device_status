@@ -31,9 +31,9 @@ public:
     IDeviceManager() = default;
     virtual ~IDeviceManager() = default;
     virtual std::shared_ptr<IDevice> GetDevice(int32_t id) const = 0;
-    virtual int32_t AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void RetriggerHotplug(std::shared_ptr<IDeviceObserver> observer) = 0;
+    virtual int32_t AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
+    virtual void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
+    virtual void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
