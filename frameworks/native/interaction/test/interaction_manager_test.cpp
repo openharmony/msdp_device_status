@@ -35,8 +35,8 @@ constexpr int32_t TIME_WAIT_FOR_OP = 100;
 static bool stopCallbackFlag { false };
 static int32_t dragSrcX { 0 };
 static int32_t dragSrcY { 0 };
-static int32_t dragDstX { 50 };
-static int32_t dragDstY { 50 };
+static int32_t dragDstX { 10 };
+static int32_t dragDstY { 10 };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 class InteractionManagerTest : public testing::Test {

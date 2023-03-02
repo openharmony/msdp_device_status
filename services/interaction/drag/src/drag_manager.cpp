@@ -189,6 +189,7 @@ OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
     OHOS::MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
     extraData.sourceType = dragData.sourceType;
+    extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
     return extraData;
 }
