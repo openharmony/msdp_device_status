@@ -141,13 +141,17 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    auto pointerAction = pointerEvent->GetPointerAction();
+    int32_t sourceType = pointerEvent->GetSourceType();
+    int32_t pointerId = pointerEvent->GetPointerId();
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+            sourceType, pointerId, pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         OnDragUp(pointerEvent);
     } else {
-        FI_HILOGW("Unknow pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        FI_HILOGD("Unknow pointerAction, pointerAction:%{public}d", pointerAction);
     }
 }
 
@@ -169,6 +173,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerItem.GetTargetWindowId());
+    FI_HILOGD("dragTargetPid_:%{public}d", dragTargetPid_);
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
@@ -185,12 +190,14 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEven
 
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
 {
+    CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
     OHOS::MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
     extraData.sourceType = dragData.sourceType;
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
+    FI_HILOGD("sourceType:%{public}d,pointerId:%{public}d", extraData.sourceType, extraData.pointerId);
     return extraData;
 }
 
