@@ -446,8 +446,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragTargetPid, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
-    ASSERT_TRUE(pid >= -1);
+    int32_t targetPid = InteractionManager::GetInstance()->GetDragTargetPid();
+    FI_HILOGD("targetPid:%{public}d", targetPid);
+    ASSERT_TRUE(targetPid > -1);
 }
 
 } // namespace DeviceStatus
