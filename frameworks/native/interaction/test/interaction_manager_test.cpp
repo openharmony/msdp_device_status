@@ -375,7 +375,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     SimulateDown({ dragSrcX, dragSrcY }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
     ASSERT_EQ(ret, RET_OK);
-    SimulateMove({ dragSrcX, dragSrcY }, {dragDstX, dragDstY},
+    SimulateMove({ dragSrcX, dragSrcY }, { dragDstX, dragDstY },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId, true);
 }
 
@@ -389,7 +389,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t result = 0;
-    SimulateUp({dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
+    SimulateUp({ dragDstX, dragDstY }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
@@ -416,7 +416,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     };
     SimulateDown({ dragSrcX, dragSrcY }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
     ret = InteractionManager::GetInstance()->StartDrag(dragData, callback);
-    SimulateMove({ dragSrcX, dragSrcY }, {dragDstX, dragDstY},
+    SimulateMove({ dragSrcX, dragSrcY }, { dragDstX, dragDstY },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId, true);
     ASSERT_EQ(ret, RET_OK);
 }
@@ -431,7 +431,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t result = 0;
-    SimulateUp({dragDstX, dragDstY}, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
+    SimulateUp({ dragDstX, dragDstY }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
