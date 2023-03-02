@@ -170,9 +170,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     INPUT_MANAGER->SetPointerVisible(true);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
-    MMI::PointerEvent::PointerItem pointerItem;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerItem.GetTargetWindowId());
+    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("dragTargetPid_:%{public}d", dragTargetPid_);
 }
 
