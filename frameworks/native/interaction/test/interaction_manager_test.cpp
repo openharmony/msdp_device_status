@@ -108,7 +108,7 @@ int32_t SetParam(int32_t width, int32_t height, DragData& dragData, int32_t sour
 
 
 std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
-    std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool pressed)
+    std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
     int32_t displayX = displayLoc.first;
     int32_t displayY = displayLoc.second;
@@ -123,8 +123,8 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);
-    item.SetDisplayX(623);
-    item.SetDisplayY(823); 
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY); 
     item.SetPressure(5);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
@@ -132,7 +132,7 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     pointerEvent->SetPointerAction(action);
     pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetSourceType(sourceType);
-    item.SetPressed(pressed);
+    item.SetPressed(isPressed);
     return pointerEvent;
 }
 
@@ -150,11 +150,11 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc, int32_
     int32_t dstX = dstLoc.first;
     int32_t dstY = dstLoc.second;
     std::vector<std::pair<int32_t, int32_t>> pointers;
-    if (dstX - srcX == 0) {
+    if (dstX == srcX) {
         for (int32_t y = srcY; y <= dstY; y++) {
             pointers.push_back({srcX, y});
         }
-    } else if (dstY - srcY == 0) {
+    } else if (dstY == srcY) {
         for (int32_t x = srcX; x <= dstX; x++) {
             pointers.push_back({x, srcY});
         }
@@ -165,7 +165,7 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc, int32_
         }
         pointers.push_back({dstX, dstY});
     }
-    for (const auto& pointer : pointers) {
+    for (const auto& pointer : pointers) {                                                          
         std::shared_ptr<MMI::PointerEvent> pointerEvent = 
         SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE,sourceType, pointerId, isPressed);
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
