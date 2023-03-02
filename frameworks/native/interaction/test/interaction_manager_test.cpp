@@ -185,7 +185,7 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc,
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
-        sleep(1);
+        usleep(10000);
     }
 }
 
