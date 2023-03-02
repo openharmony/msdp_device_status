@@ -32,6 +32,7 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
+constexpr int32_t TIME_WAIT_FOR_INJECT = 10000;
 static int32_t mousePointerId { 0 };
 static int32_t touchPointerId { 1 };
 static bool stopCallbackFlag { false };
@@ -137,9 +138,9 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
         item.SetPointerId(pointerId);
         item.SetDisplayX(displayX + 1);
         item.SetDisplayY(displayY + 1);
-        item.SetPressure(7);
+        item.SetPressure(1);
         item.SetDeviceId(1);
-        isPressed ? item.SetPressure(5) : item.SetPressed(0);
+        isPressed ? item.SetPressure(1) : item.SetPressed(0);
         pointerEvent->AddPointerItem(item);
     }
     return pointerEvent;
@@ -148,10 +149,10 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
 void SimulateDown(std::pair<int, int> loc, int32_t sourceType, int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<MMI::PointerEvent> pointerEvent = 
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =
         SetupPointerEvent(loc, MMI::PointerEvent::POINTER_ACTION_DOWN, sourceType, pointerId, true);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-            pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
     INPUT_MANAGER->SimulateInputEvent(pointerEvent);
 }
 
@@ -180,20 +181,20 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc,
         pointers.push_back({dstX, dstY});
     }
     for (const auto& pointer : pointers) {                                                          
-        std::shared_ptr<MMI::PointerEvent> pointerEvent = 
-        SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE,sourceType, pointerId, isPressed);
+        std::shared_ptr<MMI::PointerEvent> pointerEvent =
+            SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE,sourceType, pointerId, isPressed);
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
-        usleep(10000);
+        usleep(TIME_WAIT_FOR_INJECT);
     }
 }
 
 void SimulateUp(std::pair<int, int> loc, int32_t sourceType, int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<MMI::PointerEvent> pointerEvent = 
-    SetupPointerEvent(loc, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =
+        SetupPointerEvent(loc, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
     INPUT_MANAGER->SimulateInputEvent(pointerEvent);
