@@ -101,6 +101,7 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
+    dragTargetPid_ = -1;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed, monitorId_:%{public}d", monitorId_);
