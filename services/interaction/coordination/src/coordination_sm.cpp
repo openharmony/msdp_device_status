@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include "hitrace_meter.h"
 #include "input_manager.h"
 
+#include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
@@ -65,8 +66,7 @@ void CoordinationSM::Init()
         this->InitDeviceManager();
         CooSoftbusAdapter->Init();
     });
-    devObserver_ = std::make_shared<DeviceObserver>();
-    context->GetDeviceManager().AddDeviceObserver(devObserver_);
+    CooDevMgr->Init();
 }
 
 void CoordinationSM::OnSessionLost(SessionPtr session)
@@ -93,9 +93,7 @@ void CoordinationSM::Reset(const std::string &networkId)
         }
     }
     if (coordinationState_ == CoordinationState::STATE_IN) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
-        std::string sinkNetwoekId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
+        std::string sinkNetwoekId = CooDevMgr->GetOriginNetworkId(startDhid_);
         if (networkId != sinkNetwoekId) {
             needReset = false;
         }
@@ -113,9 +111,7 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
     srcNetworkId_ = "";
     currentStateSM_ = std::make_shared<CoordinationStateFree>();
     coordinationState_ = CoordinationState::STATE_FREE;
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPV(context);
-    bool hasPointer = context->GetDeviceManager().HasLocalPointerDevice();
+    bool hasPointer = CooDevMgr->HasLocalPointerDevice();
     if (hasPointer && adjustAbsolutionLocation) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     } else {
@@ -149,11 +145,8 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
             if (coordinationState_ != CoordinationState::STATE_FREE) {
-                auto* context = CoordinationEventMgr->GetIContext();
-                CHKPV(context);
-                auto dhids = context->GetDeviceManager().GetCoordinationDhids(startDhid_);
                 DistributedAdapter->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                    dhids, [](bool isSuccess) {
+                    CooDevMgr->GetCoordinationDhids(startDhid_), [](bool isSuccess) {
                     FI_HILOGI("Failed to stop remote");
                 });
             }
@@ -169,10 +162,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
         Reset(true);
         return;
     }
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPV(context);
-    std::string originNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
-    if (originNetworkId == networkId) {
+    if (CooDevMgr->GetOriginNetworkId(startDhid_) == networkId) {
         Reset();
     }
 }
@@ -207,8 +197,7 @@ void CoordinationSM::EnableCoordination(bool enabled)
     }
 }
 
-int32_t CoordinationSM::StartCoordination(
-    const std::string &remoteNetworkId, int32_t startDeviceId)
+int32_t CoordinationSM::StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -244,9 +233,7 @@ int32_t CoordinationSM::StopCoordination()
     isStopping_ = true;
     std::string stopNetworkId = "";
     if (coordinationState_ == CoordinationState::STATE_IN) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPR(context, ERROR_NULL_POINTER);
-        stopNetworkId = context->GetDeviceManager().GetOriginNetworkId(startDhid_);
+        stopNetworkId = CooDevMgr->GetOriginNetworkId(startDhid_);
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
         stopNetworkId = srcNetworkId_;
@@ -368,14 +355,12 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
         FI_HILOGE("Start distributed fail, startDevice: %{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
-        startDhid_ = context->GetDeviceManager().GetDhid(startDeviceId);
+        startDhid_ = CooDevMgr->GetDhid(startDeviceId);
         NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             UpdateState(CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
-            std::string sink = context->GetDeviceManager().GetOriginNetworkId(startDeviceId);
+            std::string sink = CooDevMgr->GetOriginNetworkId(startDeviceId);
             if (!sink.empty() && remoteNetworkId != sink) {
                 CooSoftbusAdapter->StartCoordinationOtherResult(sink, remoteNetworkId);
             }
@@ -397,9 +382,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
     }
     NotifyRemoteStopFinish(isSuccess, remoteNetworkId);
     if (isSuccess) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
-        if (context->GetDeviceManager().HasLocalPointerDevice()) {
+        if (CooDevMgr->HasLocalPointerDevice()) {
             SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
@@ -453,8 +436,7 @@ bool CoordinationSM::UpdateMouseLocation()
     }
     int32_t xPercent = displayX_ * MOUSE_ABS_LOCATION / width;
     int32_t yPercent = displayY_ * MOUSE_ABS_LOCATION / height;
-    FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, "
-        "physicalX: %{public}d, physicalY: %{public}d,",
+    FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, ""physicalX: %{public}d, physicalY: %{public}d,",
         width, height, displayX_, displayY_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;
@@ -481,8 +463,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
             break;
         }
         case CoordinationState::STATE_OUT: {
-            auto* context = CoordinationEventMgr->GetIContext();
-            CHKPV(context);
             OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
             currentStateSM_ = std::make_shared<CoordinationStateOut>(startDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
@@ -551,11 +531,11 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::string
         Reset();
         return;
     }
-    if (coordinationState_ == CoordinationState::STATE_IN && startDhid_ == dhid) {
+    if ((coordinationState_ == CoordinationState::STATE_IN) && (startDhid_ == dhid)) {
         Reset();
         return;
     }
-    if (coordinationState_ == CoordinationState::STATE_OUT && startDhid_ == dhid) {
+    if ((coordinationState_ == CoordinationState::STATE_OUT) && (startDhid_ == dhid)) {
         std::string src = srcNetworkId_;
         if (src.empty()) {
             src = preparedNetworkId_.first;
@@ -588,8 +568,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     onlineDevice_.push_back(networkId);
-    DProfileAdapter->RegisterCrossingStateListener(networkId,
-        std::bind(&CoordinationSM::OnCoordinationChanged,
+    DProfileAdapter->RegisterCrossingStateListener(networkId, std::bind(&CoordinationSM::OnCoordinationChanged,
         CooSM, std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -678,8 +657,7 @@ void CoordinationSM::RemoveInterceptor()
     }
 }
 
-bool CoordinationSM::IsNeedFilterOut(const std::string &deviceId,
-    const std::shared_ptr<MMI::KeyEvent> keyEvent)
+bool CoordinationSM::IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
@@ -705,28 +683,24 @@ void CoordinationSM::DeviceInitCallBack::OnRemoteDied()
     CALL_INFO_TRACE;
 }
 
-void CoordinationSM::DmDeviceStateCallback::OnDeviceOnline(
-    const DistributedHardware::DmDeviceInfo &deviceInfo)
+void CoordinationSM::DmDeviceStateCallback::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
     CooSM->OnDeviceOnline(deviceInfo.deviceId);
 }
 
-void CoordinationSM::DmDeviceStateCallback::OnDeviceOffline(
-    const DistributedHardware::DmDeviceInfo &deviceInfo)
+void CoordinationSM::DmDeviceStateCallback::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
     CooSM->OnDeviceOffline(deviceInfo.deviceId);
 }
 
-void CoordinationSM::DmDeviceStateCallback::OnDeviceChanged(
-    const DistributedHardware::DmDeviceInfo &deviceInfo)
+void CoordinationSM::DmDeviceStateCallback::OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
 }
 
-void CoordinationSM::DmDeviceStateCallback::OnDeviceReady(
-    const DistributedHardware::DmDeviceInfo &deviceInfo)
+void CoordinationSM::DmDeviceStateCallback::OnDeviceReady(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
 }
@@ -748,25 +722,6 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
     OHOS::MMI::InputManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
 }
 
-void CoordinationSM::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
-{
-    CHKPV(device);
-    if (device->IsKeyboard()) {
-        CooSM->OnKeyboardOnline(device->GetDhid());
-    }
-}
-
-void CoordinationSM::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> device)
-{
-    CHKPV(device);
-    if (device->IsPointerDevice()) {
-        auto *context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
-        CooSM->OnPointerOffline(device->GetDhid(), device->GetNetworkId(),
-            context->GetDeviceManager().GetCoordinationDhids(device->GetId()));
-    }
-}
-
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
     CALL_DEBUG_ENTER;
@@ -780,11 +735,9 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
     }
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
         int32_t deviceId = keyEvent->GetDeviceId();
-        if (context->GetDeviceManager().IsRemote(deviceId)) {
-            auto networkId = context->GetDeviceManager().GetOriginNetworkId(deviceId);
+        if (CooDevMgr->IsRemote(deviceId)) {
+            auto networkId = CooDevMgr->GetOriginNetworkId(deviceId);
             if (!CooSM->IsNeedFilterOut(networkId, keyEvent)) {
                 keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
                 MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
@@ -805,10 +758,8 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
     CHKPV(pointerEvent);
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_OUT) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
-        std::string dhid = context->GetDeviceManager().GetDhid(deviceId);
+        std::string dhid = CooDevMgr->GetDhid(deviceId);
         if (CooSM->startDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
             CHKPV(CooSM->currentStateSM_);
@@ -840,10 +791,8 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
     }
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
-        auto* context = CoordinationEventMgr->GetIContext();
-        CHKPV(context);
         int32_t deviceId = pointerEvent->GetDeviceId();
-        if (!context->GetDeviceManager().IsRemote(deviceId)) {
+        if (!CooDevMgr->IsRemote(deviceId)) {
             CHKPV(CooSM->currentStateSM_);
             CooSM->StopCoordination();
         }

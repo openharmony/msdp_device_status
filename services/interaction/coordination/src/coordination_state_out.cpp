@@ -15,12 +15,13 @@
 
 #include "coordination_state_out.h"
 
+#include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
-#include "distributed_input_adapter.h"
 #include "coordination_sm.h"
 #include "coordination_util.h"
+#include "distributed_input_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -58,9 +59,7 @@ void CoordinationStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = COORDINATION::GetLocalDeviceId();
-    auto* context = CoordinationEventMgr->GetIContext();
-    CHKPV(context);
-    std::vector<std::string> dhids = context->GetDeviceManager().GetCoordinationDhids(startDhid_);
+    std::vector<std::string> dhids = CooDevMgr->GetCoordinationDhids(startDhid_);
     if (dhids.empty()) {
         CooSM->OnStopFinish(false, srcNetworkId);
     }

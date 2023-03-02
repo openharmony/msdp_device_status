@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -93,11 +93,6 @@ class CoordinationSM final {
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
 
-    class DeviceObserver : public IDeviceObserver {
-        virtual void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
-        virtual void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
-    };
-
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
@@ -164,7 +159,6 @@ private:
     bool UpdateMouseLocation();
 
 private:
-    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;

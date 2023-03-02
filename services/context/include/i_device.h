@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,13 +53,6 @@ public:
     virtual int32_t GetVendor() const = 0;
     virtual std::string GetPhys() const = 0;
     virtual std::string GetUniq() const = 0;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    virtual std::string GetDhid() const = 0;
-    virtual std::string GetNetworkId() const = 0;
-    virtual bool IsRemote() const = 0;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
     virtual KeyboardType GetKeyboardType() const = 0;
     virtual bool IsPointerDevice() const = 0;
     virtual bool IsKeyboard() const = 0;

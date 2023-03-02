@@ -23,12 +23,12 @@
 #include <sys/epoll.h>
 #include <sys/stat.h>
 
-#include "devicestatus_define.h"
-#include "fi_log.h"
-#include "device.h"
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_util.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+#include "device.h"
+#include "devicestatus_define.h"
+#include "fi_log.h"
 #include "napi_constants.h"
 
 namespace OHOS {
@@ -247,23 +247,22 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
     FI_HILOGI("  name:          \"%{public}s\"", dev->GetName().c_str());
     FI_HILOGI("  location:      \"%{public}s\"", dev->GetPhys().c_str());
     FI_HILOGI("  unique id:     \"%{public}s\"", dev->GetUniq().c_str());
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    FI_HILOGI("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
-    FI_HILOGI("  Network id:    \"%{public}s\"", dev->GetNetworkId().c_str());
-    FI_HILOGI("  local/remote:  \"%{public}s\"", dev->IsRemote() ? "Remote Device" : "Local Device");
-#endif // OHOS_BUILD_ENABLE_COORDINATION
     FI_HILOGI("  is pointer:    %{public}s", dev->IsPointerDevice() ? "True" : "False");
     FI_HILOGI("  is keyboard:   %{public}s", dev->IsKeyboard() ? "True" : "False");
 
     for (auto observer : observers_) {
-        observer->OnDeviceAdded(dev);
+        std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        CHKPC(ptr);
+        ptr->OnDeviceAdded(dev);
     }
 }
 
 void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
     for (auto observer : observers_) {
-        observer->OnDeviceRemoved(dev);
+        std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+        CHKPC(ptr);
+        ptr->OnDeviceRemoved(dev);
     }
 }
 
@@ -379,7 +378,34 @@ int32_t DeviceManager::RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(
     return RET_OK;
 }
 
-int32_t DeviceManager::AddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
+{
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+        std::bind(&DeviceManager::OnRetriggerHotplug, this, observer));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post task failed");
+    }
+}
+
+int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
+{
+    CALL_INFO_TRACE;
+    CHKPR(observer, RET_ERR);
+    std::shared_ptr<IDeviceObserver> ptr = observer.lock();
+    CHKPR(ptr, RET_ERR);
+    std::for_each(devices_.cbegin(), devices_.cend(),
+        [ptr] (const auto &item) {
+            if (item.second != nullptr) {
+                ptr->OnDeviceAdded(item.second);
+            }
+        }
+    );
+    return RET_OK;
+}
+
+int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
@@ -391,7 +417,7 @@ int32_t DeviceManager::AddDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     return ret;
 }
 
-int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);
@@ -402,7 +428,7 @@ int32_t DeviceManager::OnAddDeviceObserver(std::shared_ptr<IDeviceObserver> obse
     return RET_OK;
 }
 
-void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
@@ -413,326 +439,13 @@ void DeviceManager::RemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observ
     }
 }
 
-int32_t DeviceManager::OnRemoveDeviceObserver(std::shared_ptr<IDeviceObserver> observer)
+int32_t DeviceManager::OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPR(observer, RET_ERR);
     observers_.erase(observer);
     return RET_OK;
 }
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-
-bool DeviceManager::IsRemote(int32_t id) const
-{
-    CHKPR(context_, false);
-    std::packaged_task<bool(int32_t)> task { std::bind(&DeviceManager::OnIsRemote, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunIsRemote, this, std::ref(task), id));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return false;
-    }
-    return fu.get();
-}
-
-bool DeviceManager::OnIsRemote(int32_t id) const
-{
-    CALL_INFO_TRACE;
-    if (auto devIter = devices_.find(id); devIter != devices_.end()) {
-        if (devIter->second != nullptr) {
-            return devIter->second->IsRemote();
-        } else {
-            FI_HILOGW("Device is unsynchronized");
-        }
-    }
-    return false;
-}
-
-int32_t DeviceManager::RunIsRemote(std::packaged_task<bool(int32_t)> &task, int32_t id) const
-{
-    task(id);
-    return RET_OK;
-}
-
-std::vector<std::string> DeviceManager::GetCoordinationDhids(int32_t deviceId) const
-{
-    CALL_INFO_TRACE;
-    if (context_ == nullptr) {
-        FI_HILOGE("context_ is nullptr");
-        return std::vector<std::string>();
-    }
-    std::packaged_task<std::vector<std::string>(int32_t)> task {
-        std::bind(&DeviceManager::OnGetCoopDhids, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetGetCoopDhids, this, std::ref(task), deviceId));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return std::vector<std::string>();
-    }
-    return fu.get();
-}
-
-std::vector<std::string> DeviceManager::OnGetCoopDhids(int32_t deviceId) const
-{
-    CALL_INFO_TRACE;
-    std::vector<std::string> dhids;
-    auto devIter = devices_.find(deviceId);
-    if (devIter == devices_.end()) {
-        FI_HILOGI("Find pointer id failed");
-        return dhids;
-    }
-    if (devIter->second == nullptr) {
-        FI_HILOGW("Device is unsynchronized");
-        return dhids;
-    }
-    std::shared_ptr<IDevice> dev = devIter->second;
-    if (!dev->IsPointerDevice()) {
-        FI_HILOGI("Not pointer device");
-        return dhids;
-    }
-    dhids.push_back(dev->GetDhid());
-    FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
-
-    const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
-    const auto pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
-
-    for (const auto &[id, d]: devices_) {
-        if (d == nullptr) {
-            FI_HILOGW("Device is unsynchronized");
-            continue;
-        }
-        const auto networkId { d->IsRemote() ? d->GetNetworkId() : localNetworkId };
-        if (networkId != pointerNetworkId) {
-            continue;
-        }
-        if (d->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            dhids.push_back(d->GetDhid());
-            FI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
-        }
-    }
-    return dhids;
-}
-
-int32_t DeviceManager::RunGetGetCoopDhids(
-    std::packaged_task<std::vector<std::string>(int32_t)> &task,
-    int32_t deviceId) const
-{
-    task(deviceId);
-    return RET_OK;
-}
-
-std::vector<std::string> DeviceManager::GetCoordinationDhids(const std::string &dhid) const
-{
-    if (context_ == nullptr) {
-        FI_HILOGE("context_ is nullptr");
-        return std::vector<std::string>();
-    }
-    std::packaged_task<std::vector<std::string>(const std::string &)> task {
-        std::bind(&DeviceManager::OnGetCoordinationDhids, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetCoordinationDhids, this, std::ref(task), std::cref(dhid)));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return std::vector<std::string>();
-    }
-    return fu.get();
-}
-
-std::vector<std::string> DeviceManager::OnGetCoordinationDhids(const std::string &dhid) const
-{
-    int32_t deviceId { -1 };
-    for (const auto &[id, dev] : devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("Device is unsynchronized");
-            continue;
-        }
-        if (dev->GetDhid() == dhid) {
-            deviceId = id;
-            break;
-        }
-    }
-    return GetCoordinationDhids(deviceId);
-}
-
-int32_t DeviceManager::RunGetCoordinationDhids(
-    std::packaged_task<std::vector<std::string>(const std::string &)> &task,
-    const std::string &dhid) const
-{
-    task(dhid);
-    return RET_OK;
-}
-
-std::string DeviceManager::GetOriginNetworkId(int32_t id) const
-{
-    CALL_INFO_TRACE;
-    if (context_ == nullptr) {
-        FI_HILOGE("context_ is nullptr");
-        return EMPTYSTR;
-    }
-    std::packaged_task<std::string(int32_t)> task {
-        std::bind(&DeviceManager::OnGetOriginNetId, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetOriginNetId, this, std::ref(task), id));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return EMPTYSTR;
-    }
-    return fu.get();
-}
-
-std::string DeviceManager::OnGetOriginNetId(int32_t id) const
-{
-    CALL_INFO_TRACE;
-    auto devIter = devices_.find(id);
-    if (devIter == devices_.end()) {
-        FI_HILOGE("Failed to search for the device: id %{public}d", id);
-        return EMPTYSTR;
-    }
-    if (devIter->second == nullptr) {
-        FI_HILOGW("Device is unsynchronized");
-        return EMPTYSTR;
-    }
-    auto networkId = devIter->second->GetNetworkId();
-    if (networkId.empty()) {
-        networkId = COORDINATION::GetLocalDeviceId();
-    }
-    return networkId;
-}
-
-int32_t DeviceManager::RunGetOriginNetId(std::packaged_task<std::string(int32_t)> &task, int32_t id) const
-{
-    task(id);
-    return RET_OK;
-}
-
-std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
-{
-    CALL_INFO_TRACE;
-    if (context_ == nullptr) {
-        FI_HILOGE("context_ is nullptr");
-        return EMPTYSTR;
-    }
-    std::packaged_task<std::string(const std::string &)> task {
-        std::bind(&DeviceManager::OnGetOriginNetworkId, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetOriginNetworkId, this, std::ref(task), std::cref(dhid)));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return EMPTYSTR;
-    }
-    return fu.get();
-}
-
-std::string DeviceManager::OnGetOriginNetworkId(const std::string &dhid) const
-{
-    CALL_INFO_TRACE;
-    if (dhid.empty()) {
-        return EMPTYSTR;
-    }
-    for (const auto &[id, dev] : devices_) {
-        if (dev == nullptr) {
-            FI_HILOGW("Device is unsynchronized");
-            continue;
-        }
-        if (dev->IsRemote() && dev->GetDhid() == dhid) {
-            return dev->GetNetworkId();
-        }
-    }
-    return EMPTYSTR;
-}
-
-int32_t DeviceManager::RunGetOriginNetworkId(std::packaged_task<std::string(const std::string &)> &task,
-                                             const std::string &dhid) const
-{
-    task(dhid);
-    return RET_OK;
-}
-
-std::string DeviceManager::GetDhid(int32_t deviceId) const
-{
-    CALL_INFO_TRACE;
-    if (context_ == nullptr) {
-        FI_HILOGE("context_ is nullptr");
-        return EMPTYSTR;
-    }
-    std::packaged_task<std::string(int32_t)> task {
-        std::bind(&DeviceManager::OnGetDhid, this, std::placeholders::_1) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunGetDhid, this, std::ref(task), deviceId));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return EMPTYSTR;
-    }
-    return fu.get();
-}
-
-std::string DeviceManager::OnGetDhid(int32_t deviceId) const
-{
-    CALL_INFO_TRACE;
-    if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
-        if (devIter->second != nullptr) {
-            return devIter->second->GetDhid();
-        } else {
-            FI_HILOGW("Device is unsynchronized");
-        }
-    }
-    return EMPTYSTR;
-}
-
-int32_t DeviceManager::RunGetDhid(std::packaged_task<std::string(int32_t)> &task, int32_t deviceId) const
-{
-    task(deviceId);
-    return RET_OK;
-}
-
-bool DeviceManager::HasLocalPointerDevice() const
-{
-    CHKPR(context_, false);
-    std::packaged_task<bool()> task { std::bind(&DeviceManager::OnHasLocalPointerDevice, this) };
-    auto fu = task.get_future();
-
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&DeviceManager::RunHasLocalPointerDevice, this, std::ref(task)));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post task failed");
-        return false;
-    }
-    return fu.get();
-}
-
-bool DeviceManager::OnHasLocalPointerDevice() const
-{
-    for (const auto &[id, dev] : devices_) {
-        if (dev != nullptr) {
-            if (!dev->IsRemote() && dev->IsPointerDevice()) {
-                return true;
-            }
-        } else {
-            FI_HILOGW("Device is unsynchronized");
-        }
-    }
-    return false;
-}
-
-int32_t DeviceManager::RunHasLocalPointerDevice(std::packaged_task<bool()> &task) const
-{
-    task();
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
