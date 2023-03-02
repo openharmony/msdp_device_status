@@ -131,7 +131,7 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetPressed(isPressed);
-    isPressed ? item.SetPressure(5) : item.SetPressed(0);
+    isPressed ? item.SetPressure(1) : item.SetPressed(0);
 
     pointerEvent->AddPointerItem(item);
     if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
@@ -180,9 +180,9 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc,
         }
         pointers.push_back({dstX, dstY});
     }
-    for (const auto& pointer : pointers) {                                                          
+    for (const auto& pointer : pointers) {
         std::shared_ptr<MMI::PointerEvent> pointerEvent =
-            SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE,sourceType, pointerId, isPressed);
+            SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE, sourceType, pointerId, isPressed);
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
