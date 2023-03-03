@@ -393,9 +393,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t result = 0;
     SimulateUp({ dragDstX, dragDstY }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
@@ -435,9 +434,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t result = 0;
     SimulateUp({ dragDstX, dragDstY }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(result);
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
