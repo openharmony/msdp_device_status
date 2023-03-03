@@ -102,14 +102,15 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    if (monitorId_ < 0) {
-        FI_HILOGE("Invalid monitor to be removed, monitorId_:%{public}d", monitorId_);
-        return RET_ERR;
-    }
-    INPUT_MANAGER->RemoveMonitor(monitorId_);
     NotifyDragResult(result);
-    return RET_OK;
+    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
+    if ((monitorId_ > 0) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
+        INPUT_MANAGER->RemoveMonitor(monitorId_);
+        monitorId_ = -1;
+        monitorConsumer_ = nullptr;
+        return RET_OK;
+    }
+    return RET_ERR;
 }
 
 int32_t DragManager::GetDragTargetPid() const
