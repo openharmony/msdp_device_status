@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ public:
 
 public:
     explicit Device(int32_t deviceId);
-    ~Device();
+    ~Device() = default;
     DISALLOW_COPY_AND_MOVE(Device);
 
     int32_t Open() override;
@@ -91,13 +91,6 @@ public:
     int32_t GetVendor() const override;
     std::string GetPhys() const override;
     std::string GetUniq() const override;
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    std::string GetDhid() const override;
-    std::string GetNetworkId() const override;
-    bool IsRemote() const override;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
     IDevice::KeyboardType GetKeyboardType() const override;
     bool IsPointerDevice() const override;
     bool IsKeyboard() const override;
@@ -105,17 +98,9 @@ public:
 private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
-    void Populate();
     void UpdateCapability();
     void CheckPointers();
     void CheckKeys();
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    std::string MakeNetworkId(const std::string &phys) const;
-    std::string GenerateDescriptor() const;
-    std::string Sha256(const std::string &in) const;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-
     void RemoveSpace(std::string &str) const;
     std::string MakeConfigFileName() const;
     int32_t ReadConfigFile(const std::string &filePath);
@@ -211,20 +196,6 @@ inline std::string Device::GetUniq() const
 {
     return uniq_;
 }
-
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-
-inline std::string Device::GetDhid() const
-{
-    return dhid_;
-}
-
-inline std::string Device::GetNetworkId() const
-{
-    return networkId_;
-}
-
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 inline IDevice::KeyboardType Device::GetKeyboardType() const
 {
