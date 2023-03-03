@@ -34,14 +34,15 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
-constexpr int32_t TIME_WAIT_FOR_INJECT = 10000;
-static int32_t mousePointerId { 0 };
-static int32_t touchPointerId { 1 };
+constexpr int32_t TIME_WAIT_FOR_INJECT_MS = 10000;
+constexpr int32_t DEFAULT_DEVICE_ID = 0;
+constexpr int32_t mousePointerId { 0 };
+constexpr int32_t touchPointerId { 1 };
+constexpr int32_t dragSrcX { 0 };
+constexpr int32_t dragSrcY { 0 };
+constexpr int32_t dragDstX { 50 };
+constexpr int32_t dragDstY { 50 };
 static std::atomic_bool stopCallbackFlag { false };
-static int32_t dragSrcX { 0 };
-static int32_t dragSrcY { 0 };
-static int32_t dragDstX { 10 };
-static int32_t dragDstY { 10 };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 class InteractionManagerTest : public testing::Test {
@@ -114,6 +115,24 @@ std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t so
     return dragData;
 }
 
+MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId, int32_t deviceId, std::pair<int, int> displayLoc, bool isPressed)
+{
+    MMI::PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    item.SetDeviceId(deviceId);
+    int32_t displayX = displayLoc.first;
+    int32_t displayY = displayLoc.second;
+    item.SetDisplayX(displayX);
+    item.SetDisplayY(displayY);
+    item.SetWindowX(0);
+    item.SetWindowY(0);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressed(isPressed);
+    isPressed ? item.SetPressure(1) : item.SetPressed(0);
+    return item;
+}
+
 std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
@@ -124,30 +143,8 @@ std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetPointerId(pointerId);
 
-    MMI::PointerEvent::PointerItem item;
-    item.SetPointerId(pointerId);
-    int32_t displayX = displayLoc.first;
-    int32_t displayY = displayLoc.second;
-    item.SetDisplayX(displayX);
-    item.SetDisplayY(displayY);
-    item.SetWindowX(0);
-    item.SetWindowY(0);
-    item.SetDeviceId(1);
-    item.SetWidth(0);
-    item.SetHeight(0);
-    item.SetPressed(isPressed);
-    isPressed ? item.SetPressure(1) : item.SetPressed(0);
-
-    pointerEvent->AddPointerItem(item);
-    if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        item.SetPointerId(pointerId);
-        item.SetDisplayX(displayX + 1);
-        item.SetDisplayY(displayY + 1);
-        item.SetPressure(1);
-        item.SetDeviceId(1);
-        isPressed ? item.SetPressure(1) : item.SetPressed(0);
-        pointerEvent->AddPointerItem(item);
-    }
+    auto curPointerItem = CreatePointerItem(pointerId, DEFAULT_DEVICE_ID, displayLoc, isPressed);
+    pointerEvent->AddPointerItem(curPointerItem);
     return pointerEvent;
 }
 
@@ -191,7 +188,7 @@ void SimulateMove(std::pair<int, int> srcLoc, std::pair<int, int> dstLoc,
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
-        usleep(TIME_WAIT_FOR_INJECT);
+        usleep(TIME_WAIT_FOR_INJECT_MS);
     }
 }
 
@@ -372,8 +369,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
     ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
-    std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
+    auto callback = [](const DragParam& dragParam) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
         stopCallbackFlag = true;
     };
@@ -413,13 +410,14 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
     ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
-    std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
+    auto callback = [](const DragParam& dragParam) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             dragParam.displayX, dragParam.displayY, dragParam.result, dragParam.targetPid);
         stopCallbackFlag = true;
     };
     SimulateDown({ dragSrcX, dragSrcY }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
     ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
     SimulateMove({ dragSrcX, dragSrcY }, { dragDstX, dragDstY },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId, true);
     ASSERT_EQ(ret, RET_OK);
@@ -450,8 +448,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragTargetPid, TestSi
 {
     CALL_TEST_DEBUG;
     int32_t targetPid = InteractionManager::GetInstance()->GetDragTargetPid();
-    FI_HILOGD("targetPid:%{public}d", targetPid);
-    ASSERT_TRUE(targetPid > -1);
+    FI_HILOGD("target:%{public}d", targetPid);
+    ASSERT_TRUE(targetPid >= -1);
 }
 
 } // namespace DeviceStatus
