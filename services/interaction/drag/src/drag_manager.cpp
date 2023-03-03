@@ -72,6 +72,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
     CHKPR(sess, RET_ERR);
     dragOutSession_ = sess;
+    dragTargetPid_ = -1;
     MMI::PointerStyle pointerStyle;
     if (INPUT_MANAGER->GetPointerStyle(OHOS::MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
         FI_HILOGE("GetPointerStyle failed");
@@ -101,7 +102,6 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    dragTargetPid_ = -1;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (monitorId_ < 0) {
         FI_HILOGE("Invalid monitor to be removed, monitorId_:%{public}d", monitorId_);
@@ -168,10 +168,10 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     INPUT_MANAGER->SetPointerVisible(true);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
-    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("dragTargetPid_:%{public}d", dragTargetPid_);
 }
 
