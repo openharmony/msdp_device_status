@@ -102,15 +102,19 @@ int32_t DragManager::StopDrag(int32_t result)
         return RET_ERR;
     }
     dragState_ = DragState::FREE;
-    NotifyDragResult(result);
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    if ((monitorId_ > 0) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
-        INPUT_MANAGER->RemoveMonitor(monitorId_);
-        monitorId_ = -1;
-        monitorConsumer_ = nullptr;
-        return RET_OK;
+    if (monitorId_ < 0 || monitorId_ >= std::numeric_limits<int32_t>::max()) {
+        FI_HILOGE("Invalid monitorId: monitorId_:%{public}d", monitorId_);
+        return RET_ERR;
     }
-    return RET_ERR;
+    INPUT_MANAGER->RemoveMonitor(monitorId_);
+    monitorId_ = -1;
+    monitorConsumer_ = nullptr;
+    if (NotifyDragResult(result) != RET_OK) {
+        FI_HILOGE("NotifyDragResult failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t DragManager::GetDragTargetPid() const
@@ -143,11 +147,9 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    int32_t sourceType = pointerEvent->GetSourceType();
-    int32_t pointerId = pointerEvent->GetPointerId();
     int32_t pointerAction = pointerEvent->GetPointerAction();
     FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-        sourceType, pointerId, pointerAction);
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
     } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {

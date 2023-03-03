@@ -114,7 +114,6 @@ std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t so
     return dragData;
 }
 
-
 std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
@@ -370,9 +369,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
-    if (!dragData.has_value()) {
-        ASSERT_EQ(-1, RET_OK);
-    }
+    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
+    ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
     std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
@@ -380,7 +378,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
         stopCallbackFlag = true;
     };
     SimulateDown({ dragSrcX, dragSrcY }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     SimulateMove({ dragSrcX, dragSrcY }, { dragDstX, dragDstY },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId, true);
@@ -413,9 +411,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
-    if (!dragData.has_value()) {
-        ASSERT_EQ(-1, RET_OK);
-    }
+    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
+    ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
     std::function<void(const DragParam&)> callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, targetPid%{public}d",
@@ -423,7 +420,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
         stopCallbackFlag = true;
     };
     SimulateDown({ dragSrcX, dragSrcY }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateMove({ dragSrcX, dragSrcY }, { dragDstX, dragDstY },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId, true);
     ASSERT_EQ(ret, RET_OK);
