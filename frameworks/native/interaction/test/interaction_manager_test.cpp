@@ -67,6 +67,7 @@ void InteractionManagerTest::TearDown()
 
 int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
+    CALL_DEBUG_ENTER;
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Invalid size, pixelMapWidth:%{public}d, pixelMapHeight:%{public}d", pixelMapWidth, pixelMapHeight);
@@ -92,27 +93,9 @@ int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::share
     return RET_OK;
 }
 
-int32_t SetParam(int32_t width, int32_t height, DragData& dragData, int32_t sourceType, int32_t pointerId)
-{
-    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
-    if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
-        FI_HILOGE("CreatePixelMap failed");
-        return RET_ERR;
-    }
-    dragData.pictureResourse.pixelMap = pixelMap;
-    dragData.pictureResourse.x = 0;
-    dragData.pictureResourse.y = 0;
-    dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
-    dragData.sourceType = sourceType;
-    dragData.pointerId = pointerId;
-    dragData.dragNum = 1;
-    dragData.displayX = dragSrcX;
-    dragData.displayY = dragSrcY;
-    return RET_OK;
-}
-
 std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t sourceType, int32_t pointerId)
 {
+    CALL_DEBUG_ENTER;
     auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
     if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
         FI_HILOGE("CreatePixelMap failed");
@@ -135,6 +118,7 @@ std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t so
 std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(
     std::pair<int, int> displayLoc, int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
+    CALL_DEBUG_ENTER;
     auto pointerEvent = MMI::PointerEvent::Create();
     CHKPP(pointerEvent);
     pointerEvent->SetPointerAction(action);
@@ -428,7 +412,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, mousePointerId);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, touchPointerId);
     if (!dragData.has_value()) {
         ASSERT_EQ(-1, RET_OK);
     }
