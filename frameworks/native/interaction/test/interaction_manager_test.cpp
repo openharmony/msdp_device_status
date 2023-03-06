@@ -40,8 +40,8 @@ constexpr int32_t mousePointerId { 0 };
 constexpr int32_t touchPointerId { 1 };
 constexpr int32_t dragSrcX { 0 };
 constexpr int32_t dragSrcY { 0 };
-constexpr int32_t dragDstX { 50 };
-constexpr int32_t dragDstY { 50 };
+constexpr int32_t dragDstX { 10 };
+constexpr int32_t dragDstY { 10 };
 static std::atomic_bool stopCallbackFlag { false };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
