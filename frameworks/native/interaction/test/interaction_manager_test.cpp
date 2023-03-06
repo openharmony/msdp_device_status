@@ -36,6 +36,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS = 10000;
+constexpr int32_t TIME_WAIT_FOR_PROCESS_CALLBACK = 20000;
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t MOUSE_POINTER_ID { 0 };
 constexpr int32_t TOUCH_POINTER_ID { 1 };
@@ -45,6 +46,9 @@ constexpr int32_t DRAG_DST_X { 10 };
 constexpr int32_t DRAG_DST_Y { 10 };
 static std::atomic_bool stopCallbackFlag { false };
 static const std::string IMAGE_INPUT_JPG_PATH_600 = "/data/local/tmp/image/test600.jpg";
+static const std::string IMAGE_INPUT_PNG_PATH_600 = "/data/local/tmp/image/test600.png";
+static const std::string IMAGE_INPUT_JPG_PATH_200 = "/data/local/tmp/image/test200.jpg";
+static const std::string IMAGE_INPUT_PNG_PATH_200 = "/data/local/tmp/image/test200.png";
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 class InteractionManagerTest : public testing::Test {
@@ -69,8 +73,24 @@ void InteractionManagerTest::TearDown()
 
 std::shared_ptr<Media::PixelMap> CreatePixelMap(const std::string& path)
 {
+    CALL_DEBUG_ENTER;
     Media::SourceOptions opts;
-    opts.formatHint = "image/jpg";
+    int32_t pos = path.find_last_of(".");
+    if (pos < 0) {
+        FI_HILOGE("Invalid image path:%{public}s", path.c_str());
+        return nullptr;
+    }
+    auto suffix = path.substr(pos);
+    if (suffix == std::string(".png")) {
+        opts.formatHint = "image/png";  
+    } else if (suffix == std::string(".jpg")) {
+        opts.formatHint = "image/jpg";
+    } else if (suffix == std::string(".jpeg")) {
+        opts.formatHint = "image/jpeg";
+    } else {
+        FI_HILOGE("Invalid image path:%{public}s", path.c_str());
+        return nullptr;
+    }
     uint32_t errorCode = 0;
     std::unique_ptr<Media::ImageSource> imageSource =
         Media::ImageSource::CreateImageSource(path, opts, errorCode);
@@ -105,11 +125,12 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t p
     return pixelMap;
 }
 
-std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t sourceType, int32_t pointerId)
+std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t sourceType,
+    int32_t pointerId, std::pair<int32_t, int32_t> loc)
 {
     CALL_DEBUG_ENTER;
     // std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(width, height);
-    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(IMAGE_INPUT_JPG_PATH_600);
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(IMAGE_INPUT_PNG_PATH_600);
     if (pixelMap == nullptr) {
         FI_HILOGE("CreatePixelMap failed");
         return std::nullopt;
@@ -122,8 +143,8 @@ std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t so
     dragData.sourceType = sourceType;
     dragData.pointerId = pointerId;
     dragData.dragNum = 1;
-    dragData.displayX = DRAG_SRC_X;
-    dragData.displayY = DRAG_SRC_Y;
+    dragData.displayX = loc.first;
+    dragData.displayY = loc.second;
     return dragData;
 }
 
@@ -377,10 +398,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
-    ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
     auto callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
@@ -388,6 +405,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
         stopCallbackFlag = true;
     };
     SimulateDown({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
+    ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     SimulateMove({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
@@ -405,7 +426,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
     CALL_TEST_DEBUG;
     SimulateUp({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
-    usleep(10000);
+    usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
@@ -419,10 +440,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
-    ASSERT_EQ(ret, RET_OK);
     stopCallbackFlag = false;
     auto callback = [](const DragParam& dragParam) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
@@ -430,6 +447,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
         stopCallbackFlag = true;
     };
     SimulateDown({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT,
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    int32_t ret = dragData.has_value() ? RET_OK : RET_ERR;
+    ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     SimulateMove({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
@@ -448,7 +469,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
     CALL_TEST_DEBUG;
     SimulateUp({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
-    usleep(10000);
+    usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
