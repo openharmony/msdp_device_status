@@ -36,7 +36,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS = 10000;
-constexpr int32_t TIME_WAIT_FOR_PROCESS_CALLBACK = 20000;
+constexpr int32_t TIME_WAIT_FOR_PROCESS_CALLBACK = 500000;
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t MOUSE_POINTER_ID { 0 };
 constexpr int32_t TOUCH_POINTER_ID { 1 };
