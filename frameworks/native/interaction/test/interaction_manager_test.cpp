@@ -129,8 +129,7 @@ std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t so
     int32_t pointerId, std::pair<int32_t, int32_t> loc)
 {
     CALL_DEBUG_ENTER;
-    // std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(width, height);
-    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(IMAGE_INPUT_PNG_PATH_600);
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(width, height);
     if (pixelMap == nullptr) {
         FI_HILOGE("CreatePixelMap failed");
         return std::nullopt;
