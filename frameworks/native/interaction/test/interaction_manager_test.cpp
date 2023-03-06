@@ -19,6 +19,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include "image_source.h"
 #include "input_manager.h"
 #include "pointer_event.h"
 
@@ -43,6 +44,7 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 10 };
 constexpr int32_t DRAG_DST_Y { 10 };
 static std::atomic_bool stopCallbackFlag { false };
+static const std::string IMAGE_INPUT_JPG_PATH_600 = "/data/local/tmp/image/test600.jpg";
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 class InteractionManagerTest : public testing::Test {
@@ -65,40 +67,50 @@ void InteractionManagerTest::TearDown()
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
+std::shared_ptr<Media::PixelMap> CreatePixelMap(const std::string& path)
+{
+    Media::SourceOptions opts;
+    opts.formatHint = "image/jpg";
+    uint32_t errorCode = 0;
+    std::unique_ptr<Media::ImageSource> imageSource =
+        Media::ImageSource::CreateImageSource(path, opts, errorCode);
+    Media::ImageInfo imageInfo;
+    imageSource->GetImageInfo(0, imageInfo);
+    FI_HILOGD("imageInfo.size.width:%{public}d, imageInfo.size.height:%{public}d",
+        imageInfo.size.width, imageInfo.size.width);
+    if (errorCode != 0 || imageSource.get() == nullptr) {
+        FI_HILOGE("CreateImageSource failed");
+        return nullptr;
+    }
+    Media::DecodeOptions decodeOpts;
+    decodeOpts.allocatorType = Media::AllocatorType::SHARE_MEM_ALLOC;
+    std::unique_ptr<Media::PixelMap> uniquePixelMap = imageSource->CreatePixelMap(decodeOpts, errorCode);
+    std::shared_ptr<Media::PixelMap> pixelMap = std::move(uniquePixelMap);
+    return pixelMap;
+}
 
-int32_t CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight, std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
     CALL_DEBUG_ENTER;
     if (pixelMapWidth <= 0 || pixelMapWidth > MAX_PIXEL_MAP_WIDTH ||
         pixelMapHeight <= 0 || pixelMapHeight > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Invalid size, pixelMapWidth:%{public}d, pixelMapHeight:%{public}d", pixelMapWidth, pixelMapHeight);
-        return RET_ERR;
+        return nullptr;
     }
-    OHOS::Media::ImageInfo info;
-    info.size.width = pixelMapWidth;
-    info.size.height = pixelMapHeight;
-    info.pixelFormat = Media::PixelFormat::RGB_888;
-    info.colorSpace = OHOS::Media::ColorSpace::SRGB;
-    pixelMap->SetImageInfo(info);
-    int32_t bufferSize = pixelMap->GetByteCount();
-    char *buffer = static_cast<char *>(malloc(bufferSize));
-    if (buffer == nullptr) {
-        FI_HILOGE("Malloc buffer failed");
-        return RET_ERR;
-    }
-    char *character = buffer;
-    for (int32_t i = 0; i < bufferSize; i++) {
-        *(character++) = static_cast<char>(i);
-    }
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, OHOS::Media::AllocatorType::HEAP_ALLOC, nullptr);
-    return RET_OK;
+    OHOS::Media::InitializationOptions opts;
+    opts.size.width = pixelMapWidth;
+    opts.size.height = pixelMapHeight;
+    std::unique_ptr<Media::PixelMap> uniquePixelMap = Media::PixelMap::Create(opts);
+    std::shared_ptr<Media::PixelMap> pixelMap = std::move(uniquePixelMap);
+    return pixelMap;
 }
 
 std::optional<DragData> CreateDragData(int32_t width, int32_t height, int32_t sourceType, int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
-    auto pixelMap = std::make_shared<OHOS::Media::PixelMap>();
-    if (CreatePixelMap(width, height, pixelMap) != RET_OK) {
+    // std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(width, height);
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(IMAGE_INPUT_JPG_PATH_600);
+    if (pixelMap == nullptr) {
         FI_HILOGE("CreatePixelMap failed");
         return std::nullopt;
     }
@@ -393,6 +405,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
     CALL_TEST_DEBUG;
     SimulateUp({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    usleep(10000);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
@@ -435,6 +448,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
     CALL_TEST_DEBUG;
     SimulateUp({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    usleep(10000);
     ASSERT_TRUE(stopCallbackFlag);
     ASSERT_EQ(ret, RET_OK);
 }
