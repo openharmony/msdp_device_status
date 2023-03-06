@@ -51,11 +51,6 @@ struct DragParam {
     int32_t targetPid { -1 };
 };
 
-enum class DragState {
-    FREE = 0,
-    DRAGGING = 1
-};
-
 enum class DragCursorStyle {
     FORBIDDEN,
     ALLOWABLE
