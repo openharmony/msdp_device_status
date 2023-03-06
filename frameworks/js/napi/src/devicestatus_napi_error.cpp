@@ -20,7 +20,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage) {
+napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage)
+{
     napi_value businessError = nullptr;
     napi_value code = nullptr;
     napi_value msg = nullptr;
@@ -31,7 +32,8 @@ napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std
     return businessError;
 }
 
-std::optional <std::string> GetErrMsg(int32_t errorCode) {
+std::optional <std::string> GetErrMsg(int32_t errorCode)
+{
     auto iter = ERROR_MESSAGES.find(errorCode);
     if (iter != ERROR_MESSAGES.end()) {
         return iter->second;
@@ -39,7 +41,8 @@ std::optional <std::string> GetErrMsg(int32_t errorCode) {
     return std::nullopt;
 }
 
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg) {
+void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
+{
     DEV_HILOGE(JS_NAPI, "message: %{public}s, code: %{public}d", printMsg.c_str(), errCode);
     auto msg = GetErrMsg(errCode);
     if (!msg) {
