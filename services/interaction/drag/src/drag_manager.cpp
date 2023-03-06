@@ -162,7 +162,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
-    INPUT_MANAGER->SetPointerVisible(true);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
     FI_HILOGD("dragTargetPid_:%{public}d", dragTargetPid_);
@@ -196,6 +195,7 @@ OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
 
 int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 {
+    CALL_DEBUG_ENTER;
     MMI::PointerStyle pointerStyle;
     if (INPUT_MANAGER->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
         FI_HILOGE("GetPointerStyle failed");
@@ -207,6 +207,7 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 
 int32_t DragManager::OnStartDrag()
 {
+    CALL_DEBUG_ENTER;
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
@@ -221,6 +222,8 @@ int32_t DragManager::OnStartDrag()
 
 int32_t DragManager::OnStopDrag()
 {
+    CALL_DEBUG_ENTER;
+    INPUT_MANAGER->SetPointerVisible(true);
     if ((monitorId_ > 0) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
