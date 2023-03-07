@@ -81,7 +81,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
-    INPUT_MANAGER->SetPointerVisible(false);
     dragState_ = DragMessage::MSG_DRAG_STATE_START;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
@@ -208,8 +207,6 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 int32_t DragManager::OnStartDrag()
 {
     CALL_DEBUG_ENTER;
-    auto extraData = CreateExtraData(true);
-    INPUT_MANAGER->AppendExtraData(extraData);
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
     monitorConsumer_ = std::make_shared<MonitorConsumer>(MonitorConsumer(callback));
     monitorId_ = INPUT_MANAGER->AddMonitor(monitorConsumer_);
@@ -217,19 +214,21 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("AddMonitor failed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
+    auto extraData = CreateExtraData(true);
+    INPUT_MANAGER->AppendExtraData(extraData);
     return RET_OK;
 }
 
 int32_t DragManager::OnStopDrag()
 {
     CALL_DEBUG_ENTER;
-    INPUT_MANAGER->SetPointerVisible(true);
-    if ((monitorId_ > 0) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
+    if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
         monitorConsumer_ = nullptr;
         return RET_OK;
     }
+    FI_HILOGE("ARemoveMonitor failed, monitorId_:%{public}d", monitorId_);
     return RET_ERR;
 }
 } // namespace DeviceStatus

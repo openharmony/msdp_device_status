@@ -39,7 +39,7 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
     return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragParam&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -57,8 +57,10 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    stopCallback_ = callback;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        stopCallback_ = callback;
+    }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
@@ -77,15 +79,15 @@ int32_t DragManagerImpl::GetDragTargetPid()
 int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    DragParam param;
-    pkt >> param.displayX >> param.displayY >> param.result >> param.targetPid;
+    DragNotifyMsg notifyMsg;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> notifyMsg.result >> notifyMsg.targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(param);
+    stopCallback_(notifyMsg);
     StreamClient &streamClient = const_cast<StreamClient &>(client);
     streamClient.Stop();
     return RET_OK;

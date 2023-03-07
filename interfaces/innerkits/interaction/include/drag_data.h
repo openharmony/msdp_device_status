@@ -44,7 +44,7 @@ struct DragData {
     int32_t displayY { -1 };
 };
 
-struct DragParam {
+struct DragNotifyMsg {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     int32_t result { -1 };
