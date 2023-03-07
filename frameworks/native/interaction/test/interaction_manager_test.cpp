@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include <atomic>
 #include <optional>
 #include <utility>
 #include <vector>
+
+#include <unistd.h>
 
 #include <gtest/gtest.h>
 #include "input_manager.h"
@@ -36,6 +37,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Inter
 constexpr int32_t TIME_WAIT_FOR_OP { 100 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20000 };
 constexpr int32_t TIME_WAIT_FOR_PROCESS_CALLBACK { 20000 };
+constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN { 1 };
 constexpr int32_t DEFAULT_DEVICE_ID { 0 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
 constexpr int32_t TOUCH_POINTER_ID { 1 };
@@ -414,7 +416,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
     };
     SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    sleep(1);
+    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData.has_value());
@@ -443,6 +445,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
         FI_HILOGD("set stopCallbackFlag to true");
     };
     SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData.has_value());
