@@ -185,11 +185,13 @@ void Client::OnRecvMsg(const char *buf, size_t size)
 
 int32_t Client::Reconnect()
 {
+    CALL_DEBUG_ENTER;
     return ConnectTo();
 }
 
 void Client::OnReconnect()
 {
+    CALL_DEBUG_ENTER;
     if (Reconnect() == RET_OK) {
         FI_HILOGI("Reconnect ok");
         return;

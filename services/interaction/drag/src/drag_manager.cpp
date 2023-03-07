@@ -228,7 +228,7 @@ int32_t DragManager::OnStopDrag()
         monitorConsumer_ = nullptr;
         return RET_OK;
     }
-    FI_HILOGE("ARemoveMonitor failed, monitorId_:%{public}d", monitorId_);
+    FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
     return RET_ERR;
 }
 } // namespace DeviceStatus

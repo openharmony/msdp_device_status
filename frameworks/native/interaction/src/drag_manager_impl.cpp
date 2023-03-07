@@ -39,7 +39,8 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
     return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
+    std::function<void()> disconnectCallback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -51,15 +52,16 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
         return RET_ERR;
     }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
-        dragData.displayX < 0 || dragData.displayY < 0) {
+        dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-                  "displayX:%{public}d, displayY:%{public}d",
-            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
+                  "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
+            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
         return RET_ERR;
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
         stopCallback_ = callback;
+        disconnectCallback_ = disconnectCallback;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -90,6 +92,8 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     stopCallback_(notifyMsg);
     StreamClient &streamClient = const_cast<StreamClient &>(client);
     streamClient.Stop();
+    CHKPR(disconnectCallback_, RET_ERR);
+    disconnectCallback_();
     return RET_OK;
 }
 

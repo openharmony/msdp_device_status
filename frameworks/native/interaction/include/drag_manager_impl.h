@@ -37,7 +37,8 @@ public:
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
+        std::function<void()> disconnectCallback);
     int32_t StopDrag(int32_t result);
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
@@ -48,6 +49,7 @@ private:
     std::atomic_bool hasRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
     std::function<void(const DragNotifyMsg&)> stopCallback_;
+    std::function<void()> disconnectCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
