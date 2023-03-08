@@ -143,7 +143,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragUp(pointerEvent);
     } else {
         FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
+            pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
     }
 }
 
