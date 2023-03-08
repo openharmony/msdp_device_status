@@ -50,6 +50,7 @@ constexpr int32_t DRAG_NUM { 1 };
 constexpr int32_t MOVE_STEP { 10 };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
+
 class InteractionManagerTest : public testing::Test {
 public:
     void SetUp();
