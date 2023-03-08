@@ -101,3 +101,11 @@ ohos_unittest("InteractionManagerTest") {
     "multimedia_image_framework:image_native",
   ]
 }
+
+group("unittest") {
+  testonly = true
+  deps = []
+  deps += [
+    ":InteractionManagerTest",
+  ]
+}

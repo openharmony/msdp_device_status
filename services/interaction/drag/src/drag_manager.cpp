@@ -191,7 +191,6 @@ OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
     return extraData;
 }
 
-
 int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
@@ -207,9 +206,9 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 int32_t DragManager::OnStartDrag()
 {
     CALL_DEBUG_ENTER;
-    auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
-    monitorConsumer_ = std::make_shared<MonitorConsumer>(MonitorConsumer(callback));
-    monitorId_ = INPUT_MANAGER->AddMonitor(monitorConsumer_);
+    auto consumer = std::make_shared<MonitorConsumer>(MonitorConsumer(
+        std::bind(&DragManager::DragCallback, this, std::placeholders::_1)));
+    monitorId_ = INPUT_MANAGER->AddMonitor(consumer);
     if (monitorId_ < 0) {
         FI_HILOGE("AddMonitor failed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
@@ -225,7 +224,6 @@ int32_t DragManager::OnStopDrag()
     if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
-        monitorConsumer_ = nullptr;
         return RET_OK;
     }
     FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);

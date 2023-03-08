@@ -113,7 +113,6 @@ void StreamSession::UpdateDescript()
 
 bool StreamSession::SendMsg(NetPacket &pkt) const
 {
-    CALL_DEBUG_ENTER;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Read and write status is error");
         return false;

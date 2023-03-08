@@ -33,7 +33,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragManager {
 public:
-    DragManager() : monitorConsumer_(std::make_shared<MonitorConsumer>(nullptr))
+    DragManager()
     {}
     ~DragManager() = default;
 
@@ -68,7 +68,6 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
-    std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
