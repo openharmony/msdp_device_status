@@ -365,7 +365,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData.has_value());
+    ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
@@ -393,7 +393,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
     SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData.has_value());
+    ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
@@ -419,7 +419,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     sleep(TIME_WAIT_FOR_TOUCH_DOWN);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData.has_value());
+    ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
@@ -448,7 +448,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
     sleep(TIME_WAIT_FOR_TOUCH_DOWN);
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData.has_value());
+    ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
     int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));

@@ -105,7 +105,5 @@ ohos_unittest("InteractionManagerTest") {
 group("unittest") {
   testonly = true
   deps = []
-  deps += [
-    ":InteractionManagerTest",
-  ]
+  deps += [ ":InteractionManagerTest" ]
 }
