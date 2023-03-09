@@ -20,6 +20,8 @@ group("device_status_fuzztest") {
   deps += [
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
+    "startdrag_fuzzer:fuzztest",
+    "stopdrag_fuzzer:fuzztest",
   ]
   if (fusion_interaction_coordination) {
     deps += [
