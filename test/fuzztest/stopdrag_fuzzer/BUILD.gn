@@ -21,11 +21,10 @@ module_output_path = "device_status/device_status_native"
 ##############################fuzztest##########################################
 ohos_fuzztest("StopDragFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/msdp/device_status/test/fuzztest/stopdrag_fuzzer"
+  fuzz_config_file = "./../stopdrag_fuzzer"
   include_dirs = [
-    "//base/msdp/device_status/interfaces/innerkits/interaction/include",
-    "//base/msdp/device_status/utils/common/include",
+    "./../../../interfaces/innerkits/interaction/include",
+    "./../../../utils/common/include",
   ]
   cflags = [
     "-g",
@@ -34,8 +33,7 @@ ohos_fuzztest("StopDragFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "stop_drag_fuzzer.cpp" ]
-  deps =
-      [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
+  deps = [ "./../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
@@ -47,9 +45,6 @@ ohos_fuzztest("StopDragFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":StopDragFuzzTest",
-  ]
+  deps += [ ":StopDragFuzzTest" ]
 }
 ###############################################################################
