@@ -39,7 +39,8 @@ int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
     return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(int32_t)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
+    std::function<void()> disconnectCallback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -50,13 +51,18 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
             dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
         return RET_ERR;
     }
-    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE) {
-        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu",
-            dragData.dragNum, dragData.buffer.size());
+    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
+        dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
+        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+                  "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
+            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
-    stopCallback_ = callback;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        stopCallback_ = callback;
+        disconnectCallback_ = disconnectCallback;
+    }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
@@ -75,17 +81,19 @@ int32_t DragManagerImpl::GetDragTargetPid()
 int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t result;
-    pkt >> result;
+    DragNotifyMsg notifyMsg;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> notifyMsg.result >> notifyMsg.targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(result);
+    stopCallback_(notifyMsg);
     StreamClient &streamClient = const_cast<StreamClient &>(client);
     streamClient.Stop();
+    CHKPR(disconnectCallback_, RET_ERR);
+    disconnectCallback_();
     return RET_OK;
 }
 

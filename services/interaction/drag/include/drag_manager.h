@@ -33,7 +33,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragManager {
 public:
-    DragManager() : monitorConsumer_(std::make_shared<MonitorConsumer>(nullptr))
+    DragManager()
     {}
     ~DragManager() = default;
 
@@ -59,13 +59,15 @@ public:
 private:
     int32_t NotifyDragResult(int32_t result);
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
+    int32_t InitDataAdapter(const DragData &dragData) const;
+    int32_t OnStartDrag();
+    int32_t OnStopDrag();
 private:
     StateChangeNotify stateNotify_;
-    DragState dragState_ { DragState::FREE };
+    DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
-    std::shared_ptr<MonitorConsumer> monitorConsumer_ { nullptr };
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus

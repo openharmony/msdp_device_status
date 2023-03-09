@@ -40,11 +40,16 @@ struct DragData {
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t displayId { -1 };
 };
 
-enum class DragState {
-    FREE = 0,
-    DRAGGING = 1
+struct DragNotifyMsg {
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t result { -1 };
+    int32_t targetPid { -1 };
 };
 
 enum class DragCursorStyle {
