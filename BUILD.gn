@@ -17,8 +17,8 @@ import("//build/ohos.gni")
 group("device_status_tests") {
   testonly = true
   deps = [
+    "frameworks/native/interaction/test:interaction_manager_test",
     "services/native/test:devicestatussrv_test",
     "test/fuzztest:device_status_fuzztest",
-    "frameworks/native/interaction/test:interaction_manager_test"
   ]
 }

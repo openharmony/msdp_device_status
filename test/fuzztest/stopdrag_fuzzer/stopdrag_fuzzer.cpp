@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "stop_drag_fuzzer.h"
+#include "stopdrag_fuzzer.h"
 
 #include "fi_log.h"
 #include "interaction_manager.h"
@@ -21,9 +21,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDragFuzzTest" };
-} // namespace
 
 void StopDragFuzzTest(const uint8_t* data, size_t  size)
 {

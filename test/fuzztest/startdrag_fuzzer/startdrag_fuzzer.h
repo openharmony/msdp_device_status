@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef START_DRAG_FUZZER_H
-#define START_DRAG_FUZZER_H
+#ifndef STARTDRAG_FUZZER_H
+#define STARTDRAG_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "startdrag_fuzzer"
 
-#endif // START_DRAG_FUZZER_H
+#endif // STARTDRAG_FUZZER_H

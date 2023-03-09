@@ -32,7 +32,7 @@ ohos_fuzztest("StopDragFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "stop_drag_fuzzer.cpp" ]
+  sources = [ "stopdrag_fuzzer.cpp" ]
   deps = [ "./../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
