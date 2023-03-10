@@ -44,11 +44,11 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
-    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
-    if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.pictureResourse.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    CHKPR(dragData.shadowRes.pixelMap, RET_ERR);
+    if (dragData.shadowRes.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.shadowRes.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
+            dragData.shadowRes.pixelMap->GetWidth(), dragData.shadowRes.pixelMap->GetHeight());
         return RET_ERR;
     }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
@@ -66,10 +66,10 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t result)
+int32_t DragManagerImpl::StopDrag(int32_t result, bool hasSucceedAnimation)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().StopDrag(result);
+    return DeviceStatusClient::GetInstance().StopDrag(result, hasSucceedAnimation);
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()
