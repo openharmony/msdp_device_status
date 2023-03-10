@@ -12,6 +12,10 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "${device_status_part_name}/unit_out"
 
 config("drag_private_config") {
   include_dirs = [ "include" ]
@@ -23,12 +27,19 @@ ohos_shared_library("interaction_drag") {
     "${device_status_utils_path}/include",
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/native/include",
+    "//foundation/graphic/graphic_2d/interfaces/inner_api/composer",
+    "//foundation/graphic/graphic_2d/rosen/modules/composer/vsync/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client/core",
+    "//foundation/window/window_manager/interfaces/innerkits/wm",
   ]
 
   sources = [
     "src/drag_data_adapter.cpp",
     "src/drag_manager.cpp",
     "src/state_change_notify.cpp",
+    "src/drag_drawing.cpp",
   ]
 
   configs = [ ":drag_private_config" ]
@@ -38,6 +49,11 @@ ohos_shared_library("interaction_drag") {
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/etc/mouse_icon:device_status_mouse_icon",
+    "//foundation/graphic/graphic_2d/rosen/modules/composer/vsync:libvsync",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
+    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
@@ -49,8 +65,46 @@ ohos_shared_library("interaction_drag") {
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",
     "window_manager:libdm",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
+}
+
+ohos_unittest("DragDrawingTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/include",
+    "//utils/system/safwk/native/include",
+    "//base/msdp/device_status/interfaces/innerkits/interaction/include",
+    "//base/msdp/device_status/services/interaction/drag/include",
+    "../../../communication/service/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client/core",
+    "//foundation/window/window_manager/interfaces/innerkits/wm",
+  ]
+
+  sources = [ "src/drag_drawing_test.cpp" ]
+
+  configs = [ "${device_status_utils_path}:devicestatus_utils_config" ]
+
+  deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+    "//base/msdp/device_status/services/interaction/drag:interaction_drag",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "input:libmmi-client",
+    "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
+    "window_manager:libwm"
+  ]
 }

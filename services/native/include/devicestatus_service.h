@@ -103,6 +103,7 @@ private:
 
     int32_t OnStartDrag(const DragData &dragData, int32_t pid);
     int32_t OnStopDrag(int32_t result);
+    int32_t OnUpdateDragStyle(int32_t style);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);

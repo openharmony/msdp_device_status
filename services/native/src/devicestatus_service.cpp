@@ -720,7 +720,13 @@ int32_t DeviceStatusService::StopDrag(int32_t result)
 int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnUpdateDragStyle, this, style));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStartDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 
 int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
@@ -878,6 +884,17 @@ int32_t DeviceStatusService::OnStopDrag(int32_t result)
     int32_t ret = dragMgr_.StopDrag(result);
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::OnUpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = dragMgr_.UpdateDragStyle(style);
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

@@ -82,6 +82,11 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_START;
+    dragDrawing_ = std::make_shared<DragDrawing>();
+    CHKPR(dragDrawing_, RET_ERR);
+    INPUT_MANAGER->SetPointerVisible(false);
+    dragDrawing_->InitPicture(dragData.pictureResourse, dragData.sourceType, dragData.displayId);
+    dragDrawing_->Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
 }
@@ -103,12 +108,33 @@ int32_t DragManager::StopDrag(int32_t result)
         FI_HILOGE("NotifyDragResult failed");
         return RET_ERR;
     }
+    CHKPR(dragDrawing_, RET_ERR);
+    dragDrawing_->EraseMouseIcon();
+    INPUT_MANAGER->SetPointerVisible(true);
+    if (result == 0) {
+        dragDrawing_->OnDragSuccess();
+    }
+    else {
+        dragDrawing_->OnDragFail();
+    }
+    dragDrawing_->DestroyPointerWindow();
     return RET_OK;
 }
 
 int32_t DragManager::GetDragTargetPid() const
 {
     return dragTargetPid_;
+}
+
+int32_t DragManager::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(dragDrawing_, RET_ERR);
+    if (style < 0) {
+        FI_HILOGE("Invalid style:%{public}d", style);
+        return RET_ERR;
+    }
+    return dragDrawing_->UpdateDragStyle(style);
 }
 
 int32_t DragManager::NotifyDragResult(int32_t result)
@@ -151,8 +177,11 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    CHKPV(dragDrawing_);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    FI_HILOGE("XJP1111, displayID:%{public}d", pointerEvent->GetTargetDisplayId());
+    dragDrawing_->Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
