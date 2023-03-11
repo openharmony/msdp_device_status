@@ -82,11 +82,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_START;
-    dragDrawing_ = std::make_shared<DragDrawing>();
-    CHKPR(dragDrawing_, RET_ERR);
-    INPUT_MANAGER->SetPointerVisible(false);
-    dragDrawing_->InitPicture(dragData.pictureResourse, dragData.sourceType, dragData.displayId);
-    dragDrawing_->Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
 }
@@ -98,7 +93,7 @@ int32_t DragManager::StopDrag(int32_t result)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (OnStopDrag() != RET_OK) {
+    if (OnStopDrag(result) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
     }
@@ -108,16 +103,6 @@ int32_t DragManager::StopDrag(int32_t result)
         FI_HILOGE("NotifyDragResult failed");
         return RET_ERR;
     }
-    CHKPR(dragDrawing_, RET_ERR);
-    dragDrawing_->EraseMouseIcon();
-    INPUT_MANAGER->SetPointerVisible(true);
-    if (result == 0) {
-        dragDrawing_->OnDragSuccess();
-    }
-    else {
-        dragDrawing_->OnDragFail();
-    }
-    dragDrawing_->DestroyPointerWindow();
     return RET_OK;
 }
 
@@ -134,7 +119,7 @@ int32_t DragManager::UpdateDragStyle(int32_t style)
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    return dragDrawing_->UpdateDragStyle(style);
+    return RET_OK;
 }
 
 int32_t DragManager::NotifyDragResult(int32_t result)
@@ -180,7 +165,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(dragDrawing_);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    FI_HILOGE("XJP1111, displayID:%{public}d", pointerEvent->GetTargetDisplayId());
     dragDrawing_->Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
@@ -243,15 +227,27 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
+    dragDrawing_ = std::make_shared<DragDrawing>();
+    CHKPR(dragDrawing_, RET_ERR);
+    INPUT_MANAGER->SetPointerVisible(false);
+    DragData dragData = DataAdapter.GetDragData();
+    int32_t ret = dragDrawing_->InitPicture(dragData);
+    if (ret != RET_OK) {
+        FI_HILOGE("Init Picture failed");
+        return RET_ERR;
+    }
+    dragDrawing_->Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     return RET_OK;
 }
 
-int32_t DragManager::OnStopDrag()
+int32_t DragManager::OnStopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
     if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
+        CHKPR(dragDrawing_, RET_ERR);
+        INPUT_MANAGER->SetPointerVisible(true);
         return RET_OK;
     }
     FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
