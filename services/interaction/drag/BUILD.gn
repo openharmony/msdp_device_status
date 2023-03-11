@@ -15,8 +15,6 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "${device_status_part_name}/unit_out"
-
 config("drag_private_config") {
   include_dirs = [ "include" ]
 }
