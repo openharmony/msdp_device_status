@@ -41,7 +41,7 @@ public:
     };
     bool Init();
     void InitMockStore();
-    void SetTimerInterval(int32_t interval);
+    int32_t SetTimerInterval(int32_t interval);
     void CloseTimer();
     void InitTimer();
     void TimerCallback();
@@ -54,7 +54,7 @@ public:
     ErrCode RegisterCallback(std::shared_ptr<IMsdp::MsdpAlgoCallback> callback) override;
     ErrCode UnregisterCallback() override;
     ErrCode NotifyMsdpImpl(const Data& data);
-    void GetDeviceStatusData();
+    int32_t GetDeviceStatusData();
     std::shared_ptr<MsdpAlgoCallback> GetCallbackImpl()
     {
         std::unique_lock lock(mutex_);
