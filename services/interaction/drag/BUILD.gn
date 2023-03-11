@@ -35,9 +35,9 @@ ohos_shared_library("interaction_drag") {
 
   sources = [
     "src/drag_data_adapter.cpp",
+    "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
     "src/state_change_notify.cpp",
-    "src/drag_drawing.cpp",
   ]
 
   configs = [ ":drag_private_config" ]
@@ -47,8 +47,8 @@ ohos_shared_library("interaction_drag") {
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "//foundation/graphic/graphic_2d/rosen/modules/composer/vsync:libvsync",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/composer/vsync:libvsync",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/libxml2:xml2",
   ]
