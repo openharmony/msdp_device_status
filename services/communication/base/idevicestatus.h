@@ -45,6 +45,7 @@ public:
         GET_DRAG_TARGET_PID,
         REGISTER_DRAG_MONITOR,
         UNREGISTER_DRAG_MONITOR,
+        SET_DRAG_WINDOW_VISIBLE,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -73,6 +74,7 @@ public:
     virtual int32_t RemoveDraglistener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
+    virtual int32_t SetDragWindowVisible(bool visible) = 0;
     virtual bool IsRunning() const
     {
         return true;

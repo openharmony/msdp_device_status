@@ -172,7 +172,7 @@ std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) con
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, in.data(), in.size());
     SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
-    
+
     constexpr int32_t width = 4;
     constexpr unsigned char mask = 0x0F;
     const char* hexCode = "0123456789abcdef";
@@ -322,7 +322,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     CHKPV(device);
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
-    
+
     if (dev->IsKeyboard()) {
         CooSM->OnKeyboardOnline(dev->GetDhid());
     }

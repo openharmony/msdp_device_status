@@ -142,6 +142,12 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
     }
     return RET_OK;
 }
+
+int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -64,6 +64,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::GET_DRAG_TARGET_PID, &DeviceStatusSrvStub::GetDragTargetPidStub},
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
+        {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -336,6 +337,18 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
         FI_HILOGE("Call RemoveDraglistener failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool visible;
+    READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = SetDragWindowVisible(visible);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }
     return ret;
 }

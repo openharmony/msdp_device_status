@@ -46,6 +46,7 @@ public:
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    int32_t OnSetDragWindowVisible(bool visible);
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
         explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb)
@@ -68,6 +69,7 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
+    bool visible_ { false };
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus

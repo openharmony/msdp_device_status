@@ -99,6 +99,11 @@ int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener)
 {
     return InteractionMgrImpl.RemoveDraglistener(listener);
 }
+
+int32_t InteractionManager::SetDragWindowVisible(bool visible)
+{
+    return InteractionMgrImpl.SetDragWindowVisible(visible);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -717,6 +717,18 @@ int32_t DeviceStatusService::StopDrag(int32_t result)
     return RET_OK;
 }
 
+int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnSetDragWindowVisible, dragMgr_, visible));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;

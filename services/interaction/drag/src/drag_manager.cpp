@@ -228,6 +228,12 @@ int32_t DragManager::OnStopDrag()
     FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
     return RET_ERR;
 }
+
+int32_t DragManager::OnSetDragWindowVisible(bool visible)
+{
+    visible_ = visible;
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

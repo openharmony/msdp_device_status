@@ -47,7 +47,7 @@ public:
     int32_t GetDragTargetPid();
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
-
+    int32_t SetDragWindowVisible(bool visible);
 private:
     void InitMsgHandler();
     void DisconnectClient();
