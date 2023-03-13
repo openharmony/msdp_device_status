@@ -57,7 +57,7 @@ constexpr int32_t MOUSE_ICON_INDEX = 2;
 const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/mouse_icon/Mouse_Drag.png";
 
 static struct DrawingInfo {
-    int32_t sourceType_ { -1 };
+    int32_t sourceType { -1 };
     int32_t currentStyle { -1 };
     int32_t displayId { -1 };
     int32_t pixelMapX { -1 };
@@ -83,7 +83,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
         return RET_ERR;
     }
-    g_drawingInfo.sourceType_ = dragData.sourceType;
+    g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.pixelMap = dragData.pictureResourse.pixelMap;
     g_drawingInfo.pixelMapX = dragData.pictureResourse.x;
@@ -101,7 +101,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return RET_ERR;
     }
     
-    if (g_drawingInfo.sourceType_ != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         g_drawingInfo.dragWindow->Show();
         return RET_OK;
     }
@@ -144,12 +144,12 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 int32_t DragDrawing::DrawShadowPic()
 {
     CALL_DEBUG_ENTER;
-    if ((g_drawingInfo.sourceType_ == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
         FI_HILOGE("Nodes size invalid, node size: %{public}d", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
-    if ((g_drawingInfo.sourceType_ == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
         FI_HILOGE("Nodes size invalid, node size: %{public}d", g_drawingInfo.nodes.size());
         return RET_ERR;
@@ -226,7 +226,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
 
-    if (g_drawingInfo.sourceType_ == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         mouseIconNode->SetBounds(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
         mouseIconNode->SetFrame(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
