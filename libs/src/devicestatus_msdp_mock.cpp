@@ -141,16 +141,16 @@ void DeviceStatusMsdpMock::InitTimer()
     }
 }
 
-void DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
+int32_t DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
 {
     if (timerFd_ == ERR_INVALID_FD) {
         DEV_HILOGE(SERVICE, "create timer fd failed");
-        return;
+        return RET_ERR;
     }
 
     if (interval < 0) {
         DEV_HILOGE(SERVICE, "Illegal time interval");
-        return;
+        return RET_ERR;
     }
     struct itimerspec itval;
     itval.it_interval.tv_sec = interval;
@@ -159,8 +159,9 @@ void DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
     itval.it_value.tv_nsec = 0;
     if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
         DEV_HILOGE(SERVICE, "set timer failed");
-        return;
+        return RET_ERR;
     }
+    return RET_OK;
 }
 
 void DeviceStatusMsdpMock::CloseTimer()
@@ -180,19 +181,20 @@ void DeviceStatusMsdpMock::TimerCallback()
     GetDeviceStatusData();
 }
 
-void DeviceStatusMsdpMock::GetDeviceStatusData()
+int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
 {
     for (auto item : enabledType_) {
         Type type = item;
         if (dataParse_ == nullptr) {
             DEV_HILOGE(SERVICE, "dataParse_ is nullptr");
-            return;
+            return RET_ERR;
         }
         Data data;
         dataParse_->ParseDeviceStatusData(data, type);
         DEV_HILOGD(SERVICE, "mock type: %{public}d,value: %{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
+    return RET_OK;
 }
 
 int32_t DeviceStatusMsdpMock::RegisterTimerCallback(const int32_t fd, const EventType et)
