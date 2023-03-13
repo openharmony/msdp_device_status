@@ -348,7 +348,7 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
+        FI_HILOGE("Call SetDragWindowVisible failed ret:%{public}d", ret);
     }
     return ret;
 }

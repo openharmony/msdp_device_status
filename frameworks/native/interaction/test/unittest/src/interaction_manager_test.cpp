@@ -560,6 +560,24 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
     TestRemoveMonitor(monitorId);
     InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
 }
+
+/**
+* @tc.name: InteractionManagerTest_SetDragWindowVisible
+* @tc.desc: Set Drag Window Visible
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
