@@ -50,13 +50,13 @@ constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
 constexpr int32_t IMAGE_WIDTH = 400;
 constexpr int32_t IMAGE_HEIGHT = 500;
 constexpr int32_t SVG_HEIGHT = 40;
-constexpr int32_t TOUCH_NODE_MIN_COUNT = 2;
-constexpr int32_t MOUSE_NODE_MIN_COUNT = 3;
 constexpr int32_t PIXEL_MAP_INDEX = 0;
 constexpr int32_t MOUSE_ICON_INDEX = 2;
+constexpr size_t TOUCH_NODE_MIN_COUNT = 2;
+constexpr size_t MOUSE_NODE_MIN_COUNT = 3;
 const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/mouse_icon/Mouse_Drag.png";
 
-static struct DrawingInfo {
+struct DrawingInfo {
     int32_t sourceType { -1 };
     int32_t currentStyle { -1 };
     int32_t displayId { -1 };
@@ -71,7 +71,7 @@ static struct DrawingInfo {
     std::shared_ptr<OHOS::Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
-}g_drawingInfo;
+} g_drawingInfo;
 } // namespace
 
 int32_t DragDrawing::Init(const DragData &dragData)
@@ -79,7 +79,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CALL_DEBUG_ENTER;
     CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
     if ((dragData.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-      (dragData.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
+        (dragData.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
         return RET_ERR;
     }
@@ -136,8 +136,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
             g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
         return;
     }
-    CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX,
-        g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
+    CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
     g_drawingInfo.dragWindow->Show();
 }
 
@@ -146,12 +145,12 @@ int32_t DragDrawing::DrawShadowPic()
     CALL_DEBUG_ENTER;
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}d", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}d", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if (drawPixelMapModifier_ != nullptr) {
@@ -166,7 +165,7 @@ int32_t DragDrawing::DrawMouseIcon()
 {
     CALL_DEBUG_ENTER;
     if (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}d", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if (drawMouseIconModifier_ != nullptr) {
@@ -296,7 +295,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     std::set<std::string> formats;
     imageSource->GetSupportedFormats(formats);
     int32_t iconSize = GetIconSize();
-    if (iconSize == RET_ERR) {
+    if (iconSize <= 0) {
         FI_HILOGE("Get icon size failed");
         return;
     }
@@ -323,7 +322,7 @@ int32_t DrawMouseIconModifier::GetIconSize() const
 {
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
-    CHKPR(displayInfo, RET_ERR);
+    CHKPR(displayInfo, 0);
     return displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
 }
 } // namespace DeviceStatus
