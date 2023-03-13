@@ -261,7 +261,6 @@ void DragDrawing::CreateDragWindow(int32_t displayX, int32_t displayY)
     option->SetTouchable(true);
     std::string windowName = "drag window";
     g_dragDringInfo.dragWindow = OHOS::Rosen::Window::Create(windowName, option, nullptr);
-    
 }
 
 void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
