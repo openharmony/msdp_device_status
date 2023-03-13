@@ -215,19 +215,15 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
-    INPUT_MANAGER->SetPointerVisible(false);
-    DragData dragData = DataAdapter.GetDragData();
-    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     return RET_OK;
 }
 
-int32_t DragManager::OnStopDrag(int32_t result)
+int32_t DragManager::OnStopDrag()
 {
     CALL_DEBUG_ENTER;
     if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
-        INPUT_MANAGER->SetPointerVisible(true);
         return RET_OK;
     }
     FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
