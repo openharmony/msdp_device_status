@@ -111,17 +111,6 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::UpdateDragStyle(int32_t style)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(dragDrawing_, RET_ERR);
-    if (style < 0) {
-        FI_HILOGE("Invalid style:%{public}d", style);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t DragManager::NotifyDragResult(int32_t result)
 {
     CALL_DEBUG_ENTER;
@@ -162,10 +151,9 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    CHKPV(dragDrawing_);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    dragDrawing_->Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -227,16 +215,9 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
-    dragDrawing_ = std::make_shared<DragDrawing>();
-    CHKPR(dragDrawing_, RET_ERR);
     INPUT_MANAGER->SetPointerVisible(false);
     DragData dragData = DataAdapter.GetDragData();
-    int32_t ret = dragDrawing_->InitPicture(dragData);
-    if (ret != RET_OK) {
-        FI_HILOGE("Init Picture failed");
-        return RET_ERR;
-    }
-    dragDrawing_->Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     return RET_OK;
 }
 
@@ -246,7 +227,6 @@ int32_t DragManager::OnStopDrag(int32_t result)
     if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
-        CHKPR(dragDrawing_, RET_ERR);
         INPUT_MANAGER->SetPointerVisible(true);
         return RET_OK;
     }

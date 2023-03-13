@@ -45,6 +45,8 @@ public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
     void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+private:
+    int32_t GetIconSize() const;
 };
 
 class DragDrawing  final {
@@ -53,18 +55,15 @@ public:
     ~DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
 
-    int32_t InitPicture(const DragData &dragData);
+    int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
 private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
-    int32_t InitPictureLayer(int32_t displayX, int32_t displayY);
-    void CreateDragWindow(int32_t displayX, int32_t displayY);
-    void DrawPicture();
-    void DrawMouseIcon();
-
+    void CreateWindow(int32_t displayX, int32_t displayY);
+    int32_t DrawShadowPic();
+    int32_t DrawMouseIcon();
 private:
-    int32_t sourceType_ { -1 };
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_  { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
