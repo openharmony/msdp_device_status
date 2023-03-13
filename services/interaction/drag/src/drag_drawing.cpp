@@ -318,6 +318,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->SetBgImagePositionY(0);
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->SetBgImage(rosenImage);
 }
+
 int32_t DrawMouseIconModifier::GetIconSize() const
 {
     CALL_DEBUG_ENTER;
