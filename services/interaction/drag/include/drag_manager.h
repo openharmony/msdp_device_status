@@ -25,6 +25,7 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_drawing.h"
 #include "state_change_notify.h"
 #include "stream_session.h"
 
@@ -68,6 +69,7 @@ private:
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
+    DragDrawing dragDrawing_;
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
