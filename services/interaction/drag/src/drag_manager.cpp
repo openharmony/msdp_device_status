@@ -93,7 +93,7 @@ int32_t DragManager::StopDrag(int32_t result)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (OnStopDrag(result) != RET_OK) {
+    if (OnStopDrag() != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
     }
@@ -153,7 +153,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
