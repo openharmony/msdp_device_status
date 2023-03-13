@@ -532,7 +532,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_SUCCEED_ANIMATION);
 }
 
 /**
@@ -563,7 +563,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_SUCCEED_ANIMATION);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
