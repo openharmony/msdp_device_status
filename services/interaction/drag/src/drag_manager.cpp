@@ -232,7 +232,6 @@ int32_t DragManager::OnStopDrag()
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
     visible_ = visible;
-    FI_HILOGD("set drag window visible %{public}s success", visible ? "true" : "false");
     return RET_OK;
 }
 } // namespace DeviceStatus
