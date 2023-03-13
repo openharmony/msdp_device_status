@@ -147,7 +147,7 @@ public:
     /**
      * @brief 设置拖拽窗口显示/隐藏。
      * @param visible 要设置拖拽窗口的状态
-     * @return 返返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
      * @since 10
      */
     int32_t SetDragWindowVisible(bool visible);
