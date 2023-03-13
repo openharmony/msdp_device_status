@@ -48,12 +48,6 @@ config("devicestatus_services_public_config") {
     "interaction/drag/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api/composer",
-    "//foundation/graphic/graphic_2d/rosen/modules/composer/vsync/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
-    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client/core",
-    "//foundation/window/window_manager/interfaces/innerkits/wm",
   ]
 }
 
@@ -100,6 +94,8 @@ ohos_shared_library("devicestatus_service") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
+    "graphic_standard:libcomposer",
+    "graphic_standard:window_animation",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",

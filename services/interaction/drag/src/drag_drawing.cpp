@@ -35,7 +35,7 @@
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
 #include "ui/rs_root_node.h"
-#include "window.h"
+#include "../wm/window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"
@@ -51,8 +51,8 @@ constexpr int32_t IMAGE_WIDTH = 400;
 constexpr int32_t IMAGE_HEIGHT = 500;
 constexpr int32_t SVG_HEIGHT = 40;
 constexpr int32_t CANVAS_VECTOR_MIN_SIZE = 2;
-constexpr int32_t PIXEL_MAP_INDEX= 0;
-constexpr int32_t MOUSE_ICON_INDEX= 2;
+constexpr int32_t PIXEL_MAP_INDEX = 0;
+constexpr int32_t MOUSE_ICON_INDEX = 2;
 const std::string COPY_DRAG_PATH = "/system/etc/device_status/mouse_icon/Copy_Drag.svg";
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/mouse_icon/Copy_One_Drag.svg";
 const std::string FORBID_DRAG_PATH = "/system/etc/device_status/mouse_icon/Forbid_Drag.svg";
@@ -73,7 +73,7 @@ struct DragDringInfo {
     std::shared_ptr<OHOS::Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
-}dragDringInfo;
+}g_dragDringInfo;
 } // namespace
 
 int32_t DragDrawing::InitPicture(const DragData &dragData)
@@ -91,10 +91,10 @@ int32_t DragDrawing::InitPicture(const DragData &dragData)
         return RET_ERR;
     }
     sourceType_ = dragData.sourceType;
-    dragDringInfo.displayId = dragData.displayId;
-    dragDringInfo.pixelMap = dragData.pictureResourse.pixelMap;
-    dragDringInfo.pixelMapX = dragData.pictureResourse.x;
-    dragDringInfo.pixelMapY = dragData.pictureResourse.y;
+    g_dragDringInfo.displayId = dragData.displayId;
+    g_dragDringInfo.pixelMap = dragData.pictureResourse.pixelMap;
+    g_dragDringInfo.pixelMapX = dragData.pictureResourse.x;
+    g_dragDringInfo.pixelMapY = dragData.pictureResourse.y;
     int32_t ret = InitPictureLayer(dragData.displayX, dragData.displayY);
     if (ret != RET_OK) {
         FI_HILOGE("Init Picture failed");
@@ -110,84 +110,84 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
         FI_HILOGE("Invalid display:%{public}d", displayId);
         return;
     }
-    dragDringInfo.displayId = displayId;
-    dragDringInfo.displayX = displayX;
-    dragDringInfo.displayY = displayY;
+    g_dragDringInfo.displayId = displayId;
+    g_dragDringInfo.displayX = displayX;
+    g_dragDringInfo.displayY = displayY;
     if (displayX < 0) {
-        dragDringInfo.displayX = 0;
+        g_dragDringInfo.displayX = 0;
     }
     if (displayY < 0) {
-        dragDringInfo.displayY = 0;
+        g_dragDringInfo.displayY = 0;
     }
 
-    if (dragDringInfo.dragWindow != nullptr) {
-        dragDringInfo.dragWindow->MoveTo(dragDringInfo.displayX + dragDringInfo.pixelMapX,
-            dragDringInfo.displayY + dragDringInfo.pixelMapY);
-        dragDringInfo.dragWindow->Show();
+    if (g_dragDringInfo.dragWindow != nullptr) {
+        g_dragDringInfo.dragWindow->MoveTo(g_dragDringInfo.displayX + g_dragDringInfo.pixelMapX,
+            g_dragDringInfo.displayY + g_dragDringInfo.pixelMapY);
+        g_dragDringInfo.dragWindow->Show();
         return;
     }
-    CreateDragWindow(dragDringInfo.displayX + dragDringInfo.pixelMapX,
-        dragDringInfo.displayY + dragDringInfo.pixelMapY);
-    dragDringInfo.dragWindow->Show();
+    CreateDragWindow(g_dragDringInfo.displayX + g_dragDringInfo.pixelMapX,
+        g_dragDringInfo.displayY + g_dragDringInfo.pixelMapY);
+    g_dragDringInfo.dragWindow->Show();
 }
 
 void DragDrawing::DrawPicture()
 {
     CALL_DEBUG_ENTER;
-     if (dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
-        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", dragDringInfo.nodes.size());
+    if (g_dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
+        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", g_dragDringInfo.nodes.size());
         return;
     }
-    if (drawPixelMapModifier_ != nullptr){
-        dragDringInfo.nodes[PIXEL_MAP_INDEX]->RemoveModifier(drawPixelMapModifier_);
+    if (drawPixelMapModifier_ != nullptr) {
+        g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->RemoveModifier(drawPixelMapModifier_);
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->AddModifier(drawPixelMapModifier_);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->AddModifier(drawPixelMapModifier_);
 }
 
 void DragDrawing::DrawMouseIcon()
 {
     CALL_DEBUG_ENTER;
-     if (dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
-        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", dragDringInfo.nodes.size());
+    if (g_dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
+        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", g_dragDringInfo.nodes.size());
         return;
     }
     if (sourceType_ != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGD("Touch type not need draw mouse icon");
         return;
     }
-    if (drawMouseIconModifier_ != nullptr){
-        dragDringInfo.nodes[MOUSE_ICON_INDEX]->RemoveModifier(drawMouseIconModifier_);
+    if (drawMouseIconModifier_ != nullptr) {
+        g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->RemoveModifier(drawMouseIconModifier_);
     }
     drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->AddModifier(drawMouseIconModifier_);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->AddModifier(drawMouseIconModifier_);
     return;
 }
 
 int32_t DragDrawing::InitLayer()
 {
     CALL_DEBUG_ENTER;
-    if (dragDringInfo.dragWindow == nullptr) {
+    if (g_dragDringInfo.dragWindow == nullptr) {
         FI_HILOGE("Init layer failed, dragWindow is nullptr");
         return RET_ERR;
     }
-    dragDringInfo.surfaceNode = dragDringInfo.dragWindow->GetSurfaceNode();
-    if (dragDringInfo.surfaceNode == nullptr) {
-        dragDringInfo.dragWindow->Destroy();
-        dragDringInfo.dragWindow = nullptr;
+    g_dragDringInfo.surfaceNode = g_dragDringInfo.dragWindow->GetSurfaceNode();
+    if (g_dragDringInfo.surfaceNode == nullptr) {
+        g_dragDringInfo.dragWindow->Destroy();
+        g_dragDringInfo.dragWindow = nullptr;
         FI_HILOGE("Init layer failed, surfaceNode is nullptr");
         return RET_ERR;
     }
-    auto surface = dragDringInfo.surfaceNode->GetSurface();
+    auto surface = g_dragDringInfo.surfaceNode->GetSurface();
     if (surface == nullptr) {
-        dragDringInfo.dragWindow->Destroy();
-        dragDringInfo.dragWindow = nullptr;
+        g_dragDringInfo.dragWindow->Destroy();
+        g_dragDringInfo.dragWindow = nullptr;
         FI_HILOGE("Init layer failed, surface is nullptr");
         return RET_ERR;
     }
     rsUiDirector_ = OHOS::Rosen::RSUIDirector::Create();
     rsUiDirector_->Init();
-    rsUiDirector_->SetRSSurfaceNode(dragDringInfo.surfaceNode);
+    rsUiDirector_->SetRSSurfaceNode(g_dragDringInfo.surfaceNode);
     InitCanvas(IMAGE_WIDTH, IMAGE_HEIGHT);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
@@ -196,37 +196,37 @@ int32_t DragDrawing::InitLayer()
 void DragDrawing::InitCanvas(int32_t width, int32_t height)
 {
     CALL_DEBUG_ENTER;
-    if (dragDringInfo.rootNode == nullptr) {
-        dragDringInfo.rootNode = OHOS::Rosen::RSRootNode::Create();
+    if (g_dragDringInfo.rootNode == nullptr) {
+        g_dragDringInfo.rootNode = OHOS::Rosen::RSRootNode::Create();
     }
-    dragDringInfo.rootNode->SetBounds(dragDringInfo.displayX, dragDringInfo.displayY, width, height);
-    dragDringInfo.rootNode->SetFrame(dragDringInfo.displayX, dragDringInfo.displayY, width, height);
-    dragDringInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
+    g_dragDringInfo.rootNode->SetBounds(g_dragDringInfo.displayX, g_dragDringInfo.displayY, width, height);
+    g_dragDringInfo.rootNode->SetFrame(g_dragDringInfo.displayX, g_dragDringInfo.displayY, width, height);
+    g_dragDringInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 
     auto pixelMapNode = OHOS::Rosen::RSCanvasNode::Create();
-    pixelMapNode->SetBounds(0, SVG_HEIGHT, dragDringInfo.pixelMap->GetWidth(), dragDringInfo.pixelMap->GetHeight());
-    pixelMapNode->SetFrame(0, SVG_HEIGHT, dragDringInfo.pixelMap->GetWidth(), dragDringInfo.pixelMap->GetHeight());
-    dragDringInfo.nodes.emplace_back(pixelMapNode);
+    pixelMapNode->SetBounds(0, SVG_HEIGHT, g_dragDringInfo.pixelMap->GetWidth(), g_dragDringInfo.pixelMap->GetHeight());
+    pixelMapNode->SetFrame(0, SVG_HEIGHT, g_dragDringInfo.pixelMap->GetWidth(), g_dragDringInfo.pixelMap->GetHeight());
+    g_dragDringInfo.nodes.emplace_back(pixelMapNode);
 
     auto dragStyleNode = OHOS::Rosen::RSCanvasNode::Create();
     dragStyleNode->SetBounds(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
-    dragDringInfo.nodes.emplace_back(dragStyleNode);
+    g_dragDringInfo.nodes.emplace_back(dragStyleNode);
 
     if (sourceType_ == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
-        mouseIconNode->SetBounds(0 - dragDringInfo.pixelMapX, 0 - dragDringInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
-        mouseIconNode->SetFrame(0 - dragDringInfo.pixelMapX, 0 - dragDringInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
-        dragDringInfo.nodes.emplace_back(mouseIconNode);
-        dragDringInfo.rootNode->AddChild(pixelMapNode, -1);
-        dragDringInfo.rootNode->AddChild(dragStyleNode, -1);
-        dragDringInfo.rootNode->AddChild(mouseIconNode, -1);
-        rsUiDirector_->SetRoot(dragDringInfo.rootNode->GetId());
+        mouseIconNode->SetBounds(0 - g_dragDringInfo.pixelMapX, 0 - g_dragDringInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetFrame(0 - g_dragDringInfo.pixelMapX, 0 - g_dragDringInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
+        g_dragDringInfo.nodes.emplace_back(mouseIconNode);
+        g_dragDringInfo.rootNode->AddChild(pixelMapNode, -1);
+        g_dragDringInfo.rootNode->AddChild(dragStyleNode, -1);
+        g_dragDringInfo.rootNode->AddChild(mouseIconNode, -1);
+        rsUiDirector_->SetRoot(g_dragDringInfo.rootNode->GetId());
         return;
     }
-    dragDringInfo.rootNode->AddChild(pixelMapNode, -1);
-    dragDringInfo.rootNode->AddChild(dragStyleNode, -1);
-    rsUiDirector_->SetRoot(dragDringInfo.rootNode->GetId());
+    g_dragDringInfo.rootNode->AddChild(pixelMapNode, -1);
+    g_dragDringInfo.rootNode->AddChild(dragStyleNode, -1);
+    rsUiDirector_->SetRoot(g_dragDringInfo.rootNode->GetId());
 }
 
 int32_t DragDrawing::InitPictureLayer(int32_t displayX, int32_t displayY)
@@ -260,41 +260,41 @@ void DragDrawing::CreateDragWindow(int32_t displayX, int32_t displayY)
     option->SetFocusable(false);
     option->SetTouchable(true);
     std::string windowName = "drag window";
-    dragDringInfo.dragWindow = OHOS::Rosen::Window::Create(windowName, option, nullptr);
+    g_dragDringInfo.dragWindow = OHOS::Rosen::Window::Create(windowName, option, nullptr);
     
 }
 
 void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
 {
     CALL_DEBUG_ENTER;
-     if (dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
-        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", dragDringInfo.nodes.size());
+    if (g_dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
+        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", g_dragDringInfo.nodes.size());
         return;
     }
     auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
-    if (dragDringInfo.pixelMap == nullptr) {
+    if (g_dragDringInfo.pixelMap == nullptr) {
         FI_HILOGE("DragDringInfo.pixelMap is nullptr");
         return;
     }
-    rosenImage->SetPixelMap(dragDringInfo.pixelMap);
+    rosenImage->SetPixelMap(g_dragDringInfo.pixelMap);
     rosenImage->SetImageRepeat(0);
-    int32_t pixelMapWidth = dragDringInfo.pixelMap->GetWidth();
-    int32_t pixelMapHeight = dragDringInfo.pixelMap->GetHeight();
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsWidth(pixelMapWidth);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsHeight(pixelMapHeight);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImageWidth(pixelMapWidth);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImageHeight(pixelMapHeight);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImagePositionX(0);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImagePositionY(0);
-    dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImage(rosenImage);
+    int32_t pixelMapWidth = g_dragDringInfo.pixelMap->GetWidth();
+    int32_t pixelMapHeight = g_dragDringInfo.pixelMap->GetHeight();
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsWidth(pixelMapWidth);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsHeight(pixelMapHeight);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImageWidth(pixelMapWidth);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImageHeight(pixelMapHeight);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImagePositionX(0);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImagePositionY(0);
+    g_dragDringInfo.nodes[PIXEL_MAP_INDEX]->SetBgImage(rosenImage);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
 {
     CALL_DEBUG_ENTER;
-     if (dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
-        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", dragDringInfo.nodes.size());
+    if (g_dragDringInfo.nodes.size() < CANVAS_VECTOR_MIN_SIZE) {
+        FI_HILOGE("Canvas nodes vector size invalid, nodes.size(): %{public}d", g_dragDringInfo.nodes.size());
         return;
     }
     std::string imagePath = MOUSE_DRAG_PATH;
@@ -305,7 +305,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     CHKPV(imageSource);
     std::set<std::string> formats;
     imageSource->GetSupportedFormats(formats);
-    auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(dragDringInfo.displayId);
+    auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_dragDringInfo.displayId);
     CHKPV(displayInfo);
     OHOS::Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
@@ -317,13 +317,13 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     auto rosenImage = std::make_shared<Rosen::RSImage>();
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsWidth(decodeOpts.desiredSize.width);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsHeight(decodeOpts.desiredSize.height);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImageWidth(decodeOpts.desiredSize.width);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImageHeight(decodeOpts.desiredSize.height);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImagePositionX(0);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImagePositionY(0);
-    dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImage(rosenImage);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsWidth(decodeOpts.desiredSize.width);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsHeight(decodeOpts.desiredSize.height);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImageWidth(decodeOpts.desiredSize.width);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImageHeight(decodeOpts.desiredSize.height);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImagePositionX(0);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImagePositionY(0);
+    g_dragDringInfo.nodes[MOUSE_ICON_INDEX]->SetBgImage(rosenImage);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
