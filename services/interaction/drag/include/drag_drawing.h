@@ -38,6 +38,7 @@ public:
     DrawSVGModifier() = default;
     ~DrawSVGModifier() = default;
     void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
+
 private:
     bool IsValidSvgFile(const std::string &filePath) const;
     int32_t UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize) const;
@@ -60,6 +61,7 @@ public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
     void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+
 private:
     int32_t GetIconSize() const;
 };

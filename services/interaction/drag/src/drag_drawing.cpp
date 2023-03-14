@@ -31,10 +31,10 @@
 #include "pointer_event.h"
 #include "transaction/rs_interfaces.h"
 #include "transaction/rs_transaction.h"
+#include "ui/rs_root_node.h"
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "ui/rs_root_node.h"
 #include "../wm/window.h"
 
 #include "devicestatus_define.h"
@@ -47,14 +47,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragDrawing" };
 constexpr int32_t BASELINE_DENSITY = 160;
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
-constexpr int32_t EIGHT_SIZE= 8;
+constexpr int32_t EIGHT_SIZE = 8;
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t IMAGE_WIDTH = 400;
 constexpr int32_t IMAGE_HEIGHT = 500;
 constexpr int32_t SVG_HEIGHT = 40;
 constexpr int32_t VIEW_BOX_POS = 2;
 constexpr int32_t PIXEL_MAP_INDEX = 0;
-constexpr int32_t DRAG_STYLE_INDEX= 1;
+constexpr int32_t DRAG_STYLE_INDEX = 1;
 constexpr int32_t MOUSE_ICON_INDEX = 2;
 constexpr size_t TOUCH_NODE_MIN_COUNT = 2;
 constexpr size_t MOUSE_NODE_MIN_COUNT = 3;
@@ -132,23 +132,19 @@ int32_t DragDrawing::Init(const DragData &dragData)
     g_drawingInfo.pixelMapY = dragData.pictureResourse.y;
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, RET_ERR);
-    int32_t ret = InitLayer();
-    if (ret != RET_OK) {
+    if (InitLayer() != RET_OK) {
         FI_HILOGE("Init Layer failed");
         return RET_ERR;
     }
-    ret = DrawShadowPic();
-    if (ret != RET_OK) {
+    if (DrawShadowPic() != RET_OK) {
         FI_HILOGE("Draw shadow picture failed");
         return RET_ERR;
     }
-    
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         g_drawingInfo.dragWindow->Show();
         return RET_OK;
     }
-    ret = DrawMouseIcon();
-    if (ret != RET_OK) {
+    if (DrawMouseIcon() != RET_OK) {
         FI_HILOGE("Draw mouse icon failed");
         return RET_ERR;
     }
@@ -231,7 +227,7 @@ int32_t DragDrawing::DrawStyle()
         FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
-    if (drawSVGModifier_ != nullptr){
+    if (drawSVGModifier_ != nullptr) {
         g_drawingInfo.nodes[DRAG_STYLE_INDEX]->RemoveModifier(drawSVGModifier_);
     }
     auto drawSVGModifier_ = std::make_shared<DrawSVGModifier>();
@@ -331,11 +327,9 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     std::string filePath = "";
     if (g_drawingInfo.currentStyle == 0) {
         filePath = FORBID_DRAG_PATH;
-    }
-    else if (g_drawingInfo.currentStyle == 1) {
+    } else if (g_drawingInfo.currentStyle == 1) {
         filePath = COPY_ONE_DRAG_PATH;
-    }
-    else {
+    } else {
         filePath = COPY_DRAG_PATH;
     }
     
@@ -405,22 +399,26 @@ bool DrawSVGModifier::IsValidSvgFile(const std::string &filePath) const
 int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize) const
 {
     CALL_DEBUG_ENTER;
-    if(xmlStrcmp(curNode->name, BAD_CAST "svg")) {
+    if (xmlStrcmp(curNode->name, BAD_CAST "svg")) {
         FI_HILOGE("Svg format invalid");
         return RET_ERR;
     }
     int32_t number = 0;
-    std::string srcSvgWidth = (char *)xmlGetProp(curNode, BAD_CAST "width");
+    std::ostringstream oss;
+    oss << xmlGetProp(curNode, BAD_CAST "width");
+    std::string srcSvgWidth = oss.str();
     number = std::stoi(srcSvgWidth) + strSize;
     std::string tgtSvgWidth  = std::to_string(number);
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
-    std::string srcViewBox = (char *)xmlGetProp(curNode, BAD_CAST "viewBox");
-    std::istringstream strSteam(srcViewBox);
+    std::ostringstream oStrStream;
+    oStrStream << xmlGetProp(curNode, BAD_CAST "viewBox");
+    std::string srcViewBox = oStrStream.str();
+    std::istringstream iStrSteam(srcViewBox);
     std::string word;
     std::string tgtViewBox;
     int32_t i = 0;
     int32_t size = srcViewBox.size();
-    while ((strSteam >> word) && (i < size)) {
+    while ((iStrSteam >> word) && (i < size)) {
         if (i == VIEW_BOX_POS) {
             number = std::stoi(word) + strSize;
             word = std::to_string(number);
@@ -439,8 +437,8 @@ xmlNodePtr DrawSVGModifier::FindRectNode(xmlNodePtr &curNode) const
     CALL_DEBUG_ENTER;
     curNode = curNode->xmlChildrenNode;
     while (curNode != NULL) {
-        if(!xmlStrcmp(curNode->name, BAD_CAST "g")) {
-            while(!xmlStrcmp(curNode->name, BAD_CAST "g")) {
+        if (!xmlStrcmp(curNode->name, BAD_CAST "g")) {
+            while (!xmlStrcmp(curNode->name, BAD_CAST "g")) {
                 curNode = curNode->xmlChildrenNode;
             }
             break;
@@ -455,13 +453,15 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t strSize)
     CALL_DEBUG_ENTER;
     int32_t number = 0;
     while (curNode != NULL) {
-        if(!xmlStrcmp(curNode->name, BAD_CAST "rect")) {
-            std::string srcRectWidth = (char *)xmlGetProp(curNode, BAD_CAST "width");
+        if (!xmlStrcmp(curNode->name, BAD_CAST "rect")) {
+            std::ostringstream oss;
+            oss << xmlGetProp(curNode, BAD_CAST "width");
+            std::string srcRectWidth = oss.str();
             number = std::stoi(srcRectWidth) + strSize;
             std::string tgtRectWidth = std::to_string(number);
-            xmlSetProp(curNode,BAD_CAST "width", BAD_CAST tgtRectWidth.c_str());
+            xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtRectWidth.c_str());
         }
-        if(!xmlStrcmp(curNode->name, BAD_CAST "text")) {
+        if (!xmlStrcmp(curNode->name, BAD_CAST "text")) {
             return curNode->xmlChildrenNode;
         }
         curNode = curNode->next;
@@ -473,7 +473,7 @@ void DrawSVGModifier::UpdateTspanNode(xmlNodePtr &curNode) const
 {
     CALL_DEBUG_ENTER;
     while (curNode != NULL) {
-        if(!xmlStrcmp(curNode->name, BAD_CAST "tspan")) {
+        if (!xmlStrcmp(curNode->name, BAD_CAST "tspan")) {
             std::string tgtTspanValue = std::to_string(g_drawingInfo.currentStyle);
             xmlNodeSetContent(curNode, BAD_CAST tgtTspanValue.c_str());
         }
@@ -514,7 +514,9 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
     xmlChar *xmlbuff;
     int32_t buffersize;
     xmlDocDumpFormatMemory(xmlDoc, &xmlbuff, &buffersize, 1);
-    std::string content = (char *)xmlbuff;
+    std::stringstream oss;
+    oss << xmlbuff;
+    std::string content = oss.str();
     xmlFree(xmlbuff);
     xmlFreeDoc(xmlDoc);
     OHOS::Media::SourceOptions opts;
@@ -559,8 +561,6 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    std::set<std::string> formats;
-    imageSource->GetSupportedFormats(formats);
     int32_t iconSize = GetIconSize();
     if (iconSize <= 0) {
         FI_HILOGE("Get icon size failed");
