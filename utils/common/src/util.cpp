@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/prctl.h>
 #include "securec.h"
@@ -34,6 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util"
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
+constexpr int32_t FILE_SIZE_MAX = 0x5000;
+const std::string SVG_PATH = "/system/etc/device_status/drag_icon/";
 } // namespace
 
 int32_t GetPid()
@@ -201,6 +204,72 @@ const char* GetProgramName()
     return programName;
 }
 
+bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
+{
+    std::string::size_type pos = filePath.find_last_of('.');
+    if (pos == std::string::npos) {
+        FI_HILOGE("File is not find extension");
+        return false;
+    }
+    return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
+}
+
+int32_t GetFileSize(const std::string &filePath)
+{
+    struct stat statbuf = { 0 };
+    if (stat(filePath.c_str(), &statbuf) != 0) {
+        FI_HILOGE("Get file size error");
+        return RET_ERR;
+    }
+    return statbuf.st_size;
+}
+
+bool IsValidPath(const std::string &rootDir, const std::string &filePath)
+{
+    return (filePath.compare(0, rootDir.size(), rootDir) == 0);
+}
+
+bool IsValidSvgPath(const std::string &filePath)
+{
+    return IsValidPath(SVG_PATH, filePath);
+}
+
+bool IsFileExists(const std::string &fileName)
+{
+    return (access(fileName.c_str(), F_OK) == 0);
+}
+
+bool IsValidSvgFile(const std::string &filePath)
+{
+    CALL_DEBUG_ENTER;
+    if (filePath.empty()) {
+        FI_HILOGE("FilePath is empty");
+        return false;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        FI_HILOGE("Realpath return nullptr, realPath:%{public}s", realPath);
+        return false;
+    }
+    if (!IsValidSvgPath(realPath)) {
+        FI_HILOGE("File path invalid");
+        return false;
+    }
+    if (!IsFileExists(realPath)) {
+        FI_HILOGE("File not exist");
+        return false;
+    }
+    if (!CheckFileExtendName(realPath, "svg")) {
+        FI_HILOGE("Unable to parse files other than svg format");
+        return false;
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        FI_HILOGE("File size out of read range");
+        return false;
+    }
+    return true;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

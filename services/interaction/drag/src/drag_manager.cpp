@@ -93,7 +93,7 @@ int32_t DragManager::StopDrag(int32_t result)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (OnStopDrag() != RET_OK) {
+    if (OnStopDrag(result) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
     }
@@ -109,6 +109,21 @@ int32_t DragManager::StopDrag(int32_t result)
 int32_t DragManager::GetDragTargetPid() const
 {
     return dragTargetPid_;
+}
+
+int32_t DragManager::UpdateDragStyle(int32_t style)
+{
+    CALL_DEBUG_ENTER;
+    if (style < 0) {
+        FI_HILOGE("Invalid style:%{public}d", style);
+        return RET_ERR;
+    }
+    int32_t ret = dragDrawing_.UpdateDragStyle(style);
+    if (ret != RET_OK) {
+        FI_HILOGE("Update drag style failed");
+        dragDrawing_.DestroyDragWindow();
+    }
+    return RET_OK;
 }
 
 int32_t DragManager::NotifyDragResult(int32_t result)
@@ -153,6 +168,7 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -214,15 +230,37 @@ int32_t DragManager::OnStartDrag()
     }
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
+    DragData dragData = DataAdapter.GetDragData();
+    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        INPUT_MANAGER->SetPointerVisible(false);
+    }
+    if (dragDrawing_.Init(dragData) != RET_OK) {
+        FI_HILOGE("Init Picture failed");
+        dragDrawing_.DestroyDragWindow();
+        return RET_ERR;
+    }
+    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     return RET_OK;
 }
 
-int32_t DragManager::OnStopDrag()
+int32_t DragManager::OnStopDrag(int32_t result)
 {
     CALL_DEBUG_ENTER;
     if (monitorId_ > 0) {
         INPUT_MANAGER->RemoveMonitor(monitorId_);
         monitorId_ = -1;
+        DragData dragData = DataAdapter.GetDragData();
+        if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+            dragDrawing_.EraseMouseIcon();
+            INPUT_MANAGER->SetPointerVisible(true);
+        }
+        if (result == 0) {
+            dragDrawing_.OnDragSuccess();
+        }
+        else {
+            dragDrawing_.OnDragFail();
+        }
+        dragDrawing_.DestroyDragWindow();
         return RET_OK;
     }
     FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);

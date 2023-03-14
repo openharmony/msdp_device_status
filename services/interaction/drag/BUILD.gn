@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
 
 config("drag_private_config") {
   include_dirs = [ "include" ]
@@ -27,6 +28,7 @@ ohos_shared_library("interaction_drag") {
 
   sources = [
     "src/drag_data_adapter.cpp",
+    "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
     "src/state_change_notify.cpp",
   ]
@@ -38,17 +40,22 @@ ohos_shared_library("interaction_drag") {
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "graphic_standard:libcomposer",
+    "graphic_standard:window_animation",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "input:libmmi-client",
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",
     "window_manager:libdm",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "msdp"

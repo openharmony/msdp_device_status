@@ -25,6 +25,7 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_drawing.h"
 #include "state_change_notify.h"
 #include "stream_session.h"
 
@@ -43,6 +44,7 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid() const;
+    int32_t UpdateDragStyle(int32_t style);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -61,13 +63,14 @@ private:
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();
-    int32_t OnStopDrag();
+    int32_t OnStopDrag(int32_t result);
 private:
     StateChangeNotify stateNotify_;
     DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
+    DragDrawing dragDrawing_;
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
