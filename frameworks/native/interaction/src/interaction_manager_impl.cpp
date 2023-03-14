@@ -212,7 +212,7 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
     return dragManagerImpl_.StartDrag(dragData, callback, disconnectCallback);
 }
 
-int32_t InteractionManagerImpl::StopDrag(int32_t result, bool hasCustomAnimation)
+int32_t InteractionManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.StopDrag(result, hasCustomAnimation);

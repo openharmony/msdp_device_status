@@ -46,11 +46,17 @@ struct DragData {
     bool hasCanceledAnimation { false };
 };
 
+enum class DragResult {
+    DRAG_SUCCESS = 0,
+    DRAG_FAIL = 1,
+    DRAG_CANCEL = 2
+};
+
 struct DragNotifyMsg {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
-    int32_t result { -1 };
     int32_t targetPid { -1 };
+    DragResult result { DragResult::DRAG_FAIL };
 };
 
 enum class DragCursorStyle {
@@ -58,11 +64,6 @@ enum class DragCursorStyle {
     ALLOWABLE
 };
 
-enum class DragResult {
-    DRAG_SUCCESS = 0,
-    DRAG_FAIL = 1,
-    DRAG_CANCEL = 2
-};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

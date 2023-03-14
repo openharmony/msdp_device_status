@@ -349,7 +349,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDrag(int32_t result, bool hasCustomAnimation)
+int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -357,7 +357,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t result, bool hasCustomAnimation)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, result, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(result), ERR_INVALID_VALUE);
     WRITEBOOL(data, hasCustomAnimation, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;

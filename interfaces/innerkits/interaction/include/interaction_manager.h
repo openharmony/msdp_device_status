@@ -104,7 +104,7 @@ public:
      * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */
-    int32_t StopDrag(int32_t result, bool hasCustomAnimation);
+    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     
     /**
      * @brief 更新拖拽中的光标样式。

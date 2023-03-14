@@ -80,7 +80,7 @@ int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<vo
     return InteractionMgrImpl.StartDrag(dragData, callback);
 }
 
-int32_t InteractionManager::StopDrag(int32_t result, bool hasCustomAnimation)
+int32_t InteractionManager::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     return InteractionMgrImpl.StopDrag(result, hasCustomAnimation);
 }

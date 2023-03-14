@@ -66,7 +66,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t result, bool hasCustomAnimation)
+int32_t DragManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().StopDrag(result, hasCustomAnimation);
@@ -82,7 +82,10 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
 {
     CALL_DEBUG_ENTER;
     DragNotifyMsg notifyMsg;
-    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> notifyMsg.result >> notifyMsg.targetPid;
+    int32_t result = 0;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid;
+    notifyMsg.result = static_cast<DragResult>(result);
+    FI_HILOGD("result:%{public}d", notifyMsg.result);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;

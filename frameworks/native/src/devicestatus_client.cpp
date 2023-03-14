@@ -296,7 +296,7 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
     return devicestatusProxy_->StartDrag(dragData);
 }
 
-int32_t DeviceStatusClient::StopDrag(int32_t result, bool hasCustomAnimation)
+int32_t DeviceStatusClient::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);

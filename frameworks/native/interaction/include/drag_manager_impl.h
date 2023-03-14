@@ -39,7 +39,7 @@ public:
     int32_t GetDragTargetPid();
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
         std::function<void()> disconnectCallback);
-    int32_t StopDrag(int32_t result, bool hasCustomAnimation);
+    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);

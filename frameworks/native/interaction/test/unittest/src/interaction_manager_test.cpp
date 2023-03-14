@@ -401,7 +401,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_CUSTOM_ANIMATION);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -426,8 +426,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
     ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS),
-        HAS_CUSTOM_ANIMATION);
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
@@ -456,7 +455,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_CUSTOM_ANIMATION);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -482,8 +481,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
     ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS),
-        HAS_CUSTOM_ANIMATION);
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
@@ -532,7 +530,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_CUSTOM_ANIMATION);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -563,7 +561,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS), HAS_CUSTOM_ANIMATION);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

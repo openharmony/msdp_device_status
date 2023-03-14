@@ -55,7 +55,7 @@ public:
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
     int32_t StartDrag(const DragData &dragData);
-    int32_t StopDrag(int32_t result, bool hasCustomAnimation);
+    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t UpdateDragStyle(int32_t style);
     int32_t UpdateDragMessage(const std::u16string &message);
     int32_t GetDragTargetPid();
