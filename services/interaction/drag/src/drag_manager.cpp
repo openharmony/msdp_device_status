@@ -118,7 +118,6 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
-    FI_HILOGD("result:%{public}d", result);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;

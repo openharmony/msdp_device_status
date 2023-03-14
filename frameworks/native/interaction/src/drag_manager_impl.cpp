@@ -85,7 +85,6 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     int32_t result = 0;
     pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid;
     notifyMsg.result = static_cast<DragResult>(result);
-    FI_HILOGD("result:%{public}d", notifyMsg.result);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
