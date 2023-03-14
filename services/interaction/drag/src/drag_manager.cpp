@@ -111,6 +111,12 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
+void DragManager::SetDragTargetPid(int32_t dragTargetPid)
+{
+    CALL_DEBUG_ENTER;
+    dragTargetPid_ = dragTargetPid;
+}
+
 int32_t DragManager::NotifyDragResult(int32_t result)
 {
     CALL_DEBUG_ENTER;
@@ -159,10 +165,11 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    dragTargetPid_ = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
+    int32_t ret = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
+    FI_HILOGD("Target window drag information, ret: %{public}d", ret);
+    SetDragTargetPid(ret);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
-    FI_HILOGD("dragTargetPid_:%{public}d", dragTargetPid_);
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
