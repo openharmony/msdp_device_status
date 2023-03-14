@@ -86,7 +86,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     return RET_OK;
 }
 
-int32_t DragManager::StopDrag(int32_t result, bool hasSucceedAnimation)
+int32_t DragManager::StopDrag(int32_t result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ == DragMessage::MSG_DRAG_STATE_STOP) {

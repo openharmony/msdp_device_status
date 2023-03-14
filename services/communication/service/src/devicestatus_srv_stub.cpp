@@ -312,10 +312,10 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
 {
     CALL_DEBUG_ENTER;
     int32_t result;
-    bool hasSucceedAnimation;
+    bool hasCustomAnimation;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READBOOL(data, hasSucceedAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StopDrag(result, hasSucceedAnimation);
+    READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StopDrag(result, hasCustomAnimation);
     if (ret != RET_OK) {
         FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
     }

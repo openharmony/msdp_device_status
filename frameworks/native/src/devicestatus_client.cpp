@@ -296,7 +296,7 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
     return devicestatusProxy_->StartDrag(dragData);
 }
 
-int32_t DeviceStatusClient::StopDrag(int32_t result, bool hasSucceedAnimation)
+int32_t DeviceStatusClient::StopDrag(int32_t result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
@@ -304,7 +304,7 @@ int32_t DeviceStatusClient::StopDrag(int32_t result, bool hasSucceedAnimation)
         FI_HILOGE("devicestatusProxy_ is nullptr");
         return RET_ERR;
     }
-    return devicestatusProxy_->StopDrag(result, hasSucceedAnimation);
+    return devicestatusProxy_->StopDrag(result, hasCustomAnimation);
 }
 
 int32_t DeviceStatusClient::AddDraglistener()

@@ -349,7 +349,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDrag(int32_t result, bool hasSucceedAnimation)
+int32_t DeviceStatusSrvProxy::StopDrag(int32_t result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -358,7 +358,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(int32_t result, bool hasSucceedAnimation)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, result, ERR_INVALID_VALUE);
-    WRITEBOOL(data, hasSucceedAnimation, ERR_INVALID_VALUE);
+    WRITEBOOL(data, hasCustomAnimation, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

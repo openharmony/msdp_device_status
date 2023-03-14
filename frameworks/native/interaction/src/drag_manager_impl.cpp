@@ -66,10 +66,10 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t result, bool hasSucceedAnimation)
+int32_t DragManagerImpl::StopDrag(int32_t result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().StopDrag(result, hasSucceedAnimation);
+    return DeviceStatusClient::GetInstance().StopDrag(result, hasCustomAnimation);
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()
