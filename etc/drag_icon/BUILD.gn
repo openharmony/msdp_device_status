@@ -17,31 +17,31 @@ ohos_prebuilt_etc("drawing_image_Copy_Drag") {
   source = "src/Copy_Drag.svg"
   part_name = "${device_status_part_name}"
   subsystem_name = "device_status"
-  relative_install_dir = "device_status/mouse_icon"
+  relative_install_dir = "device_status/drag_icon"
 }
 
 ohos_prebuilt_etc("drawing_image_Forbid_Drag") {
   source = "src/Forbid_Drag.svg"
   part_name = "${device_status_part_name}"
   subsystem_name = "device_status"
-  relative_install_dir = "device_status/mouse_icon"
+  relative_install_dir = "device_status/drag_icon"
 }
 
 ohos_prebuilt_etc("drawing_image_Copy_One_Drag") {
   source = "src/Copy_One_Drag.svg"
   part_name = "${device_status_part_name}"
   subsystem_name = "device_status"
-  relative_install_dir = "device_status/mouse_icon"
+  relative_install_dir = "device_status/drag_icon"
 }
 
 ohos_prebuilt_etc("drawing_image_Mouse_Drag") {
   source = "src/Mouse_Drag.png"
   part_name = "${device_status_part_name}"
   subsystem_name = "device_status"
-  relative_install_dir = "device_status/mouse_icon"
+  relative_install_dir = "device_status/drag_icon"
 }
 
-group("device_status_mouse_icon") {
+group("device_status_drag_icon") {
   deps = [
     ":drawing_image_Copy_Drag",
     ":drawing_image_Copy_One_Drag",
