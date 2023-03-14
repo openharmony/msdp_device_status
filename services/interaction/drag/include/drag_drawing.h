@@ -72,6 +72,7 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
+
 private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
@@ -79,6 +80,7 @@ private:
     int32_t DrawShadowPic();
     int32_t DrawMouseIcon();
     int32_t DrawStyle();
+
 private:
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_  { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
