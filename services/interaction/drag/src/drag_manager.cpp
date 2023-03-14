@@ -231,7 +231,7 @@ int32_t DragManager::OnStopDrag()
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
-    visible_ = visible;
+    DataAdapter.SetDragWindowVisible(visible);
     return RET_OK;
 }
 } // namespace DeviceStatus

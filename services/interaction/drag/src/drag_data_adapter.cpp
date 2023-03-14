@@ -54,6 +54,15 @@ DragData DragDataAdapter::GetDragData() const
     return dragData_;
 }
 
+void DragDataAdapter::SetDragWindowVisible(bool visible)
+{
+    visible_ = visible;
+}
+
+bool DragDataAdapter::GetDragWindowVisible()
+{
+    return visible_;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

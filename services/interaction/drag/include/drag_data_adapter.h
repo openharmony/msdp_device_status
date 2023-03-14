@@ -37,12 +37,14 @@ public:
     DragData GetDragData() const;
     int32_t GetDragStyle() const;
     std::u16string GetDragMessage() const;
-
+    void SetDragWindowVisible(bool visible);
+    bool GetDragWindowVisible();
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
     int32_t dragStyle_ { -1 };
     std::u16string dragMessage_;
+    bool visible_ { false };
 };
 
 #define DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()
