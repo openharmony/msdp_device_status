@@ -31,10 +31,10 @@
 #include "pointer_event.h"
 #include "transaction/rs_interfaces.h"
 #include "transaction/rs_transaction.h"
+#include "ui/rs_root_node.h"
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "ui/rs_root_node.h"
 #include "../wm/window.h"
 
 #include "devicestatus_define.h"
@@ -90,23 +90,19 @@ int32_t DragDrawing::Init(const DragData &dragData)
     g_drawingInfo.pixelMapY = dragData.pictureResourse.y;
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, RET_ERR);
-    int32_t ret = InitLayer();
-    if (ret != RET_OK) {
+    if (InitLayer() != RET_OK) {
         FI_HILOGE("Init Layer failed");
         return RET_ERR;
     }
-    ret = DrawShadowPic();
-    if (ret != RET_OK) {
+    if (DrawShadowPic() != RET_OK) {
         FI_HILOGE("Draw shadow picture failed");
         return RET_ERR;
     }
-    
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         g_drawingInfo.dragWindow->Show();
         return RET_OK;
     }
-    ret = DrawMouseIcon();
-    if (ret != RET_OK) {
+    if (DrawMouseIcon() != RET_OK) {
         FI_HILOGE("Draw mouse icon failed");
         return RET_ERR;
     }
@@ -292,8 +288,6 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     uint32_t errCode = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
-    std::set<std::string> formats;
-    imageSource->GetSupportedFormats(formats);
     int32_t iconSize = GetIconSize();
     if (iconSize <= 0) {
         FI_HILOGE("Get icon size failed");
