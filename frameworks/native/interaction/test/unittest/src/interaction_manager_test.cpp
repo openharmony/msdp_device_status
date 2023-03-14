@@ -495,7 +495,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragTargetPid, TestSi
     CALL_TEST_DEBUG;
     int32_t targetPid = InteractionManager::GetInstance()->GetDragTargetPid();
     FI_HILOGD("target:%{public}d", targetPid);
-    ASSERT_TRUE(targetPid >= -1);
+    ASSERT_TRUE(targetPid > -1);
 }
 
 /**
