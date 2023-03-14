@@ -18,7 +18,6 @@
 #include <cstdint>
 #include <fstream>
 #include <string>
-#include <sys/stat.h>
 
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
@@ -39,6 +38,7 @@
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -48,7 +48,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragD
 constexpr int32_t BASELINE_DENSITY = 160;
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
 constexpr int32_t EIGHT_SIZE = 8;
-constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t IMAGE_WIDTH = 400;
 constexpr int32_t IMAGE_HEIGHT = 500;
 constexpr int32_t SVG_HEIGHT = 40;
@@ -62,7 +61,6 @@ const std::string COPY_DRAG_PATH = "/system/etc/device_status/mouse_icon/Copy_Dr
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/mouse_icon/Copy_One_Drag.svg";
 const std::string FORBID_DRAG_PATH = "/system/etc/device_status/mouse_icon/Forbid_Drag.svg";
 const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/mouse_icon/Mouse_Drag.png";
-const std::string SVG_PATH = "/system/etc/device_status/mouse_icon/";
 struct DrawingInfo {
     int32_t sourceType { -1 };
     int32_t currentStyle { -1 };
@@ -80,41 +78,6 @@ struct DrawingInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
 } g_drawingInfo;
 } // namespace
-
-static bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
-{
-    std::string::size_type pos = filePath.find_last_of('.');
-    if (pos == std::string::npos) {
-        FI_HILOGE("File is not find extension");
-        return false;
-    }
-    return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
-}
-
-static int32_t GetFileSize(const std::string &filePath)
-{
-    struct stat statbuf = { 0 };
-    if (stat(filePath.c_str(), &statbuf) != 0) {
-        FI_HILOGE("Get file size error");
-        return RET_ERR;
-    }
-    return statbuf.st_size;
-}
-
-static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
-{
-    return (filePath.compare(0, rootDir.size(), rootDir) == 0);
-}
-
-static bool IsValidSvgPath(const std::string &filePath)
-{
-    return IsValidPath(SVG_PATH, filePath);
-}
-
-static bool IsFileExists(const std::string &fileName)
-{
-    return (access(fileName.c_str(), F_OK) == 0);
-}
 
 int32_t DragDrawing::Init(const DragData &dragData)
 {
@@ -334,7 +297,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     }
     
     if (!IsValidSvgFile(filePath)) {
-        FI_HILOGE("Svg file is valid");
+        FI_HILOGE("Svg file is invalid");
         return;
     }
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
@@ -362,38 +325,6 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
-}
-
-bool DrawSVGModifier::IsValidSvgFile(const std::string &filePath) const
-{
-    CALL_DEBUG_ENTER;
-    if (filePath.empty()) {
-        FI_HILOGE("FilePath is empty");
-        return false;
-    }
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        FI_HILOGE("Realpath return nullptr, realPath:%{public}s", realPath);
-        return false;
-    }
-    if (!IsValidSvgPath(realPath)) {
-        FI_HILOGE("File path invalid");
-        return false;
-    }
-    if (!IsFileExists(realPath)) {
-        FI_HILOGE("File not exist");
-        return false;
-    }
-    if (!CheckFileExtendName(realPath, "svg")) {
-        FI_HILOGE("Unable to parse files other than svg format");
-        return false;
-    }
-    int32_t fileSize = GetFileSize(realPath);
-    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        FI_HILOGE("File size out of read range");
-        return false;
-    }
-    return true;
 }
 
 int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize) const

@@ -40,7 +40,6 @@ public:
     void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
 
 private:
-    bool IsValidSvgFile(const std::string &filePath) const;
     int32_t UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize) const;
     xmlNodePtr FindRectNode(xmlNodePtr &curNode) const;
     xmlNodePtr UpdateRectNode(xmlNodePtr &curNode, int32_t strSize) const;
