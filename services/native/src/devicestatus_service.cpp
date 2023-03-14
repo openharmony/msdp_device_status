@@ -724,7 +724,6 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
         std::bind(&DragManager::OnSetDragWindowVisible, dragMgr_, visible));
     if (ret != RET_OK) {
         FI_HILOGE("OnSetDragWindowVisible failed, ret:%{public}d", ret);
-        return ret;
     }
     return RET_OK;
 }

@@ -577,7 +577,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, Te
     FI_HILOGD("ret:%{public}d", ret);
     ASSERT_EQ(ret, RET_OK);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

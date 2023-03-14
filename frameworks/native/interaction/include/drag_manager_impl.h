@@ -44,6 +44,7 @@ public:
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
+    
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
