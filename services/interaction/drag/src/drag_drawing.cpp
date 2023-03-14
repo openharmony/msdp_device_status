@@ -404,15 +404,15 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize)
         return RET_ERR;
     }
     int32_t number = 0;
-    std::ostringstream oss;
-    oss << xmlGetProp(curNode, BAD_CAST "width");
-    std::string srcSvgWidth = oss.str();
+    std::ostringstream oStrSteam;
+    oStrSteam << xmlGetProp(curNode, BAD_CAST "width");
+    std::string srcSvgWidth = oStrSteam.str();
     number = std::stoi(srcSvgWidth) + strSize;
     std::string tgtSvgWidth  = std::to_string(number);
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
-    std::ostringstream oStrStream;
-    oStrStream << xmlGetProp(curNode, BAD_CAST "viewBox");
-    std::string srcViewBox = oStrStream.str();
+    oStrSteam.clear();
+    oStrSteam << xmlGetProp(curNode, BAD_CAST "viewBox");
+    std::string srcViewBox = oStrSteam.str();
     std::istringstream iStrSteam(srcViewBox);
     std::string word;
     std::string tgtViewBox;
@@ -454,9 +454,9 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t strSize)
     int32_t number = 0;
     while (curNode != NULL) {
         if (!xmlStrcmp(curNode->name, BAD_CAST "rect")) {
-            std::ostringstream oss;
-            oss << xmlGetProp(curNode, BAD_CAST "width");
-            std::string srcRectWidth = oss.str();
+            std::ostringstream oStrSteam;
+            oStrSteam << xmlGetProp(curNode, BAD_CAST "width");
+            std::string srcRectWidth = oStrSteam.str();
             number = std::stoi(srcRectWidth) + strSize;
             std::string tgtRectWidth = std::to_string(number);
             xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtRectWidth.c_str());
@@ -514,9 +514,9 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
     xmlChar *xmlbuff;
     int32_t buffersize;
     xmlDocDumpFormatMemory(xmlDoc, &xmlbuff, &buffersize, 1);
-    std::ostringstream oss;
-    oss << xmlbuff;
-    std::string content = oss.str();
+    std::ostringstream oStrSteam;
+    oStrSteam << xmlbuff;
+    std::string content = oStrSteam.str();
     xmlFree(xmlbuff);
     xmlFreeDoc(xmlDoc);
     OHOS::Media::SourceOptions opts;
