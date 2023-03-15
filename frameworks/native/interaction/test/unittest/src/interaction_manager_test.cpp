@@ -514,7 +514,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
     int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
     FI_HILOGI("Target pid:%{public}d", pid);
     ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -545,7 +545,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
     int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
     FI_HILOGI("Target pid:%{public}d", pid);
     ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**

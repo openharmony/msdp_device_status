@@ -117,7 +117,7 @@ void DragManager::SetDragTargetPid(int32_t dragTargetPid)
     dragTargetPid_ = dragTargetPid;
 }
 
-int32_t DragManager::NotifyDragResult(int32_t result)
+int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
