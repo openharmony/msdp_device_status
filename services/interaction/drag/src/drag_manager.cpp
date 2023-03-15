@@ -161,6 +161,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
 }
@@ -169,6 +171,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     int32_t pid = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
