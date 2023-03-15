@@ -50,7 +50,7 @@ private:
     int32_t GetIconSize() const;
 };
 
-class DragDrawing  final {
+class DragDrawing final {
 public:
     DragDrawing() = default;
     ~DragDrawing() = default;
@@ -67,7 +67,7 @@ private:
     int32_t DrawMouseIcon();
 
 private:
-    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_  { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
