@@ -78,7 +78,7 @@ private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
-    int32_t DrawShadowPic();
+    int32_t DrawShadow();
     int32_t DrawMouseIcon();
     int32_t DrawStyle();
 
