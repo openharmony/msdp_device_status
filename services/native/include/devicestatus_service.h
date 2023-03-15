@@ -80,6 +80,7 @@ public:
     int32_t AddDraglistener() override;
     int32_t RemoveDraglistener() override;
     int32_t SetDragWindowVisible(bool visible) override;
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) override;
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;

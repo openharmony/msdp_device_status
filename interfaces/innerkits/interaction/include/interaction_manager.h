@@ -152,6 +152,15 @@ public:
      */
     int32_t SetDragWindowVisible(bool visible);
 
+    /**
+     * @brief 获取触控点或鼠标光标相对于阴影缩略图左上角的位置。
+     * @param offsetX 要查询的x值。
+     * @param offsetY 要查询的y值。
+     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @since 10
+     */
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

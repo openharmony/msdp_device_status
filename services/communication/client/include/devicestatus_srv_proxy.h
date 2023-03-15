@@ -56,7 +56,8 @@ public:
     virtual int32_t AddDraglistener() override;
     virtual int32_t RemoveDraglistener() override;
     virtual int32_t SetDragWindowVisible(bool visible) override;
-    
+    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) override;
+
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
 };

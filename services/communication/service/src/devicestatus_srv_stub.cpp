@@ -65,6 +65,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
+        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -350,6 +351,20 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
     if (ret != RET_OK) {
         FI_HILOGE("Call SetDragWindowVisible failed ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    int32_t ret = GetShadowOffset(offsetX, offsetY);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call GetShadowOffsetStub failed ret:%{public}d", ret);
+    }
+    WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 } // namespace DeviceStatus

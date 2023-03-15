@@ -48,6 +48,7 @@ public:
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
     
 private:
     void InitMsgHandler();

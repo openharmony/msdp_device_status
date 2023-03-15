@@ -246,6 +246,12 @@ int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.SetDragWindowVisible(visible);
 }
+
+int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

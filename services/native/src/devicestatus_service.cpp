@@ -728,6 +728,17 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     return ret;
 }
 
+int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnGetShadowOffset, dragMgr_, std::ref(offsetX), std::ref(offsetY)));
+    if (ret != RET_OK) {
+        FI_HILOGE("GetShadowOffset failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
 {
     CALL_DEBUG_ENTER;

@@ -577,6 +577,22 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, Te
     FI_HILOGD("ret:%{public}d", ret);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+* @tc.name: InteractionManagerTest_GetShadowOffset
+* @tc.desc: Get Shadow Offset
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY);
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

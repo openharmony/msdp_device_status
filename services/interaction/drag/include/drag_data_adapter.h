@@ -39,6 +39,8 @@ public:
     std::u16string GetDragMessage() const;
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+    
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;

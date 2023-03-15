@@ -62,9 +62,11 @@ public:
     int32_t AddDraglistener();
     int32_t RemoveDraglistener();
     int32_t SetDragWindowVisible(bool visible);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
 
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
+
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

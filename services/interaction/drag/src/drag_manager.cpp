@@ -234,6 +234,11 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     DataAdapter.SetDragWindowVisible(visible);
     return RET_OK;
 }
+
+int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    return DataAdapter.GetShadowOffset(offsetX, offsetY);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -327,6 +327,13 @@ int32_t DeviceStatusClient::SetDragWindowVisible(bool visible)
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->SetDragWindowVisible(visible);
 }
+
+int32_t DeviceStatusClient::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetShadowOffset(offsetX, offsetY);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

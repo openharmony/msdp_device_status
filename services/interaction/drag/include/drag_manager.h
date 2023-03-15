@@ -47,6 +47,7 @@ public:
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible);
+    int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY);
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
         explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb)
