@@ -725,7 +725,7 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     if (ret != RET_OK) {
         FI_HILOGE("OnSetDragWindowVisible failed, ret:%{public}d", ret);
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::UpdateDragStyle(int32_t style)

@@ -38,7 +38,7 @@ public:
     int32_t GetDragStyle() const;
     std::u16string GetDragMessage() const;
     void SetDragWindowVisible(bool visible);
-    bool GetDragWindowVisible();
+    bool GetDragWindowVisible() const;
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;

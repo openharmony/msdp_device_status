@@ -59,7 +59,7 @@ void DragDataAdapter::SetDragWindowVisible(bool visible)
     visible_ = visible;
 }
 
-bool DragDataAdapter::GetDragWindowVisible()
+bool DragDataAdapter::GetDragWindowVisible() const
 {
     return visible_;
 }
