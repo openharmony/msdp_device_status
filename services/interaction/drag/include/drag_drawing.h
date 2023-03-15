@@ -83,7 +83,7 @@ private:
     int32_t DrawStyle();
 
 private:
-    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_  { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
