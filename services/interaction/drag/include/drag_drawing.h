@@ -65,7 +65,7 @@ private:
     int32_t GetIconSize() const;
 };
 
-class DragDrawing  final {
+class DragDrawing final {
 public:
     DragDrawing() = default;
     ~DragDrawing() = default;
