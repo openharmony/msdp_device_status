@@ -45,6 +45,7 @@ public:
     int32_t StopDrag(int32_t result);
     int32_t GetDragTargetPid() const;
     int32_t UpdateDragStyle(int32_t style);
+    void SetDragTargetPid(int32_t dragTargetPid);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
