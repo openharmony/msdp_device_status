@@ -36,7 +36,7 @@ constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
-const std::string SVG_PATH = "/system/etc/device_status/mouse_icon/";
+const std::string SVG_PATH = "/system/etc/device_status/drag_icon/";
 } // namespace
 
 int32_t GetPid()
