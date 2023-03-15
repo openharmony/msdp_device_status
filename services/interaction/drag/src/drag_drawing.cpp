@@ -35,7 +35,7 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "../wm/window.h"
+#include "window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"
@@ -91,14 +91,15 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, RET_ERR);
     if (InitLayer() != RET_OK) {
-        FI_HILOGE("Init Layer failed");
+        FI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    if (DrawShadowPic() != RET_OK) {
-        FI_HILOGE("Draw shadow picture failed");
+    if (DrawShadow() != RET_OK) {
+        FI_HILOGE("Draw shadow failed");
         return RET_ERR;
     }
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        CHKPR(g_drawingInfo.dragWindow, RET_ERR);
         g_drawingInfo.dragWindow->Show();
         return RET_OK;
     }
@@ -106,6 +107,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Draw mouse icon failed");
         return RET_ERR;
     }
+    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
     g_drawingInfo.dragWindow->Show();
     return RET_OK;
 }
@@ -133,10 +135,11 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
         return;
     }
     CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
+    CHKPV(g_drawingInfo.dragWindow);
     g_drawingInfo.dragWindow->Show();
 }
 
-int32_t DragDrawing::DrawShadowPic()
+int32_t DragDrawing::DrawShadow()
 {
     CALL_DEBUG_ENTER;
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
@@ -150,9 +153,11 @@ int32_t DragDrawing::DrawShadowPic()
         return RET_ERR;
     }
     if (drawPixelMapModifier_ != nullptr) {
+        CHKPR(g_drawingInfo.nodes[PIXEL_MAP_INDEX], RET_ERR);
         g_drawingInfo.nodes[PIXEL_MAP_INDEX]->RemoveModifier(drawPixelMapModifier_);
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
+    CHKPR(g_drawingInfo.nodes[PIXEL_MAP_INDEX], RET_ERR);
     g_drawingInfo.nodes[PIXEL_MAP_INDEX]->AddModifier(drawPixelMapModifier_);
     return RET_OK;
 }
@@ -165,9 +170,11 @@ int32_t DragDrawing::DrawMouseIcon()
         return RET_ERR;
     }
     if (drawMouseIconModifier_ != nullptr) {
+        CHKPR(g_drawingInfo.nodes[MOUSE_ICON_INDEX], RET_ERR);
         g_drawingInfo.nodes[MOUSE_ICON_INDEX]->RemoveModifier(drawMouseIconModifier_);
     }
     drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
+    CHKPR(g_drawingInfo.nodes[MOUSE_ICON_INDEX], RET_ERR);
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->AddModifier(drawMouseIconModifier_);
     return RET_OK;
 }
@@ -194,6 +201,7 @@ int32_t DragDrawing::InitLayer()
         return RET_ERR;
     }
     rsUiDirector_ = OHOS::Rosen::RSUIDirector::Create();
+    CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->Init();
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
     InitCanvas(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -206,23 +214,27 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     CALL_DEBUG_ENTER;
     if (g_drawingInfo.rootNode == nullptr) {
         g_drawingInfo.rootNode = OHOS::Rosen::RSRootNode::Create();
+        CHKPV(g_drawingInfo.rootNode);
     }
     g_drawingInfo.rootNode->SetBounds(g_drawingInfo.displayX, g_drawingInfo.displayY, width, height);
     g_drawingInfo.rootNode->SetFrame(g_drawingInfo.displayX, g_drawingInfo.displayY, width, height);
     g_drawingInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 
     auto pixelMapNode = OHOS::Rosen::RSCanvasNode::Create();
+    CHKPV(pixelMapNode);
     pixelMapNode->SetBounds(0, SVG_HEIGHT, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     pixelMapNode->SetFrame(0, SVG_HEIGHT, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
 
     auto dragStyleNode = OHOS::Rosen::RSCanvasNode::Create();
+    CHKPV(dragStyleNode);
     dragStyleNode->SetBounds(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
 
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
+        CHKPV(mouseIconNode);
         mouseIconNode->SetBounds(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
         mouseIconNode->SetFrame(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
@@ -260,11 +272,11 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
 {
     CALL_DEBUG_ENTER;
-    auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
     if (g_drawingInfo.pixelMap == nullptr) {
         FI_HILOGE("Param pixelMap is nullptr");
         return;
     }
+    auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
     rosenImage->SetPixelMap(g_drawingInfo.pixelMap);
     rosenImage->SetImageRepeat(0);
     int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
@@ -300,6 +312,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     };
     decodeOpts.allocatorType = OHOS::Media::AllocatorType::SHARE_MEM_ALLOC;
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
+    CHKPV(pixelMap);
     auto rosenImage = std::make_shared<Rosen::RSImage>();
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
@@ -316,7 +329,7 @@ int32_t DrawMouseIconModifier::GetIconSize() const
 {
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
-    CHKPR(displayInfo, 0);
+    CHKPR(displayInfo, RET_ERR);
     return displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
 }
 } // namespace DeviceStatus
