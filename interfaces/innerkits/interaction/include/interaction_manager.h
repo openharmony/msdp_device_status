@@ -100,7 +100,7 @@ public:
     /**
      * @brief 结束拖拽。
      * @param result 标识拖拽调用结果 0-成功,1-失败,2-取消
-     * @param hasCustomAnimation 标识是否在拖拽成功时做动效
+     * @param hasCustomAnimation 标识是否在拖拽成功时做默认动效，true表示做应用自定义动效，false表示做默认动效
      * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */

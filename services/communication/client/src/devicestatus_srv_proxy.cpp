@@ -322,13 +322,13 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    CHKPR(dragData.shadowRes.pixelMap, RET_ERR);
-    if (!dragData.shadowRes.pixelMap->Marshalling(data)) {
+    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
+    if (!dragData.shadowInfo.pixelMap->Marshalling(data)) {
         FI_HILOGE("Failed to marshalling pixelMap");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, dragData.shadowRes.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.shadowRes.y, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
@@ -356,6 +356,10 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
+    }
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+        return RET_ERR;
     }
     WRITEINT32(data, static_cast<int32_t>(result), ERR_INVALID_VALUE);
     WRITEBOOL(data, hasCustomAnimation, ERR_INVALID_VALUE);

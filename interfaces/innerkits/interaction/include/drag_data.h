@@ -28,14 +28,14 @@ namespace DeviceStatus {
 static const int32_t MAX_PIXEL_MAP_WIDTH = 600;
 static const int32_t MAX_PIXEL_MAP_HEIGHT = 600;
 static const int32_t MAX_BUFFER_SIZE = 512;
-struct ShadowRes {
+struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
 };
 
 struct DragData {
-    ShadowRes shadowRes;
+    ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };

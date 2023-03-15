@@ -276,15 +276,15 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.shadowRes.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
-    if (dragData.shadowRes.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.shadowRes.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
+    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.shadowRes.pixelMap->GetWidth(), dragData.shadowRes.pixelMap->GetHeight());
+            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
         return RET_ERR;
     }
-    READINT32(data, dragData.shadowRes.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.shadowRes.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -315,6 +315,11 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     bool hasCustomAnimation;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
+        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        FI_HILOGE("Invalid result:%{public}d", result);
+        return RET_ERR;
+    }
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
         FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);

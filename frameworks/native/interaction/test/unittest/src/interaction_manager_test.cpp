@@ -112,9 +112,9 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t
         return std::nullopt;
     }
     DragData dragData;
-    dragData.shadowRes.pixelMap = pixelMap;
-    dragData.shadowRes.x = 0;
-    dragData.shadowRes.y = 0;
+    dragData.shadowInfo.pixelMap = pixelMap;
+    dragData.shadowInfo.x = 0;
+    dragData.shadowInfo.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = sourceType;
     dragData.pointerId = pointerId;
