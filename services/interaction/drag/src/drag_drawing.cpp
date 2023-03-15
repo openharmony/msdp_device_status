@@ -222,6 +222,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
 
     auto pixelMapNode = OHOS::Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
+    CHKPV(g_drawingInfo.pixelMap);
     pixelMapNode->SetBounds(0, SVG_HEIGHT, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     pixelMapNode->SetFrame(0, SVG_HEIGHT, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
