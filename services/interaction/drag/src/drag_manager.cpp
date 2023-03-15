@@ -165,9 +165,9 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    int32_t ret = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
-    FI_HILOGD("Target window drag information, ret: %{public}d", ret);
-    SetDragTargetPid(ret);
+    int32_t pid = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
+    FI_HILOGD("Target window drag pid:%{public}d", pid);
+    SetDragTargetPid(pid);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
 }

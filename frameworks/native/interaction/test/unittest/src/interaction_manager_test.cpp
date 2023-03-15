@@ -508,9 +508,9 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ret = InteractionManager::GetInstance()->GetDragTargetPid();
-    FI_HILOGI("Target ret:%{public}d", ret);
-    ASSERT_TRUE(ret > 0); 
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    FI_HILOGI("Target pid:%{public}d", pid);
+    ASSERT_TRUE(pid > 0); 
     InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
 }
 
@@ -539,9 +539,9 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ret = InteractionManager::GetInstance()->GetDragTargetPid();
-    FI_HILOGI("Target ret:%{public}d", ret);
-    ASSERT_TRUE(ret > 0); 
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    FI_HILOGI("Target pid:%{public}d", pid);
+    ASSERT_TRUE(pid > 0); 
     InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
 }
 
