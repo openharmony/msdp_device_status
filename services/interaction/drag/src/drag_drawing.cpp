@@ -35,7 +35,7 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "window.h"
+#include "../wm/window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"
@@ -281,6 +281,7 @@ void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     rosenImage->SetImageRepeat(0);
     int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
     int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
+    CHKPV(g_drawingInfo.nodes[PIXEL_MAP_INDEX]);
     g_drawingInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsWidth(pixelMapWidth);
     g_drawingInfo.nodes[PIXEL_MAP_INDEX]->SetBoundsHeight(pixelMapHeight);
     g_drawingInfo.nodes[PIXEL_MAP_INDEX]->SetBgImageWidth(pixelMapWidth);
@@ -316,6 +317,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     auto rosenImage = std::make_shared<Rosen::RSImage>();
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
+    CHKPV(g_drawingInfo.nodes[MOUSE_ICON_INDEX]);
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsWidth(decodeOpts.desiredSize.width);
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->SetBoundsHeight(decodeOpts.desiredSize.height);
     g_drawingInfo.nodes[MOUSE_ICON_INDEX]->SetBgImageWidth(decodeOpts.desiredSize.width);

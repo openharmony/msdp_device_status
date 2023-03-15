@@ -46,8 +46,6 @@ ohos_shared_library("interaction_drag") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "window_manager:libdm",
-    "window_manager:libwm",
     "graphic_standard:libcomposer",
     "graphic_standard:window_animation",
     "hitrace_native:hitrace_meter",
@@ -55,6 +53,8 @@ ohos_shared_library("interaction_drag") {
     "input:libmmi-client",
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",
+    "window_manager:libdm",
+    "window_manager:libwm",
   ]
 
   subsystem_name = "msdp"
