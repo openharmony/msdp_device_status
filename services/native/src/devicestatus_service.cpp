@@ -732,7 +732,7 @@ int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    return RET_OK;
+    return dragMgr_.GetDragTargetPid();
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
