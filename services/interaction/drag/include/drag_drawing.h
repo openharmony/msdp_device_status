@@ -77,7 +77,7 @@ private:
     std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
-class DragDrawing  final {
+class DragDrawing final {
 public:
     DragDrawing() = default;
     ~DragDrawing() = default;
@@ -104,7 +104,7 @@ private:
 
 private:
     int64_t startNum_ { -1 };
-    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_  { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
