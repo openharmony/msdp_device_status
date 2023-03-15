@@ -73,8 +73,8 @@ public:
     void SetAlpha(float alpha);
     void SetScale(float scale);
 private:
-    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> alpha_;
-    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_;
+    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
 class DragDrawing  final {
@@ -95,7 +95,7 @@ private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
-    int32_t DrawShadowPic();
+    int32_t DrawShadow();
     int32_t DrawMouseIcon();
     int32_t DrawStyle();
     void InitAnimation();

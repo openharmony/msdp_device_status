@@ -256,8 +256,7 @@ int32_t DragManager::OnStopDrag(int32_t result)
         }
         if (result == 0) {
             dragDrawing_.OnDragSuccess();
-        }
-        else {
+        } else {
             dragDrawing_.OnDragFail();
         }
         dragDrawing_.DestroyDragWindow();
