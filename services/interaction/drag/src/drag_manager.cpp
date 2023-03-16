@@ -124,6 +124,8 @@ int32_t DragManager::UpdateDragStyle(int32_t style)
         dragDrawing_.DestroyDragWindow();
     }
     return RET_OK;
+}
+
 void DragManager::SetDragTargetPid(int32_t dragTargetPid)
 {
     CALL_DEBUG_ENTER;
