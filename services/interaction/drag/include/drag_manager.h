@@ -64,7 +64,7 @@ private:
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();
-    int32_t OnStopDrag(int32_t result);
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
 private:
     StateChangeNotify stateNotify_;
     DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };

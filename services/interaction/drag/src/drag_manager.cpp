@@ -93,7 +93,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (OnStopDrag(result) != RET_OK) {
+    if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
     }
@@ -258,7 +258,7 @@ int32_t DragManager::OnStartDrag()
     return RET_OK;
 }
 
-int32_t DragManager::OnStopDrag(int32_t result)
+int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     if (monitorId_ > 0) {
@@ -269,10 +269,24 @@ int32_t DragManager::OnStopDrag(int32_t result)
             dragDrawing_.EraseMouseIcon();
             INPUT_MANAGER->SetPointerVisible(true);
         }
-        if (result == 0) {
-            dragDrawing_.OnDragSuccess();
-        } else {
-            dragDrawing_.OnDragFail();
+        switch (result) {
+            case DragResult::DRAG_SUCCESS: {
+                if (!hasCustomAnimation) {
+                    dragDrawing_.OnDragSuccess();
+                }
+                break;
+            }
+            case DragResult::DRAG_FAIL:
+            case DragResult::DRAG_CANCEL: {
+                if (!dragData.hasCanceledAnimation) {
+                    dragDrawing_.OnDragFail();
+                }
+                break;
+            }
+            default: {
+                FI_HILOGE("Unsupported DragResult type, DragResult:%{public}d", result);
+                break;
+            }
         }
         dragDrawing_.DestroyDragWindow();
         return RET_OK;
