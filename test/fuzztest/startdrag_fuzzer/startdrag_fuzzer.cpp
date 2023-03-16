@@ -63,14 +63,14 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
 DragData CreateDragData(const uint8_t* data, size_t size)
 {
     size_t startPos = 0;
-    PictureResourse pictureResourse;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, pictureResourse.x);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, pictureResourse.y);
+    ShadowInfo shadowInfo;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.x);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.y);
     int32_t width = 0;
     int32_t height = 0;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, height);
-    pictureResourse.pixelMap = CreatePixelMap(width, height);
+    shadowInfo.pixelMap = CreatePixelMap(width, height);
     
     DragData dragData;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.sourceType);
@@ -79,7 +79,8 @@ DragData CreateDragData(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayX);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayY);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayId);
-    dragData.pictureResourse = pictureResourse;
+    dragData.hasCanceledAnimation = true;
+    dragData.shadowInfo = shadowInfo;
     return dragData;
 }
 
@@ -94,7 +95,8 @@ void StartDragFuzzTest(const uint8_t* data, size_t  size)
     };
     DragData dragData = CreateDragData(data, size);
     InteractionManager::GetInstance()->StartDrag(dragData, func);
-    InteractionManager::GetInstance()->StopDrag(0);
+    bool hasCustomAnimation = true;
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, hasCustomAnimation);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

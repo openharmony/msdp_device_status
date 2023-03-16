@@ -28,7 +28,8 @@ void StopDragFuzzTest(const uint8_t* data, size_t  size)
         return;
     }
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
-    InteractionManager::GetInstance()->StopDrag(result);
+    bool hasCustomAnimation = true;
+    InteractionManager::GetInstance()->StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
