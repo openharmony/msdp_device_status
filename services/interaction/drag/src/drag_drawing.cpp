@@ -330,13 +330,13 @@ int32_t DragDrawing::DrawStyle()
         FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
+    auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPR(dragStyleNode, RET_ERR);
     if (drawSVGModifier_ != nullptr) {
-        CHKPR(g_drawingInfo.nodes[DRAG_STYLE_INDEX], RET_ERR);
-        g_drawingInfo.nodes[DRAG_STYLE_INDEX]->RemoveModifier(drawSVGModifier_);
+        dragStyleNode->RemoveModifier(drawSVGModifier_);
     }
     auto drawSVGModifier_ = std::make_shared<DrawSVGModifier>();
-    CHKPR(g_drawingInfo.nodes[DRAG_STYLE_INDEX], RET_ERR);
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->AddModifier(drawSVGModifier_);
+    dragStyleNode->AddModifier(drawSVGModifier_);
     return RET_OK;
 }
 
@@ -502,21 +502,19 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     rosenImage->SetImageRepeat(0);
     CHKPV(g_drawingInfo.pixelMap);
     int32_t svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + EIGHT_SIZE - pixelMap->GetWidth();
-    CHKPV(g_drawingInfo.nodes[PIXEL_MAP_INDEX]);
-    g_drawingInfo.nodes[PIXEL_MAP_INDEX]->SetBounds(0, EIGHT_SIZE,
-        g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
-    g_drawingInfo.nodes[PIXEL_MAP_INDEX]->SetFrame(0, EIGHT_SIZE,
-        g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
-    CHKPV(g_drawingInfo.nodes[DRAG_STYLE_INDEX]);
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBounds(svgTouchPositionX, 0,
-        pixelMap->GetWidth(), pixelMap->GetHeight());
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetFrame(svgTouchPositionX, 0,
-        pixelMap->GetWidth(), pixelMap->GetHeight());
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBgImageWidth(pixelMap->GetWidth());
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBgImageHeight(SVG_HEIGHT);
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBgImagePositionX(0);
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBgImagePositionY(0);
-    g_drawingInfo.nodes[DRAG_STYLE_INDEX]->SetBgImage(rosenImage);
+    auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
+    CHKPV(pixelMapNode);
+    pixelMapNode->SetBounds(0, EIGHT_SIZE, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetFrame(0, EIGHT_SIZE, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPV(dragStyleNode);
+    dragStyleNode->SetBounds(svgTouchPositionX, 0, pixelMap->GetWidth(), pixelMap->GetHeight());
+    dragStyleNode->SetFrame(svgTouchPositionX, 0, pixelMap->GetWidth(), pixelMap->GetHeight());
+    dragStyleNode->SetBgImageWidth(pixelMap->GetWidth());
+    dragStyleNode->SetBgImageHeight(SVG_HEIGHT);
+    dragStyleNode->SetBgImagePositionX(0);
+    dragStyleNode->SetBgImagePositionY(0);
+    dragStyleNode->SetBgImage(rosenImage);
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + EIGHT_SIZE;
     g_drawingInfo.rootNodeHeight = pixelMap->GetHeight() + g_drawingInfo.pixelMap->GetHeight() + EIGHT_SIZE;
     CHKPV(g_drawingInfo.rootNode);

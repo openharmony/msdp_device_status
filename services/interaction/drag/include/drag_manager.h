@@ -42,7 +42,7 @@ public:
     int32_t AddListener(SessionPtr session);
     int32_t RemoveListener(SessionPtr session);
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
-    int32_t StopDrag(int32_t result);
+    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid() const;
     int32_t UpdateDragStyle(int32_t style);
     void SetDragTargetPid(int32_t dragTargetPid);
@@ -60,7 +60,7 @@ public:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 private:
-    int32_t NotifyDragResult(int32_t result);
+    int32_t NotifyDragResult(DragResult result);
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();

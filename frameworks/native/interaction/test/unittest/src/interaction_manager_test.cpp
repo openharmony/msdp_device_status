@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,8 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 200 };
 constexpr int32_t DRAG_DST_Y { 200 };
 constexpr int32_t DRAG_NUM { 1 };
+constexpr bool HAS_CANCELED_ANIMATION { false };
+constexpr bool HAS_CUSTOM_ANIMATION { false };
 constexpr int32_t MOVE_STEP { 100 };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
@@ -110,9 +112,9 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t
         return std::nullopt;
     }
     DragData dragData;
-    dragData.pictureResourse.pixelMap = pixelMap;
-    dragData.pictureResourse.x = 0;
-    dragData.pictureResourse.y = 0;
+    dragData.shadowInfo.pixelMap = pixelMap;
+    dragData.shadowInfo.x = 0;
+    dragData.shadowInfo.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.sourceType = sourceType;
     dragData.pointerId = pointerId;
@@ -120,6 +122,7 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t
     dragData.displayX = location.first;
     dragData.displayY = location.second;
     dragData.displayId = displayId;
+    dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
     return dragData;
 }
 
@@ -398,7 +401,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -423,7 +426,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
     ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
@@ -452,7 +455,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -478,7 +481,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
     ASSERT_TRUE(dragData);
     InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
     ASSERT_TRUE(stopCallbackFlag);
@@ -511,7 +514,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
     int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
     FI_HILOGI("Target pid:%{public}d", pid);
     ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -542,7 +545,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
     int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
     FI_HILOGI("Target pid:%{public}d", pid);
     ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -574,7 +577,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 
 /**
@@ -605,7 +608,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(static_cast<int32_t>(DragResult::DRAG_SUCCESS));
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

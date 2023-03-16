@@ -99,11 +99,12 @@ public:
 
     /**
      * @brief 结束拖拽。
-     * @param result 传出参数，标识拖拽调用结果 0-成功,1-失败,2-取消
+     * @param result 标识拖拽调用结果 0-成功,1-失败,2-取消
+     * @param hasCustomAnimation 标识是否在拖拽成功时做默认动效，true表示做应用自定义动效，false表示做默认动效
      * @return 返回0表示调用成功，否则，表示调用失败
      * @since 10
      */
-    int32_t StopDrag(int32_t result);
+    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     
     /**
      * @brief 更新拖拽中的光标样式。
@@ -128,7 +129,7 @@ public:
      */
     int32_t GetDragTargetPid();
 
-    /*
+    /**
      * @brief 注册拖拽状态监听。。
      * @param listener 拖拽状态监听。
      * @return 返回值0表示接口调用成功，否则，表示接口调用失败。

@@ -86,7 +86,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     return RET_OK;
 }
 
-int32_t DragManager::StopDrag(int32_t result)
+int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ == DragMessage::MSG_DRAG_STATE_STOP) {
@@ -132,13 +132,17 @@ void DragManager::SetDragTargetPid(int32_t dragTargetPid)
     dragTargetPid_ = dragTargetPid;
 }
 
-int32_t DragManager::NotifyDragResult(int32_t result)
+int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
-    pkt << dragData.displayX << dragData.displayY << result << targetPid;
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+        return RET_ERR;
+    }
+    pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
@@ -172,6 +176,8 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
@@ -181,6 +187,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     int32_t pid = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
