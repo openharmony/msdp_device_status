@@ -12,25 +12,15 @@
 # limitations under the License.
 
 import("//base/msdp/device_status/device_status.gni")
-
-#####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
 module_output_path = "device_status/device_status_native"
-
-##############################fuzztest##########################################
 ohos_fuzztest("StopDragFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "./../stopdrag_fuzzer"
   include_dirs = [
     "./../../../interfaces/innerkits/interaction/include",
     "./../../../utils/common/include",
-  ]
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [ "stopdrag_fuzzer.cpp" ]
   deps = [ "./../../../interfaces/innerkits:devicestatus_client" ]
@@ -41,10 +31,8 @@ ohos_fuzztest("StopDragFuzzTest") {
   ]
 }
 
-###############################################################################
 group("fuzztest") {
   testonly = true
   deps = []
   deps += [ ":StopDragFuzzTest" ]
 }
-###############################################################################
