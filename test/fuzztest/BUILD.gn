@@ -18,6 +18,7 @@ group("device_status_fuzztest") {
   deps = []
 
   deps += [
+    "adddraglistener_fuzzer:fuzztest",
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
   ]

@@ -74,8 +74,7 @@ public:
 
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
-    int32_t UpdateDragStyle(int32_t style) override;
-    int32_t UpdateDragMessage(const std::u16string &message) override;
+    int32_t UpdateDragStyle(DragCursorStyle style) override;
     int32_t GetDragTargetPid() override;
     int32_t AddDraglistener() override;
     int32_t RemoveDraglistener() override;
