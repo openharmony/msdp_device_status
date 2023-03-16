@@ -237,8 +237,10 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
-        mouseIconNode->SetBounds(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
-        mouseIconNode->SetFrame(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetBounds(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+            SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetFrame(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+            SVG_HEIGHT, SVG_HEIGHT);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
         g_drawingInfo.rootNode->AddChild(pixelMapNode);
         g_drawingInfo.rootNode->AddChild(dragStyleNode);
