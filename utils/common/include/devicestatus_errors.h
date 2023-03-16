@@ -76,6 +76,12 @@ enum {
     DEVICESTATUS_INVALID_FD = -2,
     DEVICESTATUS_NOT_FIND_JSON_ITEM = -3,
 };
+
+enum {
+    INIT_FAIL = -1,
+    INIT_SUCCESS = 0,
+    INIT_CANCEL = 1,
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

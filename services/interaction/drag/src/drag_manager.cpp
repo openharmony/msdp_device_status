@@ -249,9 +249,13 @@ int32_t DragManager::OnStartDrag()
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         INPUT_MANAGER->SetPointerVisible(false);
     }
-    if (dragDrawing_.Init(dragData) != RET_OK) {
-        FI_HILOGE("Init Picture failed");
+    if (dragDrawing_.Init(dragData) == INIT_FAIL) {
+        FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
+        return RET_ERR;
+    }
+    if (dragDrawing_.Init(dragData) == INIT_CANCEL) {
+        FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
     dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
@@ -261,38 +265,43 @@ int32_t DragManager::OnStartDrag()
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    if (monitorId_ > 0) {
-        INPUT_MANAGER->RemoveMonitor(monitorId_);
-        monitorId_ = -1;
-        DragData dragData = DataAdapter.GetDragData();
-        if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-            dragDrawing_.EraseMouseIcon();
-            INPUT_MANAGER->SetPointerVisible(true);
-        }
-        switch (result) {
-            case DragResult::DRAG_SUCCESS: {
-                if (!hasCustomAnimation) {
-                    dragDrawing_.OnDragSuccess();
-                }
-                break;
-            }
-            case DragResult::DRAG_FAIL:
-            case DragResult::DRAG_CANCEL: {
-                if (!dragData.hasCanceledAnimation) {
-                    dragDrawing_.OnDragFail();
-                }
-                break;
-            }
-            default: {
-                FI_HILOGE("Unsupported DragResult type, DragResult:%{public}d", result);
-                break;
-            }
-        }
-        dragDrawing_.DestroyDragWindow();
-        return RET_OK;
+    if (monitorId_ <= 0) {
+        FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
+        return RET_ERR;
     }
-    FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
-    return RET_ERR;
+    INPUT_MANAGER->RemoveMonitor(monitorId_);
+    monitorId_ = -1;
+    DragData dragData = DataAdapter.GetDragData();
+    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        dragDrawing_.EraseMouseIcon();
+        INPUT_MANAGER->SetPointerVisible(true);
+    }
+    switch (result) {
+        case DragResult::DRAG_SUCCESS: {
+            if (!hasCustomAnimation) {
+                dragDrawing_.OnDragSuccess();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDragStyle();
+            }
+            break;
+        }
+        case DragResult::DRAG_FAIL:
+        case DragResult::DRAG_CANCEL: {
+            if (!dragData.hasCanceledAnimation) {
+                dragDrawing_.OnDragFail();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDragStyle();
+            }
+            break;
+        }
+        default: {
+            FI_HILOGE("Unsupported DragResult type, DragResult:%{public}d", result);
+            break;
+        }
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

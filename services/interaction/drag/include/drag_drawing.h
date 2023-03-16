@@ -72,6 +72,7 @@ public:
     void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
     void SetAlpha(float alpha);
     void SetScale(float scale);
+
 private:
     std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
     std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
@@ -90,6 +91,7 @@ public:
     void OnDragFail();
     void EraseMouseIcon();
     void DestroyDragWindow();
+    void UpdateDrawingState();
 
 private:
     int32_t InitLayer();
