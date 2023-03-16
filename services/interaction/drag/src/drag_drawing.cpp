@@ -78,7 +78,7 @@ struct DrawingInfo {
 int32_t DragDrawing::Init(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
+    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
     if ((dragData.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (dragData.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
@@ -86,9 +86,9 @@ int32_t DragDrawing::Init(const DragData &dragData)
     }
     g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
-    g_drawingInfo.pixelMap = dragData.pictureResourse.pixelMap;
-    g_drawingInfo.pixelMapX = dragData.pictureResourse.x;
-    g_drawingInfo.pixelMapY = dragData.pictureResourse.y;
+    g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
+    g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
+    g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, RET_ERR);
     if (InitLayer() != RET_OK) {
