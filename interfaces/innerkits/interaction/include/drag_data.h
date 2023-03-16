@@ -28,14 +28,14 @@ namespace DeviceStatus {
 static const int32_t MAX_PIXEL_MAP_WIDTH = 600;
 static const int32_t MAX_PIXEL_MAP_HEIGHT = 600;
 static const int32_t MAX_BUFFER_SIZE = 512;
-struct PictureResourse {
+struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
 };
 
 struct DragData {
-    PictureResourse pictureResourse;
+    ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
@@ -43,18 +43,7 @@ struct DragData {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     int32_t displayId { -1 };
-};
-
-struct DragNotifyMsg {
-    int32_t displayX { -1 };
-    int32_t displayY { -1 };
-    int32_t result { -1 };
-    int32_t targetPid { -1 };
-};
-
-enum class DragCursorStyle {
-    FORBIDDEN,
-    ALLOWABLE
+    bool hasCanceledAnimation { false };
 };
 
 enum class DragResult {
@@ -62,6 +51,19 @@ enum class DragResult {
     DRAG_FAIL = 1,
     DRAG_CANCEL = 2
 };
+
+struct DragNotifyMsg {
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t targetPid { -1 };
+    DragResult result { DragResult::DRAG_FAIL };
+};
+
+enum class DragCursorStyle {
+    FORBIDDEN,
+    ALLOWABLE
+};
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

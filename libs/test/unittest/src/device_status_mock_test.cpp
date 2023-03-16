@@ -214,8 +214,11 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest010, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
+    constexpr int32_t TIMER_INTERVAL = 3;
+    int ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest010 end";
+    EXPECT_TRUE(ret == ERR_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest011 end";
 }
 
 /**
@@ -229,9 +232,10 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest011, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 3;
-    g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    constexpr int32_t TIMER_INTERVAL = -1;
+    int ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
+    EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest011 end";
 }
 
@@ -246,9 +250,10 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest012, TestSize.Level1)
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = -1;
-    g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    constexpr int32_t TIMER_INTERVAL = 0;
+    int ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
+    EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest012 end";
 }
 
@@ -260,24 +265,8 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest012, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest013, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 start";
-    g_testMock->InitTimer();
-    g_testMock->StartThread();
-    std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
-    constexpr int32_t TIMER_INTERVAL = 0;
-    g_testMock->SetTimerInterval(TIMER_INTERVAL);
-    g_testMock->CloseTimer();
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 end";
-}
-
-/**
- * @tc.name: DeviceStatusMsdpMockTest
- * @tc.desc: test devicestatus Mock in Algorithm
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest014, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 start";
     g_testMock->TimerCallback();
-    g_testMock->GetDeviceStatusData();
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 end";
+    int ret = g_testMock->GetDeviceStatusData();
+    EXPECT_TRUE(ret == ERR_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 end";
 }
