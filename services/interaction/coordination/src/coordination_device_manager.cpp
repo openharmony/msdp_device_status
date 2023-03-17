@@ -344,7 +344,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     std::shared_ptr<Device> dev = iter->second;
     CHKPV(dev);
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), dev->GetNetworkId(), GetCoordinationDhids(dev->GetId()));
+        CooSM->OnPointerOffline(dev->GetDhid(), GetCoordinationDhids(dev->GetId()));
     }
     devices_.erase(iter);
 }
