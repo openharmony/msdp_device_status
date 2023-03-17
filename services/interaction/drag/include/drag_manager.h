@@ -37,6 +37,7 @@ public:
     DragManager()
     {}
     ~DragManager() = default;
+    DISALLOW_COPY_AND_MOVE(DragManager);
 
     void OnSessionLost(SessionPtr session);
     int32_t AddListener(SessionPtr session);
