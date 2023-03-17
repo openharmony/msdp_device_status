@@ -705,11 +705,11 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StopDrag(int32_t result)
+int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopDrag, this, result));
+        std::bind(&DeviceStatusService::OnStopDrag, this, result, hasCustomAnimation));
     if (ret != RET_OK) {
         FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
         return ret;
@@ -754,7 +754,7 @@ int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    return RET_OK;
+    return dragMgr_.GetDragTargetPid();
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -894,10 +894,10 @@ int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStopDrag(int32_t result)
+int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = dragMgr_.StopDrag(result);
+    int32_t ret = dragMgr_.StopDrag(result, hasCustomAnimation);
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
         return ret;

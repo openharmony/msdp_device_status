@@ -44,11 +44,11 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
-    CHKPR(dragData.pictureResourse.pixelMap, RET_ERR);
-    if (dragData.pictureResourse.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.pictureResourse.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
+    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
+    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
+        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.pictureResourse.pixelMap->GetWidth(), dragData.pictureResourse.pixelMap->GetHeight());
+            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
         return RET_ERR;
     }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
@@ -66,10 +66,10 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
 
-int32_t DragManagerImpl::StopDrag(int32_t result)
+int32_t DragManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().StopDrag(result);
+    return DeviceStatusClient::GetInstance().StopDrag(result, hasCustomAnimation);
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()
@@ -82,11 +82,18 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
 {
     CALL_DEBUG_ENTER;
     DragNotifyMsg notifyMsg;
-    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> notifyMsg.result >> notifyMsg.targetPid;
+    int32_t result = 0;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
+    if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
+        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        FI_HILOGE("Invalid result:%{public}d", result);
+        return RET_ERR;
+    }
+    notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
     stopCallback_(notifyMsg);
