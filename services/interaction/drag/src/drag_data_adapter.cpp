@@ -64,7 +64,7 @@ bool DragDataAdapter::GetDragWindowVisible() const
     return visible_;
 }
 
-int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY) const
 {
     offsetX = dragData_.pictureResourse.x;
     offsetY = dragData_.pictureResourse.y;

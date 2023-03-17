@@ -349,7 +349,7 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {
-        FI_HILOGE("Call SetDragWindowVisible failed ret:%{public}d", ret);
+        FI_HILOGE("Call SetDragWindowVisible failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -361,7 +361,7 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     int32_t offsetY = 0;
     int32_t ret = GetShadowOffset(offsetX, offsetY);
     if (ret != RET_OK) {
-        FI_HILOGE("Call GetShadowOffsetStub failed ret:%{public}d", ret);
+        FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
