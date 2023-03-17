@@ -26,7 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
-constexpr std::string_view COORDINATION = "coordination";
+constexpr std::string_view COORDINATION = "cooperation";
 std::mutex mutex_;
 } // namespace
 
