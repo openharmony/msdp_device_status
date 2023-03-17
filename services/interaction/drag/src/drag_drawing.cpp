@@ -19,6 +19,7 @@
 #include <fstream>
 #include <string>
 
+#include "../wm/window.h"
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
@@ -34,7 +35,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "../wm/window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"

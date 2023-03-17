@@ -282,7 +282,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
                 dragDrawing_.OnDragSuccess();
             } else {
                 dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDragStyle();
+                dragDrawing_.UpdateDrawingState();
             }
             break;
         }
@@ -292,7 +292,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
                 dragDrawing_.OnDragFail();
             } else {
                 dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDragStyle();
+                dragDrawing_.UpdateDrawingState();
             }
             break;
         }
