@@ -23,7 +23,7 @@ static napi_module msdpCoordinationModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsCoordinationContext::Export,
-    .nm_modname = "device_status.coordination",
+    .nm_modname = "multimodalInput.inputDeviceCooperate",
     .nm_priv = ((void *)0),
     .reserved = { 0 },
 };
