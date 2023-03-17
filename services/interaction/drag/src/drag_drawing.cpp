@@ -19,6 +19,7 @@
 #include <fstream>
 #include <string>
 
+#include "../wm/window.h"
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
@@ -34,7 +35,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-#include "../wm/window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data_adapter.h"
@@ -104,7 +104,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return RET_ERR;
     }
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        CHKPR(g_drawingInfo.dragWindow, RET_ERR);
         g_drawingInfo.dragWindow->Show();
         return RET_OK;
     }
@@ -112,7 +111,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Draw mouse icon failed");
         return RET_ERR;
     }
-    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
     g_drawingInfo.dragWindow->Show();
     return RET_OK;
 }
@@ -149,21 +147,21 @@ int32_t DragDrawing::DrawShadow()
     CALL_DEBUG_ENTER;
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid when mouse type, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid when touchscreen type, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPR(pixelMapNode, RET_ERR);
-    if (drawPixelMapModifier_ != nullptr) {
-        pixelMapNode->RemoveModifier(drawPixelMapModifier_);
+    if (drawPixelMapModifier_.lock() != nullptr) {
+        pixelMapNode->RemoveModifier(drawPixelMapModifier_.lock());
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
-    pixelMapNode->AddModifier(drawPixelMapModifier_);
+    pixelMapNode->AddModifier(drawPixelMapModifier_.lock());
     return RET_OK;
 }
 
@@ -176,11 +174,11 @@ int32_t DragDrawing::DrawMouseIcon()
     }
     auto mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPR(mouseIconNode, RET_ERR);
-    if (drawMouseIconModifier_ != nullptr) {
-        mouseIconNode->RemoveModifier(drawMouseIconModifier_);
+    if (drawMouseIconModifier_.lock() != nullptr) {
+        mouseIconNode->RemoveModifier(drawMouseIconModifier_.lock());
     }
     drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
-    mouseIconNode->AddModifier(drawMouseIconModifier_);
+    mouseIconNode->AddModifier(drawMouseIconModifier_.lock());
     return RET_OK;
 }
 
@@ -199,11 +197,11 @@ int32_t DragDrawing::DrawStyle()
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, RET_ERR);
-    if (drawSVGModifier_ != nullptr) {
-        dragStyleNode->RemoveModifier(drawSVGModifier_);
+    if (drawSVGModifier_.lock() != nullptr) {
+        dragStyleNode->RemoveModifier(drawSVGModifier_.lock());
     }
-    auto drawSVGModifier_ = std::make_shared<DrawSVGModifier>();
-    dragStyleNode->AddModifier(drawSVGModifier_);
+    drawSVGModifier_ = std::make_shared<DrawSVGModifier>();
+    dragStyleNode->AddModifier(drawSVGModifier_.lock());
     return RET_OK;
 }
 
@@ -264,8 +262,10 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
-        mouseIconNode->SetBounds(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
-        mouseIconNode->SetFrame(0 - g_drawingInfo.pixelMapX, 0 - g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetBounds(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+            SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetFrame(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+            SVG_HEIGHT, SVG_HEIGHT);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
         g_drawingInfo.rootNode->AddChild(pixelMapNode);
         g_drawingInfo.rootNode->AddChild(dragStyleNode);

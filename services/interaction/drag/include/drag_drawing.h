@@ -84,9 +84,9 @@ private:
 
 private:
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
-    std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
-    std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
-    std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
+    std::weak_ptr<DrawSVGModifier> drawSVGModifier_;
+    std::weak_ptr<DrawPixelMapModifier> drawPixelMapModifier_;
+    std::weak_ptr<DrawMouseIconModifier> drawMouseIconModifier_;
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
 };
 } // namespace DeviceStatus
