@@ -187,12 +187,12 @@ int32_t DragDrawing::DrawStyle()
     CALL_DEBUG_ENTER;
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid when mouse type, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid, node size: %{public}zu", g_drawingInfo.nodes.size());
+        FI_HILOGE("Nodes size invalid when touchscreen type, node size: %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -315,17 +315,18 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
         FI_HILOGE("Svg file is invalid");
         return;
     }
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
-    CHKPV(pixelMap);
-    auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
-    rosenImage->SetPixelMap(pixelMap);
-    rosenImage->SetImageRepeat(0);
-    CHKPV(g_drawingInfo.pixelMap);
-    int32_t svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + EIGHT_SIZE - pixelMap->GetWidth();
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
+    CHKPV(g_drawingInfo.pixelMap);
     pixelMapNode->SetBounds(0, EIGHT_SIZE, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     pixelMapNode->SetFrame(0, EIGHT_SIZE, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
+    CHKPV(pixelMap);
+    int32_t svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + EIGHT_SIZE - pixelMap->GetWidth();
+    if (svgTouchPositionX < 0) {
+        FI_HILOGD("svgTouchPositionX:%{public}d", svgTouchPositionX);
+        svgTouchPositionX = 0;
+    }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     dragStyleNode->SetBounds(svgTouchPositionX, 0, pixelMap->GetWidth(), pixelMap->GetHeight());
@@ -334,6 +335,9 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     dragStyleNode->SetBgImageHeight(SVG_HEIGHT);
     dragStyleNode->SetBgImagePositionX(0);
     dragStyleNode->SetBgImagePositionY(0);
+    auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
+    rosenImage->SetPixelMap(pixelMap);
+    rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + EIGHT_SIZE;
     g_drawingInfo.rootNodeHeight = pixelMap->GetHeight() + g_drawingInfo.pixelMap->GetHeight() + EIGHT_SIZE;
@@ -361,16 +365,16 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr &curNode, int32_t strSize)
     oStrSteam << xmlGetProp(curNode, BAD_CAST "viewBox");
     std::string srcViewBox = oStrSteam.str();
     std::istringstream iStrSteam(srcViewBox);
-    std::string word;
+    std::string string;
     std::string tgtViewBox;
     int32_t i = 0;
     int32_t size = srcViewBox.size();
-    while ((iStrSteam >> word) && (i < size)) {
+    while ((iStrSteam >> string) && (i < size)) {
         if (i == VIEW_BOX_POS) {
-            number = std::stoi(word) + strSize;
-            word = std::to_string(number);
+            number = std::stoi(string) + strSize;
+            string = std::to_string(number);
         }
-        tgtViewBox.append(word);
+        tgtViewBox.append(string);
         tgtViewBox += " ";
         ++i;
     }
@@ -383,7 +387,7 @@ xmlNodePtr DrawSVGModifier::FindRectNode(xmlNodePtr &curNode) const
 {
     CALL_DEBUG_ENTER;
     curNode = curNode->xmlChildrenNode;
-    while (curNode != NULL) {
+    while (curNode != nullptr) {
         if (!xmlStrcmp(curNode->name, BAD_CAST "g")) {
             while (!xmlStrcmp(curNode->name, BAD_CAST "g")) {
                 curNode = curNode->xmlChildrenNode;
@@ -398,7 +402,7 @@ xmlNodePtr DrawSVGModifier::FindRectNode(xmlNodePtr &curNode) const
 xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t strSize) const
 {
     CALL_DEBUG_ENTER;
-    while (curNode != NULL) {
+    while (curNode != nullptr) {
         if (!xmlStrcmp(curNode->name, BAD_CAST "rect")) {
             std::ostringstream oStrSteam;
             oStrSteam << xmlGetProp(curNode, BAD_CAST "width");
@@ -418,7 +422,7 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t strSize)
 void DrawSVGModifier::UpdateTspanNode(xmlNodePtr &curNode) const
 {
     CALL_DEBUG_ENTER;
-    while (curNode != NULL) {
+    while (curNode != nullptr) {
         if (!xmlStrcmp(curNode->name, BAD_CAST "tspan")) {
             std::string tgtTspanValue = std::to_string(g_drawingInfo.currentStyle);
             xmlNodeSetContent(curNode, BAD_CAST tgtTspanValue.c_str());
@@ -430,6 +434,7 @@ void DrawSVGModifier::UpdateTspanNode(xmlNodePtr &curNode) const
 int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const
 {
     CALL_DEBUG_ENTER;
+    CHKPR(curNode, RET_ERR);
     std::string strStyle = std::to_string(g_drawingInfo.currentStyle);
     int32_t strSize = (strStyle.size() - 1) * EIGHT_SIZE;
     xmlKeepBlanksDefault(0);
@@ -439,7 +444,9 @@ int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const
         return RET_ERR;
     }
     curNode = FindRectNode(curNode);
+    CHKPR(curNode, RET_ERR);
     curNode = UpdateRectNode(curNode, strSize);
+    CHKPR(curNode, RET_ERR);
     UpdateTspanNode(curNode);
     return RET_OK;
 }
@@ -451,6 +458,7 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
     xmlDocPtr xmlDoc = xmlReadFile(filePath.c_str(), 0, XML_PARSE_NOBLANKS);
     if (g_drawingInfo.currentStyle != 0) {
         xmlNodePtr node = xmlDocGetRootElement(xmlDoc);
+        CHKPP(node);
         int32_t ret = ParseAndAdjustSvgInfo(node);
         if (ret != RET_OK) {
             FI_HILOGE("Parse and adjust svg info failed");
