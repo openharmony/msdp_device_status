@@ -683,7 +683,10 @@ int32_t DeviceStatusService::RemoveDraglistener()
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     auto session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
+    if (session == nullptr) {
+        FI_HILOGW("Session is nullptr");
+        return RET_OK;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -717,16 +720,15 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
+int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
-}
-
-int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
-{
-    CALL_DEBUG_ENTER;
-    return RET_ERR;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusService::GetDragTargetPid()

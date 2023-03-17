@@ -39,7 +39,12 @@ void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &po
     pointerStyle_ = pointerStyle;
 }
 
-int32_t DragDataAdapter::GetDragStyle() const
+void DragDataAdapter::SetDragStyle(DragCursorStyle style)
+{
+    dragStyle_ = style;
+}
+
+DragCursorStyle DragDataAdapter::GetDragStyle() const
 {
     return dragStyle_;
 }

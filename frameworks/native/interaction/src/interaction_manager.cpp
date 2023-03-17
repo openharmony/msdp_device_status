@@ -65,14 +65,9 @@ int32_t InteractionManager::GetCoordinationState(
     return InteractionMgrImpl.GetCoordinationState(deviceId, callback);
 }
 
-int32_t InteractionManager::UpdateDragStyle(int32_t style)
+int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 {
     return InteractionMgrImpl.UpdateDragStyle(style);
-}
-
-int32_t InteractionManager::UpdateDragMessage(const std::u16string &message)
-{
-    return InteractionMgrImpl.UpdateDragMessage(message);
 }
 
 int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)

@@ -112,15 +112,7 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
-    int32_t UpdateDragStyle(int32_t style);
-
-    /**
-     * @brief 更新拖拽中的角标文本信息。
-     * @param message 角标文本信息。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
-     * @since 10
-     */
-    int32_t UpdateDragMessage(const std::u16string &message);
+    int32_t UpdateDragStyle(DragCursorStyle style);
 
     /**
      * @brief 获取拖拽目标窗口PID
