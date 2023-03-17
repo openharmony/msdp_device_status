@@ -66,8 +66,8 @@ bool DragDataAdapter::GetDragWindowVisible() const
 
 int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY) const
 {
-    offsetX = dragData_.pictureResourse.x;
-    offsetY = dragData_.pictureResourse.y;
+    offsetX = dragData_.shadowInfo.x;
+    offsetY = dragData_.shadowInfo.y;
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
     return RET_OK;
 }
