@@ -271,6 +271,13 @@ bool IsValidSvgFile(const std::string &filePath)
     return true;
 }
 
+bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
+}
+
 int32_t ChangeNumber(int32_t num)
 {
     if (num < 0) {
