@@ -356,7 +356,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const
+int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth) const
 {
     CALL_DEBUG_ENTER;
     if (xmlStrcmp(curNode->name, BAD_CAST "svg")) {
