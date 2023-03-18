@@ -363,9 +363,9 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t ex
         FI_HILOGE("Svg format invalid");
         return RET_ERR;
     }
-    std::ostringstream oStrSteam;
-    oStrSteam << xmlGetProp(curNode, BAD_CAST "width");
-    std::string srcSvgWidth = oStrSteam.str();
+    std::ostringstream oStrStream;
+    oStrStream << xmlGetProp(curNode, BAD_CAST "width");
+    std::string srcSvgWidth = oStrStream.str();
     if (!IsNum(srcSvgWidth)) {
         FI_HILOGE("srcSvgWidth invalid, srcSvgWidth:%{public}s", srcSvgWidth.c_str());
         return RET_ERR;
@@ -373,23 +373,23 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t ex
     int32_t number = std::stoi(srcSvgWidth) + extendSvgWidth;
     std::string tgtSvgWidth  = std::to_string(number);
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
-    oStrSteam.clear();
-    oStrSteam << xmlGetProp(curNode, BAD_CAST "viewBox");
-    std::string srcViewBox = oStrSteam.str();
-    std::istringstream iStrSteam(srcViewBox);
-    std::string string;
+    oStrStream.clear();
+    oStrStream << xmlGetProp(curNode, BAD_CAST "viewBox");
+    std::string srcViewBox = oStrStream.str();
+    std::istringstream iStrStream(srcViewBox);
+    std::string tmpString;
     std::string tgtViewBox;
     int32_t i = 0;
-    while (iStrSteam >> string) {
+    while (iStrStream >> tmpString) {
         if (i == VIEW_BOX_POS) {
-            if (!IsNum(string)) {
-                FI_HILOGE("string invalid, string:%{public}s", string.c_str());
+            if (!IsNum(tmpString)) {
+                FI_HILOGE("tmpString invalid, tmpString:%{public}s", tmpString.c_str());
                 return RET_ERR;
             }
-            number = std::stoi(string) + extendSvgWidth;
-            string = std::to_string(number);
+            number = std::stoi(tmpString) + extendSvgWidth;
+            tmpString = std::to_string(number);
         }
-        tgtViewBox.append(string);
+        tgtViewBox.append(tmpString);
         tgtViewBox += " ";
         ++i;
     }
@@ -419,9 +419,9 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t extendSv
     CALL_DEBUG_ENTER;
     while (curNode != nullptr) {
         if (!xmlStrcmp(curNode->name, BAD_CAST "rect")) {
-            std::ostringstream oStrSteam;
-            oStrSteam << xmlGetProp(curNode, BAD_CAST "width");
-            std::string srcRectWidth = oStrSteam.str();
+            std::ostringstream oStrStream;
+            oStrStream << xmlGetProp(curNode, BAD_CAST "width");
+            std::string srcRectWidth = oStrStream.str();
             if (!IsNum(srcRectWidth)) {
                 FI_HILOGE("srcRectWidth invalid, srcRectWidth:%{public}s", srcRectWidth.c_str());
                 return nullptr;
@@ -493,9 +493,9 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
     xmlChar *xmlbuff;
     int32_t buffersize;
     xmlDocDumpFormatMemory(xmlDoc, &xmlbuff, &buffersize, 1);
-    std::ostringstream oStrSteam;
-    oStrSteam << xmlbuff;
-    std::string content = oStrSteam.str();
+    std::ostringstream oStrStream;
+    oStrStream << xmlbuff;
+    std::string content = oStrStream.str();
     xmlFree(xmlbuff);
     xmlFreeDoc(xmlDoc);
     OHOS::Media::SourceOptions opts;
