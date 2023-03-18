@@ -40,11 +40,11 @@ public:
     void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
 
 private:
-    int32_t UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t extendSvgWidth) const;
-    xmlNodePtr FindRectNode(xmlNodePtr &curNode) const;
-    xmlNodePtr UpdateRectNode(xmlNodePtr &curNode, int32_t extendSvgWidth) const;
-    void UpdateTspanNode(xmlNodePtr &curNode) const;
-    int32_t ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const;
+    int32_t UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    xmlNodePtr GetRectNode(xmlNodePtr curNode) const;
+    xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    void UpdateTspanNode(xmlNodePtr curNode) const;
+    int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode) const;
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
 };
 

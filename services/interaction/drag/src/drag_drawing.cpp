@@ -356,7 +356,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t extendSvgWidth) const
+int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const
 {
     CALL_DEBUG_ENTER;
     if (xmlStrcmp(curNode->name, BAD_CAST "svg")) {
@@ -398,7 +398,7 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t ex
     return RET_OK;
 }
 
-xmlNodePtr DrawSVGModifier::FindRectNode(xmlNodePtr &curNode) const
+xmlNodePtr DrawSVGModifier::GetRectNode(xmlNodePtr curNode) const
 {
     CALL_DEBUG_ENTER;
     curNode = curNode->xmlChildrenNode;
@@ -414,7 +414,7 @@ xmlNodePtr DrawSVGModifier::FindRectNode(xmlNodePtr &curNode) const
     return curNode;
 }
 
-xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t extendSvgWidth) const
+xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const
 {
     CALL_DEBUG_ENTER;
     while (curNode != nullptr) {
@@ -437,7 +437,7 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr &curNode, int32_t extendSv
     return nullptr;
 }
 
-void DrawSVGModifier::UpdateTspanNode(xmlNodePtr &curNode) const
+void DrawSVGModifier::UpdateTspanNode(xmlNodePtr curNode) const
 {
     CALL_DEBUG_ENTER;
     while (curNode != nullptr) {
@@ -448,7 +448,7 @@ void DrawSVGModifier::UpdateTspanNode(xmlNodePtr &curNode) const
     }
 }
 
-int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const
+int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr curNode) const
 {
     CALL_DEBUG_ENTER;
     CHKPR(curNode, RET_ERR);
@@ -468,7 +468,7 @@ int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const
         FI_HILOGE("Update svg node info failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    curNode = FindRectNode(curNode);
+    curNode = GetRectNode(curNode);
     CHKPR(curNode, RET_ERR);
     curNode = UpdateRectNode(curNode, extendSvgWidth);
     CHKPR(curNode, RET_ERR);
@@ -500,12 +500,12 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
     xmlFreeDoc(xmlDoc);
     OHOS::Media::SourceOptions opts;
     opts.formatHint = "image/svg+xml";
-    uint32_t ret = 0;
+    uint32_t errCode = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(reinterpret_cast<const uint8_t*>(content.c_str()),
-        content.size(), opts, ret);
+        content.size(), opts, errCode);
     CHKPP(imageSource);
     OHOS::Media::DecodeOptions decodeOpts;
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     return pixelMap;
 }
 
