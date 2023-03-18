@@ -125,6 +125,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
         return RET_ERR;
     }
     DataAdapter.SetDragStyle(style);
+    dragDrawing_.UpdateDragStyle(style);
     return RET_OK;
 }
 

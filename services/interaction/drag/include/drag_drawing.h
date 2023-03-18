@@ -86,7 +86,7 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
-    int32_t UpdateDragStyle(int32_t style);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     void OnDragSuccess();
     void OnDragFail();
     void EraseMouseIcon();
@@ -103,6 +103,7 @@ private:
     void InitAnimation();
     int32_t InitVSync();
     void OnVsync();
+    void InitDrawingInfo(const DragData &dragData);
 
 private:
     int64_t startNum_ { -1 };
