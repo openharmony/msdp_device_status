@@ -33,6 +33,21 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+class DrawSVGModifier : public OHOS::Rosen::RSContentStyleModifier {
+public:
+    DrawSVGModifier() = default;
+    ~DrawSVGModifier() = default;
+    void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
+
+private:
+    int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    xmlNodePtr GetRectNode(xmlNodePtr curNode) const;
+    xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    void UpdateTspanNode(xmlNodePtr curNode) const;
+    int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode) const;
+    std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
+};
+
 class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {
 public:
     DrawPixelMapModifier() = default;
@@ -65,9 +80,11 @@ private:
     void CreateWindow(int32_t displayX, int32_t displayY);
     int32_t DrawShadow();
     int32_t DrawMouseIcon();
+    int32_t DrawStyle();
 
 private:
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
+    std::weak_ptr<DrawSVGModifier> drawSVGModifier_;
     std::weak_ptr<DrawPixelMapModifier> drawPixelMapModifier_;
     std::weak_ptr<DrawMouseIconModifier> drawMouseIconModifier_;
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
