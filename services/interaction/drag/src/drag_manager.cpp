@@ -249,12 +249,13 @@ int32_t DragManager::OnStartDrag()
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         INPUT_MANAGER->SetPointerVisible(false);
     }
-    if (dragDrawing_.Init(dragData) == INIT_FAIL) {
+    int32_t ret = dragDrawing_.Init(dragData);
+    if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if (dragDrawing_.Init(dragData) == INIT_CANCEL) {
+    if (ret == INIT_CANCEL) {
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
