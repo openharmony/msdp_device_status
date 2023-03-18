@@ -60,8 +60,10 @@ struct DragNotifyMsg {
 };
 
 enum class DragCursorStyle {
+    DEFAULT = 0,
     FORBIDDEN,
-    ALLOWABLE
+    COPY,
+    MOVE
 };
 
 } // namespace DeviceStatus

@@ -34,13 +34,13 @@ class DragManagerImpl  {
 public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
-    int32_t UpdateDragStyle(int32_t style);
-    int32_t UpdateDragMessage(const std::u16string &message);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
         std::function<void()> disconnectCallback);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
+    int32_t OnStateChangedMessage(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
 

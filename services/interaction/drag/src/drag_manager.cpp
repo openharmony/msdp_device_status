@@ -117,6 +117,17 @@ void DragManager::SetDragTargetPid(int32_t dragTargetPid)
     dragTargetPid_ = dragTargetPid;
 }
 
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
+{
+    CALL_DEBUG_ENTER;
+    if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
+        FI_HILOGE("Invalid style:%{public}d", style);
+        return RET_ERR;
+    }
+    DataAdapter.SetDragStyle(style);
+    return RET_OK;
+}
+
 int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;
