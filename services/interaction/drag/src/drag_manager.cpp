@@ -111,21 +111,6 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::UpdateDragStyle(int32_t style)
-{
-    CALL_DEBUG_ENTER;
-    if (style < 0) {
-        FI_HILOGE("Invalid style:%{public}d", style);
-        return RET_ERR;
-    }
-    int32_t ret = dragDrawing_.UpdateDragStyle(style);
-    if (ret != RET_OK) {
-        FI_HILOGE("Update drag style failed");
-        dragDrawing_.DestroyDragWindow();
-    }
-    return RET_OK;
-}
-
 void DragManager::SetDragTargetPid(int32_t dragTargetPid)
 {
     CALL_DEBUG_ENTER;

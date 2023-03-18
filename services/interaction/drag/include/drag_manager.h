@@ -44,7 +44,6 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid() const;
-    int32_t UpdateDragStyle(int32_t style);
     void SetDragTargetPid(int32_t dragTargetPid);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);

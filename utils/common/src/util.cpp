@@ -19,10 +19,10 @@
 
 #include <string>
 
+#include "securec.h"
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
-#include <sys/prctl.h>
-#include "securec.h"
 
 #include "devicestatus_hilog_wrapper.h"
 #include "fi_log.h"
@@ -269,6 +269,13 @@ bool IsValidSvgFile(const std::string &filePath)
         return false;
     }
     return true;
+}
+
+bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
 }
 
 int32_t ChangeNumber(int32_t num)
