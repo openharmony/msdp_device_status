@@ -218,7 +218,7 @@ int32_t GetFileSize(const std::string &filePath)
 {
     struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
-        FI_HILOGE("Get file size error");
+        FI_HILOGE("Get file size error, errno:%{public}d", errno);
         return RET_ERR;
     }
     return statbuf.st_size;

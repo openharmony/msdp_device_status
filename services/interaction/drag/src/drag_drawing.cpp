@@ -559,11 +559,12 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPV(g_drawingInfo.dragWindow);
     g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const
+int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth) const
 {
     CALL_DEBUG_ENTER;
     if (xmlStrcmp(curNode->name, BAD_CAST "svg")) {
@@ -574,7 +575,7 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t ext
     oStrStream << xmlGetProp(curNode, BAD_CAST "width");
     std::string srcSvgWidth = oStrStream.str();
     if (!IsNum(srcSvgWidth)) {
-        FI_HILOGE("srcSvgWidth invalid, srcSvgWidth:%{public}s", srcSvgWidth.c_str());
+        FI_HILOGE("srcSvgWidth is not digital, srcSvgWidth:%{public}s", srcSvgWidth.c_str());
         return RET_ERR;
     }
     int32_t number = std::stoi(srcSvgWidth) + extendSvgWidth;
@@ -590,7 +591,7 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t ext
     while (iStrStream >> tmpString) {
         if (i == VIEW_BOX_POS) {
             if (!IsNum(tmpString)) {
-                FI_HILOGE("tmpString invalid, tmpString:%{public}s", tmpString.c_str());
+                FI_HILOGE("tmpString is not digital, tmpString:%{public}s", tmpString.c_str());
                 return RET_ERR;
             }
             number = std::stoi(tmpString) + extendSvgWidth;
@@ -630,7 +631,7 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr curNode, int32_t extendSvg
             oStrStream << xmlGetProp(curNode, BAD_CAST "width");
             std::string srcRectWidth = oStrStream.str();
             if (!IsNum(srcRectWidth)) {
-                FI_HILOGE("srcRectWidth invalid, srcRectWidth:%{public}s", srcRectWidth.c_str());
+                FI_HILOGE("srcRectWidth is not digital, srcRectWidth:%{public}s", srcRectWidth.c_str());
                 return nullptr;
             }
             int32_t number = std::stoi(srcRectWidth) + extendSvgWidth;

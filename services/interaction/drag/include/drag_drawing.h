@@ -40,7 +40,7 @@ public:
     void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
 
 private:
-    int32_t UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth) const;
     xmlNodePtr GetRectNode(xmlNodePtr curNode) const;
     xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const;
     void UpdateTspanNode(xmlNodePtr curNode) const;
