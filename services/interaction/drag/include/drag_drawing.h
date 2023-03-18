@@ -40,11 +40,11 @@ public:
     void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
 
 private:
-    int32_t UpdateSvgNodeInfo(const xmlNodePtr &curNode, int32_t extendSvgWidth) const;
-    xmlNodePtr FindRectNode(xmlNodePtr &curNode) const;
-    xmlNodePtr UpdateRectNode(xmlNodePtr &curNode, int32_t extendSvgWidth) const;
-    void UpdateTspanNode(xmlNodePtr &curNode) const;
-    int32_t ParseAndAdjustSvgInfo(xmlNodePtr &curNode) const;
+    int32_t UpdateSvgNodeInfo(const xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    xmlNodePtr GetRectNode(xmlNodePtr curNode) const;
+    xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const;
+    void UpdateTspanNode(xmlNodePtr curNode) const;
+    int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode) const;
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
 };
 
@@ -108,10 +108,10 @@ private:
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
-    std::weak_ptr<DrawSVGModifier> drawSVGModifier_;
-    std::weak_ptr<DrawPixelMapModifier> drawPixelMapModifier_;
-    std::weak_ptr<DrawMouseIconModifier> drawMouseIconModifier_;
-    std::weak_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_;
+    std::shared_ptr<DrawSVGModifier> drawSVGModifier_;
+    std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_;
+    std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_;
+    std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_;
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<OHOS::Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ { nullptr };
