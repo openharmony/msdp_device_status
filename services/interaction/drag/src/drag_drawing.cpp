@@ -310,7 +310,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
     std::unique_ptr<std::fstream> fs = std::make_unique<std::fstream>();
-    std::string filePath = "";
+    std::string filePath;
     if (g_drawingInfo.currentStyle == FORBID_DRAG_STYLE) {
         filePath = FORBID_DRAG_PATH;
     } else if (g_drawingInfo.currentStyle == ONE_FILE_DRAG_STYLE) {
@@ -352,6 +352,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPV(g_drawingInfo.dragWindow);
     g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
