@@ -19,10 +19,10 @@
 
 #include <string>
 
+#include "securec.h"
+#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
-#include <sys/prctl.h>
-#include "securec.h"
 
 #include "devicestatus_hilog_wrapper.h"
 #include "fi_log.h"
