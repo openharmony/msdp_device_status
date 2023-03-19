@@ -191,12 +191,11 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 void DragDrawing::OnDragSuccess()
 {
     CALL_DEBUG_ENTER;
+    CHKPV(g_drawingInfo.rootNode);
     if (drawDynamicEffectModifier_ != nullptr) {
-        CHKPV(g_drawingInfo.rootNode);
         g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
     }
     drawDynamicEffectModifier_ = std::make_shared<DrawDynamicEffectModifier>();
-    CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->AddModifier(drawDynamicEffectModifier_);
     drawDynamicEffectModifier_->SetAlpha(BEGIN_ALPHA);
     drawDynamicEffectModifier_->SetScale(BEGIN_SCALE);
@@ -214,12 +213,11 @@ void DragDrawing::OnDragSuccess()
 void DragDrawing::OnDragFail()
 {
     CALL_DEBUG_ENTER;
+    CHKPV(g_drawingInfo.rootNode);
     if (drawDynamicEffectModifier_ != nullptr) {
-        CHKPV(g_drawingInfo.rootNode);
         g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
     }
     drawDynamicEffectModifier_ = std::make_shared<DrawDynamicEffectModifier>();
-    CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->AddModifier(drawDynamicEffectModifier_);
     drawDynamicEffectModifier_->SetAlpha(BEGIN_ALPHA);
     drawDynamicEffectModifier_->SetScale(BEGIN_SCALE);
