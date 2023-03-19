@@ -65,6 +65,19 @@ private:
     int32_t GetIconSize() const;
 };
 
+class DrawDynamicEffectModifier : public OHOS::Rosen::RSContentStyleModifier {
+public:
+    DrawDynamicEffectModifier() = default;
+    ~DrawDynamicEffectModifier() = default;
+    void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+    void SetAlpha(float alpha);
+    void SetScale(float scale);
+
+private:
+    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
+    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
+};
+
 class DragDrawing final {
 public:
     DragDrawing() = default;
@@ -73,6 +86,12 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
+    int32_t UpdateDragStyle(DragCursorStyle style);
+    void OnDragSuccess();
+    void OnDragFail();
+    void EraseMouseIcon();
+    void DestroyDragWindow();
+    void UpdateDrawingState();
 
 private:
     int32_t InitLayer();
@@ -81,13 +100,22 @@ private:
     int32_t DrawShadow();
     int32_t DrawMouseIcon();
     int32_t DrawStyle();
+    void InitAnimation();
+    int32_t InitVSync();
+    void OnVsync();
+    void InitDrawingInfo(const DragData &dragData);
 
 private:
+    int64_t startNum_ { -1 };
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
-    std::weak_ptr<DrawSVGModifier> drawSVGModifier_;
-    std::weak_ptr<DrawPixelMapModifier> drawPixelMapModifier_;
-    std::weak_ptr<DrawMouseIconModifier> drawMouseIconModifier_;
+    std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
+    std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
+    std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
+    std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_ { nullptr };
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
+    std::shared_ptr<OHOS::Rosen::VSyncReceiver> receiver_ { nullptr };
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
