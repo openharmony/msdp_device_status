@@ -295,7 +295,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
             break;
         }
         default: {
-            FI_HILOGE("Unsupported DragResult type, DragResult:%{public}d", result);
+            FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
             break;
         }
     }

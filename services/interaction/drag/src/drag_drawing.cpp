@@ -130,8 +130,8 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     InitAnimation();
-    if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        CHKPR(rsUiDirector_, RET_ERR);
+    CHKPR(rsUiDirector_, RET_ERR);
+    if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) { 
         rsUiDirector_->SendMessages();
         return RET_OK;
     }
@@ -139,7 +139,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Draw mouse icon failed");
         return INIT_FAIL;
     }
-    CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     return INIT_SUCCESS;
 }
@@ -254,10 +253,10 @@ void DragDrawing::DestroyDragWindow()
 {
     CALL_DEBUG_ENTER;
     startNum_ = START_TIME;
+    rsUiDirector_ = nullptr;
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
-    if (g_drawingInfo.pixelMap != nullptr) {
-        g_drawingInfo.pixelMap = nullptr;
-    }
+    g_drawingInfo.pixelMap = nullptr;
+    g_drawingInfo.surfaceNode = nullptr;
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
     }
@@ -265,15 +264,9 @@ void DragDrawing::DestroyDragWindow()
         g_drawingInfo.rootNode->ClearChildren();
         g_drawingInfo.rootNode = nullptr;
     }
-    if (g_drawingInfo.surfaceNode != nullptr) {
-        g_drawingInfo.surfaceNode = nullptr;
-    }
     if (g_drawingInfo.dragWindow != nullptr) {
         g_drawingInfo.dragWindow->Destroy();
         g_drawingInfo.dragWindow = nullptr;
-    }
-    if (rsUiDirector_ != nullptr) {
-        rsUiDirector_ = nullptr;
     }
 }
 
@@ -371,8 +364,8 @@ int32_t DragDrawing::InitVSync()
         receiver_ = rsClient.CreateVSyncReceiver("DragDrawing", handler_);
     }
     CHKPR(receiver_, RET_ERR);
-    auto ret = receiver_->Init();
-    if (ret) {
+    int32_t ret = receiver_->Init();
+    if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
         return RET_ERR;
     }
