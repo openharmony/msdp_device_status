@@ -92,7 +92,7 @@ public:
     void EraseMouseIcon();
     void DestroyDragWindow();
     void UpdateDrawingState();
-    void UpdateDragWindowState();
+    void UpdateDragWindowState(bool visible);
 
 private:
     int32_t InitLayer();
