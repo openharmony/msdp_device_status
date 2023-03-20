@@ -196,7 +196,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    if (std::strcmp(type, "coordination") != 0) {
+    if (std::strcmp(type, "cooperation") != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be coordination");
         return nullptr;
     }
@@ -360,11 +360,11 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_START", infoStart),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_SUCCESS", infoSuccess),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_INFO_FAIL", infoFail),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_STATE_ON", stateOn),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COORDINATION_STATE_OFF", stateOff),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_START", infoStart),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_SUCCESS", infoSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_FAIL", infoFail),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
     };
 
     napi_value eventMsg = nullptr;

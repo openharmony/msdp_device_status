@@ -60,7 +60,6 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::START_DRAG, &DeviceStatusSrvStub::StartDragStub},
         {Idevicestatus::STOP_DRAG, &DeviceStatusSrvStub::StopDragStub},
         {Idevicestatus::UPDATED_DRAG_STYLE, &DeviceStatusSrvStub::UpdateDragStyleStub},
-        {Idevicestatus::UPDATED_DRAG_MESSAGE, &DeviceStatusSrvStub::UpdateDragMessageStub},
         {Idevicestatus::GET_DRAG_TARGET_PID, &DeviceStatusSrvStub::GetDragTargetPidStub},
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
@@ -209,21 +208,9 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t style;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = UpdateDragStyle(style);
+    int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
         FI_HILOGE("Call UpdateDragStyle failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusSrvStub::UpdateDragMessageStub(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    std::u16string message;
-    READSTRING16(data, message, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = UpdateDragMessage(message);
-    if (ret != RET_OK) {
-        FI_HILOGE("Call UpdateDragMessage failed, ret:%{public}d", ret);
     }
     return ret;
 }

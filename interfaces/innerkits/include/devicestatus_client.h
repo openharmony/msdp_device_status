@@ -56,8 +56,7 @@ public:
 
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
-    int32_t UpdateDragStyle(int32_t style);
-    int32_t UpdateDragMessage(const std::u16string &message);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t AddDraglistener();
     int32_t RemoveDraglistener();

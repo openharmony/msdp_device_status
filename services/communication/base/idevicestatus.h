@@ -39,7 +39,6 @@ public:
         STOP_COORDINATION,
         GET_COORDINATION_STATE,
         UPDATED_DRAG_STYLE = 20,
-        UPDATED_DRAG_MESSAGE,
         START_DRAG,
         STOP_DRAG,
         GET_DRAG_TARGET_PID,
@@ -68,8 +67,7 @@ public:
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
-    virtual int32_t UpdateDragStyle(int32_t style) = 0;
-    virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
+    virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
     virtual int32_t GetDragTargetPid() = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;

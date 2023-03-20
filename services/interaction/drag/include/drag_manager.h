@@ -46,6 +46,7 @@ public:
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid() const;
     void SetDragTargetPid(int32_t dragTargetPid);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -66,7 +67,7 @@ private:
     OHOS::MMI::ExtraData CreateExtraData(bool appended) const;
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();
-    int32_t OnStopDrag();
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
 private:
     StateChangeNotify stateNotify_;
     DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
