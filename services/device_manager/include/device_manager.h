@@ -43,7 +43,7 @@ public:
     int32_t Init(IContext *context);
     int32_t Enable();
     int32_t Disable();
-    
+
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
     std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
@@ -82,7 +82,7 @@ private:
     int32_t OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer);
-    
+
     int32_t EpollCreate();
     int32_t EpollAdd(IEpollEventSource *source);
     void EpollDel(IEpollEventSource *source);

@@ -59,6 +59,23 @@ DragData DragDataAdapter::GetDragData() const
     return dragData_;
 }
 
+void DragDataAdapter::SetDragWindowVisible(bool visible)
+{
+    visible_ = visible;
+}
+
+bool DragDataAdapter::GetDragWindowVisible() const
+{
+    return visible_;
+}
+
+int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY) const
+{
+    offsetX = dragData_.shadowInfo.x;
+    offsetY = dragData_.shadowInfo.y;
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

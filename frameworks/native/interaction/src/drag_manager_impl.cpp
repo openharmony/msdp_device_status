@@ -163,6 +163,18 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
     }
     return RET_OK;
 }
+
+int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
+}
+
+int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -52,6 +52,8 @@ private:
     int32_t GetDragTargetPidStub(MessageParcel& data, MessageParcel& reply);
     int32_t AddDraglistenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

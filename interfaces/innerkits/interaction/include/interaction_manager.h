@@ -137,6 +137,23 @@ public:
      */
     int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
 
+    /**
+     * @brief 设置拖拽窗口显示或者隐藏
+     * @param visible 设置拖拽窗口的是否显示，true表示显示，false表示隐藏。
+     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @since 10
+     */
+    int32_t SetDragWindowVisible(bool visible);
+
+    /**
+     * @brief 获取触控点或鼠标光标相对于阴影缩略图左上角的位置。
+     * @param offsetX 要查询的x值。
+     * @param offsetY 要查询的y值。
+     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @since 10
+     */
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);
