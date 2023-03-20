@@ -522,8 +522,7 @@ void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
     currentStateSM_->OnKeyboardOnline(dhid);
 }
 
-void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
-    const std::vector<std::string> &keyboards)
+void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -540,6 +539,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::string
         if (src.empty()) {
             src = preparedNetworkId_.first;
         }
+        std::string sinkNetworkId = COORDINATION::GetLocalDeviceId();
         DistributedAdapter->StopRemoteInput(src, sinkNetworkId, keyboards, [this, src](bool isSuccess) {});
         Reset();
     }
