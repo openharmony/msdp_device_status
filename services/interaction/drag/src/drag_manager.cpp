@@ -305,6 +305,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
     DataAdapter.SetDragWindowVisible(visible);
+    dragDrawing_.UpdateDragWindowState(visible);
     return RET_OK;
 }
 
