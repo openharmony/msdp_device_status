@@ -278,10 +278,10 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     CHKPV(g_drawingInfo.dragWindow);
     if (visible) {
         g_drawingInfo.dragWindow->Show();
-        MMI_HILOGD("Drag window show success");
+        FI_HILOGD("Drag window show success");
     } else {
         g_drawingInfo.dragWindow->Hide();
-        MMI_HILOGD("Drag window hide success");
+        FI_HILOGD("Drag window hide success");
     }
 }
 
