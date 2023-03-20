@@ -116,7 +116,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
     InitDrawingInfo(dragData);
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, INIT_FAIL);
-    g_drawingInfo.dragWindow->Show();
     if (InitLayer() != RET_OK) {
         FI_HILOGE("Init layer failed");
         return INIT_FAIL;
@@ -167,7 +166,6 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     }
     CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
     CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->Show();
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -272,6 +270,19 @@ void DragDrawing::UpdateDrawingState()
 {
     CALL_DEBUG_ENTER;
     g_drawingInfo.isRunning = false;
+}
+
+void DragDrawing::UpdateDragWindowState(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(g_drawingInfo.dragWindow);
+    if (visible) {
+        g_drawingInfo.dragWindow->Show();
+        FI_HILOGD("Drag window show success");
+    } else {
+        g_drawingInfo.dragWindow->Hide();
+        FI_HILOGD("Drag window hide success");
+    }
 }
 
 void DragDrawing::InitAnimation()
