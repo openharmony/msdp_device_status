@@ -103,7 +103,7 @@ bool StreamClient::StartClient(MsgClientFunCallback fun)
         FI_HILOGE("Client is connected or started");
         return false;
     }
-    isExit = false;
+    isExit_ = false;
     recvFun_ = fun;
     if (ConnectTo() < 0) {
         FI_HILOGW("Client connection failed, Try again later");
@@ -114,8 +114,7 @@ bool StreamClient::StartClient(MsgClientFunCallback fun)
 void StreamClient::Stop()
 {
     CALL_DEBUG_ENTER;
-    isExit = true;
-    isRunning_ = false;
+    isExit_ = true;
     Close();
 }
 }

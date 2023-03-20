@@ -52,7 +52,7 @@ protected:
     bool StartClient(MsgClientFunCallback fun);
 
 protected:
-    bool isExit { false };
+    bool isExit_ { false };
     bool isRunning_ { false };
     bool isConnected_ { false };
     MsgClientFunCallback recvFun_;
