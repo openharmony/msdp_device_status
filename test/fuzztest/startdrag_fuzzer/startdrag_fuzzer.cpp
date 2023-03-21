@@ -94,6 +94,7 @@ void StartDragFuzzTest(const uint8_t* data, size_t  size)
     };
     DragData dragData = CreateDragData(data, size);
     InteractionManager::GetInstance()->StartDrag(dragData, func);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, true);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
