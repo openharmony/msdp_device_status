@@ -55,8 +55,7 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
     OHOS::Media::InitializationOptions opts;
     opts.size.width = width;
     opts.size.height = height;
-    std::unique_ptr<Media::PixelMap> uniquePixelMap = Media::PixelMap::Create(opts);
-    std::shared_ptr<Media::PixelMap> pixelMap = std::move(uniquePixelMap);
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
     return pixelMap;
 }
 
@@ -95,8 +94,6 @@ void StartDragFuzzTest(const uint8_t* data, size_t  size)
     };
     DragData dragData = CreateDragData(data, size);
     InteractionManager::GetInstance()->StartDrag(dragData, func);
-    bool hasCustomAnimation = true;
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, hasCustomAnimation);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
