@@ -35,7 +35,7 @@ ohos_fuzztest("GetDragTargetPidFuzzTest") {
   ]
   sources = [ "getdragtargetpid_fuzzer.cpp" ]
   deps =
-        [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
+      [ "//base/msdp/device_status/interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
