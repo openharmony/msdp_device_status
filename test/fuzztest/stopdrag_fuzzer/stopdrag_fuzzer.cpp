@@ -13,14 +13,23 @@
  * limitations under the License.
  */
 
+#include <optional>
+#include <utility>
+
 #include "stopdrag_fuzzer.h"
 
+#include "pointer_event.h"
+
+#include "drag_data.h"
 #include "fi_log.h"
 #include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDragFuzzTest" };
+} // namespace
 
 constexpr int32_t DRAG_NUM { 1 };
 constexpr bool HAS_CANCELED_ANIMATION { false };
@@ -46,7 +55,7 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
 }
 
 
-std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t, int32_t> pixelMapSize,
+std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize,
     int32_t sourceType, int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location)
 {
     CALL_DEBUG_ENTER;
@@ -75,10 +84,14 @@ void StopDragFuzzTest(const uint8_t* data, size_t  size)
     if (data == nullptr) {
         return;
     }
+    auto func = [](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("StartDragFuzzTest:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+    };
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     dragData->hasCanceledAnimation = HAS_CANCELED_ANIMATION;
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    InteractionManager::GetInstance()->StartDrag(dragData.value(), func);
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
     InteractionManager::GetInstance()->StopDrag(static_cast<DragResult>(result), HAS_CUSTOM_ANIMATION);
 }
