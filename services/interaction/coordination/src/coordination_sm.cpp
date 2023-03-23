@@ -540,7 +540,8 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
             remoteNetworkId = preparedNetworkId_.first;
         }
         std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-        DistributedAdapter->StopRemoteInput(src, localNetworkId, keyboards, [this, src](bool isSuccess) {});
+        DistributedAdapter->StopRemoteInput(remoteNetworkId, localNetworkId, keyboards,
+            [this, remoteNetworkId](bool isSuccess) {});
         Reset();
     }
 }

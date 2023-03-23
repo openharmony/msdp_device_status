@@ -124,7 +124,7 @@ void CoordinationStateIn::StopRemoteInput(const std::string &originNetworkId,
     int32_t ret = DistributedAdapter->StopRemoteInput(originNetworkId, dhid,
         [this, remoteNetworkId, startDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
-    });
+        });
     if (ret != RET_OK) {
         CooSM->OnStartFinish(false, originNetworkId, startDeviceId);
     }
@@ -159,7 +159,7 @@ void CoordinationStateIn::ComeBack(const std::string &remoteNetworkId, int32_t s
     int32_t ret = DistributedAdapter->StopRemoteInput(remoteNetworkId, inputDeviceDhids,
         [this, remoteNetworkId, startDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
-            });
+        });
     if (ret != RET_OK) {
         CooSM->OnStartFinish(false, remoteNetworkId, startDeviceId);
     }
