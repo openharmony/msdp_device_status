@@ -19,6 +19,7 @@
 #include <cstdio>
 
 #include "devicestatus_common.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -208,6 +209,7 @@ bool SensorDataCallback::UnregisterCallbackSensor(int32_t sensorTypeId)
 
 void SensorDataCallback::AlgorithmLoop()
 {
+    SetThreadName(std::string("device_status_sensor"));
     DEV_HILOGD(SERVICE, "enter");
     while (alive_) {
         sem_wait(&sem_);

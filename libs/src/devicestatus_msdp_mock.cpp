@@ -25,6 +25,7 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -225,6 +226,7 @@ void DeviceStatusMsdpMock::StartThread()
 
 void DeviceStatusMsdpMock::LoopingThreadEntry()
 {
+    SetThreadName("device_status_mock");
     if (callbacks_.empty()) {
         DEV_HILOGD(SERVICE, "callbacks_ is empty");
         return;

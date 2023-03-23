@@ -44,7 +44,10 @@ ohos_shared_library("devicestatus_mock") {
 
   public_configs = [ ":devicestatus_srv_public_config" ]
 
-  deps = [ "//third_party/cJSON:cjson_static" ]
+  deps = [
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson_static",
+  ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 
@@ -70,6 +73,7 @@ ohos_shared_library("devicestatus_algo") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_utils_path}:devicestatus_util",
     "//commonlibrary/c_utils/base:utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//foundation/multimodalinput/input/util:libmmi-util",
@@ -81,7 +85,7 @@ ohos_shared_library("devicestatus_algo") {
     "ability_base:base",
     "hiviewdfx_hilog_native:libhilog",
     "input:libmmi-client",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "sensor:sensor_interface_native",
