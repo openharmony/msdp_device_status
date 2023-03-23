@@ -79,7 +79,11 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    CooSM->GetCoordinationState(deviceId);
+    int32_t ret = CooSM->GetCoordinationState(deviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetCoordinationState faild");
+        return ret;
+    }
     return RET_OK;
 }
 

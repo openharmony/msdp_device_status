@@ -167,11 +167,16 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
     }
 }
 
-void CoordinationSM::GetCoordinationState(const std::string &deviceId)
+int32_t CoordinationSM::GetCoordinationState(const std::string &deviceId)
 {
     CALL_INFO_TRACE;
+    if (deviceId.empty()) {
+        FI_HILOGE("DeviceId is empty");
+        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
+    }
     bool state = DProfileAdapter->GetCrossingSwitchState(deviceId);
     CoordinationEventMgr->OnGetState(state);
+    return RET_OK;
 }
 
 void CoordinationSM::EnableCoordination(bool enabled)

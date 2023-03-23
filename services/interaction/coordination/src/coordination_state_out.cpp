@@ -45,7 +45,7 @@ int32_t CoordinationStateOut::StopCoordination(const std::string &networkId)
     int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+        return RET_ERR;
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =

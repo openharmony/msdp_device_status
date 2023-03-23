@@ -197,7 +197,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     if (std::strcmp(type, "cooperation") != 0) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be coordination");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperation");
         return nullptr;
     }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);

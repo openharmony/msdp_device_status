@@ -19,21 +19,20 @@
 namespace OHOS {
 namespace Msdp {
 enum class CoordinationMessage {
-    OPEN_SUCCESS = 100,
-    OPEN_FAIL = 101,
-    INFO_START = 200,
-    INFO_SUCCESS = 201,
-    INFO_FAIL = 202,
-    CLOSE = 300,
-    CLOSE_SUCCESS = 301,
-    STOP = 400,
-    STOP_SUCCESS = 401,
-    STOP_FAIL = 402,
-    STATE_ON = 500,
-    STATE_OFF = 501,
-    DEVICE_ID_ERROR = 4400001,
-    COORDINATION_FAIL = 4400002,
-    COORDINATION_DEVICE_ERROR = 4400003,
+    OPEN_SUCCESS = 0,
+    OPEN_FAIL = 1,
+    INFO_START = 2,
+    INFO_SUCCESS = 3,
+    INFO_FAIL = 4,
+    CLOSE = 5,
+    CLOSE_SUCCESS = 6,
+    STOP = 7,
+    STOP_SUCCESS = 8,
+    STOP_FAIL = 9,
+    STATE_ON = 10,
+    STATE_OFF = 11,
+    PARAMETER_ERROR = 401,
+    COORDINATION_FAIL = 20900001,
 };
 } // namespace Msdp
 } // namespace OHOS
