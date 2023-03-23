@@ -87,7 +87,7 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
         return RET_ERR;
     }
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }

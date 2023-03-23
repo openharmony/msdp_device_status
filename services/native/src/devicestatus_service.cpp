@@ -186,6 +186,10 @@ bool DeviceStatusService::Init()
         FI_HILOGE("DevMgr init failed");
         goto INIT_FAIL;
     }
+    if (dragMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("Drag manager init failed");
+        goto INIT_FAIL;
+    }
     if (acrossDeviceDrag_.Init(this) != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
         goto INIT_FAIL;
