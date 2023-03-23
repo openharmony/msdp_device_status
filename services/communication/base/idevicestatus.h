@@ -61,8 +61,8 @@ public:
     virtual int32_t RegisterCoordinationListener() = 0;
     virtual int32_t UnregisterCoordinationListener() = 0;
     virtual int32_t EnableCoordination(int32_t userData, bool enabled) = 0;
-    virtual int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcDeviceId) = 0;
+    virtual int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId,
+        int32_t startDeviceId) = 0;
     virtual int32_t StopCoordination(int32_t userData) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;

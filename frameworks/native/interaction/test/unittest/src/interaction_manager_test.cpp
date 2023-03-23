@@ -326,12 +326,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableCoordination, Test
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string sinkDeviceId("");
-    int32_t srcDeviceId = -1;
+    std::string remoteNetworkId("");
+    int32_t startDeviceId = -1;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Start coordination success");
     };
-    int32_t ret = InteractionManager::GetInstance()->StartCoordination(sinkDeviceId, srcDeviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else

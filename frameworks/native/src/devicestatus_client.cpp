@@ -211,11 +211,11 @@ int32_t DeviceStatusClient::EnableCoordination(int32_t userData, bool enabled)
 }
 
 int32_t DeviceStatusClient::StartCoordination(int32_t userData,
-    const std::string &sinkDeviceId, int32_t srcDeviceId)
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->StartCoordination(userData, sinkDeviceId, srcDeviceId);
+    return devicestatusProxy_->StartCoordination(userData, remoteNetworkId, startDeviceId);
 }
 
 int32_t DeviceStatusClient::StopCoordination(int32_t userData)

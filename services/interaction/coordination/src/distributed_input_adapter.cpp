@@ -54,84 +54,54 @@ bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const
     return DistributedInputKit::IsNeedFilterOut(deviceId, event);
 }
 
-int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
-                                                  DInputCallback callback)
-{
-    CALL_INFO_TRACE;
-    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackDHIds();
-    CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StartDInputCallbackDHIds, callback);
-    return DistributedInputKit::StartRemoteInput(deviceId, dhIds, cb);
-}
-
-int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                  const uint32_t &inputTypes, DInputCallback callback)
-{
-    CALL_INFO_TRACE;
-    sptr<IStartDInputCallback> cb = new (std::nothrow) StartDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StartDInputCallback, callback);
-    return DistributedInputKit::StartRemoteInput(srcId, sinkId, inputTypes, cb);
-}
-
-int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                  const std::vector<std::string> &dhIds, DInputCallback callback)
+int32_t DistributedInputAdapter::StartRemoteInput(const std::string &remoteNetworkId,
+    const std::string &originNetworkId, const std::vector<std::string> &inputDeviceDhids, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StartDInputCallbackSink, callback);
-    return DistributedInputKit::StartRemoteInput(srcId, sinkId, dhIds, cb);
+    return DistributedInputKit::StartRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
 }
 
-int32_t DistributedInputAdapter::StopRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
-                                                 DInputCallback callback)
+int32_t DistributedInputAdapter::StopRemoteInput(const std::string &originNetworkId,
+    const std::vector<std::string> &inputDeviceDhids, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackDHIds();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallbackDHIds, callback);
-    return DistributedInputKit::StopRemoteInput(deviceId, dhIds, cb);
+    return DistributedInputKit::StopRemoteInput(originNetworkId, inputDeviceDhids, cb);
 }
 
-int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                 const uint32_t &inputTypes, DInputCallback callback)
-{
-    CALL_INFO_TRACE;
-    sptr<IStopDInputCallback> cb = new (std::nothrow) StopDInputCallback();
-    CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StopDInputCallback, callback);
-    return DistributedInputKit::StopRemoteInput(srcId, sinkId, inputTypes, cb);
-}
-
-int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                 const std::vector<std::string> &dhIds, DInputCallback callback)
+int32_t DistributedInputAdapter::StopRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
+    const std::vector<std::string> &inputDeviceDhids, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallbackSink, callback);
-    return DistributedInputKit::StopRemoteInput(srcId, sinkId, dhIds, cb);
+    return DistributedInputKit::StopRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
 }
 
-int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                    DInputCallback callback)
+int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &remoteNetworkId,
+                                                    const std::string &originNetworkId, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
-    return DistributedInputKit::PrepareRemoteInput(srcId, sinkId, cb);
+    return DistributedInputKit::PrepareRemoteInput(remoteNetworkId, originNetworkId, cb);
 }
 
-int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
-                                                      DInputCallback callback)
+int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &remoteNetworkId,
+                                                      const std::string &originNetworkId, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallbackSink, callback);
-    return DistributedInputKit::UnprepareRemoteInput(srcId, sinkId, cb);
+    return DistributedInputKit::UnprepareRemoteInput(remoteNetworkId, originNetworkId, cb);
 }
 
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &deviceId, DInputCallback callback)

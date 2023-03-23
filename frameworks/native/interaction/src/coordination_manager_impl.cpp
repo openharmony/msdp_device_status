@@ -89,8 +89,8 @@ int32_t CoordinationManagerImpl::EnableCoordination(bool enabled, FuncCoordinati
     return ret;
 }
 
-int32_t CoordinationManagerImpl::StartCoordination(const std::string &sinkDeviceId,
-    int32_t srcDeviceId, FuncCoordinationMessage callback)
+int32_t CoordinationManagerImpl::StartCoordination(const std::string &remoteNetworkId,
+    int32_t startDeviceId, FuncCoordinationMessage callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -101,7 +101,7 @@ int32_t CoordinationManagerImpl::StartCoordination(const std::string &sinkDevice
         return RET_ERR;
     }
     auto ret = DeviceStatusClient::GetInstance().StartCoordination(
-        userData_, sinkDeviceId, srcDeviceId);
+        userData_, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {

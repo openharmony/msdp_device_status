@@ -43,8 +43,8 @@ public:
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;
     virtual int32_t EnableCoordination(int32_t userData, bool enabled) override;
-    virtual int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcDeviceId) override;
+    virtual int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId,
+        int32_t startDeviceId) override;
     virtual int32_t StopCoordination(int32_t userData) override;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 

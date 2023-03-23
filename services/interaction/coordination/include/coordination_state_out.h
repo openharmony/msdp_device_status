@@ -23,14 +23,14 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationStateOut final : public ICoordinationState {
 public:
-    explicit CoordinationStateOut(const std::string &startDhid);
-    int32_t StopCoordination(const std::string &networkId) override;
+    explicit CoordinationStateOut(const std::string &startDeviceDhid);
+    int32_t StopCoordination(const std::string &remoteNetworkId) override;
     void OnKeyboardOnline(const std::string &dhid) override;
 
 private:
-    void OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId);
-    void ProcessStop(const std::string &srcNetworkId);
-    std::string startDhid_;
+    void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId);
+    void ProcessStop(const std::string &remoteNetworkId);
+    std::string startDeviceDhid_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

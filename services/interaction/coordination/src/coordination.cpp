@@ -34,7 +34,7 @@ void Coordination::EnableCoordination(bool enabled)
 }
 
 int32_t Coordination::StartCoordination(SessionPtr sess, int32_t userData,
-    const std::string& sinkDeviceId, int32_t srcDeviceId)
+    const std::string& remoteNetworkId, int32_t startDeviceId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -43,7 +43,7 @@ int32_t Coordination::StartCoordination(SessionPtr sess, int32_t userData,
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
+    int32_t ret = CooSM->StartCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("StartCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));

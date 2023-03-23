@@ -48,10 +48,10 @@ int32_t InteractionManager::EnableCoordination(bool enabled,
     return InteractionMgrImpl.EnableCoordination(enabled, callback);
 }
 
-int32_t InteractionManager::StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
+int32_t InteractionManager::StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
     std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.StartCoordination(sinkDeviceId, srcDeviceId, callback);
+    return InteractionMgrImpl.StartCoordination(remoteNetworkId, startDeviceId, callback);
 }
 
 int32_t InteractionManager::StopCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)

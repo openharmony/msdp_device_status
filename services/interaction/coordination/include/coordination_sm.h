@@ -122,12 +122,12 @@ public:
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCoordinationResult(bool isSuccess,
-        const std::string &startDhid, int32_t xPercent, int32_t yPercent);
+        const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
     void StopRemoteCoordination();
     void StopRemoteCoordinationResult(bool isSuccess);
-    void StartCoordinationOtherResult(const std::string &srcNetworkId);
+    void StartCoordinationOtherResult(const std::string &remoteNetworkId);
     void UpdateState(CoordinationState state);
-    void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
+    void UpdatePreparedDevices(const std::string &remoteNetworkId, const std::string &originNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
     CoordinationState GetCurrentCoordinationState() const;
     void OnCoordinationChanged(const std::string &networkId, bool isOpen);
@@ -153,15 +153,15 @@ private:
     void Reset(bool adjustAbsolutionLocation = false);
     void OnCloseCoordination(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
-    void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
+    void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDeviceDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
 
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
-    std::string startDhid_ ;
-    std::string srcNetworkId_;
+    std::string startDeviceDhid_;
+    std::string remoteNetworkId_;
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };

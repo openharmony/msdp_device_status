@@ -209,25 +209,25 @@ bool CoordinationDeviceManager::IsRemote(int32_t id)
 std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
-    std::vector<std::string> dhids;
+    std::vector<std::string> inputDeviceDhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
         FI_HILOGW("Cannot find pointer id:%{public}d", deviceId);
-        return dhids;
+        return inputDeviceDhids;
     }
     if (devIter->second == nullptr) {
         FI_HILOGW("Device is nullptr");
-        return dhids;
+        return inputDeviceDhids;
     }
     std::shared_ptr<Device> dev = devIter->second;
     if (!dev->IsPointerDevice()) {
         FI_HILOGD("Not pointer device");
-        return dhids;
+        return inputDeviceDhids;
     }
-    dhids.push_back(dev->GetDhid());
-    FI_HILOGD("unq:%{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
+    inputDeviceDhids.push_back(dev->GetDhid());
+    FI_HILOGD("unq:%{public}s, type:%{public}s", inputDeviceDhids.back().c_str(), "pointer");
 
-    const std::string localNetworkId { COORDINATION::GetLocalDeviceId() };
+    const std::string localNetworkId { COORDINATION::GetLocalNetworkId() };
     const std::string pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
     for (const auto &[id, dev] : devices_) {
@@ -237,11 +237,11 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
             continue;
         }
         if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            dhids.push_back(dev->GetDhid());
-            FI_HILOGD("unq:%{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
+            inputDeviceDhids.push_back(dev->GetDhid());
+            FI_HILOGD("unq:%{public}s, type:%{public}s", inputDeviceDhids.back().c_str(), "supportkey");
         }
     }
-    return dhids;
+    return inputDeviceDhids;
 }
 
 std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(const std::string &dhid) const
@@ -268,7 +268,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     CHKPS(devIter->second);
     auto networkId = devIter->second->GetNetworkId();
     if (networkId.empty()) {
-        networkId = COORDINATION::GetLocalDeviceId();
+        networkId = COORDINATION::GetLocalNetworkId();
     }
     return networkId;
 }
@@ -322,7 +322,6 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     CHKPV(device);
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
-
     if (dev->IsKeyboard()) {
         CooSM->OnKeyboardOnline(dev->GetDhid());
     }

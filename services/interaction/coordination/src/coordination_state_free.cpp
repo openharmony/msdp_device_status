@@ -34,7 +34,7 @@ int32_t CoordinationStateFree::StartCoordination(
         FI_HILOGE("RemoteNetworkId is empty");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
     }
-    std::string localNetworkId = COORDINATION::GetLocalDeviceId();
+    std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);

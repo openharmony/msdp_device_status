@@ -38,7 +38,7 @@ struct JsonParser {
     cJSON *json_ { nullptr };
 };
 namespace COORDINATION {
-std::string GetLocalDeviceId();
+std::string GetLocalNetworkId();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

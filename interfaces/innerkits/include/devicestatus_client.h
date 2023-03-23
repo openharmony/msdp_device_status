@@ -50,7 +50,7 @@ public:
     int32_t RegisterCoordinationListener();
     int32_t UnregisterCoordinationListener();
     int32_t EnableCoordination(int32_t userData, bool enabled);
-    int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId, int32_t srcDeviceId);
+    int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t StopCoordination(int32_t userData);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
