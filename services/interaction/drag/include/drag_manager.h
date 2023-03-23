@@ -19,6 +19,7 @@
 #include <string>
 
 #include "extra_data.h"
+#include "i_context.h"
 #include "i_input_event_consumer.h"
 #include "input_manager.h"
 #include "pixel_map.h"
@@ -39,6 +40,7 @@ public:
     ~DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
 
+    int32_t Init(IContext* context);
     void OnSessionLost(SessionPtr session);
     int32_t AddListener(SessionPtr session);
     int32_t RemoveListener(SessionPtr session);
@@ -69,12 +71,14 @@ private:
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
 private:
+    int32_t timerId_ { 0 };
     StateChangeNotify stateNotify_;
     DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
     int32_t monitorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
+    IContext *context_ { nullptr };
 };
 #define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus

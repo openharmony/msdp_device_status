@@ -32,7 +32,16 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
+constexpr int32_t TIMEOUT_MS = 1000;
 } // namespace
+
+int32_t DragManager::Init(IContext* context)
+{
+    CALL_INFO_TRACE;
+    CHKPR(context, RET_ERR);
+    context_ = context;
+    return RET_OK;
+}
 
 void DragManager::OnSessionLost(SessionPtr session)
 {
@@ -93,6 +102,10 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
+    if (result != DragResult::DRAG_EXCEPTION) {
+        CHKPR(context_, RET_ERR);
+        context_->GetTimerManager().RemoveTimer(timerId_);
+    }
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
@@ -135,7 +148,7 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     DragData dragData = DataAdapter.GetDragData();
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -191,6 +204,11 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     SetDragTargetPid(pid);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
+
+    CHKPV(context_);
+    context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+        this->StopDrag(DragResult::DRAG_EXCEPTION, false);
+    });
 }
 
 void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
@@ -292,6 +310,11 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
             }
+            break;
+        }
+        case DragResult::DRAG_EXCEPTION: {
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
             break;
         }
         default: {
