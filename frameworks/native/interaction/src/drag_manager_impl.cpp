@@ -93,8 +93,6 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
     stopCallback_(notifyMsg);
-    CHKPR(disconnectCallback_, RET_ERR);
-    disconnectCallback_();
     return RET_OK;
 }
 

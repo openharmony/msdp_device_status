@@ -194,7 +194,7 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return dragManagerImpl_.StartDrag(dragData, callback, disconnectCallback);
+    return dragManagerImpl_.StartDrag(dragData, callback);
 }
 
 int32_t InteractionManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
