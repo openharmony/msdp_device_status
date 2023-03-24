@@ -134,7 +134,7 @@ void StartDragFuzzTest(const uint8_t* data, size_t  size)
     };
     DragData dragData = CreateDragData(data, size);
     InteractionManager::GetInstance()->StartDrag(dragData, func);
-    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID );
+    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID);
     InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, true);
 }
 } // namespace DeviceStatus

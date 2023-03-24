@@ -134,7 +134,7 @@ void StopDragFuzzTest(const uint8_t* data, size_t  size)
     dragData->hasCanceledAnimation = HAS_CANCELED_ANIMATION;
     InteractionManager::GetInstance()->StartDrag(dragData.value(), func);
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
-    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID );
+    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID);
     InteractionManager::GetInstance()->StopDrag(static_cast<DragResult>(result), HAS_CUSTOM_ANIMATION);
 }
 } // namespace DeviceStatus
