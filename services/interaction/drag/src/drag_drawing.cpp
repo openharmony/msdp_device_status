@@ -512,7 +512,6 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
-    std::unique_ptr<std::fstream> fs = std::make_unique<std::fstream>();
     std::string filePath;
     if (g_drawingInfo.currentStyle == DragCursorStyle::FORBIDDEN) {
         filePath = FORBID_DRAG_PATH;

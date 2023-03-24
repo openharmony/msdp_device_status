@@ -33,8 +33,8 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDragFuzzTest" };
 constexpr int32_t DRAG_NUM { 1 };
-constexpr bool HAS_CANCELED_ANIMATION { false };
-constexpr bool HAS_CUSTOM_ANIMATION { false };
+constexpr bool HAS_CANCELED_ANIMATION { true };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DRAG_SRC_X { 0 };
 constexpr int32_t DRAG_SRC_Y { 0 };
