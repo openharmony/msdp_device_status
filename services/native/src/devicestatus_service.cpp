@@ -186,6 +186,10 @@ bool DeviceStatusService::Init()
         FI_HILOGE("DevMgr init failed");
         goto INIT_FAIL;
     }
+    if (dragMgr_.Init(this) != RET_OK) {
+        FI_HILOGE("Drag manager init failed");
+        goto INIT_FAIL;
+    }
     if (acrossDeviceDrag_.Init(this) != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
         goto INIT_FAIL;
@@ -683,7 +687,10 @@ int32_t DeviceStatusService::RemoveDraglistener()
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     auto session = GetSession(GetClientFd(pid));
-    CHKPR(session, RET_ERR);
+    if (session == nullptr) {
+        FI_HILOGW("Session is nullptr");
+        return RET_OK;
+    }
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -717,16 +724,37 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UpdateDragStyle(int32_t style)
+int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnSetDragWindowVisible, &dragMgr_, visible));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnSetDragWindowVisible failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
-int32_t DeviceStatusService::UpdateDragMessage(const std::u16string &message)
+int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::OnGetShadowOffset, &dragMgr_, std::ref(offsetX), std::ref(offsetY)));
+    if (ret != RET_OK) {
+        FI_HILOGE("GetShadowOffset failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusService::GetDragTargetPid()

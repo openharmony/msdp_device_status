@@ -27,16 +27,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManagerImpl" };
 } // namespace
 
-int32_t DragManagerImpl::UpdateDragStyle(int32_t style)
+int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
+    if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
+        FI_HILOGE("Invalid style:%{public}d", style);
+        return RET_ERR;
+    }
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
-}
-
-int32_t DragManagerImpl::UpdateDragMessage(const std::u16string &message)
-{
-    CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().UpdateDragMessage(message);
 }
 
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
@@ -89,7 +87,7 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
         return RET_ERR;
     }
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
@@ -104,6 +102,22 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     return RET_OK;
 }
 
+int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t dragMsg;
+    pkt >> dragMsg;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read drag msg failed");
+        return RET_ERR;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &listener : dragListener_) {
+        listener->OnDragMessage(static_cast<DragMessage>(dragMsg));
+    }
+    return RET_OK;
+}
+
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
 {
     CALL_INFO_TRACE;
@@ -111,12 +125,12 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
     std::lock_guard<std::mutex> guard(mtx_);
     if (!hasRegistered_) {
         FI_HILOGI("Start monitoring");
-        hasRegistered_ = true;
         int32_t ret = DeviceStatusClient::GetInstance().AddDraglistener();
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register");
             return ret;
         }
+        hasRegistered_ = true;
     }
     if (std::all_of(dragListener_.cbegin(), dragListener_.cend(),
                     [listener](DragListenerPtr tListener) {
@@ -148,6 +162,18 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         return DeviceStatusClient::GetInstance().RemoveDraglistener();
     }
     return RET_OK;
+}
+
+int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
+}
+
+int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

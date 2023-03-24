@@ -39,12 +39,13 @@ public:
         STOP_COORDINATION,
         GET_COORDINATION_STATE,
         UPDATED_DRAG_STYLE = 20,
-        UPDATED_DRAG_MESSAGE,
         START_DRAG,
         STOP_DRAG,
         GET_DRAG_TARGET_PID,
         REGISTER_DRAG_MONITOR,
         UNREGISTER_DRAG_MONITOR,
+        SET_DRAG_WINDOW_VISIBLE,
+        GET_SHADOW_OFFSET,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -66,13 +67,14 @@ public:
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
-    virtual int32_t UpdateDragStyle(int32_t style) = 0;
-    virtual int32_t UpdateDragMessage(const std::u16string &message) = 0;
+    virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
     virtual int32_t GetDragTargetPid() = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
+    virtual int32_t SetDragWindowVisible(bool visible) = 0;
+    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) = 0;
     virtual bool IsRunning() const
     {
         return true;

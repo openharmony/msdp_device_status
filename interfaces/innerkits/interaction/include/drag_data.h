@@ -49,7 +49,8 @@ struct DragData {
 enum class DragResult {
     DRAG_SUCCESS = 0,
     DRAG_FAIL = 1,
-    DRAG_CANCEL = 2
+    DRAG_CANCEL = 2,
+    DRAG_EXCEPTION = 3
 };
 
 struct DragNotifyMsg {
@@ -60,8 +61,10 @@ struct DragNotifyMsg {
 };
 
 enum class DragCursorStyle {
+    DEFAULT = 0,
     FORBIDDEN,
-    ALLOWABLE
+    COPY,
+    MOVE
 };
 
 } // namespace DeviceStatus

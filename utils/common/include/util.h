@@ -61,6 +61,14 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);
 
 std::string StringPrintf(const char *format, ...);
+bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension);
+int32_t GetFileSize(const std::string &filePath);
+bool IsValidPath(const std::string &rootDir, const std::string &filePath);
+bool IsValidSvgPath(const std::string &filePath);
+bool IsFileExists(const std::string &fileName);
+bool IsValidSvgFile(const std::string &filePath);
+bool IsNum(const std::string &str);
+int32_t ChangeNumber(int32_t num);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

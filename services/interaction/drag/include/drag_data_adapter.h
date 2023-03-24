@@ -35,14 +35,19 @@ public:
 
     void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
     DragData GetDragData() const;
-    int32_t GetDragStyle() const;
+    void SetDragStyle(DragCursorStyle style);
+    DragCursorStyle GetDragStyle() const;
     std::u16string GetDragMessage() const;
-
+    void SetDragWindowVisible(bool visible);
+    bool GetDragWindowVisible() const;
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) const;
+    
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
-    int32_t dragStyle_ { -1 };
+    DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::u16string dragMessage_;
+    bool visible_ { false };
 };
 
 #define DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()

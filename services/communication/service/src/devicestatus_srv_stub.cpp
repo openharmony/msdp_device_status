@@ -60,10 +60,11 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::START_DRAG, &DeviceStatusSrvStub::StartDragStub},
         {Idevicestatus::STOP_DRAG, &DeviceStatusSrvStub::StopDragStub},
         {Idevicestatus::UPDATED_DRAG_STYLE, &DeviceStatusSrvStub::UpdateDragStyleStub},
-        {Idevicestatus::UPDATED_DRAG_MESSAGE, &DeviceStatusSrvStub::UpdateDragMessageStub},
         {Idevicestatus::GET_DRAG_TARGET_PID, &DeviceStatusSrvStub::GetDragTargetPidStub},
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
+        {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
+        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -131,7 +132,7 @@ int32_t DeviceStatusSrvStub::RegisterCoordinationMonitorStub(MessageParcel& data
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterCoordinationListener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -141,7 +142,7 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterCoordinationListener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -155,7 +156,7 @@ int32_t DeviceStatusSrvStub::EnableCoordinationStub(MessageParcel& data, Message
     READBOOL(data, enabled, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = EnableCoordination(userData, enabled);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -171,7 +172,7 @@ int32_t DeviceStatusSrvStub::StartCoordinationStub(MessageParcel& data, MessageP
     READINT32(data, srcDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StartCoordination(userData, sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartCoordination failed ret:%{public}d", ret);
+        FI_HILOGE("Call StartCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -183,7 +184,7 @@ int32_t DeviceStatusSrvStub::StopCoordinationStub(MessageParcel& data, MessagePa
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopCoordination(userData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -197,7 +198,7 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
     READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = GetCoordinationState(userData, deviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed ret:%{public}d", ret);
+        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -207,21 +208,9 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t style;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = UpdateDragStyle(style);
+    int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
-        FI_HILOGE("Call UpdateDragStyle failed ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusSrvStub::UpdateDragMessageStub(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    std::u16string message;
-    READSTRING16(data, message, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = UpdateDragMessage(message);
-    if (ret != RET_OK) {
-        FI_HILOGE("Call UpdateDragMessage failed ret:%{public}d", ret);
+        FI_HILOGE("Call UpdateDragStyle failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -302,7 +291,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     }
     int32_t ret = StartDrag(dragData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartDrag failed ret:%{public}d", ret);
+        FI_HILOGE("Call StartDrag failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
@@ -322,7 +311,7 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StopDrag failed ret:%{public}d", ret);
+        FI_HILOGE("Call StopDrag failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
@@ -333,7 +322,7 @@ int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t ret = AddDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call AddDraglistener failed ret:%{public}d", ret);
+        FI_HILOGE("Call AddDraglistener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -343,8 +332,34 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
     CALL_DEBUG_ENTER;
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RemoveDraglistener failed ret:%{public}d", ret);
+        FI_HILOGE("Call RemoveDraglistener failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool visible;
+    READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = SetDragWindowVisible(visible);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call SetDragWindowVisible failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    int32_t ret = GetShadowOffset(offsetX, offsetY);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
+    }
+    WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 } // namespace DeviceStatus

@@ -56,14 +56,16 @@ public:
 
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
-    int32_t UpdateDragStyle(int32_t style);
-    int32_t UpdateDragMessage(const std::u16string &message);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t AddDraglistener();
     int32_t RemoveDraglistener();
+    int32_t SetDragWindowVisible(bool visible);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
 
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
+
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:

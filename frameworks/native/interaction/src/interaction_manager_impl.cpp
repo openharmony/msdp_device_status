@@ -70,7 +70,9 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
-            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)}
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
+        {MessageId::DRAG_STATE_LISTENER,
+            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)}
     };
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {
@@ -188,16 +190,10 @@ int32_t InteractionManagerImpl::GetCoordinationState(
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UpdateDragStyle(int32_t style)
+int32_t InteractionManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.UpdateDragStyle(style);
-}
-
-int32_t InteractionManagerImpl::UpdateDragMessage(const std::u16string &message)
-{
-    CALL_DEBUG_ENTER;
-    return dragManagerImpl_.UpdateDragMessage(message);
 }
 
 int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
@@ -239,6 +235,18 @@ int32_t InteractionManagerImpl::RemoveDraglistener(DragListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.RemoveDraglistener(listener);
+}
+
+int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.SetDragWindowVisible(visible);
+}
+
+int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

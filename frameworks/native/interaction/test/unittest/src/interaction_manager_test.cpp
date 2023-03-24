@@ -225,6 +225,7 @@ void InputEventCallbackTest::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
     ASSERT_TRUE(!pointerEvent->GetBuffer().empty());
     ASSERT_TRUE(pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE);
 }
+
 /**
  * @tc.name: InteractionManagerTest_RegisterCoordinationListener_001
  * @tc.desc: Register coordination listener
@@ -376,6 +377,45 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+/**
+ * @tc.name: InteractionManagerTest_Draglistener
+ * @tc.desc: Drag listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    class DragListenerTest : public IDragListener {
+    public:
+        DragListenerTest() : IDragListener() {}
+        void OnDragMessage(DragMessage msg) override
+        {
+            FI_HILOGD("DragListenerTest msg:%{public}d", msg);
+        };
+    };
+    std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
+    int32_t ret = InteractionManager::GetInstance()->AddDraglistener(listener);
+    ASSERT_EQ(ret, RET_OK);
+    std::function<void(const DragNotifyMsg&)> callback = [](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+    };
+    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ret = InteractionManager::GetInstance()->RemoveDraglistener(listener);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -718,6 +758,39 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     TestRemoveMonitor(monitorId);
     InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+}
+
+/**
+* @tc.name: InteractionManagerTest_SetDragWindowVisible
+* @tc.desc: Set Drag Window Visible
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+* @tc.name: InteractionManagerTest_GetShadowOffset
+* @tc.desc: Get Shadow Offset
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY);
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
