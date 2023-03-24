@@ -82,9 +82,8 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     int32_t ret = CooSM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("GetCoordinationState faild");
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t Coordination::RegisterCoordinationListener(SessionPtr sess)

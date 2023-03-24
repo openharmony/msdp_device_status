@@ -880,9 +880,8 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     int32_t ret = CooSM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("GetCoordinationState faild");
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
