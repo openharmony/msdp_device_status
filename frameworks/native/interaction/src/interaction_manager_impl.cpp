@@ -47,16 +47,6 @@ bool InteractionManagerImpl::InitClient()
     return true;
 }
 
-void InteractionManagerImpl::DisconnectClient()
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (client_ != nullptr) {
-        client_->OnDisconnect();
-    }
-    client_ = nullptr;
-}
-
 void InteractionManagerImpl::InitMsgHandler()
 {
     CALL_DEBUG_ENTER;
@@ -204,7 +194,6 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    auto disconnectCallback = std::bind(&InteractionManagerImpl::DisconnectClient, this);
     return dragManagerImpl_.StartDrag(dragData, callback, disconnectCallback);
 }
 
