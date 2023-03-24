@@ -16,6 +16,7 @@
 #include "startdrag_fuzzer.h"
 
 #include <memory>
+#include <utility>
 
 #include "securec.h"
 
@@ -29,6 +30,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
+constexpr int32_t DRAG_UP_X { 100 };
+constexpr int32_t DRAG_UP_Y { 100 };
+constexpr int32_t POINTER_ID { 0 };
 } // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
@@ -68,15 +72,25 @@ DragData CreateDragData(const uint8_t* data, size_t size)
     shadowInfo.pixelMap = CreatePixelMap(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT);
     
     DragData dragData;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.sourceType);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.dragNum);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.pointerId);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayX);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayY);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayId);
     dragData.hasCanceledAnimation = true;
     dragData.shadowInfo = shadowInfo;
+    dragData.pointerId = POINTER_ID;
+    dragData.sourceType = MMI::PointerEvent::SOURCE_TYPE_MOUSE;
     return dragData;
+}
+
+void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =
+        SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
+    FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
 void StartDragFuzzTest(const uint8_t* data, size_t  size)
@@ -90,6 +104,7 @@ void StartDragFuzzTest(const uint8_t* data, size_t  size)
     };
     DragData dragData = CreateDragData(data, size);
     InteractionManager::GetInstance()->StartDrag(dragData, func);
+    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID );
     InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, true);
 }
 } // namespace DeviceStatus

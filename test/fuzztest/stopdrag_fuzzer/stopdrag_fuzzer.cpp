@@ -34,10 +34,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopD
 constexpr int32_t DRAG_NUM { 1 };
 constexpr bool HAS_CANCELED_ANIMATION { false };
 constexpr bool HAS_CUSTOM_ANIMATION { false };
-constexpr int32_t TOUCH_POINTER_ID { 1 };
 constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DRAG_SRC_X { 0 };
 constexpr int32_t DRAG_SRC_Y { 0 };
+constexpr int32_t DRAG_UP_X { 100 };
+constexpr int32_t DRAG_UP_Y { 100 };
+constexpr int32_t POINTER_ID { 0 }
 
 std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
 {
@@ -79,6 +81,16 @@ std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize,
     return dragData;
 }
 
+void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<MMI::PointerEvent> pointerEvent =
+        SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
+    FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
 void StopDragFuzzTest(const uint8_t* data, size_t  size)
 {
     if (data == nullptr) {
@@ -89,10 +101,11 @@ void StopDragFuzzTest(const uint8_t* data, size_t  size)
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
     };
     std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     dragData->hasCanceledAnimation = HAS_CANCELED_ANIMATION;
     InteractionManager::GetInstance()->StartDrag(dragData.value(), func);
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    SimulateUpEvent({DRAG_UP_X, DRAG_UP_Y}, MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID );
     InteractionManager::GetInstance()->StopDrag(static_cast<DragResult>(result), HAS_CUSTOM_ANIMATION);
 }
 } // namespace DeviceStatus
