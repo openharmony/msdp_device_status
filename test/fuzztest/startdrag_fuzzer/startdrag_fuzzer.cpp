@@ -18,6 +18,8 @@
 #include <memory>
 #include <utility>
 
+#include "input_manager.h"
+#include "pointer_event.h"
 #include "securec.h"
 
 #include "devicestatus_define.h"

@@ -18,6 +18,7 @@
 
 #include "stopdrag_fuzzer.h"
 
+#include "input_manager.h"
 #include "pointer_event.h"
 
 #include "drag_data.h"
