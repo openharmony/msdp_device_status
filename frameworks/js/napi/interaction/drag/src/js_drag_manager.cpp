@@ -36,10 +36,18 @@ void JsDragManager::ResetEnv()
 
 bool JsDragManager::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 {
+    CALL_INFO_TRACE;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        FI_HILOGE("scope is nullptr");
+        return false;
+    }
     napi_value handlerTemp = nullptr;
-    CHKRF(napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE);
+    CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
     bool isEqual = false;
-    CHKRF(napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
+    CHKRF_SCOPE(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS, scope);
+    napi_close_handle_scope(env, scope);
     return isEqual;
 }
 
