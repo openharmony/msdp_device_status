@@ -158,9 +158,13 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
+    if (g_drawingInfo.dragWindow != nullptr) {
+        g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX,
+            g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
+        return;
+    }
+    CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
     CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX,
-        g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
