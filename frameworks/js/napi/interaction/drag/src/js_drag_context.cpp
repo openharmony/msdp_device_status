@@ -120,6 +120,12 @@ JsDragContext *JsDragContext::GetInstance(napi_env env)
         return nullptr;
     }
 
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        FI_HILOGE("scope is nullptr");
+        return nullptr;
+    }
     napi_value object = nullptr;
     CHKRP(napi_get_named_property(env, global, DRAG, &object), GET_NAMED_PROPERTY);
     if (object == nullptr) {
@@ -133,6 +139,7 @@ JsDragContext *JsDragContext::GetInstance(napi_env env)
         FI_HILOGE("instance is nullptr");
         return nullptr;
     }
+    napi_close_handle_scope(env, scope);
     return instance;
 }
 
