@@ -332,15 +332,17 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
         return nullptr;
     }
     napi_value object = nullptr;
-    CHKRP(napi_get_named_property(env, global, COORDINATION, &object), GET_NAMED_PROPERTY);
+    CHKRP_SCOPE(env, napi_get_named_property(env, global, COORDINATION, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
+        napi_close_handle_scope(env, scope);
         FI_HILOGE("object is nullptr");
         return nullptr;
     }
 
     JsCoordinationContext *instance = nullptr;
-    CHKRP(napi_unwrap(env, object, (void**)&instance), UNWRAP);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
     if (instance == nullptr) {
+        napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");
         return nullptr;
     }

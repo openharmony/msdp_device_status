@@ -44,9 +44,9 @@ bool JsDragManager::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
         return false;
     }
     napi_value handlerTemp = nullptr;
-    CHKRF(napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE);
+    CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
     bool isEqual = false;
-    CHKRF(napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
+    CHKRF_SCOPE(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS, scope);
     napi_close_handle_scope(env, scope);
     return isEqual;
 }
