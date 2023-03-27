@@ -227,8 +227,8 @@ void Client::OnDisconnected()
     if (!DelFdListener(fd_)) {
         FI_HILOGW("Delete fd listener failed");
     }
-    Close();
-    if (!isExit && eventHandler_ != nullptr) {
+    StreamClient::Stop();
+    if (hasClient_ && eventHandler_ != nullptr) {
         if (!eventHandler_->PostTask(std::bind(&Client::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
             FI_HILOGE("Send reconnect event task failed");
         }
@@ -243,7 +243,7 @@ void Client::OnConnected()
     if (funConnected_) {
         funConnected_(*this);
     }
-    if (!isExit && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
+    if (hasClient_ && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             FI_HILOGE("Add fd listener failed");
             return;
@@ -272,6 +272,7 @@ void Client::Stop()
 {
     CALL_DEBUG_ENTER;
     StreamClient::Stop();
+    isRunning_ = false;
     if (eventHandler_ != nullptr) {
         auto runner = eventHandler_->GetEventRunner();
         CHKPV(runner);
