@@ -116,7 +116,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
     InitDrawingInfo(dragData);
     CreateWindow(dragData.displayX, dragData.displayY);
     CHKPR(g_drawingInfo.dragWindow, INIT_FAIL);
-    g_drawingInfo.dragWindow->Show();
     if (InitLayer() != RET_OK) {
         FI_HILOGE("Init layer failed");
         return INIT_FAIL;
@@ -159,7 +158,6 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-
     if (g_drawingInfo.dragWindow != nullptr) {
         g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX,
             g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
@@ -167,7 +165,6 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     }
     CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, g_drawingInfo.displayY + g_drawingInfo.pixelMapY);
     CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->Show();
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -254,7 +251,6 @@ void DragDrawing::DestroyDragWindow()
     rsUiDirector_ = nullptr;
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
     g_drawingInfo.pixelMap = nullptr;
-    g_drawingInfo.surfaceNode = nullptr;
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
     }
@@ -266,12 +262,26 @@ void DragDrawing::DestroyDragWindow()
         g_drawingInfo.dragWindow->Destroy();
         g_drawingInfo.dragWindow = nullptr;
     }
+    g_drawingInfo.surfaceNode = nullptr;
 }
 
 void DragDrawing::UpdateDrawingState()
 {
     CALL_DEBUG_ENTER;
     g_drawingInfo.isRunning = false;
+}
+
+void DragDrawing::UpdateDragWindowState(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(g_drawingInfo.dragWindow);
+    if (visible) {
+        g_drawingInfo.dragWindow->Show();
+        FI_HILOGD("Drag window show success");
+    } else {
+        g_drawingInfo.dragWindow->Hide();
+        FI_HILOGD("Drag window hide success");
+    }
 }
 
 void DragDrawing::InitAnimation()
@@ -506,7 +516,6 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
-    std::unique_ptr<std::fstream> fs = std::make_unique<std::fstream>();
     std::string filePath;
     if (g_drawingInfo.currentStyle == DragCursorStyle::FORBIDDEN) {
         filePath = FORBID_DRAG_PATH;

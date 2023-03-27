@@ -37,8 +37,7 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
-    std::function<void()> disconnectCallback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -59,7 +58,6 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     {
         std::lock_guard<std::mutex> guard(mtx_);
         stopCallback_ = callback;
-        disconnectCallback_ = disconnectCallback;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -87,7 +85,7 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
         return RET_ERR;
     }
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
@@ -95,8 +93,6 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(stopCallback_, RET_ERR);
     stopCallback_(notifyMsg);
-    CHKPR(disconnectCallback_, RET_ERR);
-    disconnectCallback_();
     return RET_OK;
 }
 

@@ -32,7 +32,17 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
+constexpr int32_t TIMEOUT_MS = 1000;
+constexpr int32_t DRAG_PRIORITY = 500;
 } // namespace
+
+int32_t DragManager::Init(IContext* context)
+{
+    CALL_INFO_TRACE;
+    CHKPR(context, RET_ERR);
+    context_ = context;
+    return RET_OK;
+}
 
 void DragManager::OnSessionLost(SessionPtr session)
 {
@@ -93,6 +103,10 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
+    if (result != DragResult::DRAG_EXCEPTION) {
+        CHKPR(context_, RET_ERR);
+        context_->GetTimerManager().RemoveTimer(timerId_);
+    }
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
         return RET_ERR;
@@ -135,7 +149,7 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     DragData dragData = DataAdapter.GetDragData();
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -191,18 +205,39 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     SetDragTargetPid(pid);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
+
+    CHKPV(context_);
+    context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+        this->StopDrag(DragResult::DRAG_EXCEPTION, false);
+    });
 }
 
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
-{}
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
-{}
-void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+}
+
+void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     CHKPV(callback_);
+    CHKPV(context_);
     callback_(pointerEvent);
+    pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    auto fun = [] (std::shared_ptr<MMI::PointerEvent> pointerEvent) -> int32_t {
+        MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+        return RET_OK;
+    };
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(std::bind(fun, pointerEvent));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
+{
+    CALL_DEBUG_ENTER;
 }
 
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
@@ -230,22 +265,33 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
     return RET_OK;
 }
 
-int32_t DragManager::OnStartDrag()
+int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
 {
     CALL_DEBUG_ENTER;
-    auto consumer = std::make_shared<MonitorConsumer>(MonitorConsumer(
-        std::bind(&DragManager::DragCallback, this, std::placeholders::_1)));
-    monitorId_ = INPUT_MANAGER->AddMonitor(consumer);
-    if (monitorId_ < 0) {
-        FI_HILOGE("AddMonitor failed, monitorId_:%{public}d", monitorId_);
+    uint32_t deviceTags = 0;
+    if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
+    } else if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TOUCH);
+    } else {
+        FI_HILOGW("Drag is not supported for this device type:%{public}d", sourceType);
         return RET_ERR;
     }
+    auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
+    auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
+    interceptorId_ = INPUT_MANAGER->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
+    if (interceptorId_ <= 0) {
+        FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragManager::OnStartDrag()
+{
     auto extraData = CreateExtraData(true);
     INPUT_MANAGER->AppendExtraData(extraData);
     DragData dragData = DataAdapter.GetDragData();
-    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        INPUT_MANAGER->SetPointerVisible(false);
-    }
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
@@ -257,18 +303,27 @@ int32_t DragManager::OnStartDrag()
         return RET_ERR;
     }
     dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    ret = AddDragEventInterceptor(dragData.sourceType);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add drag event interceptor");
+        dragDrawing_.DestroyDragWindow();
+        return RET_ERR;
+    }
+    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        INPUT_MANAGER->SetPointerVisible(false);
+    }
     return RET_OK;
 }
 
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    if (monitorId_ <= 0) {
-        FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
+    if (interceptorId_ <= 0) {
+        FI_HILOGE("Invalid interceptor to be removed, interceptorId_:%{public}d", interceptorId_);
         return RET_ERR;
     }
-    INPUT_MANAGER->RemoveMonitor(monitorId_);
-    monitorId_ = -1;
+    MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
+    interceptorId_ = -1;
     DragData dragData = DataAdapter.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -294,6 +349,11 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
             }
             break;
         }
+        case DragResult::DRAG_EXCEPTION: {
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            break;
+        }
         default: {
             FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
             break;
@@ -305,6 +365,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
     DataAdapter.SetDragWindowVisible(visible);
+    dragDrawing_.UpdateDragWindowState(visible);
     return RET_OK;
 }
 

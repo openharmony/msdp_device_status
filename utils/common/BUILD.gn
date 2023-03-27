@@ -40,6 +40,7 @@ ohos_shared_library("devicestatus_util") {
     "napi:ace_napi",
   ]
 
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
