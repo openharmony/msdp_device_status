@@ -266,11 +266,11 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
         return EMPTYSTR;
     }
     CHKPS(devIter->second);
-    auto networkId = devIter->second->GetNetworkId();
-    if (networkId.empty()) {
-        networkId = COORDINATION::GetLocalNetworkId();
+    auto OriginNetworkId = devIter->second->GetNetworkId();
+    if (OriginNetworkId.empty()) {
+        OriginNetworkId = COORDINATION::GetLocalNetworkId();
     }
-    return networkId;
+    return OriginNetworkId;
 }
 
 std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhid) const
