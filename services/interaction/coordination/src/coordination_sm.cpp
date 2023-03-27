@@ -744,6 +744,9 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
                 keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
                 MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
             }
+        } else {
+            keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
+            MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
     } else if (state == CoordinationState::STATE_OUT) {
         std::string networkId = COORDINATION::GetLocalDeviceId();
@@ -782,15 +785,17 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not mouse event, skip");
+        return;
+    }
     if (callback_) {
         callback_(pointerEvent);
     }
-    if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        MMI::PointerEvent::PointerItem pointerItem;
-        pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-        CooSM->displayX_ = pointerItem.GetDisplayX();
-        CooSM->displayY_ = pointerItem.GetDisplayY();
-    }
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    CooSM->displayX_ = pointerItem.GetDisplayX();
+    CooSM->displayY_ = pointerItem.GetDisplayY();
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
