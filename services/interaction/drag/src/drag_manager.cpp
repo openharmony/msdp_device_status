@@ -369,9 +369,9 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     return RET_OK;
 }
 
-int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
-    return DataAdapter.GetShadowOffset(offsetX, offsetY);
+    return DataAdapter.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

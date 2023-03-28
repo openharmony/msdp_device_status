@@ -679,8 +679,11 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
     CALL_TEST_DEBUG;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY);
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
+    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+        offsetX, offsetY, width, height);
     ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
