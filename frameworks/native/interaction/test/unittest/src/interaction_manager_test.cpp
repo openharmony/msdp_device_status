@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <iostream>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -131,7 +130,6 @@ void InteractionManagerTest::SetUp()
     auto mouseAndTouch = GetMouseAndTouch();
     DEVICE_MOUSE_ID = mouseAndTouch.first;
     DEVICE_TOUCH_ID = mouseAndTouch.second;
-    std::cout << "DEVICE_MOUSE_ID:" << DEVICE_MOUSE_ID << " DEVICE_TOUCH_ID:" << DEVICE_TOUCH_ID << std::endl;
 }
 
 void InteractionManagerTest::TearDown()
