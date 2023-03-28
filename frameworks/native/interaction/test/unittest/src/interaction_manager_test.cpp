@@ -82,7 +82,7 @@ public:
 std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
 {
     std::vector<int32_t> realDeviceIds;
-    auto callback = [&](std::vector<int32_t>& deviceIds) {
+    auto callback = [&realDeviceIds](std::vector<int32_t>& deviceIds) {
         realDeviceIds = deviceIds;
     };
     int32_t ret = INPUT_MANAGER->GetDeviceIds(callback);
@@ -96,7 +96,7 @@ std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
 std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t deviceId)
 {
     std::shared_ptr<MMI::InputDevice> inputDevice;
-    auto callback = [&](std::shared_ptr<MMI::InputDevice> device) {
+    auto callback = [&inputDevice](std::shared_ptr<MMI::InputDevice> device) {
         inputDevice = device;
     };
     int32_t ret = INPUT_MANAGER->GetDevice(deviceId, callback);
