@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <iostream>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -59,6 +61,10 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static std::vector<int32_t> GetInputDeviceIds();
+    static std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
+    static std::pair<int32_t, int32_t> GetMouseAndTouch();
+
     std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
     std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
     int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
@@ -72,9 +78,6 @@ public:
     void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
     int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
     void TestRemoveMonitor(int32_t monitorId);
-    std::vector<int32_t> GetInputDeviceIds();
-    std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
-    std::pair<int32_t, int32_t> GetMouseAndTouch();
 };
 
 std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
@@ -123,13 +126,13 @@ std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
 
 void InteractionManagerTest::SetUpTestCase()
 {
+    auto mouseAndTouch = GetMouseAndTouch();
+    DEVICE_MOUSE_ID = mouseAndTouch.first;
+    DEVICE_TOUCH_ID = mouseAndTouch.second;
 }
 
 void InteractionManagerTest::SetUp()
 {
-    auto mouseAndTouch = GetMouseAndTouch();
-    DEVICE_MOUSE_ID = mouseAndTouch.first;
-    DEVICE_TOUCH_ID = mouseAndTouch.second;
 }
 
 void InteractionManagerTest::TearDown()
