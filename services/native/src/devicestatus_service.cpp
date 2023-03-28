@@ -842,7 +842,6 @@ int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
     int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
-        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -882,8 +881,11 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    CooSM->GetCoordinationState(deviceId);
-    return RET_OK;
+    int32_t ret = CooSM->GetCoordinationState(deviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetCoordinationState faild");
+    }
+    return ret;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
