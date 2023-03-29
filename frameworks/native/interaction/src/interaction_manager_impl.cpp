@@ -33,7 +33,7 @@ InteractionManagerImpl::~InteractionManagerImpl() {}
 bool InteractionManagerImpl::InitClient()
 {
     CALL_DEBUG_ENTER;
-    if (client_ != nullptr) {
+    if (client_ != nullptr && client_->CheckValidFd()) {
         return true;
     }
     client_ = std::make_shared<Client>();
