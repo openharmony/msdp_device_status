@@ -42,6 +42,10 @@ public:
     int32_t Reconnect() override;
     void OnDisconnect() override;
     IClientPtr GetSharedPtr() override;
+    inline bool CheckValidFd() const override
+    {
+        return GetFd() > 0;
+    }
     bool IsEventHandlerChanged() const override
     {
         return isEventHandlerChanged_;

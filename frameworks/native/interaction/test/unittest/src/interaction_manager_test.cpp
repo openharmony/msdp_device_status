@@ -429,7 +429,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopCoordination, TestSi
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string deviceId("");
+    const std::string deviceId("deviceId");
     auto fun = [](bool state) {
         FI_HILOGD("Get coordination state success");
     };
