@@ -100,9 +100,9 @@ int32_t InteractionManager::SetDragWindowVisible(bool visible)
     return InteractionMgrImpl.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
-    return InteractionMgrImpl.GetShadowOffset(offsetX, offsetY);
+    return InteractionMgrImpl.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

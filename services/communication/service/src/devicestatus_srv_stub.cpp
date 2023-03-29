@@ -354,12 +354,16 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    int32_t ret = GetShadowOffset(offsetX, offsetY);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t ret = GetShadowOffset(offsetX, offsetY, width, height);
     if (ret != RET_OK) {
         FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, width, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 } // namespace DeviceStatus
