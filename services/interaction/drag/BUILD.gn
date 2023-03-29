@@ -51,6 +51,7 @@ ohos_shared_library("interaction_drag") {
     "graphic_standard:window_animation",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",

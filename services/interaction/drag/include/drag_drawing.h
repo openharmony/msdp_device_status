@@ -46,6 +46,8 @@ private:
     void UpdateTspanNode(xmlNodePtr curNode) const;
     int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode) const;
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
+    int32_t GetFilePath(std::string &filePath) const;
+    bool NeedAdjustSvgInfo() const;
 };
 
 class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {
@@ -105,7 +107,6 @@ private:
     int32_t InitVSync();
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
-
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
