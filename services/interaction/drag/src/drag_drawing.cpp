@@ -132,7 +132,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     if (DrawShadow() != RET_OK) {
         FI_HILOGE("Draw shadow failed");
         return INIT_FAIL;
-    }   
+    }
     if (DrawStyle() != RET_OK) {
         FI_HILOGE("Draw style failed");
         return INIT_FAIL;
@@ -176,8 +176,12 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     } else {
         positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - EIGHT_SIZE;
     }
+    if (g_drawingInfo.dragWindow != nullptr) {
+        g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
+        return;
+    }
+    CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
     CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -761,7 +765,7 @@ int32_t DrawSVGModifier::GetFilePath(std::string &filePath) const
             if (((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
                 (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
                 (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-                FI_HILOGD("Device type is Phone, not need draw svg style, deviceType:%{public}s", deviceType.c_str());
+                FI_HILOGD("Device type is phone, not need draw svg style, deviceType:%{public}s", deviceType.c_str());
                 dragStyleNode->SetVisible(false);
                 return RET_ERR;
             } else {

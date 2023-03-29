@@ -107,6 +107,7 @@ private:
     int32_t InitVSync();
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
+
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
