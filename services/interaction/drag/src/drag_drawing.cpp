@@ -535,7 +535,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     CALL_DEBUG_ENTER;
     std::string filePath;
     if (GetFilePath(filePath) != RET_OK) {
-        FI_HILOGE("Get file path failed");
+        FI_HILOGD("Get file path failed");
         return;
     }
     if (!IsValidSvgFile(filePath)) {
