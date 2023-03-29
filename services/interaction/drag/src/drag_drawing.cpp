@@ -170,12 +170,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-    int32_t positionY = -1;
-    if ((g_drawingInfo.displayY + g_drawingInfo.pixelMapY) < EIGHT_SIZE) {
-        positionY = 0;
-    } else {
-        positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - EIGHT_SIZE;
-    }
+    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - EIGHT_SIZE;
     if (g_drawingInfo.dragWindow != nullptr) {
         g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
         return;
@@ -599,7 +594,7 @@ int32_t DrawSVGModifier::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvg
     std::string tgtSvgWidth  = std::to_string(number);
     tgtSvgWidth.append("px");
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
-    oStrStream.clear();
+    oStrStream.str("");
     oStrStream << xmlGetProp(curNode, BAD_CAST "viewBox");
     std::string srcViewBox = oStrStream.str();
     std::istringstream iStrStream(srcViewBox);
