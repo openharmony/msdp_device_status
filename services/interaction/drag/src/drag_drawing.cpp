@@ -103,6 +103,22 @@ struct DrawingInfo {
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
 } g_drawingInfo;
+
+bool CheckNodesValid()
+{
+    CALL_DEBUG_ENTER;
+    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
+        FI_HILOGE("Nodes size invalid when mouse type, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return false;
+    }
+    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
+        FI_HILOGE("Nodes size invalid when touchscreen type, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return false;
+    }
+    return true;
+}
 } // namespace
 
 int32_t DragDrawing::Init(const DragData &dragData)
@@ -137,11 +153,15 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Draw style failed");
         return INIT_FAIL;
     }
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return INIT_FAIL;
+    }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPR(dragStyleNode, RET_ERR);
+    CHKPR(dragStyleNode, INIT_FAIL);
     dragStyleNode->SetVisible(false);
     InitAnimation();
-    CHKPR(rsUiDirector_, RET_ERR);
+    CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         rsUiDirector_->SendMessages();
         return INIT_SUCCESS;
@@ -188,6 +208,10 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     }
     CHKPR(rsUiDirector_, RET_ERR);
     if (g_drawingInfo.currentStyle == style) {
+        if (!CheckNodesValid()) {
+            FI_HILOGE("CheckNodesValid failed");
+            return RET_ERR;
+        }
         auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
         CHKPR(dragStyleNode, RET_ERR);
         dragStyleNode->SetVisible(true);
@@ -315,14 +339,8 @@ void DragDrawing::InitAnimation()
 int32_t DragDrawing::DrawShadow()
 {
     CALL_DEBUG_ENTER;
-    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid when mouse type, node size:%{public}zu", g_drawingInfo.nodes.size());
-        return RET_ERR;
-    }
-    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid when touchscreen type, node size:%{public}zu", g_drawingInfo.nodes.size());
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
         return RET_ERR;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -355,14 +373,8 @@ int32_t DragDrawing::DrawMouseIcon()
 int32_t DragDrawing::DrawStyle()
 {
     CALL_DEBUG_ENTER;
-    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid when mouse type, node size:%{public}zu", g_drawingInfo.nodes.size());
-        return RET_ERR;
-    }
-    if ((g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
-        FI_HILOGE("Nodes size invalid when touchscreen type, node size:%{public}zu", g_drawingInfo.nodes.size());
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -548,6 +560,10 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     if (svgTouchPositionX < 0) {
         FI_HILOGD("svgTouchPositionX:%{public}d", svgTouchPositionX);
         svgTouchPositionX = 0;
+    }
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
@@ -744,6 +760,10 @@ bool DrawSVGModifier::NeedAdjustSvgInfo() const
 int32_t DrawSVGModifier::GetFilePath(std::string &filePath) const
 {
     CALL_DEBUG_ENTER;
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return RET_ERR;
+    }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, RET_ERR);
     switch (g_drawingInfo.currentStyle) {
