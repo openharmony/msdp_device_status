@@ -443,7 +443,7 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -461,7 +461,10 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     }
     READINT32(reply, offsetX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    READINT32(reply, width, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
+    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+        offsetX, offsetY, width, height);
     return ret;
 }
 } // namespace DeviceStatus

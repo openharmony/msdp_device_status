@@ -167,11 +167,16 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
     }
 }
 
-void CoordinationSM::GetCoordinationState(const std::string &deviceId)
+int32_t CoordinationSM::GetCoordinationState(const std::string &deviceId)
 {
     CALL_INFO_TRACE;
+    if (deviceId.empty()) {
+        FI_HILOGE("DeviceId is empty");
+        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
+    }
     bool state = DProfileAdapter->GetCrossingSwitchState(deviceId);
     CoordinationEventMgr->OnGetState(state);
+    return RET_OK;
 }
 
 void CoordinationSM::EnableCoordination(bool enabled)
@@ -744,6 +749,9 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
                 keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
                 MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
             }
+        } else {
+            keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
+            MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
     } else if (state == CoordinationState::STATE_OUT) {
         std::string networkId = COORDINATION::GetLocalDeviceId();
@@ -782,15 +790,17 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not mouse event, skip");
+        return;
+    }
     if (callback_) {
         callback_(pointerEvent);
     }
-    if (pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        MMI::PointerEvent::PointerItem pointerItem;
-        pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-        CooSM->displayX_ = pointerItem.GetDisplayX();
-        CooSM->displayY_ = pointerItem.GetDisplayY();
-    }
+    MMI::PointerEvent::PointerItem pointerItem;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    CooSM->displayX_ = pointerItem.GetDisplayX();
+    CooSM->displayY_ = pointerItem.GetDisplayY();
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();

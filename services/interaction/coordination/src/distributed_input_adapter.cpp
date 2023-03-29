@@ -31,20 +31,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Distr
 constexpr int32_t DEFAULT_DELAY_TIME = 4000;
 constexpr int32_t RETRY_TIME = 2;
 } // namespace
-DistributedInputAdapter::DistributedInputAdapter()
-{
-    CALL_INFO_TRACE;
-    simulationEventListener_ = new (std::nothrow) SimulateEventCallbackImpl();
-    CHKPL(simulationEventListener_);
-    DistributedInputKit::RegisterSimulationEventListener(simulationEventListener_);
-}
+DistributedInputAdapter::DistributedInputAdapter() = default;
 
 DistributedInputAdapter::~DistributedInputAdapter()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedInputKit::UnregisterSimulationEventListener(simulationEventListener_);
-    simulationEventListener_ = nullptr;
     callbackMap_.clear();
 }
 
@@ -152,21 +144,6 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }
 
-int32_t DistributedInputAdapter::RegisterEventCallback(SimulateEventCallback callback)
-{
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(callback, RET_ERR);
-    SimulateEventCallback_ = callback;
-    return RET_OK;
-}
-int32_t DistributedInputAdapter::UnregisterEventCallback(SimulateEventCallback callback)
-{
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(callback, RET_ERR);
-    SimulateEventCallback_ = nullptr;
-    return RET_OK;
-}
-
 void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
@@ -226,13 +203,6 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
     callbackMap_.erase(it);
 }
 
-void DistributedInputAdapter::OnSimulationEvent(uint32_t type, uint32_t code, int32_t value)
-{
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPV(SimulateEventCallback_);
-    SimulateEventCallback_(type, code, value);
-}
-
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
                                                             const int32_t &status)
 {
@@ -283,13 +253,6 @@ void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
     DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
-}
-
-int32_t DistributedInputAdapter::SimulateEventCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
-    int32_t value)
-{
-    DistributedAdapter->OnSimulationEvent(type, code, value);
-    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

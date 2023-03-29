@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <gtest/gtest.h>
+#include "input_device.h"
 #include "input_manager.h"
 #include "pointer_event.h"
 
@@ -38,7 +39,6 @@ constexpr int32_t TIME_WAIT_FOR_OP { 100 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20000 };
 constexpr int32_t TIME_WAIT_FOR_PROCESS_CALLBACK { 20000 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN { 1 };
-constexpr int32_t DEFAULT_DEVICE_ID { 0 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
 constexpr int32_t TOUCH_POINTER_ID { 1 };
 constexpr int32_t DISPLAY_ID { 0 };
@@ -50,6 +50,8 @@ constexpr int32_t DRAG_NUM { 1 };
 constexpr bool HAS_CANCELED_ANIMATION { false };
 constexpr bool HAS_CUSTOM_ANIMATION { false };
 constexpr int32_t MOVE_STEP { 100 };
+static int32_t DEVICE_MOUSE_ID { -1 };
+static int32_t DEVICE_TOUCH_ID { -1 };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 
@@ -58,6 +60,10 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static std::vector<int32_t> GetInputDeviceIds();
+    static std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
+    static std::pair<int32_t, int32_t> GetMouseAndTouch();
+
     std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
     std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
     int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
@@ -73,8 +79,55 @@ public:
     void TestRemoveMonitor(int32_t monitorId);
 };
 
+std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
+{
+    std::vector<int32_t> realDeviceIds;
+    auto callback = [&realDeviceIds](std::vector<int32_t>& deviceIds) {
+        realDeviceIds = deviceIds;
+    };
+    int32_t ret = INPUT_MANAGER->GetDeviceIds(callback);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetDeviceIds failed");
+        return { };
+    }
+    return realDeviceIds;
+}
+
+std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t deviceId)
+{
+    std::shared_ptr<MMI::InputDevice> inputDevice;
+    auto callback = [&inputDevice](std::shared_ptr<MMI::InputDevice> device) {
+        inputDevice = device;
+    };
+    int32_t ret = INPUT_MANAGER->GetDevice(deviceId, callback);
+    if (ret != RET_OK || inputDevice == nullptr) {
+        FI_HILOGE("GetMouse failed");
+        return nullptr;
+    }
+    return inputDevice;
+}
+
+std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
+{
+    std::vector<int32_t> deviceIds = GetInputDeviceIds();
+    std::pair<int32_t, int32_t> mouseAndTouch {-1, -1};
+    for (const auto& id : deviceIds) {
+        std::shared_ptr<MMI::InputDevice> device = GetDevice(id);
+        if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+            mouseAndTouch.first = device->GetId();
+        }
+        if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) {
+            mouseAndTouch.second = device->GetId();
+        }
+    }
+    return mouseAndTouch;
+}
+
 void InteractionManagerTest::SetUpTestCase()
 {
+    auto mouseAndTouch = GetMouseAndTouch();
+    DEVICE_MOUSE_ID = mouseAndTouch.first;
+    DEVICE_TOUCH_ID = mouseAndTouch.second;
 }
 
 void InteractionManagerTest::SetUp()
@@ -147,7 +200,15 @@ std::shared_ptr<MMI::PointerEvent> InteractionManagerTest::SetupPointerEvent(std
     pointerEvent->SetPointerAction(action);
     pointerEvent->SetSourceType(sourceType);
     pointerEvent->SetPointerId(pointerId);
-    auto curPointerItem = CreatePointerItem(pointerId, DEFAULT_DEVICE_ID, displayLocation, isPressed);
+    MMI::PointerEvent::PointerItem curPointerItem;
+    if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        curPointerItem = CreatePointerItem(pointerId, DEVICE_MOUSE_ID, displayLocation, isPressed);
+    } else if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        curPointerItem = CreatePointerItem(pointerId, DEVICE_TOUCH_ID, displayLocation, isPressed);
+    } else {
+        FI_HILOGE("Unknow sourceType:%{public}d", sourceType);
+        return nullptr;
+    }
     pointerEvent->AddPointerItem(curPointerItem);
     return pointerEvent;
 }
@@ -389,34 +450,38 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, Te
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    class DragListenerTest : public IDragListener {
-    public:
-        DragListenerTest() : IDragListener() {}
-        void OnDragMessage(DragMessage msg) override
-        {
-            FI_HILOGD("DragListenerTest msg:%{public}d", msg);
+    if (DEVICE_MOUSE_ID < 0) {
+        ASSERT_TRUE(DEVICE_MOUSE_ID < 0);
+    } else {
+        class DragListenerTest : public IDragListener {
+        public:
+            DragListenerTest() : IDragListener() {}
+            void OnDragMessage(DragMessage msg) override
+            {
+                FI_HILOGD("DragListenerTest msg:%{public}d", msg);
+            };
         };
-    };
-    std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
-    int32_t ret = InteractionManager::GetInstance()->AddDraglistener(listener);
-    ASSERT_EQ(ret, RET_OK);
-    std::function<void(const DragNotifyMsg&)> callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ret = InteractionManager::GetInstance()->RemoveDraglistener(listener);
-    ASSERT_EQ(ret, RET_OK);
+        std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
+        int32_t ret = InteractionManager::GetInstance()->AddDraglistener(listener);
+        ASSERT_EQ(ret, RET_OK);
+        std::function<void(const DragNotifyMsg&)> callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+        ret = InteractionManager::GetInstance()->RemoveDraglistener(listener);
+        ASSERT_EQ(ret, RET_OK);
+    }
 }
 
 /**
@@ -428,20 +493,24 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    if (DEVICE_MOUSE_ID < 0) {
+        ASSERT_TRUE(DEVICE_MOUSE_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -453,23 +522,27 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool stopCallbackFlag = false;
-    auto callback = [&stopCallbackFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-        stopCallbackFlag = true;
-        FI_HILOGD("set stopCallbackFlag to true");
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
-    ASSERT_EQ(ret, RET_OK);
-    usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
-    ASSERT_TRUE(stopCallbackFlag);
+    if (DEVICE_MOUSE_ID < 0) {
+        ASSERT_TRUE(DEVICE_MOUSE_ID < 0);
+    } else {
+        bool stopCallbackFlag = false;
+        auto callback = [&stopCallbackFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            stopCallbackFlag = true;
+            FI_HILOGD("set stopCallbackFlag to true");
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
+        usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
+        ASSERT_TRUE(stopCallbackFlag);
+    }
 }
 
 /**
@@ -481,21 +554,25 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    if (DEVICE_TOUCH_ID < 0) {
+        ASSERT_TRUE(DEVICE_TOUCH_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        sleep(TIME_WAIT_FOR_TOUCH_DOWN);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -507,24 +584,28 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool stopCallbackFlag = false;
-    auto callback = [&stopCallbackFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-        stopCallbackFlag = true;
-        FI_HILOGD("set stopCallbackFlag to true");
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
-    ASSERT_EQ(ret, RET_OK);
-    usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
-    ASSERT_TRUE(stopCallbackFlag);
+    if (DEVICE_TOUCH_ID < 0) {
+        ASSERT_TRUE(DEVICE_TOUCH_ID < 0);
+    } else {
+        bool stopCallbackFlag = false;
+        auto callback = [&stopCallbackFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            stopCallbackFlag = true;
+            FI_HILOGD("set stopCallbackFlag to true");
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        sleep(TIME_WAIT_FOR_TOUCH_DOWN);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        int32_t ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
+        usleep(TIME_WAIT_FOR_PROCESS_CALLBACK);
+        ASSERT_TRUE(stopCallbackFlag);
+    }
 }
 
 /**
@@ -536,25 +617,29 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
 HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    if (DEVICE_MOUSE_ID < 0) {
+        ASSERT_TRUE(DEVICE_MOUSE_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
-    FI_HILOGI("Target pid:%{public}d", pid);
-    ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+        FI_HILOGI("Target pid:%{public}d", pid);
+        ASSERT_TRUE(pid > 0); 
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -566,26 +651,30 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
-    SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+    if (DEVICE_TOUCH_ID < 0) {
+        ASSERT_TRUE(DEVICE_TOUCH_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        sleep(TIME_WAIT_FOR_TOUCH_DOWN);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
-    FI_HILOGI("Target pid:%{public}d", pid);
-    ASSERT_TRUE(pid > 0); 
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+        FI_HILOGI("Target pid:%{public}d", pid);
+        ASSERT_TRUE(pid > 0); 
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -597,27 +686,31 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-    sleep(TIME_WAIT_FOR_TOUCH_DOWN);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
+    if (DEVICE_TOUCH_ID < 0) {
+        ASSERT_TRUE(DEVICE_TOUCH_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        sleep(TIME_WAIT_FOR_TOUCH_DOWN);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
 
-    auto callbackPtr = std::make_shared<InputEventCallbackTest>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>();
+        ASSERT_TRUE(callbackPtr != nullptr);
+        int32_t monitorId = TestAddMonitor(callbackPtr);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        TestRemoveMonitor(monitorId);
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -629,26 +722,30 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto callback = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0);
-    std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
+    if (DEVICE_MOUSE_ID < 0) {
+        ASSERT_TRUE(DEVICE_MOUSE_ID < 0);
+    } else {
+        auto callback = [](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
 
-    auto callbackPtr = std::make_shared<InputEventCallbackTest>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, true);
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>();
+        ASSERT_TRUE(callbackPtr != nullptr);
+        int32_t monitorId = TestAddMonitor(callbackPtr);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, true);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    TestRemoveMonitor(monitorId);
-    InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        TestRemoveMonitor(monitorId);
+        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+    }
 }
 
 /**
@@ -679,8 +776,11 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
     CALL_TEST_DEBUG;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY);
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
+    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+        offsetX, offsetY, width, height);
     ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
