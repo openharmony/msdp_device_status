@@ -62,6 +62,24 @@ namespace Msdp {
         } \
     } while (0)
 
+#define CHKRF_SCOPE(env, state, desc, scope) \
+    do { \
+        if ((state) != napi_ok) { \
+            FI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            napi_close_handle_scope(env, scope); \
+            return false; \
+        } \
+    } while (0)
+
+#define CHKRP_SCOPE(env, state, desc, scope) \
+    do { \
+        if ((state) != napi_ok) { \
+            FI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            napi_close_handle_scope(env, scope); \
+            return nullptr; \
+        } \
+    } while (0)
+
 namespace UtilNapi {
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 } // namespace UtilNapi

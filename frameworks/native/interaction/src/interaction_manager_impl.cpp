@@ -33,7 +33,7 @@ InteractionManagerImpl::~InteractionManagerImpl() {}
 bool InteractionManagerImpl::InitClient()
 {
     CALL_DEBUG_ENTER;
-    if (client_ != nullptr) {
+    if (client_ != nullptr && client_->CheckValidFd()) {
         return true;
     }
     client_ = std::make_shared<Client>();
@@ -45,16 +45,6 @@ bool InteractionManagerImpl::InitClient()
         return false;
     }
     return true;
-}
-
-void InteractionManagerImpl::DisconnectClient()
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (client_ != nullptr) {
-        client_->OnDisconnect();
-    }
-    client_ = nullptr;
 }
 
 void InteractionManagerImpl::InitMsgHandler()
@@ -204,8 +194,7 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    auto disconnectCallback = std::bind(&InteractionManagerImpl::DisconnectClient, this);
-    return dragManagerImpl_.StartDrag(dragData, callback, disconnectCallback);
+    return dragManagerImpl_.StartDrag(dragData, callback);
 }
 
 int32_t InteractionManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
@@ -243,10 +232,10 @@ int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
     return dragManagerImpl_.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY);
+    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -47,11 +47,10 @@ public:
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     
 private:
     void InitMsgHandler();
-    void DisconnectClient();
 
 private:
     std::mutex mutex_;

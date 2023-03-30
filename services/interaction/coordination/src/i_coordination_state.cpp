@@ -84,7 +84,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
     std::vector<std::string> inputDeviceDhids = CooDevMgr->GetCoordinationDhids(startDeviceId);
     if (inputDeviceDhids.empty()) {
         CooSM->OnStartFinish(false, networkIds.first, startDeviceId);
-        return static_cast<int32_t>(CoordinationMessage::DEVICE_ID_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     int32_t ret = DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, inputDeviceDhids,

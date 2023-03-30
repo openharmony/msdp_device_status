@@ -59,7 +59,7 @@ int32_t StateChangeNotify::StateChangedNotify(DragMessage msg)
 {
     CALL_DEBUG_ENTER;
     if (msgInfos_.empty()) {
-        FI_HILOGE("No listener, send message failed");
+        FI_HILOGW("No listener, send message failed");
         return RET_ERR;
     }
     for (auto it = msgInfos_.begin(); it != msgInfos_.end(); ++it) {

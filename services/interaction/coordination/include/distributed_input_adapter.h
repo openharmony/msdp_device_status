@@ -63,9 +63,6 @@ public:
     int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
 
-    int32_t RegisterEventCallback(SimulateEventCallback callback);
-    int32_t UnregisterEventCallback(SimulateEventCallback callback);
-
 private:
     enum class CallbackType {
         StartDInputCallback,
@@ -142,22 +139,13 @@ private:
     public:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
-
-    class SimulateEventCallbackImpl final :
-        public DistributedHardware::DistributedInput::SimulationEventListenerStub {
-    public:
-        int32_t OnSimulationEvent(uint32_t type, uint32_t code, int32_t value) override;
-    };
     
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
-    void OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
-    SimulateEventCallback SimulateEventCallback_ = { nullptr };
-    sptr<SimulateEventCallbackImpl> simulationEventListener_ { nullptr };
     std::mutex adapterLock_;
 };
 

@@ -25,7 +25,7 @@ class CoordinationStateOut final : public ICoordinationState {
 public:
     explicit CoordinationStateOut(const std::string &startDeviceDhid);
     int32_t StopCoordination(const std::string &remoteNetworkId) override;
-    void OnKeyboardOnline(const std::string &dhid) override;
+    void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) override;
 
 private:
     void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId);

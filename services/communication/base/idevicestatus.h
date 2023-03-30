@@ -74,7 +74,7 @@ public:
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
-    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) = 0;
+    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
     virtual bool IsRunning() const
     {
         return true;

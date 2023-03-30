@@ -32,17 +32,17 @@ int32_t CoordinationStateFree::StartCoordination(
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         FI_HILOGE("RemoteNetworkId is empty");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         FI_HILOGE("Input Parameters error");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_DEVICE_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     int32_t ret = CooSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start input device coordination fail");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+        return RET_ERR;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =

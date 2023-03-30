@@ -36,22 +36,20 @@ public:
     ~DragManagerImpl() = default;
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback,
-        std::function<void()> disconnectCallback);
+    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
 
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
     std::function<void(const DragNotifyMsg&)> stopCallback_;
-    std::function<void()> disconnectCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
