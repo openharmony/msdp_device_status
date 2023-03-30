@@ -658,7 +658,7 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
         std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, deviceId));
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);

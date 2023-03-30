@@ -48,7 +48,7 @@ int32_t CoordinationStateIn::StartCoordination(const std::string &remoteNetworkI
     int32_t ret = CooSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start coordination fail");
-        return RET_ERR;
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =
