@@ -81,9 +81,9 @@ void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
 
-void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid)
+void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid,
+    const std::pair<std::string, std::string> &networkIds)
 {
-    std::pair<std::string, std::string> networkIds = CooSM->GetPreparedDevices();
     std::vector<std::string> dhids;
     dhids.push_back(dhid);
     DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSuccess) {});

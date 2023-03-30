@@ -42,7 +42,7 @@ public:
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    virtual void OnKeyboardOnline(const std::string &dhid) {}
+    virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
     virtual void UpdateSinkDeviceInfo(const std::map<std::string, std::set<std::string>> &sinkDeviceInfo) {}
 
 protected:
