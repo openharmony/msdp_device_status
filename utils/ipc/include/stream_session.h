@@ -42,19 +42,9 @@ public:
     bool SendMsg(NetPacket &pkt) const;
     void Close();
 
-    int32_t GetUid() const
-    {
-        return uid_;
-    }
-
     int32_t GetPid() const
     {
         return pid_;
-    }
-
-    int32_t GetModuleType() const
-    {
-        return moduleType_;
     }
 
     SessionPtr GetSharedPtr()
@@ -72,34 +62,15 @@ public:
         return descript_;
     }
 
-    const std::string GetProgramName() const
-    {
-        return programName_;
-    }
-
     void SetTokenType(int32_t type)
     {
         tokenType_ = type;
     }
 
-    int32_t GetTokenType() const
-    {
-        return tokenType_;
-    }
-
     void UpdateDescript();
 protected:
-    struct EventTime {
-        int32_t id { 0 };
-        int64_t eventTime { 0 };
-        int32_t timerId { -1 };
-    };
-    std::map<int32_t, std::vector<EventTime>> events_;
     std::string descript_;
-    const std::string programName_;
-    const int32_t moduleType_ { -1 };
     int32_t fd_ { -1 };
-    const int32_t uid_ { -1 };
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
 };

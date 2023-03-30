@@ -51,10 +51,6 @@ public:
     {
         return fd_;
     }
-    int32_t GetEpollFd() const
-    {
-        return epollFd_;
-    }
 
 protected:
     int32_t fd_ { -1 };
