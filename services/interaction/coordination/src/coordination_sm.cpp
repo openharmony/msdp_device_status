@@ -526,7 +526,7 @@ void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(currentStateSM_);
-    currentStateSM_->OnKeyboardOnline(dhid);
+    currentStateSM_->OnKeyboardOnline(dhid, preparedNetworkId_);
 }
 
 void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards)
@@ -731,7 +731,7 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGD("Interceptor consumer key event enter");
     CHKPV(keyEvent);
     int32_t keyCode = keyEvent->GetKeyCode();
     if (keyCode == MMI::KeyEvent::KEYCODE_BACK || keyCode == MMI::KeyEvent::KEYCODE_VOLUME_UP
@@ -760,11 +760,12 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
             MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
     }
+    FI_HILOGD("Interceptor consumer key event leave");
 }
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGD("Interceptor consumer pointer event enter");
     CHKPV(pointerEvent);
     CoordinationState state = CooSM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_OUT) {
@@ -776,6 +777,7 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
             CooSM->StopCoordination();
         }
     }
+    FI_HILOGD("Interceptor consumer pointer event leave");
 }
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
@@ -788,7 +790,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGD("Monitor consumer pointer event enter");
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGD("Not mouse event, skip");
@@ -809,6 +811,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
             CooSM->StopCoordination();
         }
     }
+    FI_HILOGD("Monitor consumer pointer event leave");
 }
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
