@@ -205,7 +205,11 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     SetDragTargetPid(pid);
     auto extraData = CreateExtraData(false);
     INPUT_MANAGER->AppendExtraData(extraData);
-
+    DragData dragData = DataAdapter.GetDragData();
+    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        dragDrawing_.EraseMouseIcon();
+        INPUT_MANAGER->SetPointerVisible(true);
+    }
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
