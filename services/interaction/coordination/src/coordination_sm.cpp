@@ -212,7 +212,10 @@ int32_t CoordinationSM::StartCoordination(const std::string &remoteNetworkId, in
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     isStarting_ = true;
-    CooSoftbusAdapter->OpenInputSoftbus(remoteNetworkId);
+    if (CooSoftbusAdapter->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
+        FI_HILOGE("Open input softbus fail");
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+    }
     int32_t ret = currentStateSM_->StartCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Start remote input fail");
