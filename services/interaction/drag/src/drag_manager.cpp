@@ -118,6 +118,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
+    DataAdapter.ResetDragData();
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         return RET_ERR;
@@ -130,22 +131,22 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-std::string DragManager::GetUdKey() const
+int32_t DragManager::GetUdKey(std::string &udKey) const
 {
     CALL_DEBUG_ENTER;
-    return udKey_;
+    DragData dragData = DataAdapter.GetDragData();
+    if (dragData.udKey.empty()) {
+        FI_HILOGD("Target udKey is empty");
+        return RET_ERR;
+    }
+    udKey = dragData.udKey;
+    return RET_OK;
 }
 
 void DragManager::SetDragTargetPid(int32_t dragTargetPid)
 {
     CALL_DEBUG_ENTER;
     dragTargetPid_ = dragTargetPid;
-}
-
-void DragManager::SetUdKey(const std::string &udKey)
-{
-    CALL_DEBUG_ENTER;
-    udKey_ = udKey;
 }
 
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
@@ -228,7 +229,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         INPUT_MANAGER->SetPointerVisible(true);
     }
 
-    SetUdKey(dragData.udKey);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     UDMF::UDQueryOption option;
     option.udKey_ = dragData.udKey;

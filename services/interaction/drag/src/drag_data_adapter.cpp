@@ -81,6 +81,14 @@ int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
         offsetX, offsetY, width, height);
     return RET_OK;
 }
+
+void DragDataAdapter::ResetDragData()
+{
+    CALL_DEBUG_ENTER;
+    ShadowInfo shadowInfo;
+    std::vector<uint8_t> buffer;
+    dragData_ = { shadowInfo, buffer, "", -1, -1, -1, -1, -1, -1, false };
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

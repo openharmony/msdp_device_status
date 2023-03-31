@@ -126,7 +126,7 @@ public:
      * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
      * @since 10
      */
-   int32_t GetUdKey(std::string &udKey);
+    int32_t GetUdKey(std::string &udKey);
 
     /**
      * @brief 注册拖拽状态监听。。
