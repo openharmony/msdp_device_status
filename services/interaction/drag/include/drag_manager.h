@@ -49,6 +49,7 @@ public:
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey);
     void SetDragTargetPid(int32_t dragTargetPid);
+    void SendDragData(int32_t targetPid, const std::string &udKey);
     int32_t UpdateDragStyle(DragCursorStyle style);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);

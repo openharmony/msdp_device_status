@@ -212,6 +212,25 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
+void DragManager::SendDragData(int32_t targetPid, const std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    UDMF::QueryOption option;
+    option.key = udKey;
+    UDMF::Privilege privilege;
+    privilege.pid = targetPid;
+    FI_HILOGD("AddPrivilege enter");
+    int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send pid to Udmf client");
+    }
+#else
+    (void)(targetPid);
+    (void)(udKey);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -229,17 +248,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         INPUT_MANAGER->SetPointerVisible(true);
     }
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    UDMF::QueryOption option;
-    option.key_ = dragData.udKey;
-    UDMF::Privilege privilege;
-    privilege.pid_ = pid;
-    FI_HILOGD("AddPrivilege enter");
-    int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to send pid to Udmf client");
-    }
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+    SendDragData(pid, dragData.udKey);
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
