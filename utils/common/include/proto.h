@@ -29,7 +29,6 @@ static const int32_t INVALID_FD = 6;
 static const int32_t INVALID_PID = 7;
 static const int32_t SESSION_NOT_FOUND = 8;
 static const int32_t EPOLL_MODIFY_FAIL = 9;
-static const int32_t MAKE_SHARED_FAIL = 10;
 static const int32_t ADD_SESSION_FAIL = 11;
 static const int32_t MAX_SESSON_ALARM = 100;
 static const int32_t MAX_RECV_LIMIT = 13;

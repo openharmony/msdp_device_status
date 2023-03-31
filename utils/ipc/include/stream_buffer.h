@@ -34,7 +34,7 @@ public:
     virtual ~StreamBuffer() = default;
     explicit StreamBuffer(const StreamBuffer &buf);
     virtual StreamBuffer &operator=(const StreamBuffer &other);
-    
+
     void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
@@ -61,13 +61,8 @@ public:
     bool Read(T &data);
     template<typename T>
     bool Write(const T &data);
-    template<typename T>
-    bool Read(std::vector<T> &data);
-    template<typename T>
-    bool Write(const std::vector<T> &data);
 
     const char *ReadBuf() const;
-    const char *WriteBuf() const;
 
     template<typename T>
     StreamBuffer &operator >> (T &data);
@@ -110,50 +105,6 @@ bool StreamBuffer::Write(const T &data)
         FI_HILOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
             GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1, STREAM_BUF_WRITE_FAIL);
         return false;
-    }
-    return true;
-}
-
-template<typename T>
-bool StreamBuffer::Read(std::vector<T> &data)
-{
-    int32_t size = 0;
-    if (!Read(size)) {
-        FI_HILOGE("Read vector size error");
-        return false;
-    }
-    if (size < 0 || size > MAX_VECTOR_SIZE) {
-        FI_HILOGE("Read vector size:%{public}d error", size);
-        return false;
-    }
-    for (int32_t i = 0; i < size; i++) {
-        T val;
-        if (!Read(val)) {
-            FI_HILOGE("Read vector data error");
-            return false;
-        }
-        data.push_back(val);
-    }
-    return true;
-}
-
-template<typename T>
-bool StreamBuffer::Write(const std::vector<T> &data)
-{
-    if (data.size() > INT32_MAX) {
-        FI_HILOGE("Vector exceeds the max range");
-        return false;
-    }
-    int32_t size = static_cast<int32_t>(data.size());
-    if (!Write(size)) {
-        FI_HILOGE("Write vector size error");
-        return false;
-    }
-    for (const auto &item : data) {
-        if (!Write(item)) {
-            FI_HILOGE("Write vector data error");
-            return false;
-        }
     }
     return true;
 }
