@@ -59,6 +59,10 @@ ohos_shared_library("interaction_drag") {
     "window_manager:libwm",
   ]
 
+  if (fusion_interaction_coordination) {
+    external_deps += [ "udmf:udmf_client" ]
+  }
+
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

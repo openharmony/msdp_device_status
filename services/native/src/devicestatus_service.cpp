@@ -757,6 +757,23 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     return ret;
 }
 
+int32_t DeviceStatusService::ReadUdKey(std::string &udKey)
+{
+    udKey = dragMgr_.GetUdKey();
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::ReadUdKey, this, udKey));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get target udKey failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;

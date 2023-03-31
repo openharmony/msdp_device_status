@@ -122,6 +122,13 @@ public:
     int32_t GetDragTargetPid();
 
     /**
+     * @brief 获取拖拽目标窗口UdKey
+     * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
+     * @since 10
+     */
+   int32_t GetUdKey(std::string &udKey);
+
+    /**
      * @brief 注册拖拽状态监听。。
      * @param listener 拖拽状态监听。
      * @return 返回值0表示接口调用成功，否则，表示接口调用失败。

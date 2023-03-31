@@ -74,6 +74,12 @@ int32_t DragManagerImpl::GetDragTargetPid()
     return DeviceStatusClient::GetInstance().GetDragTargetPid();
 }
 
+int32_t DragManagerImpl::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().GetUdKey(udKey);
+}
+
 int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;

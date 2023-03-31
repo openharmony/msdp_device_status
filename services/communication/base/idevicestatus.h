@@ -46,7 +46,8 @@ public:
         UNREGISTER_DRAG_MONITOR,
         SET_DRAG_WINDOW_VISIBLE,
         GET_SHADOW_OFFSET,
-        ALLOC_SOCKET_FD = 40
+        ALLOC_SOCKET_FD = 40,
+        GET_DRAG_TARGET_UDKEY
     };
 
     virtual void Subscribe(Type type,
@@ -69,6 +70,7 @@ public:
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
     virtual int32_t GetDragTargetPid() = 0;
+    virtual int32_t GetUdKey(std::string &udKey) = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,

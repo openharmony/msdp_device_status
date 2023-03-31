@@ -27,6 +27,11 @@
 #include "fi_log.h"
 #include "proto.h"
 
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "udmf_client.h"
+#include "unified_types.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -125,10 +130,22 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
+std::string DragManager::GetUdKey() const
+{
+    CALL_DEBUG_ENTER;
+    return udKey_;
+}
+
 void DragManager::SetDragTargetPid(int32_t dragTargetPid)
 {
     CALL_DEBUG_ENTER;
     dragTargetPid_ = dragTargetPid;
+}
+
+void DragManager::SetUdKey(const std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    udKey_ = udKey;
 }
 
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
@@ -210,6 +227,20 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         dragDrawing_.EraseMouseIcon();
         INPUT_MANAGER->SetPointerVisible(true);
     }
+
+    SetUdKey(dragData.udKey);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    UDMF::UDQueryOption option;
+    option.udKey_ = dragData.udKey;
+    UDMF::UDPrivilege privilege;
+    privilege.pid_ = pid;
+    FI_HILOGD("AddPrivilege enter");
+    int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
+    if (ret != RET_OK) {
+        FI_HILOGD("Failed to send pid to Udmf client");
+    }
+    FI_HILOGD("AddPrivilege end");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
