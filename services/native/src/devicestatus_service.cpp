@@ -760,7 +760,12 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-    return dragMgr_.GetUdKey(udKey);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetUdKey, &dragMgr_, udKey));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusService::GetDragTargetPid()

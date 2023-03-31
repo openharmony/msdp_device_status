@@ -123,6 +123,7 @@ public:
 
     /**
      * @brief 获取拖拽目标窗口UdKey
+     * @param UdKey 拖拽目标窗口统一数据密钥。
      * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
      * @since 10
      */

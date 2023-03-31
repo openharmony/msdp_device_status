@@ -131,12 +131,12 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::GetUdKey(std::string &udKey) const
+int32_t DragManager::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
     if (dragData.udKey.empty()) {
-        FI_HILOGD("Target udKey is empty");
+        FI_HILOGE("Target udKey is empty");
         return RET_ERR;
     }
     udKey = dragData.udKey;
@@ -230,16 +230,15 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    UDMF::UDQueryOption option;
-    option.udKey_ = dragData.udKey;
-    UDMF::UDPrivilege privilege;
+    UDMF::QueryOption option;
+    option.key_ = dragData.udKey;
+    UDMF::Privilege privilege;
     privilege.pid_ = pid;
     FI_HILOGD("AddPrivilege enter");
     int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
     if (ret != RET_OK) {
-        FI_HILOGD("Failed to send pid to Udmf client");
+        FI_HILOGE("Failed to send pid to Udmf client");
     }
-    FI_HILOGD("AddPrivilege end");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {

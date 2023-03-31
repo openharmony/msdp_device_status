@@ -42,12 +42,12 @@ public:
         START_DRAG,
         STOP_DRAG,
         GET_DRAG_TARGET_PID,
+        GET_DRAG_TARGET_UDKEY,
         REGISTER_DRAG_MONITOR,
         UNREGISTER_DRAG_MONITOR,
         SET_DRAG_WINDOW_VISIBLE,
         GET_SHADOW_OFFSET,
-        ALLOC_SOCKET_FD = 40,
-        GET_DRAG_TARGET_UDKEY
+        ALLOC_SOCKET_FD = 40
     };
 
     virtual void Subscribe(Type type,
