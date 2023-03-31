@@ -217,7 +217,8 @@ void Device::CheckPointers()
                 FI_HILOGD("This is touch device");
             }
         }
-    } else if (hasRels) {
+    }
+    if (hasRels) {
         if (hasRelCoords) {
             caps_.set(DEVICE_CAP_POINTER);
             FI_HILOGD("This is pointer device");
