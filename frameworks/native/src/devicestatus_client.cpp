@@ -246,6 +246,16 @@ int32_t DeviceStatusClient::GetDragTargetPid()
     return devicestatusProxy_->GetDragTargetPid();
 }
 
+int32_t DeviceStatusClient::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    if (devicestatusProxy_ == nullptr) {
+        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
+        return RET_ERR;
+    }
+    return devicestatusProxy_->GetUdKey(udKey);
+}
+
 int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
 {
     CALL_DEBUG_ENTER;

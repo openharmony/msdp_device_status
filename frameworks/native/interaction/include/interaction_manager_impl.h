@@ -44,6 +44,7 @@ public:
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid();
+    int32_t GetUdKey(std::string &udKey);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);

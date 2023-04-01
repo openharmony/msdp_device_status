@@ -757,10 +757,26 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     return ret;
 }
 
+int32_t DeviceStatusService::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetUdKey, &dragMgr_, std::ref(udKey)));
+    if (ret != RET_OK) {
+        FI_HILOGE("GetUdKey failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    return dragMgr_.GetDragTargetPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragTargetPid, &dragMgr_));
+    if (ret == RET_ERR) {
+        FI_HILOGE("GetDragTargetPid failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION

@@ -27,12 +27,17 @@
 #include "fi_log.h"
 #include "proto.h"
 
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "udmf_client.h"
+#include "unified_types.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
-constexpr int32_t TIMEOUT_MS = 1000;
+constexpr int32_t TIMEOUT_MS = 2000;
 constexpr int32_t DRAG_PRIORITY = 500;
 } // namespace
 
@@ -113,6 +118,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
+    DataAdapter.ResetDragData();
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         return RET_ERR;
@@ -123,6 +129,18 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
 int32_t DragManager::GetDragTargetPid() const
 {
     return dragTargetPid_;
+}
+
+int32_t DragManager::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DataAdapter.GetDragData();
+    if (dragData.udKey.empty()) {
+        FI_HILOGE("Target udKey is empty");
+        return RET_ERR;
+    }
+    udKey = dragData.udKey;
+    return RET_OK;
 }
 
 void DragManager::SetDragTargetPid(int32_t dragTargetPid)
@@ -194,6 +212,25 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
+void DragManager::SendDragData(int32_t targetPid, const std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    UDMF::QueryOption option;
+    option.key = udKey;
+    UDMF::Privilege privilege;
+    privilege.pid = targetPid;
+    FI_HILOGD("AddPrivilege enter");
+    int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send pid to Udmf client");
+    }
+#else
+    (void)(targetPid);
+    (void)(udKey);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -210,6 +247,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         dragDrawing_.EraseMouseIcon();
         INPUT_MANAGER->SetPointerVisible(true);
     }
+
+    SendDragData(pid, dragData.udKey);
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
