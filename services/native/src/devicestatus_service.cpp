@@ -761,7 +761,7 @@ int32_t DeviceStatusService::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetUdKey, &dragMgr_, udKey));
+        std::bind(&DragManager::GetUdKey, &dragMgr_, std::ref(udKey)));
     if (ret != RET_OK) {
         FI_HILOGE("GetUdKey failed, ret:%{public}d", ret);
     }
