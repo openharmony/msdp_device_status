@@ -123,6 +123,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("NotifyDragResult failed");
         return RET_ERR;
     }
+    dragResult_ = static_cast<DragResult>(result);
     return RET_OK;
 }
 
@@ -281,6 +282,112 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
 {
     CALL_DEBUG_ENTER;
+}
+
+void DragManager::Dump(int32_t fd)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DataAdapter.GetDragData();
+    DragCursorStyle style = DataAdapter.GetDragStyle();
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
+    CHKPV(pixelMap);
+    dprintf(fd, "Drag information:\n");
+    dprintf(fd,
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | cursorStyle:%s | isWindowVisble:%s\n"
+            "pixelMapWidth:%d | pixelMapHeight:%d | shadowInfoX:%d | shadowInfoY:%d | sourceType:%d | dragNum:%d\n"
+            "pointerId:%d | displayX:%d | displayY:%d | displayId:%d | hasCanceledAnimation:%s\n",
+            GetDragState(dragState_).c_str(), GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(),
+            GetDragCursorStyle(style).c_str(), DataAdapter.GetDragWindowVisible() ? "true" : "false",
+            pixelMap->GetWidth(), pixelMap->GetHeight(), dragData.shadowInfo.x, dragData.shadowInfo.y,
+            dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY,
+            dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
+}
+
+std::string DragManager::GetDragState(DragMessage value) const
+{
+    std::string state;
+    switch (value) {
+        case DragMessage::MSG_DRAG_STATE_START: {
+            state = "start";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_STOP: {
+            state = "stop";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_CANCEL: {
+            state = "cancel";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_ERROR: {
+            state = "error";
+            break;
+        }
+        default: {
+            state = "unknown";
+            FI_HILOGW("Drag status unknown");
+            break;
+        }
+    }
+    return state;
+}
+
+std::string DragManager::GetDragResult(DragResult value) const
+{
+    std::string result;
+    switch (value) {
+        case DragResult::DRAG_SUCCESS: {
+            result = "success";
+            break;
+        }
+        case DragResult::DRAG_FAIL: {
+            result = "fail";
+            break;
+        }
+        case DragResult::DRAG_CANCEL: {
+            result = "cancel";
+            break;
+        }
+        case DragResult::DRAG_EXCEPTION: {
+            result = "abnormal";
+            break;
+        }
+        default: {
+            result = "unknown";
+            FI_HILOGW("Drag result unknown");
+            break;
+        }
+    }
+    return result;
+}
+
+std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
+{
+    std::string style;
+    switch (value) {
+        case DragCursorStyle::COPY: {
+            style = "copy";
+            break;
+        }
+        case DragCursorStyle::DEFAULT: {
+            style = "default";
+            break;
+        }
+        case DragCursorStyle::FORBIDDEN: {
+            style = "forbidden";
+            break;
+        }
+        case DragCursorStyle::MOVE: {
+            style = "move";
+            break;
+        }
+        default: {
+            style = "unknown";
+            FI_HILOGW("Drag cursor style unknown");
+            break;
+        }
+    }
+    return style;
 }
 
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const

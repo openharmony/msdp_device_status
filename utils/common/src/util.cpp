@@ -35,6 +35,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util"
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
+constexpr uint32_t BASE_YEAR = 1900;
+constexpr uint32_t BASE_MON = 1;
+constexpr uint32_t MS_NS = 1000000;
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 const std::string SVG_PATH = "/system/etc/device_status/drag_icon/";
 } // namespace
@@ -74,6 +77,22 @@ int64_t GetMillisTime()
     auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
+}
+
+void GetTimeStamp(std::string &startTime)
+{
+    timespec curTime;
+    clock_gettime(CLOCK_REALTIME, &curTime);
+    struct tm *timeinfo = localtime(&(curTime.tv_sec));
+    if (timeinfo == nullptr) {
+        DEV_HILOGE(SERVICE, "get localtime failed");
+        return;
+    }
+    startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
+        .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
+        .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
+        .append(":").append(std::to_string(timeinfo->tm_sec)).append(".")
+        .append(std::to_string(curTime.tv_nsec / MS_NS));
 }
 
 void SetThreadName(const std::string &name)

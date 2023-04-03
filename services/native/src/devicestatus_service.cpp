@@ -125,6 +125,11 @@ ITimerManager& DeviceStatusService::GetTimerManager()
     return timerMgr_;
 }
 
+IDragManager& DeviceStatusService::GetDragManager()
+{
+    return dragMgr_;
+}
+
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
@@ -132,11 +137,10 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
         DEV_HILOGE(SERVICE, "fd is invalid");
         return RET_NG;
     }
-    DeviceStatusDumper &deviceStatusDumper = DeviceStatusDumper::GetInstance();
     if (args.empty()) {
         DEV_HILOGE(SERVICE, "param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
-        deviceStatusDumper.DumpHelpInfo(fd);
+        deviceStatusDumper_.DumpHelpInfo(fd);
         return RET_NG;
     }
     std::vector<std::string> argList = { "" };
@@ -153,7 +157,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
             datas.emplace_back(data);
         }
     }
-    deviceStatusDumper.ParseCommand(fd, argList, datas);
+    deviceStatusDumper_.ParseCommand(fd, argList, datas);
     return RET_OK;
 }
 
@@ -192,6 +196,10 @@ bool DeviceStatusService::Init()
     }
     if (acrossDeviceDrag_.Init(this) != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
+        goto INIT_FAIL;
+    }
+    if (deviceStatusDumper_.Init(this) != RET_OK) {
+        FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
     InitSessionDeathMonitor();

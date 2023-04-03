@@ -101,7 +101,6 @@ private:
     void UpdateCapability();
     void CheckPointers();
     void CheckKeys();
-    void RemoveSpace(std::string &str) const;
     std::string MakeConfigFileName() const;
     int32_t ReadConfigFile(const std::string &filePath);
     int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value);

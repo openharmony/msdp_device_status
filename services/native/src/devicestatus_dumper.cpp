@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,13 +32,24 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "devicestatus_dumper.h"
+#include "drag_manager.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    constexpr uint32_t MS_NS = 1000000;
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
 }
+
+int32_t DeviceStatusDumper::Init(IContext *context)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(context, RET_ERR);
+    context_ = context;
+    return RET_OK;
+}
+
 void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
 {
     ParseLong(fd, args, datas);
@@ -123,6 +134,8 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
             break;
         }
         case 'd': {
+            CHKPV(context_);
+            context_->GetDragManager().Dump(fd);
             break;
         }
         default: {
@@ -141,7 +154,7 @@ void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
         return;
     }
     std::string startTime;
-    DumpCurrentTime(startTime);
+    GetTimeStamp(startTime);
     dprintf(fd, "Current time: %s \n", startTime.c_str());
     for (const auto &item : appInfoMap_) {
         for (auto appInfo : item.second) {
@@ -160,7 +173,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
         return;
     }
     std::string startTime;
-    DumpCurrentTime(startTime);
+    GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s\n", startTime.c_str());
     size_t length = deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE ? \
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
@@ -182,7 +195,7 @@ void DeviceStatusDumper::DumpDeviceStatusCurrentStatus(int32_t fd, const std::ve
 {
     DEV_HILOGI(SERVICE, "start");
     std::string startTime;
-    DumpCurrentTime(startTime);
+    GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s\n", startTime.c_str());
     dprintf(fd, "Current device status:\n");
     if (datas.empty()) {
@@ -250,22 +263,6 @@ std::string DeviceStatusDumper::GetStatusType(Type type) const
     return stateType;
 }
 
-void DeviceStatusDumper::DumpCurrentTime(std::string &startTime) const
-{
-    timespec curTime;
-    clock_gettime(CLOCK_REALTIME, &curTime);
-    struct tm *timeinfo = localtime(&(curTime.tv_sec));
-    if (timeinfo == nullptr) {
-        DEV_HILOGE(SERVICE, "get localtime failed");
-        return;
-    }
-    startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
-        .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
-        .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
-        .append(":").append(std::to_string(timeinfo->tm_sec)).append(".")
-        .append(std::to_string(curTime.tv_nsec / MS_NS));
-}
-
 void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
 {
     dprintf(fd, "Usage:\n");
@@ -284,7 +281,7 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
         DEV_HILOGE(SERVICE, "appInfo is nullptr");
         return;
     }
-    DumpCurrentTime(appInfo->startTime);
+    GetTimeStamp(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
@@ -332,7 +329,7 @@ void DeviceStatusDumper::PushDeviceStatus(const Data& data)
     DEV_HILOGD(SERVICE, "Enter");
     std::unique_lock lock(mutex_);
     auto record = std::make_shared<DeviceStatusRecord>();
-    DumpCurrentTime(record->startTime);
+    GetTimeStamp(record->startTime);
     record->data = data;
     deviceStatusQueue_.push(record);
     if (deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE) {

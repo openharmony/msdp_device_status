@@ -92,6 +92,11 @@ void Utility::RemoveTrailingChars(std::string &path, const std::string &toRemove
     }
 }
 
+void Utility::RemoveSpace(std::string &str)
+{
+    str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());
+}
+
 bool Utility::IsInteger(const std::string &target)
 {
     std::regex pattern("^\\s*-?(0|([1-9]\\d*))\\s*$");
