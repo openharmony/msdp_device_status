@@ -17,6 +17,7 @@
 #include <optional>
 #include <utility>
 
+#include "pointer_event.h"
 #include "stopdrag_fuzzer.h"
 
 #include "devicestatus_define.h"

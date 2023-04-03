@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "pointer_event.h"
 #include "securec.h"
 
 #include "devicestatus_define.h"
