@@ -18,8 +18,6 @@
 #include <memory>
 #include <utility>
 
-#include "input_manager.h"
-#include "pointer_event.h"
 #include "securec.h"
 
 #include "devicestatus_define.h"
@@ -33,7 +31,6 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
 constexpr int32_t POINTER_ID { 0 };
-#define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)

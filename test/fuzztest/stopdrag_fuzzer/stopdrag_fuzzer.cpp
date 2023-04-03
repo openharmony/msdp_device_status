@@ -19,9 +19,6 @@
 
 #include "stopdrag_fuzzer.h"
 
-#include "input_manager.h"
-#include "pointer_event.h"
-
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "fi_log.h"
