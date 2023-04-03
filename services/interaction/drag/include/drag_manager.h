@@ -47,13 +47,15 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid() const;
+    int32_t GetUdKey(std::string &udKey);
     void SetDragTargetPid(int32_t dragTargetPid);
+    void SendDragData(int32_t targetPid, const std::string &udKey);
     int32_t UpdateDragStyle(DragCursorStyle style);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible);
-    int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+    int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     class InterceptorConsumer final : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,

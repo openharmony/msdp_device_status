@@ -658,7 +658,7 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
         std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, deviceId));
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -735,11 +735,11 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     return ret;
 }
 
-int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::OnGetShadowOffset, &dragMgr_, std::ref(offsetX), std::ref(offsetY)));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset, &dragMgr_,
+        std::ref(offsetX), std::ref(offsetY), std::ref(width), std::ref(height)));
     if (ret != RET_OK) {
         FI_HILOGE("GetShadowOffset failed, ret:%{public}d", ret);
     }
@@ -757,10 +757,26 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     return ret;
 }
 
+int32_t DeviceStatusService::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetUdKey, &dragMgr_, std::ref(udKey)));
+    if (ret != RET_OK) {
+        FI_HILOGE("GetUdKey failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
-    return dragMgr_.GetDragTargetPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragTargetPid, &dragMgr_));
+    if (ret == RET_ERR) {
+        FI_HILOGE("GetDragTargetPid failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -842,7 +858,6 @@ int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
     int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
-        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -882,8 +897,11 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    CooSM->GetCoordinationState(deviceId);
-    return RET_OK;
+    int32_t ret = CooSM->GetCoordinationState(deviceId);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetCoordinationState faild");
+    }
+    return ret;
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 

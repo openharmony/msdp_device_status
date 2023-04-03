@@ -33,7 +33,7 @@ InteractionManagerImpl::~InteractionManagerImpl() {}
 bool InteractionManagerImpl::InitClient()
 {
     CALL_DEBUG_ENTER;
-    if (client_ != nullptr) {
+    if (client_ != nullptr && client_->CheckValidFd()) {
         return true;
     }
     client_ = std::make_shared<Client>();
@@ -209,6 +209,12 @@ int32_t InteractionManagerImpl::GetDragTargetPid()
     return dragManagerImpl_.GetDragTargetPid();
 }
 
+int32_t InteractionManagerImpl::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetUdKey(udKey);
+}
+
 int32_t InteractionManagerImpl::AddDraglistener(DragListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
@@ -232,10 +238,10 @@ int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
     return dragManagerImpl_.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY);
+    return dragManagerImpl_.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

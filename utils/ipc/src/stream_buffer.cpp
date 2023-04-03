@@ -204,11 +204,6 @@ const char *StreamBuffer::ReadBuf() const
     return &szBuff_[rPos_];
 }
 
-const char *StreamBuffer::WriteBuf() const
-{
-    return &szBuff_[wPos_];
-}
-
 bool StreamBuffer::Clone(const StreamBuffer &buf)
 {
     Clean();

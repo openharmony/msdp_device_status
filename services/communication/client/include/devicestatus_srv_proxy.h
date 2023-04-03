@@ -52,10 +52,11 @@ public:
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) override;
     virtual int32_t GetDragTargetPid() override;
+    virtual int32_t GetUdKey(std::string &udKey) override;
     virtual int32_t AddDraglistener() override;
     virtual int32_t RemoveDraglistener() override;
     virtual int32_t SetDragWindowVisible(bool visible) override;
-    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) override;
+    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

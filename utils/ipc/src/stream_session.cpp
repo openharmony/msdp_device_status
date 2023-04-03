@@ -35,10 +35,7 @@ const std::string FOUNDATION = "foundation";
 
 StreamSession::StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
-    : programName_(programName),
-      moduleType_(moduleType),
-      fd_(fd),
-      uid_(uid),
+    : fd_(fd),
       pid_(pid)
 {
     UpdateDescript();
@@ -101,10 +98,7 @@ void StreamSession::UpdateDescript()
 {
     std::ostringstream oss;
     oss << "fd = " << fd_
-        << ", programName = " << programName_
-        << ", moduleType = " << moduleType_
         << ((fd_ < 0) ? ", closed" : ", opened")
-        << ", uid = " << uid_
         << ", pid = " << pid_
         << ", tokenType = " << tokenType_
         << std::endl;

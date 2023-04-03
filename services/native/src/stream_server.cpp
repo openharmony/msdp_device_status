@@ -156,11 +156,6 @@ CLOSE_SOCK:
     return RET_ERR;
 }
 
-void StreamServer::Dump(int32_t fd, const std::vector<std::string> &args)
-{
-    CALL_DEBUG_ENTER;
-}
-
 void StreamServer::OnConnected(SessionPtr sess)
 {
     CHKPV(sess);

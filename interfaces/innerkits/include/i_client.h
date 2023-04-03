@@ -43,6 +43,7 @@ public:
     virtual void SetEventHandler(EventHandlerPtr eventHandler) = 0;
     virtual void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
     virtual bool IsEventHandlerChanged() const = 0;
+    virtual bool CheckValidFd() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

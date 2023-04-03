@@ -118,7 +118,7 @@ public:
     void EnableCoordination(bool enabled);
     int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t StopCoordination();
-    void GetCoordinationState(const std::string &deviceId);
+    int32_t GetCoordinationState(const std::string &deviceId);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCoordinationResult(bool isSuccess,

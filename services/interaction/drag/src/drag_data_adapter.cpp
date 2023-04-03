@@ -69,12 +69,25 @@ bool DragDataAdapter::GetDragWindowVisible() const
     return visible_;
 }
 
-int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY) const
+int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
 {
     offsetX = dragData_.shadowInfo.x;
     offsetY = dragData_.shadowInfo.y;
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    auto pixelMap = dragData_.shadowInfo.pixelMap;
+    CHKPR(pixelMap, RET_ERR);
+    width = pixelMap->GetWidth();
+    height = pixelMap->GetHeight();
+    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+        offsetX, offsetY, width, height);
     return RET_OK;
+}
+
+void DragDataAdapter::ResetDragData()
+{
+    CALL_DEBUG_ENTER;
+    ShadowInfo shadowInfo;
+    std::vector<uint8_t> buffer;
+    dragData_ = { shadowInfo, buffer, "", -1, -1, -1, -1, -1, -1, false };
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -42,6 +42,7 @@ public:
         START_DRAG,
         STOP_DRAG,
         GET_DRAG_TARGET_PID,
+        GET_DRAG_TARGET_UDKEY,
         REGISTER_DRAG_MONITOR,
         UNREGISTER_DRAG_MONITOR,
         SET_DRAG_WINDOW_VISIBLE,
@@ -69,12 +70,13 @@ public:
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;
     virtual int32_t GetDragTargetPid() = 0;
+    virtual int32_t GetUdKey(std::string &udKey) = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
-    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) = 0;
+    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
     virtual bool IsRunning() const
     {
         return true;

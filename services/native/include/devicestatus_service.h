@@ -76,10 +76,11 @@ public:
     int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
     int32_t GetDragTargetPid() override;
+    int32_t GetUdKey(std::string &udKey) override;
     int32_t AddDraglistener() override;
     int32_t RemoveDraglistener() override;
     int32_t SetDragWindowVisible(bool visible) override;
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY) override;
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
 
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;

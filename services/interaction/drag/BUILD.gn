@@ -51,12 +51,17 @@ ohos_shared_library("interaction_drag") {
     "graphic_standard:window_animation",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
+
+  if (fusion_interaction_coordination) {
+    external_deps += [ "udmf:udmf_client" ]
+  }
 
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"

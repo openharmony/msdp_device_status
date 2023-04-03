@@ -273,6 +273,27 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     return pid;
 }
 
+int32_t DeviceStatusSrvProxy::GetUdKey(std::string &udKey)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_DRAG_TARGET_UDKEY, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    READSTRING(reply, udKey, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
@@ -310,6 +331,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.shadowInfo.x, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
@@ -443,7 +465,7 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -461,7 +483,10 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     }
     READINT32(reply, offsetX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d", offsetX, offsetY);
+    READINT32(reply, width, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
+    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+        offsetX, offsetY, width, height);
     return ret;
 }
 } // namespace DeviceStatus

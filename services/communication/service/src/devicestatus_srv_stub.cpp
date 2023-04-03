@@ -61,6 +61,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::STOP_DRAG, &DeviceStatusSrvStub::StopDragStub},
         {Idevicestatus::UPDATED_DRAG_STYLE, &DeviceStatusSrvStub::UpdateDragStyleStub},
         {Idevicestatus::GET_DRAG_TARGET_PID, &DeviceStatusSrvStub::GetDragTargetPidStub},
+        {Idevicestatus::GET_DRAG_TARGET_UDKEY, &DeviceStatusSrvStub::GetUdKeyStub},
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
@@ -223,6 +224,19 @@ int32_t DeviceStatusSrvStub::GetDragTargetPidStub(MessageParcel& data, MessagePa
     return RET_OK;
 }
 
+int32_t DeviceStatusSrvStub::GetUdKeyStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::string udKey;
+    int32_t ret = GetUdKey(udKey);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get udKey failed ret:%{public}d", ret);
+    }
+    WRITESTRING(reply, udKey, IPC_STUB_WRITE_PARCEL_ERR);
+    FI_HILOGD("Target udKey:%{public}s", udKey.c_str());
+    return RET_OK;
+}
+
 int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply)
 {
     int32_t pid = GetCallingPid();
@@ -275,6 +289,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -354,12 +369,16 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    int32_t ret = GetShadowOffset(offsetX, offsetY);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t ret = GetShadowOffset(offsetX, offsetY, width, height);
     if (ret != RET_OK) {
         FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, width, IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 } // namespace DeviceStatus

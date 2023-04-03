@@ -85,6 +85,11 @@ int32_t InteractionManager::GetDragTargetPid()
     return InteractionMgrImpl.GetDragTargetPid();
 }
 
+int32_t InteractionManager::GetUdKey(std::string &udKey)
+{
+    return InteractionMgrImpl.GetUdKey(udKey);
+}
+
 int32_t InteractionManager::AddDraglistener(DragListenerPtr listener)
 {
     return InteractionMgrImpl.AddDraglistener(listener);
@@ -100,9 +105,9 @@ int32_t InteractionManager::SetDragWindowVisible(bool visible)
     return InteractionMgrImpl.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY)
+int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
-    return InteractionMgrImpl.GetShadowOffset(offsetX, offsetY);
+    return InteractionMgrImpl.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

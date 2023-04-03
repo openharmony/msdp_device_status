@@ -122,6 +122,14 @@ public:
     int32_t GetDragTargetPid();
 
     /**
+     * @brief 获取拖拽目标窗口UdKey
+     * @param UdKey 拖拽目标窗口统一数据密钥。
+     * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
+     * @since 10
+     */
+    int32_t GetUdKey(std::string &udKey);
+
+    /**
      * @brief 注册拖拽状态监听。。
      * @param listener 拖拽状态监听。
      * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
@@ -149,10 +157,12 @@ public:
      * @brief 获取触控点或鼠标光标相对于阴影缩略图左上角的位置。
      * @param offsetX 要查询的x值。
      * @param offsetY 要查询的y值。
+     * @param width 要查询缩略图的宽
+     * @param height 要查询缩略图的高
      * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
      * @since 10
      */
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
 
 private:
     InteractionManager() = default;

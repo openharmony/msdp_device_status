@@ -29,7 +29,6 @@ static const int32_t INVALID_FD = 6;
 static const int32_t INVALID_PID = 7;
 static const int32_t SESSION_NOT_FOUND = 8;
 static const int32_t EPOLL_MODIFY_FAIL = 9;
-static const int32_t MAKE_SHARED_FAIL = 10;
 static const int32_t ADD_SESSION_FAIL = 11;
 static const int32_t MAX_SESSON_ALARM = 100;
 static const int32_t MAX_RECV_LIMIT = 13;
@@ -41,21 +40,6 @@ static const int32_t SERVICE_NOT_RUNNING = 14;
 
 enum class MessageId : int32_t {
     INVALID,
-    DEVICE,
-    DEVICE_IDS,
-    DEVICE_SUPPORT_KEYS,
-    ADD_DEVICE_LISTENER,
-    DEVICE_KEYBOARD_TYPE,
-    DISPLAY_INFO,
-    NOTICE_ANR,
-    MARK_PROCESS,
-    ON_SUBSCRIBE_KEY,
-    ON_KEY_EVENT,
-    ON_POINTER_EVENT,
-    REPORT_KEY_EVENT,
-    REPORT_POINTER_EVENT,
-    ON_DEVICE_ADDED,
-    ON_DEVICE_REMOVED,
 
     COORDINATION_ADD_LISTENER,
     COORDINATION_MESSAGE,

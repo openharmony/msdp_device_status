@@ -38,18 +38,16 @@ public:
 
     virtual void MakeData(StreamBuffer &buf) const;
 
-    size_t GetSize() const
-    {
-        return Size();
-    }
     int32_t GetPacketLength() const
     {
         return (static_cast<int32_t>(sizeof(PackHead)) + wPos_);
     }
+
     const char *GetData() const
     {
         return Data();
     }
+
     MessageId GetMsgId() const
     {
         return msgId_;
