@@ -31,7 +31,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopDragFuzzTest" };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 #define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
