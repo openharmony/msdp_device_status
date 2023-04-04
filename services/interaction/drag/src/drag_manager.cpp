@@ -108,22 +108,22 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (result != DragResult::DRAG_EXCEPTION) {
-        CHKPR(context_, RET_ERR);
+    if (result != DragResult::DRAG_EXCEPTION && context_ != nullptr) {
         context_->GetTimerManager().RemoveTimer(timerId_);
     }
+    int32_t ret = RET_OK;
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
-        return RET_ERR;
+        ret = RET_ERR;
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    DataAdapter.ResetDragData();
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
-        return RET_ERR;
+        ret = RET_ERR;
     }
-    return RET_OK;
+    DataAdapter.ResetDragData();
+    return ret;
 }
 
 int32_t DragManager::GetDragTargetPid() const
