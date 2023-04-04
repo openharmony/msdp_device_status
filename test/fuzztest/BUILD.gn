@@ -22,6 +22,8 @@ group("device_status_fuzztest") {
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
+    "startdrag_fuzzer:fuzztest",
+    "stopdrag_fuzzer:fuzztest",
   ]
   if (fusion_interaction_coordination) {
     deps += [

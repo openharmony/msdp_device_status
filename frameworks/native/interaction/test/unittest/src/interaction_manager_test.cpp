@@ -88,7 +88,7 @@ std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
     int32_t ret = INPUT_MANAGER->GetDeviceIds(callback);
     if (ret != RET_OK) {
         FI_HILOGE("GetDeviceIds failed");
-        return { };
+        return {};
     }
     return realDeviceIds;
 }
@@ -101,7 +101,7 @@ std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t devi
     };
     int32_t ret = INPUT_MANAGER->GetDevice(deviceId, callback);
     if (ret != RET_OK || inputDevice == nullptr) {
-        FI_HILOGE("GetMouse failed");
+        FI_HILOGE("GetDevice failed");
         return nullptr;
     }
     return inputDevice;
@@ -110,7 +110,7 @@ std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t devi
 std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
 {
     std::vector<int32_t> deviceIds = GetInputDeviceIds();
-    std::pair<int32_t, int32_t> mouseAndTouch {-1, -1};
+    std::pair<int32_t, int32_t> mouseAndTouch { -1, -1 };
     for (const auto& id : deviceIds) {
         std::shared_ptr<MMI::InputDevice> device = GetDevice(id);
         if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
@@ -150,8 +150,7 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     OHOS::Media::InitializationOptions opts;
     opts.size.width = width;
     opts.size.height = height;
-    std::unique_ptr<Media::PixelMap> uniquePixelMap = Media::PixelMap::Create(opts);
-    std::shared_ptr<Media::PixelMap> pixelMap = std::move(uniquePixelMap);
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
     return pixelMap;
 }
 
@@ -509,7 +508,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
@@ -571,7 +571,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
@@ -637,8 +638,9 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
         FI_HILOGI("Target pid:%{public}d", pid);
-        ASSERT_TRUE(pid > 0); 
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_TRUE(pid > 0);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
@@ -672,8 +674,9 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
         FI_HILOGI("Target pid:%{public}d", pid);
-        ASSERT_TRUE(pid > 0); 
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_TRUE(pid > 0);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
@@ -702,14 +705,14 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         ASSERT_EQ(ret, RET_OK);
 
         auto callbackPtr = std::make_shared<InputEventCallbackTest>();
-        ASSERT_TRUE(callbackPtr != nullptr);
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         TestRemoveMonitor(monitorId);
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
@@ -737,14 +740,14 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         ASSERT_EQ(ret, RET_OK);
 
         auto callbackPtr = std::make_shared<InputEventCallbackTest>();
-        ASSERT_TRUE(callbackPtr != nullptr);
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, true);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         TestRemoveMonitor(monitorId);
-        InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 

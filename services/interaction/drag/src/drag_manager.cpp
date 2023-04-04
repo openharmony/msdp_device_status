@@ -114,7 +114,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     int32_t ret = RET_OK;
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
         FI_HILOGE("OnStopDrag failed");
-        ret = RET_ERR;
+        ret = RET_ERR
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
