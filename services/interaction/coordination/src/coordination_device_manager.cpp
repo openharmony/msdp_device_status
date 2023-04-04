@@ -348,7 +348,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     if (device->IsPointerDevice()) {
         CooSM->OnPointerOffline(dev->GetDhid(), dhids);
     } else if (device->IsKeyboard()) {
-        if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+        if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             CooSM->OnKeyboardOffline(dev->GetDhid());
         }
     }
