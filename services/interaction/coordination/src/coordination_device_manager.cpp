@@ -343,10 +343,15 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     }
     std::shared_ptr<Device> dev = iter->second;
     CHKPV(dev);
-    if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), GetCoordinationDhids(dev->GetId()));
-    }
+    auto dhids = GetCoordinationDhids(dev->GetId());
     devices_.erase(iter);
+    if (device->IsPointerDevice()) {
+        CooSM->OnPointerOffline(dev->GetDhid(), dhids);
+    } else if (device->IsKeyboard()) {
+        if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+            CooSM->OnKeyboardOffline(dev->GetDhid());
+        }
+    }
 }
 
 CoordinationDeviceManager::DeviceObserver::DeviceObserver(CoordinationDeviceManager &cooDevMgr)

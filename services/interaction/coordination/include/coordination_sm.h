@@ -133,6 +133,7 @@ public:
     void OnCoordinationChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards);
+    void OnKeyboardOffline(const std::string &dhid);
     bool InitDeviceManager();
     void OnDeviceOnline(const std::string &networkId);
     void OnDeviceOffline(const std::string &networkId);
