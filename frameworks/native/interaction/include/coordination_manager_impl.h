@@ -48,7 +48,7 @@ public:
     int32_t RegisterCoordinationListener(CoordinationListenerPtr listener);
     int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener = nullptr);
     int32_t EnableCoordination(bool enabled, FuncCoordinationMessage callback);
-    int32_t StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
+    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         FuncCoordinationMessage callback);
     int32_t StopCoordination(FuncCoordinationMessage callback);
     int32_t GetCoordinationState(const std::string &deviceId, FuncCoordinationState callback);

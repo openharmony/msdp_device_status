@@ -62,13 +62,13 @@ public:
 
     /**
      * @brief 启动跨设备键鼠穿越。
-     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
-     * @param srcDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @param remoteNetworkId 键鼠穿越目标设备描述符（networkID）
+     * @param startDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
      * @param callback 启动跨设备键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StartCoordination(const std::string &sinkDeviceId, int32_t srcDeviceId,
+    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**

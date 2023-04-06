@@ -39,17 +39,17 @@ public:
         STOPDRAG_DATA = 2,
         MAX_ID = 50,
     };
-    int32_t StartRemoteCoordination(const std::string &localDeviceId, const std::string &remoteDeviceId);
-    int32_t StartRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess,
-        const std::string &startDhid, int32_t xPercent, int32_t yPercent);
-    int32_t StopRemoteCoordination(const std::string &remoteDeviceId);
-    int32_t StopRemoteCoordinationResult(const std::string &remoteDeviceId, bool isSuccess);
-    int32_t StartCoordinationOtherResult(const std::string &remoteDeviceId, const std::string &srcNetworkId);
+    int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
+        const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
+    int32_t StopRemoteCoordination(const std::string &remoteNetworkId);
+    int32_t StopRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess);
+    int32_t StartCoordinationOtherResult(const std::string &originNetworkId, const std::string &remoteNetworkId);
 
     int32_t Init();
     void Release();
-    int32_t OpenInputSoftbus(const std::string &remoteDevId);
-    void CloseInputSoftbus(const std::string &remoteDevId);
+    int32_t OpenInputSoftbus(const std::string &remoteNetworkId);
+    void CloseInputSoftbus(const std::string &remoteNetworkId);
 
     int32_t OnSessionOpened(int32_t sessionId, int32_t result);
     void OnSessionClosed(int32_t sessionId);
@@ -62,9 +62,9 @@ private:
     DISALLOW_COPY_AND_MOVE(CoordinationSoftbusAdapter);
     std::string FindDevice(int32_t sessionId);
     int32_t SendMsg(int32_t sessionId, const std::string &message);
-    bool CheckDeviceSessionState(const std::string &remoteDevId);
+    bool CheckDeviceSessionState(const std::string &remoteNetworkId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
-    int32_t WaitSessionOpend(const std::string &remoteDevId, int32_t sessionId);
+    int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     std::map<std::string, int32_t> sessionDevMap_;
     std::map<std::string, bool> channelStatusMap_;
     std::mutex operationMutex_;

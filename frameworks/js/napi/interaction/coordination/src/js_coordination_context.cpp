@@ -97,31 +97,31 @@ napi_value JsCoordinationContext::Start(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "remoteNetworkDescriptor", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_number)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "srcDeviceId", "number");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "startDeviceId", "number");
         return nullptr;
     }
-    char sinkDeviceDescriptor[MAX_STRING_LEN] = {};
-    int32_t srcDeviceId = 0;
+    char remoteNetworkDescriptor[MAX_STRING_LEN] = {};
+    int32_t startDeviceId = 0;
     size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
-        sizeof(sinkDeviceDescriptor), &length), GET_VALUE_STRING_UTF8);
-    CHKRP(napi_get_value_int32(env, argv[1], &srcDeviceId), GET_VALUE_INT32);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], remoteNetworkDescriptor,
+        sizeof(remoteNetworkDescriptor), &length), GET_VALUE_STRING_UTF8);
+    CHKRP(napi_get_value_int32(env, argv[1], &startDeviceId), GET_VALUE_INT32);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     if (argc == 2) {
-        return jsCoordinationMgr->Start(env, sinkDeviceDescriptor, srcDeviceId);
+        return jsCoordinationMgr->Start(env, remoteNetworkDescriptor, startDeviceId);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Start(env, std::string(sinkDeviceDescriptor), srcDeviceId, argv[2]);
+    return jsCoordinationMgr->Start(env, std::string(remoteNetworkDescriptor), startDeviceId, argv[2]);
 }
 
 napi_value JsCoordinationContext::Stop(napi_env env, napi_callback_info info)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,33 @@
  * limitations under the License.
  */
 
-#include "startcoordination_fuzzer.h"
+#include <memory>
+#include <optional>
+#include <utility>
 
-#include "coordination_message.h"
-#include "interaction_manager.h"
+#include "pointer_event.h"
+#include "stopdrag_fuzzer.h"
+
+#include "devicestatus_define.h"
+#include "drag_data.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartCoordinationFuzzTest" };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
+#define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 
-void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void StopDragFuzzTest(const uint8_t* data, size_t  size)
 {
     if (data == nullptr) {
         return;
     }
-    const std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
-    const int32_t startDeviceId = *(reinterpret_cast<const int32_t*>(data));
-    auto fun = [](const std::string &listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("StartCoordinationFuzzTest");
-    };
-    InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
+    int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    InteractionManager::GetInstance()->StopDrag(static_cast<DragResult>(result), HAS_CUSTOM_ANIMATION);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
@@ -51,7 +54,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::StartCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::StopDragFuzzTest(data, size);
     return 0;
 }
 

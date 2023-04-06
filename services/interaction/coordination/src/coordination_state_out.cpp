@@ -30,53 +30,54 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateOut" };
 } // namespace
 
-CoordinationStateOut::CoordinationStateOut(const std::string& startDhid)
-    : startDhid_(startDhid)
+CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
+    : startDeviceDhid_(startDeviceDhid)
 {}
 
-int32_t CoordinationStateOut::StopCoordination(const std::string &networkId)
+int32_t CoordinationStateOut::StopCoordination(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string srcNetworkId = networkId;
-    if (srcNetworkId.empty()) {
+    std::string tempRemoteNetworkId = remoteNetworkId;
+    if (tempRemoteNetworkId.empty()) {
         std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
-        srcNetworkId = prepared.first;
+        tempRemoteNetworkId = prepared.first;
     }
-    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(networkId);
+    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return RET_ERR;
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
-        std::bind(&CoordinationStateOut::ProcessStop, this, srcNetworkId);
+        std::bind(&CoordinationStateOut::ProcessStop, this, tempRemoteNetworkId);
     CHKPR(eventHandler_, RET_ERR);
     eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
 
-void CoordinationStateOut::ProcessStop(const std::string& srcNetworkId)
+void CoordinationStateOut::ProcessStop(const std::string& remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string sink = COORDINATION::GetLocalDeviceId();
-    std::vector<std::string> dhids = CooDevMgr->GetCoordinationDhids(startDhid_);
-    if (dhids.empty()) {
-        CooSM->OnStopFinish(false, srcNetworkId);
+    std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+    std::vector<std::string> inputDeviceDhids = CooDevMgr->GetCoordinationDhids(startDeviceDhid_);
+    if (inputDeviceDhids.empty()) {
+        CooSM->OnStopFinish(false, remoteNetworkId);
     }
-    int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
-        this->OnStopRemoteInput(isSuccess, srcNetworkId);
+    int32_t ret = DistributedAdapter->StopRemoteInput(remoteNetworkId, localNetworkId, inputDeviceDhids,
+        [this, remoteNetworkId](bool isSuccess) {
+            this->OnStopRemoteInput(isSuccess, remoteNetworkId);
         });
     if (ret != RET_OK) {
-        CooSM->OnStopFinish(false, srcNetworkId);
+        CooSM->OnStopFinish(false, remoteNetworkId);
     }
 }
 
-void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &srcNetworkId)
+void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&CoordinationSM::OnStopFinish, CooSM, isSuccess, srcNetworkId);
+        std::bind(&CoordinationSM::OnStopFinish, CooSM, isSuccess, remoteNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
@@ -84,9 +85,9 @@ void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &
 void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid,
     const std::pair<std::string, std::string> &networkIds)
 {
-    std::vector<std::string> dhids;
-    dhids.push_back(dhid);
-    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, dhids, [](bool isSuccess) {});
+    std::vector<std::string> inputDeviceDhids;
+    inputDeviceDhids.push_back(dhid);
+    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids, [](bool isSuccess) {});
 }
 } // namespace DeviceStatus
 } // namespace Msdp
