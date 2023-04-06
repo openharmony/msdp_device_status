@@ -42,15 +42,15 @@ napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value h
     return result;
 }
 
-napi_value JsCoordinationManager::Start(napi_env env, const std::string &sinkDeviceDescriptor,
-    int32_t srcDeviceId, napi_value handle)
+napi_value JsCoordinationManager::Start(napi_env env, const std::string &remoteNetworkDescriptor,
+    int32_t startDeviceId, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->StartCoordination(sinkDeviceDescriptor, srcDeviceId, callback);
+    int32_t errCode = InteractionMgr->StartCoordination(remoteNetworkDescriptor, startDeviceId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }

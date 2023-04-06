@@ -47,23 +47,18 @@ public:
     bool IsNeedFilterOut(const std::string &deviceId,
                          const DistributedHardware::DistributedInput::BusinessEvent &event);
 
-    int32_t StartRemoteInput(const std::string &srcId, const std::string &sinkId, const uint32_t &inputTypes,
-                             DInputCallback callback);
-    int32_t StopRemoteInput(const std::string &srcId, const std::string &sinkId, const uint32_t &inputTypes,
-                            DInputCallback callback);
+    int32_t StartRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
+                             const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+    int32_t StopRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
+                            const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
 
-    int32_t StartRemoteInput(const std::string &srcId, const std::string &sinkId, const std::vector<std::string> &dhIds,
-                             DInputCallback callback);
-    int32_t StopRemoteInput(const std::string &srcId, const std::string &sinkId, const std::vector<std::string> &dhIds,
-                            DInputCallback callback);
+    int32_t StopRemoteInput(const std::string &originNetworkId,
+                            const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
 
-    int32_t StartRemoteInput(const std::string &deviceId,
-                             const std::vector<std::string> &dhIds, DInputCallback callback);
-    int32_t StopRemoteInput(const std::string &deviceId,
-                            const std::vector<std::string> &dhIds, DInputCallback callback);
-
-    int32_t PrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId, DInputCallback callback);
+    int32_t PrepareRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
+                               DInputCallback callback);
+    int32_t UnPrepareRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
+                                 DInputCallback callback);
 
     int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);

@@ -31,12 +31,12 @@ void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
     if (data == nullptr) {
         return;
     }
-    const std::string sinkDeviceId(reinterpret_cast<const char*>(data), size);
-    const int32_t srcDeviceId = *(reinterpret_cast<const int32_t*>(data));
+    const std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
+    const int32_t startDeviceId = *(reinterpret_cast<const int32_t*>(data));
     auto fun = [](const std::string &listener, CoordinationMessage cooperateMessages) {
         FI_HILOGD("StartCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->StartCoordination(sinkDeviceId, srcDeviceId, fun);
+    InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
