@@ -304,7 +304,7 @@ void DragManager::Dump(int32_t fd)
             "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tsourceType:%d\n\tdragNum:%d\n\tpointerId:%d\n"
             "\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
             dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
-            dragData.pointerId, dragData.displayX,dragData.displayY, dragData.displayId,
+            dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
             dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragMessage::MSG_DRAG_STATE_STOP) {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
