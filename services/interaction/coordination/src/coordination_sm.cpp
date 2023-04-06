@@ -559,14 +559,15 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
 void CoordinationSM::OnKeyboardOffline(const std::string &dhid) {
     CALL_INFO_TRACE;
     if (coordinationState_ == CoordinationState::STATE_OUT) {
-        std::string src = srcNetworkId_;
-        if (src.empty()) {
-            src = preparedNetworkId_.first;
+        std::string remoteNetworkId = remoteNetworkId_;
+        if (remoteNetworkId.empty()) {
+            remoteNetworkId = preparedNetworkId_.first;
         }
-        std::string sinkNetworkId = COORDINATION::GetLocalDeviceId();
-        std::vector<std::string> dhids;
-        dhids.push_back(dhid);
-        DistributedAdapter->StopRemoteInput(src, sinkNetworkId, dhids, [this, src](bool isSuccess) {});
+        std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+        std::vector<std::string> inputDeviceDhids;
+        inputDeviceDhids.push_back(dhid);
+        DistributedAdapter->StopRemoteInput(remoteNetworkId, localNetworkId, inputDeviceDhids,
+            [this, remoteNetworkId](bool isSuccess) {});
     }
 }
 
