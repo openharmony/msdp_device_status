@@ -830,7 +830,6 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Mouse, TestSize.Level1)
         std::string udKey;
         ret = InteractionManager::GetInstance()->GetUdKey(udKey);
         ASSERT_EQ(ret, RET_OK);
-        FI_HILOGI("udKey:%{public}s", udKey.c_str());
         ASSERT_EQ(udKey, UD_KEY);
         InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     }
@@ -867,7 +866,6 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Touch, TestSize.Level1)
         std::string udKey;
         ret = InteractionManager::GetInstance()->GetUdKey(udKey);
         ASSERT_EQ(ret, RET_OK);
-        FI_HILOGI("udKey:%{public}s", udKey.c_str());
         ASSERT_EQ(udKey, UD_KEY);
         InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     }
