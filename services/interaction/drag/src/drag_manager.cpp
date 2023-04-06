@@ -287,20 +287,31 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEve
 void DragManager::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    DragData dragData = DataAdapter.GetDragData();
     DragCursorStyle style = DataAdapter.GetDragStyle();
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
-    CHKPV(pixelMap);
     dprintf(fd, "Drag information:\n");
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | cursorStyle:%s | isWindowVisble:%s\n"
-            "pixelMapWidth:%d | pixelMapHeight:%d | shadowInfoX:%d | shadowInfoY:%d | sourceType:%d | dragNum:%d\n"
-            "pointerId:%d | displayX:%d | displayY:%d | displayId:%d | hasCanceledAnimation:%s\n",
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | "
+            "cursorStyle:%s | isWindowVisble:%s\n",
             GetDragState(dragState_).c_str(), GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(),
-            GetDragCursorStyle(style).c_str(), DataAdapter.GetDragWindowVisible() ? "true" : "false",
-            pixelMap->GetWidth(), pixelMap->GetHeight(), dragData.shadowInfo.x, dragData.shadowInfo.y,
-            dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY,
-            dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
+            GetDragCursorStyle(style).c_str(), DataAdapter.GetDragWindowVisible() ? "true" : "false");
+    DragData dragData = DataAdapter.GetDragData();
+    std::string udKey;
+    if (RET_ERR == GetUdKey(udKey)) {
+        FI_HILOGE("Target udKey is empty");
+        udKey = "";
+    }
+    dprintf(fd, "dragData = {\n"
+            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tsourceType:%d\n\tdragNum:%d\n\tpointerId:%d\n"
+            "\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
+            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
+            dragData.pointerId, dragData.displayX,dragData.displayY, dragData.displayId,
+            dragData.hasCanceledAnimation ? "true" : "false");
+    if (dragState_ != DragMessage::MSG_DRAG_STATE_STOP) {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
+        CHKPV(pixelMap);
+        dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
+    }
+    dprintf(fd, "}\n");
 }
 
 std::string DragManager::GetDragState(DragMessage value) const
