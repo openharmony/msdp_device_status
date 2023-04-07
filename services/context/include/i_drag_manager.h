@@ -26,7 +26,7 @@ public:
     IDragManager() = default;
     virtual ~IDragManager() = default;
 
-    virtual void Dump(int32_t fd) = 0;
+    virtual void Dump(int32_t fd) const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

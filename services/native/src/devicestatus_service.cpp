@@ -125,7 +125,7 @@ ITimerManager& DeviceStatusService::GetTimerManager()
     return timerMgr_;
 }
 
-IDragManager& DeviceStatusService::GetDragManager()
+const IDragManager& DeviceStatusService::GetDragManager() const
 {
     return dragMgr_;
 }

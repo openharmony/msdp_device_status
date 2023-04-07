@@ -132,7 +132,7 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::GetUdKey(std::string &udKey)
+int32_t DragManager::GetUdKey(std::string &udKey) const
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
@@ -284,7 +284,7 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEve
     CALL_DEBUG_ENTER;
 }
 
-void DragManager::Dump(int32_t fd)
+void DragManager::Dump(int32_t fd) const
 {
     CALL_DEBUG_ENTER;
     DragCursorStyle style = DataAdapter.GetDragStyle();
