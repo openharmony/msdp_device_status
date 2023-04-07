@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,10 @@
 #ifndef DEVICESTATUS_DUMPER_H
 #define DEVICESTATUS_DUMPER_H
 
-#include <refbase.h>
-#include <singleton.h>
 #include <map>
 #include <memory>
 #include <queue>
+#include <refbase.h>
 #include <set>
 #include <string>
 #include <vector>
@@ -30,6 +29,7 @@
 #include "accesstoken_kit.h"
 #include "devicestatus_data_utils.h"
 #include "idevicestatus_callback.h"
+#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -40,8 +40,6 @@ const std::string ARG_DUMP_DEVICESTATUS_CHANGES = "-l";
 const std::string ARG_DUMP_DEVICESTATUS_CURRENT_STATE = "-c";
 constexpr int32_t RET_NG = -1;
 constexpr uint32_t MAX_DEVICE_STATUS_SIZE = 10;
-constexpr uint32_t BASE_YEAR = 1900;
-constexpr uint32_t BASE_MON = 1;
 struct AppInfo {
     std::string startTime;
     int32_t uid {};
@@ -60,6 +58,7 @@ class DeviceStatusDumper final : public RefBase,
 public:
     DeviceStatusDumper() = default;
     ~DeviceStatusDumper() = default;
+    int32_t Init(IContext *context);
     void ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
     void ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
     void ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t info);
@@ -73,13 +72,13 @@ public:
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 private:
     DISALLOW_COPY_AND_MOVE(DeviceStatusDumper);
-    void DumpCurrentTime(std::string &startTime) const;
     std::string GetStatusType(Type type) const;
     std::string GetDeviceState(OnChangedValue type) const;
 
     std::map<Type, std::set<std::shared_ptr<AppInfo>>> appInfoMap_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;
+    IContext *context_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

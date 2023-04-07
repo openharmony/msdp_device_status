@@ -21,6 +21,7 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
+#include "across_device_drag.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
@@ -28,7 +29,6 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
-#include "across_device_drag.h"
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
@@ -54,6 +54,7 @@ public:
     IDelegateTasks& GetDelegateTasks() override;
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
+    const IDragManager& GetDragManager() const override;
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
@@ -126,6 +127,7 @@ private:
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
     DragManager dragMgr_;
     AcrossDeviceDrag acrossDeviceDrag_;
+    DeviceStatusDumper deviceStatusDumper_;
 };
 
 } // namespace DeviceStatus

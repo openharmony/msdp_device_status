@@ -31,6 +31,7 @@ int64_t GetMillisTime();
 uint64_t GetThisThreadId();
 
 void SetThreadName(const std::string &name);
+void GetTimeStamp(std::string &startTime);
 
 template<typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)

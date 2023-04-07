@@ -22,9 +22,10 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//utils/system/safwk/native/include",
-    "//base/msdp/device_status/libs/interface",
-    "//base/msdp/device_status/services/delegate_task/include",
-    "../../../communication/service/include",
+    "${device_status_root_path}/libs/interface",
+    "${device_status_service_path}/delegate_task/include",
+    "${device_status_service_path}/context/include",
+    "${device_status_service_path}/communication/service/include",
   ]
 }
 

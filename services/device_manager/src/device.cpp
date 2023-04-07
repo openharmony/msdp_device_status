@@ -244,17 +244,12 @@ void Device::CheckKeys()
     }
 }
 
-void Device::RemoveSpace(std::string &str) const
-{
-    str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());
-}
-
 std::string Device::MakeConfigFileName() const
 {
     std::ostringstream ss;
     ss << GetVendor() << "_" << GetProduct() << "_" << GetVersion() << "_" << GetName();
     std::string fname { ss.str() };
-    RemoveSpace(fname);
+    Utility::RemoveSpace(fname);
 
     std::ostringstream sp;
     sp << "/vendor/etc/keymap/" << fname << ".TOML";
@@ -271,7 +266,7 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
     }
     std::string tmp;
     while (std::getline(cfgFile, tmp)) {
-        RemoveSpace(tmp);
+        Utility::RemoveSpace(tmp);
         size_t pos = tmp.find('#');
         if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
             FI_HILOGE("File format is error");

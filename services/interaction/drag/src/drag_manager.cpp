@@ -123,6 +123,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         ret = RET_ERR;
     }
     DataAdapter.ResetDragData();
+    dragResult_ = static_cast<DragResult>(result);
     return ret;
 }
 
@@ -131,7 +132,7 @@ int32_t DragManager::GetDragTargetPid() const
     return dragTargetPid_;
 }
 
-int32_t DragManager::GetUdKey(std::string &udKey)
+int32_t DragManager::GetUdKey(std::string &udKey) const
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();
@@ -279,6 +280,123 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
 {
     CALL_DEBUG_ENTER;
+}
+
+void DragManager::Dump(int32_t fd) const
+{
+    CALL_DEBUG_ENTER;
+    DragCursorStyle style = DataAdapter.GetDragStyle();
+    dprintf(fd, "Drag information:\n");
+    dprintf(fd,
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | "
+            "cursorStyle:%s | isWindowVisble:%s\n",
+            GetDragState(dragState_).c_str(), GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(),
+            GetDragCursorStyle(style).c_str(), DataAdapter.GetDragWindowVisible() ? "true" : "false");
+    DragData dragData = DataAdapter.GetDragData();
+    std::string udKey;
+    if (RET_ERR == GetUdKey(udKey)) {
+        FI_HILOGE("Target udKey is empty");
+        udKey = "";
+    }
+    dprintf(fd, "dragData = {\n"
+            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tsourceType:%d\n\tdragNum:%d\n\tpointerId:%d\n"
+            "\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
+            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
+            dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
+            dragData.hasCanceledAnimation ? "true" : "false");
+    if (dragState_ != DragMessage::MSG_DRAG_STATE_STOP) {
+        std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
+        CHKPV(pixelMap);
+        dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
+    }
+    dprintf(fd, "}\n");
+}
+
+std::string DragManager::GetDragState(DragMessage value) const
+{
+    std::string state;
+    switch (value) {
+        case DragMessage::MSG_DRAG_STATE_START: {
+            state = "start";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_STOP: {
+            state = "stop";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_CANCEL: {
+            state = "cancel";
+            break;
+        }
+        case DragMessage::MSG_DRAG_STATE_ERROR: {
+            state = "error";
+            break;
+        }
+        default: {
+            state = "unknown";
+            FI_HILOGW("Drag status unknown");
+            break;
+        }
+    }
+    return state;
+}
+
+std::string DragManager::GetDragResult(DragResult value) const
+{
+    std::string result;
+    switch (value) {
+        case DragResult::DRAG_SUCCESS: {
+            result = "success";
+            break;
+        }
+        case DragResult::DRAG_FAIL: {
+            result = "fail";
+            break;
+        }
+        case DragResult::DRAG_CANCEL: {
+            result = "cancel";
+            break;
+        }
+        case DragResult::DRAG_EXCEPTION: {
+            result = "abnormal";
+            break;
+        }
+        default: {
+            result = "unknown";
+            FI_HILOGW("Drag result unknown");
+            break;
+        }
+    }
+    return result;
+}
+
+std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
+{
+    std::string style;
+    switch (value) {
+        case DragCursorStyle::COPY: {
+            style = "copy";
+            break;
+        }
+        case DragCursorStyle::DEFAULT: {
+            style = "default";
+            break;
+        }
+        case DragCursorStyle::FORBIDDEN: {
+            style = "forbidden";
+            break;
+        }
+        case DragCursorStyle::MOVE: {
+            style = "move";
+            break;
+        }
+        default: {
+            style = "unknown";
+            FI_HILOGW("Drag cursor style unknown");
+            break;
+        }
+    }
+    return style;
 }
 
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
