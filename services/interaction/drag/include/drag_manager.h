@@ -47,7 +47,7 @@ public:
     int32_t StartDrag(const DragData &dragData, SessionPtr sess);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t GetDragTargetPid() const;
-    int32_t GetUdKey(std::string &udKey) const; 
+    int32_t GetUdKey(std::string &udKey) const;
     void SetDragTargetPid(int32_t dragTargetPid);
     void SendDragData(int32_t targetPid, const std::string &udKey);
     int32_t UpdateDragStyle(DragCursorStyle style);
