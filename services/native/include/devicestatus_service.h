@@ -68,8 +68,7 @@ public:
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
     int32_t EnableCoordination(int32_t userData, bool enable) override;
-    int32_t StartCoordination(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcDeviceId) override;
+    int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
     int32_t StopCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
@@ -111,8 +110,8 @@ private:
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
     int32_t OnEnableCoordination(int32_t pid, int32_t userData, bool enabled);
-    int32_t OnStartCoordination(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcDeviceId);
+    int32_t OnStartCoordination(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
+        int32_t startDeviceId);
     int32_t OnStopCoordination(int32_t pid, int32_t userData);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION

@@ -188,8 +188,8 @@ int32_t DeviceStatusSrvProxy::EnableCoordination(int32_t userData, bool enabled)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::string &sinkDeviceId,
-    int32_t srcDeviceId)
+int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::string &remoteNetworkId,
+    int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -198,8 +198,8 @@ int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::str
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    WRITESTRING(data, sinkDeviceId, ERR_INVALID_VALUE);
-    WRITEINT32(data, srcDeviceId, ERR_INVALID_VALUE);
+    WRITESTRING(data, remoteNetworkId, ERR_INVALID_VALUE);
+    WRITEINT32(data, startDeviceId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

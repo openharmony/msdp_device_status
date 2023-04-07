@@ -31,7 +31,7 @@ class ICoordination {
 public:
     virtual void EnableCoordination(bool enabled) = 0;
     virtual int32_t StartCoordination(SessionPtr sess, int32_t userData,
-        const std::string &sinkDeviceId, int32_t srcDeviceId) = 0;
+        const std::string &remoteNetworkId, int32_t startDeviceId) = 0;
     virtual int32_t StopCoordination(SessionPtr sess, int32_t userData) = 0;
     virtual int32_t GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t RegisterCoordinationListener(SessionPtr sess) = 0;

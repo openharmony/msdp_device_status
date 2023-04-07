@@ -620,22 +620,22 @@ int32_t DeviceStatusService::EnableCoordination(int32_t userData, bool enabled)
 }
 
 int32_t DeviceStatusService::StartCoordination(int32_t userData,
-    const std::string &sinkDeviceId, int32_t srcDeviceId)
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnStartCoordination,
-        this, pid, userData, sinkDeviceId, srcDeviceId));
+        this, pid, userData, remoteNetworkId, startDeviceId));
     if (ret != RET_OK) {
         FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
-    (void)(sinkDeviceId);
-    (void)(srcDeviceId);
+    (void)(remoteNetworkId);
+    (void)(startDeviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
@@ -837,7 +837,7 @@ int32_t DeviceStatusService::OnEnableCoordination(int32_t pid, int32_t userData,
 }
 
 int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
-    int32_t userData, const std::string &sinkDeviceId, int32_t srcDeviceId)
+    int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -863,7 +863,7 @@ int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
         return RET_OK;
     }
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartCoordination(sinkDeviceId, srcDeviceId);
+    int32_t ret = CooSM->StartCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
         return ret;

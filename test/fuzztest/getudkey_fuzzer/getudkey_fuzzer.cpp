@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#include "startcoordination_fuzzer.h"
+#include "getudkey_fuzzer.h"
 
-#include "coordination_message.h"
 #include "interaction_manager.h"
 #include "fi_log.h"
 
@@ -23,20 +22,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "GetUdKeyFuzzTest" };
 } // namespace
 
-void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void GetUdKeyFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return;
-    }
-    const std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
-    const int32_t startDeviceId = *(reinterpret_cast<const int32_t*>(data));
-    auto fun = [](const std::string &listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("StartCoordinationFuzzTest");
-    };
-    InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
+    FI_HILOGD("GetUdKeyFuzzTest");
+    std::string udKey;
+    InteractionManager::GetInstance()->GetUdKey(udKey);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
@@ -45,13 +38,13 @@ void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::StartCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::GetUdKeyFuzzTest(data, size);
     return 0;
 }
-

@@ -167,11 +167,11 @@ int32_t DeviceStatusSrvStub::StartCoordinationStub(MessageParcel& data, MessageP
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    std::string sinkDeviceId;
-    READSTRING(data, sinkDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t srcDeviceId;
-    READINT32(data, srcDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StartCoordination(userData, sinkDeviceId, srcDeviceId);
+    std::string remoteNetworkId;
+    READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t startDeviceId;
+    READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = StartCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Call StartCoordination failed, ret:%{public}d", ret);
     }
