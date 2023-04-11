@@ -296,9 +296,9 @@ void DragDrawing::UpdateDragWindowState(bool visible)
 void DragDrawing::RunAnimation(float endAlpha, float endScale)
 {
     CALL_DEBUG_ENTER;
-    auto runner = AppExecFwk::EventRunner::Create(true);
-    CHKPV(runner);
     if (handler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(true);
+        CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
     if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
