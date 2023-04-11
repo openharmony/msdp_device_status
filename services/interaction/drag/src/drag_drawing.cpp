@@ -79,7 +79,6 @@ constexpr float PIVOT_X = 0.5f;
 constexpr float PIVOT_Y = 0.5f;
 const std::string DEVICE_TYPE_DEFAULT = "default";
 const std::string DEVICE_TYPE_PHONE = "phone";
-// const std::string THREAD_NAME = "AnimationEventHandler";
 const std::string COPY_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_One_Drag.svg";
 const std::string MOVE_DRAG_PATH = "/system/etc/device_status/drag_icon/Move_Drag.svg";
