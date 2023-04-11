@@ -385,10 +385,12 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     CHKPR(g_drawingInfo.surfaceNode, RET_ERR);
     g_drawingInfo.surfaceNode->SetPivot(PIVOT_X, PIVOT_Y);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
-    auto& rsClient = OHOS::Rosen::RSInterfaces::GetInstance();
-    CHKPR(handler_, RET_ERR);
-    receiver_ = rsClient.CreateVSyncReceiver("DragDrawing", handler_);
-    CHKPR(receiver_, RET_ERR);
+    if (receiver_ == nullptr) {
+        CHKPR(handler_, RET_ERR);
+        auto& rsClient = OHOS::Rosen::RSInterfaces::GetInstance();
+        receiver_ = rsClient.CreateVSyncReceiver("DragDrawing", handler_);
+        CHKPR(receiver_, RET_ERR);
+    }
     int32_t ret = receiver_->Init();
     if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
@@ -419,7 +421,6 @@ void DragDrawing::OnVsync()
         handler_->RemoveAllFileDescriptorListeners();
         handler_ = nullptr;
         g_drawingInfo.isRunning = false;
-        CHKPV(receiver_);
         receiver_ = nullptr;
         DestroyDragWindow();
         return;
@@ -461,7 +462,6 @@ int32_t DragDrawing::InitLayer()
         FI_HILOGE("Init layer failed, surface is nullptr");
         return RET_ERR;
     }
-
     rsUiDirector_ = OHOS::Rosen::RSUIDirector::Create();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->Init();
