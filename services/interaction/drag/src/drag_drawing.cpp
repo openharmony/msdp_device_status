@@ -257,7 +257,6 @@ void DragDrawing::DestroyDragWindow()
     rsUiDirector_ = nullptr;
     g_drawingInfo.currentStyle = DragCursorStyle::COPY;
     g_drawingInfo.pixelMap = nullptr;
-    handler_ = nullptr;
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
         g_drawingInfo.nodes.shrink_to_fit();
