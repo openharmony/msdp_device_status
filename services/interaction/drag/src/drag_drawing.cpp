@@ -79,6 +79,7 @@ constexpr float PIVOT_X = 0.5f;
 constexpr float PIVOT_Y = 0.5f;
 const std::string DEVICE_TYPE_DEFAULT = "default";
 const std::string DEVICE_TYPE_PHONE = "phone";
+const std::string THREAD_NAME = "AnimationEventRunner";
 const std::string COPY_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_One_Drag.svg";
 const std::string MOVE_DRAG_PATH = "/system/etc/device_status/drag_icon/Move_Drag.svg";
@@ -295,7 +296,7 @@ void DragDrawing::RunAnimation(float endAlpha, float endScale)
 {
     CALL_DEBUG_ENTER;
     if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(true);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
