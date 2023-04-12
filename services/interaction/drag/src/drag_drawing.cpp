@@ -212,8 +212,7 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
             FI_HILOGE("CheckNodesValid failed");
             return RET_ERR;
         }
-        if (style == DragCursorStyle::COPY)
-        {
+        if (style == DragCursorStyle::COPY) {
             auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
             CHKPR(dragStyleNode, RET_ERR);
             dragStyleNode->SetVisible(true);
