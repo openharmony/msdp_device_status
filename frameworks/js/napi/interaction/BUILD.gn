@@ -15,10 +15,7 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("interaction_config") {
-  visibility = [
-    ":drag",
-    ":inputdevicecooperate",
-  ]
+  visibility = [ "./*" ]
 
   include_dirs = [
     "coordination/include",
