@@ -302,7 +302,6 @@ void DragDrawing::RunAnimation(float endAlpha, float endScale)
     }
     if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
         FI_HILOGE("Send vsync event failed");
-        return;
     }
 }
 
