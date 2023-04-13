@@ -383,10 +383,24 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
 
 void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string& message)
 {
+    if (message.empty()) {
+        FI_HILOGE("Message is empty");
+        return;
+    }
     JsonParser parser;
     parser.json_ = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json_)) {
-        FI_HILOGE("Parser.json_ is not object");
+        FI_HILOGI("Parser json is not object");
+        DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
+        if (registerRecvMap_.find(dataPacket->messageId) == registerRecvMap_.end()) {
+            FI_HILOGW("Message:%{public}d does not register", dataPacket->messageId);
+            return;
+        }
+        FI_HILOGI("Message:%{public}d", dataPacket->messageId);
+        if (dataPacket->messageId == DRAGING_DATA || dataPacket->messageId == STOPDRAG_DATA) {
+            CHKPV(registerRecvMap_[dataPacket->messageId]);
+            registerRecvMap_[dataPacket->messageId](dataPacket->data, dataPacket->dataLen);
+        }
         return;
     }
     cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_CMD_TYPE);
