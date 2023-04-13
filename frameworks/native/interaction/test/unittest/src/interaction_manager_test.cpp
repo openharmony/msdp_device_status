@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <future>
 #include <optional>
-#include <thread>
 #include <utility>
 #include <vector>
 
