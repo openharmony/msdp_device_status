@@ -58,7 +58,7 @@ ohos_unittest("test_devicestatus_service") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "input:libmmi-client",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
@@ -84,7 +84,7 @@ ohos_unittest("DeviceStatusAgentTest") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

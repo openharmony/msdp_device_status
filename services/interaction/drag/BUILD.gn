@@ -53,7 +53,7 @@ ohos_shared_library("interaction_drag") {
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "input:libmmi-client",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
