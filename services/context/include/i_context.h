@@ -37,7 +37,7 @@ public:
     virtual IDelegateTasks& GetDelegateTasks() = 0;
     virtual IDeviceManager& GetDeviceManager() = 0;
     virtual ITimerManager& GetTimerManager() = 0;
-    virtual const IDragManager& GetDragManager() const = 0;
+    virtual IDragManager& GetDragManager() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
