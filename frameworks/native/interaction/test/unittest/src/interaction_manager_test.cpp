@@ -277,11 +277,11 @@ void InteractionManagerTest::TestRemoveMonitor(int32_t monitorId)
 class InputEventCallbackTest : public MMI::IInputEventConsumer {
 public:
     InputEventCallbackTest() {}
-    InputEventCallbackTest(std::function<void()> callback) : callback_(callback) {}
+    explicit InputEventCallbackTest(std::function<void()> callback) : callback_(callback) {}
 public:
-    virtual void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
-    virtual void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
 private:
     std::function<void()> callback_;
 };
@@ -661,7 +661,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
-        auto callbackPtr = std::make_shared<InputEventCallbackTest>([&promiseEventFlag]{ promiseEventFlag.set_value(true); });
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>(
+            [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
         ASSERT_TRUE(futureEventFlag.get());
@@ -700,7 +701,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
-        auto callbackPtr = std::make_shared<InputEventCallbackTest>([&promiseEventFlag]{ promiseEventFlag.set_value(true); });
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>(
+            [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
         ASSERT_TRUE(futureEventFlag.get());
@@ -737,7 +739,8 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         ASSERT_EQ(ret, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
-        auto callbackPtr = std::make_shared<InputEventCallbackTest>([&promiseEventFlag]{ promiseEventFlag.set_value(true); });
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>(
+            [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
@@ -772,7 +775,8 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         ASSERT_EQ(ret, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
-        auto callbackPtr = std::make_shared<InputEventCallbackTest>([&promiseEventFlag]{ promiseEventFlag.set_value(true); });
+        auto callbackPtr = std::make_shared<InputEventCallbackTest>(
+            [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_SRC_X, DRAG_SRC_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, TOUCH_POINTER_ID, true);
