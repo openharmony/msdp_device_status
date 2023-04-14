@@ -210,7 +210,7 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
     if (handle == nullptr) {
         CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     return promise;
 }
