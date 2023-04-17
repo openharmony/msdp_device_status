@@ -41,13 +41,14 @@ public:
     };
 
     struct CallbackData {
-        bool enableResult { false };
-        bool startResult { false };
-        bool stopResult { false };
+        bool prepareResult { false };
+        bool unprepareResult { false };
+        bool activateResult { false };
+        bool deactivateResult { false };
         bool coordinationOpened { false };
         std::string deviceDescriptor;
         int32_t errCode { 0 };
-        CoordinationMessage msg = CoordinationMessage::OPEN_SUCCESS;
+        CoordinationMessage msg = CoordinationMessage::PREPARE;
     };
 
     struct CallbackInfo : RefBase {
@@ -60,11 +61,12 @@ public:
         CallbackData data;
     };
 
-    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStateResult(napi_env env, bool result);
+    static napi_value GetPrepareInfo(sptr<CallbackInfo> cb);
+    static napi_value GetUnPrepareInfo(sptr<CallbackInfo> cb);
+    static napi_value GetActivateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetDeactivateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetCrossingSwitchStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 

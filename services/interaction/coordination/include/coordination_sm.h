@@ -115,9 +115,10 @@ public:
     DISALLOW_COPY_AND_MOVE(CoordinationSM);
     void Init();
     void OnSessionLost(SessionPtr session);
-    void EnableCoordination(bool enabled);
-    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t StopCoordination();
+    void PrepareCoordination();
+    void UnprepareCoordination();
+    int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
+    int32_t DeactivateCoordination();
     int32_t GetCoordinationState(const std::string &deviceId);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();

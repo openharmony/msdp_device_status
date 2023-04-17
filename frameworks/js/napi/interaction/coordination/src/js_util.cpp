@@ -26,28 +26,35 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
 } // namespace
 
-napi_value JsUtil::GetEnableInfo(sptr<CallbackInfo> cb)
+napi_value JsUtil::GetPrepareInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.prepareResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStartInfo(sptr<CallbackInfo> cb)
+napi_value JsUtil::GetUnPrepareInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.unprepareResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStopInfo(sptr<CallbackInfo> cb)
+napi_value JsUtil::GetActivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
+    return GetResult(cb->env, cb->data.activateResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetStateInfo(sptr<CallbackInfo> cb)
+napi_value JsUtil::GetDeactivateInfo(sptr<CallbackInfo> cb)
+{
+    CHKPP(cb);
+    CHKPP(cb->env);
+    return GetResult(cb->env, cb->data.deactivateResult, cb->data.errCode);
+}
+
+napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
@@ -82,7 +89,7 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
     return object;
 }
 
-napi_value JsUtil::GetStateResult(napi_env env, bool result)
+napi_value JsUtil::GetCrossingSwitchStateResult(napi_env env, bool result)
 {
     CHKPP(env);
     napi_value state = nullptr;

@@ -26,10 +26,11 @@ public:
     Coordination() = default;
     virtual ~Coordination() = default;
 
-    void EnableCoordination(bool enabled);
-    int32_t StartCoordination(SessionPtr sess, int32_t userData,
+    void PrepareCoordination();
+    void UnprepareCoordination();
+    int32_t ActivateCoordination(SessionPtr sess, int32_t userData,
         const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t StopCoordination(SessionPtr sess, int32_t userData);
+    int32_t DeactivateCoordination(SessionPtr sess, int32_t userData);
     int32_t GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId);
     int32_t RegisterCoordinationListener(SessionPtr sess);
     int32_t UnregisterCoordinationListener(SessionPtr sess);

@@ -601,35 +601,51 @@ int32_t DeviceStatusService::UnregisterCoordinationListener()
     return RET_OK;
 }
 
-int32_t DeviceStatusService::EnableCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusService::PrepareCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnEnableCoordination, this, pid, userData, enabled));
+        std::bind(&DeviceStatusService::OnPrepareCoordination, this, pid, userData));
     if (ret != RET_OK) {
-        FI_HILOGE("OnEnableCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnPrepareCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
-    (void)(enabled);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StartCoordination(int32_t userData,
+int32_t DeviceStatusService::UnprepareCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnUnprepareCoordination, this, pid, userData));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnUnprepareCoordination failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(userData);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStartCoordination,
+        std::bind(&DeviceStatusService::OnActivateCoordination,
         this, pid, userData, remoteNetworkId, startDeviceId));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnActivateCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -640,15 +656,15 @@ int32_t DeviceStatusService::StartCoordination(int32_t userData,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::StopCoordination(int32_t userData)
+int32_t DeviceStatusService::DeactivateCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopCoordination, this, pid, userData));
+        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -814,13 +830,12 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnEnableCoordination(int32_t pid, int32_t userData, bool enabled)
+int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    CooSM->EnableCoordination(enabled);
+    CooSM->PrepareCoordination();
     std::string deviceId =  "";
-    CoordinationMessage msg =
-        enabled ? CoordinationMessage::OPEN_SUCCESS : CoordinationMessage::CLOSE_SUCCESS;
+    CoordinationMessage msg = CoordinationMessage::PREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
@@ -836,7 +851,28 @@ int32_t DeviceStatusService::OnEnableCoordination(int32_t pid, int32_t userData,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
+int32_t DeviceStatusService::OnUnprepareCoordination(int32_t pid, int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    CooSM->UnprepareCoordination();
+    std::string deviceId =  "";
+    CoordinationMessage msg = CoordinationMessage::UNPREPARE;
+    NetPacket pkt(MessageId::COORDINATION_MESSAGE);
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    if (!sess->SendMsg(pkt)) {
+        FI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -851,7 +887,7 @@ int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
     if (CooSM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
-        pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::INFO_SUCCESS);
+        pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
         if (pkt.ChkRWError()) {
             FI_HILOGE("Packet write data failed");
             return RET_ERR;
@@ -863,15 +899,15 @@ int32_t DeviceStatusService::OnStartCoordination(int32_t pid,
         return RET_OK;
     }
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartCoordination(remoteNetworkId, startDeviceId);
+    int32_t ret = CooSM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnActivateCoordination failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnStopCoordination(int32_t pid, int32_t userData)
+int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -883,9 +919,9 @@ int32_t DeviceStatusService::OnStopCoordination(int32_t pid, int32_t userData)
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StopCoordination();
+    int32_t ret = CooSM->DeactivateCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }

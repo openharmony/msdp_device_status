@@ -52,13 +52,20 @@ public:
     int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
 
     /**
-     * @brief 开启/关闭键鼠穿越管理接口。
-     * @param enabled 开启/关闭。
+     * @brief 开启键鼠穿越管理接口。
      * @param callback 开启/关闭键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t EnableCoordination(bool enabled, std::function<void(const std::string&, CoordinationMessage)> callback);
+    int32_t PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
+
+    /**
+     * @brief 关闭键鼠穿越管理接口。
+     * @param callback 开启/关闭键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
      * @brief 启动跨设备键鼠穿越。
@@ -68,16 +75,17 @@ public:
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
+    int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
      * @brief 停止跨设备键鼠穿越。
+     * @param isUnchained 跨设备连接是否断开。
      * @param callback 停止跨设备键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t StopCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
+    int32_t DeactivateCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
      * @brief 获取指定设备键鼠穿越状态。

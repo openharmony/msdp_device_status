@@ -17,7 +17,7 @@ import("//build/ohos.gni")
 config("interaction_config") {
   visibility = [
     ":drag",
-    ":inputdevicecooperate",
+    ":cooperate",
   ]
 
   include_dirs = [
@@ -32,6 +32,6 @@ config("interaction_config") {
 group("interaction_jsapi_group") {
   deps = [ "${device_status_frameworks_path}/js/napi/interaction/drag:drag" ]
   if (fusion_interaction_coordination) {
-    deps += [ "${device_status_frameworks_path}/js/napi/interaction/coordination:inputdevicecooperate" ]
+    deps += [ "${device_status_frameworks_path}/js/napi/interaction/coordination:cooperate" ]
   }
 }

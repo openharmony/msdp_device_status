@@ -14,7 +14,7 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-ohos_shared_library("inputdevicecooperate") {
+ohos_shared_library("cooperate") {
   sources = [
     "src/js_coordination_context.cpp",
     "src/js_coordination_manager.cpp",
@@ -40,7 +40,7 @@ ohos_shared_library("inputdevicecooperate") {
     "napi:ace_napi",
   ]
 
-  relative_install_dir = "module/multimodalinput"
+  relative_install_dir = "module"
   subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

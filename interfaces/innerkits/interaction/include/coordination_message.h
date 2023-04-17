@@ -19,18 +19,13 @@
 namespace OHOS {
 namespace Msdp {
 enum class CoordinationMessage {
-    OPEN_SUCCESS = 0,
-    OPEN_FAIL = 1,
-    INFO_START = 2,
-    INFO_SUCCESS = 3,
-    INFO_FAIL = 4,
-    CLOSE = 5,
-    CLOSE_SUCCESS = 6,
-    STOP = 7,
-    STOP_SUCCESS = 8,
-    STOP_FAIL = 9,
-    STATE_ON = 10,
-    STATE_OFF = 11,
+    PREPARE = 0,  //OPEN_SUCCESS
+    UNPREPARE = 1,   //OPEN_FAIL
+    ACTIVATE = 2,   // INFO_START
+    ACTIVATE_SUCCESS = 3, // INFO_SUCCESS
+    ACTIVATE_FAIL = 4,   //  INFO_FAIL
+    DEACTIVATE_SUCCESS = 5,  // STOP_SUCCESS
+    DEACTIVATE_FAIL  = 6,  // STOP_FAIL
     PARAMETER_ERROR = 401,
     COORDINATION_FAIL = 20900001,
 };
