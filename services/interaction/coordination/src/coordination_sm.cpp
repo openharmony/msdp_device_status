@@ -80,6 +80,9 @@ void CoordinationSM::OnSessionLost(SessionPtr session)
     CoordinationEventMgr->RemoveCoordinationEvent(event);
     RemoveMonitor();
     RemoveInterceptor();
+    if (coordinationState_ != CoordinationState::STATE_FREE) {
+        StopCoordination();
+    }
 }
 
 void CoordinationSM::Reset(const std::string &networkId)
