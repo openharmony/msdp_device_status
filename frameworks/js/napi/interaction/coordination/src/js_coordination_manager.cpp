@@ -73,7 +73,7 @@ napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remo
     return result;
 }
 
-napi_value JsCoordinationManager::Deactivate(napi_env env, napi_value handle)
+napi_value JsCoordinationManager::Deactivate(napi_env env, bool isUnchained, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();

@@ -33,13 +33,6 @@ napi_value JsUtil::GetPrepareInfo(sptr<CallbackInfo> cb)
     return GetResult(cb->env, cb->data.prepareResult, cb->data.errCode);
 }
 
-napi_value JsUtil::GetUnPrepareInfo(sptr<CallbackInfo> cb)
-{
-    CHKPP(cb);
-    CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.unprepareResult, cb->data.errCode);
-}
-
 napi_value JsUtil::GetActivateInfo(sptr<CallbackInfo> cb)
 {
     CHKPP(cb);

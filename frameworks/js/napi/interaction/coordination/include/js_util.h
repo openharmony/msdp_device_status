@@ -62,7 +62,6 @@ public:
     };
 
     static napi_value GetPrepareInfo(sptr<CallbackInfo> cb);
-    static napi_value GetUnPrepareInfo(sptr<CallbackInfo> cb);
     static napi_value GetActivateInfo(sptr<CallbackInfo> cb);
     static napi_value GetDeactivateInfo(sptr<CallbackInfo> cb);
     static napi_value GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb);

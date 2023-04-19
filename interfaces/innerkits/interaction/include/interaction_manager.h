@@ -52,7 +52,7 @@ public:
     int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
 
     /**
-     * @brief 开启键鼠穿越管理接口。
+     * @brief 准备键鼠穿越管理接口。
      * @param callback 开启/关闭键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
@@ -60,7 +60,7 @@ public:
     int32_t PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
-     * @brief 关闭键鼠穿越管理接口。
+     * @brief 取消准备键鼠穿越管理接口。
      * @param callback 开启/关闭键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9

@@ -81,7 +81,7 @@ void CoordinationSM::OnSessionLost(SessionPtr session)
     RemoveMonitor();
     RemoveInterceptor();
     if (coordinationState_ != CoordinationState::STATE_FREE) {
-        StopCoordination();
+        DeactivateCoordination();
     }
 }
 
@@ -301,8 +301,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
-    CoordinationMessage msg =
-            isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
+    CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(

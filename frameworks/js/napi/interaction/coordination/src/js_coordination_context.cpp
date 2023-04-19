@@ -64,6 +64,7 @@ napi_value JsCoordinationContext::Prepare(napi_env env, napi_callback_info info)
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (argc == 0) {
         return jsCoordinationMgr->Prepare(env);
     }
@@ -84,6 +85,7 @@ napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info inf
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (argc == 0) {
         return jsCoordinationMgr->Unprepare(env);
     }
@@ -106,11 +108,11 @@ napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "remoteNetworkId", "string");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "targetNetworkId", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_number)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "startDeviceId", "number");
+        THROWERR(env, COMMON_PARAMETER_ERROR, "inputDeviceId", "number");
         return nullptr;
     }
     char remoteNetworkId[MAX_STRING_LEN] = { 0 };
@@ -123,6 +125,7 @@ napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (argc == 2) {
         return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId);
     }
@@ -136,21 +139,33 @@ napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info
 napi_value JsCoordinationContext::Deactivate(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 1;
-    napi_value argv[1] = { nullptr };
+    size_t argc = 2;
+    napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    if (argc == 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "isUnchained", "boolean");
+        return nullptr;
+    }
+    bool isUnchained = false;
+    CHKRP(napi_get_value_bool(env, argv[0], &isUnchained), GET_VALUE_BOOL);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
-    if (argc == 0) {
-        return jsCoordinationMgr->Deactivate(env);
+    CHKPP(jsCoordinationMgr);
+    if (argc == 1) {
+        return jsCoordinationMgr->Deactivate(env, isUnchained);
     }
-    if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Deactivate(env, argv[0]);
+    return jsCoordinationMgr->Deactivate(env, isUnchained, argv[1]);
 }
 
 napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_callback_info info)
@@ -177,6 +192,7 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (argc == 1) {
         return jsCoordinationMgr->GetCrossingSwitchState(env, networkId_);
     }
@@ -212,6 +228,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
@@ -243,6 +260,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
     if (argc == 1) {
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;

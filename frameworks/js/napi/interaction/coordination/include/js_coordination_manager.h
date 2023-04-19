@@ -34,7 +34,7 @@ public:
     napi_value Unprepare(napi_env env, napi_value handle = nullptr);
     napi_value Activate(napi_env env, const std::string &remoteNetworkDescriptor, int32_t startDeviceId,
         napi_value handle = nullptr);
-    napi_value Deactivate(napi_env env, napi_value handle = nullptr);
+    napi_value Deactivate(napi_env env, bool isUnchained, napi_value handle = nullptr);
     napi_value GetCrossingSwitchState(napi_env env, const std::string &networkId, napi_value handle = nullptr);
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
