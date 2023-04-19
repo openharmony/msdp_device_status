@@ -103,8 +103,8 @@ private:
     int32_t DrawShadow();
     int32_t DrawMouseIcon();
     int32_t DrawStyle();
-    void InitAnimation();
-    int32_t InitVSync();
+    void RunAnimation(float endAlpha, float endScale);
+    int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
 
@@ -118,7 +118,6 @@ private:
     std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<OHOS::Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ { nullptr };
-    std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
