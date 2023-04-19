@@ -300,7 +300,7 @@ void DragDrawing::RunAnimation(float endAlpha, float endScale)
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
         FI_HILOGE("Send vsync event failed");
