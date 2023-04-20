@@ -90,7 +90,6 @@ private:
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
 };
-#define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
