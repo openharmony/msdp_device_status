@@ -63,7 +63,7 @@ napi_value JsCoordinationContext::Prepare(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
         return jsCoordinationMgr->Prepare(env);
@@ -84,7 +84,7 @@ napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info inf
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
         return jsCoordinationMgr->Unprepare(env);
@@ -124,7 +124,7 @@ napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 2) {
         return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId);
@@ -156,7 +156,7 @@ napi_value JsCoordinationContext::Deactivate(napi_env env, napi_callback_info in
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
         return jsCoordinationMgr->Deactivate(env, isUnchained);
@@ -191,7 +191,7 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
         return jsCoordinationMgr->GetCrossingSwitchState(env, networkId_);
@@ -227,7 +227,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
@@ -259,7 +259,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
-    auto jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
         jsCoordinationMgr->UnregisterListener(env, type_);

@@ -92,9 +92,9 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
 int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
     CoordinationEvent event;
     event.msg = callback;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (userData_ == INT32_MAX) {
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
