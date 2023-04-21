@@ -24,8 +24,8 @@
 #include <string_ex.h>
 
 #include "devicestatus_common.h"
-#include "devicestatus_client.h"
 #include "devicestatus_dumper.h"
+#include "stationary_manager.h"
 
 using namespace testing::ext;
 using namespace OHOS::Msdp::DeviceStatus;
@@ -35,7 +35,7 @@ using namespace std;
 namespace{
 const int32_t SLEEP_TIME = 2000;
 static Type g_type = Type::TYPE_INVALID;
-auto& g_client = StationaryManager::GetInstance();
+auto g_client = StationaryManager::GetInstance();
 }
 
 sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;

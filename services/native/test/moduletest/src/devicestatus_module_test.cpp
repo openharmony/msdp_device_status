@@ -53,7 +53,7 @@ HWTEST_F (DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
 {
     g_moduleTest = Type::TYPE_ABSOLUTE_STILL;
     Type type = g_moduleTest;
-    auto& stationaryManager = StationaryManager::GetInstance();
+    auto stationaryManager = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusModuleTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
@@ -72,7 +72,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 Enter");
     g_moduleTest = Type::TYPE_HORIZONTAL_POSITION;
     Type type = g_moduleTest;
-    auto& stationaryManager = StationaryManager::GetInstance();
+    auto stationaryManager = StationaryManager::GetInstance();
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -90,7 +90,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
     g_moduleTest = Type::TYPE_ABSOLUTE_STILL;
     Type type = g_moduleTest;
-    auto& stationaryManager = StationaryManager::GetInstance();
+    auto stationaryManager = StationaryManager::GetInstance();
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -108,7 +108,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 Enter");
     g_moduleTest = Type::TYPE_VERTICAL_POSITION;
     Type type = g_moduleTest;
-    auto& stationaryManager = StationaryManager::GetInstance();
+    auto stationaryManager = StationaryManager::GetInstance();
     Data data = stationaryManager->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
