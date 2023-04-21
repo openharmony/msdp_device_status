@@ -239,8 +239,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pid = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
-    auto extraData = CreateExtraData(false);
-    INPUT_MANAGER->AppendExtraData(extraData);
     DragData dragData = DataAdapter.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -269,6 +267,9 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
     pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
     auto fun = [] (std::shared_ptr<MMI::PointerEvent> pointerEvent) -> int32_t {
         MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+        if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+            INPUT_MANAGER->AppendExtraData(DragManager::CreateExtraData(false));
+        }
         return RET_OK;
     };
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(std::bind(fun, pointerEvent));
@@ -399,7 +400,7 @@ std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
     return style;
 }
 
-OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended) const
+OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended)
 {
     CALL_DEBUG_ENTER;
     DragData dragData = DataAdapter.GetDragData();

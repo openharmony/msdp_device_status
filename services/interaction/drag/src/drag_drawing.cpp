@@ -62,7 +62,6 @@ constexpr int64_t INTERVAL_TIME = 16666667;
 constexpr int32_t FRAMERATE = 30;
 constexpr int32_t SVG_HEIGHT = 40;
 constexpr int32_t SIXTEEN = 16;
-constexpr int32_t FAIL_ANIMATION_DURATION = 1000;
 constexpr int32_t SUCCESS_ANIMATION_DURATION = 300;
 constexpr int32_t VIEW_BOX_POS = 2;
 constexpr int32_t PIXEL_MAP_INDEX = 0;
@@ -80,13 +79,14 @@ constexpr float PIVOT_X = 0.5f;
 constexpr float PIVOT_Y = 0.5f;
 const std::string DEVICE_TYPE_DEFAULT = "default";
 const std::string DEVICE_TYPE_PHONE = "phone";
+const std::string THREAD_NAME = "AnimationEventRunner";
 const std::string COPY_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_One_Drag.svg";
 const std::string MOVE_DRAG_PATH = "/system/etc/device_status/drag_icon/Move_Drag.svg";
 const std::string FORBID_DRAG_PATH = "/system/etc/device_status/drag_icon/Forbid_Drag.svg";
 const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/drag_icon/Mouse_Drag.png";
 struct DrawingInfo {
-    std::atomic<bool> isRunning { false };
+    std::atomic_bool isRunning { false };
     int32_t sourceType { -1 };
     int32_t currentDragNum { -1 };
     DragCursorStyle currentStyle { DragCursorStyle::COPY };
@@ -160,7 +160,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
     dragStyleNode->SetVisible(false);
-    InitAnimation();
     CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         rsUiDirector_->SendMessages();
@@ -230,45 +229,13 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 void DragDrawing::OnDragSuccess()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_drawingInfo.rootNode);
-    if (drawDynamicEffectModifier_ != nullptr) {
-        g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
-    }
-    drawDynamicEffectModifier_ = std::make_shared<DrawDynamicEffectModifier>();
-    g_drawingInfo.rootNode->AddModifier(drawDynamicEffectModifier_);
-    drawDynamicEffectModifier_->SetAlpha(BEGIN_ALPHA);
-    drawDynamicEffectModifier_->SetScale(BEGIN_SCALE);
-
-    OHOS::Rosen::RSAnimationTimingProtocol protocol;
-    protocol.SetDuration(SUCCESS_ANIMATION_DURATION);
-    OHOS::Rosen::RSNode::Animate(protocol, OHOS::Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-        drawDynamicEffectModifier_->SetAlpha(END_ALPHA);
-        drawDynamicEffectModifier_->SetScale(END_SCALE_SUCCESS);
-    });
-    CHKPV(runner_);
-    runner_->Run();
+    RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
 }
 
 void DragDrawing::OnDragFail()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_drawingInfo.rootNode);
-    if (drawDynamicEffectModifier_ != nullptr) {
-        g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
-    }
-    drawDynamicEffectModifier_ = std::make_shared<DrawDynamicEffectModifier>();
-    g_drawingInfo.rootNode->AddModifier(drawDynamicEffectModifier_);
-    drawDynamicEffectModifier_->SetAlpha(BEGIN_ALPHA);
-    drawDynamicEffectModifier_->SetScale(BEGIN_SCALE);
-
-    OHOS::Rosen::RSAnimationTimingProtocol protocol;
-    protocol.SetDuration(FAIL_ANIMATION_DURATION);
-    OHOS::Rosen::RSNode::Animate(protocol, OHOS::Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-        drawDynamicEffectModifier_->SetAlpha(END_ALPHA);
-        drawDynamicEffectModifier_->SetScale(END_SCALE_FAIL);
-    });
-    CHKPV(runner_);
-    runner_->Run();
+    RunAnimation(END_ALPHA, END_SCALE_FAIL);
 }
 
 void DragDrawing::EraseMouseIcon()
@@ -295,16 +262,17 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.pixelMap = nullptr;
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
+        g_drawingInfo.nodes.shrink_to_fit();
     }
     if (g_drawingInfo.rootNode != nullptr) {
         g_drawingInfo.rootNode->ClearChildren();
         g_drawingInfo.rootNode = nullptr;
     }
+    g_drawingInfo.surfaceNode = nullptr;
     if (g_drawingInfo.dragWindow != nullptr) {
         g_drawingInfo.dragWindow->Destroy();
         g_drawingInfo.dragWindow = nullptr;
     }
-    g_drawingInfo.surfaceNode = nullptr;
 }
 
 void DragDrawing::UpdateDrawingState()
@@ -326,16 +294,17 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     }
 }
 
-void DragDrawing::InitAnimation()
+void DragDrawing::RunAnimation(float endAlpha, float endScale)
 {
     CALL_DEBUG_ENTER;
-    if (runner_ == nullptr) {
-        runner_ = AppExecFwk::EventRunner::Create(false);
-    }
     if (handler_ == nullptr) {
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(runner_);
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        CHKPV(runner);
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    handler_->PostTask(std::bind(&DragDrawing::InitVSync, this));
+    if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
+        FI_HILOGE("Send vsync event failed");
+    }
 }
 
 int32_t DragDrawing::DrawShadow()
@@ -349,6 +318,7 @@ int32_t DragDrawing::DrawShadow()
     CHKPR(pixelMapNode, RET_ERR);
     if (drawPixelMapModifier_ != nullptr) {
         pixelMapNode->RemoveModifier(drawPixelMapModifier_);
+        drawPixelMapModifier_ = nullptr;
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     pixelMapNode->AddModifier(drawPixelMapModifier_);
@@ -366,6 +336,7 @@ int32_t DragDrawing::DrawMouseIcon()
     CHKPR(mouseIconNode, RET_ERR);
     if (drawMouseIconModifier_ != nullptr) {
         mouseIconNode->RemoveModifier(drawMouseIconModifier_);
+        drawMouseIconModifier_ = nullptr;
     }
     drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
     mouseIconNode->AddModifier(drawMouseIconModifier_);
@@ -383,38 +354,55 @@ int32_t DragDrawing::DrawStyle()
     CHKPR(dragStyleNode, RET_ERR);
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
+        drawSVGModifier_ = nullptr;
     }
     drawSVGModifier_ = std::make_shared<DrawSVGModifier>();
     dragStyleNode->AddModifier(drawSVGModifier_);
     return RET_OK;
 }
 
-int32_t DragDrawing::InitVSync()
+int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 {
     CALL_DEBUG_ENTER;
     startNum_ = START_TIME;
+    CHKPR(g_drawingInfo.rootNode, RET_ERR);
+    if (drawDynamicEffectModifier_ != nullptr) {
+        g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
+        drawDynamicEffectModifier_ = nullptr;
+    }
+    drawDynamicEffectModifier_ = std::make_shared<DrawDynamicEffectModifier>();
+    g_drawingInfo.rootNode->AddModifier(drawDynamicEffectModifier_);
+    drawDynamicEffectModifier_->SetAlpha(BEGIN_ALPHA);
+    drawDynamicEffectModifier_->SetScale(BEGIN_SCALE);
+
+    OHOS::Rosen::RSAnimationTimingProtocol protocol;
+    protocol.SetDuration(SUCCESS_ANIMATION_DURATION);
+    OHOS::Rosen::RSNode::Animate(protocol, OHOS::Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+        drawDynamicEffectModifier_->SetAlpha(endAlpha);
+        drawDynamicEffectModifier_->SetScale(endScale);
+    });
+
     CHKPR(g_drawingInfo.surfaceNode, RET_ERR);
     g_drawingInfo.surfaceNode->SetPivot(PIVOT_X, PIVOT_Y);
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
-    auto& rsClient = OHOS::Rosen::RSInterfaces::GetInstance();
     if (receiver_ == nullptr) {
         CHKPR(handler_, RET_ERR);
+        auto& rsClient = OHOS::Rosen::RSInterfaces::GetInstance();
         receiver_ = rsClient.CreateVSyncReceiver("DragDrawing", handler_);
+        CHKPR(receiver_, RET_ERR);
     }
-    CHKPR(receiver_, RET_ERR);
     int32_t ret = receiver_->Init();
     if (ret != RET_OK) {
         FI_HILOGE("Receiver init failed");
         return RET_ERR;
     }
-
     OHOS::Rosen::VSyncReceiver::FrameCallback fcb = {
         .userData_ = this,
         .callback_ = std::bind(&DragDrawing::OnVsync, this),
     };
     int32_t changeFreq = static_cast<int32_t>((ONETHOUSAND / FRAMERATE) / SIXTEEN);
     ret = receiver_->SetVSyncRate(fcb, changeFreq);
-    if (ret) {
+    if (ret != RET_OK) {
         FI_HILOGE("Set vsync rate failed");
         return RET_ERR;
     }
@@ -428,10 +416,13 @@ void DragDrawing::OnVsync()
     bool hasRunningAnimation = rsUiDirector_->RunningCustomAnimation(startNum_);
     if (!hasRunningAnimation) {
         FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
-        CHKPV(runner_);
-        runner_->Stop();
-        DestroyDragWindow();
+        CHKPV(handler_);
+        handler_->RemoveAllEvents();
+        handler_->RemoveAllFileDescriptorListeners();
+        handler_ = nullptr;
         g_drawingInfo.isRunning = false;
+        receiver_ = nullptr;
+        DestroyDragWindow();
         return;
     }
     rsUiDirector_->SendMessages();
