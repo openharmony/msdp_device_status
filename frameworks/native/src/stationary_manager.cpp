@@ -15,7 +15,6 @@
 
 #include "stationary_manager.h"
 
-#include "fi_log.h"
 #include "util.h"
 
 #include "devicestatus_client.h"
@@ -25,9 +24,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StationaryManager" };
-} // namespace
 
 StationaryManager *StationaryManager::instance_ = new (std::nothrow) StationaryManager();
 
