@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ 1.0{
+    global:
+        extern "C++" {
+            "OHOS::Msdp::DeviceStatus::StationaryManager::GetInstance()";
+            "OHOS::Msdp::DeviceStatus::DeviceStatusClient::DeviceStatusClient()";
+            "OHOS::Msdp::DeviceStatus::DeviceStatusClient::RegisterDeathListener(std::__h::function<void ()>)";
+            "OHOS::Msdp::DeviceStatus::StationaryManager::SubscribeCallback(OHOS::Msdp::DeviceStatus::Type, OHOS::Msdp::DeviceStatus::ActivityEvent, OHOS::Msdp::DeviceStatus::ReportLatencyNs, OHOS::sptr<OHOS::Msdp::DeviceStatus::IRemoteDevStaCallback>)";
+            "OHOS::Msdp::DeviceStatus::StationaryManager::UnsubscribeCallback(OHOS::Msdp::DeviceStatus::Type, OHOS::Msdp::DeviceStatus::ActivityEvent, OHOS::sptr<OHOS::Msdp::DeviceStatus::IRemoteDevStaCallback>)";
+            "OHOS::Msdp::DeviceStatus::StationaryManager::GetDeviceStatusData(OHOS::Msdp::DeviceStatus::Type)";
+            "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackStub";
+            "OHOS::Msdp::DeviceStatus::DeviceStatusCallbackStub::OnRemoteRequest(unsigned int, OHOS::MessageParcel&, OHOS::MessageParcel&, OHOS::MessageOption&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::AddDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
+            "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackProxy";
+            "vtable for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackProxy";
+            "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusSrvProxy";
+            "vtable for OHOS::Msdp::DeviceStatus::DeviceStatusSrvProxy";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragTargetPid()";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetUdKey(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::RegisterCoordinationListener(std::__h::shared_ptr<OHOS::Msdp::ICoordinationListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::UnregisterCoordinationListener(std::__h::shared_ptr<OHOS::Msdp::ICoordinationListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::EnableCoordination(bool, std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StartCoordination(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StopCoordination(std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetCoordinationState(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::function<void (bool)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::function<void (OHOS::Msdp::DeviceStatus::DragNotifyMsg const&)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragResult, bool)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
+        };
+    local:
+        *;
+ };

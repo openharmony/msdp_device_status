@@ -16,8 +16,8 @@
 #include "devicestatus_agent.h"
 
 #include "devicestatus_common.h"
-#include "devicestatus_client.h"
 #include "devicestatus_define.h"
+#include "stationary_manager.h"
 
 #include "idevicestatus_callback.h"
 
@@ -72,14 +72,14 @@ void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEve
 {
     DEV_HILOGD(INNERKIT, "Enter");
     callback_ = new DeviceStatusAgentCallback(shared_from_this());
-    DeviceStatusClient::GetInstance().SubscribeCallback(type, event, latency, callback_);
+    StationaryManager::GetInstance()->SubscribeCallback(type, event, latency, callback_);
 }
 
 void DeviceStatusAgent::UnRegisterServiceEvent(const Type& type,
     const ActivityEvent& event)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    DeviceStatusClient::GetInstance().UnsubscribeCallback(type, event, callback_);
+    StationaryManager::GetInstance()->UnsubscribeCallback(type, event, callback_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
