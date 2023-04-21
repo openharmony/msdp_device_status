@@ -48,17 +48,19 @@
       "inner_kits": [
         {
             "name": "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
-            "header_files": [
-              "include/devicestatus_data_utils.h",
-              "include/idevicestatus_callback.h",
-              "include/stationary_manager.h",
-              "interaction/include/coordination_message.h",
-              "interaction/include/drag_data.h",
-              "interaction/include/i_coordination_listener.h",
-              "interaction/include/i_drag_listener.h",
-              "interaction/include/interaction_manager.h"
-            ],
-            "header_base": "//base/msdp/device_status/interfaces/innerkits"
+            "header": {
+              "header_files": [
+                "include/devicestatus_data_utils.h",
+                "include/idevicestatus_callback.h",
+                "include/stationary_manager.h",
+                "interaction/include/coordination_message.h",
+                "interaction/include/drag_data.h",
+                "interaction/include/i_coordination_listener.h",
+                "interaction/include/i_drag_listener.h",
+                "interaction/include/interaction_manager.h"
+              ],
+              "header_base": "//base/msdp/device_status/interfaces/innerkits"
+          }
         }
       ],
       "test": [
