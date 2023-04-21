@@ -21,8 +21,9 @@
 
 #include "nocopyable.h"
 
+#include "devicestatus_common.h"
 #include "devicestatus_data_utils.h"
-#include "idevicestatus_callback"
+#include "idevicestatus_callback.h"
 
 namespace OHOS {
 namespace Msdp {
