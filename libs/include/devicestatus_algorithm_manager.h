@@ -27,7 +27,7 @@
 #include "algo_horizontal.h"
 #include "algo_vertical.h"
 #include "devicestatus_data_define.h"
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 #include "devicestatus_msdp_interface.h"
 #include "sensor_data_callback.h"
 

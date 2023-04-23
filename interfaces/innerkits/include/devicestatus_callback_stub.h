@@ -22,8 +22,8 @@
 #include "message_option.h"
 #include "message_parcel.h"
 
-#include "devicestatus_data_utils.h"
-#include "idevicestatus_callback.h"
+#include "stationary_data.h"
+#include "stationary_callback.h"
 
 namespace OHOS {
 namespace Msdp {

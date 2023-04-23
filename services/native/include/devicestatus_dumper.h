@@ -27,8 +27,8 @@
 #include <singleton.h>
 
 #include "accesstoken_kit.h"
-#include "devicestatus_data_utils.h"
-#include "idevicestatus_callback.h"
+#include "stationary_data.h"
+#include "stationary_callback.h"
 #include "i_context.h"
 
 namespace OHOS {

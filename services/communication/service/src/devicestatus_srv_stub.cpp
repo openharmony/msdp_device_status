@@ -20,12 +20,12 @@
 
 #include "devicestatus_callback_proxy.h"
 #include "devicestatus_common.h"
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
 #include "fi_log.h"
-#include "idevicestatus_callback.h"
+#include "stationary_callback.h"
 #include "util.h"
 
 namespace OHOS {
