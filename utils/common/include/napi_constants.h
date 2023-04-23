@@ -26,6 +26,7 @@ constexpr int32_t ZERO_PARAM = 0;
 constexpr int32_t ONE_PARAM = 1;
 constexpr int32_t TWO_PARAM = 2;
 constexpr int32_t THREE_PARAM = 3;
+constexpr std::string_view COOPERATE = "cooperate";
 inline const std::string EMPTYSTR { "" };
 inline const std::string STATE_TYPE { "state" };
 inline const std::string DEV_INPUT_PATH { "/dev/input/" };

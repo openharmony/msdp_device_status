@@ -221,7 +221,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    if (std::strcmp(type, "cooperate") != 0) {
+    if ((COOPERATE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate");
         return nullptr;
     }
@@ -412,9 +412,9 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
     };
 
     napi_value cooperateMsg = nullptr;
-    CHKRV(napi_define_class(env, "CooperateMsg ", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRV(napi_define_class(env, "CooperateMsg", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(msg) / sizeof(*msg), msg, &cooperateMsg), DEFINE_CLASS);
-    CHKRV(napi_set_named_property(env, exports, "CooperateMsg ", cooperateMsg), SET_NAMED_PROPERTY);
+    CHKRV(napi_set_named_property(env, exports, "CooperateMsg", cooperateMsg), SET_NAMED_PROPERTY);
 }
 
 void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_value exports)

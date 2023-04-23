@@ -26,14 +26,13 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
-constexpr std::string_view COORDINATION = "cooperation";
 std::mutex mutex_;
 } // namespace
 
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListener_.insert({ COORDINATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, DeviceStatus::VAL_NOT_EXP);
 }
 
@@ -227,9 +226,9 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = coordinationListener_.find(COORDINATION);
+    auto changeEvent = coordinationListener_.find(COOPERATE);
     if (changeEvent == coordinationListener_.end()) {
-        FI_HILOGE("Find %{public}s failed", std::string(COORDINATION).c_str());
+        FI_HILOGE("Find %{public}s failed", std::string(COOPERATE).c_str());
         return;
     }
 
@@ -567,7 +566,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     JsUtil::DeletePtr<uv_work_t*>(work);
 
-    auto messageEvent = coordinationListener_.find(COORDINATION);
+    auto messageEvent = coordinationListener_.find(COOPERATE);
     if (messageEvent == coordinationListener_.end()) {
         FI_HILOGE("Find messageEvent failed");
         return;
