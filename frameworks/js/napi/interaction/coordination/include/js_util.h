@@ -42,7 +42,6 @@ public:
 
     struct CallbackData {
         bool prepareResult { false };
-        bool unprepareResult { false };
         bool activateResult { false };
         bool deactivateResult { false };
         bool coordinationOpened { false };
