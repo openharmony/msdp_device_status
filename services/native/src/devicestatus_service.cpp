@@ -834,7 +834,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
 {
     CALL_DEBUG_ENTER;
     CooSM->PrepareCoordination();
-    std::string deviceId =  "";
+    std::string deviceId;
     CoordinationMessage msg = CoordinationMessage::PREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
@@ -855,7 +855,7 @@ int32_t DeviceStatusService::OnUnprepareCoordination(int32_t pid, int32_t userDa
 {
     CALL_DEBUG_ENTER;
     CooSM->UnprepareCoordination();
-    std::string deviceId =  "";
+    std::string deviceId;
     CoordinationMessage msg = CoordinationMessage::UNPREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
     pkt << userData << deviceId << static_cast<int32_t>(msg);
