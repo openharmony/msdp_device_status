@@ -52,6 +52,14 @@ enum class CoordinationMsg {
     COORDINATION_NULL = 10,
 };
 
+enum class CooStateChangeType {
+    STATE_NONE = -1,
+    STATE_FREE_TO_IN = 0,
+    STATE_FREE_TO_OUT = 1,
+    STATE_IN_TO_FREE = 2,
+    STATE_OUT_TO_FREE = 3,
+};
+
 struct PointerFilter : public MMI::IInputEventFilter {
     bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
     {
@@ -150,6 +158,9 @@ public:
     void RemoveMonitor();
     void RemoveInterceptor();
     bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
+    void RegisterStateChange(CooStateChangeType type,
+        std::function<void(CoordinationState, CoordinationState)> callback);
+    std::string GetRemoteId() const;
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -158,6 +169,8 @@ private:
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDeviceDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
+    void StateChangedNotify(CoordinationState oldState, CoordinationState newState);
+    void ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState);
 
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
@@ -178,6 +191,7 @@ private:
     int32_t interceptorId_ { -1 };
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
+    std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()

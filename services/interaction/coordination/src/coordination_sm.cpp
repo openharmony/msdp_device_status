@@ -317,10 +317,12 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
     if (coordinationState_ == CoordinationState::STATE_FREE) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CoordinationState::STATE_IN);
+        StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_IN);
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CoordinationState::STATE_FREE);
+        StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
     }
     isStarting_ = false;
 }
@@ -371,12 +373,14 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
         NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             UpdateState(CoordinationState::STATE_OUT);
+            StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = CooDevMgr->GetOriginNetworkId(startDeviceId);
             if (!originNetworkId.empty() && remoteNetworkId != originNetworkId) {
                 CooSoftbusAdapter->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
             UpdateState(CoordinationState::STATE_FREE);
+            StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is out");
         }
@@ -399,6 +403,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
             UpdateState(CoordinationState::STATE_FREE);
+            StateChangedNotify(coordinationState_, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is free");
         }
@@ -839,6 +844,48 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
 {
+}
+
+void CoordinationSM::RegisterStateChange(CooStateChangeType type,
+    std::function<void(CoordinationState, CoordinationState)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    stateChangedCallbacks_[type] = callback;
+}
+
+void CoordinationSM::StateChangedNotify(CoordinationState oldState, CoordinationState newState)
+{
+    CALL_DEBUG_ENTER;
+    if (oldState == CoordinationState::STATE_FREE && newState == CoordinationState::STATE_IN) {
+        ChangeNotify(CooStateChangeType::STATE_FREE_TO_IN, oldState, newState);
+        return;
+    }
+    if (oldState == CoordinationState::STATE_FREE && newState == CoordinationState::STATE_OUT) {
+        ChangeNotify(CooStateChangeType::STATE_FREE_TO_OUT, oldState, newState);
+        return;
+    }
+    if (oldState == CoordinationState::STATE_IN && newState == CoordinationState::STATE_FREE) {
+        ChangeNotify(CooStateChangeType::STATE_IN_TO_FREE, oldState, newState);
+        return;
+    }
+    if (oldState == CoordinationState::STATE_OUT && newState == CoordinationState::STATE_FREE) {
+        ChangeNotify(CooStateChangeType::STATE_OUT_TO_FREE, oldState, newState);
+    }
+}
+
+void CoordinationSM::ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState)
+{
+    auto item = stateChangedCallbacks_[type];
+    if (item != nullptr) {
+        item(oldState, newState);
+    }
+}
+
+std::string CoordinationSM::GetRemoteId() const
+{
+    std::lock_guard<std::mutex> guard(mutex_);
+    return remoteNetworkId_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
