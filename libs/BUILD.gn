@@ -14,7 +14,7 @@
 import("//base/msdp/device_status/device_status.gni")
 
 config("devicestatus_private_config") {
-  include_dirs = [ "//utils/system/safwk/native/include" ]
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
 }
 
 config("devicestatus_srv_public_config") {
@@ -23,11 +23,6 @@ config("devicestatus_srv_public_config") {
     "interface",
     "include/algorithm",
     "include/datahub",
-    "${device_status_interfaces_path}/innerkits/include",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "//base/sensors/sensor/interfaces/native/include/",
-    "//third_party/cJSON",
   ]
 }
 
@@ -49,7 +44,10 @@ ohos_shared_library("devicestatus_mock") {
     "//third_party/cJSON:cjson_static",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "sensor:sensor_interface_native",
+  ]
 
   part_name = "${device_status_part_name}"
 }

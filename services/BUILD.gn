@@ -24,13 +24,9 @@ config("devicestatus_services_private_config") {
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
-    "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "//base/msdp/device_status/libs/interface",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native/",
-    "${relational_store_innerapi_path}/appdatafwk/include/",
     "interaction/drag/include",
     "interaction/across/include",
-    "//utils/system/safwk/native/include",
     "communication/base",
     "communication/service/include",
   ]
@@ -46,29 +42,47 @@ config("devicestatus_services_public_config") {
     "timer_manager/include",
     "device_manager/include",
     "interaction/drag/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 }
 
+sources_set = [
+  "communication/service/src/devicestatus_srv_stub.cpp",
+  "delegate_task/src/delegate_tasks.cpp",
+  "device_manager/src/device.cpp",
+  "device_manager/src/device_manager.cpp",
+  "device_manager/src/enumerator.cpp",
+  "device_manager/src/monitor.cpp",
+  "native/src/devicestatus_dumper.cpp",
+  "native/src/devicestatus_hisysevent.cpp",
+  "native/src/devicestatus_manager.cpp",
+  "native/src/devicestatus_msdp_client_impl.cpp",
+  "native/src/devicestatus_service.cpp",
+  "native/src/stream_server.cpp",
+  "timer_manager/src/timer_manager.cpp",
+]
+
+external_deps_set = [
+  "drivers_peripheral_sensor:hdi_sensor",
+  "distributed_input:libdinput_sdk",
+  "device_manager:devicemanagersdk",
+  "access_token:libaccesstoken_sdk",
+  "c_utils:utils",
+  "graphic_standard:libcomposer",
+  "graphic_standard:window_animation",
+  "hisysevent_native:libhisysevent",
+  "hitrace_native:hitrace_meter",
+  "hiviewdfx_hilog_native:libhilog",
+  "input:libmmi-client",
+  "ipc:ipc_single",
+  "multimedia_image_framework:image_native",
+  "safwk:system_ability_fwk",
+]
+
 ohos_shared_library("devicestatus_service") {
+  shlib_type = "sa"
   include_dirs = [ "//third_party/cJSON" ]
 
-  sources = [
-    "communication/service/src/devicestatus_srv_stub.cpp",
-    "delegate_task/src/delegate_tasks.cpp",
-    "device_manager/src/device.cpp",
-    "device_manager/src/device_manager.cpp",
-    "device_manager/src/enumerator.cpp",
-    "device_manager/src/monitor.cpp",
-    "native/src/devicestatus_dumper.cpp",
-    "native/src/devicestatus_hisysevent.cpp",
-    "native/src/devicestatus_manager.cpp",
-    "native/src/devicestatus_msdp_client_impl.cpp",
-    "native/src/devicestatus_service.cpp",
-    "native/src/stream_server.cpp",
-    "timer_manager/src/timer_manager.cpp",
-  ]
+  sources = sources_set
 
   configs = [ ":devicestatus_services_private_config" ]
 
@@ -80,30 +94,45 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_utils_path}:devicestatus_util",
     "interaction/across:interaction_across",
     "interaction/drag:interaction_drag",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
     "//third_party/openssl:libcrypto_shared",
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [
-      "interaction/coordination:coordination",
-      "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
-    ]
+    deps += [ "interaction/coordination:coordination" ]
   }
 
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "c_utils:utils",
-    "graphic_standard:libcomposer",
-    "graphic_standard:window_animation",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
-    "input:libmmi-client",
-    "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
-    "safwk:system_ability_fwk",
+  external_deps = external_deps_set
+
+  if (fusion_interaction_coordination) {
+    external_deps += [ "input:libmmi-client" ]
+  }
+
+  part_name = "${device_status_part_name}"
+}
+
+ohos_static_library("devicestatus_static_service") {
+  include_dirs = [ "//third_party/cJSON" ]
+
+  sources = sources_set
+
+  configs = [ ":devicestatus_services_private_config" ]
+
+  public_configs = [ ":devicestatus_services_public_config" ]
+
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+    "interaction/across:interaction_across",
+    "interaction/drag:interaction_drag",
+    "//third_party/openssl:libcrypto_shared",
   ]
+
+  if (fusion_interaction_coordination) {
+    deps += [ "interaction/coordination:coordination" ]
+  }
+
+  external_deps = external_deps_set
 
   if (fusion_interaction_coordination) {
     external_deps += [ "input:libmmi-client" ]

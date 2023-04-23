@@ -46,7 +46,7 @@ ohos_unittest("device_status_algorithm_test") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/services:devicestatus_service",
+    "${device_status_root_path}/services:devicestatus_static_service",
     "//base/msdp/device_status/libs:devicestatus_algo",
     "//commonlibrary/c_utils/base:utils",
     "//drivers/peripheral/sensor/hal:hdi_sensor",
@@ -81,7 +81,7 @@ ohos_unittest("device_status_datahub_test") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/services:devicestatus_service",
+    "${device_status_root_path}/services:devicestatus_static_service",
     "//base/msdp/device_status/libs:devicestatus_algo",
     "//base/msdp/device_status/libs:devicestatus_mock",
     "//commonlibrary/c_utils/base:utils",
@@ -117,7 +117,7 @@ ohos_unittest("device_status_mock_test") {
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
-    "${device_status_root_path}/services:devicestatus_service",
+    "${device_status_root_path}/services:devicestatus_static_service",
     "//base/msdp/device_status/libs:devicestatus_algo",
     "//base/msdp/device_status/libs:devicestatus_mock",
     "//commonlibrary/c_utils/base:utils",
