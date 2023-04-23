@@ -193,23 +193,23 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
 void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
 {
     napi_value startMsg = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::MSG_DRAG_STATE_START), &startMsg),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::START), &startMsg),
         CREATE_INT32);
     napi_value stopMsg = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::MSG_DRAG_STATE_STOP), &stopMsg),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::STOP), &stopMsg),
         CREATE_INT32);
     napi_value errorMsg = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::MSG_DRAG_STATE_ERROR), &errorMsg),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::ERROR), &errorMsg),
         CREATE_INT32);
     napi_value cancelMsg = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::MSG_DRAG_STATE_CANCEL), &cancelMsg),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::CANCEL), &cancelMsg),
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_START", startMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_STOP", stopMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_ERROR", errorMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_CANCEL", cancelMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("START", startMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("STOP", stopMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("ERROR", errorMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg),
     };
 
     napi_value eventMsg = nullptr;

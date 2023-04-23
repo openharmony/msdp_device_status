@@ -54,7 +54,7 @@ public:
     IDelegateTasks& GetDelegateTasks() override;
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
-    const IDragManager& GetDragManager() const override;
+    IDragManager& GetDragManager() override;
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;

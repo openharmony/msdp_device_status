@@ -38,7 +38,7 @@ public:
     DISALLOW_COPY_AND_MOVE(JsDragManager);
 
     void ResetEnv();
-    void OnDragMessage(DragState msg) override;
+    void OnDragMessage(DragState state) override;
     void RegisterListener(napi_env env, napi_value handle);
     void UnregisterListener(napi_env env, napi_value handle = nullptr);
 
@@ -46,7 +46,7 @@ private:
     struct CallbackInfo : public RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
-        DragState msg;
+        DragState state;
     };
 
 private:

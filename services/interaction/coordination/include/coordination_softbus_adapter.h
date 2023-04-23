@@ -39,6 +39,12 @@ public:
         STOPDRAG_DATA = 2,
         MAX_ID = 50,
     };
+
+    struct DataPacket {
+        MessageId messageId;
+        uint32_t dataLen;
+        uint8_t data[0];
+    };
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
@@ -55,7 +61,7 @@ public:
     void OnSessionClosed(int32_t sessionId);
     void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
-    void SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
+    int32_t SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
 
 private:
     CoordinationSoftbusAdapter() = default;

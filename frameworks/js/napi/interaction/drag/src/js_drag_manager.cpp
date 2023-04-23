@@ -102,7 +102,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
 }
 
-void JsDragManager::OnDragMessage(DragState msg)
+void JsDragManager::OnDragMessage(DragState state)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -117,7 +117,7 @@ void JsDragManager::OnDragMessage(DragState msg)
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t* work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->msg = msg;
+        item->state = state;
         work->data = static_cast<void*>(&item);
         int32_t result = uv_queue_work(loop, work, [](uv_work_t* work) {}, CallDragMsg);
         if (result != 0) {
@@ -152,7 +152,7 @@ void JsDragManager::CallDragMsg(uv_work_t *work, int32_t status)
         napi_open_handle_scope(item->env, &scope);
         CHKPC(scope);
         napi_value stateMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->msg), &stateMsg),
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->state), &stateMsg),
             CREATE_INT32, scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);

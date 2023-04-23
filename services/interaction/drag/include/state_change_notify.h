@@ -34,7 +34,7 @@ public:
     struct MessageInfo {
         MessageId msgId;
         SessionPtr session;
-        DragState dragMsg;
+        DragState state;
         bool operator==(std::shared_ptr<MessageInfo> info)
         {
             if (info == nullptr || info->session == nullptr) {
@@ -46,10 +46,10 @@ public:
 
     void AddNotifyMsg(std::shared_ptr<MessageInfo> info);
     void RemoveNotifyMsg(std::shared_ptr<MessageInfo> info);
-    int32_t StateChangedNotify(DragState msg);
+    int32_t StateChangedNotify(DragState state);
 
 private:
-    void OnStateChangedNotify(SessionPtr session, MessageId msId, DragState msg);
+    void OnStateChangedNotify(SessionPtr session, MessageId msId, DragState state);
 
 private:
     std::list<std::shared_ptr<MessageInfo>> msgInfos_;

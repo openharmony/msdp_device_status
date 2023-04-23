@@ -20,10 +20,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum class DragState {
-    MSG_DRAG_STATE_ERROR,
-    MSG_DRAG_STATE_START,
-    MSG_DRAG_STATE_STOP,
-    MSG_DRAG_STATE_CANCEL
+    ERROR,
+    START,
+    STOP,
+    CANCEL
 };
 } // namespace DeviceStatus
 } // namespace Msdp
