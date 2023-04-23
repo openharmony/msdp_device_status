@@ -102,7 +102,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
 }
 
-void JsDragManager::OnDragMessage(DragMessage msg)
+void JsDragManager::OnDragMessage(DragState msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);

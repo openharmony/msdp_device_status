@@ -470,7 +470,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
         class DragListenerTest : public IDragListener {
         public:
             DragListenerTest() : IDragListener() {}
-            void OnDragMessage(DragMessage msg) override
+            void OnDragMessage(DragState msg) override
             {
                 FI_HILOGD("DragListenerTest msg:%{public}d", msg);
             };

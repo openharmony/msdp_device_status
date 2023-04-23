@@ -113,7 +113,7 @@ int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPa
     }
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &listener : dragListener_) {
-        listener->OnDragMessage(static_cast<DragMessage>(dragMsg));
+        listener->OnDragMessage(static_cast<DragState>(dragMsg));
     }
     return RET_OK;
 }

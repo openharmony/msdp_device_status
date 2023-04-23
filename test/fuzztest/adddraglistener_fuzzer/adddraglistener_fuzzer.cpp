@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "AddDr
 class DragListenerTest : public IDragListener {
 public:
     DragListenerTest() : IDragListener() {}
-    void OnDragMessage(DragMessage msg) override
+    void OnDragState(DragState msg) override
     {
         FI_HILOGD("DragListenerTest");
     };

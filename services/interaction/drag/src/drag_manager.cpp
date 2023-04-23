@@ -81,7 +81,7 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    if (dragState_ == DragMessage::MSG_DRAG_STATE_START) {
+    if (dragState_ == DragState::MSG_DRAG_STATE_START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
     }
@@ -96,15 +96,15 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
-    dragState_ = DragMessage::MSG_DRAG_STATE_START;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
+    dragState_ = DragState::MSG_DRAG_STATE_START;
+    stateNotify_.StateChangedNotify(DragState::MSG_DRAG_STATE_START);
     return RET_OK;
 }
 
 int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    if (dragState_ == DragMessage::MSG_DRAG_STATE_STOP) {
+    if (dragState_ == DragState::MSG_DRAG_STATE_STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
@@ -116,8 +116,8 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("OnStopDrag failed");
         ret = RET_ERR;
     }
-    dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
+    dragState_ = DragState::MSG_DRAG_STATE_STOP;
+    stateNotify_.StateChangedNotify(DragState::MSG_DRAG_STATE_STOP);
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         ret = RET_ERR;
@@ -305,7 +305,7 @@ void DragManager::Dump(int32_t fd) const
             dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
             dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
             dragData.hasCanceledAnimation ? "true" : "false");
-    if (dragState_ != DragMessage::MSG_DRAG_STATE_STOP) {
+    if (dragState_ != DragState::MSG_DRAG_STATE_STOP) {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
         CHKPV(pixelMap);
         dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
@@ -313,23 +313,23 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "}\n");
 }
 
-std::string DragManager::GetDragState(DragMessage value) const
+std::string DragManager::GetDragState(DragState value) const
 {
     std::string state;
     switch (value) {
-        case DragMessage::MSG_DRAG_STATE_START: {
+        case DragState::MSG_DRAG_STATE_START: {
             state = "start";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_STOP: {
+        case DragState::MSG_DRAG_STATE_STOP: {
             state = "stop";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_CANCEL: {
+        case DragState::MSG_DRAG_STATE_CANCEL: {
             state = "cancel";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_ERROR: {
+        case DragState::MSG_DRAG_STATE_ERROR: {
             state = "error";
             break;
         }

@@ -55,7 +55,7 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
     }
 }
 
-int32_t StateChangeNotify::StateChangedNotify(DragMessage msg)
+int32_t StateChangeNotify::StateChangedNotify(DragState msg)
 {
     CALL_DEBUG_ENTER;
     if (msgInfos_.empty()) {
@@ -70,7 +70,7 @@ int32_t StateChangeNotify::StateChangedNotify(DragMessage msg)
     return RET_OK;
 }
 
-void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId, DragMessage msg)
+void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId, DragState msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);

@@ -75,14 +75,14 @@ private:
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
-    std::string GetDragState(DragMessage value) const;
+    std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static OHOS::MMI::ExtraData CreateExtraData(bool appended);
 private:
     int32_t timerId_ { 0 };
     StateChangeNotify stateNotify_;
-    DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
+    DragState dragState_ { DragState::MSG_DRAG_STATE_STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t interceptorId_ { -1 };
     int32_t dragTargetPid_ { -1 };

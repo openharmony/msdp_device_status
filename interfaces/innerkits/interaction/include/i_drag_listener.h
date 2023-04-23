@@ -27,7 +27,7 @@ class IDragListener {
 public:
     IDragListener() = default;
     virtual ~IDragListener() = default;
-    virtual void OnDragMessage(DragMessage msg) = 0;
+    virtual void OnDragMessage(DragState msg) = 0;
 };
 using DragListenerPtr = std::shared_ptr<IDragListener>;
 } // namespace DeviceStatus
