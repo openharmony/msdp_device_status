@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include <gtest/gtest.h>
+#include "image_type.h"
 #include "input_device.h"
 #include "input_manager.h"
 #include "pointer_event.h"
@@ -44,12 +45,12 @@ constexpr int32_t TOUCH_POINTER_ID { 1 };
 constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DRAG_SRC_X { 0 };
 constexpr int32_t DRAG_SRC_Y { 0 };
-constexpr int32_t DRAG_DST_X { 200 };
-constexpr int32_t DRAG_DST_Y { 200 };
+constexpr int32_t DRAG_DST_X { 800 };
+constexpr int32_t DRAG_DST_Y { 800 };
 constexpr int32_t DRAG_NUM { 1 };
 constexpr bool HAS_CANCELED_ANIMATION { false };
 constexpr bool HAS_CUSTOM_ANIMATION { false };
-constexpr int32_t MOVE_STEP { 100 };
+constexpr int32_t MOVE_STEP { 5 };
 const std::string UD_KEY = "Unified data key";
 static int32_t g_deviceMouseId { -1 };
 static int32_t g_deviceTouchId { -1 };
@@ -151,7 +152,17 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     OHOS::Media::InitializationOptions opts;
     opts.size.width = width;
     opts.size.height = height;
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
+    opts.editable = false;
+    opts.pixelFormat = Media::PixelFormat::ARGB_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    int32_t colorLen = width * height;
+    uint32_t *color = new uint32_t[colorLen];
+    for (uint32_t i = 0; i < colorLen; i++) {
+        color[i] = 0xff43fd19;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(color, colorLen, opts);
+    delete[] color;
+    CHKPP(pixelMap);
     return pixelMap;
 }
 
@@ -250,6 +261,7 @@ void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, 
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+        InteractionManager::GetInstance()->SetDragWindowVisible(true);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
     }
 }
@@ -521,6 +533,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
         int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         ASSERT_EQ(ret, RET_OK);
         SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
