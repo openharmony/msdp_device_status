@@ -37,7 +37,6 @@ public:
     * @since 9
     */
     static StationaryManager *GetInstance();
-    virtual ~StationaryManager() = default;
 
     /**
      * @brief 订阅设备状态。
@@ -45,7 +44,7 @@ public:
      * @param event 订阅的事件（进入/退出/进入和退出）。
      * @param latency 上报周期。
      * @param callback 用于接收设备状态事件变化的回调。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return 返回0表示接口调用成功，返回其他表示接口调用失败。
      * @since 9
      */
     int32_t SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
@@ -56,7 +55,7 @@ public:
      * @param type 设备状态类型。
      * @param event 订阅的事件（进入/退出/进入和退出）。
      * @param callback 用于接收设备状态事件变化的回调。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return 返回0表示接口调用成功，返回其他表示接口调用失败。
      * @since 9
      */
     int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
