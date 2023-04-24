@@ -23,12 +23,6 @@ ohos_fuzztest("GetDragTargetPidFuzzTest") {
     "../../../interfaces/innerkits/interaction/include",
     "../../../utils/common/include",
   ]
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
-  ]
   sources = [ "getdragtargetpid_fuzzer.cpp" ]
   deps = [ "../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
@@ -41,8 +35,5 @@ ohos_fuzztest("GetDragTargetPidFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    # deps file
-    ":GetDragTargetPidFuzzTest",
-  ]
+  deps += [ ":GetDragTargetPidFuzzTest" ]
 }
