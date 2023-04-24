@@ -24,8 +24,8 @@ namespace DeviceStatus {
 class CoordinationStateIn final : public ICoordinationState {
 public:
     explicit CoordinationStateIn(const std::string &startDeviceDhid);
-    int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    int32_t StopCoordination(const std::string &remoteNetworkId) override;
+    int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t DeactivateCoordination(const std::string &remoteNetworkId) override;
 
 private:
     void ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);

@@ -34,11 +34,11 @@ class ICoordinationState {
 public:
     ICoordinationState();
     virtual ~ICoordinationState() = default;
-    virtual int32_t StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
+    virtual int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    virtual int32_t StopCoordination(const std::string &networkId)
+    virtual int32_t DeactivateCoordination(const std::string &networkId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }

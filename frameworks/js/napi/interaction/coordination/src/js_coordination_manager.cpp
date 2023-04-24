@@ -27,14 +27,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationManager" };
 } // namespace
 
-napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value handle)
+napi_value JsCoordinationManager::Prepare(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->EnableCoordination(enable, callback);
+    auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InteractionMgr->PrepareCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -42,15 +42,30 @@ napi_value JsCoordinationManager::Enable(napi_env env, bool enable, napi_value h
     return result;
 }
 
-napi_value JsCoordinationManager::Start(napi_env env, const std::string &remoteNetworkDescriptor,
+napi_value JsCoordinationManager::Unprepare(napi_env env, napi_value handle)
+{
+    CALL_INFO_TRACE;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value result = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InteractionMgr->UnprepareCoordination(callback);
+    if (errCode != RET_OK) {
+        RELEASE_CALLBACKINFO(cb->env, cb->ref);
+    }
+    HandleExecuteResult(env, errCode);
+    return result;
+}
+
+napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remoteNetworkId,
     int32_t startDeviceId, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->StartCoordination(remoteNetworkDescriptor, startDeviceId, callback);
+    auto callback = std::bind(EmitJsActivate, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InteractionMgr->ActivateCoordination(remoteNetworkId, startDeviceId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -58,14 +73,14 @@ napi_value JsCoordinationManager::Start(napi_env env, const std::string &remoteN
     return result;
 }
 
-napi_value JsCoordinationManager::Stop(napi_env env, napi_value handle)
+napi_value JsCoordinationManager::Deactivate(napi_env env, bool isUnchained, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->StopCoordination(callback);
+    auto callback = std::bind(EmitJsDeactivate, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InteractionMgr->DeactivateCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -73,14 +88,14 @@ napi_value JsCoordinationManager::Stop(napi_env env, napi_value handle)
     return result;
 }
 
-napi_value JsCoordinationManager::GetState(napi_env env, const std::string &deviceDescriptor, napi_value handle)
+napi_value JsCoordinationManager::GetCrossingSwitchState(napi_env env, const std::string &networkId, napi_value handle)
 {
     CALL_INFO_TRACE;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
-    auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
-    int32_t errCode = InteractionMgr->GetCoordinationState(deviceDescriptor, callback);
+    auto callback = std::bind(EmitJsGetCrossingSwitchState, cb, std::placeholders::_1);
+    int32_t errCode = InteractionMgr->GetCoordinationState(networkId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }

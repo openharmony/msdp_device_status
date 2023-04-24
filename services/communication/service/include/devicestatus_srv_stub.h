@@ -41,9 +41,10 @@ private:
 
     int32_t RegisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnregisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
-    int32_t EnableCoordinationStub(MessageParcel& data, MessageParcel& reply);
-    int32_t StartCoordinationStub(MessageParcel& data, MessageParcel& reply);
-    int32_t StopCoordinationStub(MessageParcel& data, MessageParcel& reply);
+    int32_t PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply);
+    int32_t UnPrepareCoordinationStub(MessageParcel& data, MessageParcel& reply);
+    int32_t ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply);
+    int32_t DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply);
 
     int32_t StartDragStub(MessageParcel& data, MessageParcel& reply);

@@ -368,20 +368,19 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
 }
 
 /**
- * @tc.name: InteractionManagerTest_EnableCoordination
- * @tc.desc: Enable coordination
+ * @tc.name: InteractionManagerTest_PrepareCoordination
+ * @tc.desc: Prepare coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool enabled = false;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Enable coordination success");
         (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->EnableCoordination(enabled, fun);
+    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -390,12 +389,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableCoordination, Test
 }
 
 /**
- * @tc.name: InteractionManagerTest_StartCoordination
- * @tc.desc: Start coordination
+ * @tc.name: InteractionManagerTest_ActivateCoordination
+ * @tc.desc: Activate coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string remoteNetworkId("");
@@ -404,7 +403,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestS
         FI_HILOGD("Start coordination success");
         (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -413,19 +412,19 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestS
 }
 
 /**
- * @tc.name: InteractionManagerTest_StopCoordination
- * @tc.desc: Stop coordination
+ * @tc.name: InteractionManagerTest_DeactivateCoordination
+ * @tc.desc: Deactivate coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->StopCoordination(fun);
+    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, ERROR_UNSUPPORT);
 #else

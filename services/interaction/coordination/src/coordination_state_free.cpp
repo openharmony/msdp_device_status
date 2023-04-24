@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
 } // namespace
 
-int32_t CoordinationStateFree::StartCoordination(
+int32_t CoordinationStateFree::ActivateCoordination(
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
