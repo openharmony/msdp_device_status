@@ -21,7 +21,7 @@
 #include <map>
 #include <errors.h>
 
-#include "stationary_data.h"
+#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {

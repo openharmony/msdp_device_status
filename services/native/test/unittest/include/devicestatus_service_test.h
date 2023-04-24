@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "devicestatus_callback_stub.h"
-#include "stationary_data.h"
+#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {

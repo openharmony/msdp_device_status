@@ -21,7 +21,7 @@
 #include "cJSON.h"
 #include "sensor_agent.h"
 
-#include "stationary_data.h"
+#include "devicestatus_data_utils.h"
 
 namespace OHOS {
 namespace Msdp {

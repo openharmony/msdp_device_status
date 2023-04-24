@@ -19,13 +19,13 @@
 #include <set>
 #include <map>
 
-#include "accesstoken_kit.h"
+#include "sensor_if.h"
+#include "devicestatus_data_utils.h"
+#include "idevicestatus_algorithm.h"
+#include "idevicestatus_callback.h"
 #include "devicestatus_common.h"
 #include "devicestatus_msdp_client_impl.h"
-#include "idevicestatus_algorithm.h"
-#include "sensor_if.h"
-#include "stationary_callback.h"
-#include "stationary_data.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace Msdp {
