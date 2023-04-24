@@ -471,7 +471,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
             DragListenerTest() : IDragListener() {}
             void OnDragMessage(DragState state) override
             {
-                FI_HILOGD("DragListenerTest msg:%{public}d", msg);
+                FI_HILOGD("DragListenerTest state:%{public}d", state);
             };
         };
         std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
