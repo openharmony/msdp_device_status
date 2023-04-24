@@ -23,7 +23,6 @@ config("devicestatus_util_public_config") {
 }
 
 ohos_shared_library("devicestatus_util") {
-  version_script = "libdevicestatus_util_map"
   sources = [
     "src/util.cpp",
     "src/util_napi.cpp",

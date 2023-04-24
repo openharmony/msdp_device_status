@@ -23,7 +23,6 @@
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"
 #include "devicestatus_napi_error.h"
-#include "stationary_manager.h"
 
 using namespace OHOS;
 using namespace OHOS::Msdp;
@@ -394,7 +393,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         DEV_HILOGE(JS_NAPI, "callback is nullptr");
         return nullptr;
     }
-    auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(Type(type),
+    auto subscribeRet = DeviceStatusClient::GetInstance().SubscribeCallback(Type(type),
         ActivityEvent(event), ReportLatencyNs(latency), callback);
     if (subscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "on: Failed to SubscribeCallback");
@@ -452,7 +451,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        auto unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(Type(type),
+        auto unsubscribeRet = DeviceStatusClient::GetInstance().UnsubscribeCallback(Type(type),
             ActivityEvent(event), callbackIter->second);
         if (unsubscribeRet != RET_OK) {
             ThrowErr(env, SERVICE_EXCEPTION, "off: Failed to UnsubscribeCallback");
@@ -493,7 +492,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         DEV_HILOGE(JS_NAPI, "type:%{public}d already exists", type);
         return nullptr;
     }
-    Data devicestatusData = StationaryManager::GetInstance()->GetDeviceStatusData(Type(type));
+    Data devicestatusData = DeviceStatusClient::GetInstance().GetDeviceStatusData(Type(type));
     if (devicestatusData.type == Type::TYPE_INVALID) {
         ThrowErr(env, SERVICE_EXCEPTION, "once: Failed to GetDeviceStatusData");
     }
