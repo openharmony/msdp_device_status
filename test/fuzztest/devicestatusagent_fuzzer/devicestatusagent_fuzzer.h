@@ -26,7 +26,7 @@
 #include "securec.h"
 
 #include "devicestatus_agent.h"
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 
 #define FUZZ_PROJECT_NAME "fault_fuzzer"
 

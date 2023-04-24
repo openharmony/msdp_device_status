@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_CALLBACK_H
-#define IDEVICESTATUS_CALLBACK_H
+#ifndef STATIONARY_CALLBACK_H
+#define STATIONARY_CALLBACK_H
 
 #include <iremote_broker.h>
 #include <iremote_object.h>
 
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,4 +37,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_CALLBACK_H
+#endif // STATIONARY_CALLBACK_H
