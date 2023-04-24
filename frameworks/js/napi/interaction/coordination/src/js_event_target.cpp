@@ -90,7 +90,8 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     }
 }
 
-void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId,
+    CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
