@@ -29,9 +29,9 @@
 #include "cJSON.h"
 
 #include "devicestatus_data_define.h"
-#include "devicestatus_data_utils.h"
 #include "devicestatus_errors.h"
 #include "devicestatus_hilog_wrapper.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {

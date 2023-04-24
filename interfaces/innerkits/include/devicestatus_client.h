@@ -22,11 +22,11 @@
 #include <singleton.h>
 
 #include "devicestatus_common.h"
-#include "devicestatus_data_utils.h"
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "idevicestatus.h"
-#include "idevicestatus_callback.h"
+#include "stationary_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
