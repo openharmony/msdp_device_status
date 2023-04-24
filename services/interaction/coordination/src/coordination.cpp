@@ -28,12 +28,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Coordination" };
 } // namespace
 
-void Coordination::EnableCoordination(bool enabled)
+void Coordination::PrepareCoordination()
 {
-    CooSM->EnableCoordination(enabled);
+    CooSM->PrepareCoordination();
 }
 
-int32_t Coordination::StartCoordination(SessionPtr sess, int32_t userData,
+void Coordination::UnprepareCoordination()
+{
+    CooSM->UnprepareCoordination();
+}
+
+int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     const std::string& remoteNetworkId, int32_t startDeviceId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
@@ -43,16 +48,16 @@ int32_t Coordination::StartCoordination(SessionPtr sess, int32_t userData,
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StartCoordination(remoteNetworkId, startDeviceId);
+    int32_t ret = CooSM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("StartCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("ActivateCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
 }
 
-int32_t Coordination::StopCoordination(SessionPtr sess, int32_t userData)
+int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -61,9 +66,9 @@ int32_t Coordination::StopCoordination(SessionPtr sess, int32_t userData)
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->StopCoordination();
+    int32_t ret = CooSM->DeactivateCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("StopCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("DeactivateCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }

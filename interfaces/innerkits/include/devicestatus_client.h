@@ -49,9 +49,10 @@ public:
 
     int32_t RegisterCoordinationListener();
     int32_t UnregisterCoordinationListener();
-    int32_t EnableCoordination(int32_t userData, bool enabled);
-    int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t StopCoordination(int32_t userData);
+    int32_t PrepareCoordination(int32_t userData);
+    int32_t UnprepareCoordination(int32_t userData);
+    int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
+    int32_t DeactivateCoordination(int32_t userData);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
     int32_t StartDrag(const DragData &dragData);

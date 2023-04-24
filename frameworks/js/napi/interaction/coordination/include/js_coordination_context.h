@@ -31,10 +31,11 @@ public:
     DISALLOW_COPY_AND_MOVE(JsCoordinationContext);
 
     static napi_value Export(napi_env env, napi_value exports);
-    static napi_value Enable(napi_env env, napi_callback_info info);
-    static napi_value Start(napi_env env, napi_callback_info info);
-    static napi_value Stop(napi_env env, napi_callback_info info);
-    static napi_value GetState(napi_env env, napi_callback_info info);
+    static napi_value Prepare(napi_env env, napi_callback_info info);
+    static napi_value Unprepare(napi_env env, napi_callback_info info);
+    static napi_value Activate(napi_env env, napi_callback_info info);
+    static napi_value Deactivate(napi_env env, napi_callback_info info);
+    static napi_value GetCrossingSwitchState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
 

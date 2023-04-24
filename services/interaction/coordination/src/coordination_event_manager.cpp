@@ -108,7 +108,7 @@ void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string
     coordinationCallbacks_[EventType::STOP] =  nullptr;
 }
 
-void CoordinationEventManager::OnGetState(bool state)
+void CoordinationEventManager::OnGetCrossingSwitchState(bool state)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);

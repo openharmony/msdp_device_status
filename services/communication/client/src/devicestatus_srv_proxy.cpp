@@ -167,7 +167,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::EnableCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -176,19 +176,38 @@ int32_t DeviceStatusSrvProxy::EnableCoordination(int32_t userData, bool enabled)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    WRITEBOOL(data, enabled, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ENABLE_COORDINATION, data, reply, option);
+    int32_t ret = remote->SendRequest(PREPARE_COORDINATION, data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::string &remoteNetworkId,
+int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UNPREPARE_COORDINATION, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
     int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -211,7 +230,7 @@ int32_t DeviceStatusSrvProxy::StartCoordination(int32_t userData, const std::str
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
