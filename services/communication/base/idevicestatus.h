@@ -19,9 +19,9 @@
 #include <iremote_broker.h>
 #include "iremote_object.h"
 
-#include "stationary_data.h"
 #include "drag_data.h"
 #include "stationary_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {

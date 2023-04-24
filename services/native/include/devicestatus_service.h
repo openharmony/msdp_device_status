@@ -25,7 +25,6 @@
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
-#include "stationary_data.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
@@ -33,6 +32,7 @@
 #include "drag_manager.h"
 #include "i_context.h"
 #include "stationary_callback.h"
+#include "stationary_data.h"
 #include "stream_server.h"
 #include "timer_manager.h"
 

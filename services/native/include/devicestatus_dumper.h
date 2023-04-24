@@ -27,9 +27,9 @@
 #include <singleton.h>
 
 #include "accesstoken_kit.h"
-#include "stationary_data.h"
-#include "stationary_callback.h"
 #include "i_context.h"
+#include "stationary_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {

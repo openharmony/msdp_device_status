@@ -17,9 +17,8 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#include "stationary_manager.h"
-
 #include "stationary_callback.h"
+#include "stationary_manager.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -22,9 +22,9 @@
 
 #include "bytrace_adapter.h"
 #include "devicestatus_common.h"
-#include "stationary_data.h"
 #include "devicestatus_define.h"
 #include "stationary_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
