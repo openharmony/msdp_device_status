@@ -376,12 +376,16 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Enable coordination success");
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+        FI_HILOGD("Prepare coordination success");
+        promiseFlag.set_value(true);
     };
     int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.get());
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -423,28 +427,53 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
     };
     int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    ASSERT_NE(ret, ERROR_UNSUPPORT);
+    ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetCoordinationState
+ * @tc.name: InteractionManagerTest_GetCoordinationState_Abnormal
  * @tc.desc: Get coordination state
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abnormal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string deviceId("deviceId");
+    const std::string deviceId("");
     auto fun = [](bool state) {
-        FI_HILOGD("Get coordination state success");
+        FI_HILOGD("Get coordination state failed, state:%{public}d", state);
+    };
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_NE(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetCoordinationState_Normal
+ * @tc.desc: Get coordination state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Normal, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    const std::string deviceId("deviceId");
+    auto fun = [&promiseFlag](bool state) {
+        FI_HILOGD("Get coordination state success, state:%{public}d", state);
+        promiseFlag.set_value(true);
     };
     int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.get());
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
