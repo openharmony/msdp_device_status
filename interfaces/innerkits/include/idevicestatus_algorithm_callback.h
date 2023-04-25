@@ -18,7 +18,7 @@
 
 #include <iremote_broker.h>
 
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {

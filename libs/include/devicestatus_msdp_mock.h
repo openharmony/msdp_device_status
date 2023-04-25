@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "devicestatus_data_parse.h"
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 #include "devicestatus_msdp_interface.h"
 
 namespace OHOS {

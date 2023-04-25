@@ -37,12 +37,16 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
             return RET_ERR;
         }
     }
-    devCoordinationListener_.push_back(listener);
     if (!isListeningProcess_) {
         FI_HILOGI("Start monitoring");
+        int32_t ret = DeviceStatusClient::GetInstance().RegisterCoordinationListener();
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to register, ret:%{public}d", ret);
+            return ret;
+        }
         isListeningProcess_ = true;
-        return DeviceStatusClient::GetInstance().RegisterCoordinationListener();
     }
+    devCoordinationListener_.push_back(listener);
     return RET_OK;
 }
 
