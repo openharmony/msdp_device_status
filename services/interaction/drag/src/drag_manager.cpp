@@ -85,6 +85,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
     }
+    CHKPR(sess, RET_ERR);
     dragOutSession_ = sess;
     dragTargetPid_ = -1;
     if (InitDataAdapter(dragData) != RET_OK) {
@@ -97,7 +98,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_START;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
-    StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
     return RET_OK;
 }
 
@@ -118,7 +118,6 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
     stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         ret = RET_ERR;
@@ -533,27 +532,6 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
 int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     return DataAdapter.GetShadowOffset(offsetX, offsetY, width, height);
-}
-
-void DragManager::RegisterStateChange(std::function<void(DragMessage)> callback)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(callback);
-    stateChangedCallback_ = callback;
-}
-
-void DragManager::StateChangedNotify(DragMessage state)
-{
-    CALL_DEBUG_ENTER;
-    if (stateChangedCallback_ != nullptr) {
-        stateChangedCallback_(state);
-    }
-}
-
-DragMessage DragManager::GetDragState() const
-{
-    CALL_DEBUG_ENTER;
-    return dragState_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

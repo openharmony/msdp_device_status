@@ -517,31 +517,10 @@ void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::func
     registerRecvMap_[messageId] = callback;
 }
 
-int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, MessageId messageId,
+void CoordinationSoftbusAdapter::SendData(const std::string& deviceId, MessageId messageId,
     void* data, uint32_t dataLen)
 {
     CALL_DEBUG_ENTER;
-    
-    DataPacket* dataPacket = (DataPacket*)malloc(sizeof(DataPacket) + dataLen);
-    if (dataPacket == nullptr) {
-        FI_HILOGE("Malloc data packetfailed");
-        return RET_ERR;
-    }
-    dataPacket->messageId = messageId;
-    dataPacket->dataLen = dataLen;
-    errno_t ret = memcpy_s(dataPacket->data, dataPacket->dataLen, data, dataPacket->dataLen);
-    if (ret != EOK) {
-        FI_HILOGE("Memcpy data packet failed");
-        free(dataPacket);
-        return RET_ERR;
-    }
-    int32_t result = SendBytes(sessionDevMap_[deviceId], dataPacket, sizeof(DataPacket) + dataLen);
-    free(dataPacket);
-    if (result != RET_OK) {
-        FI_HILOGE("Send bytes failed");
-        return RET_ERR;
-    }
-    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

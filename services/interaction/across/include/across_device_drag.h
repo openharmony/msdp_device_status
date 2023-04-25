@@ -16,10 +16,6 @@
 #ifndef ACROSS_DEVICE_DRAG
 #define ACROSS_DEVICE_DRAG
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-#include "coordination_sm.h"
-#endif // OHOS_BUILD_ENABLE_COORDINATION
-#include "drag_message.h"
 #include "i_context.h"
 
 namespace OHOS {
@@ -31,50 +27,13 @@ public:
     ~AcrossDeviceDrag() = default;
 
     int32_t Init(IContext *context);
-
-public:
-    struct DragInfo {
-        int32_t dragState { 0 };
-        int32_t sourceType { 0 };
-        int32_t pointerId { 0 };
-        int32_t displayId { 0 };
-        int32_t offsetX { 0 };
-        int32_t offsetY { 0 };
-        int32_t dragNum { 0 };
-        int32_t dragStyle { 0 };
-        bool hasCanceledAnimation { false };
-        bool isExisted { false };
-        std::string udKey;
-        uint8_t buffer[MAX_BUFFER_SIZE] { 0 };
-        uint32_t dataLen { 0 };
-        uint8_t data[0];
-    };
-
-private:
-    void RecvDragingData(const void* data, uint32_t dataLen);
-    void RecvStopDragData(const void* data, uint32_t dataLen);
-    void DragStateChanged(DragMessage state);
+    void RecvDragingData(void* data, uint32_t dataLen);
+    void RecvStopDragData(void* data, uint32_t dataLen);
     void SendDragingData();
     void SendStopDragData();
-    void ProcessDragingState();
-    void ProcessStopDragState();
-    std::optional<DragData> ConvertDragingData(const DragInfo* dragInfo);
-    void PrintDragingData(const DragData &dragData) const;
-    int32_t ConvertDragingInfo(const DragData& dragData, const std::vector<uint8_t>& pixBuffer,
-        DragInfo* dragInfo);
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    void ProcessFreeToIn(CoordinationState oldState, CoordinationState newState);
-    void ProcessFreeToOut(CoordinationState oldState, CoordinationState newState);
-    void ProcessInToFree(CoordinationState oldState, CoordinationState newState);
-    void ProcessOutToFree(CoordinationState oldState, CoordinationState newState);
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:
     IContext *context_ { nullptr };
-    DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_ERROR };
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CooStateChangeType cooStateChangeType_ { CooStateChangeType::STATE_NONE };
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 };
 } // namespace DeviceStatus
 } // namespace Msdp

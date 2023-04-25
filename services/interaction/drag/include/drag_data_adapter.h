@@ -17,6 +17,7 @@
 #define DRAG_DATA_ADAPTER_H
 #include <string>
 
+#include "hitrace_meter.h"
 #include "pixel_map.h"
 #include "pointer_style.h"
 #include "singleton.h"
