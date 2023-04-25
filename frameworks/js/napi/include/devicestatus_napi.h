@@ -23,9 +23,9 @@
 #include "napi/native_node_api.h"
 #include <uv.h>
 
-#include "devicestatus_data_utils.h"
 #include "devicestatus_callback_stub.h"
 #include "devicestatus_event.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
