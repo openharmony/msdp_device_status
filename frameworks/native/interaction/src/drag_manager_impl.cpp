@@ -105,15 +105,15 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
 int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t dragMsg;
-    pkt >> dragMsg;
+    int32_t state;
+    pkt >> state;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &listener : dragListener_) {
-        listener->OnDragMessage(static_cast<DragMessage>(dragMsg));
+        listener->OnDragMessage(static_cast<DragState>(state));
     }
     return RET_OK;
 }

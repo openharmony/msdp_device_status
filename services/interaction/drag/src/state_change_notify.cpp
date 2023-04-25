@@ -55,7 +55,7 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
     }
 }
 
-int32_t StateChangeNotify::StateChangedNotify(DragMessage msg)
+int32_t StateChangeNotify::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
     if (msgInfos_.empty()) {
@@ -65,17 +65,17 @@ int32_t StateChangeNotify::StateChangedNotify(DragMessage msg)
     for (auto it = msgInfos_.begin(); it != msgInfos_.end(); ++it) {
         auto info = *it;
         CHKPC(info);
-        OnStateChangedNotify(info->session, info->msgId, msg);
+        OnStateChangedNotify(info->session, info->msgId, state);
     }
     return RET_OK;
 }
 
-void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId, DragMessage msg)
+void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId, DragState state)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
     NetPacket pkt(msgId);
-    pkt << static_cast<int32_t>(msg);
+    pkt << static_cast<int32_t>(state);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

@@ -32,10 +32,10 @@ public:
     virtual ~IDragManager() = default;
 
     virtual void Dump(int32_t fd) const = 0;
-    virtual void RegisterStateChange(std::function<void(DragMessage)> callback) = 0;
+    virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual int32_t StartDrag(const DragData &dragData, SessionPtr sess) = 0;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
-    virtual DragMessage GetDragState() const = 0;
+    virtual DragState GetDragState() const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

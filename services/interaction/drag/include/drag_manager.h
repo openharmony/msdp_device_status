@@ -57,7 +57,7 @@ public:
     int32_t OnSetDragWindowVisible(bool visible);
     int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     void Dump(int32_t fd) const override;
-    void RegisterStateChange(std::function<void(DragMessage)> callback) override;
+    void RegisterStateChange(std::function<void(DragState)> callback) override;
     class InterceptorConsumer final : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,
@@ -76,25 +76,24 @@ private:
     int32_t InitDataAdapter(const DragData &dragData) const;
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
-    std::string GetDragState(DragMessage value) const;
+    std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static OHOS::MMI::ExtraData CreateExtraData(bool appended);
-    void StateChangedNotify(DragMessage state);
-    DragMessage GetDragState() const override;
+    void StateChangedNotify(DragState state);
+    DragState GetDragState() const override;
 private:
     int32_t timerId_ { 0 };
     StateChangeNotify stateNotify_;
-    DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_STOP };
+    DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t interceptorId_ { -1 };
     int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
-    std::function<void(DragMessage)> stateChangedCallback_;
+    std::function<void(DragState)> stateChangedCallback_;
 };
-#define INPUT_MANAGER  OHOS::MMI::InputManager::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -81,7 +81,7 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    if (dragState_ == DragMessage::MSG_DRAG_STATE_START) {
+    if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
     }
@@ -95,16 +95,16 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
-    dragState_ = DragMessage::MSG_DRAG_STATE_START;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
-    StateChangedNotify(DragMessage::MSG_DRAG_STATE_START);
+    dragState_ = DragState::START;
+    stateNotify_.StateChangedNotify(DragState::START);
+    StateChangedNotify(DragState::START);
     return RET_OK;
 }
 
 int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    if (dragState_ == DragMessage::MSG_DRAG_STATE_STOP) {
+    if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
@@ -116,9 +116,9 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("OnStopDrag failed");
         ret = RET_ERR;
     }
-    dragState_ = DragMessage::MSG_DRAG_STATE_STOP;
-    stateNotify_.StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
-    StateChangedNotify(DragMessage::MSG_DRAG_STATE_STOP);
+    dragState_ = DragState::STOP;
+    stateNotify_.StateChangedNotify(DragState::STOP);
+    StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         ret = RET_ERR;
@@ -237,13 +237,13 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
-    int32_t pid = INPUT_MANAGER->GetWindowPid(pointerEvent->GetTargetWindowId());
+    int32_t pid = MMI::InputManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
     DragData dragData = DataAdapter.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
-        INPUT_MANAGER->SetPointerVisible(true);
+        MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
 
     SendDragData(pid, dragData.udKey);
@@ -269,7 +269,7 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
     auto fun = [] (std::shared_ptr<MMI::PointerEvent> pointerEvent) -> int32_t {
         MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
         if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-            INPUT_MANAGER->AppendExtraData(DragManager::CreateExtraData(false));
+            MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
         }
         return RET_OK;
     };
@@ -306,7 +306,7 @@ void DragManager::Dump(int32_t fd) const
             dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
             dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
             dragData.hasCanceledAnimation ? "true" : "false");
-    if (dragState_ != DragMessage::MSG_DRAG_STATE_STOP) {
+    if (dragState_ != DragState::STOP) {
         std::shared_ptr<OHOS::Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
         CHKPV(pixelMap);
         dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
@@ -314,23 +314,23 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "}\n");
 }
 
-std::string DragManager::GetDragState(DragMessage value) const
+std::string DragManager::GetDragState(DragState value) const
 {
     std::string state;
     switch (value) {
-        case DragMessage::MSG_DRAG_STATE_START: {
+        case DragState::START: {
             state = "start";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_STOP: {
+        case DragState::STOP: {
             state = "stop";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_CANCEL: {
+        case DragState::CANCEL: {
             state = "cancel";
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_ERROR: {
+        case DragState::ERROR: {
             state = "error";
             break;
         }
@@ -418,7 +418,7 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
     MMI::PointerStyle pointerStyle;
-    if (INPUT_MANAGER->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
+    if (MMI::InputManager::GetInstance()->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
         FI_HILOGE("GetPointerStyle failed");
         return RET_ERR;
     }
@@ -440,7 +440,7 @@ int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
     }
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
     auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
-    interceptorId_ = INPUT_MANAGER->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
+    interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
     if (interceptorId_ <= 0) {
         FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
         return RET_ERR;
@@ -451,7 +451,7 @@ int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
 int32_t DragManager::OnStartDrag()
 {
     auto extraData = CreateExtraData(true);
-    INPUT_MANAGER->AppendExtraData(extraData);
+    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     DragData dragData = DataAdapter.GetDragData();
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
@@ -471,7 +471,7 @@ int32_t DragManager::OnStartDrag()
         return RET_ERR;
     }
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        INPUT_MANAGER->SetPointerVisible(false);
+        MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     return RET_OK;
 }
@@ -488,7 +488,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     DragData dragData = DataAdapter.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
-        INPUT_MANAGER->SetPointerVisible(true);
+        MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     switch (result) {
         case DragResult::DRAG_SUCCESS: {
@@ -535,14 +535,14 @@ int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32
     return DataAdapter.GetShadowOffset(offsetX, offsetY, width, height);
 }
 
-void DragManager::RegisterStateChange(std::function<void(DragMessage)> callback)
+void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
     stateChangedCallback_ = callback;
 }
 
-void DragManager::StateChangedNotify(DragMessage state)
+void DragManager::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
     if (stateChangedCallback_ != nullptr) {
@@ -550,7 +550,7 @@ void DragManager::StateChangedNotify(DragMessage state)
     }
 }
 
-DragMessage DragManager::GetDragState() const
+DragState DragManager::GetDragState() const
 {
     CALL_DEBUG_ENTER;
     return dragState_;

@@ -30,7 +30,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr bool HAS_CUSTOM_ANIMATION { true };
-#define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 
 void StopDragFuzzTest(const uint8_t* data, size_t  size)
