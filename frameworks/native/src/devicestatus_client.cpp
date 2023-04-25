@@ -203,26 +203,33 @@ int32_t DeviceStatusClient::UnregisterCoordinationListener()
     return devicestatusProxy_->UnregisterCoordinationListener();
 }
 
-int32_t DeviceStatusClient::EnableCoordination(int32_t userData, bool enabled)
+int32_t DeviceStatusClient::PrepareCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->EnableCoordination(userData, enabled);
+    return devicestatusProxy_->PrepareCoordination(userData);
 }
 
-int32_t DeviceStatusClient::StartCoordination(int32_t userData,
+int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->UnprepareCoordination(userData);
+}
+
+int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->StartCoordination(userData, remoteNetworkId, startDeviceId);
+    return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId);
 }
 
-int32_t DeviceStatusClient::StopCoordination(int32_t userData)
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->StopCoordination(userData);
+    return devicestatusProxy_->DeactivateCoordination(userData);
 }
 
 int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)

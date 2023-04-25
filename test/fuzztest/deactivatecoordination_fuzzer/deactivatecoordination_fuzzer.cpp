@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "stopcoordination_fuzzer.h"
+#include "deactivatecoordination_fuzzer.h"
 
 #include "coordination_message.h"
 #include "interaction_manager.h"
@@ -23,25 +23,25 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StopCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeactivateCoordinationFuzzTest" };
 } // namespace
 
-void StopCoordinationFuzzTest(size_t  size)
+void DeactivateCoordinationFuzzTest()
 {
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("StopCoordinationFuzzTest");
+        FI_HILOGD("DeactivateCoordinationFuzzTest");
     };
 
-    InteractionManager::GetInstance()->StopCoordination(fun);
+    InteractionManager::GetInstance()->DeactivateCoordination(fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::StopCoordinationFuzzTest(size);
+    (void)data;
+    (void)size;
+    OHOS::Msdp::DeviceStatus::DeactivateCoordinationFuzzTest();
     return 0;
 }

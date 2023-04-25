@@ -52,9 +52,10 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::DEVICESTATUS_GETCACHE, &DeviceStatusSrvStub::GetLatestDeviceStatusDataStub},
         {Idevicestatus::REGISTER_COORDINATION_MONITOR, &DeviceStatusSrvStub::RegisterCoordinationMonitorStub},
         {Idevicestatus::UNREGISTER_COORDINATION_MONITOR, &DeviceStatusSrvStub::UnregisterCoordinationMonitorStub},
-        {Idevicestatus::ENABLE_COORDINATION, &DeviceStatusSrvStub::EnableCoordinationStub},
-        {Idevicestatus::START_COORDINATION, &DeviceStatusSrvStub::StartCoordinationStub},
-        {Idevicestatus::STOP_COORDINATION, &DeviceStatusSrvStub::StopCoordinationStub},
+        {Idevicestatus::PREPARE_COORDINATION, &DeviceStatusSrvStub::PrepareCoordinationStub},
+        {Idevicestatus::UNPREPARE_COORDINATION, &DeviceStatusSrvStub::UnPrepareCoordinationStub},
+        {Idevicestatus::START_COORDINATION, &DeviceStatusSrvStub::ActivateCoordinationStub},
+        {Idevicestatus::STOP_COORDINATION, &DeviceStatusSrvStub::DeactivateCoordinationStub},
         {Idevicestatus::GET_COORDINATION_STATE, &DeviceStatusSrvStub::GetCoordinationStateStub},
         {Idevicestatus::ALLOC_SOCKET_FD, &DeviceStatusSrvStub::HandleAllocSocketFdStub},
         {Idevicestatus::START_DRAG, &DeviceStatusSrvStub::StartDragStub},
@@ -148,21 +149,31 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::EnableCoordinationStub(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
-    bool enabled;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READBOOL(data, enabled, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = EnableCoordination(userData, enabled);
+    int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
+        FI_HILOGE("Call PrepareCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StartCoordinationStub(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = UnprepareCoordination(userData);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call UnprepareCoordination failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -171,21 +182,21 @@ int32_t DeviceStatusSrvStub::StartCoordinationStub(MessageParcel& data, MessageP
     READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t startDeviceId;
     READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StartCoordination(userData, remoteNetworkId, startDeviceId);
+    int32_t ret = ActivateCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StartCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("Call ActivateCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::StopCoordinationStub(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = StopCoordination(userData);
+    int32_t ret = DeactivateCoordination(userData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
+        FI_HILOGE("Call DeactivateCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }

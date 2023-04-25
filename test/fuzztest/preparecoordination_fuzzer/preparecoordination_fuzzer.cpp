@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,38 +13,55 @@
  * limitations under the License.
  */
 
-#include "enablecoordination_fuzzer.h"
+#include "preparecoordination_fuzzer.h"
 #include "securec.h"
 
 #include "coordination_message.h"
 #include "interaction_manager.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "EnableCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "PrepareCoordinationFuzzTest" };
 } // namespace
 
-void EnableCoordinationFuzzTest(const uint8_t* data, size_t size)
+template<class T>
+size_t GetObject(const uint8_t *data, size_t size, T &object)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = ::memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
+void PrepareCoordinationFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t random = 0;
+    (void)GetObject<int32_t>(data, 0, random);
     bool enabled = (random % 2) ? false : true;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("EnableCoordinationFuzzTest");
+        FI_HILOGD("PrepareCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->EnableCoordination(enabled, fun);
+    if (enabled) {
+        InteractionManager::GetInstance()->PrepareCoordination(fun);
+    } else {
+        InteractionManager::GetInstance()->UnprepareCoordination(fun);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::EnableCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::PrepareCoordinationFuzzTest(data, size);
     return 0;
 }
 

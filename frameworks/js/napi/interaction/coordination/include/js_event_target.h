@@ -38,10 +38,10 @@ public:
     virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
-    static void EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStart(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStop(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsGetState(sptr<JsUtil::CallbackInfo> cb, bool state);
+    static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
@@ -56,14 +56,14 @@ private:
         coordinationListener_ {};
     bool isListeningProcess_ { false };
 
-    static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
-    static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
-    static void CallStartPromiseWork(uv_work_t *work, int32_t status);
-    static void CallStartAsyncWork(uv_work_t *work, int32_t status);
-    static void CallStopPromiseWork(uv_work_t *work, int32_t status);
-    static void CallStopAsyncWork(uv_work_t *work, int32_t status);
-    static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
-    static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
+    static void CallPreparePromiseWork(uv_work_t *work, int32_t status);
+    static void CallPrepareAsyncWork(uv_work_t *work, int32_t status);
+    static void CallActivatePromiseWork(uv_work_t *work, int32_t status);
+    static void CallActivateAsyncWork(uv_work_t *work, int32_t status);
+    static void CallDeactivatePromiseWork(uv_work_t *work, int32_t status);
+    static void CallDeactivateAsyncWork(uv_work_t *work, int32_t status);
+    static void CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status);
+    static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
