@@ -36,7 +36,7 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
-constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
+constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
@@ -47,8 +47,8 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 200 };
 constexpr int32_t DRAG_DST_Y { 200 };
 constexpr int32_t DRAG_NUM { 1 };
-constexpr bool HAS_CANCELED_ANIMATION { false };
-constexpr bool HAS_CUSTOM_ANIMATION { false };
+constexpr bool HAS_CANCELED_ANIMATION { true };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 100 };
 const std::string UD_KEY = "Unified data key";
 static int32_t g_deviceMouseId { -1 };
