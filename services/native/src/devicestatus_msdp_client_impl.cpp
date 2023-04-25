@@ -31,8 +31,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr std::string_view DEVICESTATUS_MOCK_LIB_PATH = "libdevicestatus_mock.z.so";
-constexpr std::string_view DEVICESTATUS_ALGO_LIB_PATH = "libdevicestatus_algo.z.so";
+const std::string DEVICESTATUS_MOCK_LIB_PATH = "libdevicestatus_mock.z.so";
+const std::string DEVICESTATUS_ALGO_LIB_PATH = "libdevicestatus_algo.z.so";
 std::map<Type, OnChangedValue> g_devicestatusDataMap;
 DeviceStatusMsdpClientImpl::CallbackManager g_callbacksMgr;
 using ClientType = Type;
@@ -381,7 +381,13 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
         DEV_HILOGE(SERVICE, "mock handle is not nullptr");
         return RET_OK;
     }
-    mock_.handle = dlopen(static_cast<std::string>(DEVICESTATUS_MOCK_LIB_PATH).c_str(), RTLD_LAZY);
+    std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;
+    char libRealPath[PATH_MAX] = {};
+    if (realpath(dlName .c_str(), libRealPath) == nullptr) {
+        DEV_HILOGE(SERVICE, "get absolute algoPath is error, %{public}d", errno);
+        return RET_ERR;
+    }
+    mock_.handle = dlopen(libRealPath, RTLD_LAZY);
     if (mock_.handle == nullptr) {
         DEV_HILOGE(SERVICE, "Cannot load library error = %{public}s", dlerror());
         return RET_ERR;
@@ -392,7 +398,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
     mock_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(mock_.handle, "Destroy"));
     if (mock_.create == nullptr || mock_.destroy == nullptr) {
         DEV_HILOGE(SERVICE, "%{public}s dlsym Create or Destroy failed",
-            static_cast<std::string>(DEVICESTATUS_MOCK_LIB_PATH).c_str());
+            dlName.c_str());
         dlclose(mock_.handle);
         mock_.Clear();
         if (mock_.handle == nullptr) {
@@ -442,7 +448,13 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
         DEV_HILOGE(SERVICE, "algo handle has exists");
         return RET_OK;
     }
-    algo_.handle = dlopen(static_cast<std::string>(DEVICESTATUS_ALGO_LIB_PATH).c_str(), RTLD_LAZY);
+    std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
+    char libRealPath[PATH_MAX] = {};
+    if (realpath(dlName .c_str(), libRealPath) == nullptr) {
+        DEV_HILOGE(SERVICE, "get absolute algoPath is error, %{public}d", errno);
+        return RET_ERR;
+    }
+    algo_.handle = dlopen(libRealPath, RTLD_LAZY);
     if (algo_.handle == nullptr) {
         DEV_HILOGE(SERVICE, "Cannot load library error = %{public}s", dlerror());
         return RET_ERR;
@@ -453,7 +465,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
     algo_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(algo_.handle, "Destroy"));
     if (algo_.create == nullptr || algo_.destroy == nullptr) {
         DEV_HILOGE(SERVICE, "%{public}s dlsym Create or Destroy failed",
-            static_cast<std::string>(DEVICESTATUS_ALGO_LIB_PATH).c_str());
+            dlName.c_str());
         dlclose(algo_.handle);
         algo_.Clear();
         if (algo_.handle == nullptr) {
