@@ -14,14 +14,17 @@
  */
 
 #include <future>
+#include <iostream>
 #include <optional>
 #include <utility>
 #include <vector>
+#include <cstdio>
 
 #include <unistd.h>
 
 #include <gtest/gtest.h>
 #include "image_type.h"
+#include "image_source.h"
 #include "input_device.h"
 #include "input_manager.h"
 #include "pointer_event.h"
@@ -37,6 +40,7 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
+std::string CURSOR_DRAG_PATH {"/system/etc/device_status/drag_icon/File_Drag.png"};
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
@@ -48,8 +52,8 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 800 };
 constexpr int32_t DRAG_DST_Y { 800 };
 constexpr int32_t DRAG_NUM { 1 };
-constexpr bool HAS_CANCELED_ANIMATION { false };
-constexpr bool HAS_CUSTOM_ANIMATION { false };
+constexpr bool HAS_CANCELED_ANIMATION { true };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 5 };
 const std::string UD_KEY = "Unified data key";
 static int32_t g_deviceMouseId { -1 };
@@ -65,8 +69,9 @@ public:
     static std::vector<int32_t> GetInputDeviceIds();
     static std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
     static std::pair<int32_t, int32_t> GetMouseAndTouch();
-
-    std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    static void PrintPixelMap(std::shared_ptr<Media::PixelMap> pixelMap);
+    static void SetPixelMap(std::shared_ptr<Media::PixelMap> pixelMap);
+    std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight);
     std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
     int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
     MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId,
@@ -141,30 +146,54 @@ void InteractionManagerTest::TearDown()
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
-std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t width, int32_t height)
+std::shared_ptr<OHOS::Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t pixelMapWidth, int32_t pixelMapHeight)
 {
-    CALL_DEBUG_ENTER;
-    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
-       height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Invalid size,width:%{public}d,height:%{public}d", width, height);
+    std::string imagePath = CURSOR_DRAG_PATH;
+    OHOS::Media::SourceOptions opts;
+    opts.formatHint = "image/png";
+    uint32_t errCode = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
+    if (imageSource == nullptr) {
         return nullptr;
     }
-    OHOS::Media::InitializationOptions opts;
-    opts.size.width = width;
-    opts.size.height = height;
-    opts.editable = false;
-    opts.pixelFormat = Media::PixelFormat::ARGB_8888;
-    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
-    int32_t colorLen = width * height;
-    uint32_t *color = new uint32_t[colorLen];
-    for (uint32_t i = 0; i < colorLen; i++) {
-        color[i] = 0xff43fd19;
-    }
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(color, colorLen, opts);
-    delete[] color;
-    CHKPP(pixelMap);
+    std::set<std::string> formats;
+    imageSource->GetSupportedFormats(formats);
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {
+        .width = pixelMapWidth,
+        .height = pixelMapHeight
+    };
+    decodeOpts.allocatorType = OHOS::Media::AllocatorType::SHARE_MEM_ALLOC;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
+    PrintPixelMap(pixelMap);
     return pixelMap;
 }
+
+// std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t width, int32_t height)
+// {
+//     CALL_DEBUG_ENTER;
+//     if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
+//        height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+//         FI_HILOGE("Invalid size,width:%{public}d,height:%{public}d", width, height);
+//         return nullptr;
+//     }
+//     OHOS::Media::InitializationOptions opts;
+//     opts.size.width = width;
+//     opts.size.height = height;
+//     opts.pixelFormat = Media::PixelFormat::ARGB_8888;
+//     opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+//     int32_t colorLen = width * height;
+//     uint32_t *color = new uint32_t[colorLen];
+//     for (int32_t i = 0; i < colorLen; i++) {
+//         color[i] = 0xFF0000FF;
+//     }
+//     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(color, colorLen, opts);
+//     delete[] color;
+//     CHKPP(pixelMap);
+//     PrintPixelMap(pixelMap);
+//     SetPixelMap(pixelMap);
+//     return pixelMap;
+// }
 
 std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t, int32_t> pixelMapSize,
     int32_t sourceType, int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location)
@@ -188,7 +217,48 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t
     dragData.displayY = location.second;
     dragData.displayId = displayId;
     dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
+    PrintPixelMap(dragData.shadowInfo.pixelMap);
     return dragData;
+}
+
+void InteractionManagerTest::SetPixelMap(std::shared_ptr<Media::PixelMap> pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    int32_t width = pixelMap->GetWidth();
+    int32_t height = pixelMap->GetHeight();
+    int32_t rowBytes = pixelMap->GetRowBytes();
+    int32_t pixelBytes = pixelMap->GetPixelBytes();
+    const uint8_t *pixels = pixelMap->GetPixels();
+    uint8_t *mutPixels = const_cast<uint8_t*> (pixels);
+    const uint8_t pixelColor[] = {0, 255, 0, 0};
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            for (int32_t k = 0; k < pixelBytes; k++) {
+                mutPixels[i * rowBytes + j * pixelBytes + k] = pixelColor[k];
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+void InteractionManagerTest::PrintPixelMap(std::shared_ptr<Media::PixelMap> pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    int32_t width = pixelMap->GetWidth();
+    int32_t height = pixelMap->GetHeight();
+    int32_t rowBytes = pixelMap->GetRowBytes();
+    int32_t pixelBytes = pixelMap->GetPixelBytes();
+    const uint8_t *pixels = pixelMap->GetPixels();
+    for (int32_t i = 0; i < height; i++) {
+        for (int32_t j = 0; j < width; j++) {
+            std::cout << "(";
+            for (int32_t k = 0; k < pixelBytes; k++) {
+                printf("%d ", pixels[i * rowBytes + j * pixelBytes + k]);
+            }
+            std::cout << "), ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 MMI::PointerEvent::PointerItem InteractionManagerTest::CreatePointerItem(int32_t pointerId,
