@@ -26,8 +26,8 @@
 #include <random>
 #include <thread>
 
-#include "devicestatus_client.h"
 #include "devicestatus_callback_stub.h"
+#include "stationary_manager.h"
 
 #define FUZZ_PROJECT_NAME "devicestatusclient_fuzzer"
 namespace OHOS {
