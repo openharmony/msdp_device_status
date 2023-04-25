@@ -18,7 +18,6 @@ import("//build/ohos/ace/ace.gni")
 config("devicestatusnapi_private_config") {
   include_dirs = [
     "include",
-    "//third_party/node/src",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_service_path}/native/include",
   ]
