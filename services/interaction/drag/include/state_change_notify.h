@@ -20,7 +20,7 @@
 #include <memory>
 #include <mutex>
 
-#include "drag_message.h"
+#include "drag_data.h"
 #include "stream_session.h"
 
 namespace OHOS {

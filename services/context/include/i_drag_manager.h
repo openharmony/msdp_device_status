@@ -20,7 +20,6 @@
 #include <functional>
 
 #include "drag_data.h"
-#include "drag_message.h"
 #include "stream_session.h"
 
 namespace OHOS {

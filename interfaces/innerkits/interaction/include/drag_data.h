@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-static const int32_t MAX_PIXEL_MAP_WIDTH = 200;
-static const int32_t MAX_PIXEL_MAP_HEIGHT = 200;
+static const int32_t MAX_PIXEL_MAP_WIDTH = 600;
+static const int32_t MAX_PIXEL_MAP_HEIGHT = 600;
 static const int32_t MAX_BUFFER_SIZE = 512;
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
@@ -45,6 +45,13 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
+};
+
+enum class DragState {
+    ERROR = 0,
+    START = 1,
+    STOP = 2,
+    CANCEL = 3
 };
 
 enum class DragResult {

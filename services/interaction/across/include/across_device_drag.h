@@ -19,7 +19,7 @@
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-#include "drag_message.h"
+#include "drag_data.h"
 #include "i_context.h"
 
 namespace OHOS {
