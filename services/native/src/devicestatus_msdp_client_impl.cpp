@@ -31,8 +31,13 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-const std::string DEVICESTATUS_MOCK_LIB_PATH = "libdevicestatus_mock.z.so";
-const std::string DEVICESTATUS_ALGO_LIB_PATH = "libdevicestatus_algo.z.so";
+#ifdef __aarch64__
+const std::string DEVICESTATUS_MOCK_LIB_PATH = "/system/lib64/libdevicestatus_mock.z.so";
+const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib64/libdevicestatus_algo.z.so";
+#else
+const std::string DEVICESTATUS_MOCK_LIB_PATH = "/system/lib/libdevicestatus_mock.z.so";
+const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib/libdevicestatus_algo.z.so";
+#endif
 std::map<Type, OnChangedValue> g_devicestatusDataMap;
 DeviceStatusMsdpClientImpl::CallbackManager g_callbacksMgr;
 using ClientType = Type;
