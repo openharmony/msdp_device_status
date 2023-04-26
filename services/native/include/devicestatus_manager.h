@@ -19,7 +19,6 @@
 #include <set>
 #include <map>
 
-#include "sensor_if.h"
 #include "devicestatus_data_utils.h"
 #include "idevicestatus_algorithm.h"
 #include "idevicestatus_callback.h"
