@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,6 @@
  */
 
 #include "registercoordinationlistener_fuzzer.h"
-
-#include "securec.h"
 
 #include "coordination_message.h"
 #include "interaction_manager.h"
@@ -38,7 +36,7 @@ public:
     };
 };
 
-void RegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
+void RegisterCoordinationListenerFuzzTest()
 {
     std::shared_ptr<CoordinationListenerTest> consumer = std::make_shared<CoordinationListenerTest>();
     InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
@@ -48,10 +46,10 @@ void RegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 } // namespace Msdp
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
-    /* Run your code on data */
-    OHOS::Msdp::DeviceStatus::RegisterCoordinationListenerFuzzTest(data, size);
+    (void)data;
+    (void)size;
+    OHOS::Msdp::DeviceStatus::RegisterCoordinationListenerFuzzTest();
     return 0;
 }

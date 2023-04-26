@@ -19,8 +19,8 @@
 #include <iremote_proxy.h>
 #include <nocopyable.h>
 
-#include "idevicestatus_callback.h"
-#include "devicestatus_data_utils.h"
+#include "stationary_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {

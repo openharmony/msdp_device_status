@@ -55,7 +55,7 @@ public:
     void OnEnable(CoordinationMessage msg, const std::string &deviceId = "");
     void OnStart(CoordinationMessage msg, const std::string &deviceId = "");
     void OnStop(CoordinationMessage msg, const std::string &deviceId = "");
-    void OnGetState(bool state);
+    void OnGetCrossingSwitchState(bool state);
     void OnErrorMessage(EventType type, CoordinationMessage msg);
 
     void SetIContext(IContext *context);

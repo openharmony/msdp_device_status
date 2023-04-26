@@ -36,7 +36,7 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
-constexpr int32_t TIME_WAIT_FOR_OP_MS { 100 };
+constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
@@ -47,13 +47,12 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 200 };
 constexpr int32_t DRAG_DST_Y { 200 };
 constexpr int32_t DRAG_NUM { 1 };
-constexpr bool HAS_CANCELED_ANIMATION { false };
-constexpr bool HAS_CUSTOM_ANIMATION { false };
+constexpr bool HAS_CANCELED_ANIMATION { true };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 100 };
 const std::string UD_KEY = "Unified data key";
 static int32_t g_deviceMouseId { -1 };
 static int32_t g_deviceTouchId { -1 };
-#define INPUT_MANAGER  MMI::InputManager::GetInstance()
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
@@ -65,19 +64,19 @@ public:
     static std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
     static std::pair<int32_t, int32_t> GetMouseAndTouch();
 
-    std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
-    int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
-    MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId,
-    int32_t deviceId, std::pair<int, int> displayLocation, bool isPressed);
-    std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(std::pair<int, int> displayLocation, int32_t action,
-    int32_t sourceType, int32_t pointerId, bool isPressed);
-    void SimulateDownEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
-    void SimulateMoveEvent(std::pair<int, int> srcLocation, std::pair<int, int> dstLocation,
-    int32_t sourceType, int32_t pointerId, bool isPressed);
-    void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
-    int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
-    void TestRemoveMonitor(int32_t monitorId);
+    static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    static std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
+        int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
+    static MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId,
+        int32_t deviceId, std::pair<int, int> displayLocation, bool isPressed);
+    static std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(std::pair<int, int> displayLocation, int32_t action,
+        int32_t sourceType, int32_t pointerId, bool isPressed);
+    static void SimulateDownEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
+    static void SimulateMoveEvent(std::pair<int, int> srcLocation, std::pair<int, int> dstLocation,
+        int32_t sourceType, int32_t pointerId, bool isPressed);
+    static void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
+    static int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
+    static void TestRemoveMonitor(int32_t monitorId);
 };
 
 std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
@@ -86,7 +85,7 @@ std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
     auto callback = [&realDeviceIds](std::vector<int32_t>& deviceIds) {
         realDeviceIds = deviceIds;
     };
-    int32_t ret = INPUT_MANAGER->GetDeviceIds(callback);
+    int32_t ret = MMI::InputManager::GetInstance()->GetDeviceIds(callback);
     if (ret != RET_OK) {
         FI_HILOGE("GetDeviceIds failed");
         return {};
@@ -100,7 +99,7 @@ std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t devi
     auto callback = [&inputDevice](std::shared_ptr<MMI::InputDevice> device) {
         inputDevice = device;
     };
-    int32_t ret = INPUT_MANAGER->GetDevice(deviceId, callback);
+    int32_t ret = MMI::InputManager::GetInstance()->GetDevice(deviceId, callback);
     if (ret != RET_OK || inputDevice == nullptr) {
         FI_HILOGE("GetDevice failed");
         return nullptr;
@@ -221,7 +220,7 @@ void InteractionManagerTest::SimulateDownEvent(std::pair<int, int> location, int
         SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_DOWN, sourceType, pointerId, true);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
-    INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
 void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, std::pair<int, int> dstLocation,
@@ -249,7 +248,7 @@ void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, 
             SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE, sourceType, pointerId, isPressed);
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
-        INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+        MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
     }
 }
@@ -261,7 +260,7 @@ void InteractionManagerTest::SimulateUpEvent(std::pair<int, int> location, int32
         SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
-    INPUT_MANAGER->SimulateInputEvent(pointerEvent);
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
 int32_t InteractionManagerTest::TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer)
@@ -331,6 +330,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
         void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
         {
             FI_HILOGD("RegisterCoordinationListenerTest");
+            (void) deviceId;
         };
     };
     std::shared_ptr<CoordinationListenerTest> consumer =
@@ -368,41 +368,45 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
 }
 
 /**
- * @tc.name: InteractionManagerTest_EnableCoordination
- * @tc.desc: Enable coordination
+ * @tc.name: InteractionManagerTest_PrepareCoordination
+ * @tc.desc: Prepare coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_EnableCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool enabled = false;
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Enable coordination success");
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
+        FI_HILOGD("Prepare coordination success");
+        promiseFlag.set_value(true);
     };
-    int32_t ret = InteractionManager::GetInstance()->EnableCoordination(enabled, fun);
+    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.get());
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
- * @tc.name: InteractionManagerTest_StartCoordination
- * @tc.desc: Start coordination
+ * @tc.name: InteractionManagerTest_ActivateCoordination
+ * @tc.desc: Activate coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string remoteNetworkId("");
     int32_t startDeviceId = -1;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Start coordination success");
+        (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -411,41 +415,67 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartCoordination, TestS
 }
 
 /**
- * @tc.name: InteractionManagerTest_StopCoordination
- * @tc.desc: Stop coordination
+ * @tc.name: InteractionManagerTest_DeactivateCoordination
+ * @tc.desc: Deactivate coordination
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopCoordination, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Stop coordination success");
+        (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->StopCoordination(fun);
+    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    ASSERT_NE(ret, ERROR_UNSUPPORT);
+    ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetCoordinationState
+ * @tc.name: InteractionManagerTest_GetCoordinationState_Abnormal
  * @tc.desc: Get coordination state
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abnormal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string deviceId("deviceId");
+    const std::string deviceId("");
     auto fun = [](bool state) {
-        FI_HILOGD("Get coordination state success");
+        FI_HILOGD("Get coordination state failed, state:%{public}d", state);
+    };
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_NE(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetCoordinationState_Normal
+ * @tc.desc: Get coordination state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Normal, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    const std::string deviceId("deviceId");
+    auto fun = [&promiseFlag](bool state) {
+        FI_HILOGD("Get coordination state success, state:%{public}d", state);
+        promiseFlag.set_value(true);
     };
     int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.get());
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -466,9 +496,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
         class DragListenerTest : public IDragListener {
         public:
             DragListenerTest() : IDragListener() {}
-            void OnDragMessage(DragMessage msg) override
+            void OnDragMessage(DragState state) override
             {
-                FI_HILOGD("DragListenerTest msg:%{public}d", msg);
+                FI_HILOGD("DragListenerTest state:%{public}d", state);
             };
         };
         std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
@@ -553,7 +583,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
         std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
         InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
         ASSERT_TRUE(futureFlag.get());
@@ -618,7 +649,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
         std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
         SimulateUpEvent({ DRAG_DST_X, DRAG_DST_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
         InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
         ASSERT_TRUE(futureFlag.get());

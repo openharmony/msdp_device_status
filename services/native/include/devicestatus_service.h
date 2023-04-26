@@ -25,14 +25,14 @@
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
-#include "devicestatus_data_utils.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
-#include "idevicestatus_callback.h"
+#include "stationary_callback.h"
+#include "stationary_data.h"
 #include "stream_server.h"
 #include "timer_manager.h"
 
@@ -54,7 +54,7 @@ public:
     IDelegateTasks& GetDelegateTasks() override;
     IDeviceManager& GetDeviceManager() override;
     ITimerManager& GetTimerManager() override;
-    const IDragManager& GetDragManager() const override;
+    IDragManager& GetDragManager() override;
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
@@ -67,9 +67,10 @@ public:
 
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
-    int32_t EnableCoordination(int32_t userData, bool enable) override;
-    int32_t StartCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    int32_t StopCoordination(int32_t userData) override;
+    int32_t PrepareCoordination(int32_t userData) override;
+    int32_t UnprepareCoordination(int32_t userData) override;
+    int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t DeactivateCoordination(int32_t userData) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     int32_t StartDrag(const DragData &dragData) override;
@@ -109,10 +110,11 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
-    int32_t OnEnableCoordination(int32_t pid, int32_t userData, bool enabled);
-    int32_t OnStartCoordination(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
+    int32_t OnPrepareCoordination(int32_t pid, int32_t userData);
+    int32_t OnUnprepareCoordination(int32_t pid, int32_t userData);
+    int32_t OnActivateCoordination(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
         int32_t startDeviceId);
-    int32_t OnStopCoordination(int32_t pid, int32_t userData);
+    int32_t OnDeactivateCoordination(int32_t pid, int32_t userData);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 

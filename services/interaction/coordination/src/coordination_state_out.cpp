@@ -34,7 +34,7 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
     : startDeviceDhid_(startDeviceDhid)
 {}
 
-int32_t CoordinationStateOut::StopCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;

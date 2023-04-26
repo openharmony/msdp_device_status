@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_DATA_UTILS_H
-#define DEVICESTATUS_DATA_UTILS_H
+#ifndef STATIONARY_DATA_H
+#define STATIONARY_DATA_H
 
 #include <string>
 
@@ -111,4 +111,4 @@ static DeviceStatusJsonD DeviceStatusJson[] = {
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_DATA_UTILS_H
+#endif // STATIONARY_DATA_H

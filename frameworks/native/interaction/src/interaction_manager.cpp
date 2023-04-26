@@ -42,21 +42,26 @@ int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoor
     return InteractionMgrImpl.UnregisterCoordinationListener(listener);
 }
 
-int32_t InteractionManager::EnableCoordination(bool enabled,
-    std::function<void(const std::string&, CoordinationMessage)> callback)
+int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.EnableCoordination(enabled, callback);
+    return InteractionMgrImpl.PrepareCoordination(callback);
 }
 
-int32_t InteractionManager::StartCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(const std::string&, CoordinationMessage)> callback)
+int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.StartCoordination(remoteNetworkId, startDeviceId, callback);
+    return InteractionMgrImpl.UnprepareCoordination(callback);
 }
 
-int32_t InteractionManager::StopCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
+int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
+    std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.StopCoordination(callback);
+    return InteractionMgrImpl.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
+}
+
+int32_t InteractionManager::DeactivateCoordination(std::function<void(const std::string&,
+    CoordinationMessage)> callback)
+{
+    return InteractionMgrImpl.DeactivateCoordination(callback);
 }
 
 int32_t InteractionManager::GetCoordinationState(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "startcoordination_fuzzer.h"
+#include "activatecoordination_fuzzer.h"
 
 #include "coordination_message.h"
 #include "interaction_manager.h"
@@ -23,10 +23,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "ActivateCoordinationFuzzTest" };
 } // namespace
 
-void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void ActivateCoordinationFuzzTest(const uint8_t* data, size_t  size)
 {
     if (data == nullptr) {
         return;
@@ -34,24 +34,20 @@ void StartCoordinationFuzzTest(const uint8_t* data, size_t  size)
     const std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
     const int32_t startDeviceId = *(reinterpret_cast<const int32_t*>(data));
     auto fun = [](const std::string &listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("StartCoordinationFuzzTest");
+        FI_HILOGD("ActivateCoordinationFuzzTest");
     };
-    InteractionManager::GetInstance()->StartCoordination(remoteNetworkId, startDeviceId, fun);
+    InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return 0;
-    }
     if (size < sizeof(int32_t)) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::StartCoordinationFuzzTest(data, size);
+    OHOS::Msdp::DeviceStatus::ActivateCoordinationFuzzTest(data, size);
     return 0;
 }
 

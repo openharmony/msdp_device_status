@@ -23,7 +23,6 @@
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
-auto& client_ = DeviceStatusClient::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb = new DeviceStatusClientFuzzer::DeviceStatusTestCallback();
 const int WAIT_TIME = 1000;
 void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const \
@@ -42,7 +41,7 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
         return;
     }
 
-    client_.SubscribeCallback(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
+    StationaryMgr->SubscribeCallback(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestGetDevicestatusData(static_cast<Type>(type[0]));
@@ -51,7 +50,7 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 void DeviceStatusClientFuzzer::TestGetDevicestatusData(Type type)
 {
     std::cout << "TestGetDevicestatusData: Enter " << std::endl;
-    client_.GetDeviceStatusData(type);
+    StationaryMgr->GetDeviceStatusData(type);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestUnSubscribeCallback(type);
@@ -61,7 +60,7 @@ void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
 {
     std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
 
-    client_.UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
+    StationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)

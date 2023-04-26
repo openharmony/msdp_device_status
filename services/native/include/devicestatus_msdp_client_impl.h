@@ -23,7 +23,7 @@
 #include <thread>
 #include <map>
 
-#include "devicestatus_data_utils.h"
+#include "stationary_data.h"
 #include "devicestatus_delayed_sp_singleton.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_msdp_interface.h"

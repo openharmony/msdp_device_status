@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "AddDr
 class DragListenerTest : public IDragListener {
 public:
     DragListenerTest() : IDragListener() {}
-    void OnDragMessage(DragMessage msg) override
+    void OnDragMessage(DragState state) override
     {
         FI_HILOGD("DragListenerTest");
     };
@@ -44,10 +44,8 @@ void AddDragListenerFuzzTest(const uint8_t* data, size_t size)
 } // namespace Msdp
 } // namespace OHOS
 
-/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
-    /* Run your code on data */
     OHOS::Msdp::DeviceStatus::AddDragListenerFuzzTest(data, size);
     return 0;
 }

@@ -32,7 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Coord
 
 CoordinationStateIn::CoordinationStateIn(const std::string &startDeviceDhid) : startDeviceDhid_(startDeviceDhid) {}
 
-int32_t CoordinationStateIn::StartCoordination(const std::string &remoteNetworkId,
+int32_t CoordinationStateIn::ActivateCoordination(const std::string &remoteNetworkId,
     int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
@@ -72,7 +72,7 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
     }
 }
 
-int32_t CoordinationStateIn::StopCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(remoteNetworkId);
