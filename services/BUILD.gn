@@ -62,7 +62,6 @@ sources_set = [
 ]
 
 external_deps_set = [
-  "drivers_peripheral_sensor:hdi_sensor",
   "distributed_input:libdinput_sdk",
   "device_manager:devicemanagersdk",
   "access_token:libaccesstoken_sdk",
