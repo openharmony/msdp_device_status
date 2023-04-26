@@ -61,7 +61,7 @@ void AcrossDeviceDrag::RecvDragingData(const void* data, uint32_t dataLen)
         return;
     }
     const DragInfo* dragInfo = static_cast<const DragInfo*>(data);
-    if (dragInfo->dragState != static_cast<int32_t>(DragMessage::MSG_DRAG_STATE_START)) {
+    if (dragInfo->dragState != static_cast<int32_t>(DragState::START)) {
         FI_HILOGE("Drag state is not draging");
         return;
     }
@@ -117,7 +117,7 @@ void AcrossDeviceDrag::SendDragingData()
 {
     CALL_DEBUG_ENTER;
     CHKPV(context_);
-    if (context_->GetDragManager().GetDragState() != DragMessage::MSG_DRAG_STATE_START) {
+    if (context_->GetDragManager().GetDragState() != DragState::START) {
         FI_HILOGE("Drag state is not draging");
         return;
     }
@@ -227,16 +227,16 @@ void AcrossDeviceDrag::PrintDragingData(const DragData &dragData) const
         dragData.displayId, dragData.dragNum, dragData.hasCanceledAnimation);
 }
 
-void AcrossDeviceDrag::DragStateChanged(DragMessage state)
+void AcrossDeviceDrag::DragStateChanged(DragState state)
 {
     CALL_DEBUG_ENTER;
     dragState_ = state;
     switch (state) {
-        case DragMessage::MSG_DRAG_STATE_START: {
+        case DragState::START: {
             ProcessDragingState();
             break;
         }
-        case DragMessage::MSG_DRAG_STATE_STOP: {
+        case DragState::STOP: {
             ProcessStopDragState();
             break;
         }

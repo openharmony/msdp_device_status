@@ -53,7 +53,7 @@ public:
 private:
     void RecvDragingData(const void* data, uint32_t dataLen);
     void RecvStopDragData(const void* data, uint32_t dataLen);
-    void DragStateChanged(DragMessage state);
+    void DragStateChanged(DragState state);
     void SendDragingData();
     void SendStopDragData();
     void ProcessDragingState();
@@ -71,7 +71,7 @@ private:
 
 private:
     IContext *context_ { nullptr };
-    DragMessage dragState_ { DragMessage::MSG_DRAG_STATE_ERROR };
+    DragState dragState_ { DragState::ERROR };
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     CooStateChangeType cooStateChangeType_ { CooStateChangeType::STATE_NONE };
 #endif // OHOS_BUILD_ENABLE_COORDINATION
