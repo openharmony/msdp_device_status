@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-const int32_t SERVICE_EXCEPTION = 201;
-const int32_t PARAM_ERROR = 202;
+const int32_t PARAM_ERROR = 401;
+const int32_t SERVICE_EXCEPTION = 801;
 const std::map <int32_t, std::string> ERROR_MESSAGES = {
     {SERVICE_EXCEPTION, "Service exception."},
     {PARAM_ERROR, "Param error."},
