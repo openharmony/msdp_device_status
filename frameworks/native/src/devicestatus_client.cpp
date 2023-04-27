@@ -118,6 +118,7 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 {
     DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
     typeMap_.insert(std::make_pair(type, 1));
+    // TODO 这个是不是在这里不合理
     DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");
@@ -141,6 +142,7 @@ int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, 
 {
     DEV_HILOGI(INNERKIT, "UNevent: %{public}d", event);
     typeMap_.erase(type);
+    // 同上，是不是不合理
     DEV_HILOGD(INNERKIT, "typeMap_ %{public}d", typeMap_[type]);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");

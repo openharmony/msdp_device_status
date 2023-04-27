@@ -388,8 +388,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         DEV_HILOGD(JS_NAPI, "Callback exists");
         return nullptr;
     }
-    sptr<IRemoteDevStaCallback> callback;
-    callback = new (std::nothrow) DeviceStatusCallback(env);
+    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
     if (callback == nullptr) {
         DEV_HILOGE(JS_NAPI, "callback is nullptr");
         return nullptr;

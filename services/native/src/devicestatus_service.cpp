@@ -230,6 +230,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     sptr<IRemoteDevStaCallback> callback)
 {
     DEV_HILOGI(SERVICE, "Enter event:%{public}d,latency:%{public}d", event, latency);
+    CHKPV(callback);
     if (devicestatusManager_ == nullptr) {
         DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
         return;
@@ -252,6 +253,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
     DEV_HILOGE(SERVICE, "EnterUNevent: %{public}d", event);
+    CHKPV(callback);
     if (devicestatusManager_ == nullptr) {
         DEV_HILOGE(SERVICE, "Unsubscribe func is nullptr");
         return;
