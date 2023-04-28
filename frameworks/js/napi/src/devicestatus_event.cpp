@@ -153,8 +153,9 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 }
 
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
-    std::shared_ptr<DeviceStatusEventListener> &typeHandler)
+    std::shared_ptr<DeviceStatusEventListener> &typeHandler) // TODO 智能指针加引用确认下是否需要修改
 {
+    CHKPV(typeHandler);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {

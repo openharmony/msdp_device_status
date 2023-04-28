@@ -113,10 +113,11 @@ std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
     std::pair<int32_t, int32_t> mouseAndTouch { -1, -1 };
     for (const auto& id : deviceIds) {
         std::shared_ptr<MMI::InputDevice> device = GetDevice(id);
-        if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+        CHKPC(device);
+        if (device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
             mouseAndTouch.first = device->GetId();
         }
-        if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) {
+        if (device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) {
             mouseAndTouch.second = device->GetId();
         }
     }
@@ -218,6 +219,7 @@ void InteractionManagerTest::SimulateDownEvent(std::pair<int, int> location, int
     CALL_DEBUG_ENTER;
     std::shared_ptr<MMI::PointerEvent> pointerEvent =
         SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_DOWN, sourceType, pointerId, true);
+    CHKPV(pointerEvent);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -246,6 +248,7 @@ void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, 
     for (const auto& pointer : coordinates) {
         std::shared_ptr<MMI::PointerEvent> pointerEvent =
             SetupPointerEvent(pointer, MMI::PointerEvent::POINTER_ACTION_MOVE, sourceType, pointerId, isPressed);
+        CHKPC(pointerEvent);
         FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
             pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
         MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -258,6 +261,7 @@ void InteractionManagerTest::SimulateUpEvent(std::pair<int, int> location, int32
     CALL_DEBUG_ENTER;
     std::shared_ptr<MMI::PointerEvent> pointerEvent =
         SetupPointerEvent(location, MMI::PointerEvent::POINTER_ACTION_UP, sourceType, pointerId, false);
+    CHKPV(pointerEvent);
     FI_HILOGD("TEST:sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerEvent->GetPointerAction());
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -265,6 +269,7 @@ void InteractionManagerTest::SimulateUpEvent(std::pair<int, int> location, int32
 
 int32_t InteractionManagerTest::TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer)
 {
+    CHKPR(consumer, RET_ERR);
     return MMI::InputManager::GetInstance()->AddMonitor(consumer);
 }
 
