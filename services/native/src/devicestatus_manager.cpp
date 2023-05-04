@@ -44,7 +44,7 @@ bool DeviceStatusManager::Init()
         }
     }
 
-    msdpImpl_ = std::make_unique<DeviceStatusMsdpClientImpl>();
+    msdpImpl_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     if (msdpImpl_ == nullptr) {
         DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
         return false;

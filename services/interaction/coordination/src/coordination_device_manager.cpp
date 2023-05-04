@@ -28,10 +28,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
-const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
-const std::string SPLIT_SYMBOL { "|" };
-const std::string DH_ID_PREFIX { "Input_" };
-const std::string CONFIG_ITEM_KEYBOARD_TYPE { "Key.keyboard.type" };
 constexpr size_t NETWORK_ID_NUMS = 3;
 constexpr size_t DESCRIPTOR_INDEX = 2;
 } // namespace
@@ -120,22 +116,26 @@ void CoordinationDeviceManager::Device::Populate()
 
 bool CoordinationDeviceManager::Device::IsRemote()
 {
+    const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
     return (GetName().find(INPUT_VIRTUAL_DEVICE_NAME) != std::string::npos);
 }
 
 std::string CoordinationDeviceManager::Device::MakeNetworkId(const std::string &phys) const
 {
     std::vector<std::string> idParts;
+    const std::string SPLIT_SYMBOL { "|" };
     StringSplit(phys, SPLIT_SYMBOL, idParts);
     if (idParts.size() == NETWORK_ID_NUMS) {
         return idParts[1];
     }
-    return EMPTYSTR;
+    return "";
 }
 
 std::string CoordinationDeviceManager::Device::GenerateDescriptor()
 {
     const std::string phys = GetPhys();
+    const std::string SPLIT_SYMBOL { "|" };
+    const std::string DH_ID_PREFIX { "Input_" };
     std::string descriptor;
     if (IsRemote() && !phys.empty()) {
         FI_HILOGD("physicalPath:%{public}s", phys.c_str());
@@ -263,7 +263,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
         FI_HILOGE("Failed to search for the device:id %{public}d", id);
-        return EMPTYSTR;
+        return "";
     }
     CHKPS(devIter->second);
     auto OriginNetworkId = devIter->second->GetNetworkId();
@@ -278,7 +278,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
     CALL_INFO_TRACE;
     if (dhid.empty()) {
         FI_HILOGD("The current netWorkId is an empty string");
-        return EMPTYSTR;
+        return "";
     }
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
@@ -287,7 +287,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
         }
     }
     FI_HILOGD("The current netWorkId is an empty string");
-    return EMPTYSTR;
+    return "";
 }
 
 std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
@@ -300,7 +300,7 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
             return devIter->second->GetDhid();
         }
     }
-    return EMPTYSTR;
+    return "";
 }
 
 bool CoordinationDeviceManager::HasLocalPointerDevice() const

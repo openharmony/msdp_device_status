@@ -31,9 +31,6 @@ constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND = 5;
 constexpr int32_t SESSION_SIDE_SERVER = 0;
 constexpr int32_t SESSION_SIDE_CLIENT = 1;
 
-const std::string SESSION_NAME = "ohos.msdp.device_status.";
-const std::string GROUP_ID = "fi_softbus_group_id";
-
 #define FI_SOFTBUS_KEY_CMD_TYPE "fi_softbus_key_cmd_type"
 #define FI_SOFTBUS_KEY_LOCAL_DEVICE_ID "fi_softbus_key_local_device_id"
 #define FI_SOFTBUS_KEY_START_DHID "fi_softbus_key_start_dhid"

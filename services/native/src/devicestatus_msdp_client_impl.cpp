@@ -38,12 +38,8 @@ const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib64/libdevicestatus_al
 const std::string DEVICESTATUS_MOCK_LIB_PATH = "/system/lib/libdevicestatus_mock.z.so";
 const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib/libdevicestatus_algo.z.so";
 #endif
-std::map<Type, OnChangedValue> g_devicestatusDataMap;
-DeviceStatusMsdpClientImpl::CallbackManager g_callbacksMgr;
 using ClientType = Type;
 using ClientValue = OnChangedValue;
-IMsdp* g_IAlgo = nullptr;
-IMsdp* g_IMock = nullptr;
 } // namespace
 
 DeviceStatusMsdpClientImpl::DeviceStatusMsdpClientImpl()
@@ -80,11 +76,11 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
         DEV_HILOGE(SERVICE, "Start mock Library failed");
         return RET_ERR;
     }
-    if (g_IMock == nullptr) {
-        DEV_HILOGE(SERVICE, "Start mock failed, g_IMock is nullptr");
+    if (iMock_ == nullptr) {
+        DEV_HILOGE(SERVICE, "Start mock failed, iMock_ is nullptr");
         return RET_ERR;
     }
-    g_IMock->Enable(type);
+    iMock_->Enable(type);
     auto iter = mockCallCount_.find(type);
     if (iter == mockCallCount_.end()) {
         mockCallCount_.emplace(type, 0);
@@ -106,11 +102,11 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         DEV_HILOGE(SERVICE, "Start algo Library failed");
         return RET_ERR;
     }
-    if (g_IAlgo == nullptr) {
-        DEV_HILOGE(SERVICE, "Start algo Library failed, g_IAlgo is nullptr");
+    if (iAlgo_ == nullptr) {
+        DEV_HILOGE(SERVICE, "Start algo Library failed, iAlgo_ is nullptr");
         return RET_ERR;
     }
-    if ((g_IAlgo->Enable(type)) == RET_ERR) {
+    if ((iAlgo_->Enable(type)) == RET_ERR) {
         DEV_HILOGE(SERVICE, "Enable algo Library failed");
         return RET_ERR;
     }
@@ -132,8 +128,8 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         DEV_HILOGE(SERVICE, "Load algo Library failed");
         return RET_ERR;
     }
-    g_IAlgo = GetAlgoInst(type);
-    if (g_IAlgo == nullptr) {
+    iAlgo_ = GetAlgoInst(type);
+    if (iAlgo_ == nullptr) {
         DEV_HILOGE(SERVICE, "Get algo module failed");
         return RET_ERR;
     }
@@ -146,8 +142,8 @@ ErrCode DeviceStatusMsdpClientImpl::StartMock(Type type)
         DEV_HILOGE(SERVICE, "Load mock Library failed");
         return RET_ERR;
     }
-    g_IMock = GetMockInst(type);
-    if (g_IMock == nullptr) {
+    iMock_ = GetMockInst(type);
+    if (iMock_ == nullptr) {
         DEV_HILOGE(SERVICE, "Get mock module failed");
         return RET_ERR;
     }
@@ -194,8 +190,8 @@ ErrCode DeviceStatusMsdpClientImpl::SensorHdiDisable(Type type)
 ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (g_IAlgo == nullptr) {
-        DEV_HILOGE(SERVICE, "Algo disable failed, g_IAlgo is nullptr");
+    if (iAlgo_ == nullptr) {
+        DEV_HILOGE(SERVICE, "Algo disable failed, iAlgo_ is nullptr");
         return RET_ERR;
     }
     auto iter = algoCallCount_.find(type);
@@ -206,7 +202,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
     if (iter->second == 0) {
         algoCallCount_.erase(type);
     } else {
-        g_IAlgo->Disable(type);
+        iAlgo_->Disable(type);
         UnregisterAlgo();
     }
     iter->second--;
@@ -217,8 +213,8 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
             return RET_ERR;
         }
         DEV_HILOGI(SERVICE, "Close algorithm library");
-        g_IAlgo = nullptr;
-        g_callbacksMgr = nullptr;
+        iAlgo_ = nullptr;
+        callBacksMgr_ = nullptr;
     }
     DEV_HILOGI(SERVICE, "algoCallCount_ %{public}d", algoCallCount_[type]);
     return RET_OK;
@@ -227,8 +223,8 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (g_IMock == nullptr) {
-        DEV_HILOGE(SERVICE, "Mock disable failed, g_IMock is nullptr");
+    if (iMock_ == nullptr) {
+        DEV_HILOGE(SERVICE, "Mock disable failed, iMock_ is nullptr");
         return RET_ERR;
     }
     auto iter = mockCallCount_.find(type);
@@ -239,8 +235,8 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
     if (iter->second == 0) {
         mockCallCount_.erase(type);
     } else {
-        g_IMock->DisableCount(type);
-        g_IMock->Disable(type);
+        iMock_->DisableCount(type);
+        iMock_->Disable(type);
         UnregisterMock();
     }
     iter->second--;
@@ -249,26 +245,26 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
             DEV_HILOGE(SERVICE, "Failed to close library");
             return RET_ERR;
         }
-        g_IMock = nullptr;
-        g_callbacksMgr = nullptr;
+        iMock_ = nullptr;
+        callBacksMgr_ = nullptr;
     }
     return RET_OK;
 }
 
 ErrCode DeviceStatusMsdpClientImpl::ImplCallback(const Data& data)
 {
-    if (g_callbacksMgr == nullptr) {
-        DEV_HILOGE(SERVICE, "g_callbacksMgr is nullptr");
+    if (callBacksMgr_ == nullptr) {
+        DEV_HILOGE(SERVICE, "callBacksMgr_ is nullptr");
         return RET_ERR;
     }
-    g_callbacksMgr(data);
+    callBacksMgr_(data);
     return RET_OK;
 }
 
 ErrCode DeviceStatusMsdpClientImpl::RegisterImpl(const CallbackManager& callback)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    g_callbacksMgr = callback;
+    callBacksMgr_ = callback;
     return RET_OK;
 }
 
@@ -281,9 +277,9 @@ void DeviceStatusMsdpClientImpl::OnResult(const Data& data)
 ErrCode DeviceStatusMsdpClientImpl::RegisterMock()
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (g_IMock != nullptr) {
-        std::shared_ptr<IMsdp::MsdpAlgoCallback> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
-        g_IMock->RegisterCallback(callback);
+    if (iMock_ != nullptr) {
+        std::shared_ptr<IMsdp::MsdpAlgoCallback> callback = shared_from_this();
+        iMock_->RegisterCallback(callback);
     }
 
     DEV_HILOGD(SERVICE, "Exit");
@@ -293,11 +289,11 @@ ErrCode DeviceStatusMsdpClientImpl::RegisterMock()
 ErrCode DeviceStatusMsdpClientImpl::UnregisterMock()
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (g_IMock == nullptr) {
+    if (iMock_ == nullptr) {
         DEV_HILOGE(SERVICE, "Unregister mock callback failed");
         return RET_ERR;
     }
-    g_IMock->UnregisterCallback();
+    iMock_->UnregisterCallback();
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
 }
@@ -305,9 +301,9 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterMock()
 ErrCode DeviceStatusMsdpClientImpl::RegisterAlgo()
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (g_IAlgo != nullptr) {
+    if (iAlgo_ != nullptr) {
         std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-        g_IAlgo->RegisterCallback(callback_);
+        iAlgo_->RegisterCallback(callback_);
     }
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -317,12 +313,12 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterAlgo()
 {
     DEV_HILOGD(SERVICE, "Enter");
 
-    if (g_IAlgo == nullptr) {
+    if (iAlgo_ == nullptr) {
         DEV_HILOGE(SERVICE, "Unregister algo callback failed");
         return RET_ERR;
     }
 
-    g_IAlgo->UnregisterCallback();
+    iAlgo_->UnregisterCallback();
 
     DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
@@ -343,14 +339,14 @@ int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
 Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    for (auto iter = g_devicestatusDataMap.begin(); iter != g_devicestatusDataMap.end(); ++iter) {
+    for (auto iter = deviceStatusDataMap_.begin(); iter != deviceStatusDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;
             notifyManagerFlag_ = true;
             return data;
         }
     }
-    g_devicestatusDataMap.insert(std::make_pair(data.type, data.value));
+    deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
     notifyManagerFlag_ = true;
     return data;
 }
@@ -358,7 +354,7 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
 std::map<ClientType, ClientValue> DeviceStatusMsdpClientImpl::GetObserverData() const
 {
     DEV_HILOGD(SERVICE, "Enter");
-    return g_devicestatusDataMap;
+    return deviceStatusDataMap_;
 }
 
 void DeviceStatusMsdpClientImpl::GetDeviceStatusTimestamp()

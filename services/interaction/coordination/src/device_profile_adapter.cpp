@@ -31,8 +31,6 @@ using namespace OHOS::DeviceProfile;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID = "deviceStatus";
-const std::string SERVICE_TYPE = "deviceStatus";
-const std::string CHARACTERISTICS_NAME = "currentStatus";
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -47,11 +45,12 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
     CALL_INFO_TRACE;
+    const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateNumber(state));
+    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -80,11 +79,12 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
     CALL_INFO_TRACE;
+    const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
-    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateNumber(state));
+    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -105,7 +105,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
         FI_HILOGE("Parser.json_ is not object");
         return false;
     }
-    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
+    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, characteristicsName_.c_str());
     if (!cJSON_IsNumber(state)) {
         FI_HILOGE("State is not number type");
         return false;
