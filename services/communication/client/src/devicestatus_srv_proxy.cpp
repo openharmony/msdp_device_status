@@ -230,7 +230,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -239,6 +239,7 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isUnchained, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

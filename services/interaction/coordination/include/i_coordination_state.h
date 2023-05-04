@@ -38,7 +38,7 @@ public:
     {
         return RET_OK;
     }
-    virtual int32_t DeactivateCoordination(const std::string &networkId)
+    virtual int32_t DeactivateCoordination(const std::string &networkId, bool isUnchained)
     {
         return RET_OK;
     }

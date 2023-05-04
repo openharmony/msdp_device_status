@@ -57,7 +57,7 @@ int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     return RET_OK;
 }
 
-int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData)
+int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, bool isUnchained)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -66,7 +66,7 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData)
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->DeactivateCoordination();
+    int32_t ret = CooSM->DeactivateCoordination(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("DeactivateCoordination failed, ret:%{public}d", ret);
         CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));

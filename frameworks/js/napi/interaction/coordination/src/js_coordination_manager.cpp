@@ -80,7 +80,7 @@ napi_value JsCoordinationManager::Deactivate(napi_env env, bool isUnchained, nap
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsDeactivate, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->DeactivateCoordination(callback);
+    int32_t errCode = InteractionMgr->DeactivateCoordination(isUnchained, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }

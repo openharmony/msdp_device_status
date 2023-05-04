@@ -72,7 +72,14 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& 
 
 void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
 {
-    CooSM->StopRemoteCoordination();
+    CALL_DEBUG_ENTER;
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+
+    if (!cJSON_IsBool(result)) {
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        return;
+    }
+    CooSM->StopRemoteCoordination(cJSON_IsTrue(result));
 }
 
 void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
@@ -305,7 +312,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     return RET_OK;
 }
 
-int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -316,6 +323,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_STOP));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isUnchained));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
@@ -504,6 +512,7 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
         channelStatusMap_.erase(deviceId);
     }
     CooSM->Reset(deviceId);
+    CooSM->NotifySessionClosed();
 }
 
 void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)

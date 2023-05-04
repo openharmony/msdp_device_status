@@ -159,7 +159,8 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::DeactivateCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
+    std::function<void(std::string, CoordinationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -168,7 +169,7 @@ int32_t InteractionManagerImpl::DeactivateCoordination(std::function<void(std::s
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.DeactivateCoordination(callback);
+    return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);

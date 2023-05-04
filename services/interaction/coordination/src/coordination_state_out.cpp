@@ -34,7 +34,7 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
     : startDeviceDhid_(startDeviceDhid)
 {}
 
-int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;
@@ -42,7 +42,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
         std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
         tempRemoteNetworkId = prepared.first;
     }
-    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId);
+    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return RET_ERR;

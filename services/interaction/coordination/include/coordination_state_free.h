@@ -24,6 +24,7 @@ namespace DeviceStatus {
 class CoordinationStateFree final : public ICoordinationState {
 public:
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t DeactivateCoordination(const std::string &networkId, bool isUnchained) override;
 
 private:
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);

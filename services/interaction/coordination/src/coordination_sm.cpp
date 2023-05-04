@@ -81,7 +81,7 @@ void CoordinationSM::OnSessionLost(SessionPtr session)
     RemoveMonitor();
     RemoveInterceptor();
     if (coordinationState_ != CoordinationState::STATE_FREE) {
-        DeactivateCoordination();
+        DeactivateCoordination(CooSM->isUnchained_);
     }
 }
 
@@ -234,7 +234,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     return ret;
 }
 
-int32_t CoordinationSM::DeactivateCoordination()
+int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -247,11 +247,14 @@ int32_t CoordinationSM::DeactivateCoordination()
     std::string stopNetworkId = "";
     if (coordinationState_ == CoordinationState::STATE_IN) {
         stopNetworkId = CooDevMgr->GetOriginNetworkId(startDeviceDhid_);
-    }
-    if (coordinationState_ == CoordinationState::STATE_OUT) {
+    } else if (coordinationState_ == CoordinationState::STATE_OUT) {
         stopNetworkId = remoteNetworkId_;
+    } else {
+        stopNetworkId = CooDevMgr->GetOriginNetworkId(sinkDhid_);
     }
-    int32_t ret = currentStateSM_->DeactivateCoordination(stopNetworkId);
+    isUnchained_ = isUnchained;
+    FI_HILOGD("isUnchained_:%{public}d, stopNetworkId:%{public}s", isUnchained_, stopNetworkId.c_str());
+    int32_t ret = currentStateSM_->DeactivateCoordination(stopNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination fail");
         isStopping_ = false;
@@ -301,6 +304,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
+    sinkDhid_ = startDeviceDhid;
     CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
@@ -327,10 +331,11 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
     isStarting_ = false;
 }
 
-void CoordinationSM::StopRemoteCoordination()
+void CoordinationSM::StopRemoteCoordination(bool isUnchained)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
+    isUnchained_ = isUnchained;
     isStopping_ = true;
 }
 
@@ -344,6 +349,12 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     }
     if (isSuccess) {
         Reset(true);
+    }
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
+        FI_HILOGI("The peer preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
+            preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
+        UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
+        isUnchained_ = false;
     }
     isStopping_ = false;
 }
@@ -408,6 +419,12 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
             FI_HILOGI("Current state is free");
         }
     }
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
+        FI_HILOGI("The local preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
+            preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
+        UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
+        isUnchained_ = false;
+    }
     CooSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
     isStopping_ = false;
 }
@@ -459,6 +476,19 @@ bool CoordinationSM::UpdateMouseLocation()
     return true;
 }
 
+void CoordinationSM::UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    DistributedAdapter->UnPrepareRemoteInput(localNetworkId, remoteNetworkId,
+        [](bool isSuccess) {
+            if(!isSuccess) {
+                FI_HILOGI("Failed to unprepare remote");
+            }
+        });
+    preparedNetworkId_ = std::make_pair("", "");
+    CooSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
+}
+
 void CoordinationSM::UpdateState(CoordinationState state)
 {
     FI_HILOGI("state: %{public}d", state);
@@ -476,7 +506,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
-                DeactivateCoordination();
+                DeactivateCoordination(isUnchained_);
                 return;
             }
             break;
@@ -489,7 +519,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD) | CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER));
             if (interceptorId_ <= 0) {
                 FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
-                DeactivateCoordination();
+                DeactivateCoordination(isUnchained_);
                 return;
             }
             break;
@@ -802,7 +832,7 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
         if (CooSM->startDeviceDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
             CHKPV(CooSM->currentStateSM_);
-            CooSM->DeactivateCoordination();
+            CooSM->DeactivateCoordination(CooSM->isUnchained_);
         }
     }
     FI_HILOGD("Interceptor consumer pointer event leave");
@@ -836,7 +866,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!CooDevMgr->IsRemote(deviceId)) {
             CHKPV(CooSM->currentStateSM_);
-            CooSM->DeactivateCoordination();
+            CooSM->DeactivateCoordination(CooSM->isUnchained_);
         }
     }
     FI_HILOGD("Monitor consumer pointer event leave");
@@ -886,6 +916,24 @@ std::string CoordinationSM::GetRemoteId() const
 {
     std::lock_guard<std::mutex> guard(mutex_);
     return remoteNetworkId_;
+}
+
+void CoordinationSM::SetUnchainStatus(bool isUnchained)
+{
+    CALL_DEBUG_ENTER;
+    isUnchained_ = isUnchained;
+}
+
+void CoordinationSM::NotifySessionClosed()
+{
+    CoordinationMessage msg = CoordinationMessage::SESSION_CLOSED;
+    auto *context = CoordinationEventMgr->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CoordinationEventManager::OnCoordinationMessage, CoordinationEventMgr, msg, ""));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

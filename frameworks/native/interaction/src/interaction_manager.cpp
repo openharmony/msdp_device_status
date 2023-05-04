@@ -58,10 +58,10 @@ int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetwor
     return InteractionMgrImpl.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
 }
 
-int32_t InteractionManager::DeactivateCoordination(std::function<void(const std::string&,
-    CoordinationMessage)> callback)
+int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
+    std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.DeactivateCoordination(callback);
+    return InteractionMgrImpl.DeactivateCoordination(isUnchained, callback);
 }
 
 int32_t InteractionManager::GetCoordinationState(

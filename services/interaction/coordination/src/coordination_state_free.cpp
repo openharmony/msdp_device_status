@@ -57,6 +57,43 @@ int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, 
     CALL_DEBUG_ENTER;
     return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
+
+int32_t CoordinationStateFree::DeactivateCoordination(const std::string &networkId, bool isUnchained)
+{
+    CALL_INFO_TRACE;
+    if (!isUnchained) {
+        FI_HILOGD("No stop operation is required");
+        return RET_ERR;
+    }
+    int32_t ret = CooSoftbusAdapter->OpenInputSoftbus(networkId);
+    if (ret != RET_OK) {
+        FI_HILOGI("Failed to open softbus");
+        return ret;
+    }
+    ret = CooSoftbusAdapter->StopRemoteCoordination(networkId, isUnchained);
+    if (ret != RET_OK) {
+        FI_HILOGI("Stop coordination fail");
+        return ret;
+    }
+
+    std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
+    if (!prepared.first.empty() && !prepared.second.empty()) {
+        FI_HILOGI("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
+            prepared.first.c_str(), prepared.second.c_str());
+        if (networkId == prepared.first || networkId == prepared.second) {
+            FI_HILOGI("networkId:%{public}s", networkId.c_str());
+            CooSM->UnchainCoordination(prepared.first, prepared.second);
+            CooSM->SetUnchainStatus(false);
+        }
+    } else {
+        ret = CooSoftbusAdapter->StopRemoteCoordinationResult(networkId, false);
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to stop the process");
+            return ret;
+        }
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

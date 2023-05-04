@@ -51,7 +51,7 @@ public:
     int32_t UnprepareCoordination(FuncCoordinationMessage callback);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         FuncCoordinationMessage callback);
-    int32_t DeactivateCoordination(FuncCoordinationMessage callback);
+    int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback);
     int32_t GetCoordinationState(const std::string &deviceId, FuncCoordinationState callback);
     void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);

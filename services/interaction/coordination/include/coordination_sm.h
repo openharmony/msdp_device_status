@@ -126,13 +126,13 @@ public:
     void PrepareCoordination();
     void UnprepareCoordination();
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t DeactivateCoordination();
+    int32_t DeactivateCoordination(bool isUnchained);
     int32_t GetCoordinationState(const std::string &deviceId);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCoordinationResult(bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
-    void StopRemoteCoordination();
+    void StopRemoteCoordination(bool isUnchained);
     void StopRemoteCoordinationResult(bool isSuccess);
     void StartCoordinationOtherResult(const std::string &remoteNetworkId);
     void UpdateState(CoordinationState state);
@@ -161,6 +161,9 @@ public:
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CoordinationState, CoordinationState)> callback);
     std::string GetRemoteId() const;
+    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId); // 修改名称
+    void SetUnchainStatus(bool isUnchained);
+    void NotifySessionClosed();
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -177,6 +180,8 @@ private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
+    std::string sinkDhid_;
+    bool isUnchained_ { false };
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
