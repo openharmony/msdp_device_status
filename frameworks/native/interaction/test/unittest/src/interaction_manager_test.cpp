@@ -24,6 +24,7 @@
 #include "input_device.h"
 #include "input_manager.h"
 #include "pointer_event.h"
+#include "securec.h"
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
@@ -39,7 +40,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Inter
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
-constexpr std::chrono::milliseconds PROMISE_WAIT_SPAN  {3000 };
+constexpr std::chrono::milliseconds PROMISE_WAIT_SPAN  { 3000 };
 constexpr int32_t TEST_PIXEL_MAP_WIDTH { 200 };
 constexpr int32_t TEST_PIXEL_MAP_HEIGHT { 200 };
 constexpr int32_t MOUSE_POINTER_ID { 0 };
@@ -163,8 +164,10 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
         FI_HILOGE("colorPixels is nullptr");
         return nullptr;
     }
-    for (int32_t i = 0; i < colorLen; ++i) {
-        colorPixels[i] = DEFAULT_ICON_COLOR;
+    if (memset_s(colorPixels, colorLen, DEFAULT_ICON_COLOR, colorLen) != RET_OK) {
+        FI_HILOGE("memset_s failed");
+        delete[] colorPixels;
+        return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
     delete[] colorPixels;

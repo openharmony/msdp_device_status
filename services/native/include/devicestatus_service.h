@@ -120,18 +120,17 @@ private:
 
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
-    std::thread t_;
+    std::thread worker_;
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
-    std::atomic<bool> ready_ = false;
+    std::atomic<bool> ready_ { false };
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
     DragManager dragMgr_;
     AcrossDeviceDrag acrossDeviceDrag_;
     DeviceStatusDumper deviceStatusDumper_;
 };
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
