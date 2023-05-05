@@ -43,9 +43,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using namespace OHOS::HiviewDFX;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 constexpr int32_t MAX_N_RETRIES { 100 };
@@ -58,23 +57,21 @@ struct device_status_epoll_event {
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSpSingleton<DeviceStatusService>::GetInstance().GetRefPtr());
 } // namespace
-DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
-{
-    DEV_HILOGD(SERVICE, "Add SystemAbility");
-}
 
-DeviceStatusService::~DeviceStatusService() {}
+DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
+{}
+
+DeviceStatusService::~DeviceStatusService()
+{}
 
 void DeviceStatusService::OnDump()
-{
-    DEV_HILOGI(SERVICE, "OnDump");
-}
+{}
 
 void DeviceStatusService::OnStart()
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_INFO_TRACE;
     if (ready_) {
-        DEV_HILOGE(SERVICE, "OnStart is ready, nothing to do");
+        FI_HILOGE("OnStart is ready, nothing to do");
         return;
     }
 
@@ -82,32 +79,34 @@ void DeviceStatusService::OnStart()
     delegateTasks_.SetWorkerThreadId(tid);
 
     if (!Init()) {
-        DEV_HILOGE(SERVICE, "OnStart call init fail");
+        FI_HILOGE("OnStart call init fail");
         return;
     }
     if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
-        DEV_HILOGE(SERVICE, "OnStart register to system ability manager failed");
+        FI_HILOGE("OnStart register to system ability manager failed");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
-    t_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
-    t_.join();
+    worker_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
 }
 
 void DeviceStatusService::OnStop()
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_INFO_TRACE;
     if (!ready_) {
         return;
     }
     ready_ = false;
+    state_ = ServiceRunningState::STATE_EXIT;
 
-    if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusManager_ is null");
-        return;
+    delegateTasks_.PostAsyncTask([]() -> int32_t {
+        FI_HILOGD("no op");
+        return RET_OK;
+    });
+    if (worker_.joinable()) {
+        worker_.join();
     }
-    DEV_HILOGD(SERVICE, "unload algorithm library exit");
 }
 
 IDelegateTasks& DeviceStatusService::GetDelegateTasks()
@@ -132,13 +131,13 @@ IDragManager& DeviceStatusService::GetDragManager()
 
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
-    DEV_HILOGI(SERVICE, "dump DeviceStatusServiceInfo");
+    CALL_DEBUG_ENTER;
     if (fd < 0) {
-        DEV_HILOGE(SERVICE, "fd is invalid");
+        FI_HILOGE("fd is invalid");
         return RET_NG;
     }
     if (args.empty()) {
-        DEV_HILOGE(SERVICE, "param cannot be empty");
+        FI_HILOGE("param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
         deviceStatusDumper_.DumpHelpInfo(fd);
         return RET_NG;
@@ -150,8 +149,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
     });
 
     std::vector<Data> datas;
-    for (auto type = TYPE_ABSOLUTE_STILL;type <= TYPE_LID_OPEN;
-        type = (Type)(type+1)) {
+    for (auto type = TYPE_ABSOLUTE_STILL; type <= TYPE_LID_OPEN; type = static_cast<Type>(type+1)) {
         Data data = GetCache(type);
         if (data.value != OnChangedValue::VALUE_INVALID) {
             datas.emplace_back(data);
@@ -163,9 +161,9 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
 
 bool DeviceStatusService::Init()
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusManager_ is null");
+        FI_HILOGW("devicestatusManager_ is null");
         auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
@@ -214,15 +212,14 @@ INIT_FAIL:
     EpollClose();
     return false;
 }
+
 bool DeviceStatusService::IsServiceReady() const
 {
-    DEV_HILOGD(SERVICE, "Enter");
     return ready_;
 }
 
 std::shared_ptr<DeviceStatusManager> DeviceStatusService::GetDeviceStatusManager() const
 {
-    DEV_HILOGD(SERVICE, "Enter");
     return devicestatusManager_;
 }
 
@@ -244,7 +241,6 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     appInfo->callback = callback;
     DeviceStatusDumper::GetInstance().SaveAppInfo(appInfo);
     devicestatusManager_->Subscribe(type, event, latency, callback);
-    DEV_HILOGD(SERVICE, "Exit");
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
     WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
@@ -276,11 +272,11 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
 
 Data DeviceStatusService::GetCache(const Type& type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         Data data = {type, OnChangedValue::VALUE_EXIT};
         data.value = OnChangedValue::VALUE_INVALID;
-        DEV_HILOGI(SERVICE, "GetLatestDeviceStatusData func is nullptr,return default!");
+        FI_HILOGI("GetLatestDeviceStatusData func is nullptr,return default!");
         return data;
     }
     return devicestatusManager_->GetLatestDeviceStatusData(type);
@@ -301,7 +297,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
         "PKGNAME", packageName,
         "TYPE", type);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "HiviewDFX write failed, ret:%{public}d", ret);
+        FI_HILOGE("HiviewDFX write failed, ret:%{public}d", ret);
     }
 }
 
@@ -330,6 +326,7 @@ void DeviceStatusService::OnConnected(SessionPtr s)
     CHKPV(s);
     FI_HILOGI("fd:%{public}d", s->GetFd());
 }
+
 void DeviceStatusService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
@@ -355,7 +352,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     eventData->event_type = type;
     FI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
-    struct epoll_event ev = {};
+    struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, -1);
@@ -378,7 +375,7 @@ int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
         FI_HILOGE("Invalid param fd_");
         return RET_ERR;
     }
-    struct epoll_event ev = {};
+    struct epoll_event ev {};
     auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, -1);
     if (ret < 0) {
         FI_HILOGE("DelEpoll failed");
@@ -799,7 +796,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::GetDragTargetPid, &dragMgr_));
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         FI_HILOGE("GetDragTargetPid failed, ret:%{public}d", ret);
     }
     return ret;

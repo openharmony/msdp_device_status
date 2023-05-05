@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
@@ -66,7 +68,7 @@ void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest001 start";
-    AlgoAbsoluteStill* still = new (std::nothrow) AlgoAbsoluteStill();
+    std::unique_ptr<AlgoAbsoluteStill> still = std::make_unique<AlgoAbsoluteStill>();
     bool ret = still->Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
@@ -86,7 +88,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest002 start";
-    AlgoHorizontal* horizontal = new (std::nothrow) AlgoHorizontal();
+    std::unique_ptr<AlgoHorizontal> horizontal = std::make_unique<AlgoHorizontal>();
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal->Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
@@ -106,7 +108,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest003 start";
-    AlgoVertical* vertical = new (std::nothrow) AlgoVertical();
+    std::unique_ptr<AlgoVertical> vertical = std::make_unique<AlgoVertical>();
     bool ret = vertical->Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     ASSERT_TRUE(ret);
@@ -169,7 +171,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoAbsoluteStill* still = new AlgoAbsoluteStill();
+    std::unique_ptr<AlgoAbsoluteStill> still = std::make_unique<AlgoAbsoluteStill>();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     still->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
@@ -192,7 +194,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoHorizontal* horizontal = new AlgoHorizontal();
+    std::unique_ptr<AlgoHorizontal> horizontal = std::make_unique<AlgoHorizontal>();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     horizontal->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
@@ -215,7 +217,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoVertical* vertical = new AlgoVertical();
+    std::unique_ptr<AlgoVertical> vertical = std::make_unique<AlgoVertical>();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     vertical->RegisterCallback(callback_);
     ASSERT_TRUE(ret);
@@ -238,7 +240,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoVertical* vertical = new AlgoVertical();
+    std::unique_ptr<AlgoVertical> vertical = std::make_unique<AlgoVertical>();
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     vertical->RegisterCallback(callback_);
     ASSERT_TRUE(ret);

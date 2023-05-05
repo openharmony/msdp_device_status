@@ -74,6 +74,10 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 
 void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int status)
 {
+    if (work == nullptr) {
+        DEV_HILOGE(JS_NAPI, "work is nullptr");
+        return;
+    }
     Data* data = static_cast<Data*>(work->data);
     delete work;
     if (data == nullptr) {
