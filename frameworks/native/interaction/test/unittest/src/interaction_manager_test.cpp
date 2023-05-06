@@ -30,6 +30,7 @@
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
+#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -51,7 +52,8 @@ constexpr int32_t DRAG_SRC_Y { 0 };
 constexpr int32_t DRAG_DST_X { 500 };
 constexpr int32_t DRAG_DST_Y { 500 };
 constexpr int32_t DRAG_NUM { 1 };
-constexpr uint32_t DEFAULT_ICON_COLOR { 0x0000FFFF };
+constexpr int32_t INT32_BYTE { 4 };
+constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
@@ -158,13 +160,22 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
-    int32_t colorLen = width * height;
+    int32_t colorLen = 0;
+    if (!MultiplyInt32(width, width, colorLen)) {
+        FI_HILOGE("Overflow:%{public}d * %{public}d", width, height);
+        return nullptr;
+    }
+    int32_t colorByteCount = 0;
+    if (!MultiplyInt32(colorLen, INT32_BYTE, colorByteCount)) {
+        FI_HILOGE("Overflow:%{public}d * %{public}d", colorLen, INT32_BYTE);
+        return nullptr;
+    }
     uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
     if (colorPixels == nullptr) {
         FI_HILOGE("colorPixels is nullptr");
         return nullptr;
     }
-    if (memset_s(colorPixels, colorLen, DEFAULT_ICON_COLOR, colorLen) != RET_OK) {
+    if (memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount) != RET_OK) {
         FI_HILOGE("memset_s failed");
         delete[] colorPixels;
         return nullptr;
