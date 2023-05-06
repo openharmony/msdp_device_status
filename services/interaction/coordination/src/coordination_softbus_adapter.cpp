@@ -134,6 +134,7 @@ static void StreamReceived(int32_t sessionId, const StreamData *data, const Stre
 int32_t CoordinationSoftbusAdapter::Init()
 {
     CALL_INFO_TRACE;
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     sessListener_ = {
         .OnSessionOpened = SessionOpened,
         .OnSessionClosed = SessionClosed,
@@ -187,6 +188,8 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
+    const std::string GROUP_ID = "fi_softbus_group_id";
     if (CheckDeviceSessionState(remoteNetworkId)) {
         FI_HILOGD("Softbus session has already  opened");
         return RET_OK;

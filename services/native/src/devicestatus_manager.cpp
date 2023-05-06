@@ -20,10 +20,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::HiviewDFX;
-namespace {
-static constexpr uint8_t ARG_4 = 4;
-int arrs_ [ARG_4] {};
-} // namespace
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
@@ -44,7 +40,7 @@ bool DeviceStatusManager::Init()
         }
     }
 
-    msdpImpl_ = std::make_unique<DeviceStatusMsdpClientImpl>();
+    msdpImpl_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     if (msdpImpl_ == nullptr) {
         DEV_HILOGE(SERVICE, "msdpImpl_ is nullptr");
         return false;

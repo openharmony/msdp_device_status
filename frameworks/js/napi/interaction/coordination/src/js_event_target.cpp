@@ -27,6 +27,10 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
 std::mutex mutex_;
+inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
+inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
+inline constexpr std::string_view RESOLVE_DEFERRED { "napi_resolve_deferred" };
+inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 } // namespace
 
 JsEventTarget::JsEventTarget()
