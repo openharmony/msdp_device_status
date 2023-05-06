@@ -302,7 +302,7 @@ ErrCode DeviceStatusMsdpClientImpl::RegisterAlgo()
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (iAlgo_ != nullptr) {
-        std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+        std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ = shared_from_this();
         iAlgo_->RegisterCallback(callback_);
     }
     DEV_HILOGD(SERVICE, "Exit");
