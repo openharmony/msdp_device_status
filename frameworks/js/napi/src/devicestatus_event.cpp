@@ -155,7 +155,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
-     if (typeHandler == nullptr) {
+    if (typeHandler == nullptr) {
         DEV_HILOGE(JS_NAPI, "typeHandler is nullptr");
         return;
     }
