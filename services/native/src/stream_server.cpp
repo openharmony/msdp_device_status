@@ -214,7 +214,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     auto& buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
                 FI_HILOGW("Write data failed. size:%{public}zu", size);
