@@ -57,9 +57,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest001 end");
 }
 
@@ -77,9 +80,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest002 end");
 }
 
@@ -97,9 +103,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest003 end");
 }
 
@@ -117,9 +126,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest004 end");
 }
 
@@ -137,9 +149,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest005 end");
 }
 
@@ -157,9 +172,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     GTEST_LOG_(INFO) << "Start register";
-    StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = RET_OK;
+    ret = StationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(ret, RET_OK);
     GTEST_LOG_(INFO) << "Cancell register";
-    StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = StationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(ret, RET_OK);
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest006 end");
 }
 

@@ -23,9 +23,15 @@
 #include "napi/native_node_api.h"
 
 #include "devicestatus_common.h"
+#include "devicestatus_define.h"
 
 using namespace OHOS::Msdp;
 using namespace OHOS::Msdp::DeviceStatus;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
+std::mutex mutex_;
+} // namespace
+
 
 DeviceStatusEvent::DeviceStatusEvent(napi_env env)
 {
@@ -155,10 +161,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
-    if (typeHandler == nullptr) {
-        DEV_HILOGE(JS_NAPI, "typeHandler is nullptr");
-        return;
-    }
+    CHKPV(typeHandler);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {

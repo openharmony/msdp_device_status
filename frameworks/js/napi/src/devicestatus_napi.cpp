@@ -22,6 +22,7 @@
 
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"
+#include "devicestatus_define.h"
 #include "devicestatus_napi_error.h"
 #include "stationary_manager.h"
 
@@ -39,6 +40,8 @@ static const std::vector<std::string> vecDeviceStatusValue {
     "VALUE_ENTER", "VALUE_EXIT"
 };
 thread_local DeviceStatusNapi *g_obj = nullptr;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapi" };
+std::mutex mutex_;
 } // namespace
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
@@ -74,10 +77,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 
 void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int status)
 {
-    if (work == nullptr) {
-        DEV_HILOGE(JS_NAPI, "work is nullptr");
-        return;
-    }
+    CHKPV(work);
     Data* data = static_cast<Data*>(work->data);
     delete work;
     if (data == nullptr) {
@@ -159,7 +159,7 @@ bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
     DEV_HILOGD(JS_NAPI, "Enter");
     int arr[ARG_4] = {};
     size_t argc = ARG_4;
-    napi_value args[ARG_4] = { nullptr };
+    napi_value args[ARG_4] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to get_cb_info");
@@ -189,7 +189,7 @@ bool DeviceStatusNapi::CheckUnsubArguments(napi_env env, napi_callback_info info
     DEV_HILOGD(JS_NAPI, "Enter");
     int arr[ARG_3] = {};
     size_t argc = ARG_3;
-    napi_value args[ARG_3] = { nullptr };
+    napi_value args[ARG_3] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to get_cb_info");
@@ -218,7 +218,7 @@ bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
     DEV_HILOGD(JS_NAPI, "Enter");
     int arr[ARG_2] = {};
     size_t argc = ARG_2;
-    napi_value args[ARG_2] = { nullptr };
+    napi_value args[ARG_2] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         DEV_HILOGE(JS_NAPI, "Failed to get_cb_info");
@@ -247,7 +247,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
 {
     std::tuple<bool, napi_value, std::string, int32_t, int32_t> result { false, nullptr, "", -1, -1 };
     size_t argc = ARG_4;
-    napi_value args[ARG_4] = { nullptr };
+    napi_value args[ARG_4] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if ((status != napi_ok) || (argc < ARG_4)) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
@@ -289,7 +289,7 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
 {
     std::tuple<bool, napi_value, int32_t, int32_t> result { false, nullptr, -1, -1 };
     size_t argc = ARG_3;
-    napi_value args[ARG_3] = { nullptr };
+    napi_value args[ARG_3] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if ((status != napi_ok) || (argc < ARG_3)) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
@@ -334,7 +334,7 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
 {
     std::tuple<bool, napi_value, int32_t> result { false, nullptr, -1 };
     size_t argc = ARG_2;
-    napi_value args[ARG_2] = { nullptr };
+    napi_value args[ARG_2] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if ((status != napi_ok) || (argc < ARG_2)) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");

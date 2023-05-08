@@ -538,7 +538,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value resultObj[2] = { nullptr };
+    napi_value resultObj[2] = {};
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, scope);
     resultObj[1] = JsUtil::GetCrossingSwitchStateInfo(cb);
     if (resultObj[1] == nullptr) {
