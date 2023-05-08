@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/msdp/device_status/device_status.gni")
 import("//build/config/features.gni")
 import("//build/test.gni")
+import("../../../device_status.gni")
 
 module_output_path = "device_status/device_status_native"
 
@@ -32,8 +32,7 @@ deps_ex = [
 
 ohos_fuzztest("DeviceStatusAgentFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/msdp/device_status/test/fuzztest/devicestatusagent_fuzzer"
+  fuzz_config_file = "../devicestatusagent_fuzzer"
 
   include_dirs = [
     "./",
