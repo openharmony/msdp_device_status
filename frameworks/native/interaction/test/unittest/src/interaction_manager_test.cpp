@@ -30,7 +30,6 @@
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
-#include "util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -160,27 +159,17 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
-    int32_t colorLen = 0;
-    if (!MultiplyInt32(width, width, colorLen)) {
-        FI_HILOGE("Overflow:%{public}d * %{public}d", width, height);
-        return nullptr;
-    }
-    int32_t colorByteCount = 0;
-    if (!MultiplyInt32(colorLen, INT32_BYTE, colorByteCount)) {
-        FI_HILOGE("Overflow:%{public}d * %{public}d", colorLen, INT32_BYTE);
-        return nullptr;
-    }
+    int32_t colorLen = width * height;
     uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
-    if (colorPixels == nullptr) {
-        FI_HILOGE("colorPixels is nullptr");
-        return nullptr;
-    }
-    if (memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount) != RET_OK) {
+    CHKPP(colorPixels);
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    if (memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount) != EOK) {
         FI_HILOGE("memset_s failed");
         delete[] colorPixels;
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
+    CHKPL(pixelMap);
     delete[] colorPixels;
     return pixelMap;
 }
