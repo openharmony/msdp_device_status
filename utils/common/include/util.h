@@ -59,6 +59,38 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
     return AddInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
 }
 
+template<typename T>
+bool MultiplyInt(T op1, T op2, T minVal, T maxVal, T &res)
+{
+    if (op1 > 0 && op2 > 0) {
+        if (maxVal / op1 < op2) {
+            return false;
+        }
+    } else if (op1 < 0 && op2 < 0) {
+        if (maxVal / op1 > op2) {
+            return false;
+        }
+    } else if (op1 < 0 && op2 > 0) {
+        if (minVal / op1 < op2) {
+            return false;
+        }
+    } else {
+        if (minVal / op1 > op2) {
+            return false;
+        }
+    }
+    res = op1 * op2;
+    return true;
+}
+
+inline bool MultiplyInt32(int32_t op1, int32_t op2, int32_t& res) {
+    return MultiplyInt(op1, op2, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max(), res);
+}
+
+inline bool MultiplyInt64(int64_t op1, int64_t op2, int64_t& res) {
+    return MultiplyInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
+}
+
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);
 
 std::string StringPrintf(const char *format, ...);
