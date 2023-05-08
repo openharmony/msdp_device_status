@@ -31,6 +31,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusMsdpMock" };
 constexpr int32_t TIMER_INTERVAL = 3;
 constexpr int32_t ERR_INVALID_FD = -1;
 DeviceStatusMsdpMock* g_msdpMock = nullptr;
@@ -253,6 +254,7 @@ extern "C" IMsdp *Create(void)
 {
     DEV_HILOGD(SERVICE, "Enter");
     g_msdpMock = new (std::nothrow) DeviceStatusMsdpMock();
+    CHKPP(g_msdpMock);
     DEV_HILOGD(SERVICE, "Exit");
     return g_msdpMock;
 }

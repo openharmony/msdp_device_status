@@ -22,6 +22,7 @@
 
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"
+#include "devicestatus_define.h"
 #include "devicestatus_napi_error.h"
 #include "stationary_manager.h"
 
@@ -29,6 +30,7 @@ using namespace OHOS;
 using namespace OHOS::Msdp;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusNapi" };
 constexpr size_t ARG_0 = 0;
 constexpr size_t ARG_1 = 1;
 constexpr size_t ARG_2 = 2;
@@ -58,10 +60,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
         return;
     }
     uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        DEV_HILOGE(JS_NAPI, "work is nullptr");
-        return;
-    }
+    CHKPV(work);
     DEV_HILOGD(JS_NAPI, "devicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
         devicestatusData.type, devicestatusData.value);
     data_ = devicestatusData;
@@ -365,10 +364,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
 {
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
-        if (g_obj == nullptr) {
-            DEV_HILOGE(JS_NAPI, "Failed to new g_obj");
-            return nullptr;
-        }
+        CHKPP(g_obj);
         DEV_HILOGD(JS_NAPI, "Didn't find object, so created it");
     }
     napi_wrap(env, nullptr, reinterpret_cast<void *>(g_obj),
@@ -390,10 +386,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     }
     sptr<IRemoteDevStaCallback> callback;
     callback = new (std::nothrow) DeviceStatusCallback(env);
-    if (callback == nullptr) {
-        DEV_HILOGE(JS_NAPI, "callback is nullptr");
-        return nullptr;
-    }
+    CHKPP(callback);
     auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(Type(type),
         ActivityEvent(event), ReportLatencyNs(latency), callback);
     if (subscribeRet != RET_OK) {
@@ -476,10 +469,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
     }
     if (g_obj == nullptr) {
         g_obj = new (std::nothrow) DeviceStatusNapi(env);
-        if (g_obj == nullptr) {
-            DEV_HILOGE(JS_NAPI, "Failed to new g_obj");
-            return nullptr;
-        }
+        CHKPP(g_obj);
         napi_wrap(env, nullptr, reinterpret_cast<void *>(g_obj),
             [](napi_env env, void *data, void *hint) {
                 (void)env;

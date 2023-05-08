@@ -125,10 +125,7 @@ ICoordination* CreateICoordination(IContext *context)
     }
     CoordinationEventMgr->SetIContext(context);
     ICoordination *coord = new (std::nothrow) Coordination();
-    if (coord == nullptr) {
-        FI_HILOGE("Create ICoordination failed");
-        return nullptr;
-    }
+    CHKPP(coord);
     return coord;
 }
 } // namespace DeviceStatus

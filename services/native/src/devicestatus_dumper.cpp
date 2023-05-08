@@ -74,10 +74,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         { NULL, 0, 0, 0 }
     };
     char **argv = new (std::nothrow) char *[args.size()];
-    if (argv == nullptr) {
-        DEV_HILOGE(SERVICE, "argv is nullptr");
-        return;
-    }
+    CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
         DEV_HILOGE(SERVICE, "call memset_s failed");
         delete[] argv;

@@ -19,6 +19,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusManager" };
+} // namespace
 using namespace OHOS::HiviewDFX;
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
@@ -34,10 +37,7 @@ bool DeviceStatusManager::Init()
     DEV_HILOGD(SERVICE, "Enter");
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new (std::nothrow) DeviceStatusCallbackDeathRecipient();
-        if (devicestatusCBDeathRecipient_ == nullptr) {
-            DEV_HILOGE(SERVICE, "devicestatusCBDeathRecipient_ failed");
-            return false;
-        }
+        CHKPF(devicestatusCBDeathRecipient_);
     }
 
     msdpImpl_ = std::make_shared<DeviceStatusMsdpClientImpl>();
