@@ -20,6 +20,7 @@ declare_args() {
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 device_status_part_name = "device_status"
+device_status_subsystem_name = "msdp"
 device_status_root_path = "//base/msdp/device_status"
 device_status_interfaces_path = "${device_status_root_path}/interfaces"
 device_status_frameworks_path = "${device_status_root_path}/frameworks"
