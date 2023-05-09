@@ -62,21 +62,25 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
 template<typename T>
 bool MultiplyInt(T op1, T op2, T minVal, T maxVal, T &res)
 {
-    if (op1 > 0 && op2 > 0) {
-        if (maxVal / op1 < op2) {
-            return false;
-        }
-    } else if (op1 < 0 && op2 < 0) {
-        if (maxVal / op1 > op2) {
-            return false;
-        }
-    } else if (op1 < 0 && op2 > 0) {
-        if (minVal / op1 < op2) {
-            return false;
+    if (op1 > 0) {
+        if (op2 > 0) {
+            if (op1 > maxVal / op2) {
+                return false;
+            }
+        } else {
+            if (op2 < minVal / op1) {
+                return false;
+            }
         }
     } else {
-        if (minVal / op1 > op2) {
-            return false;
+        if (op2 > 0) {
+            if (op1 < minVal / op2) {
+                return false;
+            }
+        } else {
+            if (op1 != 0 && op2 < maxVal / op1) {
+                return false;
+            }
         }
     }
     res = op1 * op2;
