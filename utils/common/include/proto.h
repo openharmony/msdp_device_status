@@ -53,6 +53,6 @@ enum TokenType : int32_t {
     TOKEN_INVALID = -1,
     TOKEN_HAP = 0,
     TOKEN_NATIVE,
-    TOKEN_SHELL,
+    TOKEN_SHELL
 };
 #endif // PROTO_H

@@ -30,7 +30,7 @@ const int32_t PARAM_ERROR = 401;
 const int32_t SERVICE_EXCEPTION = 801;
 const std::map <int32_t, std::string> ERROR_MESSAGES = {
     {SERVICE_EXCEPTION, "Service exception."},
-    {PARAM_ERROR, "Param error."},
+    {PARAM_ERROR, "Param error."}
 };
 
 napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage);

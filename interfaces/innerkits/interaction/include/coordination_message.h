@@ -27,7 +27,7 @@ enum class CoordinationMessage {
     DEACTIVATE_SUCCESS = 5,
     DEACTIVATE_FAIL  = 6,
     PARAMETER_ERROR = 401,
-    COORDINATION_FAIL = 20900001,
+    COORDINATION_FAIL = 20900001
 };
 } // namespace Msdp
 } // namespace OHOS
