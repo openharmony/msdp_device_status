@@ -24,7 +24,8 @@ namespace DeviceStatus {
 class CoordinationStateOut final : public ICoordinationState {
 public:
     explicit CoordinationStateOut(const std::string &startDeviceDhid);
-    int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained) override;
+    int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
+        std::pair<std::string, std::string> preparedNetworkId) override;
     void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) override;
 
 private:

@@ -164,6 +164,7 @@ public:
     void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId); // 修改名称
     void SetUnchainStatus(bool isUnchained);
     void NotifySessionClosed();
+    void SetPeerNetworkId(const std::string &peerNetworkId);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -180,7 +181,7 @@ private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
-    std::string sinkDhid_;
+    std::string peerNetworkId_;
     bool isUnchained_ { false };
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };

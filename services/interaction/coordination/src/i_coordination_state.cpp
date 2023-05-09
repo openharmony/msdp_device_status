@@ -42,6 +42,7 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
     int32_t ret = RET_ERR;
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         CooSM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
+        CooSM->SetPeerNetworkId(remoteNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
             remoteNetworkId, originNetworkId, [this, remoteNetworkId, startDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);

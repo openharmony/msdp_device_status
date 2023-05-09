@@ -34,13 +34,13 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
     : startDeviceDhid_(startDeviceDhid)
 {}
 
-int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained)
+int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
+    std::pair<std::string, std::string> preparedNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;
     if (tempRemoteNetworkId.empty()) {
-        std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
-        tempRemoteNetworkId = prepared.first;
+        tempRemoteNetworkId = preparedNetworkId.first;
     }
     int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {

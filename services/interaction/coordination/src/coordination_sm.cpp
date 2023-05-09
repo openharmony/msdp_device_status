@@ -250,11 +250,11 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
     } else if (coordinationState_ == CoordinationState::STATE_OUT) {
         stopNetworkId = remoteNetworkId_;
     } else {
-        stopNetworkId = CooDevMgr->GetOriginNetworkId(sinkDhid_);
+        stopNetworkId = peerNetworkId_;
     }
     isUnchained_ = isUnchained;
     FI_HILOGD("isUnchained_:%{public}d, stopNetworkId:%{public}s", isUnchained_, stopNetworkId.c_str());
-    int32_t ret = currentStateSM_->DeactivateCoordination(stopNetworkId, isUnchained);
+    int32_t ret = currentStateSM_->DeactivateCoordination(stopNetworkId, isUnchained, preparedNetworkId_);
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination fail");
         isStopping_ = false;
@@ -304,7 +304,6 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
-    sinkDhid_ = startDeviceDhid;
     CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
     auto *context = CoordinationEventMgr->GetIContext();
     CHKPV(context);
@@ -934,6 +933,13 @@ void CoordinationSM::NotifySessionClosed()
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
     }
+}
+
+void CoordinationSM::SetPeerNetworkId(const std::string &peerNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    peerNetworkId_ = peerNetworkId;
+    FI_HILOGD("peerNetworkId_:%{public}s", peerNetworkId_.c_str());
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -58,31 +58,31 @@ int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, 
     return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
 
-int32_t CoordinationStateFree::DeactivateCoordination(const std::string &networkId, bool isUnchained)
+int32_t CoordinationStateFree::DeactivateCoordination(const std::string &networkId, bool isUnchained,
+    std::pair<std::string, std::string> preparedNetworkId)
 {
     CALL_INFO_TRACE;
     if (!isUnchained) {
-        FI_HILOGD("No stop operation is required");
+        FI_HILOGE("No stop operation is required");
         return RET_ERR;
     }
     int32_t ret = CooSoftbusAdapter->OpenInputSoftbus(networkId);
     if (ret != RET_OK) {
-        FI_HILOGI("Failed to open softbus");
+        FI_HILOGE("Failed to open softbus");
         return ret;
     }
     ret = CooSoftbusAdapter->StopRemoteCoordination(networkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGI("Stop coordination fail");
+        FI_HILOGE("Stop coordination fail");
         return ret;
     }
-
-    std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
-    if (!prepared.first.empty() && !prepared.second.empty()) {
-        FI_HILOGI("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
-            prepared.first.c_str(), prepared.second.c_str());
-        if (networkId == prepared.first || networkId == prepared.second) {
-            FI_HILOGI("networkId:%{public}s", networkId.c_str());
-            CooSM->UnchainCoordination(prepared.first, prepared.second);
+    
+    if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
+        FI_HILOGD("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
+            preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
+        if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
+            FI_HILOGD("networkId:%{public}s", networkId.c_str());
+            CooSM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
             CooSM->SetUnchainStatus(false);
         }
     } else {
