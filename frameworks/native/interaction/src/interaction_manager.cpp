@@ -34,85 +34,85 @@ InteractionManager *InteractionManager::GetInstance()
 
 int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
 {
-    return InteractionMgrImpl.RegisterCoordinationListener(listener);
+    return INTER_MGR_IMPL.RegisterCoordinationListener(listener);
 }
 
 int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
 {
-    return InteractionMgrImpl.UnregisterCoordinationListener(listener);
+    return INTER_MGR_IMPL.UnregisterCoordinationListener(listener);
 }
 
 int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.PrepareCoordination(callback);
+    return INTER_MGR_IMPL.PrepareCoordination(callback);
 }
 
 int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.UnprepareCoordination(callback);
+    return INTER_MGR_IMPL.UnprepareCoordination(callback);
 }
 
 int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
     std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
+    return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
 }
 
 int32_t InteractionManager::DeactivateCoordination(std::function<void(const std::string&,
     CoordinationMessage)> callback)
 {
-    return InteractionMgrImpl.DeactivateCoordination(callback);
+    return INTER_MGR_IMPL.DeactivateCoordination(callback);
 }
 
 int32_t InteractionManager::GetCoordinationState(
     const std::string &deviceId, std::function<void(bool)> callback)
 {
-    return InteractionMgrImpl.GetCoordinationState(deviceId, callback);
+    return INTER_MGR_IMPL.GetCoordinationState(deviceId, callback);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 {
-    return InteractionMgrImpl.UpdateDragStyle(style);
+    return INTER_MGR_IMPL.UpdateDragStyle(style);
 }
 
 int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
 {
-    return InteractionMgrImpl.StartDrag(dragData, callback);
+    return INTER_MGR_IMPL.StartDrag(dragData, callback);
 }
 
 int32_t InteractionManager::StopDrag(DragResult result, bool hasCustomAnimation)
 {
-    return InteractionMgrImpl.StopDrag(result, hasCustomAnimation);
+    return INTER_MGR_IMPL.StopDrag(result, hasCustomAnimation);
 }
 
 int32_t InteractionManager::GetDragTargetPid()
 {
-    return InteractionMgrImpl.GetDragTargetPid();
+    return INTER_MGR_IMPL.GetDragTargetPid();
 }
 
 int32_t InteractionManager::GetUdKey(std::string &udKey)
 {
-    return InteractionMgrImpl.GetUdKey(udKey);
+    return INTER_MGR_IMPL.GetUdKey(udKey);
 }
 
 int32_t InteractionManager::AddDraglistener(DragListenerPtr listener)
 {
-    return InteractionMgrImpl.AddDraglistener(listener);
+    return INTER_MGR_IMPL.AddDraglistener(listener);
 }
 
 int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener)
 {
-    return InteractionMgrImpl.RemoveDraglistener(listener);
+    return INTER_MGR_IMPL.RemoveDraglistener(listener);
 }
 
 int32_t InteractionManager::SetDragWindowVisible(bool visible)
 {
-    return InteractionMgrImpl.SetDragWindowVisible(visible);
+    return INTER_MGR_IMPL.SetDragWindowVisible(visible);
 }
 
 int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
-    return InteractionMgrImpl.GetShadowOffset(offsetX, offsetY, width, height);
+    return INTER_MGR_IMPL.GetShadowOffset(offsetX, offsetY, width, height);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -27,12 +27,13 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL_MS = 10000;
 constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
+constexpr int32_t TIME_CONVERSION = 1000;
 } // namespace
 
 int32_t TimerManager::Init(IContext *context)
@@ -147,10 +148,9 @@ int32_t TimerManager::OnProcessTimers()
 int32_t TimerManager::TakeNextTimerId()
 {
     uint64_t timerSlot = std::accumulate(timers_.cbegin(), timers_.cend(), uint64_t(0U),
-        [](uint64_t s, const auto &timer) {
+        [] (uint64_t s, const auto &timer) {
             return (s |= (uint64_t(1U) << timer->id));
-        }
-    );
+        });
     for (int32_t i = 0; i < MAX_TIMER_COUNT; ++i) {
         if ((timerSlot & (uint64_t(1U) << i)) == 0) {
             return i;
@@ -291,8 +291,8 @@ int32_t TimerManager::ArmTimer()
         expire = 1;
     }
     if (expire > 0) {
-        tspec.it_value.tv_sec = expire / 1000;
-        tspec.it_value.tv_nsec = (expire % 1000) * 1000000;
+        tspec.it_value.tv_sec = expire / TIME_CONVERSION;
+        tspec.it_value.tv_nsec = (expire % TIME_CONVERSION) * TIME_CONVERSION * TIME_CONVERSION;
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {

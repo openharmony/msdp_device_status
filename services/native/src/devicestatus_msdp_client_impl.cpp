@@ -150,7 +150,6 @@ ErrCode DeviceStatusMsdpClientImpl::StartMock(Type type)
     return RET_OK;
 }
 
-
 ErrCode DeviceStatusMsdpClientImpl::GetSensorHdi(Type type)
 {
     return RET_ERR;

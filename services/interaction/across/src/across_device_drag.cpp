@@ -21,7 +21,7 @@
 #include "coordination_softbus_adapter.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_define.h"
-#include "drag_data_adapter.h"
+#include "drag_data_manager.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -121,7 +121,7 @@ void AcrossDeviceDrag::SendDragingData()
         FI_HILOGE("Drag state is not draging");
         return;
     }
-    auto dragData = DataAdapter.GetDragData();
+    auto dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGE("Source type is not mouse");
         return;
@@ -146,7 +146,7 @@ void AcrossDeviceDrag::SendDragingData()
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    std::string remotedeviceId = CooSM->GetRemoteId();
+    std::string remotedeviceId = COOR_SM->GetRemoteId();
     if (remotedeviceId.empty()) {
         free(dragInfo);
         FI_HILOGE("Remote device id is empty");
@@ -180,7 +180,7 @@ int32_t AcrossDeviceDrag::ConvertDragingInfo(const DragData& dragData,
     dragInfo->pointerId = dragData.pointerId;
     dragInfo->displayId = dragData.displayId;
     dragInfo->dragNum = dragData.dragNum;
-    dragInfo->dragStyle = static_cast<int32_t>(DataAdapter.GetDragStyle());
+    dragInfo->dragStyle = static_cast<int32_t>(DRAG_DATA_MGR.GetDragStyle());
     dragInfo->offsetX = dragData.shadowInfo.x;
     dragInfo->offsetY = dragData.shadowInfo.y;
     dragInfo->hasCanceledAnimation = dragData.hasCanceledAnimation;
@@ -251,13 +251,13 @@ void AcrossDeviceDrag::ProcessDragingState()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CooSM->RegisterStateChange(CooStateChangeType::STATE_FREE_TO_IN,
+    COOR_SM->RegisterStateChange(CooStateChangeType::STATE_FREE_TO_IN,
         std::bind(&AcrossDeviceDrag::ProcessFreeToIn, this, std::placeholders::_1, std::placeholders::_2));
-    CooSM->RegisterStateChange(CooStateChangeType::STATE_FREE_TO_OUT,
+    COOR_SM->RegisterStateChange(CooStateChangeType::STATE_FREE_TO_OUT,
         std::bind(&AcrossDeviceDrag::ProcessFreeToOut, this, std::placeholders::_1, std::placeholders::_2));
-    CooSM->RegisterStateChange(CooStateChangeType::STATE_IN_TO_FREE,
+    COOR_SM->RegisterStateChange(CooStateChangeType::STATE_IN_TO_FREE,
         std::bind(&AcrossDeviceDrag::ProcessInToFree, this, std::placeholders::_1, std::placeholders::_2));
-    CooSM->RegisterStateChange(CooStateChangeType::STATE_OUT_TO_FREE,
+    COOR_SM->RegisterStateChange(CooStateChangeType::STATE_OUT_TO_FREE,
         std::bind(&AcrossDeviceDrag::ProcessOutToFree, this, std::placeholders::_1, std::placeholders::_2));
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }

@@ -39,8 +39,9 @@ void DeviceStatusClientTest::DeviceStatusClientTestCallback::OnDeviceStatusChang
 {
     GTEST_LOG_(INFO) << "DeviceStatusClientTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusClientTestCallback value: " << devicestatusData.value;
-    EXPECT_TRUE(devicestatusData.type == Type::TYPE_VERTICAL_POSITION && devicestatusData.value >= OnChangedValue::VALUE_INVALID
-        && devicestatusData.value <= OnChangedValue::VALUE_EXIT) << "DeviceStatusClientTestCallback failed";
+    EXPECT_TRUE(devicestatusData.type == Type::TYPE_VERTICAL_POSITION &&
+        devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
+        devicestatusData.value <= OnChangedValue::VALUE_EXIT) << "DeviceStatusClientTestCallback failed";
 }
 
 /**
