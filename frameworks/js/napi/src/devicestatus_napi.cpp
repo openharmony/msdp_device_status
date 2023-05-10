@@ -287,14 +287,11 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
     size_t argc = ARG_3;
     napi_value args[ARG_3] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if ((status != napi_ok) || (argc < ARG_3)) {
+    if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
         return result;
     }
-    if (!CheckUnsubArguments(env, info)) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get off arguments");
-        return result;
-    }
+    
     size_t modLen = 0;
     status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
     if (status != napi_ok) {
@@ -308,6 +305,12 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
         return result;
     }
     int32_t type = DeviceStatusNapi::ConvertTypeToInt(mode);
+    if ((argc < ARG_3) || !CheckUnsubArguments(env, info)) {
+        if (!g_obj->RemoveAllCallback(type)) {
+            DEV_HILOGE(JS_NAPI, "Callback is not exit");
+            return result;
+        }
+    }
     if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
         ThrowErr(env, PARAM_ERROR, "type is illegal");
         return result;
@@ -437,13 +440,13 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
 napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback_info info)
 {
     DEV_HILOGD(JS_NAPI, "Enter");
+    if (g_obj == nullptr) {
+        DEV_HILOGE(JS_NAPI, "g_obj is nullptr");
+        return nullptr;
+    }
     const auto [ret, handler, type, event] = CheckUnsubscribeParam(env, info);
     if (!ret) {
         DEV_HILOGE(JS_NAPI, "off: UnsubscribeDeviceStatus is failed");
-        return nullptr;
-    }
-    if (g_obj == nullptr) {
-        DEV_HILOGE(JS_NAPI, "g_obj is nullptr");
         return nullptr;
     }
     if (!g_obj->Off(type, handler)) {
