@@ -12,7 +12,9 @@
 # limitations under the License.
 
 import("../device_status.gni")
-
+if (fusion_interaction_coordination) {
+  import("//base/msdp/motion/motion.gni")
+}
 config("devicestatus_services_private_config") {
   include_dirs = [
     "context/include",
@@ -25,10 +27,13 @@ config("devicestatus_services_private_config") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "../libs/interface",
     "interaction/drag/include",
-    "interaction/across/include",
     "communication/base",
     "communication/service/include",
   ]
+
+  if (fusion_interaction_coordination) {
+    include_dirs += [ "${motion_service_path}/native/include" ]
+  }
 
   defines = device_status_default_defines
 }
@@ -90,13 +95,15 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "interaction/across:interaction_across",
     "interaction/drag:interaction_drag",
     "//third_party/openssl:libcrypto_shared",
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [ "interaction/coordination:coordination" ]
+    deps += [
+      "${motion_service_path}:motion_drag",
+      "interaction/coordination:coordination",
+    ]
   }
 
   external_deps = external_deps_set
@@ -121,13 +128,15 @@ ohos_static_library("devicestatus_static_service") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "interaction/across:interaction_across",
     "interaction/drag:interaction_drag",
     "//third_party/openssl:libcrypto_shared",
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [ "interaction/coordination:coordination" ]
+    deps += [
+      "${motion_service_path}:motion_drag",
+      "interaction/coordination:coordination",
+    ]
   }
 
   external_deps = external_deps_set
