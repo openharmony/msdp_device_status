@@ -260,6 +260,7 @@ void DragDrawing::DestroyDragWindow()
     rsUiDirector_ = nullptr;
     g_drawingInfo.currentStyle = DragCursorStyle::COPY;
     g_drawingInfo.pixelMap = nullptr;
+    g_drawingInfo.surfaceNode = nullptr;
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
         g_drawingInfo.nodes.shrink_to_fit();
@@ -537,6 +538,7 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
+    std::unique_ptr<std::fstream> fs = std::make_unique<std::fstream>();
     std::string filePath;
     if (GetFilePath(filePath) != RET_OK) {
         FI_HILOGD("Get file path failed");
