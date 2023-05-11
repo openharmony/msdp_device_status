@@ -88,7 +88,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
     }
     int32_t ret = DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, inputDeviceDhids,
-            [this, remoteNetworkId = networkIds.first, startDeviceId](bool isSuccess) {
+        [this, remoteNetworkId = networkIds.first, startDeviceId](bool isSuccess) {
             this->OnStartRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         });
     if (ret != RET_OK) {
