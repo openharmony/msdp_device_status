@@ -192,10 +192,12 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Drag manager init failed");
         goto INIT_FAIL;
     }
-    if (acrossDeviceDrag_.Init(this) != RET_OK) {
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    if (motionDrag_.Init(this) != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
         goto INIT_FAIL;
     }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     if (deviceStatusDumper_.Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
