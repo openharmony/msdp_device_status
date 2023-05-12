@@ -54,6 +54,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     Type type = Type::TYPE_VERTICAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -73,6 +74,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     Type type = Type::TYPE_INVALID;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -92,6 +94,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     Type type = Type::TYPE_ABSOLUTE_STILL;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -111,6 +114,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     Type type = Type::TYPE_HORIZONTAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -130,6 +134,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     Type type = Type::TYPE_LID_OPEN;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -149,6 +154,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     Type type = Type::TYPE_MAX;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
@@ -166,6 +172,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
 {
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 Enter");
     Type type = Type::TYPE_ABSOLUTE_STILL;
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -184,6 +191,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
 {
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest008 Enter");
     Type type = Type::TYPE_VERTICAL_POSITION;
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -202,6 +210,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
 {
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest009 Enter");
     Type type = Type::TYPE_HORIZONTAL_POSITION;
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -215,6 +224,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 Enter";
     Type type = Type::TYPE_LID_OPEN;
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -228,6 +238,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 Enter";
     Type type = Type::TYPE_INVALID;
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
@@ -241,6 +252,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 Enter";
     Type type = static_cast<Type>(10);
+    auto StationaryMgr = StationaryManager::GetInstance();
     Data data = StationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;

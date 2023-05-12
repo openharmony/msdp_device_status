@@ -139,7 +139,7 @@ private:
     public:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
-    
+
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
