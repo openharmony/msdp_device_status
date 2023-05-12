@@ -92,6 +92,7 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_utils_path}:devicestatus_util",
     "interaction/across:interaction_across",
     "interaction/drag:interaction_drag",
+    "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_shared",
   ]
 

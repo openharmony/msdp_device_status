@@ -134,7 +134,9 @@ void Device::QueryDeviceInfo()
         version_ = inputId.version;        
     }
 
-    memset(buffer, 0, sizeof(buffer));
+    if (memset_s(buffer, sizeof(buffer), 0, sizeof(buffer)) != EOK) {
+        FI_HILOGE("memset_s first failed: %{public}s", strerror(errno));
+    }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get location: %{public}s", strerror(errno));
@@ -142,7 +144,9 @@ void Device::QueryDeviceInfo()
         phys_.assign(buffer);
     }
 
-    memset(buffer, 0, sizeof(buffer));
+    if (memset_s(buffer, sizeof(buffer), 0, sizeof(buffer)) != EOK) {
+        FI_HILOGE("memset_s second failed: %{public}s", strerror(errno));
+    }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
