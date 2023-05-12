@@ -83,7 +83,7 @@ private:
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
-#define CooDevMgr ::OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
+#define COOR_DEV_MGR OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

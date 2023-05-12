@@ -189,8 +189,7 @@ const std::string &StreamBuffer::GetErrorStatusRemark() const
     auto tIter = std::find_if(remark.cbegin(), remark.cend(),
         [this](const auto &item) {
             return (item.first == rwErrorStatus_);
-        }
-    );
+        });
     return (tIter != remark.cend() ? tIter->second : invalidStatus);
 }
 

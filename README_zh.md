@@ -25,7 +25,7 @@ MSDP设备状态感知框架的示例代码如下：
 ```
 /base/msdp/device_status
 ├── frameworks                 # 框架代码
-│   └── native                 # device status客户端代码          
+│   └── native                 # device status客户端代码
 ├── interfaces                 # 对外接口存放目录
 │   ├── innerkits              # device satus innerkits API
 │   └── kits/js                # Js API
@@ -38,7 +38,6 @@ MSDP设备状态感知框架的示例代码如下：
 ## 约束<a name="section_device_status_constraint"></a>
 
 要使用MSDP设备状态感知功能，设备必须具有对应的传感器器件和相应的MSDP算法库。
-
 
 ## 使用<a name="section_device_status_usage"></a>
 
