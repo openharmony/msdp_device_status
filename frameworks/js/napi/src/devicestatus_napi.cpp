@@ -291,7 +291,7 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
         return result;
     }
-    
+
     size_t modLen = 0;
     status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
     if (status != napi_ok) {
