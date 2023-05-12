@@ -47,22 +47,21 @@ inline constexpr uint32_t MSDP_DOMAIN_ID = 0xD002220;
 
 #define FI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, LABEL.tag, LOG_DEBUG)) { \
-        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+        OHOS::HiviewDFX::HiLog::Debug(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
     } \
 } while (0)
 #define FI_HILOGI(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Info(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    OHOS::HiviewDFX::HiLog::Info(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGW(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Warn(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    OHOS::HiviewDFX::HiLog::Warn(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGE(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Error(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    OHOS::HiviewDFX::HiLog::Error(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGF(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Fatal(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    OHOS::HiviewDFX::HiLog::Fatal(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
-
 
 namespace OHOS {
 namespace Msdp {
@@ -96,13 +95,13 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER        ::OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Debug___    \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
+#define CALL_DEBUG_ENTER        OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Debug___    \
+    { std::bind(&OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
 
-#define CALL_INFO_TRACE         ::OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
+#define CALL_INFO_TRACE         OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
+    { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
 
-#define CALL_TEST_DEBUG         ::OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
+#define CALL_TEST_DEBUG         OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
+    { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
     (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
 #endif // FI_LOG_H

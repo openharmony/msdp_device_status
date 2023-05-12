@@ -52,8 +52,7 @@ public:
     void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) override;
 
 private:
-    class HotplugHandler final : public IDeviceMgr
-    {
+    class HotplugHandler final : public IDeviceMgr {
     public:
         explicit HotplugHandler(DeviceManager &devMgr);
         ~HotplugHandler() = default;

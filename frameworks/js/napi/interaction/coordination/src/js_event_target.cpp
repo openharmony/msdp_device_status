@@ -592,9 +592,9 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

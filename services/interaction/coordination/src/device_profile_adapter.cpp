@@ -110,7 +110,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
         FI_HILOGE("State is not number type");
         return false;
     }
-    return cJSON_IsTrue(state);
+    return (static_cast<bool>(state->valueint));
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
@@ -208,7 +208,7 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 {
     CALL_INFO_TRACE;
     std::string deviceId = changeNotification.GetDeviceId();
-    DProfileAdapter->OnProfileChanged(deviceId);
+    DP_ADAPTER->OnProfileChanged(deviceId);
 }
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)

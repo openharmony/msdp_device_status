@@ -43,7 +43,7 @@ struct range {
 };
 
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Device" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Device" };
 constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 constexpr std::uintmax_t MAX_FILE_SIZE_ALLOWED { 0x5000 };
 
@@ -131,18 +131,25 @@ void Device::QueryDeviceInfo()
         bus_ = inputId.bustype;
         product_ = inputId.product;
         vendor_ = inputId.vendor;
-        version_ = inputId.version;        
+        version_ = inputId.version;
     }
 
-    memset(buffer, 0, sizeof(buffer));
+    errno_t ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get location: %{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
-
-    memset(buffer, 0, sizeof(buffer));
+    ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
