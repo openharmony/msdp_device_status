@@ -77,7 +77,8 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == g_moduleTest &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID &&
+        data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
 
 /**

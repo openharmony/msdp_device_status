@@ -15,12 +15,12 @@
 
 #include "utility.h"
 
-#include <errno.h>
 #include <grp.h>
-#include <limits.h>
 #include <pwd.h>
 #include <unistd.h>
 
+#include <cerrno>
+#include <limits>
 #include <regex>
 #include <sstream>
 
@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
 }
 
 size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
@@ -108,10 +108,10 @@ bool Utility::DoesFileExist(const char *path)
     return (access(path, F_OK) == 0);
 }
 
-size_t Utility::GetFileSize(const char *path)
+ssize_t Utility::GetFileSize(const char *path)
 {
     struct stat buf {};
-    size_t sz { 0 };
+    ssize_t sz { 0 };
 
     if (stat(path, &buf) == 0) {
         if (S_ISREG(buf.st_mode)) {

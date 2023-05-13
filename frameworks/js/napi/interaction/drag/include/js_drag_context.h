@@ -32,7 +32,7 @@ public:
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-    
+
 private:
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);

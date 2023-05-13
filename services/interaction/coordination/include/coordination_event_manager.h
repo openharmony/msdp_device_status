@@ -78,7 +78,7 @@ private:
     IContext *context_ { nullptr };
 };
 
-#define CoordinationEventMgr ::OHOS::DelayedSingleton<CoordinationEventManager>::GetInstance()
+#define COOR_EVENT_MGR OHOS::DelayedSingleton<CoordinationEventManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

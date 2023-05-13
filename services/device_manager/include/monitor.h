@@ -46,7 +46,7 @@ public:
 private:
     int32_t OpenConnection();
     int32_t EnableReceiving();
-    void ReceiveDevice();    
+    void ReceiveDevice();
     void HandleInotifyEvent(struct inotify_event *event) const;
     void AddDevice(const std::string &devNode) const;
     void RemoveDevice(const std::string &devNode) const;
