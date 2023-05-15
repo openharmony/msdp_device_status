@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,8 +43,8 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         COOR_SM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
         COOR_SM->SetPeerNetworkId(remoteNetworkId);
-        ret = D_INPUT_ADAPTER->PrepareRemoteInput(
-            remoteNetworkId, originNetworkId, [this, remoteNetworkId, startDeviceId](bool isSuccess) {
+        ret = D_INPUT_ADAPTER->PrepareRemoteInput(remoteNetworkId, originNetworkId,
+            [this, remoteNetworkId, startDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);
             });
         if (ret != RET_OK) {
@@ -87,8 +87,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
         COOR_SM->OnStartFinish(false, networkIds.first, startDeviceId);
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    int32_t ret = D_INPUT_ADAPTER->StartRemoteInput(
-        networkIds.first, networkIds.second, inputDeviceDhids,
+    int32_t ret = D_INPUT_ADAPTER->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids,
         [this, remoteNetworkId = networkIds.first, startDeviceId](bool isSuccess) {
             this->OnStartRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         });
@@ -99,8 +98,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
     return RET_OK;
 }
 
-void ICoordinationState::OnStartRemoteInput(
-    bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
+void ICoordinationState::OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";

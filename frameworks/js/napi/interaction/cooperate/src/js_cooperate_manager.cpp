@@ -70,7 +70,8 @@ napi_value JsCooperateManager::Stop(napi_env env, napi_value handle)
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->DeactivateCoordination(callback);
+    bool isUnchained = false;
+    int32_t errCode = InteractionMgr->DeactivateCoordination(isUnchained, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
