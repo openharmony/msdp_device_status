@@ -18,8 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include <unistd.h>
-
 #include <gtest/gtest.h>
 #include "input_device.h"
 #include "input_manager.h"
@@ -110,7 +108,7 @@ std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t devi
 std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
 {
     std::vector<int32_t> deviceIds = GetInputDeviceIds();
-    std::pair<int32_t, int32_t> mouseAndTouch { -1, -1 };
+    std::pair<int32_t, int32_t> mouseAndTouch = { -1, -1 };
     for (const auto& id : deviceIds) {
         std::shared_ptr<MMI::InputDevice> device = GetDevice(id);
         if (device != nullptr && device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {

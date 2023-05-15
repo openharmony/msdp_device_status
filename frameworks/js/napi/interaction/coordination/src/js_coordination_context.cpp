@@ -26,6 +26,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
 const char* COORDINATION_CLASS = "Coordination_class";
 const char* COORDINATION = "Coordination";
+constexpr int32_t ZERO_PARAM = 0;
+constexpr int32_t ONE_PARAM = 1;
+constexpr int32_t TWO_PARAM = 2;
+constexpr int32_t THREE_PARAM = 3;
+inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
+inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
+inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
+inline constexpr size_t MAX_STRING_LEN { 1024 };
 } // namespace
 
 JsCoordinationContext::JsCoordinationContext()

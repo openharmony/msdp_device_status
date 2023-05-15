@@ -69,7 +69,7 @@ DragData CreateDragData(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.x);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.y);
     shadowInfo.pixelMap = CreatePixelMap(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT);
-    
+
     DragData dragData;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.dragNum);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayX);

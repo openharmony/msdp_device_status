@@ -201,7 +201,7 @@ private:
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()
-#define CooSM ::OHOS::DelayedSingleton<CoordinationSM>::GetInstance()
+#define COOR_SM OHOS::DelayedSingleton<CoordinationSM>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -114,7 +114,7 @@ public:
      * @since 10
      */
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
-    
+
     /**
      * @brief 更新拖拽中的光标样式。
      * @param style 指定光标样式。
@@ -131,7 +131,7 @@ public:
     int32_t GetDragTargetPid();
 
     /**
-     * @brief 获取拖拽目标窗口UdKey
+     * @brief 获取拖拽目标窗口统一数据密钥
      * @param UdKey 拖拽目标窗口统一数据密钥。
      * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
      * @since 10

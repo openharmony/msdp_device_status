@@ -50,7 +50,7 @@ public:
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
-    
+
 private:
     void InitMsgHandler();
 
@@ -64,6 +64,6 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define InteractionMgrImpl ::OHOS::Singleton<InteractionManagerImpl>::GetInstance()
+#define INTER_MGR_IMPL OHOS::Singleton<InteractionManagerImpl>::GetInstance()
 
 #endif // INTERACTION_MANAGER_IMPL_H

@@ -30,12 +30,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Coordin
 
 void Coordination::PrepareCoordination()
 {
-    CooSM->PrepareCoordination();
+    COOR_SM->PrepareCoordination();
 }
 
 void Coordination::UnprepareCoordination()
 {
-    CooSM->UnprepareCoordination();
+    COOR_SM->UnprepareCoordination();
 }
 
 int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
@@ -47,11 +47,11 @@ int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->ActivateCoordination(remoteNetworkId, startDeviceId);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("ActivateCoordination failed, ret:%{public}d", ret);
-        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -65,11 +65,11 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, 
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->DeactivateCoordination(isUnchained);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->DeactivateCoordination(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("DeactivateCoordination failed, ret:%{public}d", ret);
-        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -83,8 +83,8 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->GetCoordinationState(deviceId);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("GetCoordinationState faild");
     }
@@ -98,7 +98,7 @@ int32_t Coordination::RegisterCoordinationListener(SessionPtr sess)
     event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_ADD_LISTENER;
-    CoordinationEventMgr->AddCoordinationEvent(event);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
     return RET_OK;
 }
 
@@ -108,13 +108,13 @@ int32_t Coordination::UnregisterCoordinationListener(SessionPtr sess)
     CHKPR(event, RET_ERR);
     event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
-    CoordinationEventMgr->RemoveCoordinationEvent(event);
+    COOR_EVENT_MGR->RemoveCoordinationEvent(event);
     return RET_OK;
 }
 
 void Coordination::Dump(int32_t fd)
 {
-    CooSM->Dump(fd);
+    COOR_SM->Dump(fd);
 }
 
 ICoordination* CreateICoordination(IContext *context)
@@ -123,7 +123,7 @@ ICoordination* CreateICoordination(IContext *context)
         FI_HILOGE("Parameter error");
         return nullptr;
     }
-    CoordinationEventMgr->SetIContext(context);
+    COOR_EVENT_MGR->SetIContext(context);
     ICoordination *coord = new (std::nothrow) Coordination();
     if (coord == nullptr) {
         FI_HILOGE("Create ICoordination failed");

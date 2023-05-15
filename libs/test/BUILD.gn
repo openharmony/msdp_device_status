@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/msdp/device_status/device_status.gni")
 import("//build/test.gni")
+import("../../device_status.gni")
 
 group("devicestatuslib_test") {
   testonly = true

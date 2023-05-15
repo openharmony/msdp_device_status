@@ -46,7 +46,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         DEV_HILOGE(SERVICE, "DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
-    const static std::map<int32_t, ConnFunc> mapConnFunc = {
+    const std::map<int32_t, ConnFunc> mapConnFunc = {
         {Idevicestatus::DEVICESTATUS_SUBSCRIBE, &DeviceStatusSrvStub::SubscribeStub},
         {Idevicestatus::DEVICESTATUS_UNSUBSCRIBE, &DeviceStatusSrvStub::UnsubscribeStub},
         {Idevicestatus::DEVICESTATUS_GETCACHE, &DeviceStatusSrvStub::GetLatestDeviceStatusDataStub},

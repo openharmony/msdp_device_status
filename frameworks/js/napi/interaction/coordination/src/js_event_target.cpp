@@ -27,6 +27,10 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
 std::mutex mutex_;
+inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
+inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
+inline constexpr std::string_view RESOLVE_DEFERRED { "napi_resolve_deferred" };
+inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 } // namespace
 
 JsEventTarget::JsEventTarget()
@@ -588,9 +592,9 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

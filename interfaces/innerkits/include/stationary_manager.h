@@ -75,7 +75,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#define StationaryMgr OHOS::Msdp::DeviceStatus::StationaryManager::GetInstance()
-
 #endif // STATIONARY_MANAGER_H

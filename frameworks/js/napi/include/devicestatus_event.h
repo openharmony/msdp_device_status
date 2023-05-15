@@ -44,6 +44,7 @@ public:
         std::shared_ptr<DeviceStatusEventListener> &typeHandler);
     void SendRet(int32_t eventType, int32_t value, napi_value &result);
     void ClearEventMap();
+    bool RemoveAllCallback(int32_t eventType);
 protected:
     napi_env env_;
     napi_ref thisVarRef_ { nullptr };

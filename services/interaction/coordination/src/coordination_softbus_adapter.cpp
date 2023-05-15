@@ -53,7 +53,7 @@ void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser& parser
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    CooSM->StartRemoteCoordination(deviceId->valuestring, cJSON_IsTrue(buttonIsPressed));
+    COOR_SM->StartRemoteCoordination(deviceId->valuestring, cJSON_IsTrue(buttonIsPressed));
 }
 
 void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
@@ -67,7 +67,7 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& 
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    CooSM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
+    COOR_SM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
 }
 
 void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
@@ -79,7 +79,7 @@ void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    CooSM->StopRemoteCoordination(cJSON_IsTrue(result));
+    COOR_SM->StopRemoteCoordination(cJSON_IsTrue(result));
 }
 
 void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
@@ -91,7 +91,7 @@ void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& p
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    CooSM->StopRemoteCoordinationResult(cJSON_IsTrue(result));
+    COOR_SM->StopRemoteCoordinationResult(cJSON_IsTrue(result));
 }
 
 void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& parser)
@@ -103,7 +103,7 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& p
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
     }
-    CooSM->StartCoordinationOtherResult(deviceId->valuestring);
+    COOR_SM->StartCoordinationOtherResult(deviceId->valuestring);
 }
 } // namespace
 
@@ -141,6 +141,7 @@ static void StreamReceived(int32_t sessionId, const StreamData *data, const Stre
 int32_t CoordinationSoftbusAdapter::Init()
 {
     CALL_INFO_TRACE;
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     sessListener_ = {
         .OnSessionOpened = SessionOpened,
         .OnSessionClosed = SessionClosed,
@@ -194,6 +195,8 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
+    const std::string GROUP_ID = "fi_softbus_group_id";
     if (CheckDeviceSessionState(remoteNetworkId)) {
         FI_HILOGD("Softbus session has already  opened");
         return RET_OK;
@@ -264,7 +267,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
-    auto pointerEvent = CooSM->GetLastPointerEvent();
+    auto pointerEvent = COOR_SM->GetLastPointerEvent();
     CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed =
         (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
@@ -511,8 +514,8 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
     if (GetSessionSide(sessionId) != 0) {
         channelStatusMap_.erase(deviceId);
     }
-    CooSM->Reset(deviceId);
-    CooSM->NotifySessionClosed();
+    COOR_SM->Reset(deviceId);
+    COOR_SM->NotifySessionClosed();
 }
 
 void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)
@@ -530,7 +533,6 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, Messag
     void* data, uint32_t dataLen)
 {
     CALL_DEBUG_ENTER;
-    
     DataPacket* dataPacket = (DataPacket*)malloc(sizeof(DataPacket) + dataLen);
     if (dataPacket == nullptr) {
         FI_HILOGE("Malloc data packetfailed");

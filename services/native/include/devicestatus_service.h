@@ -21,7 +21,6 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
-#include "across_device_drag.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
@@ -31,6 +30,9 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "motion_drag.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -120,18 +122,18 @@ private:
 
 private:
     std::atomic<ServiceRunningState> state_ { ServiceRunningState::STATE_NOT_START };
-    std::thread t_;
+    std::thread worker_;
     DelegateTasks delegateTasks_;
     DeviceManager devMgr_;
     TimerManager timerMgr_;
-    std::atomic<bool> ready_ = false;
+    std::atomic<bool> ready_ { false };
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_;
     DragManager dragMgr_;
-    AcrossDeviceDrag acrossDeviceDrag_;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    MotionDrag motionDrag_;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     DeviceStatusDumper deviceStatusDumper_;
 };
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
