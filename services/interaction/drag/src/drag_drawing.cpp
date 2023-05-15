@@ -591,11 +591,8 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     CHKPV(pixelMap);
     CHKPV(g_drawingInfo.pixelMap);
     int32_t adjustSize = EIGHT_SIZE * GetScaling();
-    int32_t svgTouchPositionX;
-    if ((g_drawingInfo.pixelMap->GetWidth() + adjustSize) < pixelMap->GetWidth()) {
-        FI_HILOGD("pixelMap width:%{public}d", g_drawingInfo.pixelMap->GetWidth());
-        svgTouchPositionX = 0;
-    } else {
+    int32_t svgTouchPositionX = 0;
+    if ((g_drawingInfo.pixelMap->GetWidth() + adjustSize) > pixelMap->GetWidth()) {
         svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - pixelMap->GetWidth();
     }
     if (!CheckNodesValid()) {
@@ -849,14 +846,14 @@ void DrawSVGModifier::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) c
     int32_t extendSvgWidth = (strStyle.size() - 1) * EIGHT_SIZE;
     std::string deviceType = OHOS::system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::COPY) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-        decodeOpts.desiredSize= {
+        decodeOpts.desiredSize = {
             .width = DEVICE_INDEPENDENT_PIXEL * GetScaling(),
             .height = DEVICE_INDEPENDENT_PIXEL * GetScaling()
         };
     } else if (((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
         (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
         (g_drawingInfo.currentStyle == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-        decodeOpts.desiredSize= {
+        decodeOpts.desiredSize = {
             .width = DEVICE_INDEPENDENT_PIXEL * GetScaling(),
             .height = DEVICE_INDEPENDENT_PIXEL * GetScaling()
         };
