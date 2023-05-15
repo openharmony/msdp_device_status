@@ -75,7 +75,6 @@ constexpr float END_SCALE_FAIL = 0.1f;
 constexpr float PIVOT_X = 0.5f;
 constexpr float PIVOT_Y = 0.5f;
 constexpr float SVG_ORIGINAL_SIZE = 40.0f;
-constexpr float ZERO = 0.0f;
 const std::string DEVICE_TYPE_DEFAULT = "default";
 const std::string DEVICE_TYPE_PHONE = "phone";
 const std::string THREAD_NAME = "AnimationEventRunner";
@@ -126,8 +125,8 @@ float GetScaling()
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     CHKPR(displayInfo, RET_ERR);
-    if (displayInfo->GetDpi() < ZERO) {
-        return ZERO;
+    if (displayInfo->GetDpi() < 0.0f) {
+        return 0.0f;
     }
     return (displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
 }
