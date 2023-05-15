@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef JS_UTIL_H
-#define JS_UTIL_H
+#ifndef JS_UTIL_COOPERATE_H
+#define JS_UTIL_COOPERATE_H
 
 #include <cstdint>
 #include <memory>
@@ -27,10 +27,11 @@
 
 #include "refbase.h"
 
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class JsUtil {
+class JsUtilCooperate {
 public:
     struct UserData {
         int32_t userData { 0 };
@@ -40,9 +41,9 @@ public:
     };
 
     struct CallbackData {
-        bool prepareResult { false };
-        bool activateResult { false };
-        bool deactivateResult { false };
+        bool enableResult { false };
+        bool startResult { false };
+        bool stopResult { false };
         bool coordinationOpened { false };
         std::string deviceDescriptor;
         int32_t errCode { 0 };
@@ -59,11 +60,11 @@ public:
         CallbackData data;
     };
 
-    static napi_value GetPrepareInfo(sptr<CallbackInfo> cb);
-    static napi_value GetActivateInfo(sptr<CallbackInfo> cb);
-    static napi_value GetDeactivateInfo(sptr<CallbackInfo> cb);
-    static napi_value GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb);
-    static napi_value GetCrossingSwitchStateResult(napi_env env, bool result);
+    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 
@@ -79,4 +80,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // JS_UTIL_H
+#endif // JS_UTIL_COOPERATE_H

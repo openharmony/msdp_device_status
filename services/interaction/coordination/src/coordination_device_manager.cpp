@@ -189,7 +189,7 @@ std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) con
 void CoordinationDeviceManager::Init()
 {
     CALL_INFO_TRACE;
-    auto* context = CoordinationEventMgr->GetIContext();
+    auto* context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     devObserver_ = std::make_shared<DeviceObserver>(*this);
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
@@ -323,7 +323,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
     if (dev->IsKeyboard()) {
-        CooSM->OnKeyboardOnline(dev->GetDhid());
+        COOR_SM->OnKeyboardOnline(dev->GetDhid());
     }
     FI_HILOGD("add device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
     FI_HILOGD("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
@@ -345,10 +345,10 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     auto dhids = GetCoordinationDhids(dev->GetId());
     devices_.erase(iter);
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), dhids);
+        COOR_SM->OnPointerOffline(dev->GetDhid(), dhids);
     } else if (device->IsKeyboard()) {
         if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            CooSM->OnKeyboardOffline(dev->GetDhid());
+            COOR_SM->OnKeyboardOffline(dev->GetDhid());
         }
     }
 }

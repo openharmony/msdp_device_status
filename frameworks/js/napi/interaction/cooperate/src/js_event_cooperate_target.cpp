@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "js_event_target.h"
+#include "js_event_cooperate_target.h"
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
@@ -25,27 +25,31 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventTarget" };
-std::mutex mutex_;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventCooperateTarget" };
+inline constexpr std::string_view COORDINATION = "cooperation";
 inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
 inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
 inline constexpr std::string_view RESOLVE_DEFERRED { "napi_resolve_deferred" };
 inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
+std::mutex mutex_;
 } // namespace
 
-JsEventTarget::JsEventTarget()
+JsEventCooperateTarget::JsEventCooperateTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, DeviceStatus::VAL_NOT_EXP);
+    auto ret = coordinationListener_.insert({ COORDINATION,
+        std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>()});
+    if (!ret.second) {
+        FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
+    }
 }
 
-void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.prepareResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
+    cb->data.enableResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -55,24 +59,24 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnableAsyncWork);
     }
 
     if (result != 0) {
         FI_HILOGE("uv_queue_work failed");
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
 }
 
-void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.activateResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
+    cb->data.startResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -82,25 +86,24 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStartPromiseWork);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStartAsyncWork);
     }
 
     if (result != 0) {
         FI_HILOGE("uv_queue_work failed");
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
 }
 
-void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId,
-    CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
     CHKPV(cb->env);
-    cb->data.deactivateResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
+    cb->data.stopResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -110,19 +113,19 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStopPromiseWork);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivateAsyncWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStopAsyncWork);
     }
 
     if (result != 0) {
         FI_HILOGE("uv_queue_work failed");
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
 }
 
-void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state)
+void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -136,19 +139,19 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStatePromiseWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetStatePromiseWork);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStateAsyncWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetStateAsyncWork);
     }
 
     if (result != 0) {
         FI_HILOGE("uv_queue_work failed");
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
 }
 
-void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
+void JsEventCooperateTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -160,14 +163,14 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 
     for (const auto &item : iter->second) {
         CHKPC(item);
-        if (JsUtil::IsSameHandle(env, handle, item->ref)) {
+        if (JsUtilCooperate::IsSameHandle(env, handle, item->ref)) {
             FI_HILOGE("The handle already exists");
             return;
         }
     }
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_unique<JsUtil::CallbackInfo>();
+    auto monitor = std::make_unique<JsUtilCooperate::CallbackInfo>();
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -177,7 +180,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     }
 }
 
-void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_value handle)
+void JsEventCooperateTarget::RemoveListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -191,7 +194,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
         goto monitorLabel;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-        if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
+        if (JsUtilCooperate::IsSameHandle(env, handle, (*it)->ref)) {
             FI_HILOGE("Success in removing monitor");
             iter->second.erase(it);
             goto monitorLabel;
@@ -205,21 +208,28 @@ monitorLabel:
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
+napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
     CHKPP(cb);
     cb->env = env;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        FI_HILOGE("scope is nullptr");
+        return nullptr;
+    }
     napi_value promise = nullptr;
     if (handle == nullptr) {
-        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+        CHKRP_SCOPE(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE, scope);
     } else {
-        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP_SCOPE(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE, scope);
     }
+    napi_close_handle_scope(env, scope);
     return promise;
 }
 
-void JsEventTarget::ResetEnv()
+void JsEventCooperateTarget::ResetEnv()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -227,13 +237,13 @@ void JsEventTarget::ResetEnv()
     InteractionMgr->UnregisterCoordinationListener(shared_from_this());
 }
 
-void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = coordinationListener_.find(COOPERATE);
+    auto changeEvent = coordinationListener_.find(COORDINATION);
     if (changeEvent == coordinationListener_.end()) {
-        FI_HILOGE("Find %{public}s failed", std::string(COOPERATE).c_str());
+        FI_HILOGE("Find %{public}s failed", std::string(COORDINATION).c_str());
         return;
     }
 
@@ -250,22 +260,22 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCoordinationMessageEvent);
         if (result != 0) {
             FI_HILOGE("uv_queue_work failed");
-            JsUtil::DeletePtr<uv_work_t*>(work);
+            JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         }
     }
 }
 
-void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallEnablePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -275,7 +285,7 @@ void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetPrepareInfo(cb);
+    napi_value object = JsUtilCooperate::GetEnableInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -298,17 +308,17 @@ void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -318,7 +328,7 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetPrepareInfo(cb);
+    napi_value object = JsUtilCooperate::GetEnableInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -333,17 +343,17 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -353,7 +363,7 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetActivateInfo(cb);
+    napi_value object = JsUtilCooperate::GetStartInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -376,17 +386,17 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -396,7 +406,7 @@ void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetActivateInfo(cb);
+    napi_value object = JsUtilCooperate::GetStartInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -411,17 +421,17 @@ void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -431,7 +441,7 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetDeactivateInfo(cb);
+    napi_value object = JsUtilCooperate::GetStopInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -455,17 +465,17 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -475,7 +485,7 @@ void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetDeactivateInfo(cb);
+    napi_value object = JsUtilCooperate::GetStopInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -490,17 +500,17 @@ void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -510,7 +520,7 @@ void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetCrossingSwitchStateInfo(cb);
+    napi_value object = JsUtilCooperate::GetStateInfo(cb);
     if (object == nullptr) {
         FI_HILOGE("object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -522,17 +532,17 @@ void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -544,7 +554,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     }
     napi_value resultObj[2];
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, scope);
-    resultObj[1] = JsUtil::GetCrossingSwitchStateInfo(cb);
+    resultObj[1] = JsUtilCooperate::GetStateInfo(cb);
     if (resultObj[1] == nullptr) {
         FI_HILOGE("Object is nullptr");
         napi_close_handle_scope(cb->env, scope);
@@ -557,21 +567,21 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)
+void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
+        JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         FI_HILOGE("Check data is null");
         return;
     }
 
-    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
-    JsUtil::DeletePtr<uv_work_t*>(work);
+    auto temp = static_cast<std::unique_ptr<JsUtilCooperate::CallbackInfo>*>(work->data);
+    JsUtilCooperate::DeletePtr<uv_work_t*>(work);
 
-    auto messageEvent = coordinationListener_.find(COOPERATE);
+    auto messageEvent = coordinationListener_.find(COORDINATION);
     if (messageEvent == coordinationListener_.end()) {
         FI_HILOGE("Find messageEvent failed");
         return;
@@ -592,9 +602,9 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;
@@ -605,7 +615,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     }
 }
 
-void JsEventTarget::HandleExecuteResult(napi_env env, int32_t errCode)
+void JsEventCooperateTarget::HandleExecuteResult(napi_env env, int32_t errCode)
 {
     if (errCode != OTHER_ERROR && errCode != RET_OK) {
         NapiError napiError;

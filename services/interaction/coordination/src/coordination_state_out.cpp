@@ -39,7 +39,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;
     if (tempRemoteNetworkId.empty()) {
-        std::pair<std::string, std::string> prepared = CooSM->GetPreparedDevices();
+        std::pair<std::string, std::string> prepared = COOR_SM->GetPreparedDevices();
         tempRemoteNetworkId = prepared.first;
     }
     int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId);
@@ -59,16 +59,16 @@ void CoordinationStateOut::ProcessStop(const std::string& remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    std::vector<std::string> inputDeviceDhids = CooDevMgr->GetCoordinationDhids(startDeviceDhid_);
+    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_);
     if (inputDeviceDhids.empty()) {
-        CooSM->OnStopFinish(false, remoteNetworkId);
+        COOR_SM->OnStopFinish(false, remoteNetworkId);
     }
-    int32_t ret = DistributedAdapter->StopRemoteInput(remoteNetworkId, localNetworkId, inputDeviceDhids,
+    int32_t ret = D_INPUT_ADAPTER->StopRemoteInput(remoteNetworkId, localNetworkId, inputDeviceDhids,
         [this, remoteNetworkId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId);
         });
     if (ret != RET_OK) {
-        CooSM->OnStopFinish(false, remoteNetworkId);
+        COOR_SM->OnStopFinish(false, remoteNetworkId);
     }
 }
 
@@ -77,7 +77,7 @@ void CoordinationStateOut::OnStopRemoteInput(bool isSuccess, const std::string &
     CALL_DEBUG_ENTER;
     std::string taskName = "stop_finish_task";
     std::function<void()> handleStopFinishFunc =
-        std::bind(&CoordinationSM::OnStopFinish, CooSM, isSuccess, remoteNetworkId);
+        std::bind(&CoordinationSM::OnStopFinish, COOR_SM, isSuccess, remoteNetworkId);
     CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
@@ -87,7 +87,7 @@ void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid,
 {
     std::vector<std::string> inputDeviceDhids;
     inputDeviceDhids.push_back(dhid);
-    DistributedAdapter->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids, [](bool isSuccess) {});
+    D_INPUT_ADAPTER->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids, [](bool isSuccess) {});
 }
 } // namespace DeviceStatus
 } // namespace Msdp
