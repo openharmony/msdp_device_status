@@ -32,7 +32,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 
-namespace{
+namespace {
 const int32_t SLEEP_TIME = 2000;
 static Type g_type = Type::TYPE_INVALID;
 auto g_client = StationaryManager::GetInstance();
@@ -288,7 +288,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
         << "GetDeviceStatusData failed";
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest014 end");
 }
-
 
 /**
  * @tc.name: GetDeviceStatusDataTest

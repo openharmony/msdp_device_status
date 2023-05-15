@@ -205,8 +205,8 @@ bool DeviceStatusService::Init()
     InitSessionDeathMonitor();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    CoordinationEventMgr->SetIContext(this);
-    CooSM->Init();
+    COOR_EVENT_MGR->SetIContext(this);
+    COOR_SM->Init();
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return true;
 
@@ -302,7 +302,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 }
 
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd, int32_t &tokenType)
+    int32_t &toReturnClientFd, int32_t &tokenType)
 {
     FI_HILOGD("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 
@@ -411,7 +411,7 @@ void DeviceStatusService::InitSessionDeathMonitor()
     std::vector<std::function<void(SessionPtr)>> sessionLostList = {
         std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1),
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        std::bind(&CoordinationSM::OnSessionLost, CooSM, std::placeholders::_1)
+        std::bind(&CoordinationSM::OnSessionLost, COOR_SM, std::placeholders::_1)
 #endif
     };
     for (const auto &it : sessionLostList) {
@@ -813,7 +813,7 @@ int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
     event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_ADD_LISTENER;
-    CoordinationEventMgr->AddCoordinationEvent(event);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
     return RET_OK;
 }
 
@@ -825,14 +825,14 @@ int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
     CHKPR(event, RET_ERR);
     event->type = CoordinationEventManager::EventType::LISTENER;
     event->sess = sess;
-    CoordinationEventMgr->RemoveCoordinationEvent(event);
+    COOR_EVENT_MGR->RemoveCoordinationEvent(event);
     return RET_OK;
 }
 
 int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    CooSM->PrepareCoordination();
+    COOR_SM->PrepareCoordination();
     std::string deviceId;
     CoordinationMessage msg = CoordinationMessage::PREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
@@ -853,7 +853,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
 int32_t DeviceStatusService::OnUnprepareCoordination(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    CooSM->UnprepareCoordination();
+    COOR_SM->UnprepareCoordination();
     std::string deviceId;
     CoordinationMessage msg = CoordinationMessage::UNPREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
@@ -883,7 +883,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    if (CooSM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
+    if (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
@@ -897,8 +897,8 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
         }
         return RET_OK;
     }
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->ActivateCoordination(remoteNetworkId, startDeviceId);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("OnActivateCoordination failed, ret:%{public}d", ret);
         return ret;
@@ -917,11 +917,11 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->DeactivateCoordination();
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->DeactivateCoordination();
     if (ret != RET_OK) {
         FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
-        CoordinationEventMgr->OnErrorMessage(event->type, CoordinationMessage(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
     return RET_OK;
@@ -939,8 +939,8 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
-    CoordinationEventMgr->AddCoordinationEvent(event);
-    int32_t ret = CooSM->GetCoordinationState(deviceId);
+    COOR_EVENT_MGR->AddCoordinationEvent(event);
+    int32_t ret = COOR_SM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("GetCoordinationState faild");
     }

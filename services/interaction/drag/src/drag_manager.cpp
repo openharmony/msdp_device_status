@@ -23,7 +23,7 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
-#include "drag_data_adapter.h"
+#include "drag_data_manager.h"
 #include "fi_log.h"
 #include "proto.h"
 
@@ -123,7 +123,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("NotifyDragResult failed");
         ret = RET_ERR;
     }
-    DataAdapter.ResetDragData();
+    DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(result);
     return ret;
 }
@@ -136,7 +136,7 @@ int32_t DragManager::GetDragTargetPid() const
 int32_t DragManager::GetUdKey(std::string &udKey) const
 {
     CALL_DEBUG_ENTER;
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.udKey.empty()) {
         FI_HILOGE("Target udKey is empty");
         return RET_ERR;
@@ -158,7 +158,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    DataAdapter.SetDragStyle(style);
+    DRAG_DATA_MGR.SetDragStyle(style);
     dragDrawing_.UpdateDragStyle(style);
     return RET_OK;
 }
@@ -166,7 +166,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
 int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
@@ -240,7 +240,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pid = MMI::InputManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
@@ -287,14 +287,14 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEve
 void DragManager::Dump(int32_t fd) const
 {
     CALL_DEBUG_ENTER;
-    DragCursorStyle style = DataAdapter.GetDragStyle();
+    DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
     dprintf(fd, "Drag information:\n");
     dprintf(fd,
             "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n",
             GetDragState(dragState_).c_str(), GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(),
-            GetDragCursorStyle(style).c_str(), DataAdapter.GetDragWindowVisible() ? "true" : "false");
-    DragData dragData = DataAdapter.GetDragData();
+            GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string udKey;
     if (RET_ERR == GetUdKey(udKey)) {
         FI_HILOGE("Target udKey is empty");
@@ -404,7 +404,7 @@ std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
 OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended)
 {
     CALL_DEBUG_ENTER;
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     OHOS::MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
     extraData.sourceType = dragData.sourceType;
@@ -422,7 +422,7 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
         FI_HILOGE("GetPointerStyle failed");
         return RET_ERR;
     }
-    DataAdapter.Init(dragData, pointerStyle);
+    DRAG_DATA_MGR.Init(dragData, pointerStyle);
     return RET_OK;
 }
 
@@ -452,7 +452,7 @@ int32_t DragManager::OnStartDrag()
 {
     auto extraData = CreateExtraData(true);
     MMI::InputManager::GetInstance()->AppendExtraData(extraData);
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
@@ -485,7 +485,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     }
     MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
     interceptorId_ = -1;
-    DragData dragData = DataAdapter.GetDragData();
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
@@ -525,14 +525,14 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
-    DataAdapter.SetDragWindowVisible(visible);
+    DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
     return RET_OK;
 }
 
 int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
-    return DataAdapter.GetShadowOffset(offsetX, offsetY, width, height);
+    return DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
 }
 
 void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
