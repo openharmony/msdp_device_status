@@ -36,9 +36,9 @@ napi_value JsCooperateManager::Enable(napi_env env, bool enable, napi_value hand
     auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = 0;
     if (enable) {
-        errCode = InteractionMgr->PrepareCoordination(callback);
+        errCode = INTERACTION_MGR->PrepareCoordination(callback);
     } else {
-        errCode = InteractionMgr->UnprepareCoordination(callback);
+        errCode = INTERACTION_MGR->UnprepareCoordination(callback);
     }
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
@@ -55,7 +55,7 @@ napi_value JsCooperateManager::Start(napi_env env, const std::string &remoteNetw
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->ActivateCoordination(remoteNetworkDescriptor, startDeviceId, callback);
+    int32_t errCode = INTERACTION_MGR->ActivateCoordination(remoteNetworkDescriptor, startDeviceId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -70,7 +70,7 @@ napi_value JsCooperateManager::Stop(napi_env env, napi_value handle)
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->DeactivateCoordination(callback);
+    int32_t errCode = INTERACTION_MGR->DeactivateCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -85,7 +85,7 @@ napi_value JsCooperateManager::GetState(napi_env env, const std::string &deviceD
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
-    int32_t errCode = InteractionMgr->GetCoordinationState(deviceDescriptor, callback);
+    int32_t errCode = INTERACTION_MGR->GetCoordinationState(deviceDescriptor, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
