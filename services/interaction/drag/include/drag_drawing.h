@@ -48,7 +48,7 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
     int32_t GetFilePath(std::string &filePath) const;
     bool NeedAdjustSvgInfo() const;
-	void SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) const;
+    void SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) const;
 };
 
 class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {

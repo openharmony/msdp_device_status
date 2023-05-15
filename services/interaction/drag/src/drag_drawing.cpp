@@ -169,7 +169,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("CheckNodesValid failed");
         return INIT_FAIL;
     }
-     CHKPR(rsUiDirector_, INIT_FAIL);
+    CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         rsUiDirector_->SendMessages();
         return INIT_SUCCESS;
