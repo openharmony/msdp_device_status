@@ -35,8 +35,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
-    DragManager()
-    {}
+    DragManager() {}
     ~DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
 

@@ -41,12 +41,12 @@ public:
 
     struct EventInfo : public RefBase {
         EventType type;
-        SessionPtr sess;
-        MessageId msgId;
-        int32_t userData;
+        SessionPtr sess { nullptr };
+        MessageId msgId { MessageId::INVALID };
+        int32_t userData { -1 };
         std::string deviceId;
         CoordinationMessage msg;
-        bool state;
+        bool state { false };
     };
 
     void AddCoordinationEvent(sptr<EventInfo> event);

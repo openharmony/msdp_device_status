@@ -37,7 +37,9 @@ JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, DeviceStatus::VAL_NOT_EXP);
+    if (!ret.second) {
+        FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
+    }
 }
 
 void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)

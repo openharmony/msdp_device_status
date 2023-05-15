@@ -135,7 +135,7 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
 
 int32_t DeviceStatusDataParse::GetFileSize(const std::string& filePath)
 {
-    struct stat statbuf = {0};
+    struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
         DEV_HILOGE(SERVICE, "Get file size error");
         return INVALID_FILE_SIZE;
