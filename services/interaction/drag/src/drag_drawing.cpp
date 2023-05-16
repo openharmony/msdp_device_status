@@ -913,6 +913,10 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return;
+    }
     auto mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     int32_t adjustSize = EIGHT_SIZE * GetScaling();
