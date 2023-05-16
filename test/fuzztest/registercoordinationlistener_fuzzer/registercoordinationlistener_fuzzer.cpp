@@ -32,7 +32,7 @@ public:
     CoordinationListenerTest() : ICoordinationListener() {}
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
     {
-        FI_HILOGD("RegisterCoordinationListenerFuzzTest");
+        FI_HILOGD("Register coordination listener fuzz test");
     };
 };
 

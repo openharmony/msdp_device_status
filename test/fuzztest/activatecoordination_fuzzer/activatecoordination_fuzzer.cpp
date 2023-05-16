@@ -35,7 +35,7 @@ void ActivateCoordinationFuzzTest(const uint8_t* data, size_t  size)
     const std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
     const int32_t startDeviceId = *(reinterpret_cast<const int32_t*>(data));
     auto fun = [](const std::string &listener, CoordinationMessage cooperateMessages) {
-        FI_HILOGD("ActivateCoordinationFuzzTest");
+        FI_HILOGD("Activate coordination fuzz test");
     };
     InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId, fun);
 }

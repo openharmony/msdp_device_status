@@ -71,7 +71,7 @@ void DeviceStatusService::OnStart()
 {
     CALL_INFO_TRACE;
     if (ready_) {
-        FI_HILOGE("OnStart is ready, nothing to do");
+        FI_HILOGE("On start is ready, nothing to do");
         return;
     }
 
@@ -79,11 +79,11 @@ void DeviceStatusService::OnStart()
     delegateTasks_.SetWorkerThreadId(tid);
 
     if (!Init()) {
-        FI_HILOGE("OnStart call init fail");
+        FI_HILOGE("On start call init fail");
         return;
     }
     if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
-        FI_HILOGE("OnStart register to system ability manager failed");
+        FI_HILOGE("On start register to system ability manager failed");
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
@@ -276,7 +276,7 @@ Data DeviceStatusService::GetCache(const Type& type)
     if (devicestatusManager_ == nullptr) {
         Data data = {type, OnChangedValue::VALUE_EXIT};
         data.value = OnChangedValue::VALUE_INVALID;
-        FI_HILOGI("GetLatestDeviceStatusData func is nullptr, return default!");
+        FI_HILOGI("Get latest device status data func is nullptr, return default!");
         return data;
     }
     return devicestatusManager_->GetLatestDeviceStatusData(type);
@@ -313,7 +313,7 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&StreamServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     if (ret != RET_OK) {
-        FI_HILOGE("Call AddSocketPairInfo failed, return:%{public}d", ret);
+        FI_HILOGE("Call Add socket pair info failed, return:%{public}d", ret);
         return RET_ERR;
     }
     FI_HILOGD("Leave, programName:%{public}s, moduleType:%{public}d, alloc success",
@@ -578,7 +578,7 @@ int32_t DeviceStatusService::RegisterCoordinationListener()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnRegisterCoordinationListener, this, pid));
     if (ret != RET_OK) {
-        FI_HILOGE("OnRegisterCoordinationListener failed, ret:%{public}d", ret);
+        FI_HILOGE("On register coordination listener failed, ret:%{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -593,7 +593,7 @@ int32_t DeviceStatusService::UnregisterCoordinationListener()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnUnregisterCoordinationListener, this, pid));
     if (ret != RET_OK) {
-        FI_HILOGE("OnUnregisterCoordinationListener failed, ret:%{public}d", ret);
+        FI_HILOGE("On unregister coordination listener failed, ret:%{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -608,7 +608,7 @@ int32_t DeviceStatusService::PrepareCoordination(int32_t userData)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnPrepareCoordination, this, pid, userData));
     if (ret != RET_OK) {
-        FI_HILOGE("OnPrepareCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On prepare coordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -644,7 +644,7 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
         std::bind(&DeviceStatusService::OnActivateCoordination,
         this, pid, userData, remoteNetworkId, startDeviceId));
     if (ret != RET_OK) {
-        FI_HILOGE("OnActivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -663,7 +663,7 @@ int32_t DeviceStatusService::DeactivateCoordination(int32_t userData)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData));
     if (ret != RET_OK) {
-        FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -680,7 +680,7 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, deviceId));
     if (ret != RET_OK) {
-        FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
+        FI_HILOGE("On get coordination state failed, ret:%{public}d", ret);
         return ret;
     }
 #else
@@ -717,7 +717,7 @@ int32_t DeviceStatusService::RemoveDraglistener()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
-        FI_HILOGE("RemoveListener failed, ret:%{public}d", ret);
+        FI_HILOGE("Remove listener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -729,7 +729,7 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStartDrag failed, ret:%{public}d", ret);
+        FI_HILOGE("On start drag failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -741,7 +741,7 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnStopDrag, this, result, hasCustomAnimation));
     if (ret != RET_OK) {
-        FI_HILOGE("OnStopDrag failed, ret:%{public}d", ret);
+        FI_HILOGE("On stop drag failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -753,7 +753,7 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::OnSetDragWindowVisible, &dragMgr_, visible));
     if (ret != RET_OK) {
-        FI_HILOGE("OnSetDragWindowVisible failed, ret:%{public}d", ret);
+        FI_HILOGE("On set drag window visible failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -764,7 +764,7 @@ int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY,
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset, &dragMgr_,
         std::ref(offsetX), std::ref(offsetY), std::ref(width), std::ref(height)));
     if (ret != RET_OK) {
-        FI_HILOGE("GetShadowOffset failed, ret:%{public}d", ret);
+        FI_HILOGE("Get shadow offset failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -775,7 +775,7 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style));
     if (ret != RET_OK) {
-        FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
+        FI_HILOGE("Update drag style failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -786,7 +786,7 @@ int32_t DeviceStatusService::GetUdKey(std::string &udKey)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::GetUdKey, &dragMgr_, std::ref(udKey)));
     if (ret != RET_OK) {
-        FI_HILOGE("GetUdKey failed, ret:%{public}d", ret);
+        FI_HILOGE("Get udkey failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -797,7 +797,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::GetDragTargetPid, &dragMgr_));
     if (ret != RET_OK) {
-        FI_HILOGE("GetDragTargetPid failed, ret:%{public}d", ret);
+        FI_HILOGE("Get drag target pid failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -900,7 +900,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("OnActivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -920,7 +920,7 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->DeactivateCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
@@ -942,7 +942,7 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("GetCoordinationState faild");
+        FI_HILOGE("Get coordination state failed");
     }
     return ret;
 }

@@ -88,7 +88,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     dragOutSession_ = sess;
     dragTargetPid_ = -1;
     if (InitDataAdapter(dragData) != RET_OK) {
-        FI_HILOGE("InitDataAdapter failed");
+        FI_HILOGE("Init data adapter failed");
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
@@ -113,14 +113,14 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     int32_t ret = RET_OK;
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
-        FI_HILOGE("OnStopDrag failed");
+        FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
     dragState_ = DragState::STOP;
     stateNotify_.StateChangedNotify(DragState::STOP);
     StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(result) != RET_OK) {
-        FI_HILOGE("NotifyDragResult failed");
+        FI_HILOGE("Notify drag result failed");
         ret = RET_ERR;
     }
     DRAG_DATA_MGR.ResetDragData();
@@ -419,7 +419,7 @@ int32_t DragManager::InitDataAdapter(const DragData &dragData) const
     CALL_DEBUG_ENTER;
     MMI::PointerStyle pointerStyle;
     if (MMI::InputManager::GetInstance()->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
-        FI_HILOGE("GetPointerStyle failed");
+        FI_HILOGE("Get pointer style failed");
         return RET_ERR;
     }
     DRAG_DATA_MGR.Init(dragData, pointerStyle);

@@ -154,7 +154,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return INIT_FAIL;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -208,7 +208,7 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     CHKPR(rsUiDirector_, RET_ERR);
     if (g_drawingInfo.currentStyle == style) {
         if (!CheckNodesValid()) {
-            FI_HILOGE("CheckNodesValid failed");
+            FI_HILOGE("Check nodes valid failed");
             return RET_ERR;
         }
         if (style == DragCursorStyle::COPY) {
@@ -311,7 +311,7 @@ int32_t DragDrawing::DrawShadow()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -347,7 +347,7 @@ int32_t DragDrawing::DrawStyle()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -555,7 +555,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
         svgTouchPositionX = 0;
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -754,7 +754,7 @@ int32_t DrawSVGModifier::GetFilePath(std::string &filePath) const
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];

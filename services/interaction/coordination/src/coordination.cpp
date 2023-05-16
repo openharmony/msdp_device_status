@@ -68,7 +68,7 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData)
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->DeactivateCoordination();
     if (ret != RET_OK) {
-        FI_HILOGE("DeactivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("Deactivate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
         return ret;
     }
@@ -86,7 +86,7 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->GetCoordinationState(deviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("GetCoordinationState faild");
+        FI_HILOGE("Get coordination state failed");
     }
     return ret;
 }

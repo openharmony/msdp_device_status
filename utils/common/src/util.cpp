@@ -218,7 +218,7 @@ const char* GetProgramName()
         FI_HILOGE("memcpy_s failed");
         return "";
     }
-    FI_HILOGI("GetProgramName success, programName:%{public}s", programName);
+    FI_HILOGI("Get program name success, programName:%{public}s", programName);
 
     return programName;
 }

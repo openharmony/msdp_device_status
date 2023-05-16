@@ -48,7 +48,7 @@ void PrepareCoordinationFuzzTest(const uint8_t* data, size_t size)
     (void)GetObject<int32_t>(data, 0, random);
     bool enabled = (random % 2) ? false : true;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("PrepareCoordinationFuzzTest");
+        FI_HILOGD("Prepare coordination fuzz test");
     };
     if (enabled) {
         InteractionManager::GetInstance()->PrepareCoordination(fun);

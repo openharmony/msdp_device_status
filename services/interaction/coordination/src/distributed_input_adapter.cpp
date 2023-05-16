@@ -150,7 +150,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
 
 void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
-    FI_HILOGD("RemoveTimer type:%{public}d", type);
+    FI_HILOGD("Remove timer type:%{public}d", type);
     if (watchingMap_.find(type) != watchingMap_.end()) {
         auto context = COOR_EVENT_MGR->GetIContext();
         CHKPV(context);

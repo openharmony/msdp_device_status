@@ -309,7 +309,7 @@ bool StreamServer::AddSession(SessionPtr ses)
     DumpSession("AddSession");
     idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
-    FI_HILOGI("AddSession end");
+    FI_HILOGI("Add session end");
     return true;
 }
 
