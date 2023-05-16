@@ -55,7 +55,7 @@ Data DeviceStatusManager::GetLatestDeviceStatusData(Type type)
     DEV_HILOGD(SERVICE, "Enter");
     Data data = {type, OnChangedValue::VALUE_EXIT};
     if (msdpImpl_ == nullptr) {
-        DEV_HILOGE(SERVICE, "GetObserverData func is nullptr,return default");
+        DEV_HILOGE(SERVICE, "GetObserverData func is nullptr, return default");
         data.value = OnChangedValue::VALUE_INVALID;
         return data;
     }
@@ -136,7 +136,7 @@ int32_t DeviceStatusManager::MsdpDataCallback(const Data& data)
 int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusData)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    DEV_HILOGI(SERVICE, "type:%{public}d,value:%{public}d", devicestatusData.type, devicestatusData.value);
+    DEV_HILOGI(SERVICE, "type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     auto iter = listenerMap_.find(devicestatusData.type);
     if (iter == listenerMap_.end()) {
@@ -149,7 +149,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
             DEV_HILOGE(SERVICE, "Listener is nullptr");
             return false;
         }
-        DEV_HILOGI(SERVICE, "type:%{public}d,arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
+        DEV_HILOGI(SERVICE, "type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
         switch (arrs_[devicestatusData.type]) {
             case ENTER: {
                 if (devicestatusData.value == VALUE_ENTER) {
@@ -183,7 +183,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     event_ = event;
     type_ = type;
     arrs_ [type_] = event_;
-    DEV_HILOGI(SERVICE, "arr save:%{public}d ,event:%{public}d", type_, event);
+    DEV_HILOGI(SERVICE, "arr save:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     DEV_HILOGI(SERVICE, "listenerMap_.size:%{public}zu", listenerMap_.size());
     auto object = callback->AsObject();
@@ -208,10 +208,10 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
         }
     }
     if (!Enable(type)) {
-        DEV_HILOGE(SERVICE, "Enable failed!");
+        DEV_HILOGE(SERVICE, "Enable failed");
         return;
     }
-    DEV_HILOGI(SERVICE, "Subscribe success,Exit");
+    DEV_HILOGI(SERVICE, "Subscribe success, Exit");
 }
 
 void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
@@ -220,8 +220,8 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     DEV_RET_IF_NULL(callback == nullptr);
     auto object = callback->AsObject();
     DEV_RET_IF_NULL(object == nullptr);
-    DEV_HILOGE(SERVICE, "listenerMap_.size:%{public}zu,arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
-    DEV_HILOGE(SERVICE, "UNevent: %{public}d", event);
+    DEV_HILOGE(SERVICE, "listenerMap_.size:%{public}zu, arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
+    DEV_HILOGE(SERVICE, "UNevent:%{public}d", event);
     std::lock_guard lock(mutex_);
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
@@ -244,7 +244,7 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     } else {
         DEV_HILOGI(SERVICE, "other subscribe exist");
     }
-    DEV_HILOGI(SERVICE, "Unsubscribe success,Exit");
+    DEV_HILOGI(SERVICE, "Unsubscribe success, Exit");
 }
 
 int32_t DeviceStatusManager::LoadAlgorithm()

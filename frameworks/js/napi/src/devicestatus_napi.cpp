@@ -325,7 +325,7 @@ std::tuple<bool, napi_value, int32_t, int32_t> DeviceStatusNapi::CheckUnsubscrib
         ThrowErr(env, PARAM_ERROR, "event is illegal");
         return result;
     }
-    DEV_HILOGD(JS_NAPI, "type: %{public}d, event: %{public}d", type, event);
+    DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d", type, event);
     return std::make_tuple(true, args[ARG_2], type, event);
 }
 

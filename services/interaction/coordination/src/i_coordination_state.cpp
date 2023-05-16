@@ -64,7 +64,7 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
 void ICoordinationState::OnPrepareDistributedInput(bool isSuccess, const std::string &remoteNetworkId,
     int32_t startDeviceId)
 {
-    FI_HILOGI("isSuccess: %{public}s", isSuccess ? "true" : "false");
+    FI_HILOGI("isSuccess:%{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
         COOR_SM->UpdatePreparedDevices("", "");
         COOR_SM->OnStartFinish(false, remoteNetworkId, startDeviceId);
@@ -114,7 +114,7 @@ bool ICoordinationState::NeedPrepare(const std::string &remoteNetworkId, const s
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> prepared = COOR_SM->GetPreparedDevices();
     bool isNeed = !(remoteNetworkId == prepared.first && originNetworkId == prepared.second);
-    FI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
+    FI_HILOGI("NeedPrepare?:%{public}s", isNeed ? "true" : "false");
     return isNeed;
 }
 } // namespace DeviceStatus

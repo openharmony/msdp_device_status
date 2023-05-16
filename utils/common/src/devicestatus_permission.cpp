@@ -28,7 +28,7 @@ bool DeviceStatusPermission::CheckCallingPermission(const string &permissionName
     if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return ERR_OK;
     } else {
-        DEV_HILOGD(COMMON, "has no permission.permission name = %{public}s", permissionName.c_str());
+        DEV_HILOGD(COMMON, "has no permission, permission name:%{public}s", permissionName.c_str());
         return ERR_NG;
     }
 }

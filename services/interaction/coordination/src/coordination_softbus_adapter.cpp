@@ -394,7 +394,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         FI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
     }
-    FI_HILOGD("valueint: %{public}d", comType->valueint);
+    FI_HILOGD("valueint:%{public}d", comType->valueint);
     switch (comType->valueint) {
         case REMOTE_COORDINATION_START: {
             ResponseStartRemoteCoordination(sessionId, parser);

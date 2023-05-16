@@ -112,7 +112,7 @@ ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data& data)
         DEV_HILOGE(SERVICE, "callbacksImpl is nullptr");
         return RET_ERR;
     }
-    DEV_HILOGI(SERVICE, "type:%{public}d,value:%{public}d", data.type, data.value);
+    DEV_HILOGI(SERVICE, "type:%{public}d, value:%{public}d", data.type, data.value);
     g_msdpMock->GetCallbackImpl()->OnResult(data);
 
     return RET_OK;
@@ -192,7 +192,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
         }
         Data data;
         dataParse_->ParseDeviceStatusData(data, type);
-        DEV_HILOGD(SERVICE, "mock type: %{public}d,value: %{public}d", data.type, data.value);
+        DEV_HILOGD(SERVICE, "mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
     return RET_OK;

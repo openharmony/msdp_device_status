@@ -116,9 +116,9 @@ void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRe
 int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
+    DEV_HILOGI(INNERKIT, "Enter event:%{public}d, latency:%{public}d", event, latency);
     typeMap_.insert(std::make_pair(type, 1));
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
+    DEV_HILOGD(INNERKIT, "typeMap_:%{public}d, type:%{public}d", typeMap_[type], type);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");
         return RET_ERR;
@@ -139,9 +139,9 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 
 int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "UNevent: %{public}d", event);
+    DEV_HILOGI(INNERKIT, "UNevent:%{public}d", event);
     typeMap_.erase(type);
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d", typeMap_[type]);
+    DEV_HILOGD(INNERKIT, "typeMap_:%{public}d", typeMap_[type]);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");
         return RET_ERR;
@@ -277,7 +277,7 @@ int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    FI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
+    FI_HILOGI("AllocSocketPair success, socketFd_:%{public}d, tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 

@@ -26,7 +26,7 @@ static void WriteEvent(const std::string& packageName, Types ... args)
     int32_t ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MSDP, packageName,
         HiviewDFX::HiSysEvent::EventType::STATISTIC, args...);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Write event fail: %{public}s", packageName.c_str());
+        DEV_HILOGE(SERVICE, "Write event fail:%{public}s", packageName.c_str());
     }
 }
 void WriteSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type)

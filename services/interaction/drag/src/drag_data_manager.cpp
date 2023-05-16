@@ -77,7 +77,7 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
     CHKPR(pixelMap, RET_ERR);
     width = pixelMap->GetWidth();
     height = pixelMap->GetHeight();
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
     return RET_OK;
 }

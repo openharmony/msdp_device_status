@@ -286,7 +286,7 @@ void CoordinationSM::StartPointerEventFilter()
     filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY,
         touchTags);
     if (0 > filterId_) {
-        FI_HILOGE("Add Event Filter Failed.");
+        FI_HILOGE("Add Event Filter Failed");
     }
     filter->UpdateCurrentFilterId(filterId_);
 }
@@ -366,7 +366,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
     }
 
     if (!isSuccess) {
-        FI_HILOGE("Start distributed fail, startDevice: %{public}d", startDeviceId);
+        FI_HILOGE("Start distributed fail, startDevice:%{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
@@ -453,7 +453,7 @@ bool CoordinationSM::UpdateMouseLocation()
     }
     int32_t xPercent = displayX_ * MOUSE_ABS_LOCATION / width;
     int32_t yPercent = displayY_ * MOUSE_ABS_LOCATION / height;
-    FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, ""physicalX: %{public}d, physicalY: %{public}d,",
+    FI_HILOGI("displayWidth:%{public}d, displayHeight:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         width, height, displayX_, displayY_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;
@@ -461,7 +461,7 @@ bool CoordinationSM::UpdateMouseLocation()
 
 void CoordinationSM::UpdateState(CoordinationState state)
 {
-    FI_HILOGI("state: %{public}d", state);
+    FI_HILOGI("state:%{public}d", state);
     switch (state) {
         case CoordinationState::STATE_FREE: {
             Reset();
@@ -708,7 +708,7 @@ bool CoordinationSM::IsNeedFilterOut(const std::string &deviceId, const std::sha
     FI_HILOGI("businessEvent.keyCode:%{public}d, keyAction:%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);
     for (const auto &item : businessEvent.pressedKeys) {
-        FI_HILOGI("pressedKeys :%{public}d", item);
+        FI_HILOGI("pressedKeys:%{public}d", item);
     }
     return D_INPUT_ADAPTER->IsNeedFilterOut(deviceId, businessEvent);
 }

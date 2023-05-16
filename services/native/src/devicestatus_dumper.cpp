@@ -302,14 +302,14 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
         DEV_HILOGW(SERVICE, "callback is nullptr");
         return;
     }
-    DEV_HILOGI(SERVICE, "appInfoMap size=%{public}zu", appInfoMap_.size());
+    DEV_HILOGI(SERVICE, "appInfoMap size:%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
-        DEV_HILOGE(SERVICE, "not exist %d type appInfo", appInfo->type);
+        DEV_HILOGE(SERVICE, "not exist %{public}d type appInfo", appInfo->type);
         return;
     }
-    DEV_HILOGI(SERVICE, "callbacklist type=%d size=%{public}zu",
+    DEV_HILOGI(SERVICE, "callbacklist type:%{public}d, size:%{public}zu",
         appInfo->type, appInfoMap_[appInfoSetIter->first].size());
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {

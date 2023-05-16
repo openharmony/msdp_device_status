@@ -56,7 +56,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code:%{public}d", ret);
         return;
     }
     DEV_HILOGD(INNERKIT, "Exit");
@@ -85,7 +85,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code:%{public}d", ret);
         return;
     }
     DEV_HILOGD(INNERKIT, "Exit");
@@ -106,7 +106,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
+        DEV_HILOGE(INNERKIT, "Write descriptor failed");
         return devicestatusData;
     }
 
@@ -114,7 +114,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code:%{public}d", ret);
         return devicestatusData;
     }
 
@@ -124,7 +124,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     READINT32(reply, devicestatusValue, devicestatusData);
     devicestatusData.type = Type(devicestatusType);
     devicestatusData.value = OnChangedValue(devicestatusValue);
-    DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
+    DEV_HILOGD(INNERKIT, "type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
@@ -418,7 +418,7 @@ int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, cons
     }
     socketFd = reply.ReadFileDescriptor();
     if (socketFd < RET_OK) {
-        FI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
+        FI_HILOGE("Read file descriptor failed, fd:%{public}d", socketFd);
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -504,7 +504,7 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     READINT32(reply, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, width, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
     return ret;
 }

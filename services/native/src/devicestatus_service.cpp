@@ -228,7 +228,7 @@ std::shared_ptr<DeviceStatusManager> DeviceStatusService::GetDeviceStatusManager
 void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(SERVICE, "Enter event:%{public}d,latency:%{public}d", event, latency);
+    DEV_HILOGI(SERVICE, "Enter event:%{public}d, latency:%{public}d", event, latency);
     if (devicestatusManager_ == nullptr) {
         DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
         return;
@@ -249,7 +249,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGE(SERVICE, "EnterUNevent: %{public}d", event);
+    DEV_HILOGE(SERVICE, "EnterUNevent:%{public}d", event);
     if (devicestatusManager_ == nullptr) {
         DEV_HILOGE(SERVICE, "Unsubscribe func is nullptr");
         return;
@@ -276,7 +276,7 @@ Data DeviceStatusService::GetCache(const Type& type)
     if (devicestatusManager_ == nullptr) {
         Data data = {type, OnChangedValue::VALUE_EXIT};
         data.value = OnChangedValue::VALUE_INVALID;
-        FI_HILOGI("GetLatestDeviceStatusData func is nullptr,return default!");
+        FI_HILOGI("GetLatestDeviceStatusData func is nullptr, return default!");
         return data;
     }
     return devicestatusManager_->GetLatestDeviceStatusData(type);
@@ -304,7 +304,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType)
 {
-    FI_HILOGD("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    FI_HILOGD("Enter, programName:%{public}s, moduleType:%{public}d", programName.c_str(), moduleType);
 
     toReturnClientFd = -1;
     int32_t serverFd = -1;
@@ -313,10 +313,10 @@ int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&StreamServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     if (ret != RET_OK) {
-        FI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
+        FI_HILOGE("Call AddSocketPairInfo failed, return:%{public}d", ret);
         return RET_ERR;
     }
-    FI_HILOGD("Leave, programName:%{public}s,moduleType:%{public}d,alloc success",
+    FI_HILOGD("Leave, programName:%{public}s, moduleType:%{public}d, alloc success",
         programName.c_str(), moduleType);
     return RET_OK;
 }
@@ -350,7 +350,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    FI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    FI_HILOGD("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev {};
     ev.events = EPOLLIN;
@@ -401,7 +401,7 @@ int32_t DeviceStatusService::InitDelegateTasks()
         FI_HILOGE("AddEpoll error ret:%{public}d", ret);
         return ret;
     }
-    FI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
+    FI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
     return RET_OK;
 }
 
@@ -440,7 +440,7 @@ void DeviceStatusService::OnThread()
     SetThreadName(std::string("device_status_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
-    FI_HILOGD("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);
     EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
@@ -464,7 +464,7 @@ void DeviceStatusService::OnThread()
             }
         }
     }
-    FI_HILOGD("Main worker thread stop. tid:%{public}" PRId64 "", tid);
+    FI_HILOGD("Main worker thread stop, tid:%{public}" PRId64 "", tid);
 }
 
 void DeviceStatusService::OnSignalEvent(int32_t signalFd)
@@ -473,7 +473,7 @@ void DeviceStatusService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        FI_HILOGE("Read signal info failed, invalid size:%{public}d,errno:%{public}d", size, errno);
+        FI_HILOGE("Read signal info failed, invalid size:%{public}d, errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
@@ -508,8 +508,8 @@ void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
     if (res == -1) {
         FI_HILOGW("Read failed erron:%{public}d", errno);
     }
-    FI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
-        ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
+    FI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ", std:%{public}" PRId64 ""
+        ", taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
     delegateTasks_.ProcessTasks();
 }
 
@@ -520,11 +520,11 @@ void DeviceStatusService::OnTimeout(const epoll_event &ev)
         uint64_t expiration {};
         int ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
         if (ret < 0) {
-            FI_HILOGE("Read expiration failed: %{public}s", strerror(errno));
+            FI_HILOGE("Read expiration failed:%{public}s", strerror(errno));
         }
         timerMgr_.ProcessTimers();
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
 }
 
@@ -534,7 +534,7 @@ void DeviceStatusService::OnDeviceMgr(const epoll_event &ev)
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         devMgr_.Dispatch(ev);
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
 }
 

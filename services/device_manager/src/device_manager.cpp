@@ -173,30 +173,30 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     struct stat statbuf;
 
     if (stat(devPath.c_str(), &statbuf) != 0) {
-        FI_HILOGD("Invalid device path: %{public}s", devPath.c_str());
+        FI_HILOGD("Invalid device path:%{public}s", devPath.c_str());
         return nullptr;
     }
     if (!S_ISCHR(statbuf.st_mode)) {
-        FI_HILOGD("Not character device: %{public}s", devPath.c_str());
+        FI_HILOGD("Not character device:%{public}s", devPath.c_str());
         return nullptr;
     }
 
     int32_t deviceId = ParseDeviceId(devNode);
     if (deviceId < 0) {
-        FI_HILOGE("Parsing device name failed: %{public}s", devNode.c_str());
+        FI_HILOGE("Parsing device name failed:%{public}s", devNode.c_str());
         return nullptr;
     }
 
     std::shared_ptr<IDevice> dev = FindDevice(devPath);
     if (dev != nullptr) {
-        FI_HILOGD("Already exists: %{public}s", devPath.c_str());
+        FI_HILOGD("Already exists:%{public}s", devPath.c_str());
         return dev;
     }
 
     const std::string lSysPath { SYS_INPUT_PATH + devNode };
     char rpath[PATH_MAX];
     if (realpath(lSysPath.c_str(), rpath) == nullptr) {
-        FI_HILOGD("Invalid sysPath: %{public}s", lSysPath.c_str());
+        FI_HILOGD("Invalid sysPath:%{public}s", lSysPath.c_str());
         return nullptr;
     }
 
@@ -287,7 +287,7 @@ int32_t DeviceManager::EpollAdd(IEpollEventSource *source)
     };
     int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, source->GetFd(), &ev);
     if (ret != 0) {
-        FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));
+        FI_HILOGE("epoll_ctl failed:%{public}s", strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
@@ -299,7 +299,7 @@ void DeviceManager::EpollDel(IEpollEventSource *source)
     CHKPV(source);
     int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_DEL, source->GetFd(), nullptr);
     if (ret != 0) {
-        FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));
+        FI_HILOGE("epoll_ctl failed:%{public}s", strerror(errno));
     }
 }
 
@@ -323,7 +323,7 @@ void DeviceManager::Dispatch(const struct epoll_event &ev)
             FI_HILOGE("PostAsyncTask failed");
         }
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
 }
 
@@ -341,7 +341,7 @@ int32_t DeviceManager::OnEpollDispatch()
         if ((evs[index].events & EPOLLIN) == EPOLLIN) {
             source->Dispatch(evs[index]);
         } else if ((evs[index].events & (EPOLLHUP | EPOLLERR)) != 0) {
-            FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+            FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
         }
     }
     return RET_OK;

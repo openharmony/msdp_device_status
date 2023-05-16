@@ -144,7 +144,7 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     CALL_DEBUG_ENTER;
     if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
        height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Invalid size,width:%{public}d,height:%{public}d", width, height);
+        FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
         return nullptr;
     }
     OHOS::Media::InitializationOptions opts;
@@ -863,7 +863,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
     ASSERT_EQ(ret, RET_OK);
 
     ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
