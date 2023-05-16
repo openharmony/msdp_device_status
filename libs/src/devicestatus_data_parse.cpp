@@ -166,7 +166,7 @@ bool DeviceStatusDataParse::CheckFileExtendName(const std::string& filePath, con
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        DEV_HILOGE(SERVICE, "File is not find extension");
+        DEV_HILOGE(SERVICE, "File is not found extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);

@@ -227,7 +227,7 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        FI_HILOGE("File is not find extension");
+        FI_HILOGE("File is not found extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
