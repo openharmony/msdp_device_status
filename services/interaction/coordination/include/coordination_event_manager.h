@@ -40,12 +40,12 @@ public:
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
 
     struct EventInfo : public RefBase {
-        EventType type;
+        EventType type { LISTENER };
         SessionPtr sess { nullptr };
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
         std::string deviceId;
-        CoordinationMessage msg;
+        CoordinationMessage msg { CoordinationMessage::PREPARE };
         bool state { false };
     };
 
