@@ -109,17 +109,17 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& p
 
 static int32_t SessionOpened(int32_t sessionId, int32_t result)
 {
-    return CooSoftbusAdapter->OnSessionOpened(sessionId, result);
+    return COOR_SOFTBUS_ADAPTER->OnSessionOpened(sessionId, result);
 }
 
 static void SessionClosed(int32_t sessionId)
 {
-    CooSoftbusAdapter->OnSessionClosed(sessionId);
+    COOR_SOFTBUS_ADAPTER->OnSessionClosed(sessionId);
 }
 
 static void BytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
-    CooSoftbusAdapter->OnBytesReceived(sessionId, data, dataLen);
+    COOR_SOFTBUS_ADAPTER->OnBytesReceived(sessionId, data, dataLen);
 }
 
 static void MessageReceived(int32_t sessionId, const void *data, uint32_t dataLen)

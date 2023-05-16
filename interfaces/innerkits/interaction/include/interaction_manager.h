@@ -182,6 +182,6 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define InteractionMgr OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()
+#define INTERACTION_MGR OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()
 
 #endif // INTERACTION_MANAGER_H

@@ -173,7 +173,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InteractionMgr->RegisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -201,7 +201,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -224,7 +224,7 @@ void JsEventTarget::ResetEnv()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     coordinationListener_.clear();
-    InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+    INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
 void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)

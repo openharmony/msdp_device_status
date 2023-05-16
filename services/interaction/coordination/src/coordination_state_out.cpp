@@ -42,7 +42,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
     if (tempRemoteNetworkId.empty()) {
         tempRemoteNetworkId = preparedNetworkId.first;
     }
-    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return RET_ERR;

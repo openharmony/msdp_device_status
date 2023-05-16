@@ -37,7 +37,6 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
         return DEVICESTATUS_FAILED;
     }
     close(fd);
-    fd = -1;
 
     struct stat buf;
     if (stat(MSDP_DATA_DIR.c_str(), &buf) != 0) {
