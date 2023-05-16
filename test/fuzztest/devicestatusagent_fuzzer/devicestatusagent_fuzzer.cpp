@@ -98,6 +98,7 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 
 bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
+    CALL_DEBUG_ENTER;
     int idSize = 8;
     if (static_cast<int>(size) > idSize) {
         DevicestatusAgentFuzzer::TestSubscribeAgentEvent(data);

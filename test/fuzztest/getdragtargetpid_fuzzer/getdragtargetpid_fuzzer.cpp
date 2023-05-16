@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "GetDr
 
 void GetDragTargetPidFuzzTest(const uint8_t* data, size_t size)
 {
-    FI_HILOGD("GetDragTargetPidFuzzTest");
+    CALL_DEBUG_ENTER;
     InteractionManager::GetInstance()->GetDragTargetPid();
 }
 } // namespace DeviceStatus

@@ -34,6 +34,7 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 
 void StopDragFuzzTest(const uint8_t* data, size_t  size)
 {
+    CALL_DEBUG_ENTER;
     if (data == nullptr) {
         return;
     }

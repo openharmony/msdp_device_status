@@ -66,6 +66,7 @@ void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
+    CALL_DEBUG_ENTER;
     int32_t idSize = 8;
     if (static_cast<int32_t>(size) > idSize) {
         DeviceStatusClientFuzzer::TestSubscribeCallback(data);

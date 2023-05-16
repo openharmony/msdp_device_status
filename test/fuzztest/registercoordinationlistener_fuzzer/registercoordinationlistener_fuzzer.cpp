@@ -38,6 +38,7 @@ public:
 
 void RegisterCoordinationListenerFuzzTest()
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<CoordinationListenerTest> consumer = std::make_shared<CoordinationListenerTest>();
     InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
     InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
