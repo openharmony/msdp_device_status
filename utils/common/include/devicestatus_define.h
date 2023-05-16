@@ -104,13 +104,6 @@ namespace DeviceStatus {
         } \
     } while (0)
 
-#define CK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            FI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
-        } \
-    } while (0)
-
 #define CHK_PID_AND_TID() \
     do { \
         FI_HILOGD("%{public}s, (%{public}d), pid:%{public}d, threadId:%{public}" PRIu64, \

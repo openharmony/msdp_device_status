@@ -165,7 +165,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetDeviceStatusDataTest
+ * @tc.name: GetDeviceStatusDataTest007
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
@@ -184,7 +184,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetDeviceStatusDataTest
+ * @tc.name: GetDeviceStatusDataTest008
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
@@ -203,7 +203,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetDeviceStatusDataTest
+ * @tc.name: GetDeviceStatusDataTest009
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
@@ -221,6 +221,11 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest009 end");
 }
 
+/**
+ * @tc.name: GetDeviceStatusDataTest010
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 Enter";
@@ -235,6 +240,11 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 end";
 }
 
+/**
+ * @tc.name: GetDeviceStatusDataTest011
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 Enter";
@@ -249,6 +259,11 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
 }
 
+/**
+ * @tc.name: GetDeviceStatusDataTest012
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 Enter";

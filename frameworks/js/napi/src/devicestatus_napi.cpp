@@ -44,7 +44,7 @@ std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
 struct ResponseEntity {
-    OnChangedValue value;
+    OnChangedValue value { VALUE_INVALID };
 };
 
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)

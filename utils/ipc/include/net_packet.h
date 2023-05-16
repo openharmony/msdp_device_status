@@ -20,7 +20,7 @@
 
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
-    MessageId idMsg;
+    MessageId idMsg { MessageId::INVALID };
     int32_t size;
 };
 #pragma pack()
