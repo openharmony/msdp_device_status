@@ -82,5 +82,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define CooSoftbusAdapter CoordinationSoftbusAdapter::GetInstance()
+#define COOR_SOFTBUS_ADAPTER CoordinationSoftbusAdapter::GetInstance()
 #endif // COORDINATION_SOFTBUS_ADAPTER_H

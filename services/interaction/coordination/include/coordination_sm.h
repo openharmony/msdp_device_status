@@ -194,7 +194,7 @@ private:
     std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
 };
 
-#define DisHardware DistributedHardware::DeviceManager::GetInstance()
+#define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()
 #define COOR_SM OHOS::DelayedSingleton<CoordinationSM>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
