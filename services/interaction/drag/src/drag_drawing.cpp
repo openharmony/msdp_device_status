@@ -207,14 +207,14 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     CHKPV(g_drawingInfo.dragWindow);
 }
 
-int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style, bool isFirstTime)
+int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
     if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    if (!isFirstTime && (g_drawingInfo.currentStyle == style)) {
+    if (g_drawingInfo.currentStyle == style) {
         FI_HILOGD("Not need update drag style");
         return RET_OK;
     }
@@ -560,6 +560,11 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 void DragDrawing::RemoveModifier()
 {
     CALL_DEBUG_ENTER;
+    if ((g_drawingInfo.nodes.size() < TOUCH_NODE_MIN_COUNT)) {
+        FI_HILOGE("Nodes size invalid, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
     if (drawPixelMapModifier_ != nullptr) {
@@ -838,7 +843,7 @@ void DrawSVGModifier::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) c
 {
     CALL_DEBUG_ENTER;
     std::string strStyle = std::to_string(g_drawingInfo.currentDragNum);
-    if (strStyle.size() < 1) {
+    if (strStyle.empty() || (strStyle.size() < 1)) {
         FI_HILOGE("strStyle size:%{public}zu invalid", strStyle.size());
         return;
     }
@@ -876,6 +881,10 @@ void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     rosenImage->SetImageRepeat(0);
     int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
     int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return;
+    }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
     pixelMapNode->SetBoundsWidth(pixelMapWidth);

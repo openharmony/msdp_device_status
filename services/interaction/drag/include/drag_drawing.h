@@ -86,7 +86,7 @@ public:
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
-    int32_t UpdateDragStyle(DragCursorStyle style, bool isFirstTime = false);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     void OnDragSuccess();
     void OnDragFail();
     void EraseMouseIcon();
