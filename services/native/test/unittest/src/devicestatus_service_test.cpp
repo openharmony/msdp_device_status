@@ -352,3 +352,27 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest018 end");
 }
+
+/**
+ * @tc.name: GetDeviceStatusDataTest
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
+{
+    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 Enter");
+    g_type = Type::TYPE_VERTICAL_POSITION;
+    Data data = g_client->GetDeviceStatusData(g_type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
+        (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT))
+        << "GetDeviceStatusData failed";
+    Data InvalidData;
+    InvalidData.type = Type::TYPE_INVALID;
+    InvalidData.value = OnChangedValue::VALUE_INVALID;
+    InvalidData.status = Status::STATUS_INVALID;
+    InvalidData.movement = 0.0f;
+    EXPECT_TRUE(data != InvalidData);
+    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 end");
+}
