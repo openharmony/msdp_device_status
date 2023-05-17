@@ -721,13 +721,13 @@ void CoordinationSM::DeviceInitCallBack::OnRemoteDied()
 void CoordinationSM::DmDeviceStateCallback::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
-    COOR_SM->OnDeviceOnline(deviceInfo.deviceId);
+    COOR_SM->OnDeviceOnline(deviceInfo.networkId);
 }
 
 void CoordinationSM::DmDeviceStateCallback::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
-    COOR_SM->OnDeviceOffline(deviceInfo.deviceId);
+    COOR_SM->OnDeviceOffline(deviceInfo.networkId);
 }
 
 void CoordinationSM::DmDeviceStateCallback::OnDeviceChanged(const DistributedHardware::DmDeviceInfo &deviceInfo)
