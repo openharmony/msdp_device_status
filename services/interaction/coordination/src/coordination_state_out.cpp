@@ -35,7 +35,7 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
 {}
 
 int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
-    std::pair<std::string, std::string> preparedNetworkId)
+    const std::pair<std::string, std::string> &preparedNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;

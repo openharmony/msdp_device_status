@@ -59,19 +59,19 @@ int32_t CoordinationStateFree::ProcessStart(const std::string &remoteNetworkId, 
 }
 
 int32_t CoordinationStateFree::DeactivateCoordination(const std::string &networkId, bool isUnchained,
-    std::pair<std::string, std::string> preparedNetworkId)
+    const std::pair<std::string, std::string> &preparedNetworkId)
 {
     CALL_INFO_TRACE;
     if (!isUnchained) {
         FI_HILOGE("No stop operation is required");
         return RET_ERR;
     }
-    int32_t ret = CooSoftbusAdapter->OpenInputSoftbus(networkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to open softbus");
         return ret;
     }
-    ret = CooSoftbusAdapter->StopRemoteCoordination(networkId, isUnchained);
+    ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(networkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return ret;
@@ -82,11 +82,11 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
             preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
         if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
             FI_HILOGD("networkId:%{public}s", networkId.c_str());
-            CooSM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
-            CooSM->SetUnchainStatus(false);
+            COOR_SM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
+            COOR_SM->SetUnchainStatus(false);
         }
     } else {
-        ret = CooSoftbusAdapter->StopRemoteCoordinationResult(networkId, false);
+        ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordinationResult(networkId, false);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to stop the process");
             return ret;

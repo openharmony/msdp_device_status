@@ -39,7 +39,7 @@ public:
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     virtual int32_t DeactivateCoordination(const std::string &networkId, bool isUnchained,
-        std::pair<std::string, std::string> preparedNetworkId)
+        const std::pair<std::string, std::string> &preparedNetworkId)
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }

@@ -161,10 +161,10 @@ public:
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CoordinationState, CoordinationState)> callback);
     std::string GetRemoteId() const;
-    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId); // 修改名称
+    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     void SetUnchainStatus(bool isUnchained);
     void NotifySessionClosed();
-    void SetPeerNetworkId(const std::string &peerNetworkId);
+    void SetSinkNetworkId(const std::string &sinkNetworkId);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -181,7 +181,7 @@ private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
-    std::string peerNetworkId_;
+    std::string sinkNetworkId_;
     bool isUnchained_ { false };
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
