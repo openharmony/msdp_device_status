@@ -368,11 +368,11 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT))
         << "GetDeviceStatusData failed";
-    Data InvalidData;
-    InvalidData.type = Type::TYPE_INVALID;
-    InvalidData.value = OnChangedValue::VALUE_INVALID;
-    InvalidData.status = Status::STATUS_INVALID;
-    InvalidData.movement = 0.0f;
-    EXPECT_TRUE(data != InvalidData);
+    Data invalidData;
+    invalidData.type = Type::TYPE_INVALID;
+    invalidData.value = OnChangedValue::VALUE_INVALID;
+    invalidData.status = Status::STATUS_INVALID;
+    invalidData.movement = 0.0f;
+    EXPECT_TRUE(data != invalidData);
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 end");
 }
