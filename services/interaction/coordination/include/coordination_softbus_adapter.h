@@ -42,7 +42,7 @@ public:
 
     struct DataPacket {
         MessageId messageId;
-        uint32_t dataLen;
+        uint32_t dataLen { 0 };
         uint8_t data[0];
     };
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
@@ -82,5 +82,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define CooSoftbusAdapter CoordinationSoftbusAdapter::GetInstance()
+#define COOR_SOFTBUS_ADAPTER CoordinationSoftbusAdapter::GetInstance()
 #endif // COORDINATION_SOFTBUS_ADAPTER_H

@@ -24,6 +24,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
+inline constexpr std::string_view GET_BOOLEAN { "napi_get_boolean" };
+inline constexpr std::string_view COERCE_TO_BOOL { "napi_coerce_to_bool" };
+inline constexpr std::string_view CREATE_ERROR { "napi_create_error" };
 } // namespace
 
 napi_value JsUtil::GetPrepareInfo(sptr<CallbackInfo> cb)

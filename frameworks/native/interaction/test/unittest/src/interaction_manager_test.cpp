@@ -131,9 +131,7 @@ void InteractionManagerTest::SetUpTestCase()
     g_deviceTouchId = mouseAndTouch.second;
 }
 
-void InteractionManagerTest::SetUp()
-{
-}
+void InteractionManagerTest::SetUp() {}
 
 void InteractionManagerTest::TearDown()
 {
@@ -750,11 +748,11 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 }
 
 /**
-* @tc.name: InteractionManagerTest_TouchEventDispatch
-* @tc.desc: Get Drag Target Pid
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: InteractionManagerTest_TouchEventDispatch
+ * @tc.desc: Get Drag Target Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -787,11 +785,11 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 }
 
 /**
-* @tc.name: InteractionManagerTest_MouseEventDispatch
-* @tc.desc: Get Drag Target Pid
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: InteractionManagerTest_MouseEventDispatch
+ * @tc.desc: Get Drag Target Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -823,11 +821,11 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 }
 
 /**
-* @tc.name: InteractionManagerTest_SetDragWindowVisible
-* @tc.desc: Set Drag Window Visible
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: InteractionManagerTest_SetDragWindowVisible
+ * @tc.desc: Set Drag Window Visible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
@@ -840,11 +838,11 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, Te
 }
 
 /**
-* @tc.name: InteractionManagerTest_GetShadowOffset
-* @tc.desc: Get Shadow Offset
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: InteractionManagerTest_GetShadowOffset
+ * @tc.desc: Get Shadow Offset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSize.Level1)
 {
     CALL_TEST_DEBUG;

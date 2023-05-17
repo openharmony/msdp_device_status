@@ -70,7 +70,7 @@ void JsDragManager::RegisterListener(napi_env env, napi_value handle)
     listeners_.push_back(std::move(monitor));
     if (!hasRegistered_) {
         hasRegistered_ = true;
-        InteractionMgr->AddDraglistener(shared_from_this());
+        INTERACTION_MGR->AddDraglistener(shared_from_this());
     }
 }
 
@@ -98,7 +98,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
     }
     if (hasRegistered_ && listeners_.empty()) {
         hasRegistered_ = false;
-        InteractionMgr->RemoveDraglistener(shared_from_this());
+        INTERACTION_MGR->RemoveDraglistener(shared_from_this());
     }
 }
 

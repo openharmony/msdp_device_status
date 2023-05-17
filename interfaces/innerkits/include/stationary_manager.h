@@ -32,10 +32,10 @@ class StationaryManager {
 public:
 
     /**
-    * @brief 获取StationaryManager实例。
-    * @return StationaryManager实例。
-    * @since 9
-    */
+     * @brief 获取StationaryManager实例。
+     * @return StationaryManager实例。
+     * @since 9
+     */
     static StationaryManager *GetInstance();
 
     /**
@@ -75,7 +75,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#define StationaryMgr OHOS::Msdp::DeviceStatus::StationaryManager::GetInstance()
-
 #endif // STATIONARY_MANAGER_H

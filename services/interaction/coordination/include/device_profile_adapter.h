@@ -51,9 +51,10 @@ private:
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
     std::mutex adapterLock_;
     std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
+    const std::string characteristicsName_ = "currentStatus";
 };
 
-#define DProfileAdapter ::OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()
+#define DP_ADAPTER OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -54,7 +54,7 @@ public:
     static void RemoveSpace(std::string &str);
     static bool IsInteger(const std::string &target);
     static bool DoesFileExist(const char *path);
-    static size_t GetFileSize(const char *path);
+    static ssize_t GetFileSize(const char *path);
 
     static void ShowFileAttributes(const char *path);
     static void ShowUserAndGroup();
