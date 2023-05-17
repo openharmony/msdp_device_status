@@ -728,7 +728,7 @@ int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr curNode) const
     CALL_DEBUG_ENTER;
     CHKPR(curNode, RET_ERR);
     std::string strStyle = std::to_string(g_drawingInfo.currentDragNum);
-    if (strStyle.size() < 1) {
+    if (strStyle.empty()) {
         FI_HILOGE("strStyle size:%{public}zu invalid", strStyle.size());
         return RET_ERR;
     }
@@ -843,7 +843,7 @@ void DrawSVGModifier::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) c
 {
     CALL_DEBUG_ENTER;
     std::string strStyle = std::to_string(g_drawingInfo.currentDragNum);
-    if (strStyle.empty() || (strStyle.size() < 1)) {
+    if (strStyle.empty()) {
         FI_HILOGE("strStyle size:%{public}zu invalid", strStyle.size());
         return;
     }
