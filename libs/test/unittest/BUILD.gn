@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/msdp/device_status/device_status.gni")
 import("//build/test.gni")
+import("../../../device_status.gni")
 
 module_output_path = "${device_status_part_name}/devicestatussrv"
 
@@ -21,16 +21,15 @@ config("devicestatus_private_config") {
 
   include_dirs = [
     "include",
-    "//base/msdp/device_status/services/native/include",
-    "//base/msdp/device_status/libs/include",
-    "//base/msdp/device_status/libs/include/algorithm",
-    "//base/msdp/device_status/libs/include/datahub",
-    "//base/msdp/device_status/libs/interface",
+    "../../../services/native/include",
+    "../../../libs/include",
+    "../../../libs/include/algorithm",
+    "../../../libs/include/datahub",
+    "../../../libs/interface",
     "${device_status_interfaces_path}/innerkits/include",
     "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include/",
     "${ability_runtime_path}/interfaces/kits/native/ability/native/",
     "//base/sensors/sensor/interfaces/native/include/",
-    "//utils/system/safwk/native/include",
   ]
 }
 
@@ -47,10 +46,7 @@ ohos_unittest("device_status_algorithm_test") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
-    "//base/msdp/device_status/libs:devicestatus_algo",
-    "//commonlibrary/c_utils/base:utils",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "../../../libs:devicestatus_algo",
     "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",
@@ -83,11 +79,8 @@ ohos_unittest("device_status_datahub_test") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
-    "//base/msdp/device_status/libs:devicestatus_algo",
-    "//base/msdp/device_status/libs:devicestatus_mock",
-    "//commonlibrary/c_utils/base:utils",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "../../../libs:devicestatus_algo",
+    "../../../libs:devicestatus_mock",
     "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",
@@ -120,11 +113,8 @@ ohos_unittest("device_status_mock_test") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
-    "//base/msdp/device_status/libs:devicestatus_algo",
-    "//base/msdp/device_status/libs:devicestatus_mock",
-    "//commonlibrary/c_utils/base:utils",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "../../../libs:devicestatus_algo",
+    "../../../libs:devicestatus_mock",
     "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",

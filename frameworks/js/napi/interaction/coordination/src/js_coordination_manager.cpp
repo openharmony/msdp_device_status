@@ -34,7 +34,7 @@ napi_value JsCoordinationManager::Prepare(napi_env env, napi_value handle)
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->PrepareCoordination(callback);
+    int32_t errCode = INTERACTION_MGR->PrepareCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -49,7 +49,7 @@ napi_value JsCoordinationManager::Unprepare(napi_env env, napi_value handle)
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->UnprepareCoordination(callback);
+    int32_t errCode = INTERACTION_MGR->UnprepareCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -65,7 +65,7 @@ napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remo
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsActivate, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->ActivateCoordination(remoteNetworkId, startDeviceId, callback);
+    int32_t errCode = INTERACTION_MGR->ActivateCoordination(remoteNetworkId, startDeviceId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -80,7 +80,7 @@ napi_value JsCoordinationManager::Deactivate(napi_env env, bool isUnchained, nap
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsDeactivate, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InteractionMgr->DeactivateCoordination(callback);
+    int32_t errCode = INTERACTION_MGR->DeactivateCoordination(callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
@@ -95,7 +95,7 @@ napi_value JsCoordinationManager::GetCrossingSwitchState(napi_env env, const std
     CHKPP(cb);
     napi_value result = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsGetCrossingSwitchState, cb, std::placeholders::_1);
-    int32_t errCode = InteractionMgr->GetCoordinationState(networkId, callback);
+    int32_t errCode = INTERACTION_MGR->GetCoordinationState(networkId, callback);
     if (errCode != RET_OK) {
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }

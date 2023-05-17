@@ -31,7 +31,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DeviceStatusMsdpClientImpl : public IMsdp::MsdpAlgoCallback {
+class DeviceStatusMsdpClientImpl : public IMsdp::MsdpAlgoCallback,
+    public std::enable_shared_from_this<DeviceStatusMsdpClientImpl> {
 public:
     using CallbackManager = std::function<int32_t(const Data&)>;
     using LoadMockLibraryFunc = IMsdp* (*)();
@@ -72,6 +73,10 @@ private:
     MsdpAlgoHandle algo_;
     std::map<Type, uint32_t> algoCallCount_;
     std::map<Type, uint32_t> mockCallCount_;
+    std::map<Type, OnChangedValue> deviceStatusDataMap_;
+    DeviceStatusMsdpClientImpl::CallbackManager callBacksMgr_;
+    IMsdp* iAlgo_ = nullptr;
+    IMsdp* iMock_ = nullptr;
 
     std::mutex mMutex_;
     bool notifyManagerFlag_ = false;

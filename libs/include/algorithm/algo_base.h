@@ -55,22 +55,22 @@ protected:
     };
 
     struct {
-        float x;
-        float y;
-        float z;
-        double resultantAcc;
-        double pitch;
-        double roll;
+        float x { 0.0 };
+        float y { 0.0 };
+        float z { 0.0 };
+        double resultantAcc { 0.0 };
+        double pitch { 0.0 };
+        double roll { 0.0 };
     } algoPara_ {};
 
     int32_t state_ = UNKNOWN;
     int32_t counter_ = COUNTER_THRESHOLD;
 
-    Data reportInfo_ {TYPE_INVALID,
-                      VALUE_INVALID,
-                      STATUS_INVALID,
-                      ACTION_INVALID,
-                      0.0};
+    Data reportInfo_ { TYPE_INVALID,
+                       VALUE_INVALID,
+                       STATUS_INVALID,
+                       ACTION_INVALID,
+                       0.0 };
 
     SensorCallback algoCallback_;
     std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ { nullptr };

@@ -143,6 +143,11 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest003, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest003 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest004
+ * @tc.desc: test subscribing lid open event
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest004 start";
@@ -159,9 +164,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest004, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest004 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest005
+ * @tc.desc: test subscribing lid open event
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest007 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest005 start";
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
     int32_t ret = g_agent1->SubscribeAgentEvent(Type::TYPE_INVALID, ActivityEvent::ENTER_EXIT,
@@ -174,9 +184,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest005 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest006
+ * @tc.desc: test subscribing lid open event
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest008 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest006 start";
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
     int32_t ret = g_agent1->SubscribeAgentEvent(static_cast<Type>(10), ActivityEvent::ENTER_EXIT,
@@ -189,9 +204,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest006 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest007
+ * @tc.desc: test subscribing lid open event for 2 client
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest009 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest007 start";
     g_agentTest = Type::TYPE_LID_OPEN;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -211,9 +231,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest007 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest008
+ * @tc.desc: test subscribing lid open event
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest010 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest008 start";
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent = nullptr;
     int32_t ret = g_agent1->SubscribeAgentEvent(Type::TYPE_LID_OPEN, ActivityEvent::ENTER_EXIT,
         ReportLatencyNs::LONG, agentEvent);
@@ -222,9 +247,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest008 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest009
+ * @tc.desc: test subscribing lid open event for 3 client
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest013 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest009 start";
     g_agentTest = Type::TYPE_HORIZONTAL_POSITION;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -250,9 +280,14 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest009 end";
 }
 
+/**
+ * @tc.name: DeviceStatusAgentTest0010
+ * @tc.desc: test subscribing lid open event
+ * @tc.type: FUNC
+ */
 HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAgentTest014 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAgentTest010 start";
     g_agentTest = Type::TYPE_LID_OPEN;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =

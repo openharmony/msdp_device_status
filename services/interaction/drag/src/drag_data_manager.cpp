@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "drag_data_adapter.h"
+#include "drag_data_manager.h"
 
 #include "hitrace_meter.h"
 #include "pointer_style.h"
@@ -26,50 +26,50 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragDataAdapter" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragDataManager" };
 } // namespace
 
-DragDataAdapter::DragDataAdapter() = default;
-DragDataAdapter::~DragDataAdapter() = default;
+DragDataManager::DragDataManager() = default;
+DragDataManager::~DragDataManager() = default;
 
-void DragDataAdapter::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
+void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
     pointerStyle_ = pointerStyle;
 }
 
-void DragDataAdapter::SetDragStyle(DragCursorStyle style)
+void DragDataManager::SetDragStyle(DragCursorStyle style)
 {
     dragStyle_ = style;
 }
 
-DragCursorStyle DragDataAdapter::GetDragStyle() const
+DragCursorStyle DragDataManager::GetDragStyle() const
 {
     return dragStyle_;
 }
 
-std::u16string DragDataAdapter::GetDragMessage() const
+std::u16string DragDataManager::GetDragMessage() const
 {
     return dragMessage_;
 }
 
-DragData DragDataAdapter::GetDragData() const
+DragData DragDataManager::GetDragData() const
 {
     return dragData_;
 }
 
-void DragDataAdapter::SetDragWindowVisible(bool visible)
+void DragDataManager::SetDragWindowVisible(bool visible)
 {
     visible_ = visible;
 }
 
-bool DragDataAdapter::GetDragWindowVisible() const
+bool DragDataManager::GetDragWindowVisible() const
 {
     return visible_;
 }
 
-int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
+int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
 {
     offsetX = dragData_.shadowInfo.x;
     offsetY = dragData_.shadowInfo.y;
@@ -82,7 +82,7 @@ int32_t DragDataAdapter::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
     return RET_OK;
 }
 
-void DragDataAdapter::ResetDragData()
+void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
     ShadowInfo shadowInfo;

@@ -27,6 +27,9 @@
 using namespace OHOS::Msdp;
 using namespace OHOS::Msdp::DeviceStatus;
 
+namespace {
+constexpr size_t EVENT_MAP_MAX = 20;
+} // namespace
 DeviceStatusEvent::DeviceStatusEvent(napi_env env)
 {
     env_ = env;
@@ -41,6 +44,10 @@ DeviceStatusEvent::~DeviceStatusEvent()
 bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 {
     DEV_HILOGD(JS_NAPI, "On for event:%{public}d, isOnce:%{public}d", eventType, isOnce);
+    if ((eventMap_.size() > EVENT_MAP_MAX) || (eventOnceMap_.size() > EVENT_MAP_MAX)) {
+        DEV_HILOGE(JS_NAPI, "eventMap_ or eventOnceMap_  size over");
+        return false;
+    }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
@@ -150,6 +157,19 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
     DEV_HILOGI(JS_NAPI, "%{public}zu listeners in the once list of %{public}d",
         eventOnceMap_[eventType].size(), eventType);
     return eventMap_[eventType].empty();
+}
+
+bool DeviceStatusEvent::RemoveAllCallback(int32_t eventType)
+{
+    DEV_HILOGD(JS_NAPI, "Enter");
+    auto iter = eventMap_.find(eventType);
+    if (iter == eventMap_.end()) {
+        DEV_HILOGE(JS_NAPI, "evenType %{public}d not find", eventType);
+        return false;
+    }
+    eventMap_.erase(eventType);
+    DEV_HILOGD(JS_NAPI, "Exit");
+    return true;
 }
 
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,

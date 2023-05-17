@@ -38,7 +38,7 @@ JsDragContext::~JsDragContext()
     if (mgr_ != nullptr) {
         mgr_->ResetEnv();
         mgr_ = nullptr;
-     }
+    }
 }
 
 std::shared_ptr<JsDragManager> JsDragContext::GetJsDragMgr()

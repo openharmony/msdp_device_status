@@ -25,9 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Coord
 } // namespace
 CoordinationEventHandler::CoordinationEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
-{
-}
+    : AppExecFwk::EventHandler(runner) {}
 
 bool CoordinationEventHandler::ProxyPostTask(const Callback &callback, int64_t delayTime)
 {

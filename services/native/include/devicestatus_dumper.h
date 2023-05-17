@@ -34,10 +34,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-const std::string ARG_DUMP_HELP = "-h";
-const std::string ARG_DUMP_DEVICESTATUS_SUBSCRIBER = "-s";
-const std::string ARG_DUMP_DEVICESTATUS_CHANGES = "-l";
-const std::string ARG_DUMP_DEVICESTATUS_CURRENT_STATE = "-c";
 constexpr int32_t RET_NG = -1;
 constexpr uint32_t MAX_DEVICE_STATUS_SIZE = 10;
 struct AppInfo {
@@ -46,7 +42,7 @@ struct AppInfo {
     int32_t pid {};
     Security::AccessToken::AccessTokenID tokenId;
     std::string packageName;
-    Type type;
+    Type type { TYPE_INVALID };
     sptr<IRemoteDevStaCallback> callback { nullptr };
 };
 struct DeviceStatusRecord {

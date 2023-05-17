@@ -28,10 +28,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
-const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
-const std::string SPLIT_SYMBOL { "|" };
-const std::string DH_ID_PREFIX { "Input_" };
-const std::string CONFIG_ITEM_KEYBOARD_TYPE { "Key.keyboard.type" };
 constexpr size_t NETWORK_ID_NUMS = 3;
 constexpr size_t DESCRIPTOR_INDEX = 2;
 } // namespace
@@ -120,22 +116,26 @@ void CoordinationDeviceManager::Device::Populate()
 
 bool CoordinationDeviceManager::Device::IsRemote()
 {
+    const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
     return (GetName().find(INPUT_VIRTUAL_DEVICE_NAME) != std::string::npos);
 }
 
 std::string CoordinationDeviceManager::Device::MakeNetworkId(const std::string &phys) const
 {
     std::vector<std::string> idParts;
+    const std::string SPLIT_SYMBOL { "|" };
     StringSplit(phys, SPLIT_SYMBOL, idParts);
     if (idParts.size() == NETWORK_ID_NUMS) {
         return idParts[1];
     }
-    return EMPTYSTR;
+    return "";
 }
 
 std::string CoordinationDeviceManager::Device::GenerateDescriptor()
 {
     const std::string phys = GetPhys();
+    const std::string SPLIT_SYMBOL { "|" };
+    const std::string DH_ID_PREFIX { "Input_" };
     std::string descriptor;
     if (IsRemote() && !phys.empty()) {
         FI_HILOGD("physicalPath:%{public}s", phys.c_str());
@@ -189,7 +189,7 @@ std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) con
 void CoordinationDeviceManager::Init()
 {
     CALL_INFO_TRACE;
-    auto* context = CoordinationEventMgr->GetIContext();
+    auto* context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     devObserver_ = std::make_shared<DeviceObserver>(*this);
     context->GetDeviceManager().AddDeviceObserver(devObserver_);
@@ -263,7 +263,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
         FI_HILOGE("Failed to search for the device:id %{public}d", id);
-        return EMPTYSTR;
+        return "";
     }
     CHKPS(devIter->second);
     auto OriginNetworkId = devIter->second->GetNetworkId();
@@ -278,7 +278,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
     CALL_INFO_TRACE;
     if (dhid.empty()) {
         FI_HILOGD("The current netWorkId is an empty string");
-        return EMPTYSTR;
+        return "";
     }
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
@@ -287,7 +287,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
         }
     }
     FI_HILOGD("The current netWorkId is an empty string");
-    return EMPTYSTR;
+    return "";
 }
 
 std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
@@ -300,7 +300,7 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
             return devIter->second->GetDhid();
         }
     }
-    return EMPTYSTR;
+    return "";
 }
 
 bool CoordinationDeviceManager::HasLocalPointerDevice() const
@@ -323,7 +323,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
     if (dev->IsKeyboard()) {
-        CooSM->OnKeyboardOnline(dev->GetDhid());
+        COOR_SM->OnKeyboardOnline(dev->GetDhid());
     }
     FI_HILOGD("add device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
     FI_HILOGD("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
@@ -345,10 +345,10 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     auto dhids = GetCoordinationDhids(dev->GetId());
     devices_.erase(iter);
     if (device->IsPointerDevice()) {
-        CooSM->OnPointerOffline(dev->GetDhid(), dhids);
+        COOR_SM->OnPointerOffline(dev->GetDhid(), dhids);
     } else if (device->IsKeyboard()) {
         if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            CooSM->OnKeyboardOffline(dev->GetDhid());
+            COOR_SM->OnKeyboardOffline(dev->GetDhid());
         }
     }
 }
