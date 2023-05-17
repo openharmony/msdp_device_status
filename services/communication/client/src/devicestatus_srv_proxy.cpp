@@ -20,7 +20,6 @@
 #include <message_option.h>
 #include <message_parcel.h>
 
-#include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "stationary_callback.h"
@@ -36,7 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "Enter event:%{public}d, latency:%{public}d", event, latency);
+    CALL_DEBUG_ENTER;
+    FI_HILOGI("Enter event:%{public}d, latency:%{public}d", event, latency);
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
 
@@ -45,7 +45,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed");
+        FI_HILOGE("Write descriptor failed");
         return;
     }
 
@@ -56,15 +56,15 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGD(INNERKIT, "Enter, event:%{public}d", event);
+    CALL_DEBUG_ENTER;
+    FI_HILOGD("Enter, event:%{public}d", event);
     StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
@@ -74,7 +74,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed");
+        FI_HILOGE("Write descriptor failed");
         return;
     }
 
@@ -85,15 +85,14 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code: %{public}d", ret);
         return;
     }
-    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 Data DeviceStatusSrvProxy::GetCache(const Type& type)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
+    CALL_DEBUG_ENTER;
     Data devicestatusData;
     devicestatusData.type = Type::TYPE_INVALID;
     devicestatusData.value = OnChangedValue::VALUE_INVALID;
@@ -106,7 +105,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
+        FI_HILOGE("Write descriptor failed!");
         return devicestatusData;
     }
 
@@ -114,7 +113,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code: %{public}d", ret);
         return devicestatusData;
     }
 
@@ -124,8 +123,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     READINT32(reply, devicestatusValue, devicestatusData);
     devicestatusData.type = Type(devicestatusType);
     devicestatusData.value = OnChangedValue(devicestatusValue);
-    DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
-    DEV_HILOGD(INNERKIT, "Exit");
+    FI_HILOGD("type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
     return devicestatusData;
 }
 

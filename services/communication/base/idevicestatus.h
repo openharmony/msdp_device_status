@@ -17,7 +17,6 @@
 #define IDEVICESTATUS_H
 
 #include <iremote_broker.h>
-#include "iremote_object.h"
 
 #include "drag_data.h"
 #include "stationary_callback.h"
