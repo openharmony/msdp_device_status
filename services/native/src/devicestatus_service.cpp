@@ -847,6 +847,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    motionDrag_.RegisterCallback();
     return RET_OK;
 }
 
