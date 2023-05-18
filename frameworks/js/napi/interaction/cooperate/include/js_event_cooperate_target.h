@@ -32,15 +32,19 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class JsEventCooperateTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventCooperateTarget> {
+class JsEventCooperateTarget : public ICoordinationListener,
+                               public std::enable_shared_from_this<JsEventCooperateTarget> {
 public:
     JsEventCooperateTarget();
     virtual ~JsEventCooperateTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventCooperateTarget);
 
-    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string& deviceId, CoordinationMessage msg);
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);
