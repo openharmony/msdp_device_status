@@ -43,7 +43,6 @@ public:
     void ResetDragData();
     void SetMotionDrag(bool isMotionDrag);
     bool IsMotionDrag() const;
-
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
