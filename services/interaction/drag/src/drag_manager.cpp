@@ -87,8 +87,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
     dragOutSession_ = sess;
     dragTargetPid_ = -1;
-    if (InitDataAdapter(dragData) != RET_OK) {
-        FI_HILOGE("InitDataAdapter failed");
+    if (InitDataManager(dragData) != RET_OK) {
+        FI_HILOGE("InitDataManager failed");
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
@@ -151,7 +151,7 @@ void DragManager::SetDragTargetPid(int32_t dragTargetPid)
     dragTargetPid_ = dragTargetPid;
 }
 
-int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetTid)
 {
     CALL_DEBUG_ENTER;
     if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
@@ -159,6 +159,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style)
         return RET_ERR;
     }
     DRAG_DATA_MGR.SetDragStyle(style);
+    DRAG_DATA_MGR.SetTargetTid(targetTid);
     dragDrawing_.UpdateDragStyle(style);
     return RET_OK;
 }
@@ -212,21 +213,21 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
-void DragManager::SendDragData(int32_t targetPid, const std::string &udKey)
+void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
-    privilege.pid = targetPid;
+    privilege.tokenId = targetTid;
     FI_HILOGD("AddPrivilege enter");
     int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
 #else
-    (void)(targetPid);
+    (void)(targetTid);
     (void)(udKey);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
@@ -240,13 +241,15 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pid = MMI::InputManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
     SetDragTargetPid(pid);
+
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
-
-    SendDragData(pid, dragData.udKey);
+    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
+    FI_HILOGD("Target window drag tid: %{public}d", targetTid);
+    SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
     context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
@@ -288,11 +291,12 @@ void DragManager::Dump(int32_t fd) const
 {
     CALL_DEBUG_ENTER;
     DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
+    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
     dprintf(fd, "Drag information:\n");
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | "
-            "cursorStyle:%s | isWindowVisble:%s\n",
-            GetDragState(dragState_).c_str(), GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(),
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
+            "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
+            GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string udKey;
@@ -414,7 +418,7 @@ OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended)
     return extraData;
 }
 
-int32_t DragManager::InitDataAdapter(const DragData &dragData) const
+int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
     MMI::PointerStyle pointerStyle;

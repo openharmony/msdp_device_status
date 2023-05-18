@@ -48,8 +48,8 @@ public:
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey) const;
     void SetDragTargetPid(int32_t dragTargetPid);
-    void SendDragData(int32_t targetPid, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style);
+    void SendDragData(int32_t targetTid, const std::string &udKey);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetTid);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -73,7 +73,7 @@ public:
 private:
     int32_t AddDragEventInterceptor(int32_t sourceType);
     int32_t NotifyDragResult(DragResult result);
-    int32_t InitDataAdapter(const DragData &dragData) const;
+    int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
     std::string GetDragState(DragState value) const;
