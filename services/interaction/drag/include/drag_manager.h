@@ -67,7 +67,7 @@ public:
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
         IContext* context_ { nullptr };
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 private:
     int32_t AddDragEventInterceptor(int32_t sourceType);
@@ -91,7 +91,7 @@ private:
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
-    std::function<void(DragState)> stateChangedCallback_;
+    std::function<void(DragState)> stateChangedCallback_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

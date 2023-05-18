@@ -55,7 +55,7 @@ protected:
     bool hasClient_ { false };
     bool isRunning_ { false };
     bool isConnected_ { false };
-    MsgClientFunCallback recvFun_;
+    MsgClientFunCallback recvFun_ { nullptr };
 };
 } //
 } // namespace Msdp

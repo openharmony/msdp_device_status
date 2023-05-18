@@ -61,7 +61,7 @@ public:
     private:
         std::atomic_bool hasWaited_ { false };
         int32_t id_ { 0 };
-        DTaskCallback fun_;
+        DTaskCallback fun_ { nullptr };
         Promise* promise_ { nullptr };
     };
     using TaskPtr = Task::TaskPtr;

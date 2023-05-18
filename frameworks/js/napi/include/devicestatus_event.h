@@ -46,7 +46,7 @@ public:
     void ClearEventMap();
     bool RemoveAllCallback(int32_t eventType);
 protected:
-    napi_env env_;
+    napi_env env_ { nullptr };
     napi_ref thisVarRef_ { nullptr };
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_;
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventOnceMap_;
