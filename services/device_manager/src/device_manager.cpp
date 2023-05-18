@@ -281,10 +281,9 @@ int32_t DeviceManager::EpollAdd(IEpollEventSource *source)
 {
     CALL_DEBUG_ENTER;
     CHKPR(source, RET_ERR);
-    struct epoll_event ev {
-        .events = EPOLLIN | EPOLLHUP | EPOLLERR,
-        .data.ptr = source,
-    };
+    struct epoll_event ev {};
+    ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+    ev.data.ptr = source;
     int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, source->GetFd(), &ev);
     if (ret != 0) {
         FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));

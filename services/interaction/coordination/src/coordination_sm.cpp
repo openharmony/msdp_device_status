@@ -565,7 +565,8 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
     }
 }
 
-void CoordinationSM::OnKeyboardOffline(const std::string &dhid) {
+void CoordinationSM::OnKeyboardOffline(const std::string &dhid)
+{
     CALL_INFO_TRACE;
     if (coordinationState_ == CoordinationState::STATE_OUT) {
         std::string remoteNetworkId = remoteNetworkId_;
