@@ -118,7 +118,7 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
     if (hasPointer && adjustAbsolutionLocation) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     } else {
-        OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
+        OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     isStarting_ = false;
     isStopping_ = false;
@@ -317,12 +317,14 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         return;
     }
     if (coordinationState_ == CoordinationState::STATE_FREE) {
-        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        NotifyMouseLocation(xPercent, yPercent);
         UpdateState(CoordinationState::STATE_IN);
+        NotifyRemoteNetworkId(COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_));
         StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_IN);
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
-        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        NotifyMouseLocation(xPercent, yPercent);
+        NotifyRemoteNetworkId(remoteNetworkId_);
         UpdateState(CoordinationState::STATE_FREE);
         StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
     }
@@ -381,6 +383,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             UpdateState(CoordinationState::STATE_OUT);
+            NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
@@ -388,6 +391,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
             UpdateState(CoordinationState::STATE_FREE);
+            NotifyRemoteNetworkId(originNetworkId);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is out");
@@ -411,6 +415,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
             UpdateState(CoordinationState::STATE_FREE);
+            NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(coordinationState_, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is free");
@@ -495,6 +500,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             break;
         }
         case CoordinationState::STATE_IN: {
+            OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
             currentStateSM_ = std::make_shared<CoordinationStateIn>(startDeviceDhid_);
             auto interceptor = std::make_shared<InterceptorConsumer>();
             MMI::InputManager::GetInstance()->EnableInputDevice(true);
@@ -874,6 +880,20 @@ void CoordinationSM::RegisterStateChange(CooStateChangeType type,
     stateChangedCallbacks_[type] = callback;
 }
 
+void CoordinationSM::RegisterRemoteNetworkId(std::function<void(std::string)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    remoteNetworkIdCallback_ = callback;
+}
+
+void CoordinationSM::RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    mouseLocationCallback_ = callback;
+}
+
 void CoordinationSM::StateChangedNotify(CoordinationState oldState, CoordinationState newState)
 {
     CALL_DEBUG_ENTER;
@@ -902,10 +922,18 @@ void CoordinationSM::ChangeNotify(CooStateChangeType type, CoordinationState old
     }
 }
 
-std::string CoordinationSM::GetRemoteId() const
+void CoordinationSM::NotifyRemoteNetworkId(const std::string &remoteNetworkId)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
-    return remoteNetworkId_;
+    if (remoteNetworkIdCallback_ != nullptr) {
+        remoteNetworkIdCallback_(remoteNetworkId);
+    }
+}
+
+void CoordinationSM::NotifyMouseLocation(int32_t x, int32_t y)
+{
+    if (mouseLocationCallback_ != nullptr) {
+        mouseLocationCallback_(x, y);
+    }
 }
 
 void CoordinationSM::SetUnchainStatus(bool isUnchained)

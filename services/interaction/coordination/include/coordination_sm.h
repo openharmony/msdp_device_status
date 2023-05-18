@@ -165,6 +165,8 @@ public:
     void SetUnchainStatus(bool isUnchained);
     void NotifySessionClosed();
     void SetSinkNetworkId(const std::string &sinkNetworkId);
+    void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
+    void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -175,6 +177,8 @@ private:
     bool UpdateMouseLocation();
     void StateChangedNotify(CoordinationState oldState, CoordinationState newState);
     void ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState);
+    void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
+    void NotifyMouseLocation(int32_t x, int32_t y);
 
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
@@ -198,6 +202,8 @@ private:
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
     std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
+    std::function<void(std::string)> remoteNetworkIdCallback_;
+    std::function<void(int32_t, int32_t)> mouseLocationCallback_;
 };
 
 #define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()
