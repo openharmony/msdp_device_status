@@ -315,14 +315,14 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess,
         return;
     }
     if (coordinationState_ == CoordinationState::STATE_FREE) {
-        MouseLocationNotify(xPercent, yPercent);
+        NotifyMouseLocation(xPercent, yPercent);
         UpdateState(CoordinationState::STATE_IN);
-        RemoteNetworkIdNotify(COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_));
+        NotifyRemoteNetworkId(COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_));
         StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_IN);
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
-        MouseLocationNotify(xPercent, yPercent);
-        RemoteNetworkIdNotify(remoteNetworkId_);
+        NotifyMouseLocation(xPercent, yPercent);
+        NotifyRemoteNetworkId(remoteNetworkId_);
         UpdateState(CoordinationState::STATE_FREE);
         StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
     }
@@ -375,7 +375,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
         NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             UpdateState(CoordinationState::STATE_OUT);
-            RemoteNetworkIdNotify(remoteNetworkId);
+            NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
@@ -383,7 +383,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess,
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
             UpdateState(CoordinationState::STATE_FREE);
-            RemoteNetworkIdNotify(originNetworkId);
+            NotifyRemoteNetworkId(originNetworkId);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is out");
@@ -407,7 +407,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
             UpdateState(CoordinationState::STATE_FREE);
-            RemoteNetworkIdNotify(remoteNetworkId);
+            NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(coordinationState_, CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is free");
@@ -903,7 +903,7 @@ void CoordinationSM::NotifyRemoteNetworkId(const std::string &remoteNetworkId)
     }
 }
 
-void CoordinationSM::MouseLocationNotify(int32_t x, int32_t y)
+void CoordinationSM::NotifyMouseLocation(int32_t x, int32_t y)
 {
     if (mouseLocationCallback_ != nullptr) {
         mouseLocationCallback_(x, y);
