@@ -502,7 +502,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         }
         case DragResult::DRAG_FAIL:
         case DragResult::DRAG_CANCEL: {
-            if (!dragData.hasCanceledAnimation) {
+            if (!hasCustomAnimation) {
                 dragDrawing_.OnDragFail();
             } else {
                 dragDrawing_.DestroyDragWindow();
