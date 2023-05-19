@@ -16,9 +16,8 @@
 #ifndef DEVICESTATUS_MSDP_INTERFACE_H
 #define DEVICESTATUS_MSDP_INTERFACE_H
 
-#include <string>
 #include <memory>
-#include <map>
+
 #include <errors.h>
 
 #include "stationary_data.h"

@@ -20,9 +20,7 @@
 #include <map>
 
 #include "accesstoken_kit.h"
-#include "devicestatus_common.h"
 #include "devicestatus_msdp_client_impl.h"
-#include "idevicestatus_algorithm.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 
