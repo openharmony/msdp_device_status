@@ -139,7 +139,7 @@ private:
     public:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
-    
+
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
@@ -149,7 +149,7 @@ private:
     std::mutex adapterLock_;
 };
 
-#define DistributedAdapter ::OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()
+#define D_INPUT_ADAPTER OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

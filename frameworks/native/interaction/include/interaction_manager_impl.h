@@ -39,7 +39,7 @@ public:
     int32_t UnprepareCoordination(std::function<void(std::string, CoordinationMessage)> callback);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         std::function<void(std::string, CoordinationMessage)> callback);
-    int32_t DeactivateCoordination(std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback);
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
@@ -50,7 +50,6 @@ public:
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
-    
 private:
     void InitMsgHandler();
 
@@ -64,6 +63,6 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define InteractionMgrImpl ::OHOS::Singleton<InteractionManagerImpl>::GetInstance()
+#define INTER_MGR_IMPL OHOS::Singleton<InteractionManagerImpl>::GetInstance()
 
 #endif // INTERACTION_MANAGER_IMPL_H

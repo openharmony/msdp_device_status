@@ -21,7 +21,6 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
-#include "across_device_drag.h"
 #include "delegate_tasks.h"
 #include "device_manager.h"
 #include "devicestatus_srv_stub.h"
@@ -31,6 +30,9 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "motion_drag.h"
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -70,7 +72,7 @@ public:
     int32_t PrepareCoordination(int32_t userData) override;
     int32_t UnprepareCoordination(int32_t userData) override;
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    int32_t DeactivateCoordination(int32_t userData) override;
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
 
     int32_t StartDrag(const DragData &dragData) override;
@@ -114,7 +116,7 @@ private:
     int32_t OnUnprepareCoordination(int32_t pid, int32_t userData);
     int32_t OnActivateCoordination(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
         int32_t startDeviceId);
-    int32_t OnDeactivateCoordination(int32_t pid, int32_t userData);
+    int32_t OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
@@ -127,7 +129,9 @@ private:
     std::atomic<bool> ready_ { false };
     std::shared_ptr<DeviceStatusManager> devicestatusManager_;
     DragManager dragMgr_;
-    AcrossDeviceDrag acrossDeviceDrag_;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    MotionDrag motionDrag_;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     DeviceStatusDumper deviceStatusDumper_;
 };
 } // namespace DeviceStatus

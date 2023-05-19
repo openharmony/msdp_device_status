@@ -52,7 +52,7 @@ public:
     int32_t PrepareCoordination(int32_t userData);
     int32_t UnprepareCoordination(int32_t userData);
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t DeactivateCoordination(int32_t userData);
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
 
     int32_t StartDrag(const DragData &dragData);
@@ -60,7 +60,6 @@ public:
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t GetUdKey(std::string &udKey);
-    
     int32_t AddDraglistener();
     int32_t RemoveDraglistener();
     int32_t SetDragWindowVisible(bool visible);

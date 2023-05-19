@@ -150,7 +150,6 @@ ErrCode DeviceStatusMsdpClientImpl::StartMock(Type type)
     return RET_OK;
 }
 
-
 ErrCode DeviceStatusMsdpClientImpl::GetSensorHdi(Type type)
 {
     return RET_ERR;
@@ -339,6 +338,7 @@ int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
 Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
 {
     DEV_HILOGD(SERVICE, "Enter");
+    std::lock_guard<std::mutex> guard(mMutex_);
     for (auto iter = deviceStatusDataMap_.begin(); iter != deviceStatusDataMap_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;

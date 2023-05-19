@@ -28,7 +28,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Inter
 } // namespace
 
 InteractionManagerImpl::InteractionManagerImpl() {}
-InteractionManagerImpl::~InteractionManagerImpl() {}
+InteractionManagerImpl::~InteractionManagerImpl()
+{
+    CALL_DEBUG_ENTER;
+}
 
 bool InteractionManagerImpl::InitClient()
 {
@@ -93,10 +96,6 @@ int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<I
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
-    if (!InitClient()) {
-        FI_HILOGE("Get client is nullptr");
-        return RET_ERR;
-    }
     return coordinationManagerImpl_.UnregisterCoordinationListener(listener);
 #else
     FI_HILOGW("Coordination does not support");
@@ -159,7 +158,8 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::DeactivateCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
+    std::function<void(std::string, CoordinationMessage)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -168,7 +168,7 @@ int32_t InteractionManagerImpl::DeactivateCoordination(std::function<void(std::s
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.DeactivateCoordination(callback);
+    return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);

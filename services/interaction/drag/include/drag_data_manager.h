@@ -26,11 +26,11 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragDataAdapter final {
-    DECLARE_SINGLETON(DragDataAdapter);
+class DragDataManager final {
+    DECLARE_SINGLETON(DragDataManager);
 
 public:
-    DISALLOW_MOVE(DragDataAdapter);
+    DISALLOW_MOVE(DragDataManager);
 
     void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
     DragData GetDragData() const;
@@ -41,16 +41,18 @@ public:
     bool GetDragWindowVisible() const;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const;
     void ResetDragData();
-    
+    void SetMotionDrag(bool isMotionDrag);
+    bool IsMotionDrag() const;
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::u16string dragMessage_;
     bool visible_ { false };
+    bool isMotionDrag_ { false };
 };
 
-#define DataAdapter ::OHOS::Singleton<DragDataAdapter>::GetInstance()
+#define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()
 
 } // namespace DeviceStatus
 } // namespace Msdp

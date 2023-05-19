@@ -37,7 +37,9 @@ JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, DeviceStatus::VAL_NOT_EXP);
+    if (!ret.second) {
+        FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
+    }
 }
 
 void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
@@ -173,7 +175,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InteractionMgr->RegisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -201,7 +203,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -224,7 +226,7 @@ void JsEventTarget::ResetEnv()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     coordinationListener_.clear();
-    InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+    INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
 void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
@@ -592,9 +594,9 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

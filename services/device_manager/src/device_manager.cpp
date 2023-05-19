@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
 constexpr int32_t MAX_N_EVENTS { 64 };
 constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
 constexpr size_t EXPECTED_SUBMATCH { 1 };
@@ -147,8 +147,7 @@ std::shared_ptr<IDevice> DeviceManager::FindDevice(const std::string &devPath)
     auto tIter = std::find_if(devices_.cbegin(), devices_.cend(),
         [devPath](const auto &item) {
             return ((item.second != nullptr) && (item.second->GetDevPath() == devPath));
-        }
-    );
+        });
     return (tIter != devices_.cend() ? tIter->second : nullptr);
 }
 
@@ -282,10 +281,9 @@ int32_t DeviceManager::EpollAdd(IEpollEventSource *source)
 {
     CALL_DEBUG_ENTER;
     CHKPR(source, RET_ERR);
-    struct epoll_event ev {
-        .events = EPOLLIN | EPOLLHUP | EPOLLERR,
-        .data.ptr = source,
-    };
+    struct epoll_event ev {};
+    ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+    ev.data.ptr = source;
     int32_t ret = epoll_ctl(epollFd_, EPOLL_CTL_ADD, source->GetFd(), &ev);
     if (ret != 0) {
         FI_HILOGE("epoll_ctl failed: %{public}s", strerror(errno));
@@ -401,8 +399,7 @@ int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observe
             if (item.second != nullptr) {
                 ptr->OnDeviceAdded(item.second);
             }
-        }
-    );
+        });
     return RET_OK;
 }
 

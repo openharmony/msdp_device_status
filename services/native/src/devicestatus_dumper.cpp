@@ -124,7 +124,7 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
         }
         case 'o': {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-            CooSM->Dump(fd);
+            COOR_SM->Dump(fd);
 #else
             dprintf(fd, "device coordination is not supported\n");
 #endif // OHOS_BUILD_ENABLE_COORDINATION

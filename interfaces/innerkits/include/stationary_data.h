@@ -77,11 +77,11 @@ enum Action {
 };
 
 struct Data {
-    Type type;
-    OnChangedValue value;
-    Status status;
-    Action action;
-    double movement;
+    Type type { TYPE_INVALID };
+    OnChangedValue value { VALUE_INVALID };
+    Status status { STATUS_INVALID };
+    Action action { ACTION_INVALID };
+    double movement { 0.0 };
 
     bool operator !=(const Data& r) const
     {
@@ -94,7 +94,7 @@ struct Data {
 };
 
 typedef struct DeviceStatusJsonData {
-    int32_t type;
+    int32_t type { -1 };
     std::string json;
 }DeviceStatusJsonD;
 

@@ -100,7 +100,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest002 end";
 }
 
-/*
+/**
  * @tc.name: DeviceStatusVeriticalTest
  * @tc.desc: test devicestatus Veritical Algorithm
  * @tc.type: FUNC

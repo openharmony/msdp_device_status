@@ -32,7 +32,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 using namespace std;
 
-namespace{
+namespace {
 const int32_t SLEEP_TIME = 2000;
 static Type g_type = Type::TYPE_INVALID;
 auto g_client = StationaryManager::GetInstance();
@@ -289,7 +289,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest014 end");
 }
 
-
 /**
  * @tc.name: GetDeviceStatusDataTest
  * @tc.desc: test get devicestatus data in proxy
@@ -352,4 +351,28 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest018 end");
+}
+
+/**
+ * @tc.name: GetDeviceStatusDataTest
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
+{
+    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 Enter");
+    g_type = Type::TYPE_VERTICAL_POSITION;
+    Data data = g_client->GetDeviceStatusData(g_type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
+        (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT))
+        << "GetDeviceStatusData failed";
+    Data invalidData;
+    invalidData.type = Type::TYPE_INVALID;
+    invalidData.value = OnChangedValue::VALUE_INVALID;
+    invalidData.status = Status::STATUS_INVALID;
+    invalidData.movement = 0.0f;
+    EXPECT_TRUE(data != invalidData);
+    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 end");
 }

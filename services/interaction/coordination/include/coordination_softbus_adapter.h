@@ -42,13 +42,13 @@ public:
 
     struct DataPacket {
         MessageId messageId;
-        uint32_t dataLen;
+        uint32_t dataLen { 0 };
         uint8_t data[0];
     };
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
-    int32_t StopRemoteCoordination(const std::string &remoteNetworkId);
+    int32_t StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained);
     int32_t StopRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess);
     int32_t StartCoordinationOtherResult(const std::string &originNetworkId, const std::string &remoteNetworkId);
 
@@ -82,5 +82,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#define CooSoftbusAdapter CoordinationSoftbusAdapter::GetInstance()
+#define COOR_SOFTBUS_ADAPTER CoordinationSoftbusAdapter::GetInstance()
 #endif // COORDINATION_SOFTBUS_ADAPTER_H
