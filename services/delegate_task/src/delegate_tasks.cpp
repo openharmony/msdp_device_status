@@ -36,7 +36,7 @@ void DelegateTasks::Task::ProcessTask()
     }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
-    FI_HILOGD("process %{public}s task id:%{public}d, ret:%{public}d", taskType.c_str(), id_, ret);
+    FI_HILOGD("process:%{public}s, task id:%{public}d, ret:%{public}d", taskType.c_str(), id_, ret);
     if (!hasWaited_ && promise_ != nullptr) {
         promise_->set_value(ret);
     }
