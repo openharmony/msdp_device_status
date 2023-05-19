@@ -44,7 +44,8 @@ JsEventCooperateTarget::JsEventCooperateTarget()
     }
 }
 
-void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -71,7 +72,8 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     }
 }
 
-void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -98,7 +100,8 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     }
 }
 
-void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -208,7 +211,8 @@ monitorLabel:
     }
 }
 
-napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
+napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
+    napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
     CHKPP(cb);
