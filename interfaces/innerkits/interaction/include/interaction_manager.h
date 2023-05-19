@@ -80,12 +80,13 @@ public:
 
     /**
      * @brief 停止跨设备键鼠穿越。
-     * @param isUnchained 跨设备连接是否断开。
+     * @param isUnchained 跨设备链路是否断开, true表示断开跨设备链路，false表示不断开跨设备链路
      * @param callback 停止跨设备键鼠穿越，此回调被调用
      * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    int32_t DeactivateCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
+    int32_t DeactivateCoordination(bool isUnchained,
+        std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
      * @brief 获取指定设备键鼠穿越状态。
@@ -181,6 +182,6 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define InteractionMgr OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()
+#define INTERACTION_MGR OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()
 
 #endif // INTERACTION_MANAGER_H

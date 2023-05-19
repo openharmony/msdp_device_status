@@ -40,13 +40,13 @@ public:
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
 
     struct EventInfo : public RefBase {
-        EventType type;
-        SessionPtr sess;
-        MessageId msgId;
-        int32_t userData;
+        EventType type { LISTENER };
+        SessionPtr sess { nullptr };
+        MessageId msgId { MessageId::INVALID };
+        int32_t userData { -1 };
         std::string deviceId;
-        CoordinationMessage msg;
-        bool state;
+        CoordinationMessage msg { CoordinationMessage::PREPARE };
+        bool state { false };
     };
 
     void AddCoordinationEvent(sptr<EventInfo> event);

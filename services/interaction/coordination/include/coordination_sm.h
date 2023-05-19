@@ -126,13 +126,13 @@ public:
     void PrepareCoordination();
     void UnprepareCoordination();
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t DeactivateCoordination();
+    int32_t DeactivateCoordination(bool isUnchained);
     int32_t GetCoordinationState(const std::string &deviceId);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCoordinationResult(bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
-    void StopRemoteCoordination();
+    void StopRemoteCoordination(bool isUnchained);
     void StopRemoteCoordinationResult(bool isSuccess);
     void StartCoordinationOtherResult(const std::string &remoteNetworkId);
     void UpdateState(CoordinationState state);
@@ -161,6 +161,12 @@ public:
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CoordinationState, CoordinationState)> callback);
     std::string GetRemoteId() const;
+    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    void SetUnchainStatus(bool isUnchained);
+    void NotifySessionClosed();
+    void SetSinkNetworkId(const std::string &sinkNetworkId);
+    void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
+    void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -171,12 +177,16 @@ private:
     bool UpdateMouseLocation();
     void StateChangedNotify(CoordinationState oldState, CoordinationState newState);
     void ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState);
+    void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
+    void NotifyMouseLocation(int32_t x, int32_t y);
 
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
+    std::string sinkNetworkId_;
+    bool isUnchained_ { false };
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
@@ -192,9 +202,11 @@ private:
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
     std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
+    std::function<void(std::string)> remoteNetworkIdCallback_;
+    std::function<void(int32_t, int32_t)> mouseLocationCallback_;
 };
 
-#define DisHardware DistributedHardware::DeviceManager::GetInstance()
+#define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()
 #define COOR_SM OHOS::DelayedSingleton<CoordinationSM>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp

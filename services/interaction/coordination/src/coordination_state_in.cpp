@@ -45,7 +45,7 @@ int32_t CoordinationStateIn::ActivateCoordination(const std::string &remoteNetwo
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
-    int32_t ret = CooSoftbusAdapter->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Start coordination fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
@@ -72,14 +72,16 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
     }
 }
 
-int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
+    const std::pair<std::string, std::string> &preparedNetworkId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(remoteNetworkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(remoteNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return ret;
     }
+    (void)(preparedNetworkId);
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc = std::bind(&CoordinationStateIn::ProcessStop, this);
     CHKPR(eventHandler_, RET_ERR);

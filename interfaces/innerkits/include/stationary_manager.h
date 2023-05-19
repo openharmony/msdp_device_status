@@ -32,10 +32,10 @@ class StationaryManager {
 public:
 
     /**
-    * @brief 获取StationaryManager实例。
-    * @return StationaryManager实例。
-    * @since 9
-    */
+     * @brief 获取StationaryManager实例。
+     * @return StationaryManager实例。
+     * @since 9
+     */
     static StationaryManager *GetInstance();
 
     /**
