@@ -40,11 +40,11 @@ public:
     DISALLOW_COPY_AND_MOVE(JsEventCooperateTarget);
 
     static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string& deviceId, CoordinationMessage msg);
+        const std::string &deviceId, CoordinationMessage msg);
     static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string& deviceId, CoordinationMessage msg);
+        const std::string &deviceId, CoordinationMessage msg);
     static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string& deviceId, CoordinationMessage msg);
+        const std::string &deviceId, CoordinationMessage msg);
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);

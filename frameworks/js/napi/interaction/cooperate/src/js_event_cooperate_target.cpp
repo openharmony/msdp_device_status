@@ -45,7 +45,7 @@ JsEventCooperateTarget::JsEventCooperateTarget()
 }
 
 void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string& deviceId, CoordinationMessage msg)
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -73,7 +73,7 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
 }
 
 void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string& deviceId, CoordinationMessage msg)
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -101,7 +101,7 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
 }
 
 void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-    const std::string& deviceId, CoordinationMessage msg)
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);

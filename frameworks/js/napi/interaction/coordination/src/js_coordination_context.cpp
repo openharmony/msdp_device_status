@@ -408,6 +408,9 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
     napi_value deactivateFail = nullptr;
     CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::DEACTIVATE_FAIL), &deactivateFail),
         CREATE_INT32);
+    napi_value sessionClosed = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::SESSION_CLOSED), &sessionClosed),
+        CREATE_INT32);
 
     napi_property_descriptor msg[] = {
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_PREPARE", prepare),
@@ -417,6 +420,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE_FAIL", activateFail),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_SUCCESS", deactivateSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_FAIL", deactivateFail),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed),
     };
 
     napi_value cooperateMsg = nullptr;
