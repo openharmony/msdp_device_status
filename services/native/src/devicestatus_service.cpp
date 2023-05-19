@@ -655,19 +655,20 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData));
+        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData, isUnchained));
     if (ret != RET_OK) {
         FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
+    (void)(isUnchained);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
@@ -847,6 +848,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    motionDrag_.RegisterCallback();
     return RET_OK;
 }
 
@@ -906,7 +908,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData)
+int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -918,7 +920,7 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     COOR_EVENT_MGR->AddCoordinationEvent(event);
-    int32_t ret = COOR_SM->DeactivateCoordination();
+    int32_t ret = COOR_SM->DeactivateCoordination(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));

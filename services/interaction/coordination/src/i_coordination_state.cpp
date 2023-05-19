@@ -42,8 +42,9 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
     int32_t ret = RET_ERR;
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         COOR_SM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
-        ret = D_INPUT_ADAPTER->PrepareRemoteInput(
-            remoteNetworkId, originNetworkId, [this, remoteNetworkId, startDeviceId](bool isSuccess) {
+        COOR_SM->SetSinkNetworkId(remoteNetworkId);
+        ret = D_INPUT_ADAPTER->PrepareRemoteInput(remoteNetworkId, originNetworkId,
+            [this, remoteNetworkId, startDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);
             });
         if (ret != RET_OK) {
@@ -86,8 +87,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
         COOR_SM->OnStartFinish(false, networkIds.first, startDeviceId);
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    int32_t ret = D_INPUT_ADAPTER->StartRemoteInput(
-        networkIds.first, networkIds.second, inputDeviceDhids,
+    int32_t ret = D_INPUT_ADAPTER->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids,
         [this, remoteNetworkId = networkIds.first, startDeviceId](bool isSuccess) {
             this->OnStartRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         });
@@ -98,8 +98,7 @@ int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)
     return RET_OK;
 }
 
-void ICoordinationState::OnStartRemoteInput(
-    bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
+void ICoordinationState::OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::string taskName = "start_finish_task";

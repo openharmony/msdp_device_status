@@ -32,8 +32,9 @@ void DeactivateCoordinationFuzzTest()
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Deactivate coordination fuzz test");
     };
+    bool isUnchained = false;
 
-    InteractionManager::GetInstance()->DeactivateCoordination(fun);
+    InteractionManager::GetInstance()->DeactivateCoordination(isUnchained, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

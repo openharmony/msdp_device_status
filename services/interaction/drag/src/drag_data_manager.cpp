@@ -89,6 +89,18 @@ void DragDataManager::ResetDragData()
     std::vector<uint8_t> buffer;
     dragData_ = { shadowInfo, buffer, "", -1, -1, -1, -1, -1, -1, false };
 }
+
+void DragDataManager::SetMotionDrag(bool isMotionDrag)
+{
+    isMotionDrag_ = isMotionDrag;
+    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
+}
+
+bool DragDataManager::IsMotionDrag() const
+{
+    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
+    return isMotionDrag_;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

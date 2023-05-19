@@ -194,7 +194,9 @@ int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = DeactivateCoordination(userData);
+    bool isUnchained;
+    READBOOL(data, isUnchained, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = DeactivateCoordination(userData, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Call DeactivateCoordination failed, ret:%{public}d", ret);
     }
