@@ -285,8 +285,8 @@ void CoordinationSM::StartPointerEventFilter()
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
     uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_MAX);
-    filterId_ = OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY,
-        touchTags);
+    filterId_ =
+        OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
     if (0 > filterId_) {
         FI_HILOGE("Add Event Filter Failed");
     }
@@ -477,6 +477,17 @@ bool CoordinationSM::UpdateMouseLocation()
         width, height, displayX_, displayY_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;
+}
+
+void CoordinationSM::UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = D_INPUT_ADAPTER->UnPrepareRemoteInput(localNetworkId, remoteNetworkId, [](bool isSuccess) {});
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to call distributed UnprepareRemoteInput");
+    }
+    preparedNetworkId_ = std::make_pair("", "");
+    COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
 }
 
 void CoordinationSM::UpdateState(CoordinationState state)
