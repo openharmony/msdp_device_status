@@ -125,7 +125,7 @@ float GetScaling()
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     CHKPR(displayInfo, RET_ERR);
-    if (displayInfo->GetDpi() < 0.0f) {
+    if (displayInfo->GetDpi() < -std::numeric_limits<float>::epsilon()) {
         return 0.0f;
     }
     return (displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
