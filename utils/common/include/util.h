@@ -66,7 +66,6 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
 int32_t GetFileSize(const std::string &filePath);
 bool IsValidPath(const std::string &rootDir, const std::string &filePath);
 bool IsValidSvgPath(const std::string &filePath);
-bool IsFileExists(const std::string &fileName);
 bool IsValidSvgFile(const std::string &filePath);
 bool IsNum(const std::string &str);
 int32_t ChangeNumber(int32_t num);
