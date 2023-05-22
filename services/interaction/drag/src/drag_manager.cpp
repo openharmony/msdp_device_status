@@ -118,13 +118,13 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragState_ = DragState::STOP;
     stateNotify_.StateChangedNotify(DragState::STOP);
-    StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("NotifyDragResult failed");
         ret = RET_ERR;
     }
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(result);
+    StateChangedNotify(DragState::STOP);
     return ret;
 }
 
@@ -486,7 +486,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
     interceptorId_ = -1;
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
@@ -502,7 +502,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         }
         case DragResult::DRAG_FAIL:
         case DragResult::DRAG_CANCEL: {
-            if (!dragData.hasCanceledAnimation) {
+            if (!hasCustomAnimation) {
                 dragDrawing_.OnDragFail();
             } else {
                 dragDrawing_.DestroyDragWindow();
@@ -554,6 +554,12 @@ DragState DragManager::GetDragState() const
 {
     CALL_DEBUG_ENTER;
     return dragState_;
+}
+
+DragResult DragManager::GetDragResult() const
+{
+    CALL_DEBUG_ENTER;
+    return dragResult_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

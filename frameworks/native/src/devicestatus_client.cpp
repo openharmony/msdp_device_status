@@ -219,11 +219,11 @@ int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
     return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId);
 }
 
-int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->DeactivateCoordination(userData);
+    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained);
 }
 
 int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
