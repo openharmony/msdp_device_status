@@ -29,11 +29,8 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "bytrace_adapter.h"
 #include "devicestatus_common.h"
-#include "devicestatus_dumper.h"
 #include "devicestatus_hisysevent.h"
-#include "devicestatus_permission.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
@@ -228,11 +225,8 @@ std::shared_ptr<DeviceStatusManager> DeviceStatusService::GetDeviceStatusManager
 void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(SERVICE, "Enter event:%{public}d,latency:%{public}d", event, latency);
-    if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
-        return;
-    }
+    FI_HILOGI("Enter event:%{public}d,latency:%{public}d", event, latency);
+    CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
@@ -249,12 +243,8 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGE(SERVICE, "EnterUNevent: %{public}d", event);
-    if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "Unsubscribe func is nullptr");
-        return;
-    }
-
+    FI_HILOGE("EnterUNevent: %{public}d", event);
+    CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();
@@ -655,19 +645,20 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData));
+        std::bind(&DeviceStatusService::OnDeactivateCoordination, this, pid, userData, isUnchained));
     if (ret != RET_OK) {
         FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
+    (void)(isUnchained);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
@@ -847,6 +838,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+    motionDrag_.RegisterCallback();
     return RET_OK;
 }
 
@@ -906,7 +898,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     return RET_OK;
 }
 
-int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData)
+int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
@@ -918,7 +910,7 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     COOR_EVENT_MGR->AddCoordinationEvent(event);
-    int32_t ret = COOR_SM->DeactivateCoordination();
+    int32_t ret = COOR_SM->DeactivateCoordination(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("OnDeactivateCoordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));

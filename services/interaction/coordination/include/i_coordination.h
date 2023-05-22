@@ -33,7 +33,7 @@ public:
     virtual void UnprepareCoordination() = 0;
     virtual int32_t ActivateCoordination(SessionPtr sess, int32_t userData,
         const std::string &remoteNetworkId, int32_t startDeviceId) = 0;
-    virtual int32_t DeactivateCoordination(SessionPtr sess, int32_t userData) = 0;
+    virtual int32_t DeactivateCoordination(SessionPtr sess, int32_t userData, bool isUnchained) = 0;
     virtual int32_t GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t RegisterCoordinationListener(SessionPtr sess) = 0;
     virtual int32_t UnregisterCoordinationListener(SessionPtr sess) = 0;

@@ -16,16 +16,11 @@
 #ifndef DEVICESTATUS_MSDP_CLIENT_IMPL_H
 #define DEVICESTATUS_MSDP_CLIENT_IMPL_H
 
-#include <string>
 #include <memory>
 #include <mutex>
-#include <vector>
-#include <thread>
 #include <map>
 
 #include "stationary_data.h"
-#include "devicestatus_delayed_sp_singleton.h"
-#include "devicestatus_dumper.h"
 #include "devicestatus_msdp_interface.h"
 
 namespace OHOS {
@@ -64,23 +59,25 @@ public:
     ErrCode AlgoDisable(Type type);
     ErrCode MockDisable(Type type);
     ErrCode SensorHdiDisable(Type type);
+
 private:
-    std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
     ErrCode ImplCallback(const Data& data);
     IMsdp* GetAlgoInst(Type type);
     IMsdp* GetMockInst(Type type);
+    void OnResult(const Data& data) override;
+
+private:
+    std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
     MsdpAlgoHandle mock_;
     MsdpAlgoHandle algo_;
     std::map<Type, uint32_t> algoCallCount_;
     std::map<Type, uint32_t> mockCallCount_;
     std::map<Type, OnChangedValue> deviceStatusDataMap_;
     DeviceStatusMsdpClientImpl::CallbackManager callBacksMgr_;
-    IMsdp* iAlgo_ = nullptr;
-    IMsdp* iMock_ = nullptr;
-
-    std::mutex mMutex_;
-    bool notifyManagerFlag_ = false;
-    void OnResult(const Data& data) override;
+    IMsdp* iAlgo_ { nullptr };
+    IMsdp* iMock_ { nullptr };
+    std::mutex mutex_;
+    bool notifyManagerFlag_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

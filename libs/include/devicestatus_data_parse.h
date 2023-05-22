@@ -16,21 +16,9 @@
 #ifndef DEVICESTATUS_DATA_PARSE_H
 #define DEVICESTATUS_DATA_PARSE_H
 
-#include <fcntl.h>
-#include <poll.h>
-#include <stdint.h>
 #include <string>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <unistd.h>
 #include <vector>
 
-#include "cJSON.h"
-
-#include "devicestatus_data_define.h"
-#include "devicestatus_errors.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "stationary_data.h"
 
 namespace OHOS {

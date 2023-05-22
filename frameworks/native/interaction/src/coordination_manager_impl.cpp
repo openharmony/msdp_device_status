@@ -135,7 +135,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
     return ret;
 }
 
-int32_t CoordinationManagerImpl::DeactivateCoordination(FuncCoordinationMessage callback)
+int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -145,7 +145,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(FuncCoordinationMessage 
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_);
+    auto ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
