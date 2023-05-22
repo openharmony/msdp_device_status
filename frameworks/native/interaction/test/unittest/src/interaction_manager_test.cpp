@@ -280,7 +280,7 @@ public:
     void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
     void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
 private:
-    std::function<void()> callback_;
+    std::function<void()> callback_ { nullptr };
 };
 
 void InputEventCallbackTest::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const

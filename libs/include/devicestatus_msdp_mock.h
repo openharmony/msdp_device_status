@@ -66,14 +66,14 @@ private:
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
 
     std::map<int32_t, Callback> callbacks_;
-    std::unique_ptr<DeviceStatusDataParse> dataParse_;
+    std::unique_ptr<DeviceStatusDataParse> dataParse_ { nullptr };
     int32_t timerInterval_ { -1 };
     int32_t timerFd_ { -1 };
     int32_t epFd_ { -1 };
     std::mutex mutex_;
     std::vector<Type> enabledType_;
     std::atomic<bool> alive_ { false };
-    std::shared_ptr<std::thread> thread_;
+    std::shared_ptr<std::thread> thread_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
