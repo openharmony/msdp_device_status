@@ -763,8 +763,9 @@ int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY,
 int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
+    int32_t tid = GetCallingTokenID();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style));
+        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style, tid));
     if (ret != RET_OK) {
         FI_HILOGE("Update drag style failed, ret:%{public}d", ret);
     }
