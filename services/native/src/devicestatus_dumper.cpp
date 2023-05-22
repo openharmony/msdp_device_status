@@ -39,7 +39,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
 }
 
 int32_t DeviceStatusDumper::Init(IContext *context)
@@ -58,7 +58,7 @@ void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string>
 void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
 {
     if (args.empty()) {
-        DEV_HILOGE(SERVICE, "args is empty");
+        FI_HILOGE("args is empty");
         return;
     }
     int32_t c;
@@ -76,18 +76,18 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
-        DEV_HILOGE(SERVICE, "call memset_s failed");
+        FI_HILOGE("call memset_s failed");
         delete[] argv;
         return;
     }
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
-            DEV_HILOGE(SERVICE, "failed to allocate memory");
+            FI_HILOGE("failed to allocate memory");
             goto RELEASE_RES;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
-            DEV_HILOGE(SERVICE, "strcpy_s error");
+            FI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
         }
     }
@@ -145,9 +145,9 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
 
 void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 {
-    DEV_HILOGD(SERVICE, "start");
+    CALL_DEBUG_ENTER;
     if (appInfoMap_.empty()) {
-        DEV_HILOGE(SERVICE, "appInfoMap_ is empty");
+        FI_HILOGE("appInfoMap_ is empty");
         return;
     }
     std::string startTime;
@@ -164,9 +164,9 @@ void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 
 void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
 {
-    DEV_HILOGD(SERVICE, "start");
+    CALL_DEBUG_ENTER;
     if (deviceStatusQueue_.empty()) {
-        DEV_HILOGI(SERVICE, "deviceStatusQueue_ is empty");
+        FI_HILOGI("deviceStatusQueue_ is empty");
         return;
     }
     std::string startTime;
@@ -177,7 +177,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
         if (record == nullptr) {
-            DEV_HILOGE(SERVICE, "deviceStatusQueue is nullptr");
+            FI_HILOGE("deviceStatusQueue is nullptr");
             continue;
         }
         deviceStatusQueue_.push(record);
@@ -190,7 +190,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
 
 void DeviceStatusDumper::DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const
 {
-    DEV_HILOGI(SERVICE, "start");
+    CALL_DEBUG_ENTER;
     std::string startTime;
     GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s\n", startTime.c_str());
@@ -273,11 +273,8 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
-    DEV_HILOGD(SERVICE, "Enter");
-    if (appInfo == nullptr) {
-        DEV_HILOGE(SERVICE, "appInfo is nullptr");
-        return;
-    }
+    CALL_DEBUG_ENTER;
+    CHKPV(appInfo);
     GetTimeStamp(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
     auto iter = appInfoMap_.find(appInfo->type);
@@ -287,30 +284,28 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
         }
     } else {
         if (!appInfoMap_[iter->first].insert(appInfo).second) {
-            DEV_HILOGW(SERVICE, "duplicated app info");
+            FI_HILOGW("duplicated app info");
         }
     }
 }
 
 void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 {
-    DEV_HILOGD(SERVICE, "Enter");
-    if (appInfo->callback == nullptr) {
-        DEV_HILOGW(SERVICE, "callback is nullptr");
-        return;
-    }
-    DEV_HILOGI(SERVICE, "appInfoMap size=%{public}zu", appInfoMap_.size());
+    CALL_DEBUG_ENTER;
+    CHKPV(appInfo);
+    CHKPV(appInfo->callback);
+    FI_HILOGI("appInfoMap size=%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
-        DEV_HILOGE(SERVICE, "not exist %d type appInfo", appInfo->type);
+        FI_HILOGE("not exist %d type appInfo", appInfo->type);
         return;
     }
-    DEV_HILOGI(SERVICE, "callbacklist type=%d size=%{public}zu",
+    FI_HILOGI("callbacklist type=%d size=%{public}zu",
         appInfo->type, appInfoMap_[appInfoSetIter->first].size());
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
-        DEV_HILOGW(SERVICE, "Remove app info is not exists");
+        FI_HILOGW("Remove app info is not exists");
         return;
     }
     for (const auto &item : iter->second) {
@@ -323,7 +318,7 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 
 void DeviceStatusDumper::PushDeviceStatus(const Data& data)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     std::unique_lock lock(mutex_);
     auto record = std::make_shared<DeviceStatusRecord>();
     GetTimeStamp(record->startTime);
@@ -336,14 +331,14 @@ void DeviceStatusDumper::PushDeviceStatus(const Data& data)
 
 std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     std::string packageName = "unknown";
     int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     switch (tokenType) {
         case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: {
             Security::AccessToken::NativeTokenInfo tokenInfo;
             if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                DEV_HILOGE(SERVICE, "get native token info fail");
+                FI_HILOGE("get native token info fail");
                 return packageName;
             }
             packageName = tokenInfo.processName;
@@ -352,14 +347,14 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
             Security::AccessToken::HapTokenInfo hapInfo;
             if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                DEV_HILOGE(SERVICE, "get hap token info fail");
+                FI_HILOGE("get hap token info fail");
                 return packageName;
             }
             packageName = hapInfo.bundleName;
             break;
         }
         default: {
-            DEV_HILOGW(SERVICE, "token type not match");
+            FI_HILOGW("token type not match");
             break;
         }
     }

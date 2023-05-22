@@ -794,6 +794,8 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
     FI_HILOGD("Interceptor consumer key event enter");
     CHKPV(keyEvent);
     int32_t keyCode = keyEvent->GetKeyCode();
+    CoordinationState state = COOR_SM->GetCurrentCoordinationState();
+    int32_t deviceId = keyEvent->GetDeviceId();
     if (keyCode == MMI::KeyEvent::KEYCODE_BACK || keyCode == MMI::KeyEvent::KEYCODE_VOLUME_UP ||
         keyCode == MMI::KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == MMI::KeyEvent::KEYCODE_POWER) {
         if ((state == CoordinationState::STATE_OUT) || (!COOR_DEV_MGR->IsRemote(deviceId))) {
@@ -802,9 +804,7 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
         }
         return;
     }
-    CoordinationState state = COOR_SM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
-        int32_t deviceId = keyEvent->GetDeviceId();
         if (COOR_DEV_MGR->IsRemote(deviceId)) {
             auto networkId = COOR_DEV_MGR->GetOriginNetworkId(deviceId);
             if (!COOR_SM->IsNeedFilterOut(networkId, keyEvent)) {

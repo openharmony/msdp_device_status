@@ -361,19 +361,19 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
 void JsCooperateContext::DeclareDeviceCoordinationInterface(napi_env env, napi_value exports)
 {
     napi_value infoStart = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_START), &infoStart),
-        CREATE_INT32);
+    CHKRV(napi_create_int32(env,
+        static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_START), &infoStart), CREATE_INT32);
     napi_value infoSuccess = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_SUCCESS), &infoSuccess),
-        CREATE_INT32);
+    CHKRV(napi_create_int32(env,
+        static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_SUCCESS), &infoSuccess), CREATE_INT32);
     napi_value infoFail = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_FAIL), &infoFail),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_FAIL), &infoFail),
         CREATE_INT32);
     napi_value stateOn = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::STATE_ON), &stateOn),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::STATE_ON), &stateOn),
         CREATE_INT32);
     napi_value stateOff = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::STATE_OFF), &stateOff),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::STATE_OFF), &stateOff),
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
