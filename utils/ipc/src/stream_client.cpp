@@ -117,6 +117,6 @@ void StreamClient::Stop()
     hasClient_ = false;
     Close();
 }
-}
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
