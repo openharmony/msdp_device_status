@@ -127,8 +127,7 @@ void DeviceStatusMsdpMock::InitTimer()
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
     auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
     if (!ret) {
-        DEV_HILOGE(SERVICE, "insert timer fd failed");
-        return;
+        DEV_HILOGW(SERVICE, "insert timer fd failed");
     }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
         FI_HILOGE("register timer fd failed");
