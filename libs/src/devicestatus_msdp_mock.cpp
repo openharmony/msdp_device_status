@@ -242,7 +242,7 @@ extern "C" IMsdp *Create(void)
     CALL_DEBUG_ENTER;
     g_msdpMock = new (std::nothrow) DeviceStatusMsdpMock();
     CHKPP(g_msdpMock);
-    DEV_HILOGD(SERVICE, "Exit");
+    return g_msdpMock;
 }
 
 extern "C" void Destroy(const IMsdp* algorithm)
