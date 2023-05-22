@@ -67,7 +67,7 @@ private:
 
     std::map<int32_t, Callback> callbacks_;
     std::unique_ptr<DeviceStatusDataParse> dataParse_ { nullptr };
-    int32_t timerInterval_ { -1 } ;
+    int32_t timerInterval_ { -1 };
     int32_t timerFd_ { -1 };
     int32_t epFd_ { -1 };
     std::mutex mutex_;
