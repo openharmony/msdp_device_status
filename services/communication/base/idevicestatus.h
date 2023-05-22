@@ -17,7 +17,6 @@
 #define IDEVICESTATUS_H
 
 #include <iremote_broker.h>
-#include "iremote_object.h"
 
 #include "drag_data.h"
 #include "stationary_callback.h"
@@ -66,7 +65,7 @@ public:
     virtual int32_t UnprepareCoordination(int32_t userData) = 0;
     virtual int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
         int32_t startDeviceId) = 0;
-    virtual int32_t DeactivateCoordination(int32_t userData) = 0;
+    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;

@@ -32,15 +32,19 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class JsEventCooperateTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventCooperateTarget> {
+class JsEventCooperateTarget : public ICoordinationListener,
+                               public std::enable_shared_from_this<JsEventCooperateTarget> {
 public:
     JsEventCooperateTarget();
     virtual ~JsEventCooperateTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventCooperateTarget);
 
-    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
+    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
+    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);
@@ -50,6 +54,14 @@ public:
     void ResetEnv();
 
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
+
+    enum class CooperateMessage {
+        INFO_START = 0,
+        INFO_SUCCESS = 1,
+        INFO_FAIL = 2,
+        STATE_ON = 3,
+        STATE_OFF = 4,
+    };
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>>
@@ -67,6 +79,14 @@ private:
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     static std::unique_ptr<JsUtilCooperate::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+
+    inline static std::map<CoordinationMessage, CooperateMessage> messageTransform = {
+        { CoordinationMessage::PREPARE, CooperateMessage::STATE_ON },
+        { CoordinationMessage::UNPREPARE, CooperateMessage::STATE_OFF },
+        { CoordinationMessage::ACTIVATE, CooperateMessage::INFO_START },
+        { CoordinationMessage::ACTIVATE_SUCCESS, CooperateMessage::INFO_SUCCESS },
+        { CoordinationMessage::ACTIVATE_FAIL, CooperateMessage::INFO_FAIL }
+    };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

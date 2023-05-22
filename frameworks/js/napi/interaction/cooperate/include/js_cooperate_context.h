@@ -40,14 +40,6 @@ public:
 
     std::shared_ptr<JsCooperateManager> GetJsCoordinationMgr();
 
-    enum class CooperateMessage {
-        INFO_START = 0,
-        INFO_SUCCESS = 1,
-        INFO_FAIL = 2,
-        STATE_ON = 3,
-        STATE_OFF = 4,
-    };
-
 private:
     std::shared_ptr<JsCooperateManager> mgr_ { nullptr };
     std::mutex mutex_;

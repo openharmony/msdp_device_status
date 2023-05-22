@@ -31,6 +31,7 @@ inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
 inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
 inline constexpr std::string_view RESOLVE_DEFERRED { "napi_resolve_deferred" };
 inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
+inline constexpr std::string_view CLOSE_SCOPE { "napi_close_handle_scope" };
 std::mutex mutex_;
 } // namespace
 
@@ -44,7 +45,8 @@ JsEventCooperateTarget::JsEventCooperateTarget()
     }
 }
 
-void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -71,7 +73,8 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     }
 }
 
-void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -98,7 +101,8 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     }
 }
 
-void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
+    const std::string &deviceId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -208,7 +212,8 @@ monitorLabel:
     }
 }
 
-napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
+napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
+    napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
     CHKPP(cb);
@@ -586,7 +591,6 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         FI_HILOGE("Find messageEvent failed");
         return;
     }
-
     for (const auto &item : messageEvent->second) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
@@ -598,7 +602,13 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
         napi_value eventMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &eventMsg),
+        auto iter = messageTransform.find(item->data.msg);
+        if (iter == messageTransform.end()) {
+            FI_HILOGE("Find message code failed");
+            CHKRV(napi_close_handle_scope(item->env, scope), CLOSE_SCOPE);
+            return;
+        }
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(iter->second), &eventMsg),
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
@@ -606,7 +616,6 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
             SET_NAMED_PROPERTY, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "eventMsg", eventMsg),
             SET_NAMED_PROPERTY, scope);
-
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
         napi_value ret = nullptr;

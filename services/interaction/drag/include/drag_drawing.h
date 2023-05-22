@@ -48,6 +48,7 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
     int32_t GetFilePath(std::string &filePath) const;
     bool NeedAdjustSvgInfo() const;
+    void SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) const;
 };
 
 class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {
@@ -62,9 +63,6 @@ public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
     void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
-
-private:
-    int32_t GetIconSize() const;
 };
 
 class DrawDynamicEffectModifier : public OHOS::Rosen::RSContentStyleModifier {
@@ -107,6 +105,7 @@ private:
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
+    void RemoveModifier();
 
 private:
     int64_t startNum_ { -1 };
