@@ -125,7 +125,11 @@ void DeviceStatusMsdpMock::InitTimer()
     }
     SetTimerInterval(TIMER_INTERVAL);
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-    callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    if (!ret) {
+        DEV_HILOGE(SERVICE, "insert timer fd failed");
+        return;
+    }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
         FI_HILOGE("register timer fd failed");
         return;
@@ -172,7 +176,7 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    for (auto item : enabledType_) {
+    for (const auto &item : enabledType_) {
         Type type = item;
         if (dataParse_ == nullptr) {
             FI_HILOGE("dataParse_ is nullptr");

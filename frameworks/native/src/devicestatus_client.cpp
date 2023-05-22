@@ -117,7 +117,11 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
     sptr<IRemoteDevStaCallback> callback)
 {
     DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
-    typeMap_.insert(std::make_pair(type, 1));
+    auto [_, ret] = typeMap_.insert(std::make_pair(type, 1));
+    if (!ret) {
+        DEV_HILOGE(SERVICE, "Insert pair to typeMap_ failed");
+        return RET_ERR;
+    }
     DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");
