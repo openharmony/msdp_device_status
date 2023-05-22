@@ -98,7 +98,7 @@ private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
-    int32_t InitDrawStyle();
+    int32_t InitDrawStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode);
     int32_t DrawShadow(std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode);
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode,
@@ -107,6 +107,7 @@ private:
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
+    int32_t InitDragAnimationData(DragAnimationData &dragAnimationData);
     void RemoveModifier();
     int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth);
     xmlNodePtr GetRectNode(xmlNodePtr curNode);

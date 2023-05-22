@@ -154,17 +154,19 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Init layer failed");
         return INIT_FAIL;
     }
-    DragAnimationData dragAnimationData;
-    dragAnimationData.displayX = g_drawingInfo.displayX;
-    dragAnimationData.displayY = g_drawingInfo.displayY;
-    dragAnimationData.offsetX = g_drawingInfo.pixelMapX;
-    dragAnimationData.offsetY = g_drawingInfo.pixelMapY;
-    CHKPR(g_drawingInfo.pixelMap, INIT_FAIL);
-    dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
-    CHKPR(g_drawingInfo.nodes[PIXEL_MAP_INDEX], INIT_FAIL);
-    CHKPR(g_drawingInfo.nodes[DRAG_STYLE_INDEX], INIT_FAIL);
+    if (!CheckNodesValid()) {
+        FI_HILOGE("CheckNodesValid failed");
+        return INIT_FAIL;
+    }
     auto shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPR(shadowNode, INIT_FAIL);
+    CHKPR(dragStyleNode, INIT_FAIL);
+    DragAnimationData dragAnimationData;
+    if (InitDragAnimationData(dragAnimationData) != RET_OK) {
+        FI_HILOGE("Init Drag Animation data failed");
+        return INIT_FAIL;
+    }
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
@@ -247,20 +249,20 @@ void DragDrawing::OnDragSuccess()
         FI_HILOGE("CheckNodesValid failed");
         return;
     }
-    CHKPV(g_drawingInfo.nodes[PIXEL_MAP_INDEX]);
-    CHKPV(g_drawingInfo.nodes[DRAG_STYLE_INDEX]);
     auto shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     auto styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPV(shadowNode);
+    CHKPV(styleNode);
     OnStopDragSuccess(shadowNode, styleNode);
 }
 
 void DragDrawing::OnDragFail()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_drawingInfo.dragWindow);
-    CHKPV(g_drawingInfo.rootNode);
     auto dragWindow = g_drawingInfo.dragWindow;
     auto rootNode = g_drawingInfo.rootNode;
+    CHKPV(dragWindow);
+    CHKPV(rootNode);
     OnStopDragFail(dragWindow, rootNode);
 }
 
@@ -336,33 +338,29 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     }
 }
 
-void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData, std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode,
-        std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
+void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
+    std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode, std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
-    if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
-        return INIT_FAIL;
-    }
     if (DrawShadow(shadowNode) != RET_OK) {
         FI_HILOGE("Draw shadow failed");
         return;
     }
-    if (InitDrawStyle() != RET_OK) {
+    if (InitDrawStyle(dragStyleNode) != RET_OK) {
         FI_HILOGE("Init draw style failed");
         return;
     }
-    CHKPV(rsUiDirector_);
-    rsUiDirector_->SendMessages();
 }
 
-void DragDrawing::OnDragStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode, std::shared_ptr<OHOS::Media::PixelMap> stylePixelMap)
+void DragDrawing::OnDragStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode,
+    std::shared_ptr<OHOS::Media::PixelMap> stylePixelMap)
 {
     CALL_DEBUG_ENTER;
     DrawStyle(dragStyleNode, stylePixelMap);
 }
 
-void DragDrawing::OnStopDragSuccess(std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode, std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
+void DragDrawing::OnStopDragSuccess(std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode,
+    std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
     RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
@@ -392,9 +390,10 @@ void DragDrawing::RunAnimation(float endAlpha, float endScale)
     }
 }
 
-int32_t DragDrawing::InitDrawStyle()
+int32_t DragDrawing::InitDrawStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(dragStyleNode, RET_ERR);
     std::string filePath;
     if (GetFilePath(filePath) != RET_OK) {
         FI_HILOGD("Get file path failed");
@@ -406,18 +405,11 @@ int32_t DragDrawing::InitDrawStyle()
     }
     auto pixelMap = DecodeSvgToPixelMap(filePath);
     CHKPV(pixelMap);
-    if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
-        return RET_ERR;
-    }
-    auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPR(dragStyleNode, RET_ERR);
     if (DrawStyle(dragStyleNode, pixelMap) != RET_OK) {
         FI_HILOGE("Drag style failed");
         return RET_ERR;
     }
-    rsUiDirector_->SendMessages();
-    CHKPR(rsUiDirector_, RET_ERR);
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawShadow(std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode)
@@ -549,6 +541,18 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
     g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
+}
+
+int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
+{
+    CALL_DEBUG_ENTER;
+    dragAnimationData.displayX = g_drawingInfo.displayX;
+    dragAnimationData.displayY = g_drawingInfo.displayY;
+    dragAnimationData.offsetX = g_drawingInfo.pixelMapX;
+    dragAnimationData.offsetY = g_drawingInfo.pixelMapY;
+    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+    dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
+    return RET_OK;
 }
 
 int32_t DragDrawing::InitLayer()
