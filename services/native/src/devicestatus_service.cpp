@@ -29,11 +29,8 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "bytrace_adapter.h"
 #include "devicestatus_common.h"
-#include "devicestatus_dumper.h"
 #include "devicestatus_hisysevent.h"
-#include "devicestatus_permission.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
@@ -228,11 +225,8 @@ std::shared_ptr<DeviceStatusManager> DeviceStatusService::GetDeviceStatusManager
 void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(SERVICE, "Enter event:%{public}d, latency:%{public}d", event, latency);
-    if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusManager_ is nullptr");
-        return;
-    }
+    FI_HILOGI("Enter event:%{public}d, latency:%{public}d", event, latency);
+    CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = GetCallingUid();
     appInfo->pid = GetCallingPid();
@@ -249,12 +243,8 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGE(SERVICE, "EnterUNevent:%{public}d", event);
-    if (devicestatusManager_ == nullptr) {
-        DEV_HILOGE(SERVICE, "Unsubscribe func is nullptr");
-        return;
-    }
-
+    FI_HILOGE("EnterUNevent:%{public}d", event);
+    CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();

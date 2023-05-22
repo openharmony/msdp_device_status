@@ -15,15 +15,25 @@
 
 #include "devicestatus_data_parse.h"
 
+#include <fcntl.h>
+#include <unistd.h>
+
+#include <sys/stat.h>
+
+#include "devicestatus_data_define.h"
+#include "devicestatus_errors.h"
+#include "fi_log.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr int32_t FILE_SIZE_MAX = 0x5000;
-constexpr int32_t READ_DATA_BUFF_SIZE = 256;
-constexpr int32_t INVALID_FILE_SIZE = -1;
-const std::string MSDP_DATA_PATH = "/data/msdp/device_status_data.json";
-const std::string MSDP_DATA_DIR = "/data/msdp";
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDataParse" };
+constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+constexpr int32_t READ_DATA_BUFF_SIZE { 256 };
+constexpr int32_t INVALID_FILE_SIZE { -1 };
+const std::string MSDP_DATA_PATH { "/data/msdp/device_status_data.json" };
+const std::string MSDP_DATA_DIR { "/data/msdp" };
 } // namespace
 
 std::vector<int32_t> DeviceStatusDataParse::tempcount_ =
@@ -33,18 +43,18 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
 {
     int32_t fd = open(MSDP_DATA_PATH.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
     if (fd < 0) {
-        DEV_HILOGE(SERVICE, "open failed");
+        FI_HILOGE("open failed");
         return DEVICESTATUS_FAILED;
     }
     close(fd);
 
     struct stat buf;
     if (stat(MSDP_DATA_DIR.c_str(), &buf) != 0) {
-        DEV_HILOGE(SERVICE, "stat folder path is invalid %{public}d", errno);
+        FI_HILOGE("stat folder path is invalid %{public}d", errno);
         return DEVICESTATUS_FAILED;
     }
     if (chown(MSDP_DATA_PATH.c_str(), buf.st_uid, buf.st_gid) != 0) {
-        DEV_HILOGE(SERVICE, "chown failed, errno is %{public}d", errno);
+        FI_HILOGE("chown failed, errno is %{public}d", errno);
         return DEVICESTATUS_FAILED;
     }
 
@@ -55,7 +65,7 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(Data& data, Type type)
 {
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
-        DEV_HILOGE(SERVICE, "read json failed, errno is %{public}d", errno);
+        FI_HILOGE("read json failed, errno is %{public}d", errno);
         data.type = type;
         data.value = OnChangedValue::VALUE_INVALID;
         return false;
@@ -66,18 +76,18 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(Data& data, Type type)
 bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bool logStatus, Type& type,
     Data& data)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     JsonParser parser;
     parser.json_ = cJSON_Parse(fileData.c_str());
     data.type = type;
     data.value = OnChangedValue::VALUE_INVALID;
     if (cJSON_IsArray(parser.json_)) {
-        DEV_HILOGE(SERVICE, "parser is array");
+        FI_HILOGE("parser is array");
         return false;
     }
 
     if (type < Type::TYPE_ABSOLUTE_STILL || type >= Type::TYPE_MAX) {
-        DEV_HILOGE(SERVICE, "Type error");
+        FI_HILOGE("Type error");
         return false;
     }
 
@@ -91,13 +101,13 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     tempcount_[type]++;
     data.type = type;
     data.value = static_cast<OnChangedValue>(mockvalue->valueint);
-    DEV_HILOGD(SERVICE, "type:%{public}d, status:%{public}d", data.type, data.value);
+    FI_HILOGD("type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
 }
 
 bool DeviceStatusDataParse::DisableCount(const Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     tempcount_[static_cast<int32_t>(type)] = static_cast<int32_t>(TypeValue::INVALID);
     return true;
 }
@@ -105,28 +115,28 @@ bool DeviceStatusDataParse::DisableCount(const Type type)
 std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
 {
     if (filePath.empty()) {
-        DEV_HILOGE(SERVICE, "Path is empty");
+        FI_HILOGE("Path is empty");
         return "";
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
-        DEV_HILOGE(SERVICE, "Path is error, %{public}d", errno);
+        FI_HILOGE("Path is error, %{public}d", errno);
         return "";
     }
     if (!CheckFileDir(realPath, MSDP_DATA_DIR)) {
-        DEV_HILOGE(SERVICE, "File dir is invalid");
+        FI_HILOGE("File dir is invalid");
         return "";
     }
     if (!CheckFileExtendName(realPath, "json")) {
-        DEV_HILOGE(SERVICE, "Unable to parse files other than json format");
+        FI_HILOGE("Unable to parse files other than json format");
         return "";
     }
     if (!IsFileExists(filePath)) {
-        DEV_HILOGE(SERVICE, "File not exist");
+        FI_HILOGE("File not exist");
         return "";
     }
     if (!CheckFileSize(filePath)) {
-        DEV_HILOGE(SERVICE, "File size out of read range");
+        FI_HILOGE("File size out of read range");
         return "";
     }
     return ReadFile(realPath);
@@ -136,7 +146,7 @@ int32_t DeviceStatusDataParse::GetFileSize(const std::string& filePath)
 {
     struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
-        DEV_HILOGE(SERVICE, "Get file size error");
+        FI_HILOGE("Get file size error");
         return INVALID_FILE_SIZE;
     }
     return statbuf.st_size;
@@ -145,7 +155,7 @@ int32_t DeviceStatusDataParse::GetFileSize(const std::string& filePath)
 bool DeviceStatusDataParse::CheckFileDir(const std::string& filePath, const std::string& dir)
 {
     if (filePath.compare(0, MSDP_DATA_DIR.size(), MSDP_DATA_DIR) != 0) {
-        DEV_HILOGE(SERVICE, "FilePath dir is invalid");
+        FI_HILOGE("FilePath dir is invalid");
         return false;
     }
     return true;
@@ -155,7 +165,7 @@ bool DeviceStatusDataParse::CheckFileSize(const std::string& filePath)
 {
     int32_t fileSize = GetFileSize(filePath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        DEV_HILOGE(SERVICE, "File size out of read range");
+        FI_HILOGE("File size out of read range");
         return false;
     }
     return true;
@@ -165,7 +175,7 @@ bool DeviceStatusDataParse::CheckFileExtendName(const std::string& filePath, con
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        DEV_HILOGE(SERVICE, "File is not found extension");
+        FI_HILOGE("File is not find extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
@@ -178,10 +188,10 @@ bool DeviceStatusDataParse::IsFileExists(const std::string& fileName)
 
 std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     FILE* fp = fopen(filePath.c_str(), "r");
     if (fp == nullptr) {
-        DEV_HILOGE(SERVICE, "Open failed");
+        FI_HILOGE("Open failed");
         return "";
     }
     std::string dataStr;
@@ -190,9 +200,8 @@ std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)
         dataStr += buf;
     }
     if (fclose(fp) != 0) {
-        DEV_HILOGW(SERVICE, "Close file failed");
+        FI_HILOGW("Close file failed");
     }
-    DEV_HILOGD(SERVICE, "Exit");
     return dataStr;
 }
 } // namespace DeviceStatus

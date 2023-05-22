@@ -39,11 +39,11 @@ using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessagePa
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DEV_HILOGD(SERVICE, "cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
+    FI_HILOGD("cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
     std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        DEV_HILOGE(SERVICE, "DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
+        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
     const std::map<int32_t, ConnFunc> mapConnFunc = {
@@ -72,60 +72,59 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     if (it != mapConnFunc.end()) {
         return (this->*it->second)(data, reply);
     }
-    DEV_HILOGE(SERVICE, "Unknown code:%{public}u", code);
+    FI_HILOGE("Unknown code:%{public}u", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data, MessageParcel& reply)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Read type successfully");
+    FI_HILOGD("Read type successfully");
     int32_t event = -1;
     READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Read event successfully");
-    DEV_HILOGD(SERVICE, "event:%{public}d", event);
+    FI_HILOGD("Read event successfully");
+    FI_HILOGD("event:%{public}d", event);
     int32_t latency = -1;
     READINT32(data, latency, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Read latency successfully");
+    FI_HILOGD("Read latency successfully");
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
-    DEV_RET_IF_NULL_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGI(SERVICE, "Read remote obj successfully");
+    CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    FI_HILOGI("Read remote obj successfully");
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
-    DEV_RET_IF_NULL_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGI(SERVICE, "Read callback successfully");
+    CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    FI_HILOGI("Read callback successfully");
     Subscribe(Type(type), ActivityEvent(event), ReportLatencyNs(latency), callback);
     return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data, MessageParcel& reply)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t event = -1;
     READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    DEV_HILOGE(SERVICE, "UNevent:%{public}d", event);
+    FI_HILOGE("UNevent:%{public}d", event);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
-    DEV_RET_IF_NULL_WITH_RET((obj == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
-    DEV_RET_IF_NULL_WITH_RET((callback == nullptr), E_DEVICESTATUS_READ_PARCEL_ERROR);
+    CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
     Unsubscribe(Type(type), ActivityEvent(event), callback);
     return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     Data devicestatusData = GetCache(Type(type));
-    DEV_HILOGD(SERVICE, "devicestatusData.type:%{public}d", devicestatusData.type);
-    DEV_HILOGD(SERVICE, "devicestatusData.value:%{public}d", devicestatusData.value);
+    FI_HILOGD("devicestatusData.type:%{public}d", devicestatusData.type);
+    FI_HILOGD("devicestatusData.value:%{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
-    DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
 }
 
