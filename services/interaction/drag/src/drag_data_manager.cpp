@@ -80,6 +80,16 @@ int32_t DragDataManager::GetTargetTid() const
     return targetTid_;
 }
 
+void DragDataManager::SetTargetPid(int32_t pid)
+{
+    targetPid_ = pid;
+}
+
+int32_t DragDataManager::GetTargetPid() const
+{
+    return targetPid_;
+}
+
 int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
 {
     offsetX = dragData_.shadowInfo.x;

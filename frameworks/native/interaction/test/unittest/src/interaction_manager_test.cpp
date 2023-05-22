@@ -765,6 +765,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN)) !=
             std::future_status::timeout);
         TestRemoveMonitor(monitorId);
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
+        ASSERT_EQ(ret, RET_OK);
         int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
         FI_HILOGI("Target pid:%{public}d", pid);
         ASSERT_TRUE(pid > 0);
@@ -811,6 +813,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN)) !=
             std::future_status::timeout);
         TestRemoveMonitor(monitorId);
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
+        ASSERT_EQ(ret, RET_OK);
         int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
         FI_HILOGI("Target pid:%{public}d", pid);
         ASSERT_TRUE(pid > 0);

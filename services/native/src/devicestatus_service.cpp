@@ -764,8 +764,9 @@ int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
     int32_t tid = GetCallingTokenID();
+    int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style, tid));
+        std::bind(&DragManager::UpdateDragStyle, &dragMgr_, style, pid, tid));
     if (ret != RET_OK) {
         FI_HILOGE("UpdateDragStyle failed, ret:%{public}d", ret);
     }

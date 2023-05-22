@@ -43,6 +43,8 @@ public:
     void ResetDragData();
     void SetTargetTid(int32_t tokenId);
     int32_t GetTargetTid() const;
+    void SetTargetPid(int32_t pid);
+    int32_t GetTargetPid() const;
     void SetMotionDrag(bool isMotionDrag);
     bool IsMotionDrag() const;
 private:
@@ -52,6 +54,7 @@ private:
     std::u16string dragMessage_;
     bool visible_ { false };
     int32_t targetTid_ { -1 };
+    int32_t targetPid_ { -1 };
     bool isMotionDrag_ { false };
 };
 
