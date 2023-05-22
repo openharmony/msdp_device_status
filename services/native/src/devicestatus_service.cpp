@@ -258,7 +258,7 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, false);
     WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
-}
+} 
 
 Data DeviceStatusService::GetCache(const Type& type)
 {
