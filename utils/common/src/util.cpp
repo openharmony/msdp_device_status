@@ -26,6 +26,7 @@
 
 #include "devicestatus_hilog_wrapper.h"
 #include "fi_log.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -253,11 +254,6 @@ bool IsValidSvgPath(const std::string &filePath)
     return IsValidPath(SVG_PATH, filePath);
 }
 
-bool IsFileExists(const std::string &fileName)
-{
-    return (access(fileName.c_str(), F_OK) == 0);
-}
-
 bool IsValidSvgFile(const std::string &filePath)
 {
     CALL_DEBUG_ENTER;
@@ -274,7 +270,7 @@ bool IsValidSvgFile(const std::string &filePath)
         FI_HILOGE("File path invalid");
         return false;
     }
-    if (!IsFileExists(realPath)) {
+    if (!Utility::DoesFileExist(realPath)) {
         FI_HILOGE("File not exist");
         return false;
     }
