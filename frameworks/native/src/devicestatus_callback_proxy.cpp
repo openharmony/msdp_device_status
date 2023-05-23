@@ -18,9 +18,9 @@
 #include "iremote_object.h"
 #include "message_option.h"
 
-#include "devicestatus_common.h"
 #include "devicestatus_callback_proxy.h"
 #include "devicestatus_client.h"
+#include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -31,9 +31,9 @@ void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusDa
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL(remote == nullptr);
 
-    std::map<Type, int32_t> typeMap_= DeviceStatusClient::GetInstance().GetTypeMap();
-    auto it = typeMap_.find(devicestatusData.type);
-    if (it != typeMap_.end()) {
+    std::map<Type, int32_t> typeMap= DeviceStatusClient::GetInstance().GetTypeMap();
+    auto it = typeMap.find(devicestatusData.type);
+    if (it == typeMap.end()) {
         DEV_HILOGE(INNERKIT, "type not exist report failed");
         return;
     }
