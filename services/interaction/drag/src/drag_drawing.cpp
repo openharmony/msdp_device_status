@@ -164,7 +164,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CHKPR(dragStyleNode, INIT_FAIL);
     DragAnimationData dragAnimationData;
     if (InitDragAnimationData(dragAnimationData) != RET_OK) {
-        FI_HILOGE("Init Drag Animation data failed");
+        FI_HILOGE("Init drag animation data failed");
         return INIT_FAIL;
     }
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
