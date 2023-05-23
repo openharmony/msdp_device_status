@@ -38,6 +38,7 @@ void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &po
     dragData_ = dragData;
     pointerStyle_ = pointerStyle;
     targetTid_ = -1;
+    targetPid_ = -1;
 }
 
 void DragDataManager::SetDragStyle(DragCursorStyle style)

@@ -152,7 +152,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         return RET_ERR;
     }
     DRAG_DATA_MGR.SetDragStyle(style);
-    DRAG_DATA_MGR.SetTargetTid(targetPid);
+    DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
     dragDrawing_.UpdateDragStyle(style);
     return RET_OK;
