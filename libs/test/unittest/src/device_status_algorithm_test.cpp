@@ -17,7 +17,11 @@
 
 #include "accesstoken_kit.h"
 
+#define private public
 #include "devicestatus_algorithm_manager.h"
+#include "sensor_agent_type.h"
+#include "sensor_data_callback.h"
+#undef private
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 
@@ -65,7 +69,7 @@ void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest001 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest001 start";
     AlgoAbsoluteStill* still = new (std::nothrow) AlgoAbsoluteStill();
     bool ret = still->Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
@@ -85,7 +89,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest002 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest002 start";
     AlgoHorizontal* horizontal = new (std::nothrow) AlgoHorizontal();
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal->Init(TYPE_INVALID);
@@ -105,7 +109,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest003 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest003 start";
     AlgoVertical* vertical = new (std::nothrow) AlgoVertical();
     bool ret = vertical->Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
@@ -125,7 +129,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest004 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest004 start";
     std::shared_ptr<AlgoMgr> g_manager = std::make_shared<AlgoMgr>();
     int32_t ret = g_manager->UnregisterCallback();
     GTEST_LOG_(INFO) << "10";
@@ -150,7 +154,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest004, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest005 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest005 start";
     int32_t ret = g_manager->Enable(Type::TYPE_LID_OPEN);
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest005 end";
@@ -163,7 +167,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest005, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest006 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest006 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
@@ -186,7 +190,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest007 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest007 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
@@ -209,7 +213,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest008 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest008 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
@@ -232,7 +236,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest009 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest009 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
@@ -258,7 +262,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest010 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest010 start";
     int32_t TYPE_ERROR = 5;
     int32_t ret = g_manager->Enable(static_cast<Type>(TYPE_ERROR));
     ASSERT_TRUE(ret);
@@ -272,7 +276,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest011, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest011 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest011 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
@@ -288,7 +292,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest011, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest012, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest012 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest012 start";
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest012 end";
@@ -301,7 +305,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest012, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest013, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest013 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest013 start";
     bool result = g_manager->StartSensor(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_HORIZONTAL_POSITION);
@@ -317,7 +321,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest013, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest014, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest014 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest014 start";
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_VERTICAL_POSITION);
@@ -333,7 +337,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest014, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest015 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest015 start";
     int32_t TYPE_ERROR = 5;
     bool result = g_manager->StartSensor(static_cast<Type>(TYPE_ERROR));
     EXPECT_FALSE(result);
@@ -347,7 +351,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest016, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest016 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest016 start";
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
     EXPECT_FALSE(result);
     g_manager->GetSensorTypeId(Type::TYPE_INVALID);
@@ -364,7 +368,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest016, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest017, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest017 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest017 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -385,7 +389,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest017, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest018 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest018 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -405,7 +409,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest019, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest019 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest019 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -425,7 +429,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest019, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest020 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest020 start";
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -445,7 +449,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest021, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest021 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest021 start";
     bool result = g_manager->StartSensor(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_HORIZONTAL_POSITION);
@@ -462,7 +466,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest021, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest022, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest022 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest022 start";
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_VERTICAL_POSITION);
@@ -479,7 +483,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest022, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest023, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "AbsolutstillTest023 start";
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest023 start";
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_MAX);
@@ -487,4 +491,74 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest023, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest023 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test Enable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest024, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest024 start";
+    int32_t ret = g_manager->Enable(Type::TYPE_MAX);
+    EXPECT_TRUE(ret == RET_ERR);
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest024 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test Disable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest025, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest025 start";
+    g_manager->callAlgoNum_[Type::TYPE_ABSOLUTE_STILL] = 2;
+    int32_t ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_TRUE(ret == RET_ERR);
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest025 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test Disable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest026, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest026 start";
+    int32_t ret = g_manager->Enable(Type::TYPE_MAX);
+    ASSERT_TRUE(ret);
+    g_manager->callAlgoNum_[Type::TYPE_MAX] = 1;
+    ret = g_manager->Disable(Type::TYPE_MAX);
+    EXPECT_TRUE(ret == RET_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest026 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test UnregisterSensor
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest027, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest027 start";
+    int32_t ret = g_manager->UnregisterSensor(Type::TYPE_MAX);
+    EXPECT_TRUE(ret == false);
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest027 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test UnregisterSensor
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 start";
+    SensorDataCallback::GetInstance().user_.callback = nullptr;
+    int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_TRUE(ret == RET_ERR);
+    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 end";
 }
