@@ -189,7 +189,6 @@ bool DeviceStatusNapi::IsMatchCallbackType(napi_env &env, napi_value &value)
         DEV_HILOGE(JS_NAPI, "Failed to get valueType");
         return false;
     }
-       
     DEV_HILOGD(JS_NAPI, "Exit");
     return valueType == napi_function;
 }
@@ -276,15 +275,18 @@ std::tuple<bool, napi_value, int32_t, int32_t, bool> DeviceStatusNapi::CheckUnsu
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
         return result;
     }
-
+    if (argc < 2) {
+        ThrowErr(env, PARAM_ERROR, "parameter is not exist");
+        return result;
+    }
     size_t modLen = 0;
-    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
+    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
     char mode[NAPI_BUF_LENGTH] = {};
-    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
+    status = napi_get_value_string_utf8(env, args[0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get mode");
         return result;
@@ -295,17 +297,31 @@ std::tuple<bool, napi_value, int32_t, int32_t, bool> DeviceStatusNapi::CheckUnsu
         return result;
     }
     int32_t event = 0;
-    status = napi_get_value_int32(env, args[ARG_1], &event);
+    status = napi_get_value_int32(env, args[1], &event);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get int32 item");
         return result;
     }
+
+    if (argc >= 3) {
+        napi_valuetype valueType = napi_undefined;
+        status = napi_typeof(env, args[2], &valueType);
+        if (status != napi_ok) {
+            ThrowErr(env, PARAM_ERROR, "Failed to get valueType");
+            return result;
+        }
+        if ((valueType != napi_function) && (valueType != napi_undefined)) {
+            ThrowErr(env, PARAM_ERROR, "Callback parameter type is error");
+            return result;
+        }
+    }
+
     if ((event < ActivityEvent::ENTER) || (event > ActivityEvent::ENTER_EXIT)) {
         ThrowErr(env, PARAM_ERROR, "event is illegal");
         return result;
     }
     bool isArgumentsValid = false;
-    if ((argc < ARG_3) || !IsMatchCallbackType(env, args[ARG_2])) {
+    if ((argc == 2) || !IsMatchCallbackType(env, args[2])) {
         isArgumentsValid = g_obj->RemoveAllCallback(type);
         if (!isArgumentsValid) {
             DEV_HILOGE(JS_NAPI, "Callback is not exist");
@@ -313,7 +329,7 @@ std::tuple<bool, napi_value, int32_t, int32_t, bool> DeviceStatusNapi::CheckUnsu
         }
     }
     DEV_HILOGD(JS_NAPI, "type: %{public}d, event: %{public}d", type, event);
-    return std::make_tuple(true, args[ARG_2], type, event, isArgumentsValid);
+    return std::make_tuple(true, args[2], type, event, isArgumentsValid);
 }
 
 std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env env, napi_callback_info info)
