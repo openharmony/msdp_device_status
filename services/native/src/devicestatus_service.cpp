@@ -461,9 +461,9 @@ void DeviceStatusService::OnSignalEvent(int32_t signalFd)
 {
     CALL_DEBUG_ENTER;
     signalfd_siginfo sigInfo;
-    ssize_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        FI_HILOGE("Read signal info failed, invalid size:%{public}d,errno:%{public}d", size, errno);
+    ssize_t size = read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
+    if (size != static_cast<ssize_t>(sizeof(signalfd_siginfo))) {
+        FI_HILOGE("Read signal info failed, invalid size:%{public}zd,errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);

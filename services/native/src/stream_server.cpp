@@ -217,16 +217,16 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
         ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
-                FI_HILOGW("Write data failed. size:%{public}zu", size);
+                FI_HILOGW("Write data failed. size:%{public}zd", size);
             }
             OnReadPackets(buf, std::bind(&StreamServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zd errno:%{public}d",
                     size, errno);
                 continue;
             }
-            FI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
+            FI_HILOGE("Recv return %{public}zd errno:%{public}d", size, errno);
             break;
         } else {
             FI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
