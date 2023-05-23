@@ -182,6 +182,12 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
+    napi_valuetype tmpType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    if (tmpType == napi_undefined) {
+        jsDragMgr->UnregisterListener(env);
+        return nullptr;
+    }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
