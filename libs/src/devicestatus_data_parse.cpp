@@ -101,6 +101,10 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     cJSON* mockvalue = cJSON_GetArrayItem(mockarray, tempcount_[type]);
     tempcount_[type]++;
     data.type = type;
+    if (mockvalue == NULL || !cJSON_IsNumber(mockvalue)) {
+        cJSON_Delete(parser.json_);
+        return false;
+    } 
     data.value = static_cast<OnChangedValue>(mockvalue->valueint);
     FI_HILOGD("type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
