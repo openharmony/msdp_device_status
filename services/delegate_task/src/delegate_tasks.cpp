@@ -144,7 +144,7 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
-    FI_HILOGD("tasks_ size %{public}zu", tasks_.size());
+    FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
     static constexpr int32_t maxTasksLimit = 1000;
     auto tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
