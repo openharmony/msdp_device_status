@@ -111,7 +111,7 @@ private:
     void RemoveModifier();
     int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth);
     xmlNodePtr GetRectNode(xmlNodePtr curNode);
-    xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth);
+    xmlNodePtr UpdateRectNode(int32_t extendSvgWidth, xmlNodePtr curNode);
     void UpdateTspanNode(xmlNodePtr curNode);
     int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode);
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath);

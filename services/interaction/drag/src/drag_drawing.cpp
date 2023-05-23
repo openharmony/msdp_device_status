@@ -260,8 +260,8 @@ void DragDrawing::OnDragFail()
 {
     CALL_DEBUG_ENTER;
     auto dragWindow = g_drawingInfo.dragWindow;
-    auto rootNode = g_drawingInfo.rootNode;
     CHKPV(dragWindow);
+    auto rootNode = g_drawingInfo.rootNode;
     CHKPV(rootNode);
     OnStopDragFail(dragWindow, rootNode);
 }
@@ -342,6 +342,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode, std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(shadowNode);
+    CHKPV(dragStyleNode);
     if (DrawShadow(shadowNode) != RET_OK) {
         FI_HILOGE("Draw shadow failed");
         return;
@@ -356,6 +358,8 @@ void DragDrawing::OnDragStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> dragSty
     std::shared_ptr<OHOS::Media::PixelMap> stylePixelMap)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(dragStyleNode);
+    CHKPV(stylePixelMap);
     DrawStyle(dragStyleNode, stylePixelMap);
 }
 
@@ -548,12 +552,12 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+    dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
     dragAnimationData.displayX = g_drawingInfo.displayX;
     dragAnimationData.displayY = g_drawingInfo.displayY;
     dragAnimationData.offsetX = g_drawingInfo.pixelMapX;
     dragAnimationData.offsetY = g_drawingInfo.pixelMapY;
-    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
-    dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
     return RET_OK;
 }
 
@@ -739,7 +743,7 @@ xmlNodePtr DragDrawing::GetRectNode(xmlNodePtr curNode)
     return curNode;
 }
 
-xmlNodePtr DragDrawing::UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth)
+xmlNodePtr DragDrawing::UpdateRectNode(int32_t extendSvgWidth, xmlNodePtr curNode)
 {
     CALL_DEBUG_ENTER;
     while (curNode != nullptr) {
@@ -791,7 +795,7 @@ int32_t DragDrawing::ParseAndAdjustSvgInfo(xmlNodePtr curNode)
     }
     curNode = GetRectNode(curNode);
     CHKPR(curNode, RET_ERR);
-    curNode = UpdateRectNode(curNode, extendSvgWidth);
+    curNode = UpdateRectNode(extendSvgWidth, curNode);
     CHKPR(curNode, RET_ERR);
     UpdateTspanNode(curNode);
     return RET_OK;
@@ -922,6 +926,7 @@ void DragDrawing::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts)
 DrawSVGModifier::DrawSVGModifier(std::shared_ptr<OHOS::Media::PixelMap> stylePixelMap)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(stylePixelMap);
     stylePixelMap_ = stylePixelMap;
 }
 
