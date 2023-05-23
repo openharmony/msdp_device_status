@@ -23,6 +23,7 @@
 #include "devicestatus_data_define.h"
 #include "devicestatus_errors.h"
 #include "fi_log.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -131,7 +132,7 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
         FI_HILOGE("Unable to parse files other than json format");
         return "";
     }
-    if (!IsFileExists(filePath)) {
+    if (!Utility::DoesFileExist(filePath.c_str())) {
         FI_HILOGE("File not exist");
         return "";
     }
@@ -179,11 +180,6 @@ bool DeviceStatusDataParse::CheckFileExtendName(const std::string& filePath, con
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
-}
-
-bool DeviceStatusDataParse::IsFileExists(const std::string& fileName)
-{
-    return (access(fileName.c_str(), F_OK) == 0);
 }
 
 std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)

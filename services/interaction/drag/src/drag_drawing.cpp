@@ -165,7 +165,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return INIT_FAIL;
     }
     CHKPR(rsUiDirector_, INIT_FAIL);
@@ -326,7 +326,7 @@ int32_t DragDrawing::DrawShadow()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -362,7 +362,7 @@ int32_t DragDrawing::DrawStyle()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -600,7 +600,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
         svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - pixelMap->GetWidth();
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];

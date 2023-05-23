@@ -39,7 +39,6 @@ private:
     bool CheckFileDir(const std::string& filePath, const std::string& dir);
     bool CheckFileSize(const std::string& filePath);
     bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
-    bool IsFileExists(const std::string& fileName);
     std::string ReadFile(const std::string &filePath);
     std::string ReadJsonFile(const std::string &filePath);
     static std::vector<int32_t> tempcount_;
