@@ -67,20 +67,16 @@ public:
         DEVICE_CAP_MAX
     };
 
-public:
     explicit Device(int32_t deviceId);
-    ~Device() = default;
     DISALLOW_COPY_AND_MOVE(Device);
+    ~Device() = default;
 
     int32_t Open() override;
     void Close() override;
-
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-
     void SetDevPath(const std::string &devPath) override;
     void SetSysPath(const std::string &sysPath) override;
-
     int32_t GetId() const override;
     std::string GetDevPath() const override;
     std::string GetSysPath() const override;
@@ -107,22 +103,20 @@ private:
     int32_t ReadTomlFile(const std::string &filePath);
     void JudgeKeyboardType();
     void LoadDeviceConfig();
-
-private:
     int32_t fd_ { -1 };
     int32_t deviceId_ { -1 };
     int32_t bus_ { 0 };
     int32_t version_ { 0 };
     int32_t product_ { 0 };
     int32_t vendor_ { 0 };
-    std::string devPath_;
-    std::string sysPath_;
-    std::string name_;
-    std::string phys_;
-    std::string uniq_;
-    std::string dhid_;
-    std::string networkId_;
-    std::bitset<DEVICE_CAP_MAX> caps_;
+    std::string devPath_ { "" };
+    std::string sysPath_ { "" };
+    std::string name_ { "" };
+    std::string phys_ { "" };
+    std::string uniq_ { "" };
+    std::string dhid_ { "" };
+    std::string networkId_ { "" };
+    std::bitset<DEVICE_CAP_MAX> caps_ {};
     uint8_t evBitmask_[NBYTES(EV_MAX)] {};
     uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
     uint8_t absBitmask_[NBYTES(ABS_MAX)] {};

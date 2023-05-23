@@ -37,7 +37,7 @@ public:
           uiTime_(tmChk),
           llParam1_(static_cast<int64_t>(llParam1)),
           llParam2_(llParam2) {}
-
+    DISALLOW_COPY_AND_MOVE(TimeCostChk);
     ~TimeCostChk(void)
     {
         int64_t ullCost = GetElapsed_micro();
@@ -55,8 +55,6 @@ public:
         }
     }
 
-    DISALLOW_COPY_AND_MOVE(TimeCostChk);
-
     int64_t GetElapsed_micro() const
     {
         int64_t tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -66,8 +64,8 @@ public:
 
 private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
-    const std::string strOutput_ = "";
-    const std::string strReason_ = "";
+    const std::string strOutput_ { "" };
+    const std::string strReason_ { "" };
     const int64_t uiTime_ { 0 };
     const int64_t llParam1_ { 0 };
     const int64_t llParam2_ { 0 };

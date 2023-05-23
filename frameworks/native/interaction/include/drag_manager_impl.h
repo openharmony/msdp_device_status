@@ -34,6 +34,7 @@ class DragManagerImpl  {
 public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
+
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t GetUdKey(std::string &udKey);
@@ -49,7 +50,7 @@ public:
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
-    std::list<DragListenerPtr> dragListener_;
+    std::list<DragListenerPtr> dragListener_ {};
     std::function<void(const DragNotifyMsg&)> stopCallback_ { nullptr };
 };
 } // namespace DeviceStatus

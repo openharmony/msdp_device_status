@@ -34,8 +34,8 @@ namespace DeviceStatus {
 class JsDragManager : public IDragListener, public std::enable_shared_from_this<JsDragManager> {
 public:
     JsDragManager() = default;
-    ~JsDragManager() = default;
     DISALLOW_COPY_AND_MOVE(JsDragManager);
+    ~JsDragManager() = default;
 
     void ResetEnv();
     void OnDragMessage(DragState state) override;
@@ -48,12 +48,6 @@ private:
         napi_ref ref { nullptr };
         DragState state;
     };
-
-private:
-    static void CallDragMsg(uv_work_t *work, int32_t status);
-    void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
-    void ReleaseReference();
-    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
@@ -62,7 +56,11 @@ private:
             ptr = nullptr;
         }
     }
-private:
+
+    static void CallDragMsg(uv_work_t *work, int32_t status);
+    void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
+    void ReleaseReference();
+    bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
     std::atomic_bool hasRegistered_ { false };
     inline static std::mutex mutex_;
     inline static std::vector<std::unique_ptr<CallbackInfo>> listeners_ {};

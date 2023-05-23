@@ -44,7 +44,7 @@ private:
 };
 
 template<typename T>
-sptr<T> DelayedSpSingleton<T>::instance_ = nullptr;
+sptr<T> DelayedSpSingleton<T>::instance_ { nullptr };
 
 template<typename T>
 std::mutex DelayedSpSingleton<T>::mutex_;

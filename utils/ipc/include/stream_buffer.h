@@ -31,39 +31,31 @@ class StreamBuffer {
 public:
     StreamBuffer() = default;
     DISALLOW_MOVE(StreamBuffer);
-    virtual ~StreamBuffer() = default;
     explicit StreamBuffer(const StreamBuffer &buf);
     virtual StreamBuffer &operator=(const StreamBuffer &other);
+    virtual ~StreamBuffer() = default;
 
     void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
-
     bool Read(std::string &buf);
     bool Write(const std::string &buf);
-
     bool Read(StreamBuffer &buf);
     bool Write(const StreamBuffer &buf);
-
     bool Read(char *buf, size_t size);
     virtual bool Write(const char *buf, size_t size);
-
     bool IsEmpty() const;
     size_t Size() const;
     int32_t UnreadSize() const;
     int32_t GetAvailableBufSize() const;
-
     bool ChkRWError() const;
     const std::string &GetErrorStatusRemark() const;
     const char *Data() const;
-
     template<typename T>
     bool Read(T &data);
     template<typename T>
     bool Write(const T &data);
-
     const char *ReadBuf() const;
-
     template<typename T>
     StreamBuffer &operator >> (T &data);
     template<typename T>
@@ -78,13 +70,12 @@ protected:
         ERROR_STATUS_READ,
         ERROR_STATUS_WRITE,
     };
-    ErrorStatus rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
+    ErrorStatus rwErrorStatus_ { ErrorStatus::ERROR_STATUS_OK };
     int32_t rCount_ { 0 };
     int32_t wCount_ { 0 };
-
     int32_t rPos_ { 0 };
     int32_t wPos_ { 0 };
-    char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
+    char szBuff_[MAX_STREAM_BUF_SIZE+1] {};
 };
 
 template<typename T>

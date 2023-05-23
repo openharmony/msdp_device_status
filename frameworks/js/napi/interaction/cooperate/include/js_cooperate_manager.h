@@ -27,8 +27,8 @@ namespace DeviceStatus {
 class JsCooperateManager : public JsEventCooperateTarget {
 public:
     JsCooperateManager() = default;
-    ~JsCooperateManager() = default;
     DISALLOW_COPY_AND_MOVE(JsCooperateManager);
+    ~JsCooperateManager() = default;
 
     napi_value Enable(napi_env env, bool enable, napi_value handle = nullptr);
     napi_value Start(napi_env env, const std::string &remoteNetworkDescriptor, int32_t startDeviceId,

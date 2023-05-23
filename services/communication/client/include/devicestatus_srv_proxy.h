@@ -29,8 +29,8 @@ class DeviceStatusSrvProxy : public IRemoteProxy<Idevicestatus> {
 public:
     explicit DeviceStatusSrvProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<Idevicestatus>(impl) {}
-    ~DeviceStatusSrvProxy() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvProxy);
+    ~DeviceStatusSrvProxy() = default;
 
     virtual void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
@@ -39,7 +39,6 @@ public:
     virtual Data GetCache(const Type& type) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
-
     virtual int32_t RegisterCoordinationListener() override;
     virtual int32_t UnregisterCoordinationListener() override;
     virtual int32_t PrepareCoordination(int32_t userData) override;
@@ -48,7 +47,6 @@ public:
         int32_t startDeviceId) override;
     virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained) override;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
-
     virtual int32_t StartDrag(const DragData &dragData) override;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) override;

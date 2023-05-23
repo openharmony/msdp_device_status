@@ -27,8 +27,8 @@ namespace DeviceStatus {
 class JsCooperateContext final {
 public:
     JsCooperateContext();
-    ~JsCooperateContext();
     DISALLOW_COPY_AND_MOVE(JsCooperateContext);
+    ~JsCooperateContext();
 
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value Enable(napi_env env, napi_callback_info info);
@@ -37,20 +37,18 @@ public:
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-
     std::shared_ptr<JsCooperateManager> GetJsCoordinationMgr();
 
 private:
-    std::shared_ptr<JsCooperateManager> mgr_ { nullptr };
-    std::mutex mutex_;
-    napi_ref contextRef_ { nullptr };
-
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static JsCooperateContext *GetInstance(napi_env env);
     static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+    std::shared_ptr<JsCooperateManager> mgr_ { nullptr };
+    std::mutex mutex_;
+    napi_ref contextRef_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

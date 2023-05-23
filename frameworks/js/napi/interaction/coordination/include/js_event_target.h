@@ -35,27 +35,21 @@ namespace DeviceStatus {
 class JsEventTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
-    virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
+    virtual ~JsEventTarget() = default;
 
     static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
     static void EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
     static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
     static void EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state);
-
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
-
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
 
 private:
-    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
-        coordinationListener_ {};
-    bool isListeningProcess_ { false };
-
     static void CallPreparePromiseWork(uv_work_t *work, int32_t status);
     static void CallPrepareAsyncWork(uv_work_t *work, int32_t status);
     static void CallActivatePromiseWork(uv_work_t *work, int32_t status);
@@ -65,8 +59,10 @@ private:
     static void CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
-
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
+        coordinationListener_ {};
+    bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

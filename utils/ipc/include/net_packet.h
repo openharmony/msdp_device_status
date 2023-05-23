@@ -21,7 +21,7 @@
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
     MessageId idMsg { MessageId::INVALID };
-    int32_t size;
+    int32_t size { 0 };
 };
 #pragma pack()
 
@@ -37,24 +37,21 @@ public:
     virtual ~NetPacket();
 
     virtual void MakeData(StreamBuffer &buf) const;
-
     int32_t GetPacketLength() const
     {
         return (static_cast<int32_t>(sizeof(PackHead)) + wPos_);
     }
-
     const char *GetData() const
     {
         return Data();
     }
-
     MessageId GetMsgId() const
     {
         return msgId_;
     }
 
 protected:
-    MessageId msgId_ = MessageId::INVALID;
+    MessageId msgId_ { MessageId::INVALID };
 };
 } // namespace Msdp
 } // namespace OHOS

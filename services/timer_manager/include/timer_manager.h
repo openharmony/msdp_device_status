@@ -31,8 +31,8 @@ namespace DeviceStatus {
 class TimerManager final : public ITimerManager {
 public:
     TimerManager() = default;
-    ~TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
+    ~TimerManager() = default;
 
     int32_t Init(IContext *context);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
@@ -52,16 +52,13 @@ private:
         std::function<void()> callback { nullptr };
     };
 
-private:
     int32_t OnInit(IContext *context);
     int32_t OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t OnRemoveTimer(int32_t timerId);
     int32_t OnResetTimer(int32_t timerId);
     int32_t OnProcessTimers();
-
     bool OnIsExist(int32_t timerId) const;
     int32_t RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const;
-
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimerInternal(int32_t timerId);
@@ -70,11 +67,9 @@ private:
     int64_t CalcNextDelayInternal();
     void ProcessTimersInternal();
     int32_t ArmTimer();
-
-private:
     int timerFd_ { -1 };
     IContext *context_ { nullptr };
-    std::list<std::unique_ptr<TimerItem>> timers_;
+    std::list<std::unique_ptr<TimerItem>> timers_ {};
 };
 
 inline int TimerManager::GetTimerFd() const
