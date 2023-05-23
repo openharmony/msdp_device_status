@@ -250,8 +250,8 @@ void DragDrawing::OnDragSuccess()
         return;
     }
     auto shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
-    auto styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(shadowNode);
+    auto styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(styleNode);
     OnStopDragSuccess(shadowNode, styleNode);
 }
