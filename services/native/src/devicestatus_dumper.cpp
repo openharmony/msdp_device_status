@@ -71,6 +71,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         { "current", no_argument, 0, 'c' },
         { "coordination", no_argument, 0, 'o' },
         { "drag", no_argument, 0, 'd' },
+        { "chkconfig", no_argument, 0, 'k' },
         { NULL, 0, 0, 0 }
     };
     char **argv = new (std::nothrow) char *[args.size()];
@@ -91,7 +92,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
             goto RELEASE_RES;
         }
     }
-    while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(args.size(), argv, "hslcodk", dumpOptions, &optionIndex)) != -1) {
         ExecutDump(fd, datas, c);
     }
     RELEASE_RES:
@@ -133,6 +134,10 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
         case 'd': {
             CHKPV(context_);
             context_->GetDragManager().Dump(fd);
+            break;
+        }
+        case 'k': {
+            DumpCheckDefine(fd);
             break;
         }
         default: {
@@ -269,6 +274,7 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
     dprintf(fd, "      -c: dump the current device status\n");
     dprintf(fd, "      -o: dump the coordination status\n");
     dprintf(fd, "      -d: dump the drag status\n");
+    dprintf(fd, "      -k, dump the ChkConfig state\n");
 }
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
@@ -359,6 +365,32 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         }
     }
     return packageName;
+}
+
+void DeviceStatusDumper::DumpCheckDefine(int32_t fd)
+{
+    ChkDefineOutput(fd);
+}
+
+void DeviceStatusDumper::ChkDefineOutput(int32_t fd)
+{
+    CheckDefineOutput(fd, "Macro switch state:");
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_COORDINATION");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+template<class ...Ts>
+void DeviceStatusDumper::CheckDefineOutput(int32_t fd, const char* fmt, Ts... args)
+{
+    CHKPV(fmt);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
+    if (ret == -1) {
+        DEV_HILOGE(SERVICE, "Call snprintf_s failed.ret = %d", ret);
+        return;
+    }
+    dprintf(fd, "%s", buf);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
