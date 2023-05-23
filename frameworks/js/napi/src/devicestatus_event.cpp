@@ -104,7 +104,7 @@ bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
     DEV_HILOGD(JS_NAPI, "DeviceStatusEvent off in for event:%{public}d", eventType);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "eventType %{public}d not find", eventType);
+        DEV_HILOGE(JS_NAPI, "eventType:%{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -142,7 +142,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 
     auto iter = eventOnceMap_.find(eventType);
     if (iter == eventOnceMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "eventType %{public}d not find", eventType);
+        DEV_HILOGE(JS_NAPI, "eventType:%{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -170,7 +170,7 @@ bool DeviceStatusEvent::RemoveAllCallback(int32_t eventType)
     DEV_HILOGD(JS_NAPI, "Enter");
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "evenType %{public}d not find", eventType);
+        DEV_HILOGE(JS_NAPI, "evenType:%{public}d not found", eventType);
         return false;
     }
     eventMap_.erase(eventType);
@@ -254,14 +254,14 @@ void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, b
     if (isOnce) {
         typeHandler = eventOnceMap_.find(eventType);
         if (typeHandler == eventOnceMap_.end()) {
-            DEV_HILOGE(JS_NAPI, "OnEvent eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "OnEvent, eventType:%{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }
     } else {
         typeHandler = eventMap_.find(eventType);
         if (typeHandler == eventMap_.end()) {
-            DEV_HILOGE(JS_NAPI, "OnEvent:eventType %{public}d not find", eventType);
+            DEV_HILOGE(JS_NAPI, "OnEvent, eventType:%{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }

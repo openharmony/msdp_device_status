@@ -32,12 +32,13 @@ public:
     CoordinationListenerTest() : ICoordinationListener() {}
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
     {
-        FI_HILOGD("RegisterCoordinationListenerFuzzTest");
+        FI_HILOGD("Register coordination listener fuzz test");
     };
 };
 
 void RegisterCoordinationListenerFuzzTest()
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<CoordinationListenerTest> consumer = std::make_shared<CoordinationListenerTest>();
     InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
     InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);

@@ -49,7 +49,7 @@ private:
         int32_t repeatCount  { 0 };
         int32_t callbackCount  { 0 };
         int64_t nextCallTime  { 0 };
-        std::function<void()> callback;
+        std::function<void()> callback { nullptr };
     };
 
 private:
