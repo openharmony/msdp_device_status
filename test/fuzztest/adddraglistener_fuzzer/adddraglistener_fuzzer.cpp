@@ -36,6 +36,7 @@ public:
 
 void AddDragListenerFuzzTest(const uint8_t* data, size_t size)
 {
+    CALL_DEBUG_ENTER;
     std::shared_ptr<DragListenerTest> listener = std::make_shared<DragListenerTest>();
     InteractionManager::GetInstance()->AddDraglistener(listener);
     InteractionManager::GetInstance()->RemoveDraglistener(listener);

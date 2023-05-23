@@ -56,7 +56,7 @@ static std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            FI_HILOGE("call sprintf_s failed, ret = %{public}d.", ret);
+            FI_HILOGE("call sprintf_s failed, ret:%{public}d", ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';
@@ -185,7 +185,7 @@ const char* GetProgramName()
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        FI_HILOGE("The fp is nullptr, filename:%s.", buf);
+        FI_HILOGE("The fp is nullptr, filename:%{public}s", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
@@ -199,19 +199,19 @@ const char* GetProgramName()
         return "";
     }
     if (fclose(fp) != 0) {
-        FI_HILOGW("Close file:%s failed", buf);
+        FI_HILOGW("Close file:%{public}s failed", buf);
     }
     fp = nullptr;
 
     std::string tempName(bufLine);
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
-        FI_HILOGE("tempName is empty.");
+        FI_HILOGE("tempName is empty");
         return "";
     }
     size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        FI_HILOGE("The copySize is 0.");
+        FI_HILOGE("The copySize is 0");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
@@ -219,7 +219,7 @@ const char* GetProgramName()
         FI_HILOGE("memcpy_s failed");
         return "";
     }
-    FI_HILOGI("GetProgramName success. programName:%s", programName);
+    FI_HILOGI("Get program name success, programName:%{public}s", programName);
 
     return programName;
 }
@@ -228,7 +228,7 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        FI_HILOGE("File is not find extension");
+        FI_HILOGE("File is not found extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);

@@ -312,7 +312,7 @@ std::tuple<bool, napi_value, int32_t, int32_t, bool> DeviceStatusNapi::CheckUnsu
             return result;
         }
     }
-    DEV_HILOGD(JS_NAPI, "type: %{public}d, event: %{public}d", type, event);
+    DEV_HILOGD(JS_NAPI, "type:%{public}d, event:%{public}d", type, event);
     return std::make_tuple(true, args[ARG_2], type, event, isArgumentsValid);
 }
 
