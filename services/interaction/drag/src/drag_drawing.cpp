@@ -155,12 +155,12 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return INIT_FAIL;
     }
     auto shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
-    auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(shadowNode, INIT_FAIL);
+    auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
     DragAnimationData dragAnimationData;
     if (InitDragAnimationData(dragAnimationData) != RET_OK) {
@@ -231,7 +231,7 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     auto pixelMap = DecodeSvgToPixelMap(filePath);
     CHKPV(pixelMap);
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -246,7 +246,7 @@ void DragDrawing::OnDragSuccess()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -942,7 +942,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
         svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -980,7 +980,7 @@ void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
     int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -1012,7 +1012,7 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
     CHKPV(pixelMap);
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
