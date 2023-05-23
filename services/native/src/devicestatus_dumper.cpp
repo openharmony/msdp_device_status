@@ -71,7 +71,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         { "current", no_argument, 0, 'c' },
         { "coordination", no_argument, 0, 'o' },
         { "drag", no_argument, 0, 'd' },
-        { "chkconfig", no_argument, 0, 'k' },
+        { "macroState", no_argument, 0, 'm' },
         { NULL, 0, 0, 0 }
     };
     char **argv = new (std::nothrow) char *[args.size()];
@@ -136,7 +136,7 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
             context_->GetDragManager().Dump(fd);
             break;
         }
-        case 'k': {
+        case 'm': {
             DumpCheckDefine(fd);
             break;
         }
@@ -274,7 +274,7 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
     dprintf(fd, "      -c: dump the current device status\n");
     dprintf(fd, "      -o: dump the coordination status\n");
     dprintf(fd, "      -d: dump the drag status\n");
-    dprintf(fd, "      -k, dump the ChkConfig state\n");
+    dprintf(fd, "      -k, dump the macro state\n");
 }
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
