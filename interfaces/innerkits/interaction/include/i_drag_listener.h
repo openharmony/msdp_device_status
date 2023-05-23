@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "drag_message.h"
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {

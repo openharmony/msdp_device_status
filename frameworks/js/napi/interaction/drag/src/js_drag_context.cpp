@@ -16,7 +16,7 @@
 #include "js_drag_context.h"
 
 #include "devicestatus_define.h"
-#include "drag_message.h"
+#include "drag_data.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
