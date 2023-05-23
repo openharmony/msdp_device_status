@@ -131,7 +131,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest004, TestSize.Level
     GTEST_LOG_(INFO) << "10";
     EXPECT_TRUE(ret == ERR_OK);
     bool result = g_manager->StartSensor(Type::TYPE_LID_OPEN);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     ret = g_manager->UnregisterCallback();
     EXPECT_TRUE(ret == ERR_OK);
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
@@ -290,7 +290,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest012, TestSize.Level
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest012 start";
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest012 end";
 }
 
@@ -336,7 +336,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level
     GTEST_LOG_(INFO) << "AbsolutstillTest015 start";
     int32_t TYPE_ERROR = 5;
     bool result = g_manager->StartSensor(static_cast<Type>(TYPE_ERROR));
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest015 end";
 }
 
@@ -349,7 +349,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest016, TestSize.Level
 {
     GTEST_LOG_(INFO) << "AbsolutstillTest016 start";
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     g_manager->GetSensorTypeId(Type::TYPE_INVALID);
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     int32_t ret = g_manager->CheckSensorTypeId(sensorTypeId);
