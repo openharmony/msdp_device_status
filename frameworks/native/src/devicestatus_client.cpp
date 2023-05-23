@@ -121,7 +121,7 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
     if (!ret) {
         DEV_HILOGW(SERVICE, "Insert pair to typeMap_ failed");
     }
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type:%{public}d", typeMap_[type], type);
+    DEV_HILOGD(INNERKIT, "typeMap_:%{public}d, type:%{public}d", typeMap_[type], type);
     if (callback == nullptr) {
         DEV_HILOGE(SERVICE, "callback is nullptr");
         return RET_ERR;
