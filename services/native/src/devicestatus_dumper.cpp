@@ -92,7 +92,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
             goto RELEASE_RES;
         }
     }
-    while ((c = getopt_long(args.size(), argv, "hslcodk", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long(args.size(), argv, "hslcodm", dumpOptions, &optionIndex)) != -1) {
         ExecutDump(fd, datas, c);
     }
     RELEASE_RES:
@@ -274,7 +274,7 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
     dprintf(fd, "      -c: dump the current device status\n");
     dprintf(fd, "      -o: dump the coordination status\n");
     dprintf(fd, "      -d: dump the drag status\n");
-    dprintf(fd, "      -k, dump the macro state\n");
+    dprintf(fd, "      -m, dump the macro state\n");
 }
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
