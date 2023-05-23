@@ -167,6 +167,8 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Init Drag Animation data failed");
         return INIT_FAIL;
     }
+    FI_HILOGE("XJP dragAnimationData.displayX:%{public}d, displayY:%{public}d, offsetX:%{public}d, offsetX:%{public}d", dragAnimationData.displayX,
+        dragAnimationData.displayY, dragAnimationData.offsetX, dragAnimationData.offsetY);
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
@@ -538,6 +540,8 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.currentDragNum = dragData.dragNum;
     g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
+    g_drawingInfo.displayX = dragData.displayX;
+    g_drawingInfo.displayY = dragData.displayY;
     g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
     g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
