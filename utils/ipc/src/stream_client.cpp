@@ -62,13 +62,13 @@ bool StreamClient::SendMsg(const char *buf, size_t size) const
     int32_t remSize = bufSize;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
-        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 FI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
-            FI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            FI_HILOGE("Send return failed, error:%{public}d, fd:%{public}d", errno, fd_);
             return false;
         }
         idx += count;
@@ -78,7 +78,7 @@ bool StreamClient::SendMsg(const char *buf, size_t size) const
         }
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
-        FI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+        FI_HILOGE("Send too many times:%{public}d/%{public}d, size:%{public}d/%{public}d, fd:%{public}d",
             retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
         return false;
     }
@@ -117,6 +117,6 @@ void StreamClient::Stop()
     hasClient_ = false;
     Close();
 }
-}
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

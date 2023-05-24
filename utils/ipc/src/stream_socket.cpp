@@ -35,7 +35,7 @@ int32_t StreamSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
-        FI_HILOGE("epoll_create return %{public}d", epollFd_);
+        FI_HILOGE("epoll_create, return:%{public}d", epollFd_);
     } else {
         FI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
     }
@@ -62,7 +62,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
         ret = epoll_ctl(epollFd, op, fd, &event);
     }
     if (ret < 0) {
-        FI_HILOGE("epoll_ctl return %{public}d,epollFd_:%{public}d, op:%{public}d,fd:%{public}d,errno:%{public}d",
+        FI_HILOGE("epoll_ctl, return:%{public}d, epollFd_:%{public}d, op:%{public}d, fd:%{public}d, errno:%{public}d",
             ret, epollFd, op, fd, errno);
     }
     return ret;
@@ -79,7 +79,7 @@ int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, i
     }
     auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
-        FI_HILOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
+        FI_HILOGE("epoll_wait, ret:%{public}d, errno:%{public}d", ret, errno);
     }
     return ret;
 }
@@ -98,8 +98,8 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
         if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
-            FI_HILOGE("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
-                " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+            FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
+                "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();
             break;
         }
@@ -108,13 +108,13 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         }
         NetPacket pkt(head->idMsg);
         if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
-            FI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid:%{public}d,"
+            FI_HILOGW("Error writing data in the NetPacket, it will be retried next time, messageid:%{public}d, "
                 "size:%{public}d", head->idMsg, head->size);
             break;
         }
         if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
-            FI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset."
-                " packetSize:%{public}d unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+            FI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset, "
+                "packetSize:%{public}d, unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
             circBuf.Reset();
             break;
         }

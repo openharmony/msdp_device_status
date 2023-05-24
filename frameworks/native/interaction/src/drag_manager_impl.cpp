@@ -50,7 +50,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
         dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-                  "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
+            "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
         return RET_ERR;
     }

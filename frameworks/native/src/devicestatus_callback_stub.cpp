@@ -26,7 +26,7 @@ namespace DeviceStatus {
 int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DEV_HILOGD(SERVICE, "cmd = %{public}u, flags= %{public}d", code, option.GetFlags());
+    DEV_HILOGD(SERVICE, "cmd:%{public}u, flags:%{public}d", code, option.GetFlags());
     std::u16string descripter = DeviceStatusCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {

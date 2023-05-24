@@ -74,7 +74,7 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        FI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
+        FI_HILOGE("The fd:%{public}d not found, The message was discarded, errCode:%{public}d",
             fd, SESSION_NOT_FOUND);
         return false;
     }
@@ -109,29 +109,29 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t nativeBufferSize = 64 * 1024;
     SessionPtr sess = nullptr;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        FI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        FI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
     }
@@ -170,7 +170,7 @@ void StreamServer::OnDisconnected(SessionPtr sess)
 
 int32_t StreamServer::AddEpoll(EpollEventType type, int32_t fd)
 {
-    FI_HILOGE("This information should not exist. Subclasses should implement this function.");
+    FI_HILOGE("This information should not exist, subclasses should implement this function.");
     return RET_ERR;
 }
 
@@ -214,22 +214,22 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     auto& buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
-                FI_HILOGW("Write data failed. size:%{public}zu", size);
+                FI_HILOGW("Write data failed, size:%{public}zd", size);
             }
             OnReadPackets(buf, std::bind(&StreamServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zd errno:%{public}d",
                     size, errno);
                 continue;
             }
-            FI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
+            FI_HILOGE("Recv return %{public}zd, errno:%{public}d", size, errno);
             break;
         } else {
-            FI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
+            FI_HILOGE("The client side disconnect with the server, size:0, errno:%{public}d", errno);
             ReleaseSession(fd, ev);
             break;
         }
@@ -248,7 +248,7 @@ void StreamServer::OnEpollEvent(epoll_event& ev)
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        FI_HILOGI("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        FI_HILOGI("EPOLLERR or EPOLLHUP, fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
@@ -270,7 +270,7 @@ SessionPtr StreamServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        FI_HILOGE("Session not found.fd:%{public}d", fd);
+        FI_HILOGE("Session not found, fd:%{public}d", fd);
         return nullptr;
     }
     CHKPP(it->second);
@@ -281,7 +281,7 @@ SessionPtr StreamServer::GetSessionByPid(int32_t pid) const
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
-        FI_HILOGE("Session not found.pid:%{public}d", pid);
+        FI_HILOGE("Session not found, pid:%{public}d", pid);
         return nullptr;
     }
     return GetSession(fd);
@@ -290,7 +290,7 @@ SessionPtr StreamServer::GetSessionByPid(int32_t pid) const
 bool StreamServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    FI_HILOGI("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
+    FI_HILOGI("pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
         FI_HILOGE("The fd is less than 0");
@@ -309,7 +309,7 @@ bool StreamServer::AddSession(SessionPtr ses)
     DumpSession("AddSession");
     idxPidMap_[pid] = fd;
     sessionsMap_[fd] = ses;
-    FI_HILOGI("AddSession end");
+    FI_HILOGI("Add session end");
     return true;
 }
 

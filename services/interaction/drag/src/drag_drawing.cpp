@@ -128,7 +128,7 @@ float GetScaling()
     if (displayInfo->GetDpi() < -std::numeric_limits<float>::epsilon()) {
         return 0.0f;
     }
-    return (displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
+    return (1.0 * displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
 }
 } // namespace
 
@@ -165,7 +165,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return INIT_FAIL;
     }
     CHKPR(rsUiDirector_, INIT_FAIL);
@@ -326,7 +326,7 @@ int32_t DragDrawing::DrawShadow()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -362,7 +362,7 @@ int32_t DragDrawing::DrawStyle()
 {
     CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -521,9 +521,9 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
-        mouseIconNode->SetBounds(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+        mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY,
             SVG_HEIGHT, SVG_HEIGHT);
-        mouseIconNode->SetFrame(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY),
+        mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY,
             SVG_HEIGHT, SVG_HEIGHT);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
         g_drawingInfo.rootNode->AddChild(pixelMapNode);
@@ -600,7 +600,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
         svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - pixelMap->GetWidth();
     }
     if (!CheckNodesValid()) {
-        FI_HILOGE("CheckNodesValid failed");
+        FI_HILOGE("Check nodes valid failed");
         return;
     }
     auto dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -732,7 +732,7 @@ int32_t DrawSVGModifier::ParseAndAdjustSvgInfo(xmlNodePtr curNode) const
         FI_HILOGE("strStyle size:%{public}zu invalid", strStyle.size());
         return RET_ERR;
     }
-    int32_t extendSvgWidth = (strStyle.size() - 1) * EIGHT_SIZE;
+    int32_t extendSvgWidth = (static_cast<int32_t>(strStyle.size()) - 1) * EIGHT_SIZE;
     xmlKeepBlanksDefault(0);
     int32_t ret = UpdateSvgNodeInfo(curNode, extendSvgWidth);
     if (ret != RET_OK) {
@@ -847,7 +847,7 @@ void DrawSVGModifier::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) c
         FI_HILOGE("strStyle size:%{public}zu invalid", strStyle.size());
         return;
     }
-    int32_t extendSvgWidth = (strStyle.size() - 1) * EIGHT_SIZE;
+    int32_t extendSvgWidth = (static_cast<int32_t>(strStyle.size()) - 1) * EIGHT_SIZE;
     std::string deviceType = OHOS::system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::COPY) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         decodeOpts.desiredSize = {
@@ -920,9 +920,9 @@ void DrawMouseIconModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
     auto mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     int32_t adjustSize = EIGHT_SIZE * GetScaling();
-    mouseIconNode->SetBounds(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY) + adjustSize,
+    mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
         pixelMap->GetWidth(), pixelMap->GetHeight());
-    mouseIconNode->SetFrame(ChangeNumber(g_drawingInfo.pixelMapX), ChangeNumber(g_drawingInfo.pixelMapY) + adjustSize,
+    mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
         pixelMap->GetWidth(), pixelMap->GetHeight());
     mouseIconNode->SetBgImageWidth(decodeOpts.desiredSize.width);
     mouseIconNode->SetBgImageHeight(decodeOpts.desiredSize.height);
