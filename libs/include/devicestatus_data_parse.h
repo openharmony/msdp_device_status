@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_DATA_PARSE_H
-#define DEVICESTATUS_DATA_PARSE_H
+#ifndef DEVICE_STATUS_DATA_PARSE_H
+#define DEVICE_STATUS_DATA_PARSE_H
 
 #include <string>
 #include <vector>
@@ -46,4 +46,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_DATA_PARSE_H
+#endif // DEVICE_STATUS_DATA_PARSE_H

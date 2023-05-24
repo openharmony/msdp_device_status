@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_ALGORITHM_CALLBACK_H
-#define IDEVICESTATUS_ALGORITHM_CALLBACK_H
+#ifndef I_DEVICE_STATUS_ALGORITHM_CALLBACK_H
+#define I_DEVICE_STATUS_ALGORITHM_CALLBACK_H
 
 #include <iremote_broker.h>
 
@@ -32,4 +32,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_ALGORITHM_CALLBACK_H
+#endif // I_DEVICE_STATUS_ALGORITHM_CALLBACK_H

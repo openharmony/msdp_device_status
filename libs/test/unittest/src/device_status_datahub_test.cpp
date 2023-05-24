@@ -29,7 +29,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 
 namespace {
-    std::shared_ptr<SensorDataCallback> g_datahub;
+std::shared_ptr<SensorDataCallback> g_datahub;
 }
 
 class DeviceStatusDatahubTest : public testing::Test {

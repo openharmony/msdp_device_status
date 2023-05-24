@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_DELAYED_SP_SINGLETON_H
-#define DEVICESTATUS_DELAYED_SP_SINGLETON_H
+#ifndef DEVICE_STATUS_DELAYED_SP_SINGLETON_H
+#define DEVICE_STATUS_DELAYED_SP_SINGLETON_H
 
 #include <mutex>
 #include <memory>

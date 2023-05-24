@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DATA_ADAPTER_H
-#define DRAG_DATA_ADAPTER_H
+#ifndef DRAG_DATA_MANAGER_H
+#define DRAG_DATA_MANAGER_H
 #include <string>
 
 #include "pixel_map.h"
@@ -63,4 +63,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DATA_ADAPTER_H
+#endif // DRAG_DATA_MANAGER_H

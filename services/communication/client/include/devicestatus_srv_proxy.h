@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_SRV_PROXY_H
-#define DEVICESTATUS_SRV_PROXY_H
+#ifndef DEVICE_STATUS_SRV_PROXY_H
+#define DEVICE_STATUS_SRV_PROXY_H
 
 #include "iremote_proxy.h"
 #include <nocopyable.h>
@@ -65,4 +65,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_SRV_PROXY_H
+#endif // DEVICE_STATUS_SRV_PROXY_H

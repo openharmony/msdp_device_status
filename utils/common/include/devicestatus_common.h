@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_COMMON_H
-#define DEVICESTATUS_COMMON_H
+#ifndef DEVICE_STATUS_COMMON_H
+#define DEVICE_STATUS_COMMON_H
 
 #include <cstdint>
 #include <type_traits>
@@ -177,4 +177,4 @@ constexpr auto DeviceStatusToUnderlying(E e) noexcept
 } // namespace Msdp
 } // namespace OHOS
 
-#endif // DEVICESTATUS_COMMON_H
+#endif // DEVICE_STATUS_COMMON_H

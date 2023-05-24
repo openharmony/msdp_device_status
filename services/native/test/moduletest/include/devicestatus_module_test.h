@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_SERVICE_TEST_H
-#define DEVICESTATUS_SERVICE_TEST_H
+#ifndef DEVICE_STATUS_MOUDULE_TEST_H
+#define DEVICE_STATUS_MOUDULE_TEST_H
 
 #include <gtest/gtest.h>
 
@@ -38,4 +38,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_SERVICE_TEST_H
+#endif // DEVICE_STATUS_MOUDULE_TEST_H

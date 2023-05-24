@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_PERMISSION_H
-#define DEVICESTATUS_PERMISSION_H
+#ifndef DEVICE_STATUS_PERMISSION_H
+#define DEVICE_STATUS_PERMISSION_H
 
 #include <string>
 
@@ -32,4 +32,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_PERMISSION_H
+#endif // DEVICE_STATUS_PERMISSION_H

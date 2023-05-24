@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MSDP_DEVICE_STATUS_UTIL_H
-#define OHOS_MSDP_DEVICE_STATUS_UTIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <limits>
 #include <string>
@@ -108,4 +108,4 @@ int32_t ChangeNumber(int32_t num);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_UTIL_H
+#endif // UTIL_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_HILOG_WRAPPER_H
-#define DEVICESTATUS_HILOG_WRAPPER_H
+#ifndef DEVICE_STATUS_HILOG_WRAPPER_H
+#define DEVICE_STATUS_HILOG_WRAPPER_H
 
 #define CONFIG_HILOG
 #ifdef CONFIG_HILOG
@@ -108,4 +108,4 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
 
 #endif // CONFIG_HILOG
 
-#endif // DEVICESTATUS_HILOG_WRAPPER_H
+#endif // DEVICE_STATUS_HILOG_WRAPPER_H

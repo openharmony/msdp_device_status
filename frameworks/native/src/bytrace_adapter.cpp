@@ -19,10 +19,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    std::string clientSubscribe = "ClientSubscribe";
-    std::string clientUnsubscribe = "ClientUnsubscribe";
-    std::string serviceSubscribe = "ServiceSubscribe";
-    std::string serviceUnsubscribe = "ServiceUnsubscribe";
+std::string clientSubscribe = "ClientSubscribe";
+std::string clientUnsubscribe = "ClientUnsubscribe";
+std::string serviceSubscribe = "ServiceSubscribe";
+std::string serviceUnsubscribe = "ServiceUnsubscribe";
 }
 void BytraceAdapter::StartBytrace(TraceBtn traceBtn, SubscribeType isSubscribe, SubscribeObject subscribeObject)
 {

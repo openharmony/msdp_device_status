@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICESTATUS_AGENT_TEST_H
-#define OHOS_MSDP_DEVICESTATUS_AGENT_TEST_H
+#ifndef DEVICE_STATUS_AGENT_TEST_H
+#define DEVICE_STATUS_AGENT_TEST_H
 
 #include <gtest/gtest.h>
 
@@ -45,4 +45,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICESTATUS_AGENT_TEST_H
+#endif // DEVICE_STATUS_AGENT_TEST_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICESTATUS_AGENT_H
-#define OHOS_MSDP_DEVICESTATUS_AGENT_H
+#ifndef DEVICE_STATUS_AGENT_H
+#define DEVICE_STATUS_AGENT_H
 
 #include <memory>
 
@@ -57,4 +57,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICESTATUS_AGENT_H
+#endif // DEVICE_STATUS_AGENT_H

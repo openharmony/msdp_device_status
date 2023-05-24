@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_SRV_STUB_H
-#define DEVICESTATUS_SRV_STUB_H
+#ifndef DEVICE_STATUS_SRV_STUB_H
+#define DEVICE_STATUS_SRV_STUB_H
 
 #include <iremote_stub.h>
 #include <nocopyable.h>
@@ -60,4 +60,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_SRV_STUB_H
+#endif // DEVICE_STATUS_SRV_STUB_H

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef UPDATEDRAGSTYLE_FUZZER_H
-#define UPDATEDRAGSTYLE_FUZZER_H
+#ifndef UPDATE_DRAG_STYLE_FUZZER_H
+#define UPDATE_DRAG_STYLE_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "updatedragstyle_fuzzer"
 
-#endif // UPDATEDRAGSTYLE_FUZZER_H
+#endif // UPDATE_DRAG_STYLE_FUZZER_H

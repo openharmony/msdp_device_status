@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MSDP_BYTRACE_ADAPTER_H
-#define OHOS_MSDP_BYTRACE_ADAPTER_H
+#ifndef BYTRACE_ADAPTER_H
+#define BYTRACE_ADAPTER_H
 
 #include <string.h>
 

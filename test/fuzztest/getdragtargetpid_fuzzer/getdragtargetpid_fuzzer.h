@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef GETDRAGTARGETPID_FUZZER_H
-#define GETDRAGTARGETPID_FUZZER_H
+#ifndef GET_DRAG_TARGET_PID_FUZZER_H
+#define GET_DRAG_TARGET_PID_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "getdragtargetpid_fuzzer"
 
-#endif // GETDRAGTARGETPID_FUZZER_H
+#endif // GET_DRAG_TARGET_PID_FUZZER_H

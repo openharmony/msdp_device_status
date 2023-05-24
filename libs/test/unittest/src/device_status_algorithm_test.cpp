@@ -31,7 +31,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 
 namespace {
-    std::shared_ptr<AlgoMgr> g_manager;
+std::shared_ptr<AlgoMgr> g_manager;
 }
 
 class DeviceStatusAlgorithmTest : public testing::Test {

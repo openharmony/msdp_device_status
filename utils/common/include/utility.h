@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MSDP_DEVICE_STATUS_UTILITY_H
-#define OHOS_MSDP_DEVICE_STATUS_UTILITY_H
+#ifndef UTILITY_H
+#define UTILITY_H
 
 #include <cstring>
 #include <sstream>
@@ -77,4 +77,4 @@ inline bool Utility::IsEqual(const char *s1, const char *s2)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_UTILITY_H
+#endif // UTILITY_H

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DEVICESTATUS_DEFINE_H
-#define DEVICESTATUS_DEFINE_H
+#ifndef DEVICE_STATUS_DEFINE_H
+#define DEVICE_STATUS_DEFINE_H
 
 #include "devicestatus_errors.h"
 #include "fi_log.h"
@@ -112,4 +112,4 @@ namespace DeviceStatus {
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_DEFINE_H
+#endif // DEVICE_STATUS_DEFINE_H

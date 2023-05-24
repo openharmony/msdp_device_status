@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef GETUDKEY_FUZZER_H
-#define GETUDKEY_FUZZER_H
+#ifndef GET_UDKEY_FUZZER_H
+#define GET_UDKEY_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "getudkey_fuzzer"
 
-#endif // GETUDKEY_FUZZER_H
+#endif // GET_UDKEY_FUZZER_H

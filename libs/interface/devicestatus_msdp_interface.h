@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_MSDP_INTERFACE_H
-#define DEVICESTATUS_MSDP_INTERFACE_H
+#ifndef DEVICE_STATUS_MSDP_INTERFACE_H
+#define DEVICE_STATUS_MSDP_INTERFACE_H
 
 #include <memory>
 
@@ -61,4 +61,4 @@ struct MsdpAlgoHandle {
 }
 }
 }
-#endif // DEVICESTATUS_MSDP_INTERFACE_H
+#endif // DEVICE_STATUS_MSDP_INTERFACE_H

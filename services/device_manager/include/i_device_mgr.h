@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_DEVICE_MAR_H
-#define I_DEVICE_MAR_H
+#ifndef I_DEVICE_MGR_H
+#define I_DEVICE_MGR_H
 
 class IDeviceMgr {
 public:
@@ -25,4 +25,4 @@ public:
     virtual void RemoveDevice(const std::string &devNode) = 0;
 };
 
-#endif // I_DEVICE_MAR_H
+#endif // I_DEVICE_MGR_H

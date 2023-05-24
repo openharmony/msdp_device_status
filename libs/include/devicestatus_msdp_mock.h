@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICESTATUS_MSDP_MOCK_H
-#define DEVICESTATUS_MSDP_MOCK_H
+#ifndef DEVICE_STATUS_MSDP_MOCK_H
+#define DEVICE_STATUS_MSDP_MOCK_H
 
 #include <atomic>
 #include <map>
@@ -78,4 +78,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICESTATUS_MSDP_MOCK_H
+#endif // DEVICE_STATUS_MSDP_MOCK_H
