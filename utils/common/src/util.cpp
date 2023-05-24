@@ -292,17 +292,6 @@ bool IsNum(const std::string &str)
     double num;
     return (sin >> num) && sin.eof();
 }
-
-int32_t ChangeNumber(int32_t num)
-{
-    if (num < 0) {
-        num = ~(num - 1);
-    } else if (num > 0) {
-        num = ~num + 1;
-    }
-    FI_HILOGD("Change number succeed, num:%{public}d", num);
-    return num;
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

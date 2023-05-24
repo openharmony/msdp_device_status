@@ -104,7 +104,6 @@ bool IsValidPath(const std::string &rootDir, const std::string &filePath);
 bool IsValidSvgPath(const std::string &filePath);
 bool IsValidSvgFile(const std::string &filePath);
 bool IsNum(const std::string &str);
-int32_t ChangeNumber(int32_t num);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

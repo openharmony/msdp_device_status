@@ -36,7 +36,7 @@ enum Type {
 
 enum TypeValue : bool {
     INVALID = false,
-    VALID = true,
+    VALID = true
 };
 
 enum OnChangedValue {

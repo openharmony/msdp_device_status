@@ -24,10 +24,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAgent" };
-std::mutex mutex_;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusAgent" };
 } // namespace
-
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
     const Data& devicestatusData)
 {

@@ -244,6 +244,7 @@ extern "C" IMsdp *Create(void)
 {
     CALL_DEBUG_ENTER;
     g_msdpMock = new (std::nothrow) DeviceStatusMsdpMock();
+    CHKPP(g_msdpMock);
     return g_msdpMock;
 }
 

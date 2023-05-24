@@ -153,7 +153,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     }
     int32_t id = GenerateId();
     TaskData data = {GetThisThreadId(), id};
-    auto res = write(fds_[1], &data, sizeof(data));
+    ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
         FI_HILOGE("Pipe write failed, errno:%{public}d", errno);

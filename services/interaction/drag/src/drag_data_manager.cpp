@@ -38,6 +38,7 @@ void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &po
     dragData_ = dragData;
     pointerStyle_ = pointerStyle;
     targetTid_ = -1;
+    targetPid_ = -1;
 }
 
 void DragDataManager::SetDragStyle(DragCursorStyle style)
@@ -78,6 +79,16 @@ void DragDataManager::SetTargetTid(int32_t targetTid)
 int32_t DragDataManager::GetTargetTid() const
 {
     return targetTid_;
+}
+
+void DragDataManager::SetTargetPid(int32_t pid)
+{
+    targetPid_ = pid;
+}
+
+int32_t DragDataManager::GetTargetPid() const
+{
+    return targetPid_;
 }
 
 int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
