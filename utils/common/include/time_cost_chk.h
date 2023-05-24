@@ -41,7 +41,7 @@ public:
     ~TimeCostChk(void)
     {
         int64_t ullCost = GetElapsed_micro();
-        if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
+        if ((ullCost > uiTime_) && (!strReason_.empty()) && (!strOutput_.empty())) {
             if (llParam1_ != 0 || llParam2_ != 0) {
                 FI_HILOGW("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
                          "(us)) when Reason:%{public}s,chk:%{public}s,"
