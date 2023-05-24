@@ -32,7 +32,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 std::mutex mutex_;
 } // namespace
 
-
 namespace {
 constexpr size_t EVENT_MAP_MAX = 20;
 } // namespace
@@ -277,16 +276,16 @@ void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, b
 
 void DeviceStatusEvent::ClearEventMap()
 {
-    for (auto iter : eventMap_) {
-        for (auto eventListener : iter.second) {
+    for (const auto &iter : eventMap_) {
+        for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
                 DEV_HILOGW(JS_NAPI, "Failed to delete reference");
             }
         }
     }
-    for (auto iter : eventOnceMap_) {
-        for (auto eventListener : iter.second) {
+    for (const auto &iter : eventOnceMap_) {
+        for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
                 DEV_HILOGW(JS_NAPI, "Failed to delete reference");

@@ -116,10 +116,16 @@ void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRe
 int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
-    CHKPR(callback, RET_ERR);
-    typeMap_.insert(std::make_pair(type, 1));
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
+    DEV_HILOGI(INNERKIT, "Enter event:%{public}d, latency:%{public}d", event, latency);
+    auto [_, ret] = typeMap_.insert(std::make_pair(type, 1));
+    if (!ret) {
+        DEV_HILOGW(SERVICE, "Insert pair to typeMap_ failed");
+    }
+    DEV_HILOGD(INNERKIT, "typeMap_:%{public}d, type:%{public}d", typeMap_[type], type);
+    if (callback == nullptr) {
+        DEV_HILOGE(SERVICE, "callback is nullptr");
+        return RET_ERR;
+    }
     if (Connect() != RET_OK) {
         DEV_HILOGE(SERVICE, "Connect failed");
         return RET_ERR;
@@ -136,10 +142,13 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 
 int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "UNevent: %{public}d", event);
-    CHKPR(callback, RET_ERR);
+    DEV_HILOGI(INNERKIT, "UNevent:%{public}d", event);
     typeMap_.erase(type);
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d", typeMap_[type]);
+    DEV_HILOGD(INNERKIT, "typeMap_:%{public}d", typeMap_[type]);
+    if (callback == nullptr) {
+        DEV_HILOGE(SERVICE, "callback is nullptr");
+        return RET_ERR;
+    }
     if (Connect() != RET_OK) {
         DEV_HILOGE(SERVICE, "Connect failed");
         return RET_ERR;
