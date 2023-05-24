@@ -160,7 +160,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
         DEV_HILOGE(SERVICE, "SensorDataCallbackImpl event is null");
         return;
     }
-    DEV_HILOGI(SERVICE, "SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
+    DEV_HILOGI(SERVICE, "SensorDataCallbackImpl sensorTypeId:%{public}d", event->sensorTypeId);
     SensorDataCallback::GetInstance().PushData(event->sensorTypeId, event->data);
 }
 
