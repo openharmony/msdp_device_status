@@ -461,9 +461,9 @@ void DeviceStatusService::OnSignalEvent(int32_t signalFd)
 {
     CALL_DEBUG_ENTER;
     signalfd_siginfo sigInfo;
-    int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        FI_HILOGE("Read signal info failed, invalid size:%{public}d, errno:%{public}d", size, errno);
+    ssize_t size = read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
+    if (size != static_cast<ssize_t>(sizeof(signalfd_siginfo))) {
+        FI_HILOGE("Read signal info failed, invalid size:%{public}zd, errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
@@ -494,7 +494,7 @@ void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
         return;
     }
     DelegateTasks::TaskData data {};
-    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
+    ssize_t res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
     if (res == -1) {
         FI_HILOGW("Read failed erron:%{public}d", errno);
     }
@@ -508,7 +508,7 @@ void DeviceStatusService::OnTimeout(const epoll_event &ev)
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         uint64_t expiration {};
-        int ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
+        ssize_t ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
         if (ret < 0) {
             FI_HILOGE("Read expiration failed:%{public}s", strerror(errno));
         }

@@ -25,7 +25,7 @@ static napi_module msdpCoordinationModule = {
     .nm_register_func = JsCoordinationContext::Export,
     .nm_modname = "cooperate",
     .nm_priv = ((void *)0),
-    .reserved = { 0 },
+    .reserved = { 0 }
 };
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)

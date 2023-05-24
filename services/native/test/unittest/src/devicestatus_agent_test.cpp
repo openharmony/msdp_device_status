@@ -296,7 +296,8 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
         ReportLatencyNs::LONG, agentEvent);
     EXPECT_TRUE(ret == RET_OK);
 
-    sptr<IRemoteDevStaCallback> callback = new DeviceStatusAgent::DeviceStatusAgentCallback(g_agent1);
+    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusAgent::DeviceStatusAgentCallback(g_agent1);
+    ASSERT_TRUE(callback != nullptr);
     Data devicestatusData = {
         Type::TYPE_LID_OPEN,
         OnChangedValue::VALUE_ENTER

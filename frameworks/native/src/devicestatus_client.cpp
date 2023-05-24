@@ -69,10 +69,7 @@ ErrCode DeviceStatusClient::Connect()
     }
 
     deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) DeviceStatusDeathRecipient());
-    if (deathRecipient_ == nullptr) {
-        DEV_HILOGE(INNERKIT, "Failed to create DeviceStatusDeathRecipient");
-        return ERR_NO_MEMORY;
-    }
+    CHKPR(deathRecipient_, ERR_NO_MEMORY);
 
     if (remoteObject->IsProxyObject()) {
         if (!remoteObject->AddDeathRecipient(deathRecipient_)) {

@@ -56,7 +56,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
@@ -76,7 +77,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
@@ -96,7 +98,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
@@ -116,7 +119,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
@@ -136,7 +140,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
@@ -156,7 +161,8 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     auto StationaryMgr = StationaryManager::GetInstance();
-    sptr<IRemoteDevStaCallback> cb = new DeviceStatusClientTestCallback();
+    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ASSERT_TRUE(cb != nullptr);
     GTEST_LOG_(INFO) << "Start register";
     StationaryMgr->SubscribeCallback(type, event, latency, cb);
     GTEST_LOG_(INFO) << "Cancell register";
