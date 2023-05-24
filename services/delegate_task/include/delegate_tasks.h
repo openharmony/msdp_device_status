@@ -98,7 +98,7 @@ private:
     uint64_t workerThreadId_ { 0 };
     int32_t fds_[2] = {};
     std::mutex mux_;
-    std::queue<TaskPtr> tasks_ {};
+    std::queue<TaskPtr> tasks_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

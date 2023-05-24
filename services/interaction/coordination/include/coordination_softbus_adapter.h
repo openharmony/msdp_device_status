@@ -41,7 +41,7 @@ public:
     struct DataPacket {
         MessageId messageId;
         uint32_t dataLen { 0 };
-        uint8_t data[0] {};
+        uint8_t data[0];
     };
 
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
@@ -70,13 +70,13 @@ private:
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
 
-    std::map<std::string, int32_t> sessionDevMap_ {};
-    std::map<std::string, bool> channelStatusMap_ {};
+    std::map<std::string, int32_t> sessionDevMap_;
+    std::map<std::string, bool> channelStatusMap_;
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
-    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvMap_ {};
+    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvMap_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

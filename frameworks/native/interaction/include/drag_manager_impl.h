@@ -50,7 +50,7 @@ public:
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
-    std::list<DragListenerPtr> dragListener_ {};
+    std::list<DragListenerPtr> dragListener_;
     std::function<void(const DragNotifyMsg&)> stopCallback_ { nullptr };
 };
 } // namespace DeviceStatus

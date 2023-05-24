@@ -53,7 +53,7 @@ public:
 private:
     T seed_ { 0 };
     const T maxLimit_ = std::numeric_limits<T>::max();
-    std::set<T> ids_ {};
+    std::set<T> ids_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

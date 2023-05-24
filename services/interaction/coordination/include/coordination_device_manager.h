@@ -82,7 +82,7 @@ private:
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
 
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
-    std::unordered_map<int32_t, std::shared_ptr<Device>> devices_ {};
+    std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
 #define COOR_DEV_MGR OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
 } // namespace DeviceStatus

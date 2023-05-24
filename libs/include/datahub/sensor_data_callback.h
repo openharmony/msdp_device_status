@@ -52,7 +52,7 @@ private:
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
 
     SensorUser user_;
-    std::list<AccelData> accelDataList_ {};
+    std::list<AccelData> accelDataList_;
     std::unique_ptr<std::thread> algorithmThread_ { nullptr };
     sem_t sem_;
     std::mutex callbackMutex_;

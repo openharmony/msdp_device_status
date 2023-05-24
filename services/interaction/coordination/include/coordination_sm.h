@@ -182,7 +182,7 @@ private:
 
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
-    std::pair<std::string, std::string> preparedNetworkId_ {};
+    std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
     std::string sinkNetworkId_;
@@ -190,7 +190,7 @@ private:
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
-    std::vector<std::string> onlineDevice_ {};
+    std::vector<std::string> onlineDevice_;
     mutable std::mutex mutex_;
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
@@ -201,9 +201,9 @@ private:
     int32_t interceptorId_ { -1 };
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
-    std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_ {};
-    std::function<void(std::string)> remoteNetworkIdCallback_ { nullptr };
-    std::function<void(int32_t, int32_t)> mouseLocationCallback_ { nullptr };
+    std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
+    std::function<void(std::string)> remoteNetworkIdCallback_;
+    std::function<void(int32_t, int32_t)> mouseLocationCallback_;
 };
 
 #define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()

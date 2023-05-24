@@ -117,7 +117,7 @@ private:
     std::string uniq_;
     std::string dhid_;
     std::string networkId_;
-    std::bitset<DEVICE_CAP_MAX> caps_ {};
+    std::bitset<DEVICE_CAP_MAX> caps_;
     uint8_t evBitmask_[NBYTES(EV_MAX)] {};
     uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
     uint8_t absBitmask_[NBYTES(ABS_MAX)] {};

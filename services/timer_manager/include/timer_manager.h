@@ -70,7 +70,7 @@ private:
 
     int timerFd_ { -1 };
     IContext *context_ { nullptr };
-    std::list<std::unique_ptr<TimerItem>> timers_ {};
+    std::list<std::unique_ptr<TimerItem>> timers_;
 };
 
 inline int TimerManager::GetTimerFd() const

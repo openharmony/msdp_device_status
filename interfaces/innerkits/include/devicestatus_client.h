@@ -84,8 +84,8 @@ private:
     std::mutex mutex_;
     int32_t tokenType_ { -1 };
     int32_t socketFd_ { -1 };
-    std::map<Type, int32_t> typeMap_ {};
-    std::function<void()> deathListener_ { nullptr };
+    std::map<Type, int32_t> typeMap_;
+    std::function<void()> deathListener_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

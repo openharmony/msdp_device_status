@@ -66,7 +66,7 @@ private:
 
 private:
     std::mutex lock_;
-    std::list<sptr<EventInfo>> remoteCoordinationCallbacks_ {};
+    std::list<sptr<EventInfo>> remoteCoordinationCallbacks_;
     std::map<EventType, sptr<EventInfo>> coordinationCallbacks_{
         {EventType::ENABLE, nullptr},
         {EventType::START, nullptr},
