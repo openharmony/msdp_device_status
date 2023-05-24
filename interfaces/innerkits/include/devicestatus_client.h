@@ -78,6 +78,7 @@ private:
 
     ErrCode Connect();
     void ResetProxy(const wptr<IRemoteObject>& remote);
+
     sptr<Idevicestatus> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
     std::mutex mutex_;

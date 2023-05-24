@@ -72,6 +72,7 @@ private:
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
     static std::unique_ptr<JsUtilCooperate::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+
     inline static std::map<CoordinationMessage, CooperateMessage> messageTransform = {
         { CoordinationMessage::PREPARE, CooperateMessage::STATE_ON },
         { CoordinationMessage::UNPREPARE, CooperateMessage::STATE_OFF },

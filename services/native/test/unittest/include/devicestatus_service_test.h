@@ -31,6 +31,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
     class DeviceStatusServiceTestCallback : public DeviceStatusCallbackStub {
     public:
         DeviceStatusServiceTestCallback() {};

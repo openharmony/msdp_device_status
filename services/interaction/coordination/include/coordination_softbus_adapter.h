@@ -69,6 +69,7 @@ private:
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
+
     std::map<std::string, int32_t> sessionDevMap_ {};
     std::map<std::string, bool> channelStatusMap_ {};
     std::mutex operationMutex_;

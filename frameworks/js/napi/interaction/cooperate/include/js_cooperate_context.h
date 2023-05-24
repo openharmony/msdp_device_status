@@ -37,6 +37,7 @@ public:
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
+
     std::shared_ptr<JsCooperateManager> GetJsCoordinationMgr();
 
 private:
@@ -46,6 +47,7 @@ private:
     static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+
     std::shared_ptr<JsCooperateManager> mgr_ { nullptr };
     std::mutex mutex_;
     napi_ref contextRef_ { nullptr };

@@ -58,6 +58,7 @@ public:
     static int32_t ConvertTypeToInt(const std::string &type);
     void OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce);
     static DeviceStatusNapi* GetDeviceStatusNapi();
+
     static std::map<int32_t, sptr<IRemoteDevStaCallback>> callbackMap_;
 
 private:
@@ -69,6 +70,7 @@ private:
     static std::tuple<bool, napi_value, int32_t, int32_t, bool> CheckUnsubscribeParam(napi_env env,
         napi_callback_info info);
     static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
+
     napi_ref callbackRef_ { nullptr };
     static napi_ref devicestatusValueRef_;
     napi_env env_ { nullptr };

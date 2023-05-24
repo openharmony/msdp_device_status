@@ -68,6 +68,7 @@ protected:
     bool GetData(int32_t sensorTypeId, AccelData* sensorData);
     virtual void ExecuteOperation() = 0;
     void UpdateStateAndReport(OnChangedValue value, int32_t state, Type type);
+
     SensorCallback algoCallback_ { nullptr };
     std::shared_ptr<IMsdp::MsdpAlgoCallback> callback_ { nullptr };
 };

@@ -47,6 +47,7 @@ private:
     static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+
     std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };
     std::mutex mutex_;
     napi_ref contextRef_ { nullptr };

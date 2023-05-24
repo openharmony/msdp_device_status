@@ -61,6 +61,7 @@ private:
     void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     void ReleaseReference();
     bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+
     std::atomic_bool hasRegistered_ { false };
     inline static std::mutex mutex_;
     inline static std::vector<std::unique_ptr<CallbackInfo>> listeners_ {};

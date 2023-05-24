@@ -103,6 +103,7 @@ private:
     int32_t ReadTomlFile(const std::string &filePath);
     void JudgeKeyboardType();
     void LoadDeviceConfig();
+
     int32_t fd_ { -1 };
     int32_t deviceId_ { -1 };
     int32_t bus_ { 0 };

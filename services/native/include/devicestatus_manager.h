@@ -63,6 +63,8 @@ private:
             return left->AsObject() < right->AsObject();
         }
     };
+    static constexpr uint8_t arg4_ { 4 };
+
     const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_ { nullptr };
@@ -71,7 +73,6 @@ private:
     std::map<Type, std::set<const sptr<IRemoteDevStaCallback>, classcomp>> listenerMap_ {};
     int32_t type_ { -1 };
     int32_t event_ { -1 };
-    static constexpr uint8_t arg4_ { 4 };
     int arrs_ [arg4_] {};
 };
 } // namespace DeviceStatus
