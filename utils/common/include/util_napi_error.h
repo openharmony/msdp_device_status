@@ -38,14 +38,14 @@ enum NapiErrorCode : int32_t {
     OTHER_ERROR = -1,
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_PARAMETER_ERROR = 401,
-    COOPERATOR_FAIL = 20900001,
+    COOPERATOR_FAIL = 20900001
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PERMISSION_CHECK_ERROR,
         {COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
     {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
-    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}},
+    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}}
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \

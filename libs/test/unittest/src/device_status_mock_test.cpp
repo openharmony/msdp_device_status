@@ -17,9 +17,12 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-
 #include "devicestatus_common.h"
 #include "devicestatus_data_define.h"
+#define private public
+#include "devicestatus_data_parse.h"
+#include "devicestatus_msdp_mock.h"
+#undef private
 #include "devicestatus_msdp_interface.h"
 #include "devicestatus_msdp_mock.h"
 #include "devicestatus_msdp_client_impl.h"
@@ -269,4 +272,45 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest013, TestSize.Level1)
     int32_t ret = g_testMock->GetDeviceStatusData();
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus NotifyMsdpImpl
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 start";
+    g_testMock->GetCallbackImpl() = nullptr;
+    EXPECT_FALSE(g_testMock->NotifyMsdpImpl({}) == ERR_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest014 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus NotifyMsdpImpl
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest015 start";
+    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
+    EXPECT_FALSE(g_testMock->NotifyMsdpImpl({TYPE_INVALID, VALUE_INVALID}) == ERR_OK);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest015 end";
+}
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus NotifyMsdpImpl
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest016 start";
+    g_testMock->dataParse_ = nullptr;
+    int32_t ret = g_testMock->GetDeviceStatusData();
+    EXPECT_TRUE(ret == RET_ERR);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest016 end";
 }

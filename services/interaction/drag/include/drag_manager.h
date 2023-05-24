@@ -47,9 +47,8 @@ public:
     int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey) const;
-    void SetDragTargetPid(int32_t dragTargetPid);
-    void SendDragData(int32_t targetPid, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style);
+    void SendDragData(int32_t targetTid, const std::string &udKey);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -68,12 +67,12 @@ public:
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
         IContext* context_ { nullptr };
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 private:
     int32_t AddDragEventInterceptor(int32_t sourceType);
     int32_t NotifyDragResult(DragResult result);
-    int32_t InitDataAdapter(const DragData &dragData) const;
+    int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
     std::string GetDragState(DragState value) const;
@@ -88,11 +87,10 @@ private:
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t interceptorId_ { -1 };
-    int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
-    std::function<void(DragState)> stateChangedCallback_;
+    std::function<void(DragState)> stateChangedCallback_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

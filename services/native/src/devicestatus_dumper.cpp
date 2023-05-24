@@ -300,14 +300,14 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CALL_DEBUG_ENTER;
     CHKPV(appInfo);
     CHKPV(appInfo->callback);
-    FI_HILOGI("appInfoMap size=%{public}zu", appInfoMap_.size());
+    FI_HILOGI("appInfoMap size:%{public}zu", appInfoMap_.size());
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
-        FI_HILOGE("not exist %d type appInfo", appInfo->type);
+        FI_HILOGE("not exist %{public}d type appInfo", appInfo->type);
         return;
     }
-    FI_HILOGI("callbacklist type=%d size=%{public}zu",
+    FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu",
         appInfo->type, appInfoMap_[appInfoSetIter->first].size());
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {

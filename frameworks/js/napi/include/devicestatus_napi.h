@@ -63,11 +63,11 @@ public:
 
 private:
     static bool CheckArguments(napi_env env, napi_callback_info info);
-    static bool CheckUnsubArguments(napi_env env, napi_callback_info info);
+    static bool IsMatchCallbackType(napi_env &env, napi_value &value);
     static bool CheckGetArguments(napi_env env, napi_callback_info info);
     static std::tuple<bool, napi_value, std::string, int32_t, int32_t> CheckSubscribeParam(napi_env env,
         napi_callback_info info);
-    static std::tuple<bool, napi_value, int32_t, int32_t> CheckUnsubscribeParam(napi_env env,
+    static std::tuple<bool, napi_value, int32_t, int32_t, bool> CheckUnsubscribeParam(napi_env env,
         napi_callback_info info);
     static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
     napi_ref callbackRef_ = { nullptr };

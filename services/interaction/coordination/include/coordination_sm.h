@@ -35,7 +35,7 @@ namespace DeviceStatus {
 enum class CoordinationState {
     STATE_FREE = 0,
     STATE_IN = 1,
-    STATE_OUT = 2,
+    STATE_OUT = 2
 };
 
 enum class CoordinationMsg {
@@ -49,7 +49,7 @@ enum class CoordinationMsg {
     COORDINATION_STOP = 7,
     COORDINATION_STOP_SUCCESS = 8,
     COORDINATION_STOP_FAIL = 9,
-    COORDINATION_NULL = 10,
+    COORDINATION_NULL = 10
 };
 
 enum class CooStateChangeType {
@@ -57,7 +57,7 @@ enum class CooStateChangeType {
     STATE_FREE_TO_IN = 0,
     STATE_FREE_TO_OUT = 1,
     STATE_IN_TO_FREE = 2,
-    STATE_OUT_TO_FREE = 3,
+    STATE_OUT_TO_FREE = 3
 };
 
 struct PointerFilter : public MMI::IInputEventFilter {
@@ -115,7 +115,7 @@ class CoordinationSM final {
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 
 public:

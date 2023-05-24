@@ -36,7 +36,7 @@ enum EpollEventType {
     EPOLL_EVENT_ETASK,
     EPOLL_EVENT_TIMER,
     EPOLL_EVENT_DEVICE_MGR,
-    EPOLL_EVENT_END,
+    EPOLL_EVENT_END
 };
 
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;

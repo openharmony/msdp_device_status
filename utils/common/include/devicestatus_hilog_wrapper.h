@@ -61,7 +61,7 @@ enum DeviceStatusSubModule {
     SERVICE,
     JS_NAPI,
     COMMON,
-    BUTT,
+    BUTT
 };
 
 // 0xD002220: subsystem:Msdp module:DeviceStatus, 8 bits reserved.
@@ -72,14 +72,14 @@ enum DeviceStatusDomainId {
     DEVICESTATUS_SERVICE_DOMAIN,
     DEVICESTATUS_JS_NAPI,
     DEVICESTATUS_COMMON,
-    DEVICESTATUS_BUTT,
+    DEVICESTATUS_BUTT
 };
 
 static constexpr OHOS::HiviewDFX::HiLogLabel DEVICESTATUS_LABEL[BUTT] = {
     {LOG_CORE, DEVICESTATUS_INNERKIT_DOMAIN, "DeviceStatusClient"},
     {LOG_CORE, DEVICESTATUS_SERVICE_DOMAIN, "DeviceStatusService"},
     {LOG_CORE, DEVICESTATUS_JS_NAPI, "DeviceStatusJsNapi"},
-    {LOG_CORE, DEVICESTATUS_COMMON, "DeviceStatusCommon"},
+    {LOG_CORE, DEVICESTATUS_COMMON, "DeviceStatusCommon"}
 };
 
 // In order to improve performance, do not check the module range.

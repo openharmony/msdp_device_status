@@ -43,10 +43,10 @@ std::optional <std::string> GetErrMsg(int32_t errorCode)
 
 void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
 {
-    DEV_HILOGE(JS_NAPI, "message: %{public}s, code: %{public}d", printMsg.c_str(), errCode);
+    DEV_HILOGE(JS_NAPI, "message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
     auto msg = GetErrMsg(errCode);
     if (!msg) {
-        DEV_HILOGE(JS_NAPI, "errCode: %{public}d is invalid", errCode);
+        DEV_HILOGE(JS_NAPI, "errCode:%{public}d is invalid", errCode);
         return;
     }
     napi_value error = CreateNapiError(env, errCode, msg.value());

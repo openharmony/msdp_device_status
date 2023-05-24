@@ -23,6 +23,7 @@
 #include "devicestatus_data_define.h"
 #include "devicestatus_errors.h"
 #include "fi_log.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -100,6 +101,10 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     cJSON* mockvalue = cJSON_GetArrayItem(mockarray, tempcount_[type]);
     tempcount_[type]++;
     data.type = type;
+    if (mockvalue == nullptr || !cJSON_IsNumber(mockvalue)) {
+        FI_HILOGE("json parser number is failed");
+        return false;
+    } 
     data.value = static_cast<OnChangedValue>(mockvalue->valueint);
     FI_HILOGD("type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
@@ -131,7 +136,7 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
         FI_HILOGE("Unable to parse files other than json format");
         return "";
     }
-    if (!IsFileExists(filePath)) {
+    if (!Utility::DoesFileExist(filePath.c_str())) {
         FI_HILOGE("File not exist");
         return "";
     }
@@ -179,11 +184,6 @@ bool DeviceStatusDataParse::CheckFileExtendName(const std::string& filePath, con
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
-}
-
-bool DeviceStatusDataParse::IsFileExists(const std::string& fileName)
-{
-    return (access(fileName.c_str(), F_OK) == 0);
 }
 
 std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)

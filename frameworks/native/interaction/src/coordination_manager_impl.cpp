@@ -214,7 +214,7 @@ void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool st
     CHKPV(event);
     event(state);
     devCoordinationEvent_.erase(iter);
-    FI_HILOGD("Coordination state event callback userData:%{public}d state:(%{public}d)", userData, state);
+    FI_HILOGD("Coordination state event callback, userData:%{public}d, state:(%{public}d)", userData, state);
 }
 
 int32_t CoordinationManagerImpl::GetUserData()

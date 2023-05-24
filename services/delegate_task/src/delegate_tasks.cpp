@@ -31,12 +31,12 @@ void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;
     if (hasWaited_) {
-        FI_HILOGE("Expired tasks will be discarded. id:%{public}d", id_);
+        FI_HILOGE("Expired tasks will be discarded, id:%{public}d", id_);
         return;
     }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
-    FI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
+    FI_HILOGD("process:%{public}s, task id:%{public}d, ret:%{public}d", taskType.c_str(), id_, ret);
     if (!hasWaited_ && promise_ != nullptr) {
         promise_->set_value(ret);
     }
@@ -59,16 +59,16 @@ bool DelegateTasks::Init()
     CALL_DEBUG_ENTER;
     int32_t res = pipe(fds_);
     if (res == -1) {
-        FI_HILOGE("The pipe create failed,errno:%{public}d", errno);
+        FI_HILOGE("The pipe create failed, errno:%{public}d", errno);
         return false;
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
-        FI_HILOGE("The fcntl read failed,errno:%{public}d", errno);
+        FI_HILOGE("The fcntl read failed, errno:%{public}d", errno);
         close(fds_[0]);
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
-        FI_HILOGE("The fcntl write failed,errno:%{public}d", errno);
+        FI_HILOGE("The fcntl write failed, errno:%{public}d", errno);
         close(fds_[1]);
         return false;
     }
@@ -144,19 +144,19 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
-    FI_HILOGD("tasks_ size %{public}d", static_cast<int32_t>(tasks_.size()));
+    FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
     static constexpr int32_t maxTasksLimit = 1000;
     auto tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
-        FI_HILOGE("The task queue is full. size:%{public}zu/%{public}d", tsize, maxTasksLimit);
+        FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
     }
     int32_t id = GenerateId();
     TaskData data = {GetThisThreadId(), id};
-    auto res = write(fds_[1], &data, sizeof(data));
+    ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        FI_HILOGE("Pipe write failed,errno:%{public}d", errno);
+        FI_HILOGE("Pipe write failed, errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);

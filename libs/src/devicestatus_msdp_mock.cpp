@@ -103,7 +103,7 @@ ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data& data)
     CALL_DEBUG_ENTER;
     CHKPR(g_msdpMock, RET_ERR);
     CHKPR(g_msdpMock->GetCallbackImpl(), RET_ERR);
-    FI_HILOGI("type:%{public}d,value:%{public}d", data.type, data.value);
+    FI_HILOGI("type:%{public}d, value:%{public}d", data.type, data.value);
     g_msdpMock->GetCallbackImpl()->OnResult(data);
     return RET_OK;
 }
@@ -125,7 +125,10 @@ void DeviceStatusMsdpMock::InitTimer()
     }
     SetTimerInterval(TIMER_INTERVAL);
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-    callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    if (!ret) {
+        DEV_HILOGW(SERVICE, "insert timer fd failed");
+    }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
         FI_HILOGE("register timer fd failed");
         return;
@@ -172,7 +175,7 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    for (auto item : enabledType_) {
+    for (const auto &item : enabledType_) {
         Type type = item;
         if (dataParse_ == nullptr) {
             FI_HILOGE("dataParse_ is nullptr");
@@ -180,7 +183,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
         }
         Data data;
         dataParse_->ParseDeviceStatusData(data, type);
-        FI_HILOGD("mock type: %{public}d,value: %{public}d", data.type, data.value);
+        FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
     return RET_OK;
@@ -241,6 +244,7 @@ extern "C" IMsdp *Create(void)
 {
     CALL_DEBUG_ENTER;
     g_msdpMock = new (std::nothrow) DeviceStatusMsdpMock();
+    CHKPP(g_msdpMock);
     return g_msdpMock;
 }
 

@@ -84,11 +84,12 @@ DragData CreateDragData(const uint8_t* data, size_t size)
 
 void StartDragFuzzTest(const uint8_t* data, size_t  size)
 {
+    CALL_DEBUG_ENTER;
     if (data == nullptr) {
         return;
     }
     auto func = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("StartDragFuzzTest:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+        FI_HILOGD("Start drag fuzz test:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
     };
     DragData dragData = CreateDragData(data, size);
