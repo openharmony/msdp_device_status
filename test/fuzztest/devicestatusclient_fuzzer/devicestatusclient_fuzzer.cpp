@@ -23,7 +23,7 @@
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
-auto StationaryMgr = StationaryManager::GetInstance();
+auto stationaryMgr = StationaryManager::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb =
     new (std::nothrow) DeviceStatusClientFuzzer::DeviceStatusTestCallback();
 const int WAIT_TIME = 1000;
