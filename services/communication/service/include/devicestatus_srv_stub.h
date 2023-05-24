@@ -33,6 +33,7 @@ public:
     virtual ~DeviceStatusSrvStub() = default;
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     int32_t SubscribeStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnsubscribeStub(MessageParcel& data, MessageParcel& reply);

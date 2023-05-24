@@ -89,6 +89,7 @@ public:
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
+
 private:
     bool Init();
     int32_t InitDelegateTasks();

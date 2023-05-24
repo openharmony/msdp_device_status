@@ -71,6 +71,7 @@ private:
         DeviceStatusDeathRecipient() = default;
         ~DeviceStatusDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote);
+
     private:
         DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };

@@ -183,9 +183,9 @@ private:
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_ {};
-    std::string startDeviceDhid_ { "" };
-    std::string remoteNetworkId_ { "" };
-    std::string sinkNetworkId_ { "" };
+    std::string startDeviceDhid_;
+    std::string remoteNetworkId_;
+    std::string sinkNetworkId_;
     bool isUnchained_ { false };
     CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };

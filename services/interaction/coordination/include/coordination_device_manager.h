@@ -50,8 +50,8 @@ public:
         std::string GenerateDescriptor();
         std::string Sha256(const std::string &in) const;
         std::shared_ptr<IDevice> device_ { nullptr };
-        std::string dhid_ { "" };
-        std::string networkId_ { "" };
+        std::string dhid_;
+        std::string networkId_;
     };
 
 private:
