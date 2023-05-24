@@ -43,7 +43,7 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
         return;
     }
 
-    StationaryMgr->SubscribeCallback(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
+    stationaryMgr->SubscribeCallback(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestGetDevicestatusData(static_cast<Type>(type[0]));
@@ -52,7 +52,7 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 void DeviceStatusClientFuzzer::TestGetDevicestatusData(Type type)
 {
     std::cout << "TestGetDevicestatusData: Enter " << std::endl;
-    StationaryMgr->GetDeviceStatusData(type);
+    stationaryMgr->GetDeviceStatusData(type);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
     TestUnSubscribeCallback(type);
@@ -62,7 +62,7 @@ void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
 {
     std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
 
-    StationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
+    stationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
