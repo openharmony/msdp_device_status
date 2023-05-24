@@ -47,6 +47,13 @@ struct DragData {
     bool hasCanceledAnimation { false };
 };
 
+enum class DragState {
+    ERROR = 0,
+    START = 1,
+    STOP = 2,
+    CANCEL = 3
+};
+
 enum class DragResult {
     DRAG_SUCCESS = 0,
     DRAG_FAIL = 1,

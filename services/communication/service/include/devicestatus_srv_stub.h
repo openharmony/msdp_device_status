@@ -33,12 +33,12 @@ public:
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-    int32_t HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t SubscribeStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnsubscribeStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply);
 
+    int32_t HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply);
     int32_t RegisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnregisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
     int32_t PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply);

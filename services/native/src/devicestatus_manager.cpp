@@ -60,7 +60,7 @@ Data DeviceStatusManager::GetLatestDeviceStatusData(Type type)
     CALL_DEBUG_ENTER;
     Data data = {type, OnChangedValue::VALUE_EXIT};
     if (msdpImpl_ == nullptr) {
-        FI_HILOGE("GetObserverData func is nullptr,return default");
+        FI_HILOGE("GetObserverData func is nullptr, return default");
         data.value = OnChangedValue::VALUE_INVALID;
         return data;
     }
@@ -141,7 +141,7 @@ int32_t DeviceStatusManager::MsdpDataCallback(const Data& data)
 int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusData)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("type:%{public}d,value:%{public}d", devicestatusData.type, devicestatusData.value);
+    FI_HILOGI("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     auto iter = listenerMap_.find(devicestatusData.type);
     if (iter == listenerMap_.end()) {
@@ -154,7 +154,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
             FI_HILOGE("Listener is nullptr");
             return false;
         }
-        FI_HILOGI("type:%{public}d,arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
+        FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
         switch (arrs_[devicestatusData.type]) {
             case ENTER: {
                 if (devicestatusData.value == VALUE_ENTER) {
@@ -189,7 +189,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     event_ = event;
     type_ = type;
     arrs_ [type_] = event_;
-    FI_HILOGI("arr save:%{public}d ,event:%{public}d", type_, event);
+    FI_HILOGI("arr save:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     FI_HILOGI("listenerMap_.size:%{public}zu", listenerMap_.size());
     auto object = callback->AsObject();
@@ -214,7 +214,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
         }
     }
     if (!Enable(type)) {
-        FI_HILOGE("Enable failed!");
+        FI_HILOGE("Enable failed");
         return;
     }
 }
@@ -225,8 +225,8 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     CHKPV(callback);
     auto object = callback->AsObject();
     CHKPV(object);
-    FI_HILOGE("listenerMap_.size:%{public}zu,arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
-    FI_HILOGE("UNevent: %{public}d", event);
+    FI_HILOGE("listenerMap_.size:%{public}zu, arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
+    FI_HILOGE("UNevent:%{public}d", event);
     std::lock_guard lock(mutex_);
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {

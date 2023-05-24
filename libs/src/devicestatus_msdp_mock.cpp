@@ -103,7 +103,7 @@ ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data& data)
     CALL_DEBUG_ENTER;
     CHKPR(g_msdpMock, RET_ERR);
     CHKPR(g_msdpMock->GetCallbackImpl(), RET_ERR);
-    FI_HILOGI("type:%{public}d,value:%{public}d", data.type, data.value);
+    FI_HILOGI("type:%{public}d, value:%{public}d", data.type, data.value);
     g_msdpMock->GetCallbackImpl()->OnResult(data);
     return RET_OK;
 }
@@ -180,7 +180,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
         }
         Data data;
         dataParse_->ParseDeviceStatusData(data, type);
-        FI_HILOGD("mock type: %{public}d,value: %{public}d", data.type, data.value);
+        FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
     return RET_OK;

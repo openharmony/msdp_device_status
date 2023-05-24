@@ -63,8 +63,8 @@ private:
     void OnMsgHandler(const StreamClient& client, NetPacket& pkt);
 
 private:
-    ConnectCallback funConnected_;
-    ConnectCallback funDisconnected_;
+    ConnectCallback funConnected_ { nullptr };
+    ConnectCallback funDisconnected_ { nullptr };
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
     EventHandlerPtr eventHandler_ { nullptr };

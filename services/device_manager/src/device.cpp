@@ -63,7 +63,7 @@ int32_t Device::Open()
     CALL_DEBUG_ENTER;
     char buf[PATH_MAX] {};
     if (realpath(devPath_.c_str(), buf) == nullptr) {
-        FI_HILOGE("Not real path: %{public}s", devPath_.c_str());
+        FI_HILOGE("Not real path:%{public}s", devPath_.c_str());
         return RET_ERR;
     }
 
@@ -74,7 +74,7 @@ int32_t Device::Open()
 
         fd_ = open(buf, O_RDWR | O_NONBLOCK | O_CLOEXEC);
         if (fd_ < 0) {
-            FI_HILOGE("Unable to open device \'%{public}s\': %{public}s", buf, strerror(errno));
+            FI_HILOGE("Unable to open device \'%{public}s\':%{public}s", buf, strerror(errno));
             if (nRetries-- > 0) {
                 static constexpr int32_t DEFAULT_WAIT_TIME { 500 };
                 std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME));
@@ -108,7 +108,7 @@ void Device::Dispatch(const struct epoll_event &ev)
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         FI_HILOGD("input data received");
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup: %{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
 }
 
@@ -118,7 +118,7 @@ void Device::QueryDeviceInfo()
     char buffer[PATH_MAX] = { 0 };
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get device name: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get device name:%{public}s", strerror(errno));
     } else {
         name_.assign(buffer);
     }
@@ -126,7 +126,7 @@ void Device::QueryDeviceInfo()
     struct input_id inputId;
     rc = ioctl(fd_, EVIOCGID, &inputId);
     if (rc < 0) {
-        FI_HILOGE("Could not get device input id: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get device input id:%{public}s", strerror(errno));
     } else {
         bus_ = inputId.bustype;
         product_ = inputId.product;
@@ -141,7 +141,7 @@ void Device::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get location: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get location:%{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
@@ -152,7 +152,7 @@ void Device::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get uniq:%{public}s", strerror(errno));
     } else {
         uniq_.assign(buffer);
     }
@@ -163,23 +163,23 @@ void Device::QuerySupportedEvents()
     CALL_DEBUG_ENTER;
     int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get events mask: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get events mask:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get key events mask: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get key events mask:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get abs events mask:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get rel events mask:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get properties mask: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get properties mask:%{public}s", strerror(errno));
     }
 }
 
@@ -239,7 +239,7 @@ void Device::CheckKeys()
     for (size_t block { 0U }; block < (sizeof(KEY_BLOCKS) / sizeof(struct range)); ++block) {
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
-                FI_HILOGD("Found key %{public}zx", key);
+                FI_HILOGD("Found key:%{public}zx", key);
                 caps_.set(DEVICE_CAP_KEYBOARD);
                 return;
             }
@@ -320,13 +320,13 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
     CALL_DEBUG_ENTER;
     char temp[PATH_MAX] {};
     if (realpath(filePath.c_str(), temp) == nullptr) {
-        FI_HILOGE("Not real path (\'%{public}s\'): %{public}s", filePath.c_str(), strerror(errno));
+        FI_HILOGE("Not real path (\'%{public}s\'):%{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
-    FI_HILOGD("config file path: %{public}s", temp);
+    FI_HILOGD("config file path:%{public}s", temp);
 
     if (!Utility::DoesFileExist(temp)) {
-        FI_HILOGE("File does not exist: %{public}s", temp);
+        FI_HILOGE("File does not exist:%{public}s", temp);
         return RET_ERR;
     }
     if (Utility::GetFileSize(temp) > MAX_FILE_SIZE_ALLOWED) {
@@ -378,7 +378,7 @@ void Device::LoadDeviceConfig()
     } else {
         keyboardType_ = IDevice::KEYBOARD_TYPE_NONE;
     }
-    FI_HILOGD("keyboard type: %{public}d", keyboardType_);
+    FI_HILOGD("keyboard type:%{public}d", keyboardType_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

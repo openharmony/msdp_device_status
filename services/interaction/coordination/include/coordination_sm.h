@@ -115,7 +115,7 @@ class CoordinationSM final {
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 
 public:

@@ -262,7 +262,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     CALL_INFO_TRACE;
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
-        FI_HILOGE("Failed to search for the device:id %{public}d", id);
+        FI_HILOGE("Failed to search for the device, id:%{public}d", id);
         return "";
     }
     CHKPS(devIter->second);
@@ -325,10 +325,9 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     if (dev->IsKeyboard()) {
         COOR_SM->OnKeyboardOnline(dev->GetDhid());
     }
-    FI_HILOGD("add device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
-    FI_HILOGD("  Dhid:          \"%{public}s\"", dev->GetDhid().c_str());
-    FI_HILOGD("  Network id:    \"%{public}s\"", dev->GetNetworkId().c_str());
-    FI_HILOGD("  local/remote:  \"%{public}s\"", dev->IsRemote() ? "Remote Device" : "Local Device");
+    FI_HILOGD("add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
+        "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
+        dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
