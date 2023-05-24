@@ -61,7 +61,7 @@ public:
     static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum);
 };
 
-void InteractionDragDrawingTest::SetUpTestCase(){}
+void InteractionDragDrawingTest::SetUpTestCase() {}
 
 void InteractionDragDrawingTest::SetUp() {}
 
@@ -74,7 +74,7 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
 {
     CALL_DEBUG_ENTER;
     if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
-       height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
         return nullptr;
     }
@@ -101,7 +101,8 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
     return pixelMap;
 }
 
-std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum)
+std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourceType,
+    int32_t pointerId, int32_t dragNum)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);

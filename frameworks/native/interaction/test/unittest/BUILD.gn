@@ -65,7 +65,7 @@ group("unittest") {
   testonly = true
   deps = []
   deps += [
-    ":InteractionManagerTest",
     ":InteractionDragDrawingTest",
+    ":InteractionManagerTest",
   ]
 }
