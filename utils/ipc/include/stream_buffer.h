@@ -75,7 +75,7 @@ protected:
     int32_t wCount_ { 0 };
     int32_t rPos_ { 0 };
     int32_t wPos_ { 0 };
-    char szBuff_[MAX_STREAM_BUF_SIZE+1] {};
+    char szBuff_[MAX_STREAM_BUF_SIZE + 1] = {};
 };
 
 template<typename T>
