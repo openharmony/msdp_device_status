@@ -302,7 +302,7 @@ bool StreamServer::AddSession(SessionPtr ses)
         return false;
     }
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        FI_HILOGE("Too many clients, Warning Value:%{public}d, Current Value:%{public}zd",
+        FI_HILOGE("Too many clients, Warning Value:%{public}zu, Current Value:%{public}zu",
             MAX_SESSON_ALARM, sessionsMap_.size());
         return false;
     }
