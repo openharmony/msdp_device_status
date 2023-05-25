@@ -46,11 +46,7 @@ ohos_unittest("InteractionDragDrawingTest") {
     "${device_status_utils_path}/include",
   ]
 
-  defines = []
-
   sources = [ "src/interaction_drag_drawing_test.cpp" ]
-
-  configs = []
 
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [
