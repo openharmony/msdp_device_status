@@ -73,8 +73,7 @@ void InteractionDragDrawingTest::TearDown()
 std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int32_t width, int32_t height)
 {
     CALL_DEBUG_ENTER;
-    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
-        height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
         FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
         return nullptr;
     }
