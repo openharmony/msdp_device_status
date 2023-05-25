@@ -23,9 +23,13 @@
 #include "napi/native_node_api.h"
 
 #include "devicestatus_common.h"
+#include "devicestatus_define.h"
 
 using namespace OHOS::Msdp;
 using namespace OHOS::Msdp::DeviceStatus;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
+} // namespace
 
 namespace {
 constexpr size_t EVENT_MAP_MAX = 20;
@@ -175,6 +179,7 @@ bool DeviceStatusEvent::RemoveAllCallback(int32_t eventType)
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
+    CHKPV(typeHandler);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     if (scope == nullptr) {
@@ -189,7 +194,7 @@ void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
         napi_close_handle_scope(env_, scope);
         return;
     }
-    napi_value result;
+    napi_value result = nullptr;
     SendRet(eventType, value, result);
     napi_value callResult = nullptr;
     DEV_HILOGD(JS_NAPI, "Report to hap");
