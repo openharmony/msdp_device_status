@@ -37,6 +37,8 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t PIXEL_MAP_WIDTH { 300 };
 constexpr int32_t PIXEL_MAP_HEIGHT { 300 };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t POINTER_ID { 0 };
 constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DISPLAY_X { 300 };
