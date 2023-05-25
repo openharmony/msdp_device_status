@@ -57,7 +57,7 @@ protected:
     bool isConnected_ { false };
     MsgClientFunCallback recvFun_ { nullptr };
 };
-} //
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_CLIENT_H

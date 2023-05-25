@@ -34,7 +34,7 @@ using namespace std;
 
 namespace {
 const int32_t SLEEP_TIME = 2000;
-static Type g_type = Type::TYPE_INVALID;
+Type g_type = Type::TYPE_INVALID;
 auto g_client = StationaryManager::GetInstance();
 }
 

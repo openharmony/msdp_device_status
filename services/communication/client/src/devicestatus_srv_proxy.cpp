@@ -121,8 +121,8 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t devicestatusValue = -1;
     READINT32(reply, devicestatusType, devicestatusData);
     READINT32(reply, devicestatusValue, devicestatusData);
-    devicestatusData.type = Type(devicestatusType);
-    devicestatusData.value = OnChangedValue(devicestatusValue);
+    devicestatusData.type = static_cast<Type>(devicestatusType);
+    devicestatusData.value = static_cast<OnChangedValue>(devicestatusValue);
     FI_HILOGD("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     return devicestatusData;
 }
@@ -508,5 +508,5 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     return ret;
 }
 } // namespace DeviceStatus
-} // Msdp
-} // OHOS
+} // namespace Msdp
+} // namespace OHOS

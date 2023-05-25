@@ -37,7 +37,7 @@ constexpr size_t ARG_2 = 2;
 constexpr size_t ARG_3 = 3;
 constexpr size_t ARG_4 = 4;
 constexpr int32_t NAPI_BUF_LENGTH  = 256;
-static const std::vector<std::string> vecDeviceStatusValue {
+const std::vector<std::string> vecDeviceStatusValue {
     "VALUE_ENTER", "VALUE_EXIT"
 };
 thread_local DeviceStatusNapi *g_obj = nullptr;
@@ -377,8 +377,8 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     sptr<IRemoteDevStaCallback> callback;
     callback = new (std::nothrow) DeviceStatusCallback(env);
     CHKPP(callback);
-    auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(Type(type),
-        ActivityEvent(event), ReportLatencyNs(latency), callback);
+    auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
+        static_cast<ActivityEvent>(event), static_cast<ReportLatencyNs>(latency), callback);
     if (subscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "on: Failed to SubscribeCallback");
         return nullptr;
@@ -435,8 +435,8 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        auto unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(Type(type),
-            ActivityEvent(event), callbackIter->second);
+        auto unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
+            static_cast<ActivityEvent>(event), callbackIter->second);
         if (unsubscribeRet != RET_OK) {
             ThrowErr(env, SERVICE_EXCEPTION, "off: Failed to UnsubscribeCallback");
         }
@@ -473,7 +473,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
         DEV_HILOGE(JS_NAPI, "type:%{public}d already exists", type);
         return nullptr;
     }
-    Data devicestatusData = StationaryManager::GetInstance()->GetDeviceStatusData(Type(type));
+    Data devicestatusData = StationaryManager::GetInstance()->GetDeviceStatusData(static_cast<Type>(type));
     if (devicestatusData.type == Type::TYPE_INVALID) {
         ThrowErr(env, SERVICE_EXCEPTION, "once: Failed to GetDeviceStatusData");
     }

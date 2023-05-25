@@ -58,7 +58,7 @@ struct MsdpAlgoHandle {
         pAlgorithm = nullptr;
     }
 };
-}
-}
-}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
 #endif // DEVICESTATUS_MSDP_INTERFACE_H

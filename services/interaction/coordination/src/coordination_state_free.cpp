@@ -76,7 +76,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
         FI_HILOGE("Stop coordination fail");
         return ret;
     }
-    
+
     if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
         FI_HILOGD("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
             preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
