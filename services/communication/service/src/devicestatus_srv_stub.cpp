@@ -292,12 +292,6 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
     dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
-    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
-        return RET_ERR;
-    }
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
