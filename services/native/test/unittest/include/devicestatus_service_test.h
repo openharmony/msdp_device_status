@@ -39,7 +39,7 @@ public:
         virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
     };
 
-    static sptr<IRemoteDevStaCallback> devCallback_ { nullptr };
+    static sptr<IRemoteDevStaCallback> devCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
