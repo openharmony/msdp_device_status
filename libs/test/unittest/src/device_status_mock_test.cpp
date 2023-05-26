@@ -314,3 +314,17 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest016, TestSize.Level1)
     EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest016 end";
 }
+
+/**
+ * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.desc: test devicestatus Mock in Algorithm
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest017 start";
+    constexpr int32_t TIMER_INTERVAL = 0;
+    int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
+    EXPECT_TRUE(ret == RET_ERR);
+    GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest017 end";
+}

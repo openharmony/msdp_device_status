@@ -31,13 +31,6 @@ void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusDa
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL(remote == nullptr);
 
-    std::map<Type, int32_t> typeMap= DeviceStatusClient::GetInstance().GetTypeMap();
-    auto it = typeMap.find(devicestatusData.type);
-    if (it == typeMap.end()) {
-        DEV_HILOGE(INNERKIT, "type not exist report failed");
-        return;
-    }
-
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
