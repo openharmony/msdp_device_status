@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_CLIENT_FUZZER_H
-#define DEVICE_STATUS_CLIENT_FUZZER_H
+#ifndef DEVICESTATUSCLIENT_FUZZER_H
+#define DEVICESTATUSCLIENT_FUZZER_H
 
 #include <cstdint>
 #include <unistd.h>
@@ -51,4 +51,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_CLIENT_FUZZER_H
+#endif // DEVICESTATUSCLIENT_FUZZER_H

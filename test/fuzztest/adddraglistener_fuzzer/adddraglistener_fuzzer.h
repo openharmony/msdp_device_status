@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ADD_DRAG_LISTENER_FUZZER_H
-#define ADD_DRAG_LISTENER_FUZZER_H
+#ifndef ADDDRAGLISTENER_FUZZER_H
+#define ADDDRAGLISTENER_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "adddraglistener_fuzzer"
 
-#endif // ADD_DRAG_LISTENER_FUZZER_H
+#endif // ADDDRAGLISTENER_FUZZER_H

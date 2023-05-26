@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef GET_SHADOWOFFSET_FUZZER_H
-#define GET_SHADOWOFFSET_FUZZER_H
+#ifndef GETSHADOWOFFSET_FUZZER_H
+#define GETSHADOWOFFSET_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "getshadowoffset_fuzzer"
 
-#endif // GET_SHADOWOFFSET_FUZZER_H
+#endif // GETSHADOWOFFSET_FUZZER_H

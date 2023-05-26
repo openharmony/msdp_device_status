@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SET_DRAG_WINDOW_VISIBLE_FUZZER_H
-#define SET_DRAG_WINDOW_VISIBLE_FUZZER_H
+#ifndef SETDRAGWINDOWVISIBLE_FUZZER_H
+#define SETDRAGWINDOWVISIBLE_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "setdragwindowvisible_fuzzer"
 
-#endif // SET_DRAG_WINDOW_VISIBLE_FUZZER_H
+#endif // SETDRAGWINDOWVISIBLE_FUZZER_H

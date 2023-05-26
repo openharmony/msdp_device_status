@@ -18,7 +18,7 @@
 
 #include <iremote_broker.h>
 
-#include "idevicestatus_algorithm_callback.h"
+#include "i_devicestatus_algorithm_callback.h"
 
 namespace OHOS {
 namespace Msdp {
