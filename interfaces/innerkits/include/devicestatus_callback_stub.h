@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_CALLBACK_STUB_H
-#define DEVICE_STATUS_CALLBACK_STUB_H
+#ifndef DEVICESTATUS_CALLBACK_STUB_H
+#define DEVICESTATUS_CALLBACK_STUB_H
 
 #include <iremote_stub.h>
 #include <nocopyable.h>

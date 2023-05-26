@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_DEVICE_STATUS_STORAGE_H
-#define I_DEVICE_STATUS_STORAGE_H
+#ifndef I_DEVICESTATUS_STORAGE_H
+#define I_DEVICESTATUS_STORAGE_H
 
 #include <iremote_broker.h>
 
@@ -39,4 +39,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_DEVICE_STATUS_STORAGE_H
+#endif // I_DEVICESTATUS_STORAGE_H

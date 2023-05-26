@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_NAPI_ERROR_H
-#define DEVICE_STATUS_NAPI_ERROR_H
+#ifndef DEVICESTATUS_NAPI_ERROR_H
+#define DEVICESTATUS_NAPI_ERROR_H
 
 #include <map>
 
@@ -39,4 +39,4 @@ void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &pri
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_NAPI_ERROR_H
+#endif // DEVICESTATUS_NAPI_ERROR_H

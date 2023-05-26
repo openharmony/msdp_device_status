@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_NAPI_H
-#define DEVICE_STATUS_NAPI_H
+#ifndef DEVICESTATUS_NAPI_H
+#define DEVICESTATUS_NAPI_H
 
 #include <map>
 #include <tuple>

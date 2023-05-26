@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_DATA_DEFINE_H
-#define DEVICE_STATUS_DATA_DEFINE_H
+#ifndef DEVICESTATUS_DATA_DEFINE_H
+#define DEVICESTATUS_DATA_DEFINE_H
 
 #include <functional>
 
@@ -61,4 +61,4 @@ using SensorCallback = std::function<void(int32_t, AccelData*)>;
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_DATA_DEFINE_H
+#endif // DEVICESTATUS_DATA_DEFINE_H

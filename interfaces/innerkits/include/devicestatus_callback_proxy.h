@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_CALLBACK_PROXY_H
-#define DEVICE_STATUS_CALLBACK_PROXY_H
+#ifndef DEVICESTATUS_CALLBACK_PROXY_H
+#define DEVICESTATUS_CALLBACK_PROXY_H
 
 #include <iremote_proxy.h>
 #include <nocopyable.h>
@@ -39,4 +39,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_CALLBACK_PROXY_H
+#endif // DEVICESTATUS_CALLBACK_PROXY_H

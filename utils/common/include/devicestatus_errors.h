@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_ERRORS_H
-#define DEVICE_STATUS_ERRORS_H
+#ifndef DEVICESTATUS_ERRORS_H
+#define DEVICESTATUS_ERRORS_H
 
 #include <errors.h>
 
@@ -86,4 +86,4 @@ enum {
 } // namespace Msdp
 } // namespace OHOS
 
-#endif // DEVICE_STATUS_ERRORS_H
+#endif // DEVICESTATUS_ERRORS_H

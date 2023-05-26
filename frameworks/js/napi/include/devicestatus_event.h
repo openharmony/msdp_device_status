@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_EVENT_H
-#define DEVICE_STATUS_EVENT_H
+#ifndef DEVICESTATUS_EVENT_H
+#define DEVICESTATUS_EVENT_H
 
 #include <list>
 #include <map>

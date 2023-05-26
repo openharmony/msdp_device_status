@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_MANAGER_H
-#define DEVICE_STATUS_MANAGER_H
+#ifndef DEVICESTATUS_MANAGER_H
+#define DEVICESTATUS_MANAGER_H
 
 #include <set>
 #include <map>
@@ -77,4 +77,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_MANAGER_H
+#endif // DEVICESTATUS_MANAGER_H

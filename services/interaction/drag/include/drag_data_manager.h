@@ -15,6 +15,7 @@
 
 #ifndef DRAG_DATA_MANAGER_H
 #define DRAG_DATA_MANAGER_H
+
 #include <string>
 
 #include "pixel_map.h"

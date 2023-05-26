@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_CLIENT_H
-#define DEVICE_STATUS_CLIENT_H
+#ifndef DEVICESTATUS_CLIENT_H
+#define DEVICESTATUS_CLIENT_H
 
 #include <functional>
 #include <map>
@@ -91,4 +91,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_CLIENT_H
+#endif // DEVICESTATUS_CLIENT_H

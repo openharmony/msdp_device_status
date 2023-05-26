@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_DUMPER_H
-#define DEVICE_STATUS_DUMPER_H
+#ifndef DEVICESTATUS_DUMPER_H
+#define DEVICESTATUS_DUMPER_H
 
 #include <map>
 #include <memory>
@@ -79,4 +79,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_DUMPER_H
+#endif // DEVICESTATUS_DUMPER_H

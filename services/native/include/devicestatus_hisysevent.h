@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_HISYSEVENT_H
-#define DEVICE_STATUS_HISYSEVENT_H
+#ifndef DEVICESTATUS_HISYSEVENT_H
+#define DEVICESTATUS_HISYSEVENT_H
 
 #include <string>
 
@@ -26,4 +26,4 @@ void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DEVICE_STATUS_HISYSEVENT_H
+#endif // DEVICESTATUS_HISYSEVENT_H
