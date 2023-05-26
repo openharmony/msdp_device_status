@@ -95,7 +95,8 @@ int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data, MessageParcel& r
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
     FI_HILOGI("Read callback successfully");
-    Subscribe(Type(type), ActivityEvent(event), ReportLatencyNs(latency), callback);
+    Subscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event),
+        static_cast<ReportLatencyNs>(latency), callback);
     return RET_OK;
 }
 
@@ -111,7 +112,7 @@ int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data, MessageParcel&
     CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Unsubscribe(Type(type), ActivityEvent(event), callback);
+    Unsubscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event), callback);
     return RET_OK;
 }
 
@@ -120,7 +121,7 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Data devicestatusData = GetCache(Type(type));
+    Data devicestatusData = GetCache(static_cast<Type>(type));
     FI_HILOGD("devicestatusData.type:%{public}d", devicestatusData.type);
     FI_HILOGD("devicestatusData.value:%{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);

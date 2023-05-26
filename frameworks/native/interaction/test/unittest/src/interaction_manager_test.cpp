@@ -59,8 +59,8 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY = "Unified data key";
-static int32_t g_deviceMouseId { -1 };
-static int32_t g_deviceTouchId { -1 };
+int32_t g_deviceMouseId { -1 };
+int32_t g_deviceTouchId { -1 };
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
