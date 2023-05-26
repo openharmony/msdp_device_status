@@ -182,9 +182,7 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
-    napi_valuetype tmpType = napi_undefined;
-    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
-    if (tmpType == napi_undefined) {
+    if (UtilNapi::TypeOf(env, argv[0], napi_undefined) || UtilNapi::TypeOf(env, argv[0], napi_null)) {
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }

@@ -273,9 +273,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
-    napi_valuetype tmpType = napi_undefined;
-    CHKRP(napi_typeof(env, argv[1], &tmpType), TYPEOF);
-    if (tmpType == napi_undefined) {
+    if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
