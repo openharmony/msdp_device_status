@@ -73,6 +73,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 
 void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int status)
 {
+    CHKPV(work);
     Data* data = static_cast<Data*>(work->data);
     delete work;
     if (data == nullptr) {
@@ -374,8 +375,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         DEV_HILOGD(JS_NAPI, "Callback exists");
         return nullptr;
     }
-    sptr<IRemoteDevStaCallback> callback;
-    callback = new (std::nothrow) DeviceStatusCallback(env);
+    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
     CHKPP(callback);
     auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(Type(type),
         ActivityEvent(event), ReportLatencyNs(latency), callback);
