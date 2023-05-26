@@ -41,12 +41,6 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
-        return RET_ERR;
-    }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
         dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
