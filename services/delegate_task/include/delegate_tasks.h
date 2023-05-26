@@ -14,7 +14,6 @@
  */
 #ifndef DELEGATE_TASKS_H
 #define DELEGATE_TASKS_H
-
 #include <cinttypes>
 #include <functional>
 #include <future>
