@@ -28,6 +28,7 @@ class DeviceStatusAgent : public std::enable_shared_from_this<DeviceStatusAgent>
 public:
     DeviceStatusAgent() {};
     ~DeviceStatusAgent() {};
+
     class DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentEvent() = default;
@@ -48,10 +49,12 @@ public:
         const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
     int32_t UnsubscribeAgentEvent(const Type& type, const ActivityEvent& event);
     friend class DeviceStatusAgentCallback;
+
 private:
     void RegisterServiceEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency);
     void UnRegisterServiceEvent(const Type& type, const ActivityEvent& event);
-    sptr<IRemoteDevStaCallback> callback_;
+
+    sptr<IRemoteDevStaCallback> callback_ { nullptr };
     std::shared_ptr<DeviceStatusAgentEvent> agentEvent_ { nullptr };
 };
 } // namespace DeviceStatus

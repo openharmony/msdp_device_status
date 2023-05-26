@@ -46,7 +46,6 @@ public:
     int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetDeviceStatusData(const Type type);
     void RegisterDeathListener(std::function<void()> deathListener);
-
     int32_t RegisterCoordinationListener();
     int32_t UnregisterCoordinationListener();
     int32_t PrepareCoordination(int32_t userData);
@@ -54,7 +53,6 @@ public:
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t DeactivateCoordination(int32_t userData, bool isUnchained);
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId);
-
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
     int32_t UpdateDragStyle(DragCursorStyle style);
@@ -64,7 +62,6 @@ public:
     int32_t RemoveDraglistener();
     int32_t SetDragWindowVisible(bool visible);
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
-
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
 
@@ -74,18 +71,20 @@ private:
         DeviceStatusDeathRecipient() = default;
         ~DeviceStatusDeathRecipient() = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote);
+
     private:
         DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };
 
     ErrCode Connect();
-    sptr<Idevicestatus> devicestatusProxy_ {nullptr};
-    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
     void ResetProxy(const wptr<IRemoteObject>& remote);
+
+    sptr<Idevicestatus> devicestatusProxy_ { nullptr };
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
     std::mutex mutex_;
-        int32_t tokenType_ { -1 };
+    int32_t tokenType_ { -1 };
     int32_t socketFd_ { -1 };
-    std::map<Type, int32_t> typeMap_ = {};
+    std::map<Type, int32_t> typeMap_;
     std::function<void()> deathListener_ { nullptr };
 };
 } // namespace DeviceStatus

@@ -36,8 +36,8 @@ namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
     DragManager() {}
-    ~DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
+    ~DragManager() = default;
 
     int32_t Init(IContext* context);
     void OnSessionLost(SessionPtr session);
@@ -60,8 +60,7 @@ public:
     class InterceptorConsumer final : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,
-            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb)
-        {}
+            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;

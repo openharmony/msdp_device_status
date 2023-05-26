@@ -35,26 +35,6 @@ namespace DeviceStatus {
 class JsEventCooperateTarget : public ICoordinationListener,
                                public std::enable_shared_from_this<JsEventCooperateTarget> {
 public:
-    JsEventCooperateTarget();
-    virtual ~JsEventCooperateTarget() = default;
-    DISALLOW_COPY_AND_MOVE(JsEventCooperateTarget);
-
-    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
-    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
-    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
-    static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
-
-    void AddListener(napi_env env, const std::string &type, napi_value handle);
-    void RemoveListener(napi_env env, const std::string &type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb);
-    void HandleExecuteResult(napi_env env, int32_t errCode);
-    void ResetEnv();
-
-    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
-
     enum class CooperateMessage {
         INFO_START = 0,
         INFO_SUCCESS = 1,
@@ -63,11 +43,25 @@ public:
         STATE_OFF = 4,
     };
 
-private:
-    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>>
-        coordinationListener_ {};
-    bool isListeningProcess_ { false };
+    JsEventCooperateTarget();
+    DISALLOW_COPY_AND_MOVE(JsEventCooperateTarget);
+    virtual ~JsEventCooperateTarget() = default;
 
+    static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
+    static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
+    static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
+        const std::string &deviceId, CoordinationMessage msg);
+    static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
+    void AddListener(napi_env env, const std::string &type, napi_value handle);
+    void RemoveListener(napi_env env, const std::string &type, napi_value handle);
+    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb);
+    void HandleExecuteResult(napi_env env, int32_t errCode);
+    void ResetEnv();
+    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
+
+private:
     static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
     static void CallStartPromiseWork(uv_work_t *work, int32_t status);
@@ -77,7 +71,6 @@ private:
     static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
-
     static std::unique_ptr<JsUtilCooperate::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 
     inline static std::map<CoordinationMessage, CooperateMessage> messageTransform = {
@@ -87,6 +80,9 @@ private:
         { CoordinationMessage::ACTIVATE_SUCCESS, CooperateMessage::INFO_SUCCESS },
         { CoordinationMessage::ACTIVATE_FAIL, CooperateMessage::INFO_FAIL }
     };
+    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>>
+        coordinationListener_ {};
+    bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -31,7 +31,6 @@ namespace DeviceStatus {
 class CoordinationSoftbusAdapter {
 public:
     virtual ~CoordinationSoftbusAdapter();
-    static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
 
     enum MessageId {
         MIN_ID = 0,
@@ -39,29 +38,28 @@ public:
         STOPDRAG_DATA = 2,
         MAX_ID = 50,
     };
-
     struct DataPacket {
         MessageId messageId;
         uint32_t dataLen { 0 };
         uint8_t data[0];
     };
+
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained);
     int32_t StopRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess);
     int32_t StartCoordinationOtherResult(const std::string &originNetworkId, const std::string &remoteNetworkId);
-
     int32_t Init();
     void Release();
     int32_t OpenInputSoftbus(const std::string &remoteNetworkId);
     void CloseInputSoftbus(const std::string &remoteNetworkId);
-
     int32_t OnSessionOpened(int32_t sessionId, int32_t result);
     void OnSessionClosed(int32_t sessionId);
-    void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen);
+    void OnBytesReceived(int32_t sessionId, const void* data, uint32_t dataLen);
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
     int32_t SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
+    static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
 
 private:
     CoordinationSoftbusAdapter() = default;
@@ -71,6 +69,7 @@ private:
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
+
     std::map<std::string, int32_t> sessionDevMap_;
     std::map<std::string, bool> channelStatusMap_;
     std::mutex operationMutex_;

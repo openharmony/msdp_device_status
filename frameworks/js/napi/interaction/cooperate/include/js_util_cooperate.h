@@ -39,7 +39,6 @@ public:
         napi_value handle { nullptr };
         std::vector<int32_t> keys;
     };
-
     struct CallbackData {
         bool enableResult { false };
         bool startResult { false };
@@ -49,7 +48,6 @@ public:
         int32_t errCode { 0 };
         CoordinationMessage msg = CoordinationMessage::PREPARE;
     };
-
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;
         ~CallbackInfo() = default;
@@ -59,15 +57,6 @@ public:
         int32_t errCode { 0 };
         CallbackData data;
     };
-
-    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
-    static napi_value GetStateResult(napi_env env, bool result);
-    static napi_value GetResult(napi_env env, bool result, int32_t errCode);
-    static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-
     template <typename T>
     static void DeletePtr(T &ptr)
     {
@@ -76,6 +65,14 @@ public:
             ptr = nullptr;
         }
     }
+
+    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateResult(napi_env env, bool result);
+    static napi_value GetResult(napi_env env, bool result, int32_t errCode);
+    static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

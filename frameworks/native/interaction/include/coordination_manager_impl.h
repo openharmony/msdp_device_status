@@ -29,21 +29,18 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationManagerImpl final {
 public:
-    CoordinationManagerImpl() = default;
-    ~CoordinationManagerImpl() = default;
-
     using FuncCoordinationMessage = std::function<void(const std::string&, CoordinationMessage)>;
     using FuncCoordinationState = std::function<void(bool)>;
-
     using CoordinationMsg = FuncCoordinationMessage;
     using CoordinationState = FuncCoordinationState;
-
     using CoordinationListenerPtr = std::shared_ptr<ICoordinationListener>;
-
     struct CoordinationEvent {
         CoordinationMsg msg;
         CoordinationState state;
     };
+
+    CoordinationManagerImpl() = default;
+    ~CoordinationManagerImpl() = default;
 
     int32_t RegisterCoordinationListener(CoordinationListenerPtr listener);
     int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener = nullptr);

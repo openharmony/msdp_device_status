@@ -33,12 +33,11 @@ namespace DeviceStatus {
 class Monitor final : public IEpollEventSource {
 public:
     Monitor() = default;
-    ~Monitor() = default;
     DISALLOW_COPY_AND_MOVE(Monitor);
+    ~Monitor() = default;
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-
     void SetDeviceMgr(IDeviceMgr *devMgr);
     int32_t Enable();
     void Disable();

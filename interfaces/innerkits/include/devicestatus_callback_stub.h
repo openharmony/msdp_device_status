@@ -30,9 +30,10 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusCallbackStub : public IRemoteStub<IRemoteDevStaCallback> {
 public:
-    DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackStub);
     DeviceStatusCallbackStub() = default;
+    DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackStub);
     virtual ~DeviceStatusCallbackStub() = default;
+
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     void OnDeviceStatusChanged(const Data &value) override {}
 

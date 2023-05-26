@@ -63,16 +63,17 @@ private:
             return left->AsObject() < right->AsObject();
         }
     };
+    static constexpr int32_t arg4_ { 4 };
+
     const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
-    sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_;
+    sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_ { nullptr };
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_ { nullptr };
     std::map<Type, OnChangedValue> msdpData_;
     std::map<Type, std::set<const sptr<IRemoteDevStaCallback>, classcomp>> listenerMap_;
-    int32_t type_ {};
-    int32_t event_ {};
-    static constexpr uint8_t arg4_ = 4;
-    int arrs_ [arg4_] {};
+    int32_t type_ { -1 };
+    int32_t event_ { -1 };
+    int32_t arrs_[arg4_] {};
 };
 } // namespace DeviceStatus
 } // namespace Msdp

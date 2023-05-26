@@ -29,8 +29,9 @@ class DeviceStatusCallbackProxy : public IRemoteProxy<IRemoteDevStaCallback> {
 public:
     explicit DeviceStatusCallbackProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<IRemoteDevStaCallback>(impl) {}
-    ~DeviceStatusCallbackProxy() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusCallbackProxy);
+    ~DeviceStatusCallbackProxy() = default;
+
     virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
 
 private:

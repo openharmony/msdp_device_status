@@ -34,6 +34,7 @@ class DragManagerImpl  {
 public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
+
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t GetDragTargetPid();
     int32_t GetUdKey(std::string &udKey);
