@@ -41,15 +41,15 @@ public:
     ~TimeCostChk(void)
     {
         int64_t ullCost = GetElapsed_micro();
-        if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
+        if ((ullCost > uiTime_) && (!strReason_.empty()) && (!strOutput_.empty())) {
             if (llParam1_ != 0 || llParam2_ != 0) {
-                FI_HILOGW("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
-                         "(us)) when Reason:%{public}s,chk:%{public}s,"
-                         "param1:%{public}" PRId64 ",param2:%{public}" PRId64 "",
+                FI_HILOGW("Time cost overtime (%{public}" PRId64 ", (us)>%{public}" PRId64
+                         "(us)) when Reason:%{public}s, chk:%{public}s, "
+                         "param1:%{public}" PRId64 ", param2:%{public}" PRId64 "",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), llParam1_, llParam2_);
             } else {
-                FI_HILOGW("Overtime(%{public}" PRId64 ",(us)>%{public}" PRId64
-                         "(us)) when Reason:%{public}s,chk:%{public}s",
+                FI_HILOGW("Overtime(%{public}" PRId64 ", (us)>%{public}" PRId64
+                         "(us)) when Reason:%{public}s, chk:%{public}s",
                          ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str());
             }
         }

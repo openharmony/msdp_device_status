@@ -25,7 +25,7 @@ void CircleStreamBuffer::CopyDataToBegin()
             szBuff_[pos++] = szBuff_[i++];
         }
     }
-    FI_HILOGD("unreadSize:%{public}d rPos:%{public}d wPos:%{public}d", unreadSize, rPos_, wPos_);
+    FI_HILOGD("unreadSize:%{public}d rPos:%{public}d, wPos:%{public}d", unreadSize, rPos_, wPos_);
     rPos_ = 0;
     wPos_ = unreadSize;
 }

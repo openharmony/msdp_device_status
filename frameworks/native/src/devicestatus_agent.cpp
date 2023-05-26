@@ -23,6 +23,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusAgent" };
+} // namespace
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
     const Data& devicestatusData)
 {
@@ -70,7 +73,8 @@ void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEve
     const ReportLatencyNs& latency)
 {
     DEV_HILOGD(INNERKIT, "Enter");
-    callback_ = new DeviceStatusAgentCallback(shared_from_this());
+    callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
+    CHKPV(callback_);
     StationaryManager::GetInstance()->SubscribeCallback(type, event, latency, callback_);
 }
 

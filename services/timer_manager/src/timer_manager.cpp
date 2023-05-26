@@ -31,9 +31,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerMa
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL_MS = 10000;
-constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 constexpr int32_t TIME_CONVERSION = 1000;
+constexpr size_t MAX_TIMER_COUNT = 64;
 } // namespace
 
 int32_t TimerManager::Init(IContext *context)
@@ -151,7 +151,7 @@ int32_t TimerManager::TakeNextTimerId()
         [] (uint64_t s, const auto &timer) {
             return (s |= (uint64_t(1U) << timer->id));
         });
-    for (int32_t i = 0; i < MAX_TIMER_COUNT; ++i) {
+    for (size_t i = 0; i < MAX_TIMER_COUNT; ++i) {
         if ((timerSlot & (uint64_t(1U) << i)) == 0) {
             return i;
         }

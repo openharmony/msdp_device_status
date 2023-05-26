@@ -13,27 +13,9 @@
  * limitations under the License.
  */
 
-#include "node_api.h"
+#ifndef DEVICESTATUSSTUB_FUZZER_H
+#define DEVICESTATUSSTUB_FUZZER_H
 
-#include "js_drag_context.h"
+#define FUZZ_PROJECT_NAME "devicestatusstub_fuzzer"
 
-namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-static napi_module msdpDragModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = JsDragContext::Export,
-    .nm_modname = "device_status.drag",
-    .nm_priv = ((void *)0),
-    .reserved = { 0 }
-};
-
-extern "C" __attribute__((constructor)) void RegisterModule(void)
-{
-    napi_module_register(&msdpDragModule);
-}
-} // namespace DeviceStatus
-} // namespace Msdp
-} // namespace OHOS
+#endif // DEVICESTATUSSTUB_FUZZER_H

@@ -80,7 +80,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
         iter->second++;
     }
     RegisterMock();
-    FI_HILOGI("mockCallCount_ %{public}d", mockCallCount_[type]);
+    FI_HILOGI("mockCallCount_:%{public}d", mockCallCount_[type]);
     return RET_OK;
 }
 
@@ -110,7 +110,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         iter->second++;
     }
     RegisterAlgo();
-    FI_HILOGI("algoCallCount_ %{public}d", algoCallCount_[type]);
+    FI_HILOGI("algoCallCount_:%{public}d", algoCallCount_[type]);
     return RET_OK;
 }
 
@@ -203,7 +203,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
         iAlgo_ = nullptr;
         callBacksMgr_ = nullptr;
     }
-    FI_HILOGI("algoCallCount_ %{public}d", algoCallCount_[type]);
+    FI_HILOGI("algoCallCount_:%{public}d", algoCallCount_[type]);
     return RET_OK;
 }
 
@@ -250,7 +250,7 @@ ErrCode DeviceStatusMsdpClientImpl::RegisterImpl(const CallbackManager& callback
 
 void DeviceStatusMsdpClientImpl::OnResult(const Data& data)
 {
-    FI_HILOGD("type:%{public}d,value:%{public}d", data.type, data.value);
+    FI_HILOGD("type:%{public}d, value:%{public}d", data.type, data.value);
     MsdpCallback(data);
 }
 
@@ -342,12 +342,12 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
     std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName .c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, %{public}d", errno);
+        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
     mock_.handle = dlopen(libRealPath, RTLD_LAZY);
     if (mock_.handle == nullptr) {
-        FI_HILOGE("Cannot load library error = %{public}s", dlerror());
+        FI_HILOGE("Cannot load library error:%{public}s", dlerror());
         return RET_ERR;
     }
     FI_HILOGI("start create pointer");
@@ -403,12 +403,12 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
     std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName .c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, %{public}d", errno);
+        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
     algo_.handle = dlopen(libRealPath, RTLD_LAZY);
     if (algo_.handle == nullptr) {
-        FI_HILOGE("Cannot load library error = %{public}s", dlerror());
+        FI_HILOGE("Cannot load library error:%{public}s", dlerror());
         return RET_ERR;
     }
     FI_HILOGI("start create pointer");

@@ -288,7 +288,7 @@ void CoordinationSM::StartPointerEventFilter()
     filterId_ =
         OHOS::MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
     if (0 > filterId_) {
-        FI_HILOGE("Add Event Filter Failed.");
+        FI_HILOGE("Add Event Filter Failed");
     }
     filter->UpdateCurrentFilterId(filterId_);
 }
@@ -376,7 +376,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
     }
 
     if (!isSuccess) {
-        FI_HILOGE("Start distributed fail, startDevice: %{public}d", startDeviceId);
+        FI_HILOGE("Start distributed fail, startDevice:%{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
@@ -492,7 +492,7 @@ void CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
 
 void CoordinationSM::UpdateState(CoordinationState state)
 {
-    FI_HILOGI("state: %{public}d", state);
+    FI_HILOGI("state:%{public}d", state);
     switch (state) {
         case CoordinationState::STATE_FREE: {
             Reset();
@@ -578,7 +578,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (coordinationState_ == CoordinationState::STATE_FREE) {
-        Reset();
+        FI_HILOGI("Current State: free");
         return;
     }
     if ((coordinationState_ == CoordinationState::STATE_IN) && (startDeviceDhid_ == dhid)) {
@@ -738,9 +738,10 @@ bool CoordinationSM::IsNeedFilterOut(const std::string &deviceId, const std::sha
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
     businessEvent.pressedKeys = KeyItemsForDInput;
-    FI_HILOGI("businessEvent.keyCode:%{public}d, keyAction:%{public}d", businessEvent.keyCode, businessEvent.keyAction);
+    FI_HILOGI("businessEvent.keyCode:%{public}d, keyAction:%{public}d",
+        businessEvent.keyCode, businessEvent.keyAction);
     for (const auto &item : businessEvent.pressedKeys) {
-        FI_HILOGI("pressedKeys :%{public}d", item);
+        FI_HILOGI("pressedKeys:%{public}d", item);
     }
     return D_INPUT_ADAPTER->IsNeedFilterOut(deviceId, businessEvent);
 }

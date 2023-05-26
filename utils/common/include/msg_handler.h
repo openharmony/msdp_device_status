@@ -49,9 +49,10 @@ public:
             str += std::to_string(it.first);
             str += ',';
         }
-        if (str.size() > 0) {
+        if (!str.empty()) {
             str.resize(str.size() - 1);
         }
+
         return std::move(str);
     }
 

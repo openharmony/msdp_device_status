@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "GetUd
 
 void GetUdKeyFuzzTest(const uint8_t* data, size_t size)
 {
-    FI_HILOGD("GetUdKeyFuzzTest");
+    CALL_DEBUG_ENTER;
     std::string udKey;
     InteractionManager::GetInstance()->GetUdKey(udKey);
 }

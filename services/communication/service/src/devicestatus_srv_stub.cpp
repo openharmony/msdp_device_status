@@ -95,7 +95,8 @@ int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data, MessageParcel& r
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
     FI_HILOGI("Read callback successfully");
-    Subscribe(Type(type), ActivityEvent(event), ReportLatencyNs(latency), callback);
+    Subscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event),
+        static_cast<ReportLatencyNs>(latency), callback);
     return RET_OK;
 }
 
@@ -106,12 +107,12 @@ int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data, MessageParcel&
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t event = -1;
     READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    FI_HILOGE("UNevent: %{public}d", event);
+    FI_HILOGE("UNevent:%{public}d", event);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Unsubscribe(Type(type), ActivityEvent(event), callback);
+    Unsubscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event), callback);
     return RET_OK;
 }
 
@@ -120,9 +121,9 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Data devicestatusData = GetCache(Type(type));
-    FI_HILOGD("devicestatusData.type: %{public}d", devicestatusData.type);
-    FI_HILOGD("devicestatusData.value: %{public}d", devicestatusData.value);
+    Data devicestatusData = GetCache(static_cast<Type>(type));
+    FI_HILOGD("devicestatusData.type:%{public}d", devicestatusData.type);
+    FI_HILOGD("devicestatusData.value:%{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(reply, devicestatusData.value, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     return RET_OK;
@@ -242,7 +243,7 @@ int32_t DeviceStatusSrvStub::GetUdKeyStub(MessageParcel& data, MessageParcel& re
     std::string udKey;
     int32_t ret = GetUdKey(udKey);
     if (ret != RET_OK) {
-        FI_HILOGE("Get udKey failed ret:%{public}d", ret);
+        FI_HILOGE("Get udKey failed, ret:%{public}d", ret);
     }
     WRITESTRING(reply, udKey, IPC_STUB_WRITE_PARCEL_ERR);
     FI_HILOGD("Target udKey:%{public}s", udKey.c_str());
@@ -253,7 +254,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
 {
     int32_t pid = GetCallingPid();
     if (!IsRunning()) {
-        FI_HILOGE("Service is not running. pid:%{public}d, go switch default", pid);
+        FI_HILOGE("Service is not running, pid:%{public}d, go switch default", pid);
         return SERVICE_NOT_RUNNING;
     }
     int32_t moduleId;
@@ -266,7 +267,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     int32_t ret = AllocSocketFd(clientName, moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
-        FI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
+        FI_HILOGE("AllocSocketFd failed, pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
             close(clientFd);
         }
@@ -292,12 +293,6 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
     dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
-    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
-        return RET_ERR;
-    }
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -312,7 +307,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
         dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-                  "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
+            "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
         return RET_ERR;
     }

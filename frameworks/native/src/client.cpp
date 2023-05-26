@@ -135,12 +135,12 @@ bool Client::AddFdListener(int32_t fd)
     auto fdListener = std::make_shared<FdListener>(GetSharedPtr());
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
-        FI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+        FI_HILOGE("Add fd listener failed, fd:%{public}d, code:%{public}u, str:%{public}s", fd, errCode,
             GetErrorStr(errCode).c_str());
         return false;
     }
     isRunning_ = true;
-    FI_HILOGI("serverFd:%{public}d was listening,mask:%{public}u pid:%{public}d threadId:%{public}" PRIu64,
+    FI_HILOGI("serverFd:%{public}d was listening, mask:%{public}u, pid:%{public}d, threadId:%{public}" PRIu64,
         fd, FILE_DESCRIPTOR_INPUT_EVENT, GetPid(), GetThisThreadId());
     return true;
 }
@@ -174,11 +174,11 @@ void Client::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
     if (size == 0 || size > MAX_PACKET_BUF_SIZE) {
-        FI_HILOGE("Invalid input param size. size:%{public}zu", size);
+        FI_HILOGE("Invalid input param size, size:%{public}zu", size);
         return;
     }
     if (!circBuf_.Write(buf, size)) {
-        FI_HILOGW("Write data failed. size:%{public}zu", size);
+        FI_HILOGW("Write data failed, size:%{public}zu", size);
     }
     OnReadPackets(circBuf_, std::bind(&Client::OnPacket, this, std::placeholders::_1));
 }
@@ -297,7 +297,7 @@ void Client::OnMsgHandler(const StreamClient& client, NetPacket& pkt)
     }
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
-        FI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        FI_HILOGE("Msg handling failed, id:%{public}d, ret:%{public}d", id, ret);
         return;
     }
 }

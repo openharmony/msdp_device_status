@@ -86,9 +86,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     dragOutSession_ = sess;
-    dragTargetPid_ = -1;
     if (InitDataManager(dragData) != RET_OK) {
-        FI_HILOGE("InitDataManager failed");
+        FI_HILOGE("Init data manager failed");
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
@@ -113,13 +112,13 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     }
     int32_t ret = RET_OK;
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
-        FI_HILOGE("OnStopDrag failed");
+        FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
     dragState_ = DragState::STOP;
     stateNotify_.StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(result) != RET_OK) {
-        FI_HILOGE("NotifyDragResult failed");
+        FI_HILOGE("Notify drag result failed");
         ret = RET_ERR;
     }
     DRAG_DATA_MGR.ResetDragData();
@@ -130,7 +129,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
 
 int32_t DragManager::GetDragTargetPid() const
 {
-    return dragTargetPid_;
+    return DRAG_DATA_MGR.GetTargetPid();
 }
 
 int32_t DragManager::GetUdKey(std::string &udKey) const
@@ -145,13 +144,7 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
     return RET_OK;
 }
 
-void DragManager::SetDragTargetPid(int32_t dragTargetPid)
-{
-    CALL_DEBUG_ENTER;
-    dragTargetPid_ = dragTargetPid;
-}
-
-int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetTid)
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
 {
     CALL_DEBUG_ENTER;
     if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
@@ -159,6 +152,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetTid)
         return RET_ERR;
     }
     DRAG_DATA_MGR.SetDragStyle(style);
+    DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
     dragDrawing_.UpdateDragStyle(style);
     return RET_OK;
@@ -240,7 +234,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     int32_t pid = MMI::InputManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId());
     FI_HILOGD("Target window drag pid:%{public}d", pid);
-    SetDragTargetPid(pid);
 
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
@@ -414,7 +407,7 @@ OHOS::MMI::ExtraData DragManager::CreateExtraData(bool appended)
     extraData.sourceType = dragData.sourceType;
     extraData.pointerId = dragData.pointerId;
     extraData.appended = appended;
-    FI_HILOGD("sourceType:%{public}d,pointerId:%{public}d", extraData.sourceType, extraData.pointerId);
+    FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d", extraData.sourceType, extraData.pointerId);
     return extraData;
 }
 
@@ -423,7 +416,7 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
     CALL_DEBUG_ENTER;
     MMI::PointerStyle pointerStyle;
     if (MMI::InputManager::GetInstance()->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
-        FI_HILOGE("GetPointerStyle failed");
+        FI_HILOGE("Get pointer style failed");
         return RET_ERR;
     }
     DRAG_DATA_MGR.Init(dragData, pointerStyle);
