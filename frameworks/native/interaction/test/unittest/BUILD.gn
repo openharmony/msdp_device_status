@@ -39,8 +39,29 @@ ohos_unittest("InteractionManagerTest") {
   ]
 }
 
+ohos_unittest("InteractionDragDrawingTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_utils_path}/include",
+  ]
+
+  sources = [ "src/interaction_drag_drawing_test.cpp" ]
+
+  deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "input:libmmi-client",
+    "multimedia_image_framework:image_native",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = []
-  deps += [ ":InteractionManagerTest" ]
+  deps += [
+    ":InteractionDragDrawingTest",
+    ":InteractionManagerTest",
+  ]
 }
