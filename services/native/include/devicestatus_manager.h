@@ -63,7 +63,7 @@ private:
             return left->AsObject() < right->AsObject();
         }
     };
-    static constexpr uint8_t arg4_ { 4 };
+    static constexpr int32_t arg4_ { 4 };
 
     const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;

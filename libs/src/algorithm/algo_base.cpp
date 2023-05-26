@@ -28,7 +28,7 @@ void AlgoBase::Unsubscribe(int32_t sensorTypeId)
     SensorDataCallback::GetInstance().UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
 }
 
-bool AlgoBase::GetData(int32_t sensorTypeId, AccelData* sensorData)
+bool AlgoBase::SetData(int32_t sensorTypeId, AccelData* sensorData)
 {
     DEV_HILOGD(SERVICE, "Enter");
     if (sensorTypeId != SENSOR_TYPE_ID_ACCELEROMETER) {

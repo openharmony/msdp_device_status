@@ -38,7 +38,7 @@ bool AlgoHorizontal::Init(Type type)
 bool AlgoHorizontal::StartAlgorithm(int32_t sensorTypeId, AccelData* sensorData)
 {
     DEV_HILOGD(SERVICE, "Enter");
-    if (!GetData(sensorTypeId, sensorData)) {
+    if (!SetData(sensorTypeId, sensorData)) {
         DEV_HILOGE(SERVICE, "Failed to get data");
         return false;
     }

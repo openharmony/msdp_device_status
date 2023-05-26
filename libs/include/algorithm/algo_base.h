@@ -65,7 +65,7 @@ protected:
                        0.0 };
 
     virtual bool StartAlgorithm(int32_t sensorTypeId, AccelData* sensorData) = 0;
-    bool GetData(int32_t sensorTypeId, AccelData* sensorData);
+    bool SetData(int32_t sensorTypeId, AccelData* sensorData);
     virtual void ExecuteOperation() = 0;
     void UpdateStateAndReport(OnChangedValue value, int32_t state, Type type);
 
