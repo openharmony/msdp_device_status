@@ -1,0 +1,12 @@
+{
+    "process": "msdp",
+    "systemability": [
+        {
+            "name": 2902,
+            "libpath": "libdevicestatus_service.z.so",
+            "run-on-create": true,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
