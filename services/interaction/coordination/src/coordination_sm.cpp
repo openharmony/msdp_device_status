@@ -268,6 +268,8 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     std::lock_guard<std::mutex> guard(mutex_);
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
+    COOR_SM->SetSinkNetworkId(remoteNetworkId);
+    FI_HILOGD("The remoteNetworkId:%{public}s", remoteNetworkId.c_str());
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(std::bind(&CoordinationEventManager::OnCoordinationMessage,
         COOR_EVENT_MGR, CoordinationMessage::ACTIVATE, remoteNetworkId));
     if (ret != RET_OK) {
@@ -426,8 +428,9 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
             preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
         UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         isUnchained_ = false;
+    } else {
+        COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
     }
-    COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
     isStopping_ = false;
 }
 

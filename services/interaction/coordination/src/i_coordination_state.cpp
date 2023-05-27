@@ -42,7 +42,6 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
     int32_t ret = RET_ERR;
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         COOR_SM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
-        COOR_SM->SetSinkNetworkId(remoteNetworkId);
         ret = D_INPUT_ADAPTER->PrepareRemoteInput(remoteNetworkId, originNetworkId,
             [this, remoteNetworkId, startDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);
