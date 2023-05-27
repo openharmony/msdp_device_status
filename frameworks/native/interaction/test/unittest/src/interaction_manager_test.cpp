@@ -473,11 +473,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
-    bool isUnchained = false;
-    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(isUnchained, fun);
+    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(false, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    ret = InteractionManager::GetInstance()->DeactivateCoordination(true, fun);
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
