@@ -20,9 +20,15 @@
 #include <stdint.h>
 #include "securec.h"
 
+#include "fi_log.h"
+
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientFuzzTest" };
+} // namespace
+
 auto stationaryMgr = StationaryManager::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb =
     new (std::nothrow) DeviceStatusClientFuzzer::DeviceStatusTestCallback();
@@ -39,7 +45,9 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
     std::cout << "TestSubscribeCallback: Enter " << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
 

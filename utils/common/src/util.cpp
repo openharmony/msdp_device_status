@@ -179,7 +179,8 @@ const char* GetProgramName()
     }
 
     char buf[BUF_CMD_SIZE] = { 0 };
-    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    int32_t ret = sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid()));
+    if (ret == -1) {
         FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
         return "";
     }
@@ -214,8 +215,8 @@ const char* GetProgramName()
         FI_HILOGE("The copySize is 0");
         return "";
     }
-    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
-    if (ret != EOK) {
+    errno_t result = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (result != EOK) {
         FI_HILOGE("memcpy_s failed");
         return "";
     }
