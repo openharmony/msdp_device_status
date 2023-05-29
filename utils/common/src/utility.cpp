@@ -52,8 +52,9 @@ size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
         }
     }
     if (len > 0) {
-        if (memcpy_s(dest, size, src, len) != EOK) {
-            FI_HILOGE("memcpy_s:bounds checking failed");
+        errno_t ret = memcpy_s(dest, size, src, len);
+        if (ret != EOK) {
+            FI_HILOGW("memcpy_s:bounds checking failed");
         }
     }
     if (size > 0) {

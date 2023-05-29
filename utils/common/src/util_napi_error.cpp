@@ -21,7 +21,7 @@ namespace UtilNapiError {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UtilNapiError" };
 } // namespace
-bool GetApiError(int32_t code, NapiError& codeMsg)
+bool GetApiError(int32_t code, NapiError &codeMsg)
 {
     auto iter = NAPI_ERRORS.find(code);
     if (iter == NAPI_ERRORS.end()) {
