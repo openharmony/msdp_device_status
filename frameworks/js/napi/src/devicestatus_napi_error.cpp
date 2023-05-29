@@ -44,7 +44,7 @@ std::optional <std::string> GetErrMsg(int32_t errorCode)
     if (iter != ERROR_MESSAGES.end()) {
         return iter->second;
     }
-    DEV_HILOGE(JS_NAPI, "Error messages not found");
+    FI_HILOGE(JS_NAPI, "Error messages not found");
     return std::nullopt;
 }
 
