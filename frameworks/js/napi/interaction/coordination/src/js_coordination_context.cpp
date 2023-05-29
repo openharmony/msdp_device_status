@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -270,6 +270,10 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == ONE_PARAM) {
+        jsCoordinationMgr->UnregisterListener(env, type_);
+        return nullptr;
+    }
+    if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
