@@ -21,7 +21,6 @@
 #include "napi/native_node_api.h"
 
 #include "devicestatus_client.h"
-#include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "devicestatus_napi_error.h"
 #include "stationary_manager.h"

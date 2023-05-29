@@ -26,27 +26,29 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusCallbackProxy" };
+} // namespace
+
 void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     sptr<IRemoteObject> remote = Remote();
-    DEV_RET_IF_NULL(remote == nullptr);
-
+    CHKPV(remote);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusCallbackProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed");
+        FI_HILOGE("Write descriptor failed");
         return;
     }
-
     WRITEINT32(data, static_cast<int32_t>(devicestatusData.type));
     WRITEINT32(data, static_cast<int32_t>(devicestatusData.value));
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(IRemoteDevStaCallback::DEVICESTATUS_CHANGE),
         data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code: %{public}d", ret);
         return;
     }
 }

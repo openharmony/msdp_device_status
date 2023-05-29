@@ -14,7 +14,6 @@
  */
 
 #include "coordination_event_manager.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {

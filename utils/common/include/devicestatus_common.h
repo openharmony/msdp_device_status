@@ -19,8 +19,8 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "devicestatus_hilog_wrapper.h"
 #include "devicestatus_errors.h"
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -30,7 +30,7 @@ namespace DeviceStatus {
 #define DEV_RET_IF_NULL_WITH_LOG(cond, loginfo) \
     do { \
         if (cond) { \
-            DEV_HILOGE(COMMON, "%{public}s "#loginfo" ", __func__); \
+            FI_HILOGE("%{public}s "#loginfo" ", __func__); \
             return; \
         } \
     } while (0) \
@@ -38,7 +38,7 @@ namespace DeviceStatus {
 #define WRITEBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).WriteBool(data)) { \
-            DEV_HILOGE(COMMON, "WriteBool "#data" failed"); \
+            FI_HILOGE("WriteBool "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -46,7 +46,7 @@ namespace DeviceStatus {
 #define WRITEINT32(parcel, data, ...) \
     do { \
         if (!(parcel).WriteInt32(data)) { \
-            DEV_HILOGE(COMMON, "WriteInt32 "#data" failed"); \
+            FI_HILOGE("WriteInt32 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -54,7 +54,7 @@ namespace DeviceStatus {
 #define WRITEINT64(parcel, data, ...) \
     do { \
         if (!(parcel).WriteInt64(data)) { \
-            DEV_HILOGE(COMMON, "WriteInt64 "#data" failed"); \
+            FI_HILOGE("WriteInt64 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -62,7 +62,7 @@ namespace DeviceStatus {
 #define WRITEUINT32(parcel, data, ...) \
     do { \
         if (!(parcel).WriteUint32(data)) { \
-            DEV_HILOGE(COMMON, "WriteUint32 "#data" failed"); \
+            FI_HILOGE("WriteUint32 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -70,7 +70,7 @@ namespace DeviceStatus {
 #define WRITEDOUBLE(parcel, data, ...) \
     do { \
         if (!(parcel).WriteDouble(data)) { \
-            DEV_HILOGE(COMMON, "WriteDouble "#data" failed"); \
+            FI_HILOGE("WriteDouble "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -78,7 +78,7 @@ namespace DeviceStatus {
 #define WRITESTRING(parcel, data, ...) \
     do { \
         if (!(parcel).WriteString(data)) { \
-            DEV_HILOGE(COMMON, "WriteString "#data" failed"); \
+            FI_HILOGE("WriteString "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -86,7 +86,7 @@ namespace DeviceStatus {
 #define WRITESTRING16(parcel, data, ...) \
     do { \
         if (!(parcel).WriteString16(data)) { \
-            DEV_HILOGE(COMMON, "WriteString16 "#data" failed"); \
+            FI_HILOGE("WriteString16 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -94,21 +94,23 @@ namespace DeviceStatus {
 #define WRITEREMOTEOBJECT(parcel, data, ...) \
     do { \
         if (!(parcel).WriteRemoteObject(data)) { \
-            DEV_HILOGE(COMMON, "WriteRemoteObject "#data" failed"); \
+            FI_HILOGE("WriteRemoteObject "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
+
 #define WRITEUINT8VECTOR(parcel, data, ...) \
     do { \
         if (!(parcel).WriteUInt8Vector(data)) { \
-                DEV_HILOGE(COMMON, "WriteUInt8Vector "#data" failed"); \
-                return __VA_ARGS__; \
-            } \
+            FI_HILOGE("WriteUInt8Vector "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
     } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
-            DEV_HILOGE(COMMON, "ReadBool "#data" failed"); \
+            FI_HILOGE("ReadBool "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -116,7 +118,7 @@ namespace DeviceStatus {
 #define READINT32(parcel, data, ...) \
     do { \
         if (!(parcel).ReadInt32(data)) { \
-            DEV_HILOGE(COMMON, "ReadInt32 "#data" failed"); \
+            FI_HILOGE("ReadInt32 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -124,7 +126,7 @@ namespace DeviceStatus {
 #define READINT64(parcel, data, ...) \
     do { \
         if (!(parcel).ReadInt64(data)) { \
-            DEV_HILOGE(COMMON, "ReadInt64 "#data" failed"); \
+            FI_HILOGE("ReadInt64 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -132,7 +134,7 @@ namespace DeviceStatus {
 #define READUINT32(parcel, data, ...) \
     do { \
         if (!(parcel).ReadUint32(data)) { \
-            DEV_HILOGE(COMMON, "ReadUint32 "#data" failed"); \
+            FI_HILOGE("ReadUint32 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -140,7 +142,7 @@ namespace DeviceStatus {
 #define READDOUBLE(parcel, data, ...) \
     do { \
         if (!(parcel).ReadDouble(data)) { \
-            DEV_HILOGE(COMMON, "ReadDouble "#data" failed"); \
+            FI_HILOGE("ReadDouble "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -148,7 +150,7 @@ namespace DeviceStatus {
 #define READSTRING(parcel, data, ...) \
     do { \
         if (!(parcel).ReadString(data)) { \
-            DEV_HILOGE(COMMON, "ReadString "#data" failed"); \
+            FI_HILOGE("ReadString "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)
@@ -156,14 +158,15 @@ namespace DeviceStatus {
 #define READUINT8VECTOR(parcel, data, ...) \
     do { \
         if (!(parcel).ReadUInt8Vector(&data)) { \
-                DEV_HILOGE(COMMON, "ReadUInt8Vector "#data" failed"); \
+                FI_HILOGE("ReadUInt8Vector "#data" failed"); \
                 return __VA_ARGS__; \
             } \
     } while (0)
+
 #define READSTRING16(parcel, data, ...) \
     do { \
         if (!(parcel).ReadString16(data)) { \
-            DEV_HILOGE(COMMON, "ReadString16 "#data" failed"); \
+            FI_HILOGE("ReadString16 "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)

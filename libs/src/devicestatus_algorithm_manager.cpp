@@ -28,22 +28,26 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AlgoMgr" };
+} // namespace
+
 bool AlgoMgr::StartSensor(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     int32_t sensorType = GetSensorTypeId(type);
     if (sensorType == RET_ERR) {
-        DEV_HILOGE(SERVICE, "Failed to get sensorType");
+        FI_HILOGE("Failed to get sensorType");
         return false;
     }
     if (!CheckSensorTypeId(sensorType)) {
-        DEV_HILOGE(SERVICE, "Sensor type mismatch");
+        FI_HILOGE("Sensor type mismatch");
         return false;
     }
 
     SensorDataCallback::GetInstance().Init();
     if (!SensorDataCallback::GetInstance().RegisterCallbackSensor(sensorType)) {
-        DEV_HILOGE(SERVICE, "Failed to register callback sensor");
+        FI_HILOGE("Failed to register callback sensor");
         return false;
     }
 
@@ -52,7 +56,7 @@ bool AlgoMgr::StartSensor(Type type)
 
 ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     switch (algoType_) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (still_ != nullptr) {
@@ -69,7 +73,7 @@ ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
             break;
         }
         default: {
-            DEV_HILOGE(SERVICE, "Unsupported algorithm type");
+            FI_HILOGE("Unsupported algorithm type");
             return RET_ERR;
         }
     }
@@ -78,7 +82,7 @@ ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
 
 ErrCode AlgoMgr::UnregisterCallback()
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     return RET_OK;
 }
 
@@ -88,7 +92,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
     SensorInfo *sensorInfo = nullptr;
     int32_t ret = GetAllSensors(&sensorInfo, &count);
     if (ret != 0) {
-        DEV_HILOGE(SERVICE, "Get all sensors failed");
+        FI_HILOGE("Get all sensors failed");
         return false;
     }
     SensorInfo *pt = sensorInfo + count;
@@ -97,7 +101,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
             return true;
         }
     }
-    DEV_HILOGE(SERVICE, "Get sensor failed");
+    FI_HILOGE("Get sensor failed");
     return false;
 }
 
@@ -114,7 +118,7 @@ int32_t AlgoMgr::GetSensorTypeId(Type type)
             return SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
         }
         default: {
-            DEV_HILOGW(SERVICE, "GetSensorTypeId failed");
+            FI_HILOGW("GetSensorTypeId failed");
             break;
         }
     }
@@ -123,15 +127,15 @@ int32_t AlgoMgr::GetSensorTypeId(Type type)
 
 ErrCode AlgoMgr::Enable(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (!StartSensor(type)) {
-        DEV_HILOGE(SERVICE, "sensor init failed");
+        FI_HILOGE("sensor init failed");
         return RET_ERR;
     }
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (!still_) {
-                DEV_HILOGE(SERVICE, "still_ is nullptr");
+                FI_HILOGE("still_ is nullptr");
                 still_ = std::make_shared<AlgoAbsoluteStill>();
                 still_->Init(type);
                 callAlgoNum_[type] = 0;
@@ -141,7 +145,7 @@ ErrCode AlgoMgr::Enable(Type type)
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
             if (!horizontalPosition_) {
-                DEV_HILOGE(SERVICE, "horizontalPosition_ is nullptr");
+                FI_HILOGE("horizontalPosition_ is nullptr");
                 horizontalPosition_ = std::make_shared<AlgoHorizontal>();
                 horizontalPosition_->Init(type);
                 callAlgoNum_[type] = 0;
@@ -151,7 +155,7 @@ ErrCode AlgoMgr::Enable(Type type)
         }
         case Type::TYPE_VERTICAL_POSITION: {
             if (!verticalPosition_) {
-                DEV_HILOGE(SERVICE, "verticalPosition_ is nullptr");
+                FI_HILOGE("verticalPosition_ is nullptr");
                 verticalPosition_ = std::make_shared<AlgoVertical>();
                 verticalPosition_->Init(type);
                 callAlgoNum_[type] = 0;
@@ -160,28 +164,27 @@ ErrCode AlgoMgr::Enable(Type type)
             break;
         }
         default: {
-            DEV_HILOGE(SERVICE, "Unsupported algorithm type");
+            FI_HILOGE("Unsupported algorithm type");
             return RET_ERR;
         }
     }
     algoType_ = type;
-    DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
 }
 
 ErrCode AlgoMgr::Disable(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     callAlgoNum_[type]--;
-    DEV_HILOGI(SERVICE, "callAlgoNum_:%{public}d", callAlgoNum_[type]);
+    FI_HILOGI("callAlgoNum_:%{public}d", callAlgoNum_[type]);
     if (callAlgoNum_[type] != 0) {
-        DEV_HILOGE(SERVICE, "callAlgoNum_[type] is not zero");
+        FI_HILOGE("callAlgoNum_[type] is not zero");
         return RET_ERR;
     }
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (still_) {
-                DEV_HILOGE(SERVICE, "still_ is not nullptr");
+                FI_HILOGE("still_ is not nullptr");
                 still_->Unsubscribe(type);
                 still_ = nullptr;
             }
@@ -189,7 +192,7 @@ ErrCode AlgoMgr::Disable(Type type)
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
             if (horizontalPosition_) {
-                DEV_HILOGE(SERVICE, "horizontalPosition_ is not nullptr");
+                FI_HILOGE("horizontalPosition_ is not nullptr");
                 horizontalPosition_->Unsubscribe(type);
                 horizontalPosition_ = nullptr;
             }
@@ -197,14 +200,14 @@ ErrCode AlgoMgr::Disable(Type type)
         }
         case Type::TYPE_VERTICAL_POSITION: {
             if (verticalPosition_) {
-                DEV_HILOGE(SERVICE, "verticalPosition_ is not nullptr");
+                FI_HILOGE("verticalPosition_ is not nullptr");
                 verticalPosition_->Unsubscribe(type);
                 verticalPosition_ = nullptr;
             }
             break;
         }
         default: {
-            DEV_HILOGE(SERVICE, "Unsupported algorithm type");
+            FI_HILOGE("Unsupported algorithm type");
             break;
         }
     }
@@ -215,37 +218,36 @@ ErrCode AlgoMgr::Disable(Type type)
 
 ErrCode AlgoMgr::DisableCount(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     return RET_OK;
 }
 
 ErrCode AlgoMgr::UnregisterSensor(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     int32_t sensorType = GetSensorTypeId(type);
     if (sensorType == RET_ERR) {
-        DEV_HILOGE(SERVICE, "Failed to get sensorType");
+        FI_HILOGE("Failed to get sensorType");
         return false;
     }
     if (!SensorDataCallback::GetInstance().UnregisterCallbackSensor(sensorType)) {
-        DEV_HILOGE(SERVICE, "Failed to unregister callback sensor");
+        FI_HILOGE("Failed to unregister callback sensor");
         return RET_ERR;
     }
-    DEV_HILOGD(SERVICE, "Exit");
     return RET_OK;
 }
 
 extern "C" IMsdp *Create(void)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     return new (std::nothrow) AlgoMgr();
 }
 
 extern "C" void Destroy(const IMsdp* algorithm)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (algorithm != nullptr) {
-        DEV_HILOGD(SERVICE, "algorithm is not nullptr");
+        FI_HILOGD("algorithm is not nullptr");
         delete algorithm;
     }
 }
