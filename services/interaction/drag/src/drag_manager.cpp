@@ -107,8 +107,9 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if (result != DragResult::DRAG_EXCEPTION && context_ != nullptr) {
+    if (result != DragResult::DRAG_EXCEPTION && context_ != nullptr && timerId_ >= 0) {
         context_->GetTimerManager().RemoveTimer(timerId_);
+        timerId_ = -1;
     }
     int32_t ret = RET_OK;
     if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
@@ -244,7 +245,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGD("Target window drag tid: %{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
-    context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
 }
