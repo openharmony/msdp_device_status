@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_ALGORITHM_H
-#define IDEVICESTATUS_ALGORITHM_H
+#ifndef I_DEVICESTATUS_ALGORITHM_CALLBACK_H
+#define I_DEVICESTATUS_ALGORITHM_CALLBACK_H
 
 #include <iremote_broker.h>
 
-#include "idevicestatus_algorithm_callback.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IdevicestatusAlgorithm : public IRemoteBroker {
+class IdevicestatusAlgorithmCallback : public IRemoteBroker {
 public:
-    virtual bool Enable() = 0;
-    virtual bool Disable() = 0;
-    virtual bool Subscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
-    virtual bool Unsubscribe(const sptr<IdevicestatusAlgorithmCallback>& callback) = 0;
+    virtual void OnDeviceStatusChanged(const Data& data) = 0;
 
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithm");
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IdevicestatusAlgorithmCallback");
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_ALGORITHM_H
+#endif // I_DEVICESTATUS_ALGORITHM_CALLBACK_H

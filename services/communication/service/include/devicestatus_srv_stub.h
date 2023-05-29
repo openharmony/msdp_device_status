@@ -19,7 +19,7 @@
 #include <iremote_stub.h>
 #include <nocopyable.h>
 
-#include "idevicestatus.h"
+#include "i_devicestatus.h"
 #include "message_option.h"
 #include "message_parcel.h"
 

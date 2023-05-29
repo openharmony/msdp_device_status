@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_H
-#define IDEVICESTATUS_H
+#ifndef I_DEVICESTATUS_H
+#define I_DEVICESTATUS_H
 
 #include <iremote_broker.h>
 
@@ -87,4 +87,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_H
+#endif // I_DEVICESTATUS_H

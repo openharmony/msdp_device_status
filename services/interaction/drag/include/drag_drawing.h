@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DRAWING_MANAGER_H
-#define DRAG_DRAWING_MANAGER_H
+#ifndef DRAG_DRAWING_H
+#define DRAG_DRAWING_H
 
 #include <vector>
 
@@ -121,4 +121,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DRAWING_MANAGER_H
+#endif // DRAG_DRAWING_H

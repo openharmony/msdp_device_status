@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
-#define OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
+#ifndef TIMER_MANAGER_H
+#define TIMER_MANAGER_H
 
 #include <future>
 #include <functional>
@@ -80,4 +80,4 @@ inline int TimerManager::GetTimerFd() const
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
+#endif // TIMER_MANAGER_H

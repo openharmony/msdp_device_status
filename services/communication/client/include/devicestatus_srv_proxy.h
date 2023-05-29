@@ -20,7 +20,7 @@
 #include <nocopyable.h>
 
 #include "drag_data.h"
-#include "idevicestatus.h"
+#include "i_devicestatus.h"
 
 namespace OHOS {
 namespace Msdp {
