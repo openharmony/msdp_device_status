@@ -11,6 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//base/msdp/device_status/device_status.gni")
+if (fusion_interaction_coordination) {
+  import("//base/msdp/motion/motion.gni")
+}
 
 ###############################hydra_fuzz#################################
 import("//build/config/features.gni")
@@ -27,9 +30,7 @@ deps_ex = [
   "hitrace_native:hitrace_meter",
   "hiviewdfx_hilog_native:libhilog",
   "input:libmmi-client",
-  "ipc:ipc_single",
   "multimedia_image_framework:image_native",
-  "safwk:system_ability_fwk",
 ]
 
 ###############################fuzztest#################################
@@ -40,14 +41,19 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
   include_dirs = [
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/interaction/drag/include",
+    "${device_status_service_path}/interaction/communication/include",
     "${device_status_service_path}/communication/service/include",
     "${device_status_utils_path}/include",
     "//third_party/cJSON",
   ]
+
+  if (fusion_interaction_coordination) {
+    include_dirs += [ "${motion_service_path}/native/include" ]
+  }
+
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
   sources = [ "devicestatusstub_fuzzer.cpp" ]
@@ -58,6 +64,10 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
   ]
+
+  if (fusion_interaction_coordination) {
+    deps += [ "${motion_service_path}:motion_drag" ]
+  }
 
   external_deps = deps_ex
 }
