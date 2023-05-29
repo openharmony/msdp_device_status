@@ -24,15 +24,14 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
-#include "devicestatus_hilog_wrapper.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 #include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
@@ -85,10 +84,7 @@ void GetTimeStamp(std::string &startTime)
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
     struct tm *timeinfo = localtime(&(curTime.tv_sec));
-    if (timeinfo == nullptr) {
-        DEV_HILOGE(SERVICE, "get localtime failed");
-        return;
-    }
+    CHKPV(timeinfo);
     startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))

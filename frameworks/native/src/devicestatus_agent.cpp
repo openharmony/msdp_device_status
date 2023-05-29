@@ -15,8 +15,8 @@
 
 #include "devicestatus_agent.h"
 
-#include "devicestatus_common.h"
 #include "devicestatus_define.h"
+#include "fi_log.h"
 #include "stationary_callback.h"
 #include "stationary_manager.h"
 
@@ -24,18 +24,16 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DevicestatusAgent" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAgent" };
 } // namespace
+
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
     const Data& devicestatusData)
 {
-    DEV_HILOGI(INNERKIT, "type:%{public}d, value:%{public}d", static_cast<Type>(devicestatusData.type),
+    FI_HILOGI("type:%{public}d, value:%{public}d", static_cast<Type>(devicestatusData.type),
         static_cast<OnChangedValue>(devicestatusData.value));
     std::shared_ptr<DeviceStatusAgent> agent = agent_.lock();
-    if (agent == nullptr) {
-        DEV_HILOGE(SERVICE, "agent is nullptr");
-        return;
-    }
+    CHKPV(agent);
     agent->agentEvent_->OnEventResult(devicestatusData);
 }
 
@@ -44,11 +42,8 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
     const ReportLatencyNs& latency,
     const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
-
-    if (agentEvent == nullptr) {
-        return ERR_INVALID_VALUE;
-    }
+    CALL_DEBUG_ENTER;
+    CHKPR(agentEvent, ERR_INVALID_VALUE);
     if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN && event > ActivityEvent::EVENT_INVALID
         && event <= ActivityEvent::ENTER_EXIT) {
         RegisterServiceEvent(type, event, latency);
@@ -72,7 +67,7 @@ int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const Type& type, const Activit
 void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEvent& event,
     const ReportLatencyNs& latency)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
+    CALL_DEBUG_ENTER;
     callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
     CHKPV(callback_);
     StationaryManager::GetInstance()->SubscribeCallback(type, event, latency, callback_);
@@ -81,7 +76,7 @@ void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEve
 void DeviceStatusAgent::UnRegisterServiceEvent(const Type& type,
     const ActivityEvent& event)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
+    CALL_DEBUG_ENTER;
     StationaryManager::GetInstance()->UnsubscribeCallback(type, event, callback_);
 }
 } // namespace DeviceStatus

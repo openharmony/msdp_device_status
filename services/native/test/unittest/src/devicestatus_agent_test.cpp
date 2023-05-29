@@ -15,13 +15,11 @@
 
 #include "devicestatus_agent_test.h"
 
-#include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
 using namespace testing::ext;
 using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
-using namespace std;
 
 static std::shared_ptr<DeviceStatusAgent> g_agent1;
 static std::shared_ptr<DeviceStatusAgent> g_agent2;

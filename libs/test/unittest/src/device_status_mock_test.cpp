@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "devicestatus_common.h"
 #include "devicestatus_data_define.h"
+#include "devicestatus_define.h"
 #define private public
 #include "devicestatus_data_parse.h"
 #include "devicestatus_msdp_mock.h"

@@ -22,7 +22,6 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
-#include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
 using namespace OHOS::Msdp;
