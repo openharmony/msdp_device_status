@@ -68,7 +68,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    char* ch = reinterpret_cast<const char*>(data);
+    const char* ch = reinterpret_cast<const char*>(data);
     if (ch == nullptr) {
         return 0;
     }
