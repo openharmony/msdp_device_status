@@ -72,16 +72,16 @@ public:
     static std::shared_ptr<MMI::InputDevice> GetDevice(int32_t deviceId);
     static std::pair<int32_t, int32_t> GetMouseAndTouch();
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    static std::optional<DragData> CreateDragData(std::pair<int32_t, int32_t> pixelMapSize, int32_t sourceType,
-        int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location);
+    static std::optional<DragData> CreateDragData(const std::pair<int32_t, int32_t> &pixelMapSize, int32_t sourceType,
+        int32_t pointerId, int32_t displayId, const std::pair<int32_t, int32_t> &location);
     static MMI::PointerEvent::PointerItem CreatePointerItem(int32_t pointerId,
-        int32_t deviceId, std::pair<int, int> displayLocation, bool isPressed);
-    static std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(std::pair<int, int> displayLocation, int32_t action,
-        int32_t sourceType, int32_t pointerId, bool isPressed);
-    static void SimulateDownEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
-    static void SimulateMoveEvent(std::pair<int, int> srcLocation, std::pair<int, int> dstLocation,
-        int32_t sourceType, int32_t pointerId, bool isPressed);
-    static void SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId);
+        int32_t deviceId, const std::pair<int32_t, int32_t> &displayLocation, bool isPressed);
+    static std::shared_ptr<MMI::PointerEvent> SetupPointerEvent(const std::pair<int32_t, int32_t> &displayLocation,
+        int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed);
+    static void SimulateDownEvent(const std::pair<int32_t, int32_t> &location, int32_t sourceType, int32_t pointerId);
+    static void SimulateMoveEvent(const std::pair<int32_t, int32_t> &srcLocation, const std::pair<int32_t, int32_t>
+        &dstLocation, int32_t sourceType, int32_t pointerId, bool isPressed);
+    static void SimulateUpEvent(const std::pair<int32_t, int32_t> &location, int32_t sourceType, int32_t pointerId);
     static int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
     static void TestRemoveMonitor(int32_t monitorId);
 };
@@ -170,8 +170,8 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     return pixelMap;
 }
 
-std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t, int32_t> pixelMapSize,
-    int32_t sourceType, int32_t pointerId, int32_t displayId, std::pair<int32_t, int32_t> location)
+std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<int32_t, int32_t> &pixelMapSize,
+    int32_t sourceType, int32_t pointerId, int32_t displayId, const std::pair<int32_t, int32_t> &location)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(pixelMapSize.first, pixelMapSize.second);
@@ -195,8 +195,8 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(std::pair<int32_t
     return dragData;
 }
 
-MMI::PointerEvent::PointerItem InteractionManagerTest::CreatePointerItem(int32_t pointerId,
-    int32_t deviceId, std::pair<int, int> displayLocation, bool isPressed)
+MMI::PointerEvent::PointerItem InteractionManagerTest::CreatePointerItem(int32_t pointerId, int32_t deviceId,
+    const std::pair<int32_t, int32_t> &displayLocation, bool isPressed)
 {
     MMI::PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
@@ -207,8 +207,8 @@ MMI::PointerEvent::PointerItem InteractionManagerTest::CreatePointerItem(int32_t
     return item;
 }
 
-std::shared_ptr<MMI::PointerEvent> InteractionManagerTest::SetupPointerEvent(std::pair<int, int> displayLocation,
-    int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
+std::shared_ptr<MMI::PointerEvent> InteractionManagerTest::SetupPointerEvent(const std::pair<int32_t, int32_t>
+    &displayLocation, int32_t action, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = MMI::PointerEvent::Create();
@@ -229,7 +229,8 @@ std::shared_ptr<MMI::PointerEvent> InteractionManagerTest::SetupPointerEvent(std
     return pointerEvent;
 }
 
-void InteractionManagerTest::SimulateDownEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId)
+void InteractionManagerTest::SimulateDownEvent(const std::pair<int32_t, int32_t> &location, int32_t sourceType,
+    int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<MMI::PointerEvent> pointerEvent =
@@ -240,8 +241,8 @@ void InteractionManagerTest::SimulateDownEvent(std::pair<int, int> location, int
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
-void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, std::pair<int, int> dstLocation,
-    int32_t sourceType, int32_t pointerId, bool isPressed)
+void InteractionManagerTest::SimulateMoveEvent(const std::pair<int32_t, int32_t> &srcLocation,
+    const std::pair<int32_t, int32_t> &dstLocation, int32_t sourceType, int32_t pointerId, bool isPressed)
 {
     CALL_DEBUG_ENTER;
     int32_t srcX = srcLocation.first;
@@ -271,7 +272,8 @@ void InteractionManagerTest::SimulateMoveEvent(std::pair<int, int> srcLocation, 
     }
 }
 
-void InteractionManagerTest::SimulateUpEvent(std::pair<int, int> location, int32_t sourceType, int32_t pointerId)
+void InteractionManagerTest::SimulateUpEvent(const std::pair<int32_t, int32_t> &location, int32_t sourceType,
+    int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<MMI::PointerEvent> pointerEvent =
