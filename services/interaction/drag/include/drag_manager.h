@@ -81,7 +81,7 @@ private:
     void StateChangedNotify(DragState state);
     DragState GetDragState() const override;
 private:
-    int32_t timerId_ { 0 };
+    int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
