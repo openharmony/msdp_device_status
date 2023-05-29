@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,15 @@
 #include <gtest/gtest.h>
 
 #include "devicestatus_callback_stub.h"
+#include "devicestatus_define.h"
 #include "stationary_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-using namespace std;
+using namespace ::OHOS::Msdp::DeviceStatus;
+
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientTest" };
+}
 
 class DeviceStatusClientTest : public testing::Test {
 public:
@@ -51,11 +53,11 @@ void DeviceStatusClientTest::DeviceStatusClientTestCallback::OnDeviceStatusChang
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest001 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_VERTICAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -65,7 +67,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest001 end");
 }
 
 /**
@@ -75,11 +76,11 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest002 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_INVALID;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -89,7 +90,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest002 end");
 }
 
 /**
@@ -99,11 +99,11 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest003 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_ABSOLUTE_STILL;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -113,7 +113,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest003 end");
 }
 
 /**
@@ -123,11 +122,11 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest004 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_HORIZONTAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -137,7 +136,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest004 end");
 }
 
 /**
@@ -147,11 +145,11 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest005 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_LID_OPEN;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -161,7 +159,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest005 end");
 }
 
 /**
@@ -171,11 +168,11 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest006 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_MAX;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+    ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     EXPECT_FALSE(cb == nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
@@ -185,7 +182,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest006 end");
 }
 
 /**
@@ -195,7 +191,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_ABSOLUTE_STILL;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -204,7 +200,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest007 end");
 }
 
 /**
@@ -214,7 +209,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest008 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_VERTICAL_POSITION;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -223,7 +218,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest008 end");
 }
 
 /**
@@ -233,7 +227,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
 {
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest009 Enter");
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_HORIZONTAL_POSITION;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -242,7 +236,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    DEV_HILOGD(SERVICE, "GetDeviceStatusDataTest009 end");
 }
 
 /**
@@ -252,7 +245,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 Enter";
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_LID_OPEN;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);

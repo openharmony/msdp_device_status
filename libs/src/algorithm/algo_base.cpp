@@ -15,65 +15,59 @@
 
 #include "algo_base.h"
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AlgoBase" };
+} // namespace
+
 void AlgoBase::Unsubscribe(int32_t sensorTypeId)
 {
-    DEV_HILOGD(SERVICE, "Enter");
-    if (algoCallback_ == nullptr) {
-        DEV_HILOGE(SERVICE, "algoCallback is nullptr");
-        return;
-    }
+    CALL_DEBUG_ENTER;
+    CHKPV(algoCallback_);
     SensorDataCallback::GetInstance().UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
 }
 
 bool AlgoBase::SetData(int32_t sensorTypeId, AccelData* sensorData)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (sensorTypeId != SENSOR_TYPE_ID_ACCELEROMETER) {
-        DEV_HILOGE(SERVICE, "sensorTypeId:%{public}d", sensorTypeId);
+        FI_HILOGE("sensorTypeId:%{public}d", sensorTypeId);
         return false;
     }
-    if (sensorData == nullptr) {
-        DEV_HILOGE(SERVICE, "sensorData is nullptr");
-        return false;
-    }
-
+    CHKPF(sensorData);
     AccelData* data = sensorData;
     if ((abs(data->x) > ACC_VALID_THRHD) ||
         (abs(data->y) > ACC_VALID_THRHD) ||
         (abs(data->z) > ACC_VALID_THRHD)) {
-        DEV_HILOGE(SERVICE, "Acc data is invalid");
+        FI_HILOGE("Acc data is invalid");
         return false;
     }
 
     algoPara_.x = data->y;
     algoPara_.y = data->x;
     algoPara_.z = -(data->z);
-    DEV_HILOGD(SERVICE, "x:%{public}f, y:%{public}f, z:%{public}f", algoPara_.x, algoPara_.y, algoPara_.z);
+    FI_HILOGD("x:%{public}f, y:%{public}f, z:%{public}f", algoPara_.x, algoPara_.y, algoPara_.z);
     return true;
 }
 
 void AlgoBase::RegisterCallback(const std::shared_ptr<IMsdp::MsdpAlgoCallback> callback)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     callback_ = callback;
 }
 
 void AlgoBase::UpdateStateAndReport(OnChangedValue value, int32_t state, Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
-
-    if (callback_ == nullptr) {
-        DEV_HILOGE(SERVICE, "callback_ is nullptr");
-        return;
-    }
-
+    CALL_DEBUG_ENTER;
+    CHKPV(callback_);
     state_ = state;
     reportInfo_.type = type;
     reportInfo_.value = value;
-    DEV_HILOGI(SERVICE, "type:%{public}d, value:%{public}d", type, value);
+    FI_HILOGI("type:%{public}d,value:%{public}d", type, value);
     callback_->OnResult(reportInfo_);
 }
 } // namespace DeviceStatus

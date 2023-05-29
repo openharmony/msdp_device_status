@@ -18,31 +18,30 @@
 #include <cmath>
 #include <cstdio>
 
-#include "devicestatus_common.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AlgoVertical" };
 constexpr float JUDGE_FLOAT = 1e-6;
 }
+
 bool AlgoVertical::Init(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     algoCallback_ = std::bind(&AlgoVertical::StartAlgorithm, this, std::placeholders::_1, std::placeholders::_2);
-    if (algoCallback_ == nullptr) {
-        DEV_HILOGE(SERVICE, "algoCallback is nullptr");
-        return false;
-    }
+    CHKPF(algoCallback_);
     SensorDataCallback::GetInstance().SubscribeSensorEvent(type, algoCallback_);
     return true;
 }
 
 bool AlgoVertical::StartAlgorithm(int32_t sensorTypeId, AccelData* sensorData)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     if (!SetData(sensorTypeId, sensorData)) {
-        DEV_HILOGE(SERVICE, "Failed to get data");
+        FI_HILOGE("Failed to get data");
         return false;
     }
     ExecuteOperation();
@@ -51,14 +50,13 @@ bool AlgoVertical::StartAlgorithm(int32_t sensorTypeId, AccelData* sensorData)
 
 void AlgoVertical::ExecuteOperation()
 {
-    DEV_HILOGD(SERVICE, "Enter");
-
+    CALL_DEBUG_ENTER;
     if ((abs(algoPara_.y) <= JUDGE_FLOAT) && (abs(algoPara_.z) <= JUDGE_FLOAT)) {
         return;
     }
     algoPara_.pitch = -atan2(algoPara_.y, algoPara_.z) * (ANGLE_180_DEGREE / PI);
     algoPara_.roll = atan2(algoPara_.x, algoPara_.z) * (ANGLE_180_DEGREE / PI);
-    DEV_HILOGD(SERVICE, "pitch:%{public}f, roll:%{public}f", algoPara_.pitch, algoPara_.roll);
+    FI_HILOGD("pitch:%{public}f, roll:%{public}f", algoPara_.pitch, algoPara_.roll);
 
     if (((abs(algoPara_.pitch) > ANGLE_VER_LOW_THRHD) && (abs(algoPara_.pitch) < ANGLE_VER_UP_THRHD)) ||
         ((abs(algoPara_.roll) > ANGLE_VER_LOW_THRHD) && (abs(algoPara_.roll) < ANGLE_VER_UP_THRHD))) {

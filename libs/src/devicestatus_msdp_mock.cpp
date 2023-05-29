@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -127,7 +127,7 @@ void DeviceStatusMsdpMock::InitTimer()
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
     auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
     if (!ret) {
-        DEV_HILOGW(SERVICE, "insert timer fd failed");
+        FI_HILOGW("insert timer fd failed");
     }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
         FI_HILOGE("register timer fd failed");

@@ -24,15 +24,14 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
-#include "devicestatus_hilog_wrapper.h"
-#include "fi_log.h"
+#include "devicestatus_define.h"
 #include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
@@ -85,10 +84,7 @@ void GetTimeStamp(std::string &startTime)
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
     struct tm *timeinfo = localtime(&(curTime.tv_sec));
-    if (timeinfo == nullptr) {
-        DEV_HILOGE(SERVICE, "get localtime failed");
-        return;
-    }
+    CHKPV(timeinfo);
     startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
@@ -179,7 +175,8 @@ const char* GetProgramName()
     }
 
     char buf[BUF_CMD_SIZE] = { 0 };
-    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    int32_t ret = sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid()));
+    if (ret == -1) {
         FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
         return "";
     }
@@ -214,8 +211,8 @@ const char* GetProgramName()
         FI_HILOGE("The copySize is 0");
         return "";
     }
-    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
-    if (ret != EOK) {
+    errno_t result = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (result != EOK) {
         FI_HILOGE("memcpy_s failed");
         return "";
     }

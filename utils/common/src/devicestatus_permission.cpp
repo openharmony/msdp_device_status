@@ -18,9 +18,15 @@
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
 
+#include "fi_log.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusPermission" };
+}
+
 bool DeviceStatusPermission::CheckCallingPermission(const std::string &permissionName)
 {
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
@@ -28,7 +34,7 @@ bool DeviceStatusPermission::CheckCallingPermission(const std::string &permissio
     if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return ERR_OK;
     } else {
-        DEV_HILOGD(COMMON, "has no permission, permission name:%{public}s", permissionName.c_str());
+        FI_HILOGD("has no permission.permission name = %{public}s", permissionName.c_str());
         return ERR_NG;
     }
 }
@@ -39,7 +45,6 @@ std::string DeviceStatusPermission::GetAppInfo()
     uid_t uid = IPCSkeleton::GetCallingUid();
     return Security::Permission::AppIdInfoHelper::CreateAppIdInfo(pid, uid);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -25,7 +25,6 @@
 #include "coordination_event_handler.h"
 #include "coordination_event_manager.h"
 #include "devicestatus_define.h"
-#include "devicestatus_hilog_wrapper.h"
 
 namespace OHOS {
 namespace Msdp {

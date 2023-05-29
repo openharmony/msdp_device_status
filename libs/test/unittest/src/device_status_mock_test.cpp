@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "devicestatus_common.h"
 #include "devicestatus_data_define.h"
+#include "devicestatus_define.h"
 #define private public
 #include "devicestatus_data_parse.h"
 #include "devicestatus_msdp_mock.h"
@@ -34,7 +34,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 
 namespace {
-std::shared_ptr <DeviceStatusMsdpMock> g_testMock;
+std::shared_ptr<DeviceStatusMsdpMock> g_testMock;
 }
 
 class DeviceStatusMsdpMoclTest : public testing::Test {
@@ -68,7 +68,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest001 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest001 end";
@@ -83,7 +83,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest002 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_INVALID) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_INVALID) == ERR_OK);
@@ -100,7 +100,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest003 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
@@ -117,7 +117,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest004 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
@@ -134,7 +134,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest005 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
@@ -151,7 +151,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest006 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_LID_OPEN) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_LID_OPEN) == ERR_OK);
@@ -168,7 +168,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest007 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_MAX) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_MAX) == ERR_OK);
@@ -185,7 +185,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest008 start";
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
@@ -295,7 +295,7 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest014, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest015, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest015 start";
-    std::shared_ptr <DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_FALSE(g_testMock->NotifyMsdpImpl({TYPE_INVALID, VALUE_INVALID}) == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest015 end";

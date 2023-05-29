@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
 #include "securec.h"
 
 #include "util_napi.h"
@@ -30,7 +29,7 @@ namespace OHOS {
 namespace Msdp {
 const std::string ERR_CODE = "code";
 struct NapiError {
-    int32_t errorCode;
+    int32_t errorCode { 0 };
     std::string msg;
 };
 
@@ -45,7 +44,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PERMISSION_CHECK_ERROR,
         {COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
     {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
-    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}}
+    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed."}}
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
@@ -67,7 +66,8 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         NapiError codeMsg; \
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[300]; \
-            if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2) > 0) { \
+            int32_t ret = sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2); \
+            if (ret > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \
                 FI_HILOGE("Failed to convert string type to char type, ErrorCode:%{public}s", (#code)); \
@@ -75,7 +75,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         } \
     } while (0)
 namespace UtilNapiError {
-bool GetApiError(int32_t code, NapiError& codeMsg);
+bool GetApiError(int32_t code, NapiError &codeMsg);
 } // namespace UtilNapiError
 } // namespace Msdp
 } // namespace OHOS

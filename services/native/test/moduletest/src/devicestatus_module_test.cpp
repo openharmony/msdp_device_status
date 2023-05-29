@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,18 +23,21 @@
 #include <ipc_skeleton.h>
 #include <string_ex.h>
 
-#include "devicestatus_common.h"
+#include "fi_log.h"
 #include "stationary_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-using namespace std;
+using namespace ::OHOS;
+using namespace ::OHOS::Msdp;
+using namespace ::OHOS::Msdp::DeviceStatus;
+
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusModuleTest" };
+}
 
 Type DeviceStatusModuleTest::g_moduleTest = Type::TYPE_INVALID;
 
-void DeviceStatusModuleTest::DeviceStatusModuleTestCallback::OnDeviceStatusChanged(const \
-    Data& devicestatusData)
+void DeviceStatusModuleTest::DeviceStatusModuleTestCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     GTEST_LOG_(INFO) << "DeviceStatusModuleTestCallback type: " << devicestatusData.type;
     GTEST_LOG_(INFO) << "DeviceStatusModuleTestCallback value: " << devicestatusData.value;
@@ -69,7 +72,7 @@ HWTEST_F (DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
  */
 HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 Enter");
+    CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_HORIZONTAL_POSITION;
     Type type = g_moduleTest;
     auto stationaryManager = StationaryManager::GetInstance();
@@ -88,7 +91,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
  */
 HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
+    CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_ABSOLUTE_STILL;
     Type type = g_moduleTest;
     auto stationaryManager = StationaryManager::GetInstance();
@@ -107,7 +110,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
  */
 HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 Enter");
+    CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_VERTICAL_POSITION;
     Type type = g_moduleTest;
     auto stationaryManager = StationaryManager::GetInstance();
