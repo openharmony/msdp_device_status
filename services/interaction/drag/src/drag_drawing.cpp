@@ -82,6 +82,7 @@ const std::string COPY_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_Dra
 const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_One_Drag.svg";
 const std::string DEFAULT_DRAG_PATH = "/system/etc/device_status/drag_icon/Default_Drag.svg";
 const std::string FORBID_DRAG_PATH = "/system/etc/device_status/drag_icon/Forbid_Drag.svg";
+const std::string FORBID_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg";
 const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/drag_icon/Mouse_Drag.svg";
 const std::string MOVE_DRAG_PATH = "/system/etc/device_status/drag_icon/Move_Drag.svg";
 struct DrawingInfo {
@@ -798,6 +799,10 @@ bool DrawSVGModifier::NeedAdjustSvgInfo() const
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
+    if ((g_drawingInfo.currentStyle == DragCursorStyle::FORBIDDEN) &&
+        (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
+        return false;
+    }
     return true;
 }
 
@@ -826,7 +831,11 @@ int32_t DrawSVGModifier::GetFilePath(std::string &filePath) const
             break;
         }
         case DragCursorStyle::FORBIDDEN: {
-            filePath = FORBID_DRAG_PATH;
+            if (g_drawingInfo.currentDragNum == DRAG_NUM_ONE) {
+                filePath = FORBID_ONE_DRAG_PATH;
+            } else {
+                filePath = FORBID_DRAG_PATH;
+            }
             break;
         }
         case DragCursorStyle::DEFAULT:
