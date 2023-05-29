@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "devicestatus_dumper.h"
+
 #include <cinttypes>
 #include <csignal>
 #include <cstring>
@@ -31,7 +33,6 @@
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#include "devicestatus_dumper.h"
 #include "drag_manager.h"
 #include "util.h"
 
@@ -76,7 +77,8 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
     };
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
-    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+    errno_t ret = memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*));
+    if (ret != EOK) {
         FI_HILOGE("call memset_s failed");
         delete[] argv;
         return;
@@ -87,7 +89,8 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
             FI_HILOGE("failed to allocate memory");
             goto RELEASE_RES;
         }
-        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
+        ret = strcpy_s(argv[i], args[i].size() + 1, args[i].c_str());
+        if (ret != RET_OK) {
             FI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
         }
