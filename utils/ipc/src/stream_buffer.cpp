@@ -92,6 +92,7 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 bool StreamBuffer::Read(char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {
@@ -123,6 +124,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {

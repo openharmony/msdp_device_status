@@ -350,6 +350,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
+        FI_HILOGE("EpollCtl failed");
         return ret;
     }
     return RET_OK;

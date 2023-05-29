@@ -44,6 +44,7 @@ std::optional <std::string> GetErrMsg(int32_t errorCode)
     if (iter != ERROR_MESSAGES.end()) {
         return iter->second;
     }
+    FI_HILOGE("Error messages not found");
     return std::nullopt;
 }
 
