@@ -108,7 +108,7 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
     if (pixelMap == nullptr) {
-        FI_HILOGE("CreatePixelMap failed");
+        FI_HILOGE("Create pixelmap failed");
         return std::nullopt;
     }
     DragData dragData;

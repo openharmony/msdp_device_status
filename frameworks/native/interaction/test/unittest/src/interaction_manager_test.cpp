@@ -94,7 +94,7 @@ std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
     };
     int32_t ret = MMI::InputManager::GetInstance()->GetDeviceIds(callback);
     if (ret != RET_OK) {
-        FI_HILOGE("GetDeviceIds failed");
+        FI_HILOGE("Get device ids failed");
         return {};
     }
     return realDeviceIds;
@@ -108,7 +108,7 @@ std::shared_ptr<MMI::InputDevice> InteractionManagerTest::GetDevice(int32_t devi
     };
     int32_t ret = MMI::InputManager::GetInstance()->GetDevice(deviceId, callback);
     if (ret != RET_OK || inputDevice == nullptr) {
-        FI_HILOGE("GetDevice failed");
+        FI_HILOGE("Get device failed");
         return nullptr;
     }
     return inputDevice;
@@ -176,7 +176,7 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<i
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(pixelMapSize.first, pixelMapSize.second);
     if (pixelMap == nullptr) {
-        FI_HILOGE("CreatePixelMap failed");
+        FI_HILOGE("Create pixelmap failed");
         return std::nullopt;
     }
     DragData dragData;
@@ -353,7 +353,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
         CoordinationListenerTest() : ICoordinationListener() {}
         void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
         {
-            FI_HILOGD("RegisterCoordinationListenerTest");
+            FI_HILOGD("Register coordination listener test");
             (void) deviceId;
         };
     };
@@ -548,7 +548,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener_Mouse, Test
             DragListenerTest() : IDragListener() {}
             void OnDragMessage(DragState state) override
             {
-                FI_HILOGD("DragListenerTest state:%{public}d", state);
+                FI_HILOGD("Drag listener test, state:%{public}d", state);
             };
         };
         auto listener = std::make_shared<DragListenerTest>();
@@ -605,7 +605,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener_Touch, Test
             DragListenerTest() : IDragListener() {}
             void OnDragMessage(DragState state) override
             {
-                FI_HILOGD("DragListenerTest state:%{public}d", state);
+                FI_HILOGD("Drag listener test, state:%{public}d", state);
             };
         };
         auto listener = std::make_shared<DragListenerTest>();
