@@ -72,7 +72,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (ch == nullptr) {
         return 0;
     }
-
     OHOS::DoSomethingInterestingWithMyAPI(ch, size);
     return 0;
 }
