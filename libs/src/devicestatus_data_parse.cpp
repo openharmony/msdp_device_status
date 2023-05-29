@@ -95,6 +95,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     cJSON* mockarray = cJSON_GetObjectItem(parser.json_, DeviceStatusJson[type].json.c_str());
     int32_t jsonsize = cJSON_GetArraySize(mockarray);
     if (jsonsize == 0) {
+        FI_HILOGE("json size is zero");
         return false;
     }
     tempcount_[type] = tempcount_[type] % jsonsize;

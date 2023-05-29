@@ -122,6 +122,7 @@ bool TimerManager::OnIsExist(int32_t timerId) const
             return true;
         }
     }
+    FI_HILOGE("timerId does not exist");
     return false;
 }
 
@@ -197,6 +198,7 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
             return RET_OK;
         }
     }
+    FI_HILOGE("Failed to remove timer internal");
     return RET_ERR;
 }
 
@@ -216,6 +218,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             return RET_OK;
         }
     }
+    FI_HILOGE("Failed to reset timer internal");
     return RET_ERR;
 }
 
