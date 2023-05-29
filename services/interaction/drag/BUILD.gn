@@ -30,8 +30,6 @@ ohos_shared_library("interaction_drag") {
     "src/state_change_notify.cpp",
   ]
 
-  configs = [ ":drag_private_config" ]
-
   defines = device_status_default_defines
 
   deps = [
