@@ -22,11 +22,18 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum {
+    /**
+     *  Module type: DeviceStatus Service
+     */
     DEVICESTATUS_MODULE_TYPE_SERVICE = 0,
+    /**
+     *  Module type: DeviceStatus Kit
+     */
     DEVICESTATUS_MODULE_TYPE_KIT = 1,
     DEVICESTATUS_MODULE_TYPE_CLIENT = 2
 };
 
+// offset of devicestatus error, only be used in this file.
 constexpr ErrCode DEVICESTATUS_SERVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_SERVICE);
 
 enum {
@@ -46,9 +53,13 @@ enum {
 };
 
 enum {
+    // 文件打开失败
     FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_KIT),
+    // 流缓冲读取失败
     STREAM_BUF_READ_FAIL,
+    // 事件注册失败
     EVENT_REG_FAIL,
+    // 参数注入失败
     PARAM_INPUT_FAIL
 };
 
