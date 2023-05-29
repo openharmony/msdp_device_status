@@ -47,6 +47,7 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
     DEV_HILOGD(INNERKIT, "Enter");
 
     if (agentEvent == nullptr) {
+        DEV_HILOGE(SERVICE, "agentEvent is nullptr");
         return ERR_INVALID_VALUE;
     }
     if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN && event > ActivityEvent::EVENT_INVALID
