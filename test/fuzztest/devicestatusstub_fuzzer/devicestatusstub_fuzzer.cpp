@@ -33,7 +33,7 @@ const std::u16string FORMMGR_DEVICE_TOKEN = u"ohos.msdp.Idevicestatus";
 
 uint32_t GetU32Data(const char* ptr, size_t size)
 {
-    constexpr size_t MIN_SIZE= 4;
+    constexpr size_t MIN_SIZE = 4;
     if (ptr == nullptr) {
         return 0;
     }
