@@ -33,6 +33,9 @@ const std::u16string FORMMGR_DEVICE_TOKEN = u"ohos.msdp.Idevicestatus";
 
 uint32_t GetU32Data(const char* ptr)
 {
+    if (ptr == nullptr) {
+        return 0;
+    }
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
 }
@@ -68,21 +71,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    char* ch = (char *)malloc(size + 1);
+    const char* ch = reinterpret_cast<const char*>(data);
     if (ch == nullptr) {
         return 0;
     }
-
-    (void)memset_s(ch, size + 1, 0x00, size + 1);
-    if (memcpy_s(ch, size, data, size) != EOK) {
-        free(ch);
-        ch = nullptr;
-        return 0;
-    }
-
     OHOS::DoSomethingWithMyAPI(ch, size);
-    free(ch);
-    ch = nullptr;
     return 0;
 }
 
