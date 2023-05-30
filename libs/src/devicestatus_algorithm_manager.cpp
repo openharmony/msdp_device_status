@@ -97,7 +97,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
     }
     SensorInfo *pt = sensorInfo + count;
     for (SensorInfo *ps = sensorInfo; ps < pt; ++ps) {
-        if (sensorInfo->sensorTypeId == sensorTypeId) {
+        if (ps->sensorTypeId == sensorTypeId) {
             return true;
         }
     }
