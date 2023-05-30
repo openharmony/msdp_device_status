@@ -126,6 +126,7 @@ float GetScaling()
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (displayInfo == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
         displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(0);
     }
     CHKPR(displayInfo, RET_ERR);
