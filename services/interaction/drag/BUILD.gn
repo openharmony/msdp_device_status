@@ -14,12 +14,9 @@
 import("//build/ohos.gni")
 import("../../../device_status.gni")
 
-config("drag_private_config") {
-  include_dirs = [ "include" ]
-}
-
 ohos_shared_library("interaction_drag") {
   include_dirs = [
+    "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}/include",
     "${device_status_service_path}/context/include",
@@ -32,8 +29,6 @@ ohos_shared_library("interaction_drag") {
     "src/drag_manager.cpp",
     "src/state_change_notify.cpp",
   ]
-
-  configs = [ ":drag_private_config" ]
 
   defines = device_status_default_defines
 
