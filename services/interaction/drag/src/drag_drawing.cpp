@@ -125,6 +125,9 @@ float GetScaling()
 {
     CALL_DEBUG_ENTER;
     auto displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (displayInfo == nullptr) {
+        displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    }
     CHKPR(displayInfo, RET_ERR);
     if (displayInfo->GetDpi() < -std::numeric_limits<float>::epsilon()) {
         return 0.0f;
