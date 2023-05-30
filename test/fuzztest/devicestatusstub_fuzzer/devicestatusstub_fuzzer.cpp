@@ -37,7 +37,7 @@ uint32_t GetU32Data(const char* ptr)
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingWithMyAPI(const char* data, size_t size)
 {
     uint32_t code = GetU32Data(data);
     MessageParcel datas;
@@ -80,7 +80,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    OHOS::DoSomethingWithMyAPI(ch, size);
     free(ch);
     ch = nullptr;
     return 0;
