@@ -47,12 +47,13 @@ void DeviceStatusModuleTest::DeviceStatusModuleTestCallback::OnDeviceStatusChang
         "DeviceStatusModuleTestCallback failed";
 }
 
+namespace {
 /**
  * @tc.name: DeviceStatusCallbackTest
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
+HWTEST_F(DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
 {
     g_moduleTest = Type::TYPE_ABSOLUTE_STILL;
     Type type = g_moduleTest;
@@ -70,7 +71,7 @@ HWTEST_F (DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
+HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_HORIZONTAL_POSITION;
@@ -89,7 +90,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest001, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
+HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_ABSOLUTE_STILL;
@@ -108,7 +109,7 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest002, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
+HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_VERTICAL_POSITION;
@@ -121,3 +122,4 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
+} // namespace

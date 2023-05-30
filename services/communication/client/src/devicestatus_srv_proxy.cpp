@@ -15,10 +15,11 @@
 
 #include "devicestatus_srv_proxy.h"
 
-#include "hitrace_meter.h"
-#include "iremote_object.h"
 #include <message_option.h>
 #include <message_parcel.h>
+
+#include "hitrace_meter.h"
+#include "iremote_object.h"
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"

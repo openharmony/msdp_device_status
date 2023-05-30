@@ -55,9 +55,9 @@ void DeviceStatusMsdpMoclTest::TearDownTestCase()
     g_testMock = nullptr;
 }
 
-void DeviceStatusMsdpMoclTest::SetUp() {}
+void DeviceStatusMsdpMoclTest::SetUp() const {}
 
-void DeviceStatusMsdpMoclTest::TearDown() {}
+void DeviceStatusMsdpMoclTest::TearDown() const {}
 
 /**
  * @tc.name: DeviceStatusMsdpMockTest

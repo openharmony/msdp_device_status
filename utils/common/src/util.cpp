@@ -15,14 +15,14 @@
 
 #include "util.h"
 
+#include <string>
 #include <unistd.h>
 
-#include <string>
-
-#include "securec.h"
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+
+#include "securec.h"
 
 #include "devicestatus_define.h"
 #include "utility.h"

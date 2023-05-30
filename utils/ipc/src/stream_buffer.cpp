@@ -16,7 +16,6 @@
 #include "stream_buffer.h"
 
 #include <algorithm>
-#include <vector>
 
 namespace OHOS {
 namespace Msdp {

@@ -16,11 +16,11 @@
 #ifndef DEVICESTATUS_SRV_PROXY_H
 #define DEVICESTATUS_SRV_PROXY_H
 
-#include "iremote_proxy.h"
 #include <nocopyable.h>
 
 #include "drag_data.h"
 #include "i_devicestatus.h"
+#include "iremote_proxy.h"
 
 namespace OHOS {
 namespace Msdp {
