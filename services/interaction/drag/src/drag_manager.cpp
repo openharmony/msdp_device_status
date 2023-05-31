@@ -215,7 +215,7 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
-    privilege.tokenId = targetTid;
+    privilege.tokenId = static_cast<uint32_t>(targetTid);
     FI_HILOGD("AddPrivilege enter");
     int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
     if (ret != RET_OK) {
