@@ -464,9 +464,7 @@ bool CoordinationSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    if (display == nullptr) {
-        return false;
-    }
+    CHKPF(disply);
     int32_t width = display->GetWidth();
     int32_t height = display->GetHeight();
     if (width == 0 || height == 0) {
@@ -780,10 +778,7 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     CALL_INFO_TRACE;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    if (display == nullptr) {
-        FI_HILOGE("display is nullptr");
-        return;
-    }
+    CHKPV(display);
     int32_t width = display->GetWidth();
     int32_t height = display->GetHeight();
     int32_t physicalX = static_cast<int32_t>(width * xPercent / PERCENT_CONST);

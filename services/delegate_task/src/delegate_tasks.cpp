@@ -95,10 +95,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
-    if (task == nullptr) {
-        FI_HILOGE("Post sync task failed");
-        return ETASKS_POST_SYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
@@ -118,10 +115,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
     CHKPR(callback, ERROR_NULL_POINTER);
     auto task = PostTask(callback);
-    if (task == nullptr) {
-        FI_HILOGE("Post async task failed");
-        return ETASKS_POST_ASYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_ASYNCTASK_FAIL);
     return RET_OK;
 }
 

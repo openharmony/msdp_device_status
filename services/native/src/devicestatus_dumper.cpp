@@ -179,10 +179,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
-        if (record == nullptr) {
-            FI_HILOGE("deviceStatusQueue is nullptr");
-            continue;
-        }
+        CHKPC(record);
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
         dprintf(fd, "startTime:%s | type:%s | value:%s\n",

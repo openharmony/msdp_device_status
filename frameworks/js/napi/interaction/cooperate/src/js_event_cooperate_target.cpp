@@ -220,10 +220,7 @@ napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
     cb->env = env;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return nullptr;
-    }
+    CHKPP(scope);
     napi_value promise = nullptr;
     if (handle == nullptr) {
         CHKRP_SCOPE(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE, scope);
