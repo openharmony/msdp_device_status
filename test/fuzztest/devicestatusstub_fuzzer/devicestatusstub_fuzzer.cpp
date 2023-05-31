@@ -31,9 +31,13 @@ constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
 const std::u16string FORMMGR_DEVICE_TOKEN = u"ohos.msdp.Idevicestatus";
 
-uint32_t GetU32Data(const char* ptr)
+uint32_t GetU32Data(const char* ptr, size_t size)
 {
+    constexpr size_t MIN_SIZE = 4;
     if (ptr == nullptr) {
+        return 0;
+    }
+    if (size < MIN_SIZE) {
         return 0;
     }
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
@@ -42,7 +46,7 @@ uint32_t GetU32Data(const char* ptr)
 
 bool DoSomethingWithMyAPI(const char* data, size_t size)
 {
-    uint32_t code = GetU32Data(data);
+    uint32_t code = GetU32Data(data, size);
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
     datas.WriteBuffer(data, size);
