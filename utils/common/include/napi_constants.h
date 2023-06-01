@@ -43,6 +43,10 @@ inline constexpr std::string_view TYPEOF { "napi_typeof" };
 inline constexpr std::string_view UNWRAP { "napi_unwrap" };
 inline constexpr std::string_view WRAP { "napi_wrap" };
 inline constexpr std::string_view CREATE_STRING_UTF8 { "napi_create_string_utf8" };
+constexpr int32_t ZERO_PARAM { 0 };
+constexpr int32_t ONE_PARAM { 1 };
+constexpr int32_t TWO_PARAM { 2 };
+constexpr int32_t THREE_PARAM { 3 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

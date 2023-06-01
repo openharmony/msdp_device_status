@@ -31,7 +31,6 @@ inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
 inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
 inline constexpr std::string_view RESOLVE_DEFERRED { "napi_resolve_deferred" };
 inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
-constexpr int32_t TWO_PARAM = 2;
 } // namespace
 
 JsEventTarget::JsEventTarget()
@@ -557,7 +556,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     napi_value result = nullptr;
     size_t argc = TWO_PARAM;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, argc, resultObj, &result),
-                CALL_FUNCTION, scope);
+        CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }

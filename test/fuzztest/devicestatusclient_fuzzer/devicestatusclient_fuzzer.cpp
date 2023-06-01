@@ -16,8 +16,8 @@
 #include "devicestatusclient_fuzzer.h"
 
 #include <cstring>
-#include <stddef>
-#include <stdint>
+#include <stddef.h>
+#include <stdint.h>
 #include "securec.h"
 
 #include "fi_log.h"

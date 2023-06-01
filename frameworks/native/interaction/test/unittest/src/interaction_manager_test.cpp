@@ -138,9 +138,9 @@ void InteractionManagerTest::SetUpTestCase()
     g_deviceTouchId = mouseAndTouch.second;
 }
 
-void InteractionManagerTest::SetUp() const {}
+void InteractionManagerTest::SetUp() {}
 
-void InteractionManagerTest::TearDown() const
+void InteractionManagerTest::TearDown()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }

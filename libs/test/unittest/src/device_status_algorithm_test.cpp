@@ -60,9 +60,9 @@ void DeviceStatusAlgorithmTest::TearDownTestCase()
     g_manager = nullptr;
 }
 
-void DeviceStatusAlgorithmTest::SetUp() const {}
+void DeviceStatusAlgorithmTest::SetUp() {}
 
-void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() const {}
+void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
 
 /**
  * @tc.name: DeviceStatusAlgoAbsoluteStillTest

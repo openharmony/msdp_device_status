@@ -21,11 +21,10 @@
 #include <string>
 #include <vector>
 
-#include <uv.h>
-
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "refbase.h"
+#include <uv.h>
 
 #include "i_drag_listener.h"
 

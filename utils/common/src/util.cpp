@@ -16,11 +16,11 @@
 #include "util.h"
 
 #include <string>
-#include <unistd.h>
 
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 #include "securec.h"
 
