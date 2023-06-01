@@ -282,7 +282,7 @@ napi_value JsCooperateContext::CreateInstance(napi_env env)
         SET_NAMED_PROPERTY);
 
     JsCooperateContext *jsContext = nullptr;
-    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, reinterpret_cast<void**>(&jsContext)), UNWRAP);
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, ONE_PARAM, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
@@ -348,7 +348,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     }
 
     JsCooperateContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
     if (instance == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");
