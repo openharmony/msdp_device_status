@@ -395,7 +395,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
-    int32_t sensorTypeId = SENSOR_TYPE_ID_GYROSCOPE;
+    int32_t sensorTypeId = SENSOR_TYPE_ID_MAX;
     int32_t ret = g_manager->CheckSensorTypeId(sensorTypeId);
     EXPECT_FALSE(ret);
     ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
