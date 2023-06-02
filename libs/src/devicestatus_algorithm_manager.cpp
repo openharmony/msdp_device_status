@@ -118,11 +118,10 @@ int32_t AlgoMgr::GetSensorTypeId(Type type)
             return SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
         }
         default: {
-            FI_HILOGW("Unknown type");
+            FI_HILOGW("GetSensorTypeId failed");
             break;
         }
     }
-    FI_HILOGE("GetSensorTypeId failed");
     return RET_ERR;
 }
 
