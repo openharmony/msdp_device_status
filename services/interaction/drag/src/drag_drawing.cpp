@@ -620,8 +620,8 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
-    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + SVG_HEIGHT * GetScaling() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + SVG_HEIGHT * GetScaling() + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
