@@ -51,9 +51,8 @@ struct DeviceStatusRecord {
 };
 class DeviceStatusDumper final : public RefBase,
     public Singleton<DeviceStatusDumper> {
+    DECLARE_DELAYED_SINGLETON(DeviceStatusDumper);
 public:
-    DeviceStatusDumper() = default;
-    ~DeviceStatusDumper() = default;
     int32_t Init(IContext *context);
     void ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
     void ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
@@ -76,6 +75,7 @@ private:
     std::mutex mutex_;
     IContext *context_ { nullptr };
 };
+#define DS_DUMPER OHOS::DelayedSingleton<DeviceStatusDumper>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

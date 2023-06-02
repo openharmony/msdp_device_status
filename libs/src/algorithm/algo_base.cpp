@@ -28,7 +28,7 @@ void AlgoBase::Unsubscribe(int32_t sensorTypeId)
 {
     CALL_DEBUG_ENTER;
     CHKPV(algoCallback_);
-    SensorDataCallback::GetInstance().UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
+    SENSOR_DATA_CALLBACK.UnsubscribeSensorEvent(sensorTypeId, algoCallback_);
 }
 
 bool AlgoBase::SetData(int32_t sensorTypeId, AccelData* sensorData)

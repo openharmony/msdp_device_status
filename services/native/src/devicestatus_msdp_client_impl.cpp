@@ -290,7 +290,7 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterAlgo()
 int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
 {
     CALL_DEBUG_ENTER;
-    DeviceStatusDumper::GetInstance().PushDeviceStatus(data);
+    DS_DUMPER->PushDeviceStatus(data);
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);

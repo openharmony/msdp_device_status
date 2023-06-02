@@ -45,8 +45,8 @@ bool AlgoMgr::StartSensor(Type type)
         return false;
     }
 
-    SensorDataCallback::GetInstance().Init();
-    if (!SensorDataCallback::GetInstance().RegisterCallbackSensor(sensorType)) {
+    SENSOR_DATA_CALLBACK.Init();
+    if (!SENSOR_DATA_CALLBACK.RegisterCallbackSensor(sensorType)) {
         FI_HILOGE("Failed to register callback sensor");
         return false;
     }
@@ -231,7 +231,7 @@ ErrCode AlgoMgr::UnregisterSensor(Type type)
         FI_HILOGE("Failed to get sensorType");
         return false;
     }
-    if (!SensorDataCallback::GetInstance().UnregisterCallbackSensor(sensorType)) {
+    if (!SENSOR_DATA_CALLBACK.UnregisterCallbackSensor(sensorType)) {
         FI_HILOGE("Failed to unregister callback sensor");
         return RET_ERR;
     }

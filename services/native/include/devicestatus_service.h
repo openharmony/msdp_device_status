@@ -128,7 +128,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     MotionDrag motionDrag_;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    DeviceStatusDumper deviceStatusDumper_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
