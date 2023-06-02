@@ -32,7 +32,7 @@ bool AlgoHorizontal::Init(Type type)
     CALL_DEBUG_ENTER;
     algoCallback_ = std::bind(&AlgoHorizontal::StartAlgorithm, this, std::placeholders::_1, std::placeholders::_2);
     CHKPF(algoCallback_);
-    SENSOR_DATA_CALLBACK.SubscribeSensorEvent(type, algoCallback_);
+    SENSOR_DATA_CB.SubscribeSensorEvent(type, algoCallback_);
     return true;
 }
 

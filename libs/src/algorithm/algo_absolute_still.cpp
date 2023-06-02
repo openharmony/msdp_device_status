@@ -32,7 +32,7 @@ bool AlgoAbsoluteStill::Init(Type type)
         FI_HILOGE("algoCallback is nullptr");
         return false;
     }
-    SENSOR_DATA_CALLBACK.SubscribeSensorEvent(type, algoCallback_);
+    SENSOR_DATA_CB.SubscribeSensorEvent(type, algoCallback_);
     return true;
 }
 

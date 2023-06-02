@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class SensorDataCallback : public Singleton<SensorDataCallback> {
+class SensorDataCallback final {
     DECLARE_SINGLETON(SensorDataCallback);
 public:
     bool RegisterCallbackSensor(int32_t sensorTypeId);
@@ -59,7 +59,7 @@ private:
     std::mutex sensorMutex_;
     std::atomic<bool> alive_ { true };
 };
-#define SENSOR_DATA_CALLBACK OHOS::Singleton<SensorDataCallback>::GetInstance()
+#define SENSOR_DATA_CB OHOS::Singleton<SensorDataCallback>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

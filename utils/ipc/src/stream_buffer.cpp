@@ -15,6 +15,9 @@
 
 #include "stream_buffer.h"
 
+#include <algorithm>
+#include <vector>
+
 namespace OHOS {
 namespace Msdp {
 StreamBuffer::StreamBuffer(const StreamBuffer &buf)

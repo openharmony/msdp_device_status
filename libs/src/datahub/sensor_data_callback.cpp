@@ -150,7 +150,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
     CALL_DEBUG_ENTER;
     CHKPV(event);
     FI_HILOGI("SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
-    SENSOR_DATA_CALLBACK.PushData(event->sensorTypeId, event->data);
+    SENSOR_DATA_CB.PushData(event->sensorTypeId, event->data);
 }
 
 bool SensorDataCallback::RegisterCallbackSensor(int32_t sensorTypeId)
