@@ -57,6 +57,7 @@ constexpr int32_t IMAGE_HEIGHT = 500;
 constexpr int64_t START_TIME = 181154000809;
 constexpr int64_t INTERVAL_TIME = 16666667;
 constexpr int32_t FRAMERATE = 30;
+constexpr int32_t SVG_WIDTH = 40;
 constexpr int32_t SVG_HEIGHT = 40;
 constexpr int32_t SIXTEEN = 16;
 constexpr int32_t SUCCESS_ANIMATION_DURATION = 300;
@@ -620,7 +621,7 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + SVG_HEIGHT * GetScaling() + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + SVG_WIDTH * GetScaling() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + SVG_HEIGHT * GetScaling() + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
