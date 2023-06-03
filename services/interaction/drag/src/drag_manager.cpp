@@ -147,6 +147,10 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
 {
     CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("No drag instance running, can not update drag style");
+        return RET_ERR;
+    }
     if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
