@@ -15,9 +15,6 @@
 
 #include "algo_horizontal.h"
 
-#include <cmath>
-#include <cstdio>
-
 #include "devicestatus_define.h"
 
 namespace OHOS {
