@@ -32,7 +32,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "InteractionDragDrawingTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InteractionDragDrawingTest" };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t PIXEL_MAP_WIDTH { 300 };

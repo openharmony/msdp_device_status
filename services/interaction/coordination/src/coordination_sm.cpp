@@ -38,14 +38,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
-constexpr int32_t INTERVAL_MS = 2000;
-constexpr double PERCENT_CONST = 100.0;
-constexpr int32_t MOUSE_ABS_LOCATION = 100;
-constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
-constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
-constexpr int32_t COORDINATION_PRIORITY = 499;
-constexpr int32_t MIN_HANDLER_ID = 1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
+constexpr int32_t INTERVAL_MS { 2000 };
+constexpr double PERCENT_CONST { 100.0 };
+constexpr int32_t MOUSE_ABS_LOCATION { 100 };
+constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
+constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
+constexpr int32_t COORDINATION_PRIORITY { 499 };
+constexpr int32_t MIN_HANDLER_ID { 1 };
 } // namespace
 
 CoordinationSM::CoordinationSM() {}

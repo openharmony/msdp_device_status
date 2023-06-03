@@ -28,12 +28,12 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
-constexpr int32_t MIN_DELAY = -1;
-constexpr int32_t MIN_INTERVAL = 50;
-constexpr int32_t MAX_INTERVAL_MS = 10000;
-constexpr int32_t NONEXISTENT_ID = -1;
-constexpr int32_t TIME_CONVERSION = 1000;
-constexpr size_t MAX_TIMER_COUNT = 64;
+constexpr int32_t MIN_DELAY { -1 };
+constexpr int32_t MIN_INTERVAL { 50 };
+constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t NONEXISTENT_ID { -1 };
+constexpr int32_t TIME_CONVERSION { 1000 };
+constexpr size_t MAX_TIMER_COUNT { 64 };
 } // namespace
 
 int32_t TimerManager::Init(IContext *context)

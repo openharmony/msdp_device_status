@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
 constexpr int32_t POINTER_ID { 0 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };

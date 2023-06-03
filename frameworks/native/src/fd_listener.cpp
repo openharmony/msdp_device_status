@@ -25,7 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "FdListener" };
-}
+} // namespace
 
 using namespace AppExecFwk;
 FdListener::FdListener(IClientPtr client) : iClient_(client) {}

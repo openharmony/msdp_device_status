@@ -34,7 +34,7 @@ using namespace OHOS;
 
 namespace {
 std::shared_ptr<AlgoMgr> g_manager;
-}
+} // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
 public:

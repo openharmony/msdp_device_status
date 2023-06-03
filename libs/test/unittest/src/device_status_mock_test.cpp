@@ -35,7 +35,7 @@ using namespace OHOS;
 
 namespace {
 std::shared_ptr<DeviceStatusMsdpMock> g_testMock;
-}
+} // namespace
 
 class DeviceStatusMsdpMoclTest : public testing::Test {
 public:

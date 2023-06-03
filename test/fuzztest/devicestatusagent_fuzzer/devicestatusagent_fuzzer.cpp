@@ -21,8 +21,8 @@ using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusAgentFuzzTest" };
-const int WAIT_TIME = 1000;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusAgentFuzzTest" };
+const int WAIT_TIME { 1000 };
 } // namespace
 
 static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =

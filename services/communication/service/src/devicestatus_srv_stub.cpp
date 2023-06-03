@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
 using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 

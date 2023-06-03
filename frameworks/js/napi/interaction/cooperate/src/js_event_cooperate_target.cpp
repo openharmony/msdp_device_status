@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsEventCooperateTarget" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsEventCooperateTarget" };
 inline constexpr std::string_view COORDINATION = "cooperation";
 inline constexpr std::string_view CREATE_PROMISE { "napi_create_promise" };
 inline constexpr std::string_view GET_UNDEFINED { "napi_get_undefined" };
