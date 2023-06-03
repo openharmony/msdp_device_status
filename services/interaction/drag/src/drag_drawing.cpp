@@ -292,6 +292,7 @@ void DragDrawing::DestroyDragWindow()
         g_drawingInfo.dragWindow->Destroy();
         g_drawingInfo.dragWindow = nullptr;
     }
+    CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
     rsUiDirector_->SendMessages();
 }
@@ -524,6 +525,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
 
+    CHKPV(rsUiDirector_);
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
