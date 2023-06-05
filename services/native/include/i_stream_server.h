@@ -23,8 +23,8 @@ namespace OHOS {
 namespace Msdp {
 class IStreamServer : public virtual RefBase {
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
+    virtual int32_t AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid,
+                                      int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
                                       int32_t& tokenType) = 0;
     virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
 };

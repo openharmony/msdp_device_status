@@ -291,7 +291,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
     }
 }
 
-int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+int32_t DeviceStatusService::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType)
 {
     FI_HILOGD("Enter, programName:%{public}s, moduleType:%{public}d", programName.c_str(), moduleType);

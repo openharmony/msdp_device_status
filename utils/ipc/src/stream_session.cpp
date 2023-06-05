@@ -33,10 +33,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamS
 const std::string FOUNDATION { "foundation" };
 } // namespace
 
-StreamSession::StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
-    const int32_t uid, const int32_t pid)
-    : fd_(fd),
-      pid_(pid)
+StreamSession::StreamSession(const std::string &programName, int32_t moduleType, int32_t fd, int32_t uid, int32_t pid)
+    : fd_(fd), pid_(pid)
 {
     UpdateDescript();
 }

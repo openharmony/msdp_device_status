@@ -189,7 +189,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
     return RET_OK;
 }
 
-int32_t DeviceStatusMsdpMock::RegisterTimerCallback(const int32_t fd, const EventType et)
+int32_t DeviceStatusMsdpMock::RegisterTimerCallback(int32_t fd, const EventType et)
 {
     CALL_DEBUG_ENTER;
     struct epoll_event ev;
