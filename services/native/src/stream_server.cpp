@@ -332,17 +332,24 @@ void StreamServer::DelSession(int32_t fd)
     DumpSession("DelSession");
 }
 
-void StreamServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+void StreamServer::AddSessionDeletedCallback(int32_t pid, std::function<void(SessionPtr)> callback)
 {
     CALL_DEBUG_ENTER;
-    callbacks_.push_back(callback);
+    auto it = callbacks_.find(pid);
+    if (it != callbacks_.end()) {
+        FI_HILOGW("Deleted session already exists");
+        return;
+    }
+    callbacks_[pid] = callback;
 }
 
 void StreamServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &callback : callbacks_) {
-        callback(ses);
+    auto it = callbacks_.find(ses->GetPid());
+    if (it != callbacks_.end()) {
+        it->second(ses);
+        callbacks_.erase(it);
     }
 }
 } // namespace Msdp

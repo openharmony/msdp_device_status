@@ -94,7 +94,6 @@ private:
     bool Init();
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
-    void InitSessionDeathMonitor();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(const epoll_event &ev);

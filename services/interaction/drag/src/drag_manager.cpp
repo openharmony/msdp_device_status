@@ -15,6 +15,7 @@
 
 #include "drag_manager.h"
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
@@ -39,6 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS = 2000;
 constexpr int32_t DRAG_PRIORITY = 500;
+constexpr double PERCENT_CONST = 100.0;
 } // namespace
 
 int32_t DragManager::Init(IContext* context)
@@ -81,6 +83,15 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d, PixelWidth:%{public}d,"
+        "PixelHeight:%{public}d, sourceType:%{public}d, pointerId:%{public}d, shadowX:%{public}d,"
+        "shadowY:%{public}d, displayId:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d",
+        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
+        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
+        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
+        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(), dragData.sourceType,
+        dragData.pointerId, dragData.shadowInfo.x, dragData.shadowInfo.y,
+        dragData.displayId, dragData.dragNum, dragData.hasCanceledAnimation);
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
@@ -547,9 +558,30 @@ void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
 void DragManager::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
-    if (stateChangedCallback_ != nullptr) {
+    if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
         stateChangedCallback_(state);
     }
+}
+
+void DragManager::MoveTo(int32_t xPercent, int32_t yPercent)
+{
+    CALL_DEBUG_ENTER;
+    if (xPercent < 0 || xPercent >= 100 || yPercent < 0 || yPercent >= 100) {
+        FI_HILOGE("Param error");
+        return;
+    }
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    CHKPV(display);
+    int32_t width = display->GetWidth();
+    int32_t height = display->GetHeight();
+    int32_t x = static_cast<int32_t>(width * (xPercent / PERCENT_CONST));
+    int32_t y = static_cast<int32_t>(height * (yPercent / PERCENT_CONST));
+    dragDrawing_.MoveTo(x, y);
+}
+
+OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
+{
+    return CreateExtraData(appended);
 }
 
 DragState DragManager::GetDragState() const
