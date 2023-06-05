@@ -26,13 +26,12 @@
 #include "sensor_data_callback.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
 std::shared_ptr <DeviceStatusMsdpMock> g_testMock;
-}
+} // namespace
 
 class DeviceStatusMsdpMoclTest : public testing::Test {
 public:
@@ -270,3 +269,6 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest013, TestSize.Level1)
     EXPECT_TRUE(ret == ERR_OK);
     GTEST_LOG_(INFO) << "DeviceStatusMsdpMoclTest013 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

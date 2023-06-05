@@ -19,10 +19,11 @@
 #include "devicestatus_define.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 using namespace std;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 static std::shared_ptr<DeviceStatusAgent> g_agent1;
 static std::shared_ptr<DeviceStatusAgent> g_agent2;
 Type DeviceStatusAgentTest::g_agentTest = Type::TYPE_INVALID;
@@ -270,3 +271,6 @@ HWTEST_F (DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest010 end";
 }
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

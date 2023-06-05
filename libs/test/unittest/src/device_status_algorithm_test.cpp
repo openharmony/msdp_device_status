@@ -22,13 +22,13 @@
 #include "devicestatus_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
     std::shared_ptr<AlgoMgr> g_manager;
-}
+} // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
 public:
@@ -488,3 +488,6 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest023, TestSize.Level
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest023 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -24,13 +24,13 @@
 #include "sensor_data_callback.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
     std::shared_ptr<SensorDataCallback> g_datahub;
-}
+} // namespace
 
 class DeviceStatusDatahubTest : public testing::Test {
 public:
@@ -444,3 +444,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest020, TestSize.Level1)
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest020 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

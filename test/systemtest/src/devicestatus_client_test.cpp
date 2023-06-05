@@ -19,11 +19,11 @@
 #include "stationary_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 using namespace std;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 class DeviceStatusClientTest : public testing::Test {
 public:
     class DeviceStatusClientTestCallback : public DeviceStatusCallbackStub {
@@ -262,3 +262,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
         << "GetDeviceStatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

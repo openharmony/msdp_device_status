@@ -27,10 +27,11 @@
 #include "stationary_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 using namespace std;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 Type DeviceStatusModuleTest::g_moduleTest = Type::TYPE_INVALID;
 
 void DeviceStatusModuleTest::DeviceStatusModuleTestCallback::OnDeviceStatusChanged(const \
@@ -116,3 +117,6 @@ HWTEST_F (DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
     EXPECT_EQ(true, data.type == g_moduleTest &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

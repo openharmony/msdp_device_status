@@ -28,15 +28,16 @@
 #include "stationary_manager.h"
 
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
 using namespace std;
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
 const int32_t SLEEP_TIME = 2000;
 static Type g_type = Type::TYPE_INVALID;
 auto g_client = StationaryManager::GetInstance();
-}
+} //namespace
 
 sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;
 
@@ -352,3 +353,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
     DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest018 end");
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
