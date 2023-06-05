@@ -34,7 +34,6 @@ public:
     int32_t CreateJsonFile();
 
 private:
-    bool JudgeTypeData(const int32_t valueInt);
     int32_t GetFileSize(const std::string& filePath);
     bool CheckFileDir(const std::string& filePath, const std::string& dir);
     bool CheckFileSize(const std::string& filePath);
