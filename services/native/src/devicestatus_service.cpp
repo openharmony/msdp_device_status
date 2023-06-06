@@ -199,7 +199,6 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
-    InitSessionDeathMonitor();
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     COOR_EVENT_MGR->SetIContext(this);
@@ -396,19 +395,6 @@ int32_t DeviceStatusService::InitDelegateTasks()
     return RET_OK;
 }
 
-void DeviceStatusService::InitSessionDeathMonitor()
-{
-    CALL_INFO_TRACE;
-    std::vector<std::function<void(SessionPtr)>> sessionLostList = {
-        std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1),
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
-        std::bind(&CoordinationSM::OnSessionLost, COOR_SM, std::placeholders::_1)
-#endif
-    };
-    for (const auto &it : sessionLostList) {
-        AddSessionDeletedCallback(it);
-    }
-}
 
 int32_t DeviceStatusService::InitTimerMgr()
 {
@@ -596,6 +582,7 @@ int32_t DeviceStatusService::PrepareCoordination(int32_t userData)
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
+    AddSessionDeletedCallback(pid, std::bind(&CoordinationSM::OnSessionLost, COOR_SM, std::placeholders::_1));
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnPrepareCoordination, this, pid, userData));
     if (ret != RET_OK) {
@@ -718,6 +705,7 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
+    AddSessionDeletedCallback(pid, std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
     if (ret != RET_OK) {
