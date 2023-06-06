@@ -24,7 +24,7 @@ using namespace ::OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientTest" };
-}
+} // namespace
 
 class DeviceStatusClientTest : public testing::Test {
 public:

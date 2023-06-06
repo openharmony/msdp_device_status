@@ -30,7 +30,7 @@ using namespace OHOS;
 
 namespace {
 std::shared_ptr<SensorDataCallback> g_datahub;
-}
+} // namespace
 
 class DeviceStatusDatahubTest : public testing::Test {
 public:

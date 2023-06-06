@@ -33,10 +33,10 @@ using namespace ::OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
-constexpr int32_t SLEEP_TIME = 2000;
-Type g_type = Type::TYPE_INVALID;
+const int32_t SLEEP_TIME { 2000 };
+Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
-}
+} // namespace
 
 sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;
 

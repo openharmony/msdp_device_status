@@ -28,8 +28,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Client" };
-const std::string THREAD_NAME = "ClientEventHandler";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Client" };
+const std::string THREAD_NAME { "ClientEventHandler" };
 } // namespace
 
 using namespace AppExecFwk;

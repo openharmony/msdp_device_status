@@ -36,7 +36,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
-}
+} // namespace
 
 size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
 {
