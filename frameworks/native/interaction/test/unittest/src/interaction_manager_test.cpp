@@ -154,7 +154,7 @@ std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
 {
     std::vector<int32_t> deviceIds = GetInputDeviceIds();
     std::pair<int32_t, int32_t> mouseAndTouch { -1, -1 };
-    for (const int32_t id : deviceIds) {
+    for (const auto& id : deviceIds) {
         std::shared_ptr<MMI::InputDevice> device = GetDevice(id);
         CHKPC(device);
         if (device->HasCapability(MMI::InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {

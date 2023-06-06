@@ -83,7 +83,7 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
 
 void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
-    for (const int32_t item : fdList) {
+    for (const auto &item : fdList) {
         SendMsg(item, pkt);
     }
 }

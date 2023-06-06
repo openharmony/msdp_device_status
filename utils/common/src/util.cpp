@@ -105,7 +105,7 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
     }
     size_t pos = str.npos;
     size_t tmp = 0;
-    for (const char item : sep) {
+    for (auto &item : sep) {
         tmp = str.find(item);
         if (str.npos != tmp) {
             pos = (std::min)(pos, tmp);
