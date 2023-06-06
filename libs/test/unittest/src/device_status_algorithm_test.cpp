@@ -566,4 +566,3 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-

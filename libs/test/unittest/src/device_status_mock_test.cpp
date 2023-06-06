@@ -330,4 +330,3 @@ HWTEST_F(DeviceStatusMsdpMoclTest, DeviceStatusMsdpMoclTest017, TestSize.Level1)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
