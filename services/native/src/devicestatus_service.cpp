@@ -422,7 +422,7 @@ void DeviceStatusService::OnThread()
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] {};
-        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, -1);
+        int32_t count = EpollWait(MAX_EVENT_SIZE, -1, ev[0]);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
             CHKPC(epollEvent);

@@ -182,7 +182,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
             return RET_ERR;
         }
         Data data;
-        dataParse_->ParseDeviceStatusData(data, type);
+        dataParse_->ParseDeviceStatusData(type, data);
         FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
