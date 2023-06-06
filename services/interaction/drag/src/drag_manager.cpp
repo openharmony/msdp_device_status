@@ -27,10 +27,8 @@
 #include "fi_log.h"
 #include "proto.h"
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "udmf_client.h"
 #include "unified_types.h"
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 namespace OHOS {
 namespace Msdp {
@@ -215,7 +213,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
@@ -225,10 +222,6 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
-#else
-    (void)(targetTid);
-    (void)(udKey);
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)

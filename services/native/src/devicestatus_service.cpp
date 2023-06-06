@@ -189,12 +189,12 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Drag manager init failed");
         goto INIT_FAIL;
     }
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     if (motionDrag_.Init(this) != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
         goto INIT_FAIL;
     }
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     if (deviceStatusDumper_.Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
@@ -841,7 +841,9 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     motionDrag_.RegisterCallback();
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return RET_OK;
 }
 

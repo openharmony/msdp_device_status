@@ -30,9 +30,9 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
 #include "motion_drag.h"
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -125,9 +125,9 @@ private:
     std::atomic<bool> ready_ { false };
     std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     MotionDrag motionDrag_;
-#endif // OHOS_BUILD_ENABLE_COORDINATION
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     DeviceStatusDumper deviceStatusDumper_;
 };
 } // namespace DeviceStatus
