@@ -83,7 +83,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
+    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -103,7 +103,7 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
+    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -124,7 +124,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().ActivateCoordination(
+    int32_t ret = DeviceStatusClient::GetInstance().ActivateCoordination(
         userData_, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
@@ -145,7 +145,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
+    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -166,7 +166,7 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {

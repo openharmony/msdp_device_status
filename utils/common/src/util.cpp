@@ -68,7 +68,7 @@ static std::string GetThisThreadIdOfString()
 uint64_t GetThisThreadId()
 {
     std::string stid = GetThisThreadIdOfString();
-    auto tid = std::stoull(stid);
+    uint64_t tid = std::stoull(stid);
     return tid;
 }
 
@@ -105,7 +105,7 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
     }
     size_t pos = str.npos;
     size_t tmp = 0;
-    for (auto &item : sep) {
+    for (const char item : sep) {
         tmp = str.find(item);
         if (str.npos != tmp) {
             pos = (std::min)(pos, tmp);

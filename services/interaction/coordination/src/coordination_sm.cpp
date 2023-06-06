@@ -743,7 +743,7 @@ bool CoordinationSM::IsNeedFilterOut(const std::string &deviceId, const std::sha
     businessEvent.pressedKeys = KeyItemsForDInput;
     FI_HILOGI("businessEvent.keyCode:%{public}d, keyAction:%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);
-    for (const auto &item : businessEvent.pressedKeys) {
+    for (const int32_t item : businessEvent.pressedKeys) {
         FI_HILOGI("pressedKeys:%{public}d", item);
     }
     return D_INPUT_ADAPTER->IsNeedFilterOut(deviceId, businessEvent);

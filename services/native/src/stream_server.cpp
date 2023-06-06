@@ -83,7 +83,7 @@ bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
 
 void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 {
-    for (const auto &item : fdList) {
+    for (const int32_t item : fdList) {
         SendMsg(item, pkt);
     }
 }
@@ -242,7 +242,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 void StreamServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
         FI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
@@ -291,12 +291,12 @@ bool StreamServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
     FI_HILOGI("pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
-    auto fd = ses->GetFd();
+    int32_t fd = ses->GetFd();
     if (fd < 0) {
         FI_HILOGE("The fd is less than 0");
         return false;
     }
-    auto pid = ses->GetPid();
+    int32_t pid = ses->GetPid();
     if (pid <= 0) {
         FI_HILOGE("Get process failed");
         return false;
@@ -321,7 +321,7 @@ void StreamServer::DelSession(int32_t fd)
         FI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
-    auto pid = GetClientPid(fd);
+    int32_t pid = GetClientPid(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }
