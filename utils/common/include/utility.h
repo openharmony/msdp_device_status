@@ -37,8 +37,8 @@ public:
     static bool StartWith(const char *str, const char *prefix);
     static bool StartWith(const std::string &str, const std::string &prefix);
 
-    static void RemoveTrailingChars(char *path, char c);
-    static void RemoveTrailingChars(std::string &path, const std::string &toRemoved);
+    static void RemoveTrailingChars(char c, char *path);
+    static void RemoveTrailingChars(const std::string &toRemoved, std::string &path);
     static bool IsEmpty(const char *str);
     static bool IsEqual(const char *s1, const char *s2);
 

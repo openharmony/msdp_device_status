@@ -68,7 +68,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
     return ret;
 }
 
-int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;

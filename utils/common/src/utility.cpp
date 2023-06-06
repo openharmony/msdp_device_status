@@ -77,7 +77,7 @@ bool Utility::StartWith(const std::string &str, const std::string &prefix)
     return (str.compare(0, prefix.size(), prefix) == 0);
 }
 
-void Utility::RemoveTrailingChars(char *path, char c)
+void Utility::RemoveTrailingChars(char c, char *path)
 {
     CHKPV(path);
     size_t len = strlen(path);
@@ -86,7 +86,7 @@ void Utility::RemoveTrailingChars(char *path, char c)
     }
 }
 
-void Utility::RemoveTrailingChars(std::string &path, const std::string &toRemoved)
+void Utility::RemoveTrailingChars(const std::string &toRemoved, std::string &path)
 {
     while (!path.empty() && (toRemoved.find(path.back()) != std::string::npos)) {
         path.pop_back();

@@ -62,7 +62,7 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
     return DEVICESTATUS_OK;
 }
 
-bool DeviceStatusDataParse::ParseDeviceStatusData(Data& data, Type type)
+bool DeviceStatusDataParse::ParseDeviceStatusData(Type type, Data& data)
 {
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
