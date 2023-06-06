@@ -27,7 +27,7 @@ using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientFuzzTest" };
-constexpr int32_t WAIT_TIME = 1000;
+constexpr int32_t WAIT_TIME { 1000 };
 } // namespace
 
 auto stationaryMgr = StationaryManager::GetInstance();
