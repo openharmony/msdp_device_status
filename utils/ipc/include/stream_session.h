@@ -33,8 +33,7 @@ class StreamSession;
 using SessionPtr = std::shared_ptr<StreamSession>;
 class StreamSession : public std::enable_shared_from_this<StreamSession> {
 public:
-    StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
-               const int32_t pid);
+    StreamSession(const std::string &programName, int32_t moduleType, int32_t fd, int32_t uid, int32_t pid);
     DISALLOW_COPY_AND_MOVE(StreamSession);
     virtual ~StreamSession() = default;
 

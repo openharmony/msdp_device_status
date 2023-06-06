@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,15 +34,15 @@ CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
     : startDeviceDhid_(startDeviceDhid)
 {}
 
-int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
+    const std::pair<std::string, std::string> &preparedNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string tempRemoteNetworkId = remoteNetworkId;
     if (tempRemoteNetworkId.empty()) {
-        std::pair<std::string, std::string> prepared = COOR_SM->GetPreparedDevices();
-        tempRemoteNetworkId = prepared.first;
+        tempRemoteNetworkId = preparedNetworkId.first;
     }
-    int32_t ret = CooSoftbusAdapter->StopRemoteCoordination(tempRemoteNetworkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop coordination fail");
         return RET_ERR;

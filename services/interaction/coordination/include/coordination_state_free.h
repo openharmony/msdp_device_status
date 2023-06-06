@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,8 @@ namespace DeviceStatus {
 class CoordinationStateFree final : public ICoordinationState {
 public:
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t DeactivateCoordination(const std::string &networkId, bool isUnchained,
+        const std::pair<std::string, std::string> &preparedNetworkId) override;
 
 private:
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);

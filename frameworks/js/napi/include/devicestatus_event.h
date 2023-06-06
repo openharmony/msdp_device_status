@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_EVENT_H
-#define DEVICE_STATUS_EVENT_H
+#ifndef DEVICESTATUS_EVENT_H
+#define DEVICESTATUS_EVENT_H
 
 #include <list>
 #include <map>
@@ -46,7 +46,7 @@ public:
     void ClearEventMap();
     bool RemoveAllCallback(int32_t eventType);
 protected:
-    napi_env env_;
+    napi_env env_ { nullptr };
     napi_ref thisVarRef_ { nullptr };
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_;
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventOnceMap_;

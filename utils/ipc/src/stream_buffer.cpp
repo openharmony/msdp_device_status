@@ -16,7 +16,6 @@
 #include "stream_buffer.h"
 
 #include <algorithm>
-#include <vector>
 
 namespace OHOS {
 namespace Msdp {
@@ -54,7 +53,7 @@ bool StreamBuffer::SeekReadPos(int32_t n)
 {
     int32_t pos = rPos_ + n;
     if (pos < 0 || pos > wPos_) {
-        FI_HILOGE("The position in the calculation is not as expected. pos:%{public}d [0, %{public}d]",
+        FI_HILOGE("The position in the calculation is not as expected, pos:%{public}d, [0, %{public}d]",
             pos, wPos_);
         return false;
     }
@@ -92,26 +91,27 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 bool StreamBuffer::Read(char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {
-        FI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", PARAM_INPUT_INVALID);
+        FI_HILOGE("Invalid input parameter buf:nullptr, errCode:%{public}d", PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (size == 0) {
-        FI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        FI_HILOGE("Invalid input parameter size:%{public}zu, errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     if (rPos_ + static_cast<int32_t>(size) > wPos_) {
-        FI_HILOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+        FI_HILOGE("Memory out of bounds on read, errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
     if (ret != EOK) {
-        FI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        FI_HILOGE("Failed to call memcpy_sp, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -123,27 +123,28 @@ bool StreamBuffer::Read(char *buf, size_t size)
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {
-        FI_HILOGE("Invalid input parameter buf=nullptr errCode:%{public}d", PARAM_INPUT_INVALID);
+        FI_HILOGE("Invalid input parameter, buf:nullptr, errCode:%{public}d", PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (size == 0) {
-        FI_HILOGE("Invalid input parameter size=%{public}zu errCode:%{public}d", size, PARAM_INPUT_INVALID);
+        FI_HILOGE("Invalid input parameter, size:%{public}zu, errCode:%{public}d", size, PARAM_INPUT_INVALID);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     if (wPos_ + static_cast<int32_t>(size) > MAX_STREAM_BUF_SIZE) {
-        FI_HILOGE("The write length exceeds buffer. wIdx:%{public}d size:%{public}zu maxBufSize:%{public}d "
+        FI_HILOGE("The write length exceeds buffer, wIdx:%{public}d, size:%{public}zu, maxBufSize:%{public}d, "
             "errCode:%{public}d", wPos_, size, MAX_STREAM_BUF_SIZE, MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
     errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableBufSize(), buf, size);
     if (ret != EOK) {
-        FI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        FI_HILOGE("Failed to call memcpy_sp, errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }

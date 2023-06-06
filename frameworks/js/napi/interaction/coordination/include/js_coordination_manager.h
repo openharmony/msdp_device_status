@@ -27,8 +27,8 @@ namespace DeviceStatus {
 class JsCoordinationManager : public JsEventTarget {
 public:
     JsCoordinationManager() = default;
-    ~JsCoordinationManager() = default;
     DISALLOW_COPY_AND_MOVE(JsCoordinationManager);
+    ~JsCoordinationManager() = default;
 
     napi_value Prepare(napi_env env, napi_value handle = nullptr);
     napi_value Unprepare(napi_env env, napi_value handle = nullptr);

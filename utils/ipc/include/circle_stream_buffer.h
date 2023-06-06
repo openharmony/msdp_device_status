@@ -22,8 +22,8 @@ class CircleStreamBuffer : public StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CircleStreamBuffer" };
 public:
     CircleStreamBuffer() = default;
-    virtual ~CircleStreamBuffer() = default;
     DISALLOW_MOVE(CircleStreamBuffer);
+    virtual ~CircleStreamBuffer() = default;
 
     bool CheckWrite(size_t size);
     virtual bool Write(const char *buf, size_t size) override;

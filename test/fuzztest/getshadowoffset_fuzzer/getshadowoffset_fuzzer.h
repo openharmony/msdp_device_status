@@ -13,19 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_MESSAGE_H
-#define DRAG_MESSAGE_H
+#ifndef GETSHADOWOFFSET_FUZZER_H
+#define GETSHADOWOFFSET_FUZZER_H
 
-namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-enum class DragState {
-    ERROR,
-    START,
-    STOP,
-    CANCEL
-};
-} // namespace DeviceStatus
-} // namespace Msdp
-} // namespace OHOS
-#endif // DRAG_MESSAGE_H
+#define FUZZ_PROJECT_NAME "getshadowoffset_fuzzer"
+
+#endif // GETSHADOWOFFSET_FUZZER_H

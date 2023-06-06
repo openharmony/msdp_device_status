@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,23 +15,23 @@
 
 #include "util.h"
 
-#include <unistd.h>
-
 #include <string>
 
-#include "securec.h"
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
-#include "devicestatus_hilog_wrapper.h"
-#include "fi_log.h"
+#include "securec.h"
+
+#include "devicestatus_define.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 constexpr size_t BUF_CMD_SIZE = 512;
@@ -55,7 +55,7 @@ static std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            FI_HILOGE("call sprintf_s failed, ret = %{public}d.", ret);
+            FI_HILOGE("call sprintf_s failed, ret:%{public}d", ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';
@@ -84,10 +84,7 @@ void GetTimeStamp(std::string &startTime)
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
     struct tm *timeinfo = localtime(&(curTime.tv_sec));
-    if (timeinfo == nullptr) {
-        DEV_HILOGE(SERVICE, "get localtime failed");
-        return;
-    }
+    CHKPV(timeinfo);
     startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
@@ -178,13 +175,14 @@ const char* GetProgramName()
     }
 
     char buf[BUF_CMD_SIZE] = { 0 };
-    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    int32_t ret = sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid()));
+    if (ret == -1) {
         FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
         return "";
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        FI_HILOGE("The fp is nullptr, filename:%s.", buf);
+        FI_HILOGE("The fp is nullptr, filename:%{public}s", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
@@ -198,27 +196,27 @@ const char* GetProgramName()
         return "";
     }
     if (fclose(fp) != 0) {
-        FI_HILOGW("Close file:%s failed", buf);
+        FI_HILOGW("Close file:%{public}s failed", buf);
     }
     fp = nullptr;
 
     std::string tempName(bufLine);
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
-        FI_HILOGE("tempName is empty.");
+        FI_HILOGE("tempName is empty");
         return "";
     }
     size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        FI_HILOGE("The copySize is 0.");
+        FI_HILOGE("The copySize is 0");
         return "";
     }
-    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
-    if (ret != EOK) {
+    errno_t result = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (result != EOK) {
         FI_HILOGE("memcpy_s failed");
         return "";
     }
-    FI_HILOGI("GetProgramName success. programName:%s", programName);
+    FI_HILOGI("Get program name success, programName:%{public}s", programName);
 
     return programName;
 }
@@ -227,7 +225,7 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        FI_HILOGE("File is not find extension");
+        FI_HILOGE("File is not found extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
@@ -253,11 +251,6 @@ bool IsValidSvgPath(const std::string &filePath)
     return IsValidPath(SVG_PATH, filePath);
 }
 
-bool IsFileExists(const std::string &fileName)
-{
-    return (access(fileName.c_str(), F_OK) == 0);
-}
-
 bool IsValidSvgFile(const std::string &filePath)
 {
     CALL_DEBUG_ENTER;
@@ -274,7 +267,7 @@ bool IsValidSvgFile(const std::string &filePath)
         FI_HILOGE("File path invalid");
         return false;
     }
-    if (!IsFileExists(realPath)) {
+    if (!Utility::DoesFileExist(realPath)) {
         FI_HILOGE("File not exist");
         return false;
     }
@@ -295,17 +288,6 @@ bool IsNum(const std::string &str)
     std::istringstream sin(str);
     double num;
     return (sin >> num) && sin.eof();
-}
-
-int32_t ChangeNumber(int32_t num)
-{
-    if (num < 0) {
-        num = ~(num - 1);
-    } else if (num > 0) {
-        num = ~num + 1;
-    }
-    FI_HILOGD("Change number succeed, num:%{public}d", num);
-    return num;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

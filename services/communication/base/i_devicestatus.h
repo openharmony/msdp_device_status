@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_H
-#define IDEVICESTATUS_H
+#ifndef I_DEVICESTATUS_H
+#define I_DEVICESTATUS_H
 
 #include <iremote_broker.h>
-#include "iremote_object.h"
 
 #include "drag_data.h"
 #include "stationary_callback.h"
@@ -66,7 +65,7 @@ public:
     virtual int32_t UnprepareCoordination(int32_t userData) = 0;
     virtual int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
         int32_t startDeviceId) = 0;
-    virtual int32_t DeactivateCoordination(int32_t userData) = 0;
+    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained) = 0;
     virtual int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
@@ -75,7 +74,7 @@ public:
     virtual int32_t GetUdKey(std::string &udKey) = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    virtual int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
     virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
@@ -88,4 +87,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_H
+#endif // I_DEVICESTATUS_H

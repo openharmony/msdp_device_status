@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -150,7 +150,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
 
 void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
-    FI_HILOGD("RemoveTimer type:%{public}d", type);
+    FI_HILOGD("Remove timer type:%{public}d", type);
     if (watchingMap_.find(type) != watchingMap_.end()) {
         auto context = COOR_EVENT_MGR->GetIContext();
         CHKPV(context);

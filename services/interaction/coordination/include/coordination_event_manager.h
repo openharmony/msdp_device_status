@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,19 +35,18 @@ namespace DeviceStatus {
 class CoordinationEventManager final {
     DECLARE_DELAYED_SINGLETON(CoordinationEventManager);
 public:
-    DISALLOW_COPY_AND_MOVE(CoordinationEventManager);
-
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
-
     struct EventInfo : public RefBase {
-        EventType type;
-        SessionPtr sess;
-        MessageId msgId;
-        int32_t userData;
+        EventType type { LISTENER };
+        SessionPtr sess { nullptr };
+        MessageId msgId { MessageId::INVALID };
+        int32_t userData { -1 };
         std::string deviceId;
-        CoordinationMessage msg;
-        bool state;
+        CoordinationMessage msg { CoordinationMessage::PREPARE };
+        bool state { false };
     };
+
+    DISALLOW_COPY_AND_MOVE(CoordinationEventManager);
 
     void AddCoordinationEvent(sptr<EventInfo> event);
     void RemoveCoordinationEvent(sptr<EventInfo> event);
@@ -57,7 +56,6 @@ public:
     void OnStop(CoordinationMessage msg, const std::string &deviceId = "");
     void OnGetCrossingSwitchState(bool state);
     void OnErrorMessage(EventType type, CoordinationMessage msg);
-
     void SetIContext(IContext *context);
     IContext* GetIContext() const;
 

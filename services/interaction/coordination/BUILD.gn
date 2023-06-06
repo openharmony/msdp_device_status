@@ -17,7 +17,7 @@ config("coordination_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("coordination") {
+ohos_shared_library("coordination") {
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,9 @@ JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, DeviceStatus::VAL_NOT_EXP);
+    if (!ret.second) {
+        FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
+    }
 }
 
 void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
@@ -173,7 +175,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InteractionMgr->RegisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -201,7 +203,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
     }
 }
 
@@ -224,7 +226,7 @@ void JsEventTarget::ResetEnv()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     coordinationListener_.clear();
-    InteractionMgr->UnregisterCoordinationListener(shared_from_this());
+    INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
 void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
@@ -552,7 +554,9 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, resultObj, &result), CALL_FUNCTION, scope);
+    size_t argc = TWO_PARAM;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, argc, resultObj, &result),
+        CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }

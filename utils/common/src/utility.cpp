@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,8 +52,9 @@ size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
         }
     }
     if (len > 0) {
-        if (memcpy_s(dest, size, src, len) != EOK) {
-            FI_HILOGE("memcpy_s: bounds checking failed");
+        errno_t ret = memcpy_s(dest, size, src, len);
+        if (ret != EOK) {
+            FI_HILOGW("memcpy_s:bounds checking failed");
         }
     }
     if (size > 0) {
@@ -117,10 +118,10 @@ ssize_t Utility::GetFileSize(const char *path)
         if (S_ISREG(buf.st_mode)) {
             sz = buf.st_size;
         } else {
-            FI_HILOGE("Not regular file: \'%{public}s\'", path);
+            FI_HILOGE("Not regular file:\'%{public}s\'", path);
         }
     } else {
-        FI_HILOGE("stat(\'%{public}s\') failed: %{public}s", path, strerror(errno));
+        FI_HILOGE("stat(\'%{public}s\') failed:%{public}s", path, strerror(errno));
     }
     return sz;
 }
@@ -129,11 +130,11 @@ void Utility::ShowFileAttributes(const char *path)
 {
     CALL_DEBUG_ENTER;
     FI_HILOGD("======================= File Attributes ========================");
-    FI_HILOGD("%{public}20s: %{public}s", "FILE NAME", path);
+    FI_HILOGD("%{public}20s:%{public}s", "FILE NAME", path);
 
     struct stat buf {};
     if (stat(path, &buf) != 0) {
-        FI_HILOGE("stat(\'%{public}s\') failed: %{public}s", path, strerror(errno));
+        FI_HILOGE("stat(\'%{public}s\') failed:%{public}s", path, strerror(errno));
     } else {
         if (S_ISDIR(buf.st_mode)) {
             FI_HILOGD("%{public}20s: directory", "TYPE");
@@ -171,7 +172,7 @@ void Utility::ShowFileAttributes(const char *path)
         if (buf.st_mode & S_IXOTH) {
             ss << "O+X ";
         }
-        FI_HILOGD("%{public}20s: %{public}s", "PERMISSIONS", ss.str().c_str());
+        FI_HILOGD("%{public}20s:%{public}s", "PERMISSIONS", ss.str().c_str());
     }
 }
 
@@ -188,28 +189,28 @@ void Utility::ShowUserAndGroup()
     FI_HILOGD("======================= Users and Groups =======================");
     uid = getuid();
     if (getpwuid_r(uid, &buf, buffer, sizeof(buffer), &pbuf) != 0) {
-        FI_HILOGE("getpwuid_r failed: %{public}s", strerror(errno));
+        FI_HILOGE("getpwuid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "USER", uid, buf.pw_name);
     }
 
     gid = getgid();
     if (getgrgid_r(gid, &grp, buffer, sizeof(buffer), &pgrp) != 0) {
-        FI_HILOGE("getgrgid_r failed: %{public}s", strerror(errno));
+        FI_HILOGE("getgrgid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "GROUP", gid, grp.gr_name);
     }
 
     uid = geteuid();
     if (getpwuid_r(uid, &buf, buffer, sizeof(buffer), &pbuf) != 0) {
-        FI_HILOGE("getpwuid_r failed: %{public}s", strerror(errno));
+        FI_HILOGE("getpwuid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "EFFECTIVE USER", uid, buf.pw_name);
     }
 
     gid = getegid();
     if (getgrgid_r(gid, &grp, buffer, sizeof(buffer), &pgrp) != 0) {
-        FI_HILOGE("getgrgid_r failed: %{public}s", strerror(errno));
+        FI_HILOGE("getgrgid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "EFFECTIVE GROUP", gid, grp.gr_name);
     }
@@ -218,7 +219,7 @@ void Utility::ShowUserAndGroup()
     int32_t ngrps = getgroups(sizeof(groups), groups);
     for (int32_t i = 0; i < ngrps; ++i) {
         if (getgrgid_r(groups[i], &grp, buffer, sizeof(buffer), &pgrp) != 0) {
-            FI_HILOGE("getgrgid_r failed: %{public}s", strerror(errno));
+            FI_HILOGE("getgrgid_r failed:%{public}s", strerror(errno));
         } else {
             FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "SUPPLEMENTARY GROUP", groups[i], grp.gr_name);
         }

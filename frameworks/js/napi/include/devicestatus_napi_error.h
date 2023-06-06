@@ -13,30 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef MSDP_DEVICE_STATUS_DEVICESTATUS_NAPI_ERROR_H
-#define MSDP_DEVICE_STATUS_DEVICESTATUS_NAPI_ERROR_H
+#ifndef DEVICESTATUS_NAPI_ERROR_H
+#define DEVICESTATUS_NAPI_ERROR_H
 
 #include <map>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
-#include "devicestatus_hilog_wrapper.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-const int32_t PARAM_ERROR = 401;
-const int32_t SERVICE_EXCEPTION = 801;
+constexpr int32_t PARAM_ERROR = 401;
+constexpr int32_t SERVICE_EXCEPTION = 801;
 const std::map <int32_t, std::string> ERROR_MESSAGES = {
     {SERVICE_EXCEPTION, "Service exception."},
-    {PARAM_ERROR, "Param error."},
+    {PARAM_ERROR, "Param error."}
 };
 
-napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage);
+napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage);
 std::optional <std::string> GetErrMsg(int32_t errorCode);
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg);
+void ThrowErr(const napi_env &env, int32_t errCode, const std::string &printMsg);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif //MSDP_DEVICE_STATUS_DEVICESTATUS_NAPI_ERROR_H
+#endif // DEVICESTATUS_NAPI_ERROR_H

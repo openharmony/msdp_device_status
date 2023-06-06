@@ -28,11 +28,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Deact
 
 void DeactivateCoordinationFuzzTest()
 {
+    CALL_DEBUG_ENTER;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("DeactivateCoordinationFuzzTest");
+        FI_HILOGD("Deactivate coordination fuzz test");
     };
+    bool isUnchained = false;
 
-    InteractionManager::GetInstance()->DeactivateCoordination(fun);
+    InteractionManager::GetInstance()->DeactivateCoordination(isUnchained, fun);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

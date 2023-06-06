@@ -24,12 +24,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCooperateContext" };
-const char* COORDINATION_CLASS = "Coordination_class";
-const char* COORDINATION = "Coordination";
-constexpr int32_t ZERO_PARAM = 0;
-constexpr int32_t ONE_PARAM = 1;
-constexpr int32_t TWO_PARAM = 2;
-constexpr int32_t THREE_PARAM = 3;
+const char* g_coordinationClass = "Coordination_class";
+const char* g_coordination = "Coordination";
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
@@ -273,16 +269,16 @@ napi_value JsCooperateContext::CreateInstance(napi_env env)
         JsCooperateContext::JsConstructor, nullptr, sizeof(desc) / sizeof(desc[ZERO_PARAM]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, COORDINATION_CLASS, jsClass);
+    status = napi_set_named_property(env, global, g_coordinationClass, jsClass);
     CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(napi_new_instance(env, jsClass, ZERO_PARAM, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(napi_set_named_property(env, global, COORDINATION, jsInstance),
+    CHKRP(napi_set_named_property(env, global, g_coordination, jsInstance),
         SET_NAMED_PROPERTY);
 
     JsCooperateContext *jsContext = nullptr;
-    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, reinterpret_cast<void**>(&jsContext)), UNWRAP);
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, ONE_PARAM, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
@@ -327,7 +323,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, COORDINATION, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, g_coordination, &result), HAS_NAMED_PROPERTY);
     if (!result) {
         FI_HILOGE("Coordination was not found");
         return nullptr;
@@ -340,7 +336,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
         return nullptr;
     }
     napi_value object = nullptr;
-    CHKRP_SCOPE(env, napi_get_named_property(env, global, COORDINATION, &object), GET_NAMED_PROPERTY, scope);
+    CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("object is nullptr");
@@ -348,7 +344,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     }
 
     JsCooperateContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
     if (instance == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");
@@ -361,19 +357,19 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
 void JsCooperateContext::DeclareDeviceCoordinationInterface(napi_env env, napi_value exports)
 {
     napi_value infoStart = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_START), &infoStart),
-        CREATE_INT32);
+    CHKRV(napi_create_int32(env,
+        static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_START), &infoStart), CREATE_INT32);
     napi_value infoSuccess = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_SUCCESS), &infoSuccess),
-        CREATE_INT32);
+    CHKRV(napi_create_int32(env,
+        static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_SUCCESS), &infoSuccess), CREATE_INT32);
     napi_value infoFail = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::INFO_FAIL), &infoFail),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::INFO_FAIL), &infoFail),
         CREATE_INT32);
     napi_value stateOn = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::STATE_ON), &stateOn),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::STATE_ON), &stateOn),
         CREATE_INT32);
     napi_value stateOff = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperateMessage::STATE_OFF), &stateOff),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(JsEventCooperateTarget::CooperateMessage::STATE_OFF), &stateOff),
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,9 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Coord
 } // namespace
 CoordinationEventHandler::CoordinationEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
-{
-}
+    : AppExecFwk::EventHandler(runner) {}
 
 bool CoordinationEventHandler::ProxyPostTask(const Callback &callback, int64_t delayTime)
 {

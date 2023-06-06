@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,21 +29,18 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationManagerImpl final {
 public:
-    CoordinationManagerImpl() = default;
-    ~CoordinationManagerImpl() = default;
-
     using FuncCoordinationMessage = std::function<void(const std::string&, CoordinationMessage)>;
     using FuncCoordinationState = std::function<void(bool)>;
-
     using CoordinationMsg = FuncCoordinationMessage;
     using CoordinationState = FuncCoordinationState;
-
     using CoordinationListenerPtr = std::shared_ptr<ICoordinationListener>;
-
     struct CoordinationEvent {
         CoordinationMsg msg;
         CoordinationState state;
     };
+
+    CoordinationManagerImpl() = default;
+    ~CoordinationManagerImpl() = default;
 
     int32_t RegisterCoordinationListener(CoordinationListenerPtr listener);
     int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener = nullptr);
@@ -51,7 +48,7 @@ public:
     int32_t UnprepareCoordination(FuncCoordinationMessage callback);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         FuncCoordinationMessage callback);
-    int32_t DeactivateCoordination(FuncCoordinationMessage callback);
+    int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback);
     int32_t GetCoordinationState(const std::string &deviceId, FuncCoordinationState callback);
     void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);

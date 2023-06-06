@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,16 @@
 
 #include "devicestatusagent_fuzzer.h"
 
+#include "fi_log.h"
+
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusAgentFuzzTest" };
 const int WAIT_TIME = 1000;
-}
+} // namespace
+
 static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
             std::make_shared<DevicestatusAgentFuzzer::DeviceStatusAgentClient>();
 static std::shared_ptr<DeviceStatusAgent> agent_ = std::make_shared<DeviceStatusAgent>();
@@ -38,7 +42,9 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
     std::cout << "TestSubscribeAgentEvent: Enter " << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
 
@@ -61,7 +67,9 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* da
     std::cout << "TestSubscribeAgentEventIsNullptr: Enter " << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
     agentEvent_ = nullptr;
@@ -78,7 +86,9 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t
     std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
 

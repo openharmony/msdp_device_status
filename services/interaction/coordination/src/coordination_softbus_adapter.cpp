@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,7 +72,14 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& 
 
 void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
 {
-    COOR_SM->StopRemoteCoordination();
+    CALL_DEBUG_ENTER;
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+
+    if (!cJSON_IsBool(result)) {
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        return;
+    }
+    COOR_SM->StopRemoteCoordination(cJSON_IsTrue(result));
 }
 
 void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
@@ -102,17 +109,17 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& p
 
 static int32_t SessionOpened(int32_t sessionId, int32_t result)
 {
-    return CooSoftbusAdapter->OnSessionOpened(sessionId, result);
+    return COOR_SOFTBUS_ADAPTER->OnSessionOpened(sessionId, result);
 }
 
 static void SessionClosed(int32_t sessionId)
 {
-    CooSoftbusAdapter->OnSessionClosed(sessionId);
+    COOR_SOFTBUS_ADAPTER->OnSessionClosed(sessionId);
 }
 
 static void BytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
-    CooSoftbusAdapter->OnBytesReceived(sessionId, data, dataLen);
+    COOR_SOFTBUS_ADAPTER->OnBytesReceived(sessionId, data, dataLen);
 }
 
 static void MessageReceived(int32_t sessionId, const void *data, uint32_t dataLen)
@@ -231,7 +238,7 @@ void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteNetw
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGI("SessionDevIdMap not find");
+        FI_HILOGI("SessionDevIdMap not found");
         return;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
@@ -256,14 +263,13 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("Start remote coordination error, not find this device");
+        FI_HILOGE("Start remote coordination error, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     CHKPR(pointerEvent, RET_ERR);
-    bool isPointerButtonPressed =
-        (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) ? true : false;
+    bool isPointerButtonPressed = pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN;
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
@@ -286,7 +292,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("Stop remote coordination error, not find this device");
+        FI_HILOGE("Stop remote coordination error, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
@@ -308,17 +314,18 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     return RET_OK;
 }
 
-int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteNetworkId)
+int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("Stop remote coordination error, not find this device");
+        FI_HILOGE("Stop remote coordination error, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_STOP));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isUnchained));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
@@ -337,7 +344,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("Stop remote coordination result error, not find this device");
+        FI_HILOGE("Stop remote coordination result error, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
@@ -362,7 +369,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevMap_.find(originNetworkId) == sessionDevMap_.end()) {
-        FI_HILOGE("Start coordination other result error, not find this device");
+        FI_HILOGE("Start coordination other result error, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevMap_[originNetworkId];
@@ -383,10 +390,24 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
 
 void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string& message)
 {
+    if (message.empty()) {
+        FI_HILOGE("Message is empty");
+        return;
+    }
     JsonParser parser;
     parser.json_ = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json_)) {
-        FI_HILOGE("Parser.json_ is not object");
+        FI_HILOGI("Parser json is not object");
+        DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
+        if (registerRecvMap_.find(dataPacket->messageId) == registerRecvMap_.end()) {
+            FI_HILOGW("Message:%{public}d does not register", dataPacket->messageId);
+            return;
+        }
+        FI_HILOGI("Message:%{public}d", dataPacket->messageId);
+        if (dataPacket->messageId == DRAGING_DATA || dataPacket->messageId == STOPDRAG_DATA) {
+            CHKPV(registerRecvMap_[dataPacket->messageId]);
+            registerRecvMap_[dataPacket->messageId](dataPacket->data, dataPacket->dataLen);
+        }
         return;
     }
     cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_CMD_TYPE);
@@ -394,7 +415,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         FI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
     }
-    FI_HILOGD("valueint: %{public}d", comType->valueint);
+    FI_HILOGD("valueint:%{public}d", comType->valueint);
     switch (comType->valueint) {
         case REMOTE_COORDINATION_START: {
             ResponseStartRemoteCoordination(sessionId, parser);
@@ -507,6 +528,7 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
         channelStatusMap_.erase(deviceId);
     }
     COOR_SM->Reset(deviceId);
+    COOR_SM->NotifySessionClosed();
 }
 
 void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)

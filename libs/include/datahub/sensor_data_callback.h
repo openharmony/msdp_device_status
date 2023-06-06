@@ -36,6 +36,7 @@ class SensorDataCallback : public Singleton<SensorDataCallback> {
 public:
     SensorDataCallback() = default;
     ~SensorDataCallback();
+
     bool RegisterCallbackSensor(int32_t sensorTypeId);
     bool UnregisterCallbackSensor(int32_t sensorTypeId);
     void Init();
@@ -49,6 +50,7 @@ private:
     void AlgorithmLoop();
     void HandleSensorEvent();
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
+
     SensorUser user_;
     std::list<AccelData> accelDataList_;
     std::unique_ptr<std::thread> algorithmThread_ { nullptr };

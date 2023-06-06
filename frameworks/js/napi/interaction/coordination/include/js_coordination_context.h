@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,8 +27,8 @@ namespace DeviceStatus {
 class JsCoordinationContext final {
 public:
     JsCoordinationContext();
-    ~JsCoordinationContext();
     DISALLOW_COPY_AND_MOVE(JsCoordinationContext);
+    ~JsCoordinationContext();
 
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value Prepare(napi_env env, napi_callback_info info);
@@ -38,20 +38,19 @@ public:
     static napi_value GetCrossingSwitchState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-
     std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:
-    std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };
-    std::mutex mutex_;
-    napi_ref contextRef_ { nullptr };
-
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static JsCoordinationContext *GetInstance(napi_env env);
     static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+
+    std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };
+    std::mutex mutex_;
+    napi_ref contextRef_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

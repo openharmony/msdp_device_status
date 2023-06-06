@@ -67,20 +67,16 @@ public:
         DEVICE_CAP_MAX
     };
 
-public:
     explicit Device(int32_t deviceId);
-    ~Device() = default;
     DISALLOW_COPY_AND_MOVE(Device);
+    ~Device() = default;
 
     int32_t Open() override;
     void Close() override;
-
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-
     void SetDevPath(const std::string &devPath) override;
     void SetSysPath(const std::string &sysPath) override;
-
     int32_t GetId() const override;
     std::string GetDevPath() const override;
     std::string GetSysPath() const override;
@@ -108,7 +104,6 @@ private:
     void JudgeKeyboardType();
     void LoadDeviceConfig();
 
-private:
     int32_t fd_ { -1 };
     int32_t deviceId_ { -1 };
     int32_t bus_ { 0 };

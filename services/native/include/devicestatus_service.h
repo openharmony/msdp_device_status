@@ -66,15 +66,13 @@ public:
     std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void ReportSensorSysEvent(int32_t type, bool enable);
-
     int32_t RegisterCoordinationListener() override;
     int32_t UnregisterCoordinationListener() override;
     int32_t PrepareCoordination(int32_t userData) override;
     int32_t UnprepareCoordination(int32_t userData) override;
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    int32_t DeactivateCoordination(int32_t userData) override;
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
-
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
@@ -84,20 +82,18 @@ public:
     int32_t RemoveDraglistener() override;
     int32_t SetDragWindowVisible(bool visible) override;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
-
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
+
 private:
     bool Init();
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
-    void InitSessionDeathMonitor();
-
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(const epoll_event &ev);
@@ -105,7 +101,6 @@ private:
     void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
-
     int32_t OnStartDrag(const DragData &dragData, int32_t pid);
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
 
@@ -116,7 +111,7 @@ private:
     int32_t OnUnprepareCoordination(int32_t pid, int32_t userData);
     int32_t OnActivateCoordination(int32_t pid, int32_t userData, const std::string &remoteNetworkId,
         int32_t startDeviceId);
-    int32_t OnDeactivateCoordination(int32_t pid, int32_t userData);
+    int32_t OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &deviceId);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
@@ -127,7 +122,7 @@ private:
     DeviceManager devMgr_;
     TimerManager timerMgr_;
     std::atomic<bool> ready_ { false };
-    std::shared_ptr<DeviceStatusManager> devicestatusManager_;
+    std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     MotionDrag motionDrag_;

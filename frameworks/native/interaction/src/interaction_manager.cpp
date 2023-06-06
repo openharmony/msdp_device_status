@@ -15,8 +15,6 @@
 
 #include "interaction_manager.h"
 
-#include <string>
-
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "interaction_manager_impl.h"
@@ -58,10 +56,10 @@ int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetwor
     return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
 }
 
-int32_t InteractionManager::DeactivateCoordination(std::function<void(const std::string&,
-    CoordinationMessage)> callback)
+int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
+    std::function<void(const std::string&, CoordinationMessage)> callback)
 {
-    return INTER_MGR_IMPL.DeactivateCoordination(callback);
+    return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback);
 }
 
 int32_t InteractionManager::GetCoordinationState(

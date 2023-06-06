@@ -20,7 +20,6 @@
 #include <message_option.h>
 #include <message_parcel.h>
 
-#include "bytrace_adapter.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "stationary_callback.h"
@@ -36,7 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "Enter event:%{public}d, latency:%{public}d", event, latency);
+    CALL_DEBUG_ENTER;
+    FI_HILOGI("Enter event:%{public}d, latency:%{public}d", event, latency);
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
 
@@ -45,7 +45,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed");
+        FI_HILOGE("Write descriptor failed");
         return;
     }
 
@@ -56,15 +56,15 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return;
     }
-    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGD(INNERKIT, "Enter, event:%{public}d", event);
+    CALL_DEBUG_ENTER;
+    FI_HILOGD("Enter, event:%{public}d", event);
     StartTrace(HITRACE_TAG_MSDP, "clientUnSubscribeStart");
     sptr<IRemoteObject> remote = Remote();
     DEV_RET_IF_NULL((remote == nullptr) || (callback == nullptr));
@@ -74,7 +74,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed");
+        FI_HILOGE("Write descriptor failed");
         return;
     }
 
@@ -85,15 +85,14 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return;
     }
-    DEV_HILOGD(INNERKIT, "Exit");
 }
 
 Data DeviceStatusSrvProxy::GetCache(const Type& type)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
+    CALL_DEBUG_ENTER;
     Data devicestatusData;
     devicestatusData.type = Type::TYPE_INVALID;
     devicestatusData.value = OnChangedValue::VALUE_INVALID;
@@ -106,7 +105,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        DEV_HILOGE(INNERKIT, "Write descriptor failed!");
+        FI_HILOGE("Write descriptor failed");
         return devicestatusData;
     }
 
@@ -114,7 +113,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
 
     int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
     if (ret != RET_OK) {
-        DEV_HILOGE(INNERKIT, "SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return devicestatusData;
     }
 
@@ -122,10 +121,9 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t devicestatusValue = -1;
     READINT32(reply, devicestatusType, devicestatusData);
     READINT32(reply, devicestatusValue, devicestatusData);
-    devicestatusData.type = Type(devicestatusType);
-    devicestatusData.value = OnChangedValue(devicestatusValue);
-    DEV_HILOGD(INNERKIT, "type: %{public}d, value: %{public}d", devicestatusData.type, devicestatusData.value);
-    DEV_HILOGD(INNERKIT, "Exit");
+    devicestatusData.type = static_cast<Type>(devicestatusType);
+    devicestatusData.value = static_cast<OnChangedValue>(devicestatusValue);
+    FI_HILOGD("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     return devicestatusData;
 }
 
@@ -230,7 +228,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -239,6 +237,7 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isUnchained, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -396,7 +395,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
@@ -418,7 +417,7 @@ int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, cons
     }
     socketFd = reply.ReadFileDescriptor();
     if (socketFd < RET_OK) {
-        FI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
+        FI_HILOGE("Read file descriptor failed, fd:%{public}d", socketFd);
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -504,10 +503,10 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     READINT32(reply, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, width, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
     return ret;
 }
 } // namespace DeviceStatus
-} // Msdp
-} // OHOS
+} // namespace Msdp
+} // namespace OHOS

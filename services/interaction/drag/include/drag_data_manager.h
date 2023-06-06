@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DATA_ADAPTER_H
-#define DRAG_DATA_ADAPTER_H
+#ifndef DRAG_DATA_MANAGER_H
+#define DRAG_DATA_MANAGER_H
+
 #include <string>
 
 #include "pixel_map.h"
@@ -41,13 +42,21 @@ public:
     bool GetDragWindowVisible() const;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const;
     void ResetDragData();
-
+    void SetTargetTid(int32_t tokenId);
+    int32_t GetTargetTid() const;
+    void SetTargetPid(int32_t pid);
+    int32_t GetTargetPid() const;
+    void SetMotionDrag(bool isMotionDrag);
+    bool IsMotionDrag() const;
 private:
     DragData dragData_;
     OHOS::MMI::PointerStyle pointerStyle_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::u16string dragMessage_;
     bool visible_ { false };
+    int32_t targetTid_ { -1 };
+    int32_t targetPid_ { -1 };
+    bool isMotionDrag_ { false };
 };
 
 #define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()
@@ -55,4 +64,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DATA_ADAPTER_H
+#endif // DRAG_DATA_MANAGER_H

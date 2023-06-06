@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,20 +32,21 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusMsdpMock final : public IMsdp {
 public:
-    DeviceStatusMsdpMock();
-    ~DeviceStatusMsdpMock();
-
     enum EventType {
         EVENT_UEVENT_FD,
         EVENT_TIMER_FD,
     };
+
+    DeviceStatusMsdpMock();
+    ~DeviceStatusMsdpMock();
+
     bool Init();
     void InitMockStore();
     int32_t SetTimerInterval(int32_t interval);
     void CloseTimer();
     void InitTimer();
     void TimerCallback();
-    int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
+    int32_t RegisterTimerCallback(int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
     ErrCode Enable(Type type) override;
@@ -64,16 +65,15 @@ public:
 private:
     using Callback = std::function<void(DeviceStatusMsdpMock*)>;
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
-
     std::map<int32_t, Callback> callbacks_;
-    std::unique_ptr<DeviceStatusDataParse> dataParse_;
-    int32_t timerInterval_ {-1};
-    int32_t timerFd_ {-1};
-    int32_t epFd_ {-1};
+    std::unique_ptr<DeviceStatusDataParse> dataParse_ { nullptr };
+    int32_t timerInterval_ { -1 };
+    int32_t timerFd_ { -1 };
+    int32_t epFd_ { -1 };
     std::mutex mutex_;
     std::vector<Type> enabledType_;
-    std::atomic<bool> alive_ {false};
-    std::shared_ptr<std::thread> thread_;
+    std::atomic<bool> alive_ { false };
+    std::shared_ptr<std::thread> thread_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

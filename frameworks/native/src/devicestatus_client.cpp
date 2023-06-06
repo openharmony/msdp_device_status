@@ -22,7 +22,6 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 
-#include "fi_log.h"
 #include "util.h"
 
 #include "coordination_manager_impl.h"
@@ -34,7 +33,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusClient" };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusClient" };
 } // namespace
 
 DeviceStatusClient::DeviceStatusClient() {}
@@ -52,85 +51,69 @@ ErrCode DeviceStatusClient::Connect()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (devicestatusProxy_ != nullptr) {
-        DEV_HILOGD(INNERKIT, "devicestatusProxy_ is not nullptr");
         return RET_OK;
     }
 
     sptr<ISystemAbilityManager> sa = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sa == nullptr) {
-        DEV_HILOGE(INNERKIT, "GetSystemAbilityManager failed");
-        return E_DEVICESTATUS_GET_SYSTEM_ABILITY_MANAGER_FAILED;
-    }
+    CHKPR(sa, E_DEVICESTATUS_GET_SYSTEM_ABILITY_MANAGER_FAILED);
 
     sptr<IRemoteObject> remoteObject = sa->CheckSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID);
-    if (remoteObject == nullptr) {
-        DEV_HILOGE(INNERKIT, "CheckSystemAbility failed");
-        return E_DEVICESTATUS_GET_SERVICE_FAILED;
-    }
+    CHKPR(remoteObject, E_DEVICESTATUS_GET_SERVICE_FAILED);
 
     deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) DeviceStatusDeathRecipient());
-    if (deathRecipient_ == nullptr) {
-        DEV_HILOGE(INNERKIT, "Failed to create DeviceStatusDeathRecipient");
-        return ERR_NO_MEMORY;
-    }
+    CHKPR(deathRecipient_, ERR_NO_MEMORY);
 
     if (remoteObject->IsProxyObject()) {
         if (!remoteObject->AddDeathRecipient(deathRecipient_)) {
-            DEV_HILOGE(INNERKIT, "Add death recipient to DeviceStatus service failed");
+            FI_HILOGE("Add death recipient to DeviceStatus service failed");
             return E_DEVICESTATUS_ADD_DEATH_RECIPIENT_FAILED;
         }
     }
 
     devicestatusProxy_ = iface_cast<Idevicestatus>(remoteObject);
-    DEV_HILOGD(INNERKIT, "Connecting DeviceStatusService success");
+    FI_HILOGD("Connecting DeviceStatusService success");
     return RET_OK;
 }
 
 void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    DEV_RET_IF_NULL(devicestatusProxy_ == nullptr);
-
+    CHKPV(devicestatusProxy_);
     auto serviceRemote = devicestatusProxy_->AsObject();
     if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
         serviceRemote->RemoveDeathRecipient(deathRecipient_);
         devicestatusProxy_ = nullptr;
     }
     if (deathListener_ != nullptr) {
-        DEV_HILOGI(INNERKIT, "notify death listner");
+        FI_HILOGI("notify death listner");
         deathListener_();
     }
 }
 
 void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    if (remote == nullptr) {
-        DEV_HILOGE(INNERKIT, "OnRemoteDied failed, remote is nullptr");
-        return;
-    }
-
+    CHKPV(remote);
     DeviceStatusClient::GetInstance().ResetProxy(remote);
-    DEV_HILOGD(INNERKIT, "Recv death notice");
+    FI_HILOGD("Recv death notice");
 }
 
 int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "Enter event:%{public}d,latency:%{public}d", event, latency);
-    typeMap_.insert(std::make_pair(type, 1));
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d, type: %{public}d", typeMap_[type], type);
-    if (callback == nullptr) {
-        DEV_HILOGE(SERVICE, "callback is nullptr");
-        return RET_ERR;
+    FI_HILOGI("Enter event:%{public}d, latency:%{public}d", event, latency);
+    auto [_, ret] = typeMap_.insert(std::make_pair(type, 1));
+    if (!ret) {
+        FI_HILOGW("Insert pair to typeMap_ failed");
     }
+    FI_HILOGD("typeMap_:%{public}d, type:%{public}d", typeMap_[type], type);
+    CHKPR(callback, RET_ERR);
+
     if (Connect() != RET_OK) {
-        DEV_HILOGE(SERVICE, "Connect failed");
+        FI_HILOGE("Connect failed");
         return RET_ERR;
     }
-    if (devicestatusProxy_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(devicestatusProxy_, RET_ERR);
+
     if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN) {
         devicestatusProxy_->Subscribe(type, event, latency, callback);
     }
@@ -139,53 +122,48 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 
 int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    DEV_HILOGI(INNERKIT, "UNevent: %{public}d", event);
+    CALL_DEBUG_ENTER;
+    FI_HILOGI("UNevent: %{public}d", event);
     typeMap_.erase(type);
-    DEV_HILOGD(INNERKIT, "typeMap_ %{public}d", typeMap_[type]);
-    if (callback == nullptr) {
-        DEV_HILOGE(SERVICE, "callback is nullptr");
-        return RET_ERR;
-    }
+    FI_HILOGD("typeMap_ %{public}d", typeMap_[type]);
+    CHKPR(callback, RET_ERR);
+
     if (Connect() != RET_OK) {
-        DEV_HILOGE(SERVICE, "Connect failed");
+        FI_HILOGE("Connect failed");
         return RET_ERR;
     }
-    if (devicestatusProxy_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(devicestatusProxy_, RET_ERR);
+
     if ((type < TYPE_INVALID) || (type > TYPE_MAX)) {
-        DEV_HILOGE(INNERKIT, "type out of range");
+        FI_HILOGE("type out of range");
         return RET_ERR;
     }
     if (event < ActivityEvent::EVENT_INVALID || event > ActivityEvent::ENTER_EXIT) {
-        DEV_HILOGE(INNERKIT, "event out of range");
+        FI_HILOGE("event out of range");
         return RET_ERR;
     }
     devicestatusProxy_->Unsubscribe(type, event, callback);
-    DEV_HILOGD(INNERKIT, "Exit");
     return RET_OK;
 }
 
 Data DeviceStatusClient::GetDeviceStatusData(Type type)
 {
-    DEV_HILOGD(INNERKIT, "Enter");
+    CALL_DEBUG_ENTER;
     Data devicestatusData;
     devicestatusData.type = Type::TYPE_INVALID;
     devicestatusData.value = OnChangedValue::VALUE_INVALID;
     if (Connect() != RET_OK) {
-        DEV_HILOGE(SERVICE, "Connect failed");
+        FI_HILOGE("Connect failed");
         return devicestatusData;
     }
     if (devicestatusProxy_ == nullptr) {
-        DEV_HILOGE(SERVICE, "devicestatusProxy_ is nullptr");
+        FI_HILOGE("devicestatusProxy_ is nullptr");
         return devicestatusData;
     }
     if (type > Type::TYPE_INVALID
         && type <= Type::TYPE_LID_OPEN) {
         devicestatusData = devicestatusProxy_->GetCache(type);
     }
-    DEV_HILOGD(INNERKIT, "Exit");
     return devicestatusData;
 }
 
@@ -225,11 +203,11 @@ int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
     return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId);
 }
 
-int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData)
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->DeactivateCoordination(userData);
+    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained);
 }
 
 int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
@@ -260,7 +238,7 @@ int32_t DeviceStatusClient::GetUdKey(std::string &udKey)
     return devicestatusProxy_->GetUdKey(udKey);
 }
 
-int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
+int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
@@ -277,7 +255,7 @@ int32_t DeviceStatusClient::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    FI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
+    FI_HILOGI("AllocSocketPair success, socketFd_:%{public}d, tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 

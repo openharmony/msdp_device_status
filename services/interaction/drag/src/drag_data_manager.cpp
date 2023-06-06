@@ -37,6 +37,8 @@ void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &po
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
     pointerStyle_ = pointerStyle;
+    targetTid_ = -1;
+    targetPid_ = -1;
 }
 
 void DragDataManager::SetDragStyle(DragCursorStyle style)
@@ -69,6 +71,26 @@ bool DragDataManager::GetDragWindowVisible() const
     return visible_;
 }
 
+void DragDataManager::SetTargetTid(int32_t targetTid)
+{
+    targetTid_ = targetTid;
+}
+
+int32_t DragDataManager::GetTargetTid() const
+{
+    return targetTid_;
+}
+
+void DragDataManager::SetTargetPid(int32_t pid)
+{
+    targetPid_ = pid;
+}
+
+int32_t DragDataManager::GetTargetPid() const
+{
+    return targetPid_;
+}
+
 int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
 {
     offsetX = dragData_.shadowInfo.x;
@@ -77,7 +99,7 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
     CHKPR(pixelMap, RET_ERR);
     width = pixelMap->GetWidth();
     height = pixelMap->GetHeight();
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
+    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
     return RET_OK;
 }
@@ -88,6 +110,18 @@ void DragDataManager::ResetDragData()
     ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     dragData_ = { shadowInfo, buffer, "", -1, -1, -1, -1, -1, -1, false };
+}
+
+void DragDataManager::SetMotionDrag(bool isMotionDrag)
+{
+    isMotionDrag_ = isMotionDrag;
+    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
+}
+
+bool DragDataManager::IsMotionDrag() const
+{
+    FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
+    return isMotionDrag_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

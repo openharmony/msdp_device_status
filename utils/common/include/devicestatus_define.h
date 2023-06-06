@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,16 +104,9 @@ namespace DeviceStatus {
         } \
     } while (0)
 
-#define CK(cond, ec) \
-    do { \
-        if (!(cond)) { \
-            FI_HILOGE("CK(%{public}s), errCode:%{public}d", #cond, ec); \
-        } \
-    } while (0)
-
 #define CHK_PID_AND_TID() \
     do { \
-        FI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
+        FI_HILOGD("%{public}s, (%{public}d), pid:%{public}d, threadId:%{public}" PRIu64, \
             __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
     } while (0)
 } // namespace DeviceStatus

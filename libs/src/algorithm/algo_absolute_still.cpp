@@ -15,15 +15,21 @@
 
 #include "algo_absolute_still.h"
 
+#include "fi_log.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AlgoAbsoluteStill" };
+} // namespace
+
 bool AlgoAbsoluteStill::Init(Type type)
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     algoCallback_ = std::bind(&AlgoAbsoluteStill::StartAlgorithm, this, std::placeholders::_1, std::placeholders::_2);
     if (algoCallback_ == nullptr) {
-        DEV_HILOGE(SERVICE, "algoCallback is nullptr");
+        FI_HILOGE("algoCallback is nullptr");
         return false;
     }
     SensorDataCallback::GetInstance().SubscribeSensorEvent(type, algoCallback_);
@@ -32,9 +38,9 @@ bool AlgoAbsoluteStill::Init(Type type)
 
 bool AlgoAbsoluteStill::StartAlgorithm(int32_t sensorTypeId, AccelData* sensorData)
 {
-    DEV_HILOGD(SERVICE, "Enter");
-    if (!GetData(sensorTypeId, sensorData)) {
-        DEV_HILOGE(SERVICE, "Failed to get data");
+    CALL_DEBUG_ENTER;
+    if (!SetData(sensorTypeId, sensorData)) {
+        FI_HILOGE("Failed to get data");
         return false;
     }
     ExecuteOperation();
@@ -43,10 +49,10 @@ bool AlgoAbsoluteStill::StartAlgorithm(int32_t sensorTypeId, AccelData* sensorDa
 
 void AlgoAbsoluteStill::ExecuteOperation()
 {
-    DEV_HILOGD(SERVICE, "Enter");
+    CALL_DEBUG_ENTER;
     algoPara_.resultantAcc =
         sqrt((algoPara_.x * algoPara_.x) + (algoPara_.y * algoPara_.y) + (algoPara_.z * algoPara_.z));
-    DEV_HILOGD(SERVICE, "resultantAcc:%{public}f", algoPara_.resultantAcc);
+    FI_HILOGD("resultantAcc:%{public}f", algoPara_.resultantAcc);
     if ((algoPara_.resultantAcc > RESULTANT_ACC_LOW_THRHD) && (algoPara_.resultantAcc < RESULTANT_ACC_UP_THRHD)) {
         if (state_ == STILL) {
             return;

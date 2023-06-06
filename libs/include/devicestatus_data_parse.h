@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,21 +16,9 @@
 #ifndef DEVICESTATUS_DATA_PARSE_H
 #define DEVICESTATUS_DATA_PARSE_H
 
-#include <fcntl.h>
-#include <poll.h>
-#include <stdint.h>
 #include <string>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <unistd.h>
 #include <vector>
 
-#include "cJSON.h"
-
-#include "devicestatus_data_define.h"
-#include "devicestatus_errors.h"
-#include "devicestatus_hilog_wrapper.h"
 #include "stationary_data.h"
 
 namespace OHOS {
@@ -46,12 +34,10 @@ public:
     int32_t CreateJsonFile();
 
 private:
-    bool JudgeTypeData(const int32_t valueInt);
     int32_t GetFileSize(const std::string& filePath);
     bool CheckFileDir(const std::string& filePath, const std::string& dir);
     bool CheckFileSize(const std::string& filePath);
     bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
-    bool IsFileExists(const std::string& fileName);
     std::string ReadFile(const std::string &filePath);
     std::string ReadJsonFile(const std::string &filePath);
     static std::vector<int32_t> tempcount_;

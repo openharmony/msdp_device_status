@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DRAWING_MANAGER_H
-#define DRAG_DRAWING_MANAGER_H
+#ifndef DRAG_DRAWING_H
+#define DRAG_DRAWING_H
 
 #include <vector>
 
@@ -48,6 +48,7 @@ private:
     std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
     int32_t GetFilePath(std::string &filePath) const;
     bool NeedAdjustSvgInfo() const;
+    void SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) const;
 };
 
 class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {
@@ -62,9 +63,6 @@ public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
     void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
-
-private:
-    int32_t GetIconSize() const;
 };
 
 class DrawDynamicEffectModifier : public OHOS::Rosen::RSContentStyleModifier {
@@ -83,8 +81,8 @@ private:
 class DragDrawing final {
 public:
     DragDrawing() = default;
-    ~DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
+    ~DragDrawing() = default;
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
@@ -95,7 +93,7 @@ public:
     void DestroyDragWindow();
     void UpdateDrawingState();
     void UpdateDragWindowState(bool visible);
-
+    void MoveTo(int32_t x, int32_t y);
 private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
@@ -107,6 +105,7 @@ private:
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
+    void RemoveModifier();
 
 private:
     int64_t startNum_ { -1 };
@@ -122,4 +121,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DRAWING_MANAGER_H
+#endif // DRAG_DRAWING_H

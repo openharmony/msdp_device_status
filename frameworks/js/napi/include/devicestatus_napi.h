@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_STATUS_NAPI_H
-#define DEVICE_STATUS_NAPI_H
+#ifndef DEVICESTATUS_NAPI_H
+#define DEVICESTATUS_NAPI_H
 
 #include <map>
 #include <tuple>
@@ -55,24 +55,25 @@ public:
     static napi_value GetDeviceStatus(napi_env env, napi_callback_info info);
     static napi_value EnumActivityEventConstructor(napi_env env, napi_callback_info info);
     static napi_value DeclareEventTypeInterface(napi_env env, napi_value exports);
-
     static int32_t ConvertTypeToInt(const std::string &type);
     void OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce);
     static DeviceStatusNapi* GetDeviceStatusNapi();
+
     static std::map<int32_t, sptr<IRemoteDevStaCallback>> callbackMap_;
 
 private:
     static bool CheckArguments(napi_env env, napi_callback_info info);
-    static bool CheckUnsubArguments(napi_env env, napi_callback_info info);
+    static bool IsMatchCallbackType(napi_env &env, napi_value &value);
     static bool CheckGetArguments(napi_env env, napi_callback_info info);
     static std::tuple<bool, napi_value, std::string, int32_t, int32_t> CheckSubscribeParam(napi_env env,
         napi_callback_info info);
-    static std::tuple<bool, napi_value, int32_t, int32_t> CheckUnsubscribeParam(napi_env env,
+    static std::tuple<bool, napi_value, int32_t, int32_t, bool> CheckUnsubscribeParam(napi_env env,
         napi_callback_info info);
     static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
-    napi_ref callbackRef_ = { nullptr };
+
+    napi_ref callbackRef_ { nullptr };
     static napi_ref devicestatusValueRef_;
-    napi_env env_ = { nullptr };
+    napi_env env_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

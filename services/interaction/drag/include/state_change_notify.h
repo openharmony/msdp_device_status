@@ -20,7 +20,7 @@
 #include <memory>
 #include <mutex>
 
-#include "drag_message.h"
+#include "drag_data.h"
 #include "stream_session.h"
 
 namespace OHOS {
@@ -32,9 +32,9 @@ public:
     ~StateChangeNotify() = default;
 
     struct MessageInfo {
-        MessageId msgId;
-        SessionPtr session;
-        DragState state;
+        MessageId msgId { MessageId::INVALID };
+        SessionPtr session { nullptr };
+        DragState state { DragState::ERROR };
         bool operator==(std::shared_ptr<MessageInfo> info)
         {
             if (info == nullptr || info->session == nullptr) {

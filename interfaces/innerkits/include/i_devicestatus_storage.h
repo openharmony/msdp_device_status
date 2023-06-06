@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_STORAGE_H
-#define IDEVICESTATUS_STORAGE_H
+#ifndef I_DEVICESTATUS_STORAGE_H
+#define I_DEVICESTATUS_STORAGE_H
 
 #include <iremote_broker.h>
 
@@ -26,8 +26,8 @@ namespace DeviceStatus {
 class IdevicestatusStorage : public IRemoteBroker {
 public:
     struct DeviceStatusRecord {
-        Type type;
-        OnChangedValue value;
+        Type type { TYPE_INVALID };
+        OnChangedValue value { VALUE_INVALID };
         std::string date;
         std::string time;
     };
@@ -39,4 +39,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_STORAGE_H
+#endif // I_DEVICESTATUS_STORAGE_H

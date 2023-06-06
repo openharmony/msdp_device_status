@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,9 +25,10 @@ enum class CoordinationMessage {
     ACTIVATE_SUCCESS = 3,
     ACTIVATE_FAIL = 4,
     DEACTIVATE_SUCCESS = 5,
-    DEACTIVATE_FAIL  = 6,
+    DEACTIVATE_FAIL = 6,
+    SESSION_CLOSED = 7,
     PARAMETER_ERROR = 401,
-    COORDINATION_FAIL = 20900001,
+    COORDINATION_FAIL = 20900001
 };
 } // namespace Msdp
 } // namespace OHOS

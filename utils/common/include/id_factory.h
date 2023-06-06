@@ -27,8 +27,8 @@ class IdFactory {
 public:
     IdFactory() : IdFactory(1) {}
     explicit IdFactory(T seed) : seed_(seed) {}
-    virtual ~IdFactory() = default;
     DISALLOW_COPY_AND_MOVE(IdFactory);
+    virtual ~IdFactory() = default;
 
     T GenerateId()
     {

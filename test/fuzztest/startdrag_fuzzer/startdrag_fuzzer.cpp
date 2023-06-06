@@ -32,6 +32,8 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
 constexpr int32_t POINTER_ID { 0 };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 } // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
@@ -50,11 +52,6 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
 {
     CALL_DEBUG_ENTER;
-    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH ||
-       height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Invalid size,width:%{public}d,height:%{public}d", width, height);
-        return nullptr;
-    }
     OHOS::Media::InitializationOptions opts;
     opts.size.width = width;
     opts.size.height = height;
@@ -84,11 +81,12 @@ DragData CreateDragData(const uint8_t* data, size_t size)
 
 void StartDragFuzzTest(const uint8_t* data, size_t  size)
 {
+    CALL_DEBUG_ENTER;
     if (data == nullptr) {
         return;
     }
     auto func = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("StartDragFuzzTest:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+        FI_HILOGD("Start drag fuzz test:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
     };
     DragData dragData = CreateDragData(data, size);

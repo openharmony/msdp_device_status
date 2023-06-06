@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICESTATUS_AGENT_H
-#define OHOS_MSDP_DEVICESTATUS_AGENT_H
+#ifndef DEVICESTATUS_AGENT_H
+#define DEVICESTATUS_AGENT_H
 
 #include <memory>
 
@@ -28,6 +28,7 @@ class DeviceStatusAgent : public std::enable_shared_from_this<DeviceStatusAgent>
 public:
     DeviceStatusAgent() {};
     ~DeviceStatusAgent() {};
+
     class DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentEvent() = default;
@@ -48,13 +49,15 @@ public:
         const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
     int32_t UnsubscribeAgentEvent(const Type& type, const ActivityEvent& event);
     friend class DeviceStatusAgentCallback;
+
 private:
     void RegisterServiceEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency);
     void UnRegisterServiceEvent(const Type& type, const ActivityEvent& event);
-    sptr<IRemoteDevStaCallback> callback_;
-    std::shared_ptr<DeviceStatusAgentEvent> agentEvent_;
+
+    sptr<IRemoteDevStaCallback> callback_ { nullptr };
+    std::shared_ptr<DeviceStatusAgentEvent> agentEvent_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICESTATUS_AGENT_H
+#endif // DEVICESTATUS_AGENT_H
