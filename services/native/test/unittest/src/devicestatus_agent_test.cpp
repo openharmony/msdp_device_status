@@ -21,8 +21,11 @@ using namespace testing::ext;
 using namespace OHOS::Msdp::DeviceStatus;
 using namespace OHOS;
 
-static std::shared_ptr<DeviceStatusAgent> g_agent1;
-static std::shared_ptr<DeviceStatusAgent> g_agent2;
+namespace {
+std::shared_ptr<DeviceStatusAgent> g_agent1;
+std::shared_ptr<DeviceStatusAgent> g_agent2;
+} // namespace
+
 Type DeviceStatusAgentTest::g_agentTest = Type::TYPE_INVALID;
 
 void DeviceStatusAgentTest::SetUpTestCase() {}
@@ -59,7 +62,6 @@ bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
     return true;
 }
 
-namespace {
 /**
  * @tc.name: DeviceStatusAgentTest001
  * @tc.desc: test subscribing lid open event
@@ -303,4 +305,3 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
     callback->OnDeviceStatusChanged(devicestatusData);
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest010 end";
 }
-} // namespace

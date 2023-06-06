@@ -389,5 +389,5 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     return ret;
 }
 } // namespace DeviceStatus
-} // Msdp
-} // OHOS
+} // namespace Msdp
+} // namespace OHOS
