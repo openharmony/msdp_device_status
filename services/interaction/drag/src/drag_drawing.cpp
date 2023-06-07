@@ -46,45 +46,46 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragDrawing" };
-constexpr int32_t BASELINE_DENSITY = 160;
-constexpr int32_t DEVICE_INDEPENDENT_PIXEL = 40;
-constexpr int32_t DRAG_NUM_ONE = 1;
-constexpr int32_t STRING_PX_LENGTH = 2;
-constexpr int32_t EIGHT_SIZE = 8;
-constexpr int32_t IMAGE_WIDTH = 400;
-constexpr int32_t IMAGE_HEIGHT = 500;
-constexpr int64_t START_TIME = 181154000809;
-constexpr int64_t INTERVAL_TIME = 16666667;
-constexpr int32_t FRAMERATE = 30;
-constexpr int32_t SVG_HEIGHT = 40;
-constexpr int32_t SIXTEEN = 16;
-constexpr int32_t SUCCESS_ANIMATION_DURATION = 300;
-constexpr int32_t VIEW_BOX_POS = 2;
-constexpr int32_t PIXEL_MAP_INDEX = 0;
-constexpr int32_t DRAG_STYLE_INDEX = 1;
-constexpr int32_t MOUSE_ICON_INDEX = 2;
-constexpr size_t TOUCH_NODE_MIN_COUNT = 2;
-constexpr size_t MOUSE_NODE_MIN_COUNT = 3;
-constexpr double ONETHOUSAND = 1000.0;
-constexpr float BEGIN_ALPHA = 1.0f;
-constexpr float END_ALPHA = 0.0f;
-constexpr float BEGIN_SCALE = 1.0f;
-constexpr float END_SCALE_SUCCESS = 1.2f;
-constexpr float END_SCALE_FAIL = 0.1f;
-constexpr float PIVOT_X = 0.5f;
-constexpr float PIVOT_Y = 0.5f;
-constexpr float SVG_ORIGINAL_SIZE = 40.0f;
-const std::string DEVICE_TYPE_DEFAULT = "default";
-const std::string DEVICE_TYPE_PHONE = "phone";
-const std::string THREAD_NAME = "AnimationEventRunner";
-const std::string COPY_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
-const std::string COPY_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Copy_One_Drag.svg";
-const std::string DEFAULT_DRAG_PATH = "/system/etc/device_status/drag_icon/Default_Drag.svg";
-const std::string FORBID_DRAG_PATH = "/system/etc/device_status/drag_icon/Forbid_Drag.svg";
-const std::string FORBID_ONE_DRAG_PATH = "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg";
-const std::string MOUSE_DRAG_PATH = "/system/etc/device_status/drag_icon/Mouse_Drag.svg";
-const std::string MOVE_DRAG_PATH = "/system/etc/device_status/drag_icon/Move_Drag.svg";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDrawing" };
+constexpr int32_t BASELINE_DENSITY { 160 };
+constexpr int32_t DEVICE_INDEPENDENT_PIXEL { 40 };
+constexpr int32_t DRAG_NUM_ONE { 1 };
+constexpr int32_t STRING_PX_LENGTH { 2 };
+constexpr int32_t EIGHT_SIZE { 8 };
+constexpr int32_t IMAGE_WIDTH { 400 };
+constexpr int32_t IMAGE_HEIGHT { 500 };
+constexpr int64_t START_TIME { 181154000809 };
+constexpr int64_t INTERVAL_TIME { 16666667 };
+constexpr int32_t FRAMERATE { 30 };
+constexpr int32_t SVG_WIDTH { 40 };
+constexpr int32_t SVG_HEIGHT { 40 };
+constexpr int32_t SIXTEEN { 16 };
+constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
+constexpr int32_t VIEW_BOX_POS { 2 };
+constexpr int32_t PIXEL_MAP_INDEX { 0 };
+constexpr int32_t DRAG_STYLE_INDEX { 1 };
+constexpr int32_t MOUSE_ICON_INDEX { 2 };
+constexpr size_t TOUCH_NODE_MIN_COUNT { 2 };
+constexpr size_t MOUSE_NODE_MIN_COUNT { 3 };
+constexpr double ONETHOUSAND { 1000.0 };
+constexpr float BEGIN_ALPHA { 1.0f };
+constexpr float END_ALPHA { 0.0f };
+constexpr float BEGIN_SCALE { 1.0f };
+constexpr float END_SCALE_SUCCESS { 1.2f };
+constexpr float END_SCALE_FAIL { 0.1f };
+constexpr float PIVOT_X { 0.5f };
+constexpr float PIVOT_Y { 0.5f };
+constexpr float SVG_ORIGINAL_SIZE { 40.0f };;
+const std::string DEVICE_TYPE_DEFAULT { "default" };
+const std::string DEVICE_TYPE_PHONE { "phone" };
+const std::string THREAD_NAME { "AnimationEventRunner" };
+const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
+const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
+const std::string DEFAULT_DRAG_PATH { "/system/etc/device_status/drag_icon/Default_Drag.svg" };
+const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
+const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg" };
+const std::string MOUSE_DRAG_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag.svg" };
+const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 struct DrawingInfo {
     std::atomic_bool isRunning { false };
     bool isInitUiDirector { true };
@@ -291,6 +292,7 @@ void DragDrawing::DestroyDragWindow()
         g_drawingInfo.dragWindow->Destroy();
         g_drawingInfo.dragWindow = nullptr;
     }
+    CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
     rsUiDirector_->SendMessages();
 }
@@ -523,6 +525,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
 
+    CHKPV(rsUiDirector_);
     if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         auto mouseIconNode = OHOS::Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
@@ -584,6 +587,14 @@ void DragDrawing::RemoveModifier()
     }
 }
 
+void DragDrawing::MoveTo(int32_t x, int32_t y)
+{
+    x = std::max(x, 0);
+    y = std::max(y, 0);
+    CHKPV(g_drawingInfo.dragWindow);
+    g_drawingInfo.dragWindow->MoveTo(x, y);
+}
+
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
@@ -620,8 +631,8 @@ void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
-    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + SVG_WIDTH * GetScaling() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + SVG_HEIGHT * GetScaling() + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);

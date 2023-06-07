@@ -24,16 +24,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-const int32_t PARAM_ERROR = 401;
-const int32_t SERVICE_EXCEPTION = 801;
+constexpr int32_t PARAM_ERROR = 401;
+constexpr int32_t SERVICE_EXCEPTION = 801;
 const std::map <int32_t, std::string> ERROR_MESSAGES = {
     {SERVICE_EXCEPTION, "Service exception."},
     {PARAM_ERROR, "Param error."}
 };
 
-napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage);
+napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage);
 std::optional <std::string> GetErrMsg(int32_t errorCode);
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg);
+void ThrowErr(const napi_env &env, int32_t errCode, const std::string &printMsg);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

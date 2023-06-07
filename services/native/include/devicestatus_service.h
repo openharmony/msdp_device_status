@@ -82,7 +82,7 @@ public:
     int32_t RemoveDraglistener() override;
     int32_t SetDragWindowVisible(bool visible) override;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
-    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
@@ -94,7 +94,6 @@ private:
     bool Init();
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
-    void InitSessionDeathMonitor();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(const epoll_event &ev);

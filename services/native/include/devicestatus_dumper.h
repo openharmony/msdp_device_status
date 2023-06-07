@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 constexpr int32_t RET_NG = -1;
-constexpr uint32_t MAX_DEVICE_STATUS_SIZE = 10;
+constexpr size_t MAX_DEVICE_STATUS_SIZE = 10;
 struct AppInfo {
     std::string startTime;
     int32_t uid {};

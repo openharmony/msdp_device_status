@@ -29,8 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
-const std::string SERVICE_ID = "deviceStatus";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
+const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}

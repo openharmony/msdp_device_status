@@ -24,7 +24,7 @@ using namespace ::OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientTest" };
-}
+} // namespace
 
 class DeviceStatusClientTest : public testing::Test {
 public:
@@ -58,7 +58,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;
@@ -81,7 +81,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;
@@ -104,7 +104,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;
@@ -127,7 +127,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;
@@ -150,7 +150,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;
@@ -173,7 +173,7 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ::OHOS::sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_EQ(cb, nullptr);
+    ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
     int32_t ret = RET_OK;

@@ -15,9 +15,6 @@
 
 #include "algo_vertical.h"
 
-#include <cmath>
-#include <cstdio>
-
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -25,8 +22,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AlgoVertical" };
-constexpr float JUDGE_FLOAT = 1e-6;
-}
+constexpr float JUDGE_FLOAT { 1e-6 };
+} // namespace
 
 bool AlgoVertical::Init(Type type)
 {

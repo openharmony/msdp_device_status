@@ -46,7 +46,7 @@ public:
     void CloseTimer();
     void InitTimer();
     void TimerCallback();
-    int32_t RegisterTimerCallback(const int32_t fd, const EventType et);
+    int32_t RegisterTimerCallback(int32_t fd, const EventType et);
     void StartThread();
     void LoopingThreadEntry();
     ErrCode Enable(Type type) override;

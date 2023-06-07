@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <functional>
 
+#include <input_manager.h>
+
 #include "drag_data.h"
 #include "stream_session.h"
 
@@ -37,6 +39,8 @@ public:
     virtual DragState GetDragState() const = 0;
     virtual DragResult GetDragResult() const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible) = 0;
+    virtual void MoveTo(int32_t xPercent, int32_t yPercent) = 0;
+    virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

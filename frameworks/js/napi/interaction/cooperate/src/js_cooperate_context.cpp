@@ -23,13 +23,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCooperateContext" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsCooperateContext" };
 const char* g_coordinationClass = "Coordination_class";
 const char* g_coordination = "Coordination";
-constexpr int32_t ZERO_PARAM = 0;
-constexpr int32_t ONE_PARAM = 1;
-constexpr int32_t TWO_PARAM = 2;
-constexpr int32_t THREE_PARAM = 3;
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
@@ -279,7 +275,7 @@ napi_value JsCooperateContext::CreateInstance(napi_env env)
         SET_NAMED_PROPERTY);
 
     JsCooperateContext *jsContext = nullptr;
-    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, reinterpret_cast<void**>(&jsContext)), UNWRAP);
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, ONE_PARAM, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
@@ -342,7 +338,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     }
 
     JsCooperateContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
     if (instance == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");

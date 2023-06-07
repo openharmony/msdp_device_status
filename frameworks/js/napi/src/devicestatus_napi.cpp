@@ -30,12 +30,12 @@ using namespace OHOS::Msdp;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapi" };
-constexpr size_t ARG_0 = 0;
-constexpr size_t ARG_1 = 1;
-constexpr size_t ARG_2 = 2;
-constexpr size_t ARG_3 = 3;
-constexpr size_t ARG_4 = 4;
-constexpr int32_t NAPI_BUF_LENGTH  = 256;
+constexpr size_t ARG_0 { 0 };
+constexpr size_t ARG_1 { 1 };
+constexpr size_t ARG_2 { 2 };
+constexpr size_t ARG_3 { 3 };
+constexpr size_t ARG_4 { 4 };
+constexpr int32_t NAPI_BUF_LENGTH { 256 };
 const std::vector<std::string> vecDeviceStatusValue {
     "VALUE_ENTER", "VALUE_EXIT"
 };

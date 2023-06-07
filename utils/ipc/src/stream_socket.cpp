@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
 } // namespace
 
 StreamSocket::StreamSocket() {}
@@ -68,7 +68,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
     return ret;
 }
 
-int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -97,7 +97,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+        if (head->size < 0 || static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE) {
             FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
                 "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();

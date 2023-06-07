@@ -28,7 +28,7 @@ using PACKHEAD = struct PackHead {
 namespace OHOS {
 namespace Msdp {
 class NetPacket : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "NetPacket" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "NetPacket" };
 public:
     explicit NetPacket(MessageId msgId);
     NetPacket(const NetPacket &pkt);

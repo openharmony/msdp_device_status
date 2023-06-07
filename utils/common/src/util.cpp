@@ -15,14 +15,14 @@
 
 #include "util.h"
 
-#include <unistd.h>
-
 #include <string>
 
-#include "securec.h"
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <unistd.h>
+
+#include "securec.h"
 
 #include "devicestatus_define.h"
 #include "utility.h"
@@ -32,14 +32,14 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
-constexpr size_t BUF_TID_SIZE = 10;
-constexpr size_t PROGRAM_NAME_SIZE = 256;
-constexpr size_t BUF_CMD_SIZE = 512;
-constexpr uint32_t BASE_YEAR = 1900;
-constexpr uint32_t BASE_MON = 1;
-constexpr uint32_t MS_NS = 1000000;
-constexpr int32_t FILE_SIZE_MAX = 0x5000;
-const std::string SVG_PATH = "/system/etc/device_status/drag_icon/";
+constexpr size_t BUF_TID_SIZE { 10 };
+constexpr size_t PROGRAM_NAME_SIZE { 256 };
+constexpr size_t BUF_CMD_SIZE { 512 };
+constexpr uint32_t BASE_YEAR { 1900 };
+constexpr uint32_t BASE_MON { 1 };
+constexpr uint32_t MS_NS { 1000000 };
+constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
 
 int32_t GetPid()

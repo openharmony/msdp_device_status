@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
 } // namespace
 
 StreamServer::~StreamServer()
@@ -88,8 +88,7 @@ void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
-int32_t StreamServer::AddSocketPairInfo(const std::string& programName,
-    const int32_t moduleType, const int32_t uid, const int32_t pid,
+int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid, int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
 {
     CALL_DEBUG_ENTER;
@@ -333,17 +332,24 @@ void StreamServer::DelSession(int32_t fd)
     DumpSession("DelSession");
 }
 
-void StreamServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+void StreamServer::AddSessionDeletedCallback(int32_t pid, std::function<void(SessionPtr)> callback)
 {
     CALL_DEBUG_ENTER;
-    callbacks_.push_back(callback);
+    auto it = callbacks_.find(pid);
+    if (it != callbacks_.end()) {
+        FI_HILOGW("Deleted session already exists");
+        return;
+    }
+    callbacks_[pid] = callback;
 }
 
 void StreamServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &callback : callbacks_) {
-        callback(ses);
+    auto it = callbacks_.find(ses->GetPid());
+    if (it != callbacks_.end()) {
+        it->second(ses);
+        callbacks_.erase(it);
     }
 }
 } // namespace Msdp

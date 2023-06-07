@@ -26,7 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SensorDataCallback" };
-constexpr int32_t RATE_MILLISEC  = 100100100;
+constexpr int32_t RATE_MILLISEC { 100100100 };
 std::map<int32_t, SensorCallback> algoMap_;
 } // namespace
 

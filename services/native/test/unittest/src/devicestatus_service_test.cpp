@@ -33,10 +33,10 @@ using namespace ::OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
-const int32_t SLEEP_TIME = 2000;
-Type g_type = Type::TYPE_INVALID;
+const int32_t SLEEP_TIME { 2000 };
+Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
-}
+} // namespace
 
 sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;
 
@@ -59,12 +59,13 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
         devicestatusData.value <= OnChangedValue::VALUE_EXIT)) << "DeviceStatusServiceTestCallback failed";
 }
 
+namespace {
 /**
  * @tc.name: DeviceStatusCallbackTest
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
@@ -79,7 +80,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
@@ -96,7 +97,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
@@ -110,7 +111,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
@@ -125,7 +126,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
@@ -142,7 +143,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
@@ -156,7 +157,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
@@ -171,7 +172,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
@@ -188,7 +189,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
@@ -202,7 +203,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
@@ -217,7 +218,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
@@ -234,7 +235,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
@@ -248,7 +249,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
@@ -263,7 +264,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
@@ -280,7 +281,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
@@ -294,7 +295,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
@@ -309,7 +310,7 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
@@ -326,7 +327,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
@@ -340,7 +341,7 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
@@ -357,3 +358,4 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
     invalidData.movement = 0.0f;
     EXPECT_TRUE(data != invalidData);
 }
+} // namespace

@@ -29,7 +29,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
-constexpr size_t EVENT_MAP_MAX = 20;
+constexpr size_t EVENT_MAP_MAX { 20 };
 } // namespace
 
 DeviceStatusEvent::DeviceStatusEvent(napi_env env)

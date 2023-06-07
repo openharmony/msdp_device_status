@@ -30,7 +30,7 @@ using namespace OHOS;
 
 namespace {
 std::shared_ptr<SensorDataCallback> g_datahub;
-}
+} // namespace
 
 class DeviceStatusDatahubTest : public testing::Test {
 public:
@@ -72,10 +72,8 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest001, TestSize.Level1)
     SensorCallback callback = SensorAccelCallbackData;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = g_datahub->SubscribeSensorEvent(sensorTypeId, callback);
-    ret += 1;
     ASSERT_TRUE(ret);
     ret = g_datahub->UnsubscribeSensorEvent(sensorTypeId, callback);
-    ret += 1;
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest001 end";
 }
@@ -90,7 +88,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest002 start";
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  g_datahub->RegisterCallbackSensor(sensorTypeId);
-    ret += 1;
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = 10;
@@ -99,7 +96,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
     ret = g_datahub->PushData(sensorTypeId, reinterpret_cast<uint8_t*>(&data));
     EXPECT_FALSE(ret);
     ret = g_datahub->UnregisterCallbackSensor(sensorTypeId);
-    ret += 1;
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest002 end";
 }
@@ -116,10 +112,8 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest003, TestSize.Level1)
     SensorCallback callback = SensorAccelCallbackData;
     int32_t SENSOR_TYPE_ID_ERROR = 300;
     bool ret = g_datahub->SubscribeSensorEvent(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR), callback);
-    ret += 1;
     ASSERT_TRUE(ret);
     ret = g_datahub->UnsubscribeSensorEvent(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR), callback);
-    ret += 1;
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest003 end";
 }

@@ -38,14 +38,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
-constexpr int32_t INTERVAL_MS = 2000;
-constexpr double PERCENT_CONST = 100.0;
-constexpr int32_t MOUSE_ABS_LOCATION = 100;
-constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
-constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
-constexpr int32_t COORDINATION_PRIORITY = 499;
-constexpr int32_t MIN_HANDLER_ID = 1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
+constexpr int32_t INTERVAL_MS { 2000 };
+constexpr double PERCENT_CONST { 100.0 };
+constexpr int32_t MOUSE_ABS_LOCATION { 100 };
+constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
+constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
+constexpr int32_t COORDINATION_PRIORITY { 499 };
+constexpr int32_t MIN_HANDLER_ID { 1 };
 } // namespace
 
 CoordinationSM::CoordinationSM() {}
@@ -104,6 +104,7 @@ void CoordinationSM::Reset(const std::string &networkId)
     if (needReset) {
         preparedNetworkId_ = std::make_pair("", "");
         Reset(true);
+        SetPointerVisible();
     }
 }
 
@@ -114,11 +115,8 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
     remoteNetworkId_ = "";
     currentStateSM_ = std::make_shared<CoordinationStateFree>();
     coordinationState_ = CoordinationState::STATE_FREE;
-    bool hasPointer = COOR_DEV_MGR->HasLocalPointerDevice();
-    if (hasPointer && adjustAbsolutionLocation) {
+    if (adjustAbsolutionLocation) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
-    } else {
-        OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     isStarting_ = false;
     isStopping_ = false;
@@ -163,10 +161,12 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
     }
     if (isLocal || networkId == remoteNetworkId_) {
         Reset(true);
+        SetPointerVisible();
         return;
     }
     if (COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_) == networkId) {
         Reset();
+        SetPointerVisible();
     }
 }
 
@@ -259,7 +259,16 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
         FI_HILOGE("Stop input device coordination fail");
         isStopping_ = false;
     }
+    CHKPR(notifyDragCancelCallback_, ERROR_NULL_POINTER);
+    notifyDragCancelCallback_();
     return ret;
+}
+
+void CoordinationSM::RegisterNotifyDragCancel(std::function<void(void)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    notifyDragCancelCallback_ = callback;
 }
 
 void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed)
@@ -279,6 +288,7 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     if (buttonIsPressed) {
         StartPointerEventFilter();
     }
+    NotifyRemoteNetworkId(remoteNetworkId);
 }
 
 void CoordinationSM::StartPointerEventFilter()
@@ -351,6 +361,7 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     }
     if (isSuccess) {
         Reset(true);
+        SetPointerVisible();
     }
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The sink preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
@@ -382,9 +393,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
-        NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
-            UpdateState(CoordinationState::STATE_OUT);
             NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
@@ -392,9 +401,15 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
             if (!originNetworkId.empty() && remoteNetworkId != originNetworkId) {
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
-            UpdateState(CoordinationState::STATE_FREE);
             NotifyRemoteNetworkId(originNetworkId);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
+            SetPointerVisible();
+        }
+        NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
+        if (coordinationState_ == CoordinationState::STATE_FREE) {
+            UpdateState(CoordinationState::STATE_OUT);
+        } else if (coordinationState_ == CoordinationState::STATE_IN) {
+            UpdateState(CoordinationState::STATE_FREE);
         } else {
             FI_HILOGI("Current state is out");
         }
@@ -413,6 +428,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
     NotifyRemoteStopFinish(isSuccess, remoteNetworkId);
     if (isSuccess) {
         if (COOR_DEV_MGR->HasLocalPointerDevice()) {
+            MMI::InputManager::GetInstance()->SetPointerVisible(true);
             SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
@@ -583,7 +599,8 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
         return;
     }
     if ((coordinationState_ == CoordinationState::STATE_IN) && (startDeviceDhid_ == dhid)) {
-        Reset();
+        Reset(true);
+        SetPointerVisible();
         return;
     }
     if ((coordinationState_ == CoordinationState::STATE_OUT) && (startDeviceDhid_ == dhid)) {
@@ -594,7 +611,8 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
         std::string localNetworkId = COORDINATION::GetLocalNetworkId();
         D_INPUT_ADAPTER->StopRemoteInput(remoteNetworkId, localNetworkId, keyboards,
             [this, remoteNetworkId](bool isSuccess) {});
-        Reset();
+        Reset(true);
+        SetPointerVisible();
     }
 }
 
@@ -959,6 +977,13 @@ void CoordinationSM::SetSinkNetworkId(const std::string &sinkNetworkId)
 {
     CALL_DEBUG_ENTER;
     sinkNetworkId_ = sinkNetworkId;
+}
+
+void CoordinationSM::SetPointerVisible()
+{
+    bool hasPointer = COOR_DEV_MGR->HasLocalPointerDevice();
+    FI_HILOGD("hasPointer:%{public}s", hasPointer ? "true" : "false");
+    OHOS::MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

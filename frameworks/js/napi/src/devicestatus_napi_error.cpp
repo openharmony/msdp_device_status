@@ -26,7 +26,7 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapiError" };
 } // namespace
 
-napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage)
+napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage)
 {
     napi_value businessError = nullptr;
     napi_value code = nullptr;
@@ -48,7 +48,7 @@ std::optional <std::string> GetErrMsg(int32_t errorCode)
     return std::nullopt;
 }
 
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
+void ThrowErr(const napi_env &env, int32_t errCode, const std::string &printMsg)
 {
     FI_HILOGE("Message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
     std::optional<std::string> msg = GetErrMsg(errCode);
