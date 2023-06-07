@@ -15,7 +15,7 @@
 #ifndef BYTRACE_ADAPTER_H
 #define BYTRACE_ADAPTER_H
 
-#include <string.h>
+#include <cstring>
 
 #include "hitrace_meter.h"
 

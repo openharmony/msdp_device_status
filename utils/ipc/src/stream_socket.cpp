@@ -77,7 +77,7 @@ int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll
         FI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
-    auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
+    int32_t ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         FI_HILOGE("epoll_wait, ret:%{public}d, errno:%{public}d", ret, errno);
     }
@@ -137,7 +137,7 @@ void StreamSocket::EpollClose()
 void StreamSocket::Close()
 {
     if (fd_ >= 0) {
-        auto rf = close(fd_);
+        int32_t rf = close(fd_);
         if (rf > 0) {
             FI_HILOGE("Socket close failed rf:%{public}d", rf);
         }

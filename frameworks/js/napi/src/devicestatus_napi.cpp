@@ -362,7 +362,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     }
     sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
     CHKPP(callback);
-    auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
+    int32_t subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
         static_cast<ActivityEvent>(event), static_cast<ReportLatencyNs>(latency), callback);
     if (subscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "On:Failed to SubscribeCallback");
@@ -416,7 +416,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        auto unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
+        int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
             static_cast<ActivityEvent>(event), callbackIter->second);
         if (unsubscribeRet != RET_OK) {
             ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");

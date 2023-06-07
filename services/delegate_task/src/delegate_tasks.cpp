@@ -146,7 +146,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     std::lock_guard<std::mutex> guard(mux_);
     FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
     static constexpr int32_t maxTasksLimit = 1000;
-    auto tsize = tasks_.size();
+    size_t tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
         FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
