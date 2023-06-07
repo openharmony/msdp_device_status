@@ -27,11 +27,10 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-
 namespace {
 std::shared_ptr<AlgoMgr> g_manager;
 } // namespace
@@ -564,3 +563,6 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level
     EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

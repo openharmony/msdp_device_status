@@ -23,11 +23,10 @@
 #include "devicestatus_msdp_mock.h"
 #include "sensor_data_callback.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-
 namespace {
 std::shared_ptr<SensorDataCallback> g_datahub;
 } // namespace
@@ -438,3 +437,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest020, TestSize.Level1)
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusDatahubTest020 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

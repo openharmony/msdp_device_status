@@ -19,9 +19,10 @@
 #include "devicestatus_define.h"
 #include "stationary_manager.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace ::OHOS::Msdp::DeviceStatus;
-
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientTest" };
 } // namespace
@@ -294,3 +295,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
         << "GetDeviceStatusDataTest006 failed";
     GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
