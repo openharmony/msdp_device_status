@@ -273,7 +273,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
