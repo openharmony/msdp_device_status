@@ -32,38 +32,38 @@ class StationaryManager {
 public:
 
     /**
-     * @brief 获取StationaryManager实例。
-     * @return StationaryManager实例。
+     * @brief Obtains a <b>StationaryManager</b> instance.
+     * @return Returns a <b>StationaryManager</b> instance.
      * @since 9
      */
     static StationaryManager *GetInstance();
 
     /**
-     * @brief 订阅设备状态。
-     * @param type 设备状态类型。
-     * @param event 订阅的事件（进入/退出/进入和退出）。
-     * @param latency 上报周期。
-     * @param callback 用于接收设备状态事件变化的回调。
-     * @return 返回0表示接口调用成功，返回其他表示接口调用失败。
+     * @brief Subscribes to device status changes.
+     * @param type Indicates the device status type.
+     * @param event Indicates the event type, which can be <b>ENTER</b>, <b>EXIT</b>, and <b>ENTER_EXIT</b>.
+     * @param latency Indicates the reporting interval.
+     * @param callback Indicates the callback used to return the device status changes.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback);
 
     /**
-     * @brief 取消订阅设备状态。
-     * @param type 设备状态类型。
-     * @param event 订阅的事件（进入/退出/进入和退出）。
-     * @param callback 用于接收设备状态事件变化的回调。
-     * @return 返回0表示接口调用成功，返回其他表示接口调用失败。
+     * @brief Unsubscribes from device status changes.
+     * @param type Indicates the device status type.
+     * @param event Indicates the event type, which can be <b>ENTER</b>, <b>EXIT</b>, and <b>ENTER_EXIT</b>.
+     * @param callback Indicates the callback used to return the device status changes.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
 
     /**
-     * @brief 获取当前设备状态数据。
-     * @param type 设备状态类型。
-     * @return 设备状态数据。
+     * @brief Obtains the device status data.
+     * @param type Indicates the device status type.
+     * @return Returns the device status data.
      * @since 9
      */
     Data GetDeviceStatusData(const Type type);

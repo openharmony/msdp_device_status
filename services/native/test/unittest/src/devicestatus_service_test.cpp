@@ -32,7 +32,7 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
-const int32_t SLEEP_TIME { 2000 };
+constexpr int32_t SLEEP_TIME { 2000 };
 Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
 } // namespace
