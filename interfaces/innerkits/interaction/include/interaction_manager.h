@@ -36,139 +36,146 @@ public:
     virtual ~InteractionManager() = default;
 
     /**
-     * @brief 注册键鼠穿越管理事件监听。
-     * @param listener 穿越管理事件监听回调。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Registers a listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener);
 
     /**
-     * @brief 注销键鼠穿越管理事件监听。
-     * @param listener 事件监听回调.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Unregisters a listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
 
     /**
-     * @brief 准备键鼠穿越接口。
-     * @param callback 开启/关闭键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Prepares for screen hopping.
+     * @param callback Indicates the callback used to receive the result of enabling or disabling screen hopping.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
-     * @brief 取消准备键鼠穿越接口。
-     * @param callback 开启/关闭键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Cancels the preparation for screen hopping.
+     * @param callback Indicates the callback used to receive the result of enabling or disabling screen hopping.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
-     * @brief 启动跨设备键鼠穿越。
-     * @param remoteNetworkId 键鼠穿越目标设备描述符（networkID）
-     * @param startDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
-     * @param callback 启动跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Starts screen hopping for the mouse pointer.
+     * @param s remoteNetworkId Indicates the descriptor of the target input device (network ID) for screen hopping.
+     * @param startDeviceId Indicates the ID of the source input device (device ID handle) for screen hopping.
+     * @param callback Indicates the callback used to receive the result of starting screen hopping.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
-     * @brief 停止跨设备键鼠穿越。
-     * @param isUnchained 跨设备链路是否断开, true表示断开跨设备链路，false表示不断开跨设备链路
-     * @param callback 停止跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Stops screen hopping for the mouse pointer.
+     * @param isUnchained Specifies Whether to disable the cross-device link.
+     * The value <b>true</b> means to disable the cross-device link, and <b>false</b> means the opposite.
+     * @param callback Indicates the callback used to receive the result of stopping screen hopping.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t DeactivateCoordination(bool isUnchained,
         std::function<void(const std::string&, CoordinationMessage)> callback);
 
     /**
-     * @brief 获取指定设备键鼠穿越状态。
-     * @param deviceId 指定设备描述符。
-     * @param callback 获取穿越管理设备状态，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Obtains the screen hopping status of a mouse pointer.
+     * @param deviceId Indicates the descriptor of the input device.
+     * @param callback Indicates the callback used to receive the screen hopping status.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
     int32_t GetCoordinationState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
-     * @brief 开始拖拽目标。
-     * @param dragData 拖拽附加数据
-     * @param callback 拖拽结果信息回调函数
-     * @return 返回0表示调用成功，否则，表示调用失败
+     * @brief Starts dragging.
+     * @param dragData Indicates additional data used for dragging.
+     * @param callback Indicates the callback used to return the dragging result.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
 
     /**
-     * @brief 结束拖拽。
-     * @param result 标识拖拽调用结果 0-成功,1-失败,2-取消
-     * @param hasCustomAnimation 标识是否在拖拽成功时做默认动效，true表示做应用自定义动效，false表示做默认动效
-     * @return 返回0表示调用成功，否则，表示调用失败
+     * @brief Stops dragging.
+     * @param result Indicates the dragging result. The value <b>0</b> means that the dragging operation is successful;
+     * <b>1</b> means that the dragging operation is failed; <b>2</b> means that the dragging operation is canceled.
+     * @param hasCustomAnimation Specifies whether a custom animation is played when the dragging is successful.
+     * The value <b>true</b> means that a custom animation is played,
+     * and <b>false</b> means that the default animation is played.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
 
     /**
-     * @brief 更新拖拽中的光标样式。
-     * @param style 指定光标样式。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Updates the mouse pointer style used for dragging.
+     * @param style Indicates the new mouse pointer style.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t UpdateDragStyle(DragCursorStyle style);
 
     /**
-     * @brief 获取拖拽目标窗口PID
-     * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
+     * @brief Obtains the PID of the target window.
+     * @return Returns a value greater than or equal to 0 in normal cases; returns <b>-1</b> if the PID is invalid.
      * @since 10
      */
     int32_t GetDragTargetPid();
 
     /**
-     * @brief 获取拖拽目标窗口统一数据密钥
-     * @param UdKey 拖拽目标窗口统一数据密钥。
-     * @return 返回值如果是-1则是无效值，为大于等于0的值为正确值
+     * @brief Obtains the unified data key of the target window.
+     * @param UdKey Indicates the unified data key of the target window.
+     * @return Returns a value greater than or equal to 0 in normal cases; returns <b>-1</b> if the PID is invalid.
      * @since 10
      */
     int32_t GetUdKey(std::string &udKey);
 
     /**
-     * @brief 注册拖拽状态监听。。
-     * @param listener 拖拽状态监听。
-     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @brief Registers a listener for dragging status changes.
+     * @param listener Indicates the listener for dragging status changes.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t AddDraglistener(std::shared_ptr<IDragListener> listener);
 
     /**
-     * @brief 取消注册拖拽状态监听。
-     * @param listener 拖拽状态监听，如果为空，表示取消所有监听。
-     * @return 返返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @brief Unregisters a listener for dragging status changes.
+     * @param listener Indicates the listener for dragging status changes.
+     * If no value is passed, all listeners are canceled.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
 
     /**
-     * @brief 设置拖拽窗口显示或者隐藏
-     * @param visible 设置拖拽窗口的是否显示，true表示显示，false表示隐藏。
-     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @brief Displays or hides the dragging window.
+     * @param visible Specifies whether to display the dragging window.
+     * The value <b>true</b> means to display the dragging window, and <b>false</b> means to hide the window.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t SetDragWindowVisible(bool visible);
 
     /**
-     * @brief 获取触控点或鼠标光标相对于阴影缩略图左上角的位置。
-     * @param offsetX 要查询的x值。
-     * @param offsetY 要查询的y值。
-     * @param width 要查询缩略图的宽
-     * @param height 要查询缩略图的高
-     * @return 返回值0表示接口调用成功，否则，表示接口调用失败。
+     * @brief Obtains the position of the touch point or mouse pointer relative to
+     * the upper left corner of the shadow thumbnail.
+     * @param offsetX Indicates the x coordinate.
+     * @param offsetY Indicates the y coordinate.
+     * @param width Indicates the width of the shadow thumbnail.
+     * @param height Indicates the height of the shadow thumbnail.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
