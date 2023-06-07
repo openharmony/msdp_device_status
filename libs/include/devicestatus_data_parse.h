@@ -28,7 +28,7 @@ class DeviceStatusDataParse {
 public:
     DeviceStatusDataParse() = default;
     ~DeviceStatusDataParse() = default;
-    bool ParseDeviceStatusData(Data& data, Type type);
+    bool ParseDeviceStatusData(Type type, Data& data);
     bool DisableCount(const Type type);
     bool DeviceStatusDataInit(const std::string& fileData, bool logStatus, Type& type, Data& data);
     int32_t CreateJsonFile();

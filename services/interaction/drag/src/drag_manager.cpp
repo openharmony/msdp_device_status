@@ -37,10 +37,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
-constexpr int32_t TIMEOUT_MS = 2000;
-constexpr int32_t DRAG_PRIORITY = 500;
-constexpr double PERCENT_CONST = 100.0;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
+constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t DRAG_PRIORITY { 500 };
+constexpr double PERCENT_CONST { 100.0 };
 } // namespace
 
 int32_t DragManager::Init(IContext* context)

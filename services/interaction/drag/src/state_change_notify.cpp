@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StateChangeNotify" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateChangeNotify" };
 } // namespace
 
 void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)

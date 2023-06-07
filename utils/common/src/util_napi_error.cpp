@@ -19,7 +19,7 @@ namespace OHOS {
 namespace Msdp {
 namespace UtilNapiError {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "UtilNapiError" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UtilNapiError" };
 } // namespace
 bool GetApiError(int32_t code, NapiError &codeMsg)
 {
