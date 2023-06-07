@@ -121,6 +121,7 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
+} // namespace
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
