@@ -22,7 +22,7 @@ using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusAgentFuzzTest" };
-const int WAIT_TIME { 1000 };
+constexpr int32_t WAIT_TIME { 1000 };
 } // namespace
 
 static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
@@ -39,7 +39,7 @@ bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEvent: Enter " << std::endl;
+    std::cout << "TestSubscribeAgentEvent: Enter" << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
@@ -57,14 +57,14 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 
 void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(Type type)
 {
-    std::cout << "TestUnSubscribeAgentEvent: Enter " << std::endl;
+    std::cout << "TestUnSubscribeAgentEvent: Enter" << std::endl;
 
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEventIsNullptr: Enter " << std::endl;
+    std::cout << "TestSubscribeAgentEventIsNullptr: Enter" << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
@@ -83,7 +83,7 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* da
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
+    std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter" << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
@@ -101,7 +101,7 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t
 
 void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 {
-    std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
+    std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter" << std::endl;
 
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }

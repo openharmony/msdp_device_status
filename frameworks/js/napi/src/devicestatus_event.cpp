@@ -24,9 +24,9 @@
 
 #include "devicestatus_define.h"
 
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
 constexpr size_t EVENT_MAP_MAX { 20 };
@@ -61,13 +61,13 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
             FI_HILOGD("EventType:%{public}d not exists", eventType);
             eventOnceMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
         status = napi_create_reference(env_, handler, 1, &onHandlerRef);
         if (status != napi_ok) {
             FI_HILOGE("Failed to create reference");
             napi_close_handle_scope(env_, scope);
             return false;
         }
+        auto listener = std::make_shared<DeviceStatusEventListener>();
         listener->onHandlerRef = onHandlerRef;
         eventOnceMap_[eventType].push_back(listener);
         FI_HILOGI("Add once handler to list %{public}d", eventType);
@@ -77,13 +77,13 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
             FI_HILOGD("EventType:%{public}d not exists", eventType);
             eventMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
         status = napi_create_reference(env_, handler, 1, &onHandlerRef);
         if (status != napi_ok) {
             FI_HILOGE("Failed to create reference");
             napi_close_handle_scope(env_, scope);
             return false;
         }
+        auto listener = std::make_shared<DeviceStatusEventListener>();
         listener->onHandlerRef = onHandlerRef;
         eventMap_[eventType].push_back(listener);
         FI_HILOGI("Add handler to list %{public}d", eventType);
@@ -281,3 +281,6 @@ void DeviceStatusEvent::ClearEventMap()
     eventMap_.clear();
     eventOnceMap_.clear();
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
