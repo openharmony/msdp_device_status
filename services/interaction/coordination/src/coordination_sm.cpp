@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "device_manager.h"
+#include "display_info.h"
 #include "display_manager.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
@@ -26,13 +27,11 @@
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
-#include "device_profile_adapter.h"
-#include "display_info.h"
 #include "coordination_state_free.h"
 #include "coordination_state_in.h"
 #include "coordination_state_out.h"
 #include "coordination_util.h"
-#include "input_manager.h"
+#include "device_profile_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
