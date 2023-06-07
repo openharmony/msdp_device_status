@@ -31,6 +31,6 @@ bool GetApiError(int32_t code, NapiError &codeMsg)
     codeMsg = iter->second;
     return true;
 }
-} // UtilNapiError
+} // namespace UtilNapiError
 } // namespace Msdp
 } // namespace OHOS

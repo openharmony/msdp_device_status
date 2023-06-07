@@ -39,7 +39,7 @@ struct JsonParser {
 };
 namespace COORDINATION {
 std::string GetLocalNetworkId();
-}
+} // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
