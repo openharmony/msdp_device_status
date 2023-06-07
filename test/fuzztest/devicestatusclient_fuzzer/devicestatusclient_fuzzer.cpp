@@ -27,12 +27,12 @@ using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientFuzzTest" };
+constexpr int32_t WAIT_TIME { 1000 };
 } // namespace
 
 auto stationaryMgr = StationaryManager::GetInstance();
 sptr<DeviceStatusClientFuzzer::DeviceStatusTestCallback> cb =
     new (std::nothrow) DeviceStatusClientFuzzer::DeviceStatusTestCallback();
-const int WAIT_TIME = 1000;
 void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(const \
     Data& devicestatusData)
 {
@@ -42,7 +42,7 @@ void DeviceStatusClientFuzzer::DeviceStatusTestCallback::OnDeviceStatusChanged(c
 
 void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 {
-    std::cout << "TestSubscribeCallback: Enter " << std::endl;
+    std::cout << "TestSubscribeCallback: Enter" << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
@@ -59,7 +59,7 @@ void DeviceStatusClientFuzzer::TestSubscribeCallback(const uint8_t* data)
 
 void DeviceStatusClientFuzzer::TestGetDevicestatusData(Type type)
 {
-    std::cout << "TestGetDevicestatusData: Enter " << std::endl;
+    std::cout << "TestGetDevicestatusData: Enter" << std::endl;
     stationaryMgr->GetDeviceStatusData(type);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME));
@@ -68,7 +68,7 @@ void DeviceStatusClientFuzzer::TestGetDevicestatusData(Type type)
 
 void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
 {
-    std::cout << "TestUnSubscribeCallback: Enter " << std::endl;
+    std::cout << "TestUnSubscribeCallback: Enter" << std::endl;
 
     stationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }

@@ -44,5 +44,6 @@ ohos_shared_library("devicestatus_ipc") {
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "${device_status_part_name}"
 }
