@@ -50,7 +50,6 @@ public:
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency, sptr<IRemoteDevStaCallback> callback);
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetLatestDeviceStatusData(Type type);
-    int32_t SensorDataCallback(struct SensorEvents *event);
     int32_t MsdpDataCallback(const Data &data);
     int32_t LoadAlgorithm();
     int32_t UnloadAlgorithm();

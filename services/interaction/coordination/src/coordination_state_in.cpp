@@ -99,6 +99,7 @@ int32_t CoordinationStateIn::ProcessStop()
             this->OnStopRemoteInput(isSuccess, originNetworkId, -1);
         });
     if (ret != RET_OK) {
+        FI_HILOGE("Stop remote input fail");
         COOR_SM->OnStopFinish(false, originNetworkId);
     }
     return RET_OK;

@@ -243,11 +243,7 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     std::lock_guard<std::mutex> guard(mutex_);
-    if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("Client has not connect server");
-        return RET_ERR;
-    }
-
+    CHKPR(devicestatusProxy_, RET_ERR);
     const std::string programName(GetProgramName());
     int32_t result = devicestatusProxy_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
@@ -274,10 +270,7 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("devicestatusProxy_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->StartDrag(dragData);
 }
 
@@ -285,10 +278,7 @@ int32_t DeviceStatusClient::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    if (devicestatusProxy_ == nullptr) {
-        FI_HILOGE("devicestatusProxy_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->StopDrag(result, hasCustomAnimation);
 }
 

@@ -547,10 +547,7 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, Messag
 {
     CALL_DEBUG_ENTER;
     DataPacket* dataPacket = (DataPacket*)malloc(sizeof(DataPacket) + dataLen);
-    if (dataPacket == nullptr) {
-        FI_HILOGE("Malloc data packetfailed");
-        return RET_ERR;
-    }
+    CHKPR(dataPacket, RET_ERR);
     dataPacket->messageId = messageId;
     dataPacket->dataLen = dataLen;
     errno_t ret = memcpy_s(dataPacket->data, dataPacket->dataLen, data, dataPacket->dataLen);

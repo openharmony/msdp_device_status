@@ -177,10 +177,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
 {
     for (const auto &item : enabledType_) {
         Type type = item;
-        if (dataParse_ == nullptr) {
-            FI_HILOGE("dataParse_ is nullptr");
-            return RET_ERR;
-        }
+        CHKPR(dataParse_, RET_ERR);
         Data data;
         dataParse_->ParseDeviceStatusData(type, data);
         FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);

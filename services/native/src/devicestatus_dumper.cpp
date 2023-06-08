@@ -43,6 +43,9 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
 } // namespace
 
+DeviceStatusDumper::DeviceStatusDumper() {}
+DeviceStatusDumper::~DeviceStatusDumper() {}
+
 int32_t DeviceStatusDumper::Init(IContext *context)
 {
     CALL_DEBUG_ENTER;
@@ -184,10 +187,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
-        if (record == nullptr) {
-            FI_HILOGE("deviceStatusQueue is nullptr");
-            continue;
-        }
+        CHKPC(record);
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
         dprintf(fd, "startTime:%s | type:%s | value:%s\n",

@@ -49,6 +49,7 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
         RegisterServiceEvent(type, event, latency);
         agentEvent_ = agentEvent;
     } else {
+        FI_HILOGE("Subscription agent event failed");
         return ERR_INVALID_VALUE;
     }
     return RET_OK;
@@ -61,6 +62,7 @@ int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const Type& type, const Activit
         UnRegisterServiceEvent(type, event);
         return RET_OK;
     }
+    FI_HILOGE("Unsubscription agent event failed");
     return ERR_INVALID_VALUE;
 }
 
