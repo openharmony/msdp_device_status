@@ -23,8 +23,8 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "stream_socket.h"
 #include "i_stream_server.h"
+#include "stream_socket.h"
 
 namespace OHOS {
 namespace Msdp {

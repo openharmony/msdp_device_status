@@ -17,9 +17,9 @@
 
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
+#include "coordination_sm.h"
 #include "devicestatus_define.h"
 #include "distributed_input_adapter.h"
-#include "coordination_sm.h"
 
 namespace OHOS {
 namespace Msdp {
