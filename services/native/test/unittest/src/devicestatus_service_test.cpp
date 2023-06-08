@@ -26,14 +26,13 @@
 #include "fi_log.h"
 #include "stationary_manager.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace ::OHOS;
-using namespace ::OHOS::Msdp;
-using namespace ::OHOS::Msdp::DeviceStatus;
-
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
-const int32_t SLEEP_TIME { 2000 };
+constexpr int32_t SLEEP_TIME { 2000 };
 Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
 } // namespace
@@ -359,3 +358,6 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
     EXPECT_TRUE(data != invalidData);
 }
 } // namespace
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

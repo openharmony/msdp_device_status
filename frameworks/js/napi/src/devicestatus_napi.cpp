@@ -25,9 +25,9 @@
 #include "devicestatus_napi_error.h"
 #include "stationary_manager.h"
 
-using namespace OHOS;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapi" };
 constexpr size_t ARG_0 { 0 };
@@ -358,7 +358,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     }
     sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
     CHKPP(callback);
-    auto subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
+    int32_t subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
         static_cast<ActivityEvent>(event), static_cast<ReportLatencyNs>(latency), callback);
     if (subscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "On:Failed to SubscribeCallback");
@@ -412,7 +412,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     }
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
-        auto unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
+        int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
             static_cast<ActivityEvent>(event), callbackIter->second);
         if (unsubscribeRet != RET_OK) {
             ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
@@ -563,3 +563,6 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&g_module);
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

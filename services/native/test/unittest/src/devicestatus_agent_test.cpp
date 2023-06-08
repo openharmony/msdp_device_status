@@ -17,12 +17,15 @@
 
 #include "devicestatus_define.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
+namespace {
+std::shared_ptr<DeviceStatusAgent> g_agent1;
+std::shared_ptr<DeviceStatusAgent> g_agent2;
+} // namespace
 
-static std::shared_ptr<DeviceStatusAgent> g_agent1;
-static std::shared_ptr<DeviceStatusAgent> g_agent2;
 Type DeviceStatusAgentTest::g_agentTest = Type::TYPE_INVALID;
 
 void DeviceStatusAgentTest::SetUpTestCase() {}
@@ -59,7 +62,6 @@ bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
     return true;
 }
 
-namespace {
 /**
  * @tc.name: DeviceStatusAgentTest001
  * @tc.desc: test subscribing lid open event
@@ -303,4 +305,6 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
     callback->OnDeviceStatusChanged(devicestatusData);
     GTEST_LOG_(INFO) << "DeviceStatusAgentTest010 end";
 }
-} // namespace
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -63,6 +63,10 @@ public:
     void SaveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void RemoveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void PushDeviceStatus(const Data &data);
+    void DumpCheckDefine(int32_t fd);
+    void ChkDefineOutput(int32_t fd);
+    template<class ...Ts>
+    void CheckDefineOutput(int32_t fd, const char* fmt, Ts... args);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 private:
     DISALLOW_COPY_AND_MOVE(DeviceStatusDumper);

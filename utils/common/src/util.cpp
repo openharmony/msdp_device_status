@@ -68,7 +68,7 @@ static std::string GetThisThreadIdOfString()
 uint64_t GetThisThreadId()
 {
     std::string stid = GetThisThreadIdOfString();
-    auto tid = std::stoull(stid);
+    uint64_t tid = std::stoull(stid);
     return tid;
 }
 
