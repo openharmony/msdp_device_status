@@ -34,7 +34,7 @@ public:
 
     enum MessageId {
         MIN_ID = 0,
-        DRAGING_DATA = 1,
+        DRAGGING_DATA = 1,
         STOPDRAG_DATA = 2,
         MAX_ID = 50,
     };

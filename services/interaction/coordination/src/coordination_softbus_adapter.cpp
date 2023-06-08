@@ -404,7 +404,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
             return;
         }
         FI_HILOGI("Message:%{public}d", dataPacket->messageId);
-        if (dataPacket->messageId == DRAGING_DATA || dataPacket->messageId == STOPDRAG_DATA) {
+        if (dataPacket->messageId == DRAGGING_DATA || dataPacket->messageId == STOPDRAG_DATA) {
             CHKPV(registerRecvMap_[dataPacket->messageId]);
             registerRecvMap_[dataPacket->messageId](dataPacket->data, dataPacket->dataLen);
         }
