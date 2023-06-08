@@ -18,10 +18,10 @@
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "coordination_softbus_adapter.h"
-#include "distributed_input_adapter.h"
 #include "coordination_sm.h"
+#include "coordination_softbus_adapter.h"
 #include "coordination_util.h"
+#include "distributed_input_adapter.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -29,13 +29,12 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "devicestatus_common.h"
-#include "devicestatus_hisysevent.h"
-
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+#include "devicestatus_common.h"
+#include "devicestatus_hisysevent.h"
 
 namespace OHOS {
 namespace Msdp {

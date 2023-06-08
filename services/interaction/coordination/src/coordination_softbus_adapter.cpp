@@ -21,10 +21,10 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
-#include "device_coordination_softbus_define.h"
-#include "devicestatus_define.h"
 #include "coordination_sm.h"
 #include "coordination_util.h"
+#include "device_coordination_softbus_define.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
