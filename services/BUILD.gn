@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("../device_status.gni")
-if (fusion_interaction_coordination) {
+if (fusion_interaction_motion_drag) {
   import("//base/msdp/motion/motion.gni")
 }
 config("devicestatus_services_private_config") {
@@ -31,7 +31,7 @@ config("devicestatus_services_private_config") {
     "communication/service/include",
   ]
 
-  if (fusion_interaction_coordination) {
+  if (fusion_interaction_motion_drag) {
     include_dirs += [ "${motion_service_path}/native/include" ]
   }
 
@@ -66,8 +66,6 @@ sources_set = [
 ]
 
 external_deps_set = [
-  "distributed_input:libdinput_sdk",
-  "device_manager:devicemanagersdk",
   "access_token:libaccesstoken_sdk",
   "c_utils:utils",
   "graphic_standard:libcomposer",
@@ -101,16 +99,24 @@ ohos_shared_library("devicestatus_service") {
 
   if (fusion_interaction_coordination) {
     deps += [
-      "${motion_service_path}:motion_drag",
       "interaction/coordination:coordination",
     ]
   }
 
-  external_deps = external_deps_set
-
-  if (fusion_interaction_coordination) {
-    external_deps += [ "input:libmmi-client" ]
+  if (fusion_interaction_motion_drag) {
+    deps += [
+      "${motion_service_path}:motion_drag",
+    ]
   }
+
+  external_deps = external_deps_set
+  if (fusion_interaction_coordination) {
+    external_deps += [
+      "distributed_input:libdinput_sdk",
+      "device_manager:devicemanagersdk",
+    ]
+  }
+
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
 }
@@ -134,15 +140,22 @@ ohos_static_library("devicestatus_static_service") {
 
   if (fusion_interaction_coordination) {
     deps += [
-      "${motion_service_path}:motion_drag",
       "interaction/coordination:coordination",
     ]
   }
 
-  external_deps = external_deps_set
+  if (fusion_interaction_motion_drag) {
+    deps += [
+      "${motion_service_path}:motion_drag",
+    ]
+  }
 
+  external_deps = external_deps_set
   if (fusion_interaction_coordination) {
-    external_deps += [ "input:libmmi-client" ]
+    external_deps += [
+      "distributed_input:libdinput_sdk",
+      "device_manager:devicemanagersdk",
+    ]
   }
 
   subsystem_name = "${device_status_subsystem_name}"
