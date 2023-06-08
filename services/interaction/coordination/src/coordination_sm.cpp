@@ -479,7 +479,7 @@ bool CoordinationSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    CHKPF(disply);
+    CHKPF(display);
     int32_t width = display->GetWidth();
     int32_t height = display->GetHeight();
     if (width == 0 || height == 0) {
