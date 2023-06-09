@@ -108,8 +108,8 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 
 bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    int idSize = 8;
-    if (static_cast<int>(size) > idSize) {
+    int32_t idSize = 8;
+    if (static_cast<int32_t>(size) > idSize) {
         DevicestatusAgentFuzzer::TestSubscribeAgentEvent(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(data);
@@ -118,7 +118,7 @@ bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* dat
 }
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::Msdp::DeviceStatus::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);

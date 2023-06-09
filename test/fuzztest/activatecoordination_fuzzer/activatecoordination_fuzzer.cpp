@@ -43,7 +43,7 @@ void ActivateCoordinationFuzzTest(const uint8_t* data, size_t  size)
 } // namespace Msdp
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if (size < sizeof(int32_t)) {
         return 0;

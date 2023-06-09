@@ -67,7 +67,7 @@ namespace OHOS {
 namespace Msdp {
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int(const char *)>;
+    using HilogFunc = std::function<int32_t(const char *)>;
 
 public:
     InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
