@@ -587,14 +587,6 @@ void DragDrawing::RemoveModifier()
     }
 }
 
-void DragDrawing::MoveTo(int32_t x, int32_t y)
-{
-    x = std::max(x, 0);
-    y = std::max(y, 0);
-    CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->MoveTo(x, y);
-}
-
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
