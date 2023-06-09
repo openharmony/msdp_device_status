@@ -152,7 +152,7 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
 int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData { -1 };
+    int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
@@ -164,7 +164,7 @@ int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, Messag
 int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData { -1 };
+    int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UnprepareCoordination(userData);
     if (ret != RET_OK) {
@@ -176,11 +176,11 @@ int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, Mess
 int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData { -1 };
+    int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string remoteNetworkId;
     READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t startDeviceId { -1 };
+    int32_t startDeviceId;
     READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = ActivateCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
@@ -192,9 +192,9 @@ int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData { -1 };
+    int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    bool isUnchained { false };
+    bool isUnchained;
     READBOOL(data, isUnchained, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = DeactivateCoordination(userData, isUnchained);
     if (ret != RET_OK) {
@@ -206,7 +206,7 @@ int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, Mes
 int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData { -1 };
+    int32_t userData;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string deviceId;
     READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -220,7 +220,7 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t style { -1 };
+    int32_t style;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
@@ -257,7 +257,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
         FI_HILOGE("Service is not running, pid:%{public}d, go switch default", pid);
         return SERVICE_NOT_RUNNING;
     }
-    int32_t moduleId { -1 };
+    int32_t moduleId;
     READINT32(data, moduleId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string clientName;
     READSTRING(data, clientName, E_DEVICESTATUS_READ_PARCEL_ERROR);
