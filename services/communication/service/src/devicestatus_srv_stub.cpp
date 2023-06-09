@@ -322,14 +322,14 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
 int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t result { -1 };
-    bool hasCustomAnimation { false };
+    int32_t result;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
         result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
+    bool hasCustomAnimation;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {

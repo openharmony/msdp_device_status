@@ -181,10 +181,10 @@ void Utility::ShowUserAndGroup()
     CALL_DEBUG_ENTER;
     static constexpr size_t BUFSIZE { 1024 };
     char buffer[BUFSIZE];
-    struct passwd buf {};
-    struct passwd *pbuf { nullptr };
-    struct group grp {};
-    struct group *pgrp { nullptr };
+    struct passwd buf;
+    struct passwd *pbuf = nullptr;
+    struct group grp;
+    struct group *pgrp = nullptr;
 
     FI_HILOGD("======================= Users and Groups =======================");
     uid_t uid = getuid();

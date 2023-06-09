@@ -778,8 +778,8 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
             return nullptr;
         }
     }
-    xmlChar *xmlbuff { nullptr };
-    int32_t buffersize { 0 };
+    xmlChar *xmlbuff = nullptr;
+    int32_t buffersize = 0;
     xmlDocDumpFormatMemory(xmlDoc, &xmlbuff, &buffersize, 1);
     std::ostringstream oStrStream;
     oStrStream << xmlbuff;

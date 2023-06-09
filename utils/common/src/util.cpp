@@ -128,7 +128,7 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
 
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList)
 {
-    size_t size { 0 };
+    size_t size = 0;
     auto strs = str;
     std::string token;
     while (str.npos != (size = StringToken(strs, sep, token))) {
@@ -286,7 +286,7 @@ bool IsValidSvgFile(const std::string &filePath)
 bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);
-    double num { 0.0 };
+    double num = 0.0;
     return (sin >> num) && sin.eof();
 }
 } // namespace DeviceStatus

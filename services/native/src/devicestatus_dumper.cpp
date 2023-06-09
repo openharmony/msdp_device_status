@@ -65,7 +65,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         FI_HILOGE("args is empty");
         return;
     }
-    int32_t optRet { -1 };
+    int32_t optRet = -1;
     optind = 1;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
