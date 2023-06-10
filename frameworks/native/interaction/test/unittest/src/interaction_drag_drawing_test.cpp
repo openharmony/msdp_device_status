@@ -62,7 +62,6 @@ public:
     void TearDown();
     static void SetUpTestCase();
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    static std::shared_ptr<Media::PixelMap> CreatePixelMap2(int32_t width, int32_t height);
     static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum);
 };
 
