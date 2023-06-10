@@ -15,7 +15,6 @@
 
 #include "drag_manager.h"
 
-#include "display_manager.h"
 #include "extra_data.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
@@ -40,7 +39,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
 constexpr int32_t DRAG_PRIORITY { 500 };
-constexpr double PERCENT_CONST { 100.0 };
 } // namespace
 
 int32_t DragManager::Init(IContext* context)
@@ -538,6 +536,10 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
 {
+    if (dragState_ == DragState::MOTION_DRAGGING) {
+        FI_HILOGW("Currently in motion dragging");
+        return RET_OK;
+    }
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
     return RET_OK;
@@ -563,22 +565,6 @@ void DragManager::StateChangedNotify(DragState state)
     }
 }
 
-void DragManager::MoveTo(int32_t xPercent, int32_t yPercent)
-{
-    CALL_DEBUG_ENTER;
-    if (xPercent < 0 || xPercent >= 100 || yPercent < 0 || yPercent >= 100) {
-        FI_HILOGE("Param error");
-        return;
-    }
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    CHKPV(display);
-    int32_t width = display->GetWidth();
-    int32_t height = display->GetHeight();
-    int32_t x = static_cast<int32_t>(width * (xPercent / PERCENT_CONST));
-    int32_t y = static_cast<int32_t>(height * (yPercent / PERCENT_CONST));
-    dragDrawing_.MoveTo(x, y);
-}
-
 OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
 {
     return CreateExtraData(appended);
@@ -586,8 +572,12 @@ OHOS::MMI::ExtraData DragManager::GetExtraData(bool appended) const
 
 DragState DragManager::GetDragState() const
 {
-    CALL_DEBUG_ENTER;
     return dragState_;
+}
+
+void DragManager::SetDragState(DragState state)
+{
+    dragState_ = state;
 }
 
 DragResult DragManager::GetDragResult() const
