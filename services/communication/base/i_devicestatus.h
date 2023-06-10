@@ -47,6 +47,7 @@ public:
         UNREGISTER_DRAG_MONITOR,
         SET_DRAG_WINDOW_VISIBLE,
         GET_SHADOW_OFFSET,
+        UPDATE_SHADOW_PIC,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -78,6 +79,7 @@ public:
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
     virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
+    virtual int32_t UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelmap) = 0;
     virtual bool IsRunning() const
     {
         return true;

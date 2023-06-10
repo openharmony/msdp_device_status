@@ -231,6 +231,25 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     return RET_OK;
 }
 
+int32_t DragDrawing::UpdateShadowPic(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, RET_ERR);
+    g_drawingInfo.pixelMap = pixelMap;
+    DrawShadow();
+    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + SVG_WIDTH * GetScaling() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + SVG_HEIGHT * GetScaling() + adjustSize;
+    CHKPR(g_drawingInfo.rootNode, RET_ERR);
+    g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
+    g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPR(rsUiDirector_, RET_ERR);
+    rsUiDirector_->SendMessages();
+    return RET_OK;
+}
+
 void DragDrawing::OnDragSuccess()
 {
     CALL_DEBUG_ENTER;

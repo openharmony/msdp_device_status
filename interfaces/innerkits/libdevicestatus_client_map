@@ -45,6 +45,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateDragStyle(OHOS::Msdp::DeviceStatus::DragCursorStyle)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateShadowPic(std::__h::shared_ptr<OHOS::Media::PixelMap>)";
         };
     local:
         *;

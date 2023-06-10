@@ -258,6 +258,12 @@ int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offse
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetShadowOffset(offsetX, offsetY, width, height);
 }
+
+int32_t InteractionManagerImpl::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.UpdateShadowPic(pixelMap);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

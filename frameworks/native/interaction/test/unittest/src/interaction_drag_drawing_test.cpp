@@ -62,6 +62,7 @@ public:
     void TearDown();
     static void SetUpTestCase();
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    static std::shared_ptr<Media::PixelMap> CreatePixelMap2(int32_t width, int32_t height);
     static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum);
 };
 
@@ -115,8 +116,8 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     }
     DragData dragData;
     dragData.shadowInfo.pixelMap = pixelMap;
-    dragData.shadowInfo.x = 0;
-    dragData.shadowInfo.y = 0;
+    dragData.shadowInfo.x = -100;
+    dragData.shadowInfo.y = -100;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.udKey = UD_KEY;
     dragData.sourceType = sourceType;
@@ -127,6 +128,36 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     dragData.displayId = DISPLAY_ID;
     dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
     return dragData;
+}
+
+std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap2(int32_t width, int32_t height)
+{
+    CALL_DEBUG_ENTER;
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
+        return nullptr;
+    }
+    Media::InitializationOptions opts;
+    opts.size.width = width;
+    opts.size.height = height;
+    opts.pixelFormat = Media::PixelFormat::BGRA_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
+
+    int32_t colorLen = width * height;
+    uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(colorPixels);
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    errno_t ret = memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    if (ret != EOK) {
+        FI_HILOGE("memset_s failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
+    CHKPL(pixelMap);
+    delete[] colorPixels;
+    return pixelMap;
 }
 
 /**
@@ -152,6 +183,11 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_On
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
+    auto pixelMap = CreatePixelMap2(100, 100);
+    ret = InteractionManager::GetInstance()->UpdateShadowPic(pixelMap);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
@@ -192,6 +228,11 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_Mu
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
+    auto pixelMap = CreatePixelMap2(500, 500);
+    ret = InteractionManager::GetInstance()->UpdateShadowPic(pixelMap);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));

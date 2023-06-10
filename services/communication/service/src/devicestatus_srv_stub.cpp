@@ -67,6 +67,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
         {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
+        {Idevicestatus::UPDATE_SHADOW_PIC, &DeviceStatusSrvStub::UpdateShadowPicStub},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -386,6 +387,18 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, width, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    auto pixelMap = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMap, RET_ERR);
+    int32_t ret = UpdateShadowPic(std::shared_ptr<OHOS::Media::PixelMap>(pixelMap));
+    if (ret != RET_OK) {
+        FI_HILOGE("Call Update shadow picture failed, ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus

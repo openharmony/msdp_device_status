@@ -507,6 +507,30 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
         offsetX, offsetY, width, height);
     return ret;
 }
+
+int32_t DeviceStatusSrvProxy::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    CHKPR(pixelMap, RET_ERR);
+    if (!pixelMap->Marshalling(data)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UPDATE_SHADOW_PIC, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
