@@ -29,13 +29,12 @@
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "devicestatus_common.h"
-#include "devicestatus_hisysevent.h"
-
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_event_manager.h"
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+#include "devicestatus_common.h"
+#include "devicestatus_hisysevent.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -136,7 +135,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
     if (args.empty()) {
         FI_HILOGE("param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
-        deviceStatusDumper_.DumpHelpInfo(fd);
+        DS_DUMPER->DumpHelpInfo(fd);
         return RET_NG;
     }
     std::vector<std::string> argList = { "" };
@@ -152,7 +151,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
             datas.emplace_back(data);
         }
     }
-    deviceStatusDumper_.ParseCommand(fd, argList, datas);
+    DS_DUMPER->ParseCommand(fd, argList, datas);
     return RET_OK;
 }
 
@@ -195,7 +194,7 @@ bool DeviceStatusService::Init()
         goto INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    if (deviceStatusDumper_.Init(this) != RET_OK) {
+    if (DS_DUMPER->Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
@@ -233,7 +232,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     devicestatusManager_->GetPackageName(appInfo->tokenId, appInfo->packageName);
     appInfo->type = type;
     appInfo->callback = callback;
-    DeviceStatusDumper::GetInstance().SaveAppInfo(appInfo);
+    DS_DUMPER->SaveAppInfo(appInfo);
     devicestatusManager_->Subscribe(type, event, latency, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
@@ -248,10 +247,10 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     appInfo->uid = IPCSkeleton::GetCallingUid();
     appInfo->pid = IPCSkeleton::GetCallingPid();
     appInfo->tokenId = IPCSkeleton::GetCallingTokenID();
-    appInfo->packageName = DeviceStatusDumper::GetInstance().GetPackageName(appInfo->tokenId);
+    appInfo->packageName = DS_DUMPER->GetPackageName(appInfo->tokenId);
     appInfo->type = type;
     appInfo->callback = callback;
-    DeviceStatusDumper::GetInstance().RemoveAppInfo(appInfo);
+    DS_DUMPER->RemoveAppInfo(appInfo);
     StartTrace(HITRACE_TAG_MSDP, "serviceUnSubscribeStart");
     devicestatusManager_->Unsubscribe(type, event, callback);
     FinishTrace(HITRACE_TAG_MSDP);

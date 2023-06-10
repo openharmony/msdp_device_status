@@ -57,6 +57,7 @@ int32_t Monitor::Enable()
     if (ret == RET_OK) {
         ret = EnableReceiving();
         if (ret != RET_OK) {
+            FI_HILOGE("Enable receive failed");
             Disable();
         }
     }

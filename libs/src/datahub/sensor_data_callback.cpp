@@ -30,6 +30,7 @@ constexpr int32_t RATE_MILLISEC { 100100100 };
 std::map<int32_t, SensorCallback> algoMap_;
 } // namespace
 
+SensorDataCallback::SensorDataCallback() {}
 SensorDataCallback::~SensorDataCallback()
 {
     algoMap_.clear();
@@ -149,7 +150,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
     CALL_DEBUG_ENTER;
     CHKPV(event);
     FI_HILOGI("SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
-    SensorDataCallback::GetInstance().PushData(event->sensorTypeId, event->data);
+    SENSOR_DATA_CB.PushData(event->sensorTypeId, event->data);
 }
 
 bool SensorDataCallback::RegisterCallbackSensor(int32_t sensorTypeId)

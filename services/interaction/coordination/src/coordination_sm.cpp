@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "device_manager.h"
+#include "display_info.h"
 #include "display_manager.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
@@ -26,13 +27,11 @@
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
-#include "device_profile_adapter.h"
-#include "display_info.h"
 #include "coordination_state_free.h"
 #include "coordination_state_in.h"
 #include "coordination_state_out.h"
 #include "coordination_util.h"
-#include "input_manager.h"
+#include "device_profile_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -41,7 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
 constexpr int32_t INTERVAL_MS { 2000 };
 constexpr double PERCENT_CONST { 100.0 };
-constexpr int32_t MOUSE_ABS_LOCATION { 100 };
+constexpr float MOUSE_ABS_LOCATION { 100 };
 constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
 constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
@@ -395,6 +394,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             NotifyRemoteNetworkId(remoteNetworkId);
+            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
@@ -402,6 +402,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
             NotifyRemoteNetworkId(originNetworkId);
+            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
             SetPointerVisible();
         }
@@ -480,9 +481,7 @@ bool CoordinationSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    if (display == nullptr) {
-        return false;
-    }
+    CHKPF(display);
     int32_t width = display->GetWidth();
     int32_t height = display->GetHeight();
     if (width == 0 || height == 0) {
@@ -798,10 +797,7 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     CALL_INFO_TRACE;
     auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    if (display == nullptr) {
-        FI_HILOGE("display is nullptr");
-        return;
-    }
+    CHKPV(display);
     int32_t width = display->GetWidth();
     int32_t height = display->GetHeight();
     int32_t physicalX = static_cast<int32_t>(width * xPercent / PERCENT_CONST);

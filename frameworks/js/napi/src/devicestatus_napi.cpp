@@ -44,10 +44,6 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-struct ResponseEntity {
-    OnChangedValue value { VALUE_INVALID };
-};
-
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     CALL_DEBUG_ENTER;

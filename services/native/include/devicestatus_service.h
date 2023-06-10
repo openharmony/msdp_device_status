@@ -23,10 +23,10 @@
 
 #include "delegate_tasks.h"
 #include "device_manager.h"
-#include "devicestatus_srv_stub.h"
+#include "devicestatus_delayed_sp_singleton.h"
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
-#include "devicestatus_delayed_sp_singleton.h"
+#include "devicestatus_srv_stub.h"
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
@@ -128,7 +128,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     MotionDrag motionDrag_;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    DeviceStatusDumper deviceStatusDumper_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

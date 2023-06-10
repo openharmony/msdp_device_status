@@ -94,7 +94,6 @@ public:
     void DestroyDragWindow();
     void UpdateDrawingState();
     void UpdateDragWindowState(bool visible);
-    void MoveTo(int32_t x, int32_t y);
 private:
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);

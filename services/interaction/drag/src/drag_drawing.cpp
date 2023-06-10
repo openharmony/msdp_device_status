@@ -606,14 +606,6 @@ void DragDrawing::RemoveModifier()
     }
 }
 
-void DragDrawing::MoveTo(int32_t x, int32_t y)
-{
-    x = std::max(x, 0);
-    y = std::max(y, 0);
-    CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->MoveTo(x, y);
-}
-
 void DrawSVGModifier::Draw(OHOS::Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
@@ -744,6 +736,7 @@ xmlNodePtr DrawSVGModifier::UpdateRectNode(xmlNodePtr curNode, int32_t extendSvg
         }
         curNode = curNode->next;
     }
+    FI_HILOGE("Empty node of XML");
     return nullptr;
 }
 
@@ -915,10 +908,7 @@ void DrawSVGModifier::SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) c
 void DrawPixelMapModifier::Draw(OHOS::Rosen::RSDrawingContext &context) const
 {
     CALL_DEBUG_ENTER;
-    if (g_drawingInfo.pixelMap == nullptr) {
-        FI_HILOGE("pixelMap is nullptr");
-        return;
-    }
+    CHKPV(g_drawingInfo.pixelMap);
     auto rosenImage = std::make_shared<OHOS::Rosen::RSImage>();
     rosenImage->SetPixelMap(g_drawingInfo.pixelMap);
     rosenImage->SetImageRepeat(0);
@@ -990,10 +980,7 @@ void DrawDynamicEffectModifier::Draw(OHOS::Rosen::RSDrawingContext &context) con
     auto rsSurface = OHOS::Rosen::RSSurfaceExtractor::ExtractRSSurface(g_drawingInfo.surfaceNode);
     CHKPV(rsSurface);
     auto frame = rsSurface->RequestFrame(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    if (frame == nullptr) {
-        FI_HILOGE("Failed to create frame");
-        return;
-    }
+    CHKPV(frame);
     FI_HILOGD("alpha_:%{public}f, scale_:%{public}f", alpha_->Get(), scale_->Get());
     frame->SetDamageRegion(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     rsSurface->FlushFrame(frame);

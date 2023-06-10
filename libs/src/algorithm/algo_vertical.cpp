@@ -30,7 +30,7 @@ bool AlgoVertical::Init(Type type)
     CALL_DEBUG_ENTER;
     algoCallback_ = std::bind(&AlgoVertical::StartAlgorithm, this, std::placeholders::_1, std::placeholders::_2);
     CHKPF(algoCallback_);
-    SensorDataCallback::GetInstance().SubscribeSensorEvent(type, algoCallback_);
+    SENSOR_DATA_CB.SubscribeSensorEvent(type, algoCallback_);
     return true;
 }
 

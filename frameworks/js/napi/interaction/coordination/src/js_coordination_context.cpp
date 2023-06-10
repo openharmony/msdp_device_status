@@ -49,10 +49,7 @@ napi_value JsCoordinationContext::Export(napi_env env, napi_value exports)
 {
     CALL_INFO_TRACE;
     auto instance = CreateInstance(env);
-    if (instance == nullptr) {
-        FI_HILOGE("instance is nullptr");
-        return nullptr;
-    }
+    CHKPP(instance);
     DeclareDeviceCoordinationInterface(env, exports);
     DeclareDeviceCoordinationData(env, exports);
     return exports;
@@ -362,10 +359,7 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
 
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return nullptr;
-    }
+    CHKPP(scope);
     napi_value object = nullptr;
     CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
