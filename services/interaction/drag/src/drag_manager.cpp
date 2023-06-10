@@ -168,8 +168,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     DRAG_DATA_MGR.SetDragStyle(style);
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
-    dragDrawing_.UpdateDragStyle(style);
-    return RET_OK;
+    return dragDrawing_.UpdateDragStyle(style);
 }
 
 int32_t DragManager::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
@@ -180,8 +179,7 @@ int32_t DragManager::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
         return RET_ERR;
     }
     CHKPR(pixelMap, RET_ERR);
-    dragDrawing_.UpdateShadowPic(pixelMap);
-    return RET_OK;
+    return dragDrawing_.UpdateShadowPic(pixelMap);
 }
 
 int32_t DragManager::NotifyDragResult(DragResult result)
