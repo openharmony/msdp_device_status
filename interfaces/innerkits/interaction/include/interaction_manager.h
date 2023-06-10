@@ -181,9 +181,9 @@ public:
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
 
     /**
-     * @brief Updates the shadow picture used for dragging.
-     * @param pixelMap Indicates the new shadow picture.
-     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @brief 更新拖拽使用的阴影缩略图
+     * @param pixelMap 待更新的阴影缩略图
+     * @return 返回0表示成功,返回非0表示失败
      * @since 10
      */
     int32_t UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap);
