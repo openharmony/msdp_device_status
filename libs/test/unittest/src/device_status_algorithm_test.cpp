@@ -32,7 +32,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-std::shared_ptr<AlgoMgr> g_manager;
+std::shared_ptr<AlgoMgr> g_manager { nullptr };
 } // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
