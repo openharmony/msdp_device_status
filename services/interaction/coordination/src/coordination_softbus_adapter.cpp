@@ -469,7 +469,7 @@ std::string CoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     auto find_item = std::find_if(sessionDevMap_.begin(), sessionDevMap_.end(),
-        [sessionId](const std::map<std::string, int>::value_type item) {
+        [sessionId](const std::map<std::string, int32_t>::value_type item) {
         return item.second == sessionId;
     });
     if (find_item == sessionDevMap_.end()) {
