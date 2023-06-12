@@ -43,7 +43,7 @@ public:
         int32_t userData { -1 };
         std::string deviceId;
         CoordinationMessage msg { CoordinationMessage::PREPARE };
-        bool state { false }
+        bool state { false };
     };
 
     DISALLOW_COPY_AND_MOVE(CoordinationEventManager);

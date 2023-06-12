@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 struct DeviceStatusEventListener {
-    napi_ref onHandlerRef;
+    napi_ref onHandlerRef { nullptr };
 };
 
 class DeviceStatusEvent {

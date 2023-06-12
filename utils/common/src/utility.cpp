@@ -181,20 +181,20 @@ void Utility::ShowUserAndGroup()
     CALL_DEBUG_ENTER;
     static constexpr size_t BUFSIZE { 1024 };
     char buffer[BUFSIZE];
-    uid_t uid;
-    gid_t gid;
-    struct passwd buf, *pbuf;
-    struct group grp, *pgrp;
+    struct passwd buf;
+    struct passwd *pbuf = nullptr;
+    struct group grp;
+    struct group *pgrp = nullptr;
 
     FI_HILOGD("======================= Users and Groups =======================");
-    uid = getuid();
+    uid_t uid = getuid();
     if (getpwuid_r(uid, &buf, buffer, sizeof(buffer), &pbuf) != 0) {
         FI_HILOGE("getpwuid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "USER", uid, buf.pw_name);
     }
 
-    gid = getgid();
+    gid_t gid = getgid();
     if (getgrgid_r(gid, &grp, buffer, sizeof(buffer), &pgrp) != 0) {
         FI_HILOGE("getgrgid_r failed:%{public}s", strerror(errno));
     } else {

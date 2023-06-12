@@ -36,7 +36,7 @@ public:
         int32_t userData { 0 };
         int32_t deviceId { 0 };
         napi_value handle { nullptr };
-        std::vector<int32_t> keys
+        std::vector<int32_t> keys;
     };
     struct CallbackData {
         bool prepareResult { false };
@@ -45,7 +45,7 @@ public:
         bool coordinationOpened { false };
         std::string deviceDescriptor;
         int32_t errCode { 0 };
-        CoordinationMessage msg = CoordinationMessage::PREPARE
+        CoordinationMessage msg = CoordinationMessage::PREPARE;
     };
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;
@@ -54,7 +54,7 @@ public:
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { 0 };
-        CallbackData data
+        CallbackData data;
     };
     template <typename T>
     static void DeletePtr(T &ptr)

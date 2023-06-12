@@ -62,7 +62,7 @@ private:
     std::shared_ptr<AlgoHorizontal> horizontalPosition_ { nullptr };
     std::shared_ptr<AlgoVertical> verticalPosition_ { nullptr };
     std::map<Type, int32_t> callAlgoNum_ {};
-    Type algoType_;
+    Type algoType_ { TYPE_INVALID };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

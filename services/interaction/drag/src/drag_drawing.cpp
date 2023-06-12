@@ -420,7 +420,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     }
     OHOS::Rosen::VSyncReceiver::FrameCallback fcb = {
         .userData_ = this,
-        .callback_ = std::bind(&DragDrawing::OnVsync, this),
+        .callback_ = std::bind(&DragDrawing::OnVsync, this)
     };
     int32_t changeFreq = static_cast<int32_t>((ONETHOUSAND / FRAMERATE) / SIXTEEN);
     ret = receiver_->SetVSyncRate(fcb, changeFreq);
@@ -556,7 +556,7 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
         .posX_ = displayX,
         .posY_ = displayY,
         .width_ = IMAGE_WIDTH,
-        .height_ = IMAGE_HEIGHT,
+        .height_ = IMAGE_HEIGHT
     };
     option->SetWindowRect(rect);
     option->SetFocusable(false);
@@ -770,8 +770,8 @@ std::shared_ptr<OHOS::Media::PixelMap> DrawSVGModifier::DecodeSvgToPixelMap(
             return nullptr;
         }
     }
-    xmlChar *xmlbuff;
-    int32_t buffersize;
+    xmlChar *xmlbuff = nullptr;
+    int32_t buffersize = 0;
     xmlDocDumpFormatMemory(xmlDoc, &xmlbuff, &buffersize, 1);
     std::ostringstream oStrStream;
     oStrStream << xmlbuff;

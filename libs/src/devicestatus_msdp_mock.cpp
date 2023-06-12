@@ -41,7 +41,7 @@ DeviceStatusMsdpMock::DeviceStatusMsdpMock()
     enabledType_ = {
         TYPE_STILL,
         TYPE_RELATIVE_STILL,
-        TYPE_CAR_BLUETOOTH,
+        TYPE_CAR_BLUETOOTH
     };
     if (dataParse_ == nullptr) {
         dataParse_ = std::make_unique<DeviceStatusDataParse>();

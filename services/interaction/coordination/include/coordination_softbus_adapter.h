@@ -41,7 +41,7 @@ public:
     struct DataPacket {
         MessageId messageId;
         uint32_t dataLen { 0 };
-        uint8_t data[0]
+        uint8_t data[0];
     };
 
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
