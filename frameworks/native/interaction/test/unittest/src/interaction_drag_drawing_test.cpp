@@ -48,8 +48,10 @@ constexpr int32_t DRAG_NUM_MULTIPLE { 10 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t PROMISE_WAIT_SPAN_MS { 2000 };
 constexpr int32_t TIME_WAIT_FOR_UPDATE_DRAG_STYLE { 50 };
+constexpr int32_t TIME_WAIT_FOR_ANIMATION_END { 1000 };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
+constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
 const std::string UD_KEY { "Unified data key" };
 } // namespace
@@ -282,9 +284,71 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
-    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION);
+    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionDragDrawingTest_Mouse_Animation
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_Animation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, NOT_HAS_CUSTOM_ANIMATION);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
+}
+
+/**
+ * @tc.name: InteractionDragDrawingTest_Touchscreen_Animation
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Animation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
 }
 } // namespace DeviceStatus
 } // namespace Msdp

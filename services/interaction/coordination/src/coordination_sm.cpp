@@ -40,7 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
 constexpr int32_t INTERVAL_MS { 2000 };
 constexpr double PERCENT_CONST { 100.0 };
-constexpr int32_t MOUSE_ABS_LOCATION { 100 };
+constexpr float MOUSE_ABS_LOCATION { 100 };
 constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
 constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
@@ -394,6 +394,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
             NotifyRemoteNetworkId(remoteNetworkId);
+            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
@@ -401,6 +402,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
             NotifyRemoteNetworkId(originNetworkId);
+            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
             SetPointerVisible();
         }

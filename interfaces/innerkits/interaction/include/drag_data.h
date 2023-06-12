@@ -49,7 +49,8 @@ enum class DragState {
     ERROR = 0,
     START = 1,
     STOP = 2,
-    CANCEL = 3
+    CANCEL = 3,
+    MOTION_DRAGGING = 4
 };
 
 enum class DragResult {

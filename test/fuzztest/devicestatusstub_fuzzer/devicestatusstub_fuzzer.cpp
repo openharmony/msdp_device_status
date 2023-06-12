@@ -28,20 +28,19 @@ using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
-constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MIN_SIZE = 4;
 const std::u16string FORMMGR_DEVICE_TOKEN = u"ohos.msdp.Idevicestatus";
 
-uint32_t GetU32Data(const char* ptr, size_t size)
+uint32_t GetU32Data(const char* ch, size_t size)
 {
-    constexpr size_t MIN_SIZE = 4;
-    if (ptr == nullptr) {
+    if (ch == nullptr) {
         return 0;
     }
     if (size < MIN_SIZE) {
         return 0;
     }
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    return (ch[0] << 24) | (ch[1] << 16) | (ch[2] << 8) | (ch[3]);
 }
 
 bool DoSomethingWithMyAPI(const char* data, size_t size)
@@ -66,19 +65,11 @@ extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    if (size < OHOS::U32_AT_SIZE) {
-        return 0;
-    }
-
     /* Validate the length of size */
-    if (size == 0 || size > OHOS::FOO_MAX_LEN) {
+    if ((size < OHOS::MIN_SIZE) || (size > OHOS::FOO_MAX_LEN)) {
         return 0;
     }
-
     const char* ch = reinterpret_cast<const char*>(data);
-    if (ch == nullptr) {
-        return 0;
-    }
     OHOS::DoSomethingWithMyAPI(ch, size);
     return 0;
 }
