@@ -68,7 +68,7 @@ protected:
     enum class ErrorStatus {
         ERROR_STATUS_OK,
         ERROR_STATUS_READ,
-        ERROR_STATUS_WRITE,
+        ERROR_STATUS_WRITE
     };
     ErrorStatus rwErrorStatus_ { ErrorStatus::ERROR_STATUS_OK };
     int32_t rCount_ { 0 };

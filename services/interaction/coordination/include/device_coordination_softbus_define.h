@@ -22,14 +22,14 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr int32_t ENCRYPT_TAG_LEN = 32;
-constexpr size_t MSG_MAX_SIZE = 45 * 1024;
-constexpr uint32_t SESSION_NAME_SIZE_MAX = 256;
-constexpr uint32_t DEVICE_ID_SIZE_MAX = 65;
-constexpr uint32_t INTERCEPT_STRING_LENGTH = 20;
-constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND = 5;
-constexpr int32_t SESSION_SIDE_SERVER = 0;
-constexpr int32_t SESSION_SIDE_CLIENT = 1;
+constexpr int32_t ENCRYPT_TAG_LEN { 32 };
+constexpr size_t MSG_MAX_SIZE { 45 * 1024 };
+constexpr uint32_t SESSION_NAME_SIZE_MAX { 256 };
+constexpr uint32_t DEVICE_ID_SIZE_MAX { 65 };
+constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
+constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND { 5 };
+constexpr int32_t SESSION_SIDE_SERVER { 0 };
+constexpr int32_t SESSION_SIDE_CLIENT { 1 };
 
 #define FI_SOFTBUS_KEY_CMD_TYPE "fi_softbus_key_cmd_type"
 #define FI_SOFTBUS_KEY_LOCAL_DEVICE_ID "fi_softbus_key_local_device_id"

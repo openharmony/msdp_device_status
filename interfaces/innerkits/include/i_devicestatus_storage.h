@@ -29,7 +29,7 @@ public:
         Type type { TYPE_INVALID };
         OnChangedValue value { VALUE_INVALID };
         std::string date;
-        std::string time;
+        std::string time
     };
 
     virtual bool Save(DeviceStatusRecord record) = 0;

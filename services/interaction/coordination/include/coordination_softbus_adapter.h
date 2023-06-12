@@ -36,12 +36,12 @@ public:
         MIN_ID = 0,
         DRAGGING_DATA = 1,
         STOPDRAG_DATA = 2,
-        MAX_ID = 50,
+        MAX_ID = 50
     };
     struct DataPacket {
         MessageId messageId;
         uint32_t dataLen { 0 };
-        uint8_t data[0];
+        uint8_t data[0]
     };
 
     int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);

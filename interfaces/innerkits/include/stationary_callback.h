@@ -27,7 +27,7 @@ namespace DeviceStatus {
 class IRemoteDevStaCallback : public IRemoteBroker {
 public:
     enum  {
-        DEVICESTATUS_CHANGE = 0,
+        DEVICESTATUS_CHANGE = 0
     };
 
     virtual void OnDeviceStatusChanged(const Data& devicestatusData) = 0;

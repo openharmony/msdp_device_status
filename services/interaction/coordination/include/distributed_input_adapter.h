@@ -74,12 +74,12 @@ private:
         PrepareStartDInputCallback,
         UnPrepareStopDInputCallback,
         PrepareStartDInputCallbackSink,
-        UnPrepareStopDInputCallbackSink,
+        UnPrepareStopDInputCallbackSink
     };
 
     struct TimerInfo {
         int32_t times { 0 };
-        int32_t timerId { 0 };
+        int32_t timerId { 0 }
     };
 
     class StartDInputCallback final : public DistributedHardware::DistributedInput::StartDInputCallbackStub {
