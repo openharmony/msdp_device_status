@@ -963,8 +963,16 @@ void DrawDynamicEffectModifier::Draw(OHOS::Rosen::RSDrawingContext &context) con
     auto frame = rsSurface->RequestFrame(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     CHKPV(frame);
     FI_HILOGD("alpha_:%{public}f, scale_:%{public}f", alpha_->Get(), scale_->Get());
+#ifdef NEW_RENDER_CONTEXT
+    std::vector<OHOS::Rosen::RectI> damageRects;
+    OHOS::Rosen::RectI rect(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    damageRects.push_back(rect);
+    rsSurface->SetDamageRegion(damageRects);
+    rsSurface->FlushFrame();
+#else
     frame->SetDamageRegion(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     rsSurface->FlushFrame(frame);
+#endif
     OHOS::Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
