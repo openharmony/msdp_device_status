@@ -501,7 +501,7 @@ napi_value DeviceStatusNapi::DeclareEventTypeInterface(napi_env env, napi_value 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("ENTER", enter),
         DECLARE_NAPI_STATIC_PROPERTY("EXIT", exit),
-        DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit),
+        DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit)
     };
     napi_value result = nullptr;
     status = napi_define_class(env, "ActivityEvent", NAPI_AUTO_LENGTH,
@@ -524,7 +524,7 @@ napi_value DeviceStatusNapi::Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", SubscribeDeviceStatus),
         DECLARE_NAPI_FUNCTION("off", UnsubscribeDeviceStatus),
-        DECLARE_NAPI_FUNCTION("once", GetDeviceStatus),
+        DECLARE_NAPI_FUNCTION("once", GetDeviceStatus)
     };
     DeclareEventTypeInterface(env, exports);
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

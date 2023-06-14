@@ -371,7 +371,7 @@ void JsCooperateContext::DeclareDeviceCoordinationInterface(napi_env env, napi_v
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_SUCCESS", infoSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_FAIL", infoFail),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff)
     };
 
     napi_value eventMsg = nullptr;
@@ -389,7 +389,7 @@ void JsCooperateContext::DeclareDeviceCoordinationData(napi_env env, napi_value 
         DECLARE_NAPI_STATIC_FUNCTION("stop", Stop),
         DECLARE_NAPI_STATIC_FUNCTION("getState", GetState),
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

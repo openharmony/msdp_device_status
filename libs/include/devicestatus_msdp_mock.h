@@ -34,7 +34,7 @@ class DeviceStatusMsdpMock final : public IMsdp {
 public:
     enum EventType {
         EVENT_UEVENT_FD,
-        EVENT_TIMER_FD,
+        EVENT_TIMER_FD
     };
 
     DeviceStatusMsdpMock();

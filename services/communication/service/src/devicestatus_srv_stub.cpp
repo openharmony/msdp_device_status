@@ -66,7 +66,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
-        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
+        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {

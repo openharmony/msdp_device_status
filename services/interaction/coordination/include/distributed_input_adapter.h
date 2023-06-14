@@ -74,7 +74,7 @@ private:
         PrepareStartDInputCallback,
         UnPrepareStopDInputCallback,
         PrepareStartDInputCallbackSink,
-        UnPrepareStopDInputCallbackSink,
+        UnPrepareStopDInputCallbackSink
     };
 
     struct TimerInfo {

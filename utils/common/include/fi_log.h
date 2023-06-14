@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
-inline constexpr uint32_t MSDP_DOMAIN_ID = 0xD002220;
+inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
 } // namespace Msdp
 } // namespace OHOS
 
