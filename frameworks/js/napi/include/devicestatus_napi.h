@@ -35,9 +35,9 @@ public:
     explicit DeviceStatusCallback(napi_env env) : env_(env) {}
     virtual ~DeviceStatusCallback() {};
     void OnDeviceStatusChanged(const Data &devicestatusData) override;
-    static void EmitOnEvent(uv_work_t *work, int status);
+    static void EmitOnEvent(uv_work_t *work, int32_t status);
 private:
-    napi_env env_ = { nullptr };
+    napi_env env_ { nullptr };
     std::mutex mutex_;
     Data data_;
 };

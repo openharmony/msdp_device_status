@@ -40,7 +40,7 @@ public:
         INFO_SUCCESS = 1,
         INFO_FAIL = 2,
         STATE_ON = 3,
-        STATE_OFF = 4,
+        STATE_OFF = 4
     };
 
     JsEventCooperateTarget();

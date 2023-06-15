@@ -213,7 +213,7 @@ void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("START", startMsg),
         DECLARE_NAPI_STATIC_PROPERTY("STOP", stopMsg),
         DECLARE_NAPI_STATIC_PROPERTY("ERROR", errorMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg)
     };
 
     napi_value eventMsg = nullptr;
@@ -226,7 +226,7 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

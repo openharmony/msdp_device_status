@@ -414,7 +414,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE_FAIL", activateFail),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_SUCCESS", deactivateSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_FAIL", deactivateFail),
-        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed)
     };
 
     napi_value cooperateMsg = nullptr;
@@ -432,7 +432,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_val
         DECLARE_NAPI_STATIC_FUNCTION("deactivate", Deactivate),
         DECLARE_NAPI_STATIC_FUNCTION("getCrossingSwitchState", GetCrossingSwitchState),
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

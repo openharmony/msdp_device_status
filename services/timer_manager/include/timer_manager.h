@@ -40,7 +40,7 @@ public:
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId) const;
     void ProcessTimers();
-    int GetTimerFd() const;
+    int32_t GetTimerFd() const;
 
 private:
     struct TimerItem {
@@ -68,12 +68,12 @@ private:
     void ProcessTimersInternal();
     int32_t ArmTimer();
 
-    int timerFd_ { -1 };
+    int32_t timerFd_ { -1 };
     IContext *context_ { nullptr };
     std::list<std::unique_ptr<TimerItem>> timers_;
 };
 
-inline int TimerManager::GetTimerFd() const
+inline int32_t TimerManager::GetTimerFd() const
 {
     return timerFd_;
 }

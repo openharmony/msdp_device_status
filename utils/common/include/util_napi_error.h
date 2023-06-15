@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Msdp {
-const std::string ERR_CODE = "code";
+const std::string ERR_CODE { "code" };
 struct NapiError {
     int32_t errorCode { 0 };
     std::string msg;
