@@ -113,9 +113,9 @@ int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, 
     return INTER_MGR_IMPL.GetShadowOffset(offsetX, offsetY, width, height);
 }
 
-int32_t InteractionManager::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
-    return INTER_MGR_IMPL.UpdateShadowPic(pixelMap);
+    return INTER_MGR_IMPL.UpdateShadowPic(shadowInfo);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

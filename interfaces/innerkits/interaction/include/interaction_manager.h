@@ -181,12 +181,12 @@ public:
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
 
     /**
-     * @brief 更新拖拽使用的阴影缩略图
-     * @param pixelMap 待更新的阴影缩略图
+     * @brief 更新拖拽使用的阴影缩略图信息
+     * @param shadowInfo 待更新的阴影缩略图信息
      * @return 返回0表示成功,返回非0表示失败
      * @since 10
      */
-    int32_t UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap);
+    int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
 
 private:
     InteractionManager() = default;

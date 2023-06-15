@@ -310,11 +310,11 @@ int32_t DeviceStatusClient::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, 
     return devicestatusProxy_->GetShadowOffset(offsetX, offsetY, width, height);
 }
 
-int32_t DeviceStatusClient::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+int32_t DeviceStatusClient::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UpdateShadowPic(pixelMap);
+    return devicestatusProxy_->UpdateShadowPic(shadowInfo);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

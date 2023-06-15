@@ -49,7 +49,7 @@ public:
     int32_t GetUdKey(std::string &udKey) const;
     void SendDragData(int32_t targetTid, const std::string &udKey);
     int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
-    int32_t UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap);
+    int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);

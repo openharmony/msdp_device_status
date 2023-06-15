@@ -171,15 +171,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     return dragDrawing_.UpdateDragStyle(style);
 }
 
-int32_t DragManager::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
         FI_HILOGE("No drag instance running, can not update shadow picture");
         return RET_ERR;
     }
-    CHKPR(pixelMap, RET_ERR);
-    return dragDrawing_.UpdateShadowPic(pixelMap);
+    return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
 int32_t DragManager::NotifyDragResult(DragResult result)

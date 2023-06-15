@@ -508,7 +508,7 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UpdateShadowPic(std::shared_ptr<Media::PixelMap> pixelMap)
+int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -516,11 +516,13 @@ int32_t DeviceStatusSrvProxy::UpdateShadowPic(std::shared_ptr<Media::PixelMap> p
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    CHKPR(pixelMap, RET_ERR);
-    if (!pixelMap->Marshalling(data)) {
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if (!shadowInfo.pixelMap->Marshalling(data)) {
         FI_HILOGE("Failed to marshalling pixelMap");
         return ERR_INVALID_VALUE;
     }
+    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
