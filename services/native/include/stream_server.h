@@ -58,9 +58,9 @@ public:
     SessionPtr GetSessionByPid(int32_t pid) const override;
 
 protected:
-    virtual void OnConnected(SessionPtr s);
-    virtual void OnDisconnected(SessionPtr s);
-    virtual int32_t AddEpoll(EpollEventType type, int32_t fd);
+    virtual void OnConnected(SessionPtr s) = 0;
+    virtual void OnDisconnected(SessionPtr s) = 0;
+    virtual int32_t AddEpoll(EpollEventType type, int32_t fd) = 0;
 
     void SetRecvFun(MsgServerFunCallback fun);
     void ReleaseSession(int32_t fd, epoll_event& ev);

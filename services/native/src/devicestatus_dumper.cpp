@@ -41,6 +41,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
+constexpr size_t MAX_DEVICE_STATUS_SIZE { 10 };
 } // namespace
 
 DeviceStatusDumper::DeviceStatusDumper() {}
@@ -56,63 +57,54 @@ int32_t DeviceStatusDumper::Init(IContext *context)
 
 void DeviceStatusDumper::ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
 {
-    ParseLong(fd, args, datas);
-}
+    constexpr size_t BUFSIZE { 1024 };
+    char buf[BUFSIZE] { "hidumper" };
 
-void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas)
-{
-    if (args.empty()) {
-        FI_HILOGE("args is empty");
-        return;
+    std::vector<char *> argv(args.size() + 1);
+    argv[0] = buf;
+
+    size_t len = std::strlen(buf) + 1;
+    char *pbuf = buf + len;
+    size_t bufLen = sizeof(buf) - len;
+
+    for (size_t index = 0, cnt = args.size(); index < cnt; ++index) {
+        len = args[index].size() + 1;
+        if (len > bufLen) {
+            FI_HILOGE("Buffer overflow");
+            return;
+        }
+        args[index].copy(pbuf, args[index].size());
+        pbuf[args[index].size()] = '\0';
+
+        argv[index + 1] = pbuf;
+        pbuf += len;
+        bufLen -= len;
     }
-    int32_t optRet = -1;
-    optind = 1;
-    int32_t optionIndex = 0;
-    struct option dumpOptions[] = {
-        { "help", no_argument, 0, 'h' },
-        { "subscribe", no_argument, 0, 's' },
-        { "list", no_argument, 0, 'l' },
-        { "current", no_argument, 0, 'c' },
-        { "coordination", no_argument, 0, 'o' },
-        { "drag", no_argument, 0, 'd' },
-        { "macroState", no_argument, 0, 'm' },
-        { NULL, 0, 0, 0 }
+
+    struct option dumpOptions[] {
+        { "help", no_argument, nullptr, 'h' },
+        { "subscribe", no_argument, nullptr, 's' },
+        { "list", no_argument, nullptr, 'l' },
+        { "current", no_argument, nullptr, 'c' },
+        { "coordination", no_argument, nullptr, 'o' },
+        { "drag", no_argument, nullptr, 'd' },
+        { "macroState", no_argument, nullptr, 'm' },
+        { nullptr, 0, nullptr, 0 }
     };
-    char **argv = new (std::nothrow) char *[args.size()];
-    CHKPV(argv);
-    errno_t ret = memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*));
-    if (ret != EOK) {
-        FI_HILOGE("call memset_s failed");
-        delete[] argv;
-        return;
-    }
-    for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new (std::nothrow) char[args[i].size() + 1];
-        if (argv[i] == nullptr) {
-            FI_HILOGE("failed to allocate memory");
-            goto RELEASE_RES;
+    optind = 0;
+
+    for (;;) {
+        int32_t opt = getopt_long(argv.size(), argv.data(), "+hslcodm", dumpOptions, nullptr);
+        if (opt < 0) {
+            break;
         }
-        ret = strcpy_s(argv[i], args[i].size() + 1, args[i].c_str());
-        if (ret != RET_OK) {
-            FI_HILOGE("strcpy_s error");
-            goto RELEASE_RES;
-        }
+        ExecutDump(fd, datas, opt);
     }
-    while ((optRet = getopt_long(args.size(), argv, "hslcodm", dumpOptions, &optionIndex)) != -1) {
-        ExecutDump(fd, datas, optRet);
-    }
-    RELEASE_RES:
-    for (size_t i = 0; i < args.size(); ++i) {
-        if (argv[i] != nullptr) {
-            delete[] argv[i];
-        }
-    }
-    delete[] argv;
 }
 
-void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t info)
+void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t opt)
 {
-    switch (info) {
+    switch (opt) {
         case 'h': {
             DumpHelpInfo(fd);
             break;
@@ -183,7 +175,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
     std::string startTime;
     GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s\n", startTime.c_str());
-    size_t length = deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE ? \
+    size_t length = deviceStatusQueue_.size() > MAX_DEVICE_STATUS_SIZE ?
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
