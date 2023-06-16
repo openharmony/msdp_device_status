@@ -36,7 +36,7 @@ public:
         MIN_ID = 0,
         DRAGGING_DATA = 1,
         STOPDRAG_DATA = 2,
-        MAX_ID = 50,
+        MAX_ID = 50
     };
     struct DataPacket {
         MessageId messageId;

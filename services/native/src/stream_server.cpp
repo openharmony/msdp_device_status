@@ -232,7 +232,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             ReleaseSession(fd, ev);
             break;
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
+        if (static_cast<size_t>(size) < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }

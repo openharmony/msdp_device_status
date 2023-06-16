@@ -34,8 +34,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr int32_t RET_NG = -1;
-constexpr size_t MAX_DEVICE_STATUS_SIZE = 10;
+constexpr int32_t RET_NG { -1 };
+constexpr size_t MAX_DEVICE_STATUS_SIZE { 10 };
 struct AppInfo {
     std::string startTime;
     int32_t uid {};
@@ -49,11 +49,9 @@ struct DeviceStatusRecord {
     std::string startTime;
     Data data;
 };
-class DeviceStatusDumper final : public RefBase,
-    public Singleton<DeviceStatusDumper> {
+class DeviceStatusDumper final : public RefBase {
+    DECLARE_DELAYED_SINGLETON(DeviceStatusDumper);
 public:
-    DeviceStatusDumper() = default;
-    ~DeviceStatusDumper() = default;
     int32_t Init(IContext *context);
     void ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
     void ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
@@ -80,6 +78,7 @@ private:
     std::mutex mutex_;
     IContext *context_ { nullptr };
 };
+#define DS_DUMPER OHOS::DelayedSingleton<DeviceStatusDumper>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -40,7 +40,7 @@ bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
 void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEvent: Enter" << std::endl;
-    int32_t type[1];
+    int32_t type[1] { -1 };
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
     if (ret != EOK) {
@@ -65,7 +65,7 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(Type type)
 void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)
 {
     std::cout << "TestSubscribeAgentEventIsNullptr: Enter" << std::endl;
-    int32_t type[1];
+    int32_t type[1] { -1 };
     int32_t idSize = 4;
     errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
     if (ret != EOK) {
@@ -108,8 +108,8 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 
 bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    int idSize = 8;
-    if (static_cast<int>(size) > idSize) {
+    size_t idSize = 8;
+    if (size > idSize) {
         DevicestatusAgentFuzzer::TestSubscribeAgentEvent(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(data);

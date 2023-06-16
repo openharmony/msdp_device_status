@@ -32,7 +32,7 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-std::shared_ptr<AlgoMgr> g_manager;
+std::shared_ptr<AlgoMgr> g_manager { nullptr };
 } // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
@@ -558,7 +558,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest027, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 start";
-    SensorDataCallback::GetInstance().user_.callback = nullptr;
+    SENSOR_DATA_CB.user_.callback = nullptr;
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 end";

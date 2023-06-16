@@ -121,10 +121,7 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         return RET_ERR;
     }
     iAlgo_ = GetAlgoInst(type);
-    if (iAlgo_ == nullptr) {
-        FI_HILOGE("Get algo module failed");
-        return RET_ERR;
-    }
+    CHKPR(iAlgo_, RET_ERR);
     return RET_OK;
 }
 
@@ -293,7 +290,7 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterAlgo()
 int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
 {
     CALL_DEBUG_ENTER;
-    DeviceStatusDumper::GetInstance().PushDeviceStatus(data);
+    DS_DUMPER->PushDeviceStatus(data);
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);

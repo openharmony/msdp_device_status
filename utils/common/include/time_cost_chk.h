@@ -23,8 +23,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-inline constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
-inline constexpr int64_t MAX_OVER_TIME = 300;
+inline constexpr int64_t MAX_INPUT_EVENT_TIME { 1000 };
+inline constexpr int64_t MAX_OVER_TIME { 300 };
 template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimeCostChk" };

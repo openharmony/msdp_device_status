@@ -53,7 +53,7 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     CHKPF(scope);
-    napi_ref onHandlerRef;
+    napi_ref onHandlerRef = nullptr;
     napi_status status = napi_ok;
     if (isOnce) {
         auto iter = eventOnceMap_.find(eventType);

@@ -469,7 +469,7 @@ std::string CoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     auto find_item = std::find_if(sessionDevMap_.begin(), sessionDevMap_.end(),
-        [sessionId](const std::map<std::string, int>::value_type item) {
+        [sessionId](const std::map<std::string, int32_t>::value_type item) {
         return item.second == sessionId;
     });
     if (find_item == sessionDevMap_.end()) {
@@ -547,10 +547,7 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, Messag
 {
     CALL_DEBUG_ENTER;
     DataPacket* dataPacket = (DataPacket*)malloc(sizeof(DataPacket) + dataLen);
-    if (dataPacket == nullptr) {
-        FI_HILOGE("Malloc data packetfailed");
-        return RET_ERR;
-    }
+    CHKPR(dataPacket, RET_ERR);
     dataPacket->messageId = messageId;
     dataPacket->dataLen = dataLen;
     errno_t ret = memcpy_s(dataPacket->data, dataPacket->dataLen, data, dataPacket->dataLen);

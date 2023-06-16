@@ -55,7 +55,7 @@ void FdListener::OnReadable(int32_t fd)
                 "errno:%{public}d", i, errno);
             break;
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
+        if (static_cast<size_t>(size) < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }

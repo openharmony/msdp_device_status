@@ -97,7 +97,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (head->size < 0 || static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE) {
+        if (static_cast<int32_t>(head->size) < 0 || static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE) {
             FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
                 "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();

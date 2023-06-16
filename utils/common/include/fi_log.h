@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
-inline constexpr uint32_t MSDP_DOMAIN_ID = 0xD002220;
+inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
 } // namespace Msdp
 } // namespace OHOS
 
@@ -67,7 +67,7 @@ namespace OHOS {
 namespace Msdp {
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int(const char *)>;
+    using HilogFunc = std::function<int32_t(const char *)>;
 
 public:
     InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)

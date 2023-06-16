@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr size_t MAX_BUFFER_SIZE = 512;
+constexpr size_t MAX_BUFFER_SIZE { 512 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -49,7 +49,8 @@ enum class DragState {
     ERROR = 0,
     START = 1,
     STOP = 2,
-    CANCEL = 3
+    CANCEL = 3,
+    MOTION_DRAGGING = 4
 };
 
 enum class DragResult {

@@ -119,10 +119,7 @@ void Coordination::Dump(int32_t fd)
 
 ICoordination* CreateICoordination(IContext *context)
 {
-    if (context == nullptr) {
-        FI_HILOGE("Parameter error");
-        return nullptr;
-    }
+    CHKPP(context);
     COOR_EVENT_MGR->SetIContext(context);
     ICoordination *coord = new (std::nothrow) Coordination();
     CHKPP(coord);

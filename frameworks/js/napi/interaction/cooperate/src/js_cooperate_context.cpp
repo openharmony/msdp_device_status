@@ -49,10 +49,7 @@ napi_value JsCooperateContext::Export(napi_env env, napi_value exports)
 {
     CALL_INFO_TRACE;
     auto instance = CreateInstance(env);
-    if (instance == nullptr) {
-        FI_HILOGE("instance is nullptr");
-        return nullptr;
-    }
+    CHKPP(instance);
     DeclareDeviceCoordinationInterface(env, exports);
     DeclareDeviceCoordinationData(env, exports);
     return exports;
@@ -331,10 +328,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
 
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return nullptr;
-    }
+    CHKPP(scope);
     napi_value object = nullptr;
     CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
@@ -377,7 +371,7 @@ void JsCooperateContext::DeclareDeviceCoordinationInterface(napi_env env, napi_v
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_SUCCESS", infoSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_FAIL", infoFail),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff)
     };
 
     napi_value eventMsg = nullptr;
@@ -395,7 +389,7 @@ void JsCooperateContext::DeclareDeviceCoordinationData(napi_env env, napi_value 
         DECLARE_NAPI_STATIC_FUNCTION("stop", Stop),
         DECLARE_NAPI_STATIC_FUNCTION("getState", GetState),
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

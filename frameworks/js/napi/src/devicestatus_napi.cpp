@@ -44,10 +44,6 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-struct ResponseEntity {
-    OnChangedValue value { VALUE_INVALID };
-};
-
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
 {
     CALL_DEBUG_ENTER;
@@ -61,13 +57,13 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
         devicestatusData.type, devicestatusData.value);
     data_ = devicestatusData;
     work->data = static_cast<void *>(&data_);
-    int ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, EmitOnEvent);
+    int32_t ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, EmitOnEvent);
     if (ret != 0) {
         FI_HILOGE("Failed to execute work queue");
     }
 }
 
-void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int status)
+void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
 {
     CHKPV(work);
     Data* data = static_cast<Data*>(work->data);
@@ -141,7 +137,7 @@ int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    int arr[ARG_4] = {};
+    int32_t arr[ARG_4] = {};
     size_t argc = ARG_4;
     napi_value args[ARG_4] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -182,7 +178,7 @@ bool DeviceStatusNapi::IsMatchCallbackType(napi_env &env, napi_value &value)
 bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    int arr[ARG_2] = {};
+    int32_t arr[ARG_2] = {};
     size_t argc = ARG_2;
     napi_value args[ARG_2] = {};
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
@@ -505,7 +501,7 @@ napi_value DeviceStatusNapi::DeclareEventTypeInterface(napi_env env, napi_value 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("ENTER", enter),
         DECLARE_NAPI_STATIC_PROPERTY("EXIT", exit),
-        DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit),
+        DECLARE_NAPI_STATIC_PROPERTY("ENTER_EXIT", enter_exit)
     };
     napi_value result = nullptr;
     status = napi_define_class(env, "ActivityEvent", NAPI_AUTO_LENGTH,
@@ -528,7 +524,7 @@ napi_value DeviceStatusNapi::Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", SubscribeDeviceStatus),
         DECLARE_NAPI_FUNCTION("off", UnsubscribeDeviceStatus),
-        DECLARE_NAPI_FUNCTION("once", GetDeviceStatus),
+        DECLARE_NAPI_FUNCTION("once", GetDeviceStatus)
     };
     DeclareEventTypeInterface(env, exports);
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

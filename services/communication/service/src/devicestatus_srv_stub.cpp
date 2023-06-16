@@ -66,7 +66,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
-        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
+        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -323,13 +323,13 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
 {
     CALL_DEBUG_ENTER;
     int32_t result;
-    bool hasCustomAnimation;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
         result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
+    bool hasCustomAnimation;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {

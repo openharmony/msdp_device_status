@@ -43,6 +43,9 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
 } // namespace
 
+DeviceStatusDumper::DeviceStatusDumper() {}
+DeviceStatusDumper::~DeviceStatusDumper() {}
+
 int32_t DeviceStatusDumper::Init(IContext *context)
 {
     CALL_DEBUG_ENTER;
@@ -62,7 +65,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         FI_HILOGE("args is empty");
         return;
     }
-    int32_t c;
+    int32_t optRet = -1;
     optind = 1;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
@@ -95,8 +98,8 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
             goto RELEASE_RES;
         }
     }
-    while ((c = getopt_long(args.size(), argv, "hslcodm", dumpOptions, &optionIndex)) != -1) {
-        ExecutDump(fd, datas, c);
+    while ((optRet = getopt_long(args.size(), argv, "hslcodm", dumpOptions, &optionIndex)) != -1) {
+        ExecutDump(fd, datas, optRet);
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
@@ -184,10 +187,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
-        if (record == nullptr) {
-            FI_HILOGE("deviceStatusQueue is nullptr");
-            continue;
-        }
+        CHKPC(record);
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
         dprintf(fd, "startTime:%s | type:%s | value:%s\n",
