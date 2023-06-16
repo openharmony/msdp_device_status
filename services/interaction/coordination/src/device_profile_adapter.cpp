@@ -103,7 +103,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("Parser.json is not object");
+        FI_HILOGE("Parser json is not object");
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());
