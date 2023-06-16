@@ -47,8 +47,8 @@ const SessionAttribute g_sessionAttr = {
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
-    cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
+    cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
     if (!cJSON_IsString(deviceId) || !cJSON_IsBool(buttonIsPressed)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
@@ -59,10 +59,10 @@ void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser& parser
 void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
-    cJSON* dhid = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_START_DHID);
-    cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_POINTER_X);
-    cJSON* y = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_POINTER_Y);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
+    cJSON* dhid = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_START_DHID);
+    cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_POINTER_X);
+    cJSON* y = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_POINTER_Y);
     if (!cJSON_IsBool(result) || !cJSON_IsString(dhid) || !cJSON_IsNumber(x) || !cJSON_IsNumber(y)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
@@ -73,7 +73,7 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& 
 void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
@@ -85,7 +85,7 @@ void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
 void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
@@ -97,7 +97,7 @@ void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& p
 void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
 
     if (!cJSON_IsString(deviceId)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
@@ -395,8 +395,8 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         return;
     }
     JsonParser parser;
-    parser.json_ = cJSON_Parse(message.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
+    parser.json = cJSON_Parse(message.c_str());
+    if (!cJSON_IsObject(parser.json)) {
         FI_HILOGI("Parser json is not object");
         DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
         if (registerRecvMap_.find(dataPacket->messageId) == registerRecvMap_.end()) {
@@ -410,7 +410,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         return;
     }
-    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_CMD_TYPE);
+    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_CMD_TYPE);
     if (!cJSON_IsNumber(comType)) {
         FI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
