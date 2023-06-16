@@ -330,14 +330,22 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
     if (coordinationState_ == CoordinationState::STATE_FREE) {
         NotifyMouseLocation(xPercent, yPercent);
         UpdateState(CoordinationState::STATE_IN);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
         NotifyRemoteNetworkId(COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_));
         StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_IN);
+#else
+        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
         NotifyMouseLocation(xPercent, yPercent);
-        NotifyRemoteNetworkId(remoteNetworkId_);
         UpdateState(CoordinationState::STATE_FREE);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+        NotifyRemoteNetworkId(remoteNetworkId_);
         StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
+#else
+        SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     }
     isStarting_ = false;
 }
@@ -393,17 +401,21 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
     } else {
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
         if (coordinationState_ == CoordinationState::STATE_FREE) {
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
             NotifyRemoteNetworkId(remoteNetworkId);
             NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
         } else if (coordinationState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
             if (!originNetworkId.empty() && remoteNetworkId != originNetworkId) {
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
             NotifyRemoteNetworkId(originNetworkId);
             NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
             SetPointerVisible();
         }
         NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
@@ -434,8 +446,10 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         }
         if (coordinationState_ == CoordinationState::STATE_IN || coordinationState_ == CoordinationState::STATE_OUT) {
             UpdateState(CoordinationState::STATE_FREE);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
             NotifyRemoteNetworkId(remoteNetworkId);
             StateChangedNotify(coordinationState_, CoordinationState::STATE_FREE);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
         } else {
             FI_HILOGI("Current state is free");
         }

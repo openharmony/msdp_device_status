@@ -194,7 +194,7 @@ bool DeviceStatusService::Init()
         goto INIT_FAIL;
     }
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
-    if (deviceStatusDumper_.Init(this) != RET_OK) {
+    if (DS_DUMPER->Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
