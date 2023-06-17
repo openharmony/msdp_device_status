@@ -79,10 +79,10 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
 {
     CALL_DEBUG_ENTER;
     JsonParser parser;
-    parser.json_ = cJSON_Parse(fileData.c_str());
+    parser.json = cJSON_Parse(fileData.c_str());
     data.type = type;
     data.value = OnChangedValue::VALUE_INVALID;
-    if (cJSON_IsArray(parser.json_)) {
+    if (cJSON_IsArray(parser.json)) {
         FI_HILOGE("parser is array");
         return false;
     }
@@ -92,7 +92,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
         return false;
     }
 
-    cJSON* mockarray = cJSON_GetObjectItem(parser.json_, DeviceStatusJson[type].json.c_str());
+    cJSON* mockarray = cJSON_GetObjectItem(parser.json, DeviceStatusJson[type].json.c_str());
     int32_t jsonsize = cJSON_GetArraySize(mockarray);
     if (jsonsize == 0) {
         FI_HILOGE("json size is zero");

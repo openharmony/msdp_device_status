@@ -26,16 +26,16 @@ struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
     {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-            json_ = nullptr;
+        if (json != nullptr) {
+            cJSON_Delete(json);
+            json = nullptr;
         }
     }
     operator cJSON *()
     {
-        return json_;
+        return json;
     }
-    cJSON *json_ { nullptr };
+    cJSON *json { nullptr };
 };
 namespace COORDINATION {
 std::string GetLocalNetworkId();
