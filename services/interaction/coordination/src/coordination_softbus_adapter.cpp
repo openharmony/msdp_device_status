@@ -398,7 +398,15 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
     parser.json_ = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json_)) {
         FI_HILOGI("Parser json is not object");
-        DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
+        if (message.size() < sizeof(DataPacket)) {
+            FI_HILOGE("Data packet is incomplete");
+            return;
+        }
+        const DataPacket* dataPacket = reinterpret_cast<const DataPacket*>(message.c_str());
+        if ((message.size() - sizeof(DataPacket)) < dataPacket->dataLen) {
+            FI_HILOGE("Data is corrupt");
+            return;
+        }
         if (registerRecvMap_.find(dataPacket->messageId) == registerRecvMap_.end()) {
             FI_HILOGW("Message:%{public}d does not register", dataPacket->messageId);
             return;
