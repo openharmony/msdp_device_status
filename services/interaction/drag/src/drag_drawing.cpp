@@ -239,8 +239,12 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
     g_drawingInfo.pixelMap = shadowInfo.pixelMap;
     DrawShadow();
-    int32_t adjustSize = ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= GetScaling()) ?
-        INT_MAX : ((SVG_WIDTH + EIGHT_SIZE) * GetScaling());
+    float scalingValue = GetScaling();
+    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+        FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
+        return RET_ERR;
+    }
+    int32_t adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
