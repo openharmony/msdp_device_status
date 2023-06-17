@@ -377,7 +377,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }

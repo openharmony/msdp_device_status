@@ -235,11 +235,12 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPR(shadowInfo.pixelMap, RET_ERR);
-    g_drawingInfo.pixelMap = shadowInfo.pixelMap;
     Draw(g_drawingInfo.displayId, g_drawingInfo.displayX + shadowInfo.x - g_drawingInfo.pixelMapX,
         g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
+    g_drawingInfo.pixelMap = shadowInfo.pixelMap;
     DrawShadow();
-    int32_t adjustSize = (SVG_WIDTH + EIGHT_SIZE) * GetScaling();
+    int32_t adjustSize = ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= GetScaling()) ?
+        INT_MAX : ((SVG_WIDTH + EIGHT_SIZE) * GetScaling());
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
