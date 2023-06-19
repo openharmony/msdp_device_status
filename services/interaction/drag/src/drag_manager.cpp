@@ -444,7 +444,8 @@ int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
     if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
     } else if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TOUCH);
+        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TOUCH) |
+            MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TABLET_TOOL);
     } else {
         FI_HILOGW("Drag is not supported for this device type:%{public}d", sourceType);
         return RET_ERR;
