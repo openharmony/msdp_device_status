@@ -15,8 +15,8 @@
 
 #include "getdragtargetpid_fuzzer.h"
 
-#include "interaction_manager.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {

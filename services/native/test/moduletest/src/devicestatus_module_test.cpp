@@ -15,13 +15,13 @@
 
 #include "devicestatus_module_test.h"
 
-#include <iostream>
 #include <chrono>
-#include <thread>
 #include <gtest/gtest.h>
 #include <if_system_ability_manager.h>
+#include <iostream>
 #include <ipc_skeleton.h>
 #include <string_ex.h>
+#include <thread>
 
 #include "fi_log.h"
 #include "stationary_manager.h"
