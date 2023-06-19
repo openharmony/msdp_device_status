@@ -220,6 +220,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     isStarting_ = true;
+    SetSinkNetworkId(remoteNetworkId);
     int32_t ret = currentStateSM_->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Start remote input fail");
@@ -365,7 +366,13 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The sink preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
             preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
-        UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
+        bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
+        if (ret) {
+            COOR_SM->NotifyChainRemoved();
+        }
+        std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+        FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
+        COOR_SOFTBUS_ADAPTER->NotifyUnchainedRseult(localNetworkId, sinkNetworkId_, ret);
         isUnchained_ = false;
     }
     isStopping_ = false;
@@ -443,11 +450,19 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The local preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
             preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
-        UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
-        isUnchained_ = false;
-    } else {
+        bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
+        if (ret) {
+            COOR_SM->NotifyChainRemoved();
+        }
+        std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+        FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
+        COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
+    }
+    if (!isUnchained_) {
         COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
     }
+    COOR_SM->SetPointerVisible();
+    isUnchained_ = false;
     isStopping_ = false;
 }
 
@@ -497,15 +512,16 @@ bool CoordinationSM::UpdateMouseLocation()
     return true;
 }
 
-void CoordinationSM::UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId)
+bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = D_INPUT_ADAPTER->UnPrepareRemoteInput(localNetworkId, remoteNetworkId, [](bool isSuccess) {});
     if (ret != RET_OK) {
         FI_HILOGE("Failed to call distributed UnprepareRemoteInput");
+        return false;
     }
     preparedNetworkId_ = std::make_pair("", "");
-    COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
+    return true;
 }
 
 void CoordinationSM::UpdateState(CoordinationState state)
@@ -962,8 +978,9 @@ void CoordinationSM::SetUnchainStatus(bool isUnchained)
     isUnchained_ = isUnchained;
 }
 
-void CoordinationSM::NotifySessionClosed()
+void CoordinationSM::NotifyChainRemoved()
 {
+    CALL_DEBUG_ENTER;
     CoordinationMessage msg = CoordinationMessage::SESSION_CLOSED;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
@@ -973,6 +990,17 @@ void CoordinationSM::NotifySessionClosed()
         FI_HILOGE("Posting async task failed");
     }
 }
+
+void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess)
+{
+    CALL_DEBUG_ENTER;
+    FI_HILOGD("Notify unchained result, isSuccess:%{public}d", isSuccess);
+    if (isSuccess) {
+        COOR_SM->NotifyChainRemoved();
+    }
+    isUnchained_ = false;
+    COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
+ }
 
 void CoordinationSM::SetSinkNetworkId(const std::string &sinkNetworkId)
 {

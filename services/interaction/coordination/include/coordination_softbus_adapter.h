@@ -60,6 +60,7 @@ public:
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
     int32_t SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
+    int32_t NotifyUnchainedResult(const std::string &localNetworkId, const std::string &remoteNetworkId, bool isSuccess);
 
 private:
     CoordinationSoftbusAdapter() = default;
