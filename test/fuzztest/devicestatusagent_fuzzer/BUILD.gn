@@ -23,7 +23,7 @@ deps_ex = [
   "bundle_framework:appexecfwk_base",
   "eventhandler:libeventhandler",
   "ipc:ipc_single",
-  "hiviewdfx_hilog_native:libhilog",
+  "hilog:libhilog",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
   "appspawn:appspawn_socket_client",
