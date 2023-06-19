@@ -335,6 +335,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_IN);
 #else
         SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        SetPointerVisible();
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     }
     if (coordinationState_ == CoordinationState::STATE_OUT) {
@@ -345,6 +346,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
 #else
         SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
+        SetPointerVisible();
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     }
     isStarting_ = false;
@@ -566,7 +568,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
 
 CoordinationState CoordinationSM::GetCurrentCoordinationState() const
 {
-    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     return coordinationState_;
 }
@@ -823,7 +824,6 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
-    FI_HILOGD("Interceptor consumer key event enter");
     CHKPV(keyEvent);
     int32_t keyCode = keyEvent->GetKeyCode();
     CoordinationState state = COOR_SM->GetCurrentCoordinationState();
@@ -854,12 +854,10 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
             MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
     }
-    FI_HILOGD("Interceptor consumer key event leave");
 }
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    FI_HILOGD("Interceptor consumer pointer event enter");
     CHKPV(pointerEvent);
     CoordinationState state = COOR_SM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_OUT) {
@@ -871,7 +869,6 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Poin
             COOR_SM->DeactivateCoordination(COOR_SM->isUnchained_);
         }
     }
-    FI_HILOGD("Interceptor consumer pointer event leave");
 }
 
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
@@ -880,7 +877,6 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    FI_HILOGD("Monitor consumer pointer event enter");
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGD("Not mouse event, skip");
@@ -901,7 +897,6 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
             COOR_SM->DeactivateCoordination(COOR_SM->isUnchained_);
         }
     }
-    FI_HILOGD("Monitor consumer pointer event leave");
 }
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
