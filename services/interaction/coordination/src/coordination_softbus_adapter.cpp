@@ -402,7 +402,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
             FI_HILOGE("Data packet is incomplete");
             return;
         }
-        const DataPacket* dataPacket = reinterpret_cast<const DataPacket*>(message.c_str());
+        DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
         if ((message.size() - sizeof(DataPacket)) < dataPacket->dataLen) {
             FI_HILOGE("Data is corrupt");
             return;
