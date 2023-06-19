@@ -127,7 +127,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     MotionDrag motionDrag_;
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
-    DeviceStatusDumper deviceStatusDumper_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
