@@ -161,9 +161,6 @@ bool Client::DelFdListener(int32_t fd)
         eventHandler_->RemoveAllEvents();
         FI_HILOGI("Remove all events success");
     }
-    if (fd >= 0) {
-        close(fd);
-    }
     isRunning_ = false;
     return true;
 }
@@ -229,6 +226,10 @@ void Client::OnDisconnected()
     }
     if (!DelFdListener(fd_)) {
         FI_HILOGW("Delete fd listener failed");
+        if (fd_ >= 0) {
+            close(fd_);
+            fd_ = -1;
+        }
     }
     StreamClient::Stop();
     if (hasClient_ && eventHandler_ != nullptr) {
