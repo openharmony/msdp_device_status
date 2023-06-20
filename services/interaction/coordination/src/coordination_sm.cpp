@@ -369,10 +369,12 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         if (ret) {
             COOR_SM->NotifyChainRemoved();
+            std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+            FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
+            COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, sinkNetworkId_, ret);
+        } else {
+            FI_HILOGE("Failed to unchain coordination");
         }
-        std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-        FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
-        COOR_SOFTBUS_ADAPTER->NotifyUnchainedRseult(localNetworkId, sinkNetworkId_, ret);
         isUnchained_ = false;
     }
     isStopping_ = false;
@@ -453,10 +455,12 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         if (ret) {
             COOR_SM->NotifyChainRemoved();
+            std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+            FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
+            COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
+        } else {
+            FI_HILOGE("Failed to unchain coordination");
         }
-        std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-        FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
-        COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
     }
     if (!isUnchained_) {
         COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
@@ -1000,7 +1004,7 @@ void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, b
     }
     isUnchained_ = false;
     COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
- }
+}
 
 void CoordinationSM::SetSinkNetworkId(const std::string &sinkNetworkId)
 {
