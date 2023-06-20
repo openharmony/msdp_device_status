@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//base/msdp/device_status/device_status.gni")
-if (fusion_interaction_coordination) {
+if (fusion_interaction_motion_drag) {
   import("//base/msdp/motion/motion.gni")
 }
 
@@ -47,7 +47,7 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "//third_party/cJSON",
   ]
 
-  if (fusion_interaction_coordination) {
+  if (fusion_interaction_motion_drag) {
     include_dirs += [ "${motion_service_path}/native/include" ]
   }
 
@@ -65,7 +65,7 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "${device_status_utils_path}:devicestatus_util",
   ]
 
-  if (fusion_interaction_coordination) {
+  if (fusion_interaction_motion_drag) {
     deps += [ "${motion_service_path}:motion_drag" ]
   }
 
