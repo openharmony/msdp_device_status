@@ -161,6 +161,10 @@ bool Client::DelFdListener(int32_t fd)
         eventHandler_->RemoveAllEvents();
         FI_HILOGI("Remove all events success");
     }
+    if (fd >= 0) {
+        close(fd);
+        fd = -1;
+    }
     isRunning_ = false;
     return true;
 }
