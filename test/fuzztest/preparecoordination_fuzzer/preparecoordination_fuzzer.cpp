@@ -14,6 +14,7 @@
  */
 
 #include "preparecoordination_fuzzer.h"
+
 #include "securec.h"
 
 #include "coordination_message.h"
