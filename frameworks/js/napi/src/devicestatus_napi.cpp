@@ -413,17 +413,16 @@ napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int
 {
     CALL_DEBUG_ENTER;
     auto callbackIter = callbackMap_.find(type);
-    if (callbackIter != callbackMap_.end()) {
-        int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
-            static_cast<ActivityEvent>(event), callbackIter->second);
-        if (unsubscribeRet != RET_OK) {
-            ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
-        }
-        callbackMap_.erase(type);
-    } else {
+    if (callbackIter == callbackMap_.end()) {
         NAPI_ASSERT(env, false, "No existed callback");
         return nullptr;
     }
+    int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
+        static_cast<ActivityEvent>(event), callbackIter->second);
+    if (unsubscribeRet != RET_OK) {
+        ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
+    }
+    callbackMap_.erase(type);
     return nullptr;
 }
 

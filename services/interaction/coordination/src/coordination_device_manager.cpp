@@ -294,11 +294,10 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
-        if (devIter->second == nullptr) {
-            FI_HILOGW("Device is nullptr");
-        } else {
+        if (devIter->second != nullptr) {
             return devIter->second->GetDhid();
         }
+        FI_HILOGW("Device is nullptr");
     }
     return "";
 }
