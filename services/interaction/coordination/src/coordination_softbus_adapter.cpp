@@ -94,6 +94,18 @@ void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& p
     COOR_SM->StopRemoteCoordinationResult(cJSON_IsTrue(result));
 }
 
+void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser& parser)
+{
+    CALL_DEBUG_ENTER;
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+    if (!cJSON_IsString(deviceId) || !cJSON_IsBool(result)) {
+        FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
+        return;
+    }
+    COOR_SM->NotifyUnchainedResult(deviceId->valuestring, cJSON_IsTrue(result));
+}
+
 void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
@@ -363,6 +375,32 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     return RET_OK;
 }
 
+int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &localNetworkId,
+    const std::string &remoteNetworkId, bool result)
+{
+    CALL_DEBUG_ENTER;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
+        FI_HILOGE("Stop remote coordination result error, not found this device");
+        return RET_ERR;
+    }
+    int32_t sessionId = sessionDevMap_[remoteNetworkId];
+    cJSON *jsonStr = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_UNCHAINED_RES));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(result));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
+    char *smsg = cJSON_Print(jsonStr);
+    cJSON_Delete(jsonStr);
+    int32_t ret = SendMsg(sessionId, smsg);
+    cJSON_free(smsg);
+    if (ret != RET_OK) {
+        FI_HILOGE("Unchained result send session msg failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::string &originNetworkId,
     const std::string &remoteNetworkId)
 {
@@ -443,6 +481,10 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         case REMOTE_COORDINATION_STOP_OTHER_RES: {
             ResponseStartCoordinationOtherResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_UNCHAINED_RES: {
+            ResponseNotifyUnchainedResult(sessionId, parser);
             break;
         }
         default: {
@@ -536,7 +578,6 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
         channelStatusMap_.erase(deviceId);
     }
     COOR_SM->Reset(deviceId);
-    COOR_SM->NotifySessionClosed();
 }
 
 void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)

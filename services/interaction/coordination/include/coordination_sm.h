@@ -160,9 +160,10 @@ public:
     bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CoordinationState, CoordinationState)> callback);
-    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    bool UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     void SetUnchainStatus(bool isUnchained);
-    void NotifySessionClosed();
+    void NotifyChainRemoved();
+    void NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess);
     void SetSinkNetworkId(const std::string &sinkNetworkId);
     void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
     void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
