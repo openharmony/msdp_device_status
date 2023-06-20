@@ -19,6 +19,7 @@
       "components": [
         "access_token",
         "hiviewdfx_hilog_native",
+        "hilog",
         "ipc",
         "safwk",
         "samgr",
@@ -35,8 +36,10 @@
         "init",
         "input",
         "hisysevent_native",
+        "hisysevent",
         "window_manager",
         "hitrace_native",
+        "hitrace",
         "ability_base",
         "libuv",
         "huks",

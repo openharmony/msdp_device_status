@@ -27,7 +27,7 @@ ohos_fuzztest("GetDragTargetPidFuzzTest") {
   deps = [ "../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "multimedia_image_framework:image_native",
   ]
 }
