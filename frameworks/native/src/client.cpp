@@ -163,7 +163,6 @@ bool Client::DelFdListener(int32_t fd)
     }
     if (fd >= 0) {
         close(fd);
-        fd = -1;
     }
     isRunning_ = false;
     return true;
