@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  fusion_interaction_coordination = true
+  fusion_interaction_coordination = false
   fusion_interaction_motion_drag = false
 }
 

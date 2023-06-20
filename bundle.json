@@ -27,6 +27,8 @@
         "multimedia_image_framework",
         "eventhandler",
         "distributed_input",
+        "libxml2",
+        "cjson",
         "device_manager",
         "sensor",
         "jsoncpp",
@@ -36,18 +38,11 @@
         "window_manager",
         "hitrace_native",
         "ability_base",
-        "huks",
-        "graphic_standard",
-        "udmf",
-        "device_info_manager",
-        "dsoftbus"
-      ],
-      "third_party": [
-        "cjson",
-        "libxml2",
         "libuv",
-        "openssl"
-      ]
+        "huks",
+        "graphic_standard"
+      ],
+      "third_party": []
     },
     "build": {
       "group_type": {
