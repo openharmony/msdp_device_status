@@ -97,8 +97,8 @@ void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& p
 void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser& parser)
 {
     CALL_DEBUG_ENTER;
-    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
-    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json_, FI_SOFTBUS_KEY_RESULT);
+    cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
+    cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
     if (!cJSON_IsString(deviceId) || !cJSON_IsBool(result)) {
         FI_HILOGE("OnBytesReceived cmdType is TRANS_SINK_MSG_ONPREPARE, data type is error");
         return;
