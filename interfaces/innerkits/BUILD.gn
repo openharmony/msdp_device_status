@@ -64,8 +64,8 @@ ohos_shared_library("devicestatus_client") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "hitrace:hitrace_meter",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "samgr:samgr_proxy",
