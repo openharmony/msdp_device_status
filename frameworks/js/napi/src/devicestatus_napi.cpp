@@ -163,7 +163,7 @@ bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
     return true;
 }
 
-bool DeviceStatusNapi::IsMatchCallbackType(napi_env &env, napi_value &value)
+bool DeviceStatusNapi::IsMatchType(napi_env env, napi_value value, napi_valuetype type)
 {
     CALL_DEBUG_ENTER;
     napi_valuetype valueType = napi_undefined;
@@ -172,7 +172,7 @@ bool DeviceStatusNapi::IsMatchCallbackType(napi_env &env, napi_value &value)
         FI_HILOGE("Failed to get valueType");
         return false;
     }
-    return valueType == napi_function;
+    return valueType == type;
 }
 
 bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
@@ -243,57 +243,6 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         return result;
     }
     return std::make_tuple(true, args[ARG_3], std::string(mode), eventMode, latencyMode);
-}
-
-std::tuple<bool, napi_value, int32_t, int32_t, bool> DeviceStatusNapi::CheckUnsubscribeParam(napi_env env,
-    napi_callback_info info)
-{
-    std::tuple<bool, napi_value, int32_t, int32_t, bool> result { false, nullptr, -1, -1, false };
-    size_t argc = ARG_3;
-    napi_value args[ARG_3] = {};
-    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Bad parameters");
-        return result;
-    }
-
-    size_t modLen = 0;
-    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
-        return result;
-    }
-    char mode[NAPI_BUF_LENGTH] = {};
-    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get mode");
-        return result;
-    }
-    int32_t type = DeviceStatusNapi::ConvertTypeToInt(mode);
-    if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
-        ThrowErr(env, PARAM_ERROR, "Type is illegal");
-        return result;
-    }
-    int32_t event = 0;
-    status = napi_get_value_int32(env, args[ARG_1], &event);
-    if (status != napi_ok) {
-        ThrowErr(env, PARAM_ERROR, "Failed to get int32 item");
-        return result;
-    }
-    if ((event < ActivityEvent::ENTER) || (event > ActivityEvent::ENTER_EXIT)) {
-        ThrowErr(env, PARAM_ERROR, "Event is illegal");
-        return result;
-    }
-    bool isArgumentsValid = false;
-    if ((argc < ARG_3) || !IsMatchCallbackType(env, args[ARG_2])) {
-        isArgumentsValid = g_obj->RemoveAllCallback(type);
-        if (!isArgumentsValid) {
-            FI_HILOGE("Callback is not exist");
-            return result;
-        }
-    }
-    FI_HILOGD("Type:%{public}d, event:%{public}d", type, event);
-    return std::make_tuple(true, args[ARG_2], type, event, isArgumentsValid);
 }
 
 std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env env, napi_callback_info info)
@@ -401,15 +350,68 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
 {
     CALL_DEBUG_ENTER;
     CHKPP(g_obj);
-    const auto [ret, handler, type, event, isArgumentsValid] = CheckUnsubscribeParam(env, info);
-    if (!ret) {
-        FI_HILOGE("Off:UnsubscribeDeviceStatus is failed");
+    size_t argc = 3;
+    napi_value args[3] = {};
+    napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Bad parameters");
         return nullptr;
     }
-    if (!isArgumentsValid && !g_obj->Off(type, handler)) {
-        FI_HILOGE("Not ready to Unsubscribe for type:%{public}d", type);
+    if (argc < 2) {
+        ThrowErr(env, PARAM_ERROR, "Param number is invalid");
         return nullptr;
     }
+    size_t modLen = 0;
+    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &modLen);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get string item");
+        return nullptr;
+    }
+    char mode[NAPI_BUF_LENGTH] = {};
+    status = napi_get_value_string_utf8(env, args[0], mode, modLen + 1, &modLen);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get mode");
+        return nullptr;
+    }
+    int32_t type = DeviceStatusNapi::ConvertTypeToInt(mode);
+    if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
+        ThrowErr(env, PARAM_ERROR, "Type is illegal");
+        return nullptr;
+    }
+    int32_t event = 0;
+    status = napi_get_value_int32(env, args[1], &event);
+    if (status != napi_ok) {
+        ThrowErr(env, PARAM_ERROR, "Failed to get int32 item");
+        return nullptr;
+    }
+    if ((event < ActivityEvent::ENTER) || (event > ActivityEvent::ENTER_EXIT)) {
+        ThrowErr(env, PARAM_ERROR, "Event is illegal");
+        return nullptr;
+    }
+    if ((argc < 3) || IsMatchType(env, args[2], napi_undefined) || IsMatchType(env, args[2], napi_null)) {
+        if (!g_obj->RemoveAllCallback(type)) {
+            FI_HILOGE("Callback type is not exist");
+            return nullptr;
+        }
+        UnsubscribeCallback(env, type, event);
+        return nullptr;
+    }
+    FI_HILOGD("type: %{public}d, event: %{public}d", type, event);
+    if (IsMatchType(env, args[2], napi_function)) {
+        if (!g_obj->Off(type, args[2])) {
+            FI_HILOGE("Not ready to unsubscribe for type:%{public}d", type);
+            return nullptr;
+        }
+        UnsubscribeCallback(env, type, event);
+    } else {
+        ThrowErr(env, PARAM_ERROR, "get error callback type");
+    }
+    return nullptr;
+}
+
+napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int32_t event)
+{
+    CALL_DEBUG_ENTER;
     auto callbackIter = callbackMap_.find(type);
     if (callbackIter != callbackMap_.end()) {
         int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
