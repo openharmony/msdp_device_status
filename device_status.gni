@@ -32,12 +32,9 @@ device_status_default_defines = []
 
 if (fusion_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
-}
-if (!fusion_interaction_coordination) {
+} else {
   fusion_interaction_motion_drag = false
 }
 if (fusion_interaction_motion_drag) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_MOTION_DRAG" ]
 }
-print("fusion_interaction_motion_drag = ${fusion_interaction_motion_drag}")
-print("fusion_interaction_coordination = ${fusion_interaction_coordination}")
