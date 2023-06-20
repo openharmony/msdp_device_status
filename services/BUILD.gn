@@ -98,22 +98,18 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [
-      "interaction/coordination:coordination",
-    ]
+    deps += [ "interaction/coordination:coordination" ]
   }
 
   if (fusion_interaction_motion_drag) {
-    deps += [
-      "${motion_service_path}:motion_drag",
-    ]
+    deps += [ "${motion_service_path}:motion_drag" ]
   }
 
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
     external_deps += [
-      "distributed_input:libdinput_sdk",
       "device_manager:devicemanagersdk",
+      "distributed_input:libdinput_sdk",
     ]
   }
 
@@ -139,22 +135,18 @@ ohos_static_library("devicestatus_static_service") {
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [
-      "interaction/coordination:coordination",
-    ]
+    deps += [ "interaction/coordination:coordination" ]
   }
 
   if (fusion_interaction_motion_drag) {
-    deps += [
-      "${motion_service_path}:motion_drag",
-    ]
+    deps += [ "${motion_service_path}:motion_drag" ]
   }
 
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
     external_deps += [
-      "distributed_input:libdinput_sdk",
       "device_manager:devicemanagersdk",
+      "distributed_input:libdinput_sdk",
     ]
   }
 
