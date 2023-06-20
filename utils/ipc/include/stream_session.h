@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus{
 class StreamSession;
 using SessionPtr = std::shared_ptr<StreamSession>;
 class StreamSession : public std::enable_shared_from_this<StreamSession> {
@@ -75,4 +76,5 @@ protected:
 };
 } // namespace Msdp
 } // namespace OHOS
+} // namespace DeviceStatus
 #endif // STREAM_SESSION_H
