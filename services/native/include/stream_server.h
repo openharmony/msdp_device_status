@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 enum EpollEventType {
     EPOLL_EVENT_BEGIN = 0,
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
@@ -79,6 +80,7 @@ protected:
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::map<int32_t, std::function<void(SessionPtr)>> callbacks_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_SERVER_H
