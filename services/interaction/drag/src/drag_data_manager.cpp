@@ -36,6 +36,10 @@ void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &po
 {
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
+    if (dragData.displayId < 0) {
+        dragData_.displayId = 0;
+        FI_HILOGW("The value of displayId(%{public}d) is correcting to 0", dragData.displayId);
+    }
     pointerStyle_ = pointerStyle;
     targetTid_ = -1;
     targetPid_ = -1;

@@ -305,10 +305,10 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
-        dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
+        dragData.displayX < 0 || dragData.displayY < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
-            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
+            "displayX:%{public}d, displayY:%{public}d",
+            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
     int32_t ret = StartDrag(dragData);
