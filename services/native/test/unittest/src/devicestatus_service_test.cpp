@@ -15,8 +15,8 @@
 
 #include "devicestatus_service_test.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <thread>
 
 #include <gtest/gtest.h>
