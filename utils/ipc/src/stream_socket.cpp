@@ -139,7 +139,7 @@ void StreamSocket::Close()
 {
     if (fd_ >= 0) {
         int32_t rf = close(fd_);
-        if (rf > 0) {
+        if (rf < 0) {
             FI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
     }

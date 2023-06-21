@@ -33,7 +33,7 @@
 
 namespace OHOS {
 namespace Msdp {
-namespace DeviceStatus{
+namespace DeviceStatus {
 class StreamSocket {
 public:
     StreamSocket();

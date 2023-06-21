@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace Msdp {
-namespace DeviceStatus{
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSession" };
 const std::string FOUNDATION { "foundation" };
