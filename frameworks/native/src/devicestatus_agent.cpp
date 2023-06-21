@@ -44,14 +44,13 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
 {
     CALL_DEBUG_ENTER;
     CHKPR(agentEvent, ERR_INVALID_VALUE);
-    if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN && event > ActivityEvent::EVENT_INVALID
-        && event <= ActivityEvent::ENTER_EXIT) {
-        RegisterServiceEvent(type, event, latency);
-        agentEvent_ = agentEvent;
-    } else {
+    if (!(type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN) ||
+        !(event > ActivityEvent::EVENT_INVALID && event <= ActivityEvent::ENTER_EXIT)) {
         FI_HILOGE("Subscription agent event failed");
         return ERR_INVALID_VALUE;
     }
+    RegisterServiceEvent(type, event, latency);
+    agentEvent_ = agentEvent;
     return RET_OK;
 }
 

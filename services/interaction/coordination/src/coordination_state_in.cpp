@@ -67,9 +67,8 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
     if (remoteNetworkId == originNetworkId) {
         ComeBack(remoteNetworkId, startDeviceId);
         return RET_OK;
-    } else {
-        return RelayComeBack(remoteNetworkId, startDeviceId);
     }
+    return RelayComeBack(remoteNetworkId, startDeviceId);
 }
 
 int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
