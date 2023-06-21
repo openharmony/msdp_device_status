@@ -12,9 +12,14 @@
 # limitations under the License.
 
 import("../device_status.gni")
-if (fusion_interaction_motion_drag) {
-  import("//base/msdp/motion/motion.gni")
+if (fusion_interaction_coordination) {
+  #import("//base/msdp/motion/motion.gni")
 }
+
+if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
+    device_status_default_defines += [ "OHOS_BUILD_ENABLE_MOTION_DRAG" ]
+}
+
 config("devicestatus_services_private_config") {
   include_dirs = [
     "context/include",
@@ -31,7 +36,7 @@ config("devicestatus_services_private_config") {
     "communication/service/include",
   ]
 
-  if (fusion_interaction_motion_drag) {
+  if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
     include_dirs += [ "${motion_service_path}/native/include" ]
   }
 
@@ -101,7 +106,7 @@ ohos_shared_library("devicestatus_service") {
     deps += [ "interaction/coordination:coordination" ]
   }
 
-  if (fusion_interaction_motion_drag) {
+  if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
     deps += [ "${motion_service_path}:motion_drag" ]
   }
 
@@ -138,7 +143,7 @@ ohos_static_library("devicestatus_static_service") {
     deps += [ "interaction/coordination:coordination" ]
   }
 
-  if (fusion_interaction_motion_drag) {
+  if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
     deps += [ "${motion_service_path}:motion_drag" ]
   }
 

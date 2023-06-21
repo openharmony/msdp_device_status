@@ -50,9 +50,9 @@ ohos_shared_library("interaction_drag") {
     "input:libmmi-client",
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
+    "udmf:udmf_client",
     "window_manager:libdm",
     "window_manager:libwm",
-    "udmf:udmf_client",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
