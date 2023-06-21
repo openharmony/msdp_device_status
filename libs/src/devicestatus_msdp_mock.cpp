@@ -165,6 +165,7 @@ void DeviceStatusMsdpMock::CloseTimer()
         return;
     }
     close(timerFd_);
+    timerFd_ = -1;
 }
 
 void DeviceStatusMsdpMock::TimerCallback()

@@ -33,6 +33,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus{
 class StreamSocket {
 public:
     StreamSocket();
@@ -56,6 +57,7 @@ protected:
     int32_t fd_ { -1 };
     int32_t epollFd_ { -1 };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_SOCKET_H
