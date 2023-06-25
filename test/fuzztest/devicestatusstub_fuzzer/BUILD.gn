@@ -47,7 +47,8 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "//third_party/cJSON",
   ]
 
-  if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
+  if (defined(fusion_interaction_motion_drag) &&
+      fusion_interaction_motion_drag) {
     include_dirs += [ "${motion_service_path}/native/include" ]
   }
 
@@ -65,7 +66,8 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "${device_status_utils_path}:devicestatus_util",
   ]
 
-  if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
+  if (defined(fusion_interaction_motion_drag) &&
+      fusion_interaction_motion_drag) {
     deps += [ "${motion_service_path}:motion_drag" ]
   }
 
