@@ -198,7 +198,6 @@ void CoordinationDeviceManager::Init()
 
 bool CoordinationDeviceManager::IsRemote(int32_t id)
 {
-    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
         CHKPF(devIter->second);
         return devIter->second->IsRemote();
