@@ -60,19 +60,17 @@ public:
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
-    class InterceptorConsumer final : public MMI::IInputEventConsumer {
+    class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
-        InterceptorConsumer(IContext *context,
-            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb) {}
+        MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        IContext* context_ { nullptr };
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 private:
-    int32_t AddDragEventInterceptor(int32_t sourceType);
+    int32_t AddDragEventMonitor(int32_t sourceType);
     int32_t NotifyDragResult(DragResult result);
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
@@ -87,7 +85,7 @@ private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
-    int32_t interceptorId_ { -1 };
+    int32_t monitorId_  { -1 };
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };

@@ -38,7 +38,6 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
-constexpr int32_t DRAG_PRIORITY { 500 };
 } // namespace
 
 int32_t DragManager::Init(IContext* context)
@@ -246,9 +245,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
-    int32_t pid = MMI::InputManager::GetInstance()->GetWindowPid(pointerEvent->GetTargetWindowId());
-    FI_HILOGD("Target window drag pid:%{public}d", pid);
-
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -263,33 +259,23 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     });
 }
 
-void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
+void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
     CALL_DEBUG_ENTER;
 }
 
-void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     CHKPV(callback_);
-    CHKPV(context_);
     callback_(pointerEvent);
-    pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    auto fun = [] (std::shared_ptr<MMI::PointerEvent> pointerEvent) -> int32_t {
-        MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-        if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-            MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
-        }
-        return RET_OK;
-    };
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(std::bind(fun, pointerEvent));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post async task failed");
+    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     }
 }
 
-void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
+void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
 {
     CALL_DEBUG_ENTER;
 }
@@ -301,9 +287,9 @@ void DragManager::Dump(int32_t fd) const
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
     dprintf(fd, "Drag information:\n");
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
+            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
-            GetDragResult(dragResult_).c_str(), interceptorId_, GetDragTargetPid(), targetTid,
+            GetDragResult(dragResult_).c_str(), monitorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string udKey;
@@ -437,7 +423,7 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
     return RET_OK;
 }
 
-int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
+int32_t DragManager::AddDragEventMonitor(int32_t sourceType)
 {
     CALL_DEBUG_ENTER;
     uint32_t deviceTags = 0;
@@ -450,11 +436,11 @@ int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
         FI_HILOGW("Drag is not supported for this device type:%{public}d", sourceType);
         return RET_ERR;
     }
-    auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
-    auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
-    interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
-    if (interceptorId_ <= 0) {
-        FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+    auto consumer = std::make_shared<MonitorConsumer>(MonitorConsumer(
+        std::bind(&DragManager::DragCallback, this, std::placeholders::_1)));
+    monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(consumer);
+    if (monitorId_ < 0) {
+        FI_HILOGE("AddMonitor failed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
     return RET_OK;
@@ -476,9 +462,9 @@ int32_t DragManager::OnStartDrag()
         return RET_ERR;
     }
     dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
-    ret = AddDragEventInterceptor(dragData.sourceType);
+    ret = AddDragEventMonitor(dragData.sourceType);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to add drag event interceptor");
+        FI_HILOGE("Failed to add drag event monitor");
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
@@ -491,12 +477,12 @@ int32_t DragManager::OnStartDrag()
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
-    if (interceptorId_ <= 0) {
-        FI_HILOGE("Invalid interceptor to be removed, interceptorId_:%{public}d", interceptorId_);
+    if (monitorId_ <= 0) {
+        FI_HILOGE("RemoveMonitor failed, monitorId_:%{public}d", monitorId_);
         return RET_ERR;
     }
-    MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
-    interceptorId_ = -1;
+    MMI::InputManager::GetInstance()->RemoveMonitor(monitorId_);
+    monitorId_ = -1;
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
