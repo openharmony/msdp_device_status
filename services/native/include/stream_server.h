@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 enum EpollEventType {
     EPOLL_EVENT_BEGIN = 0,
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
@@ -79,6 +80,7 @@ protected:
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::map<int32_t, std::function<void(SessionPtr)>> callbacks_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_SERVER_H
