@@ -16,8 +16,8 @@
 #include "registercoordinationlistener_fuzzer.h"
 
 #include "coordination_message.h"
-#include "interaction_manager.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 #include "i_coordination_listener.h"
 
 namespace OHOS {

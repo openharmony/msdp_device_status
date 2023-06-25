@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
 } // namespace
@@ -138,11 +139,12 @@ void StreamSocket::Close()
 {
     if (fd_ >= 0) {
         int32_t rf = close(fd_);
-        if (rf > 0) {
+        if (rf < 0) {
             FI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
     }
     fd_ = -1;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
