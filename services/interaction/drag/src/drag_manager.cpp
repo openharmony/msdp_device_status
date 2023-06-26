@@ -79,15 +79,16 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d, PixelWidth:%{public}d,"
-        "PixelHeight:%{public}d, sourceType:%{public}d, pointerId:%{public}d, shadowX:%{public}d,"
-        "shadowY:%{public}d, displayId:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d",
+    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
+        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
+        " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
+        " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
-        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(), dragData.sourceType,
-        dragData.pointerId, dragData.shadowInfo.x, dragData.shadowInfo.y,
-        dragData.displayId, dragData.dragNum, dragData.hasCanceledAnimation);
+        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
+        dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
+        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation);
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
@@ -127,7 +128,6 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     stateNotify_.StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(result) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
-        ret = RET_ERR;
     }
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(result);
@@ -212,10 +212,11 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
-        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(),
+        pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
