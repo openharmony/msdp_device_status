@@ -748,6 +748,17 @@ int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY,
     return ret;
 }
 
+int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateShadowPic, &dragMgr_, std::cref(shadowInfo)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Update shadow picture failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;

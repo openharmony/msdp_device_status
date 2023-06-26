@@ -166,8 +166,17 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     DRAG_DATA_MGR.SetDragStyle(style);
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
-    dragDrawing_.UpdateDragStyle(style);
-    return RET_OK;
+    return dragDrawing_.UpdateDragStyle(style);
+}
+
+int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("No drag instance running, can not update shadow picture");
+        return RET_ERR;
+    }
+    return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
 int32_t DragManager::NotifyDragResult(DragResult result)

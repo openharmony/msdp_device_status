@@ -175,6 +175,20 @@ int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY, width, height);
 }
+
+int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if (shadowInfo.x > 0 || shadowInfo.y > 0 ||
+        shadowInfo.x < -shadowInfo.pixelMap->GetWidth() ||
+        shadowInfo.y < -shadowInfo.pixelMap->GetHeight()) {
+        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            shadowInfo.x, shadowInfo.y);
+        return RET_ERR;
+    }
+    return DeviceStatusClient::GetInstance().UpdateShadowPic(shadowInfo);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

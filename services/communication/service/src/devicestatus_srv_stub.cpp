@@ -66,7 +66,8 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::REGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::AddDraglistenerStub},
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
-        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub}
+        {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
+        {Idevicestatus::UPDATE_SHADOW_PIC, &DeviceStatusSrvStub::UpdateShadowPicStub}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -304,6 +305,13 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (dragData.shadowInfo.x > 0 || dragData.shadowInfo.y > 0 ||
+        dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth() ||
+        dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight()) {
+        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            dragData.shadowInfo.x, dragData.shadowInfo.y);
+        return RET_ERR;
+    }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
         dragData.displayX < 0 || dragData.displayY < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
@@ -325,7 +333,7 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     int32_t result;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
@@ -386,6 +394,29 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, width, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    auto pixelMap = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMap, RET_ERR);
+    ShadowInfo shadowInfo;
+    shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
+    READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (shadowInfo.x > 0 || shadowInfo.y > 0 ||
+        shadowInfo.x < -shadowInfo.pixelMap->GetWidth() ||
+        shadowInfo.y < -shadowInfo.pixelMap->GetHeight()) {
+        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            shadowInfo.x, shadowInfo.y);
+        return RET_ERR;
+    }
+    int32_t ret = UpdateShadowPic(shadowInfo);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call Update shadow picture failed, ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus

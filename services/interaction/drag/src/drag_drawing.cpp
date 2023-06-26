@@ -234,6 +234,37 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     return RET_OK;
 }
 
+int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX + shadowInfo.x - g_drawingInfo.pixelMapX,
+        g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
+    g_drawingInfo.pixelMap = shadowInfo.pixelMap;
+    DrawShadow();
+    float scalingValue = GetScaling();
+    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+        FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
+        return RET_ERR;
+    }
+    int32_t adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    CHKPR(g_drawingInfo.rootNode, RET_ERR);
+    g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
+    g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        g_drawingInfo.pixelMapX = shadowInfo.x;
+        g_drawingInfo.pixelMapY = shadowInfo.y;
+        DrawMouseIcon();
+    }
+    CHKPR(rsUiDirector_, RET_ERR);
+    rsUiDirector_->SendMessages();
+    return RET_OK;
+}
+
 void DragDrawing::OnDragSuccess()
 {
     CALL_DEBUG_ENTER;
