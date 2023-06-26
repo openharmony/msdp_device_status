@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class IStreamServer : public virtual RefBase {
 public:
     virtual int32_t AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid,
@@ -28,6 +29,7 @@ public:
                                       int32_t& tokenType) = 0;
     virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // I_STREAM_SERVER_H

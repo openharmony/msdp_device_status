@@ -160,7 +160,12 @@ int32_t DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
 
 void DeviceStatusMsdpMock::CloseTimer()
 {
+    if (timerFd_ < 0) {
+        FI_HILOGE("Invalid timerFd_");
+        return;
+    }
     close(timerFd_);
+    timerFd_ = -1;
 }
 
 void DeviceStatusMsdpMock::TimerCallback()

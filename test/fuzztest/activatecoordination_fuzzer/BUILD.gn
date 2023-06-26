@@ -27,7 +27,7 @@ ohos_fuzztest("ActivateCoordinationFuzzTest") {
   sources = [ "activatecoordination_fuzzer.cpp" ]
   deps = [ "../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "multimedia_image_framework:image_native",
   ]
 }

@@ -45,7 +45,7 @@ ohos_shared_library("devicestatus_mock") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "sensor:sensor_interface_native",
   ]
 
@@ -79,7 +79,7 @@ ohos_shared_library("devicestatus_algo") {
 
   external_deps = [
     "ability_base:base",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "input:libmmi-client",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",

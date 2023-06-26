@@ -16,8 +16,8 @@
 #include "activatecoordination_fuzzer.h"
 
 #include "coordination_message.h"
-#include "interaction_manager.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -27,10 +27,8 @@
 #include "fi_log.h"
 #include "proto.h"
 
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "udmf_client.h"
 #include "unified_types.h"
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 namespace OHOS {
 namespace Msdp {
@@ -224,7 +222,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
@@ -234,10 +231,6 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
     }
-#else
-    (void)(targetTid);
-    (void)(udKey);
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -444,7 +437,8 @@ int32_t DragManager::AddDragEventInterceptor(int32_t sourceType)
     if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
     } else if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TOUCH);
+        deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TOUCH) |
+            MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_TABLET_TOOL);
     } else {
         FI_HILOGW("Drag is not supported for this device type:%{public}d", sourceType);
         return RET_ERR;

@@ -33,7 +33,7 @@ ohos_unittest("InteractionManagerTest") {
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "input:libmmi-client",
     "multimedia_image_framework:image_native",
   ]
@@ -51,7 +51,7 @@ ohos_unittest("InteractionDragDrawingTest") {
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "input:libmmi-client",
     "multimedia_image_framework:image_native",
   ]

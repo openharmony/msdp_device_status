@@ -15,9 +15,10 @@
 
 #include "devicestatus_module_test.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <thread>
+
 #include <gtest/gtest.h>
 #include <if_system_ability_manager.h>
 #include <ipc_skeleton.h>

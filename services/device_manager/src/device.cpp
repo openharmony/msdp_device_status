@@ -343,12 +343,12 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
 void Device::JudgeKeyboardType()
 {
     CALL_DEBUG_ENTER;
-    if (TestBit(KEY_HOME, keyBitmask_) && (GetBus() == BUS_BLUETOOTH)) {
-        keyboardType_ = IDevice::KEYBOARD_TYPE_REMOTECONTROL;
-        FI_HILOGD("The keyboard type is remote control");
-    } else if (TestBit(KEY_Q, keyBitmask_)) {
+    if (TestBit(KEY_Q, keyBitmask_)) {
         keyboardType_ = IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD;
         FI_HILOGD("The keyboard type is standard");
+    } else if (TestBit(KEY_HOME, keyBitmask_) && (GetBus() == BUS_BLUETOOTH)) {
+        keyboardType_ = IDevice::KEYBOARD_TYPE_REMOTECONTROL;
+        FI_HILOGD("The keyboard type is remote control");
     } else if (TestBit(KEY_KP1, keyBitmask_)) {
         keyboardType_ = IDevice::KEYBOARD_TYPE_DIGITALKEYBOARD;
         FI_HILOGD("The keyboard type is digital keyboard");

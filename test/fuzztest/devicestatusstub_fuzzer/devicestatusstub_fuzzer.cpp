@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include "securec.h"
 #include "singleton.h"
 
