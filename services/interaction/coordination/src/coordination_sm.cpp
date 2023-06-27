@@ -879,6 +879,10 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
 void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        FI_HILOGD("Not mouse event, skip");
+        return;
+    }
     CoordinationState state = COOR_SM->GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_OUT) {
         int32_t deviceId = pointerEvent->GetDeviceId();
