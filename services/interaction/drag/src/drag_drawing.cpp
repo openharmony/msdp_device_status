@@ -266,7 +266,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CHKPR(shadowNode, RET_ERR);
     DrawShadow(shadowNode);
     float scalingValue = GetScaling();
-    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+    if ((1.0 * INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
         return RET_ERR;
     }
@@ -998,9 +998,9 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     CHKPV(stylePixelMap_);
     CHKPV(g_drawingInfo.pixelMap);
     float scalingValue = GetScaling();
-    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+    if ((1.0 * INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
-        return RET_ERR;
+        return;
     }
     int32_t adjustSize = EIGHT_SIZE * scalingValue;
     int32_t svgTouchPositionX = 0;
