@@ -131,10 +131,12 @@ float GetScaling()
         displayInfo = OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(0);
     }
     CHKPR(displayInfo, RET_ERR);
-    if (displayInfo->GetDpi() < -std::numeric_limits<float>::epsilon()) {
+    int32_t deviceDpi = displayInfo->GetDpi();
+    FI_HILOGD("displayId:%{public}d, deviceDpi:%{public}d", g_drawingInfo.displayId, deviceDpi);
+    if (deviceDpi < -std::numeric_limits<float>::epsilon()) {
         return 0.0f;
     }
-    return (1.0 * displayInfo->GetDpi() * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
+    return (1.0 * deviceDpi * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
 }
 } // namespace
 
@@ -205,11 +207,12 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     }
     int32_t adjustSize = EIGHT_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
+    int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     if (g_drawingInfo.dragWindow != nullptr) {
-        g_drawingInfo.dragWindow->MoveTo(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
+        g_drawingInfo.dragWindow->MoveTo(positionX, positionY);
         return;
     }
-    CreateWindow(g_drawingInfo.displayX + g_drawingInfo.pixelMapX, positionY);
+    CreateWindow(positionX, positionY);
     CHKPV(g_drawingInfo.dragWindow);
 }
 
@@ -226,6 +229,37 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     }
     g_drawingInfo.currentStyle = style;
     DrawStyle();
+    CHKPR(rsUiDirector_, RET_ERR);
+    rsUiDirector_->SendMessages();
+    return RET_OK;
+}
+
+int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX + shadowInfo.x - g_drawingInfo.pixelMapX,
+        g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
+    g_drawingInfo.pixelMap = shadowInfo.pixelMap;
+    DrawShadow();
+    float scalingValue = GetScaling();
+    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+        FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
+        return RET_ERR;
+    }
+    int32_t adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    CHKPR(g_drawingInfo.rootNode, RET_ERR);
+    g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
+    g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        g_drawingInfo.pixelMapX = shadowInfo.x;
+        g_drawingInfo.pixelMapY = shadowInfo.y;
+        DrawMouseIcon();
+    }
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     return RET_OK;

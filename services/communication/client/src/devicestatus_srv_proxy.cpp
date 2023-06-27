@@ -377,7 +377,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -505,6 +505,32 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
         offsetX, offsetY, width, height);
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if (!shadowInfo.pixelMap->Marshalling(data)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UPDATE_SHADOW_PIC, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus
