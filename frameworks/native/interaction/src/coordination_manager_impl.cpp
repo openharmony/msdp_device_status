@@ -85,7 +85,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
     }
     int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
     if (ret != RET_OK) {
-        FI_HILOGE("Get Coordination State failed");
+        FI_HILOGE("get coordination state failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;
@@ -105,7 +105,7 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
     }
     int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
     if (ret != RET_OK) {
-        FI_HILOGE("Get Coordination State failed");
+        FI_HILOGE("get coordination state failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;
@@ -127,7 +127,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
     int32_t ret = DeviceStatusClient::GetInstance().ActivateCoordination(
         userData_, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Get Coordination State failed");
+        FI_HILOGE("get coordination state failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;
@@ -147,7 +147,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
     }
     int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Get Coordination State failed");
+        FI_HILOGE("get coordination state failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;
@@ -168,7 +168,7 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
     }
     int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Get Coordination State failed");
+        FI_HILOGE("get coordination state failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;

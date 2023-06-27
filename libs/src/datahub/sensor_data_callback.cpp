@@ -120,7 +120,7 @@ bool SensorDataCallback::PushData(int32_t sensorTypeId, uint8_t* data)
     }
     std::lock_guard lock(dataMutex_);
     accelDataList_.emplace_back(*acclData);
-    FI_HILOGD("ACCEL PushData:x:%{public}f, y:%{public}f, z:%{public}f, PushData sensorTypeId:%{public}d",
+    FI_HILOGD("ACCEL pushData:x:%{public}f, y:%{public}f, z:%{public}f, PushData sensorTypeId:%{public}d",
         acclData->x, acclData->y, acclData->z, sensorTypeId);
     sem_post(&sem_);
     return true;
@@ -140,7 +140,7 @@ bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData& data)
     }
     data = accelDataList_.front();
     accelDataList_.pop_front();
-    FI_HILOGI("ACCEL PopData:x:%{public}f, y:%{public}f, z:%{public}f, PopData sensorTypeId:%{public}d",
+    FI_HILOGD("ACCEL popData:x:%{public}f, y:%{public}f, z:%{public}f, PopData sensorTypeId:%{public}d",
         data.x, data.y, data.z, sensorTypeId);
     return true;
 }
