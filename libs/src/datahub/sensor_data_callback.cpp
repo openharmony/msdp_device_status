@@ -135,7 +135,7 @@ bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData& data)
     }
     std::lock_guard lock(dataMutex_);
     if (accelDataList_.empty()) {
-        FI_HILOGI("No accel data");
+        FI_HILOGE("No accel data");
         return false;
     }
     data = accelDataList_.front();
