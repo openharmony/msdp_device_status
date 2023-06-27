@@ -255,7 +255,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     CHKPR(g_drawingInfo.dragWindow, RET_ERR);
     g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    if (g_drawingInfo.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         g_drawingInfo.pixelMapX = shadowInfo.x;
         g_drawingInfo.pixelMapY = shadowInfo.y;
         DrawMouseIcon();
@@ -584,7 +584,7 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
     CALL_DEBUG_ENTER;
     sptr<Rosen::WindowOption> option = new (std::nothrow) Rosen::WindowOption();
     CHKPV(option);
-    option->SetWindowType(Rosen::WindowType::WINDOW_TYPE_POINTER);
+    option->SetWindowType(Rosen::WindowType::WINDOW_TYPE_DRAGGING_EFFECT);
     option->SetWindowMode(Rosen::WindowMode::WINDOW_MODE_FLOATING);
     Rosen::Rect rect = {
         .posX_ = displayX,
