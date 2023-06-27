@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,12 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
-constexpr int32_t MIN_DELAY = -1;
-constexpr int32_t MIN_INTERVAL = 50;
-constexpr int32_t MAX_INTERVAL_MS = 10000;
-constexpr int32_t MAX_TIMER_COUNT = 64;
-constexpr int32_t NONEXISTENT_ID = -1;
-constexpr int32_t TIME_CONVERSION = 1000;
+constexpr int32_t MIN_DELAY { -1 };
+constexpr int32_t MIN_INTERVAL { 50 };
+constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t NONEXISTENT_ID { -1 };
+constexpr int32_t TIME_CONVERSION { 1000 };
+constexpr size_t MAX_TIMER_COUNT { 64 };
 } // namespace
 
 int32_t TimerManager::Init(IContext *context)
@@ -122,6 +122,7 @@ bool TimerManager::OnIsExist(int32_t timerId) const
             return true;
         }
     }
+    FI_HILOGE("timerId does not exist");
     return false;
 }
 
@@ -151,7 +152,7 @@ int32_t TimerManager::TakeNextTimerId()
         [] (uint64_t s, const auto &timer) {
             return (s |= (uint64_t(1U) << timer->id));
         });
-    for (int32_t i = 0; i < MAX_TIMER_COUNT; ++i) {
+    for (size_t i = 0; i < MAX_TIMER_COUNT; ++i) {
         if ((timerSlot & (uint64_t(1U) << i)) == 0) {
             return i;
         }
@@ -179,7 +180,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->intervalMs = intervalMs;
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
-    auto nowTime = GetMillisTime();
+    int64_t nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
         FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
@@ -197,6 +198,7 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
             return RET_OK;
         }
     }
+    FI_HILOGE("Failed to remove timer internal");
     return RET_ERR;
 }
 
@@ -206,7 +208,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
         if ((*tIter)->id == timerId) {
             auto timer = std::move(*tIter);
             timers_.erase(tIter);
-            auto nowTime = GetMillisTime();
+            int64_t nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
                 FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
                 return RET_ERR;
@@ -216,6 +218,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             return RET_OK;
         }
     }
+    FI_HILOGE("Failed to reset timer internal");
     return RET_ERR;
 }
 
@@ -232,9 +235,9 @@ void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 
 int64_t TimerManager::CalcNextDelayInternal()
 {
-    auto delay = MIN_DELAY;
+    int64_t delay = MIN_DELAY;
     if (!timers_.empty()) {
-        auto nowTime = GetMillisTime();
+        int64_t nowTime = GetMillisTime();
         const auto& item = *timers_.begin();
         if (nowTime >= item->nextCallTime) {
             delay = 0;
@@ -250,7 +253,7 @@ void TimerManager::ProcessTimersInternal()
     if (timers_.empty()) {
         return;
     }
-    auto nowTime = GetMillisTime();
+    int64_t nowTime = GetMillisTime();
     for (;;) {
         auto tIter = timers_.begin();
         if (tIter == timers_.end()) {

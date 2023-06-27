@@ -15,14 +15,14 @@
 
 #include "getdragtargetpid_fuzzer.h"
 
-#include "interaction_manager.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "GetDragTargetPidFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "GetDragTargetPidFuzzTest" };
 } // namespace
 
 void GetDragTargetPidFuzzTest(const uint8_t* data, size_t size)

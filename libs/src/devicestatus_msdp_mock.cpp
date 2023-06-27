@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ DeviceStatusMsdpMock::DeviceStatusMsdpMock()
     enabledType_ = {
         TYPE_STILL,
         TYPE_RELATIVE_STILL,
-        TYPE_CAR_BLUETOOTH,
+        TYPE_CAR_BLUETOOTH
     };
     if (dataParse_ == nullptr) {
         dataParse_ = std::make_unique<DeviceStatusDataParse>();
@@ -125,7 +125,10 @@ void DeviceStatusMsdpMock::InitTimer()
     }
     SetTimerInterval(TIMER_INTERVAL);
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-    callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
+    if (!ret) {
+        FI_HILOGW("insert timer fd failed");
+    }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
         FI_HILOGE("register timer fd failed");
         return;
@@ -157,7 +160,12 @@ int32_t DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
 
 void DeviceStatusMsdpMock::CloseTimer()
 {
+    if (timerFd_ < 0) {
+        FI_HILOGE("Invalid timerFd_");
+        return;
+    }
     close(timerFd_);
+    timerFd_ = -1;
 }
 
 void DeviceStatusMsdpMock::TimerCallback()
@@ -172,21 +180,18 @@ void DeviceStatusMsdpMock::TimerCallback()
 
 int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
 {
-    for (auto item : enabledType_) {
+    for (const auto &item : enabledType_) {
         Type type = item;
-        if (dataParse_ == nullptr) {
-            FI_HILOGE("dataParse_ is nullptr");
-            return RET_ERR;
-        }
+        CHKPR(dataParse_, RET_ERR);
         Data data;
-        dataParse_->ParseDeviceStatusData(data, type);
+        dataParse_->ParseDeviceStatusData(type, data);
         FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
     return RET_OK;
 }
 
-int32_t DeviceStatusMsdpMock::RegisterTimerCallback(const int32_t fd, const EventType et)
+int32_t DeviceStatusMsdpMock::RegisterTimerCallback(int32_t fd, const EventType et)
 {
     CALL_DEBUG_ENTER;
     struct epoll_event ev;
@@ -241,6 +246,7 @@ extern "C" IMsdp *Create(void)
 {
     CALL_DEBUG_ENTER;
     g_msdpMock = new (std::nothrow) DeviceStatusMsdpMock();
+    CHKPP(g_msdpMock);
     return g_msdpMock;
 }
 

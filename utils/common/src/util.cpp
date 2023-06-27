@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,32 +15,31 @@
 
 #include "util.h"
 
-#include <unistd.h>
-
 #include <string>
 
-#include "securec.h"
 #include <sys/prctl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
-#include "devicestatus_hilog_wrapper.h"
-#include "fi_log.h"
+#include "securec.h"
+
+#include "devicestatus_define.h"
 #include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
-constexpr size_t BUF_TID_SIZE = 10;
-constexpr size_t PROGRAM_NAME_SIZE = 256;
-constexpr size_t BUF_CMD_SIZE = 512;
-constexpr uint32_t BASE_YEAR = 1900;
-constexpr uint32_t BASE_MON = 1;
-constexpr uint32_t MS_NS = 1000000;
-constexpr int32_t FILE_SIZE_MAX = 0x5000;
-const std::string SVG_PATH = "/system/etc/device_status/drag_icon/";
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
+constexpr size_t BUF_TID_SIZE { 10 };
+constexpr size_t PROGRAM_NAME_SIZE { 256 };
+constexpr size_t BUF_CMD_SIZE { 512 };
+constexpr uint32_t BASE_YEAR { 1900 };
+constexpr uint32_t BASE_MON { 1 };
+constexpr uint32_t MS_NS { 1000000 };
+constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
 
 int32_t GetPid()
@@ -69,7 +68,7 @@ static std::string GetThisThreadIdOfString()
 uint64_t GetThisThreadId()
 {
     std::string stid = GetThisThreadIdOfString();
-    auto tid = std::stoull(stid);
+    uint64_t tid = std::stoull(stid);
     return tid;
 }
 
@@ -85,10 +84,7 @@ void GetTimeStamp(std::string &startTime)
     timespec curTime;
     clock_gettime(CLOCK_REALTIME, &curTime);
     struct tm *timeinfo = localtime(&(curTime.tv_sec));
-    if (timeinfo == nullptr) {
-        DEV_HILOGE(SERVICE, "get localtime failed");
-        return;
-    }
+    CHKPV(timeinfo);
     startTime.append(std::to_string(timeinfo->tm_year + BASE_YEAR)).append("-")
         .append(std::to_string(timeinfo->tm_mon + BASE_MON)).append("-").append(std::to_string(timeinfo->tm_mday))
         .append(" ").append(std::to_string(timeinfo->tm_hour)).append(":").append(std::to_string(timeinfo->tm_min))
@@ -132,7 +128,7 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
 
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList)
 {
-    size_t size;
+    size_t size = 0;
     auto strs = str;
     std::string token;
     while (str.npos != (size = StringToken(strs, sep, token))) {
@@ -143,7 +139,7 @@ size_t StringSplit(const std::string &str, const std::string &sep, std::vector<s
 
 std::string StringPrintf(const char *format, ...)
 {
-    char space[1024];
+    char space[1024] { 0 };
 
     va_list ap;
     va_start(ap, format);
@@ -179,7 +175,8 @@ const char* GetProgramName()
     }
 
     char buf[BUF_CMD_SIZE] = { 0 };
-    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    int32_t ret = sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid()));
+    if (ret == -1) {
         FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
         return "";
     }
@@ -214,8 +211,8 @@ const char* GetProgramName()
         FI_HILOGE("The copySize is 0");
         return "";
     }
-    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
-    if (ret != EOK) {
+    errno_t result = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (result != EOK) {
         FI_HILOGE("memcpy_s failed");
         return "";
     }
@@ -289,19 +286,8 @@ bool IsValidSvgFile(const std::string &filePath)
 bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);
-    double num;
+    double num = 0.0;
     return (sin >> num) && sin.eof();
-}
-
-int32_t ChangeNumber(int32_t num)
-{
-    if (num < 0) {
-        num = ~(num - 1);
-    } else if (num > 0) {
-        num = ~num + 1;
-    }
-    FI_HILOGD("Change number succeed, num:%{public}d", num);
-    return num;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

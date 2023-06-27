@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
-}
+} // namespace
 
 size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
 {
@@ -52,8 +52,9 @@ size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
         }
     }
     if (len > 0) {
-        if (memcpy_s(dest, size, src, len) != EOK) {
-            FI_HILOGE("memcpy_s:bounds checking failed");
+        errno_t ret = memcpy_s(dest, size, src, len);
+        if (ret != EOK) {
+            FI_HILOGW("memcpy_s:bounds checking failed");
         }
     }
     if (size > 0) {
@@ -76,7 +77,7 @@ bool Utility::StartWith(const std::string &str, const std::string &prefix)
     return (str.compare(0, prefix.size(), prefix) == 0);
 }
 
-void Utility::RemoveTrailingChars(char *path, char c)
+void Utility::RemoveTrailingChars(char c, char *path)
 {
     CHKPV(path);
     size_t len = strlen(path);
@@ -85,7 +86,7 @@ void Utility::RemoveTrailingChars(char *path, char c)
     }
 }
 
-void Utility::RemoveTrailingChars(std::string &path, const std::string &toRemoved)
+void Utility::RemoveTrailingChars(const std::string &toRemoved, std::string &path)
 {
     while (!path.empty() && (toRemoved.find(path.back()) != std::string::npos)) {
         path.pop_back();
@@ -180,20 +181,20 @@ void Utility::ShowUserAndGroup()
     CALL_DEBUG_ENTER;
     static constexpr size_t BUFSIZE { 1024 };
     char buffer[BUFSIZE];
-    uid_t uid;
-    gid_t gid;
-    struct passwd buf, *pbuf;
-    struct group grp, *pgrp;
+    struct passwd buf;
+    struct passwd *pbuf = nullptr;
+    struct group grp;
+    struct group *pgrp = nullptr;
 
     FI_HILOGD("======================= Users and Groups =======================");
-    uid = getuid();
+    uid_t uid = getuid();
     if (getpwuid_r(uid, &buf, buffer, sizeof(buffer), &pbuf) != 0) {
         FI_HILOGE("getpwuid_r failed:%{public}s", strerror(errno));
     } else {
         FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "USER", uid, buf.pw_name);
     }
 
-    gid = getgid();
+    gid_t gid = getgid();
     if (getgrgid_r(gid, &grp, buffer, sizeof(buffer), &pgrp) != 0) {
         FI_HILOGE("getgrgid_r failed:%{public}s", strerror(errno));
     } else {

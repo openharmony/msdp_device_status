@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "devicestatus_dumper.h"
+
 #include <cinttypes>
 #include <csignal>
 #include <cstring>
@@ -31,7 +33,6 @@
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#include "devicestatus_dumper.h"
 #include "drag_manager.h"
 #include "util.h"
 
@@ -40,7 +41,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
-}
+} // namespace
+
+DeviceStatusDumper::DeviceStatusDumper() {}
+DeviceStatusDumper::~DeviceStatusDumper() {}
 
 int32_t DeviceStatusDumper::Init(IContext *context)
 {
@@ -61,7 +65,7 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         FI_HILOGE("args is empty");
         return;
     }
-    int32_t c;
+    int32_t optRet = -1;
     optind = 1;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
@@ -71,11 +75,13 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
         { "current", no_argument, 0, 'c' },
         { "coordination", no_argument, 0, 'o' },
         { "drag", no_argument, 0, 'd' },
+        { "macroState", no_argument, 0, 'm' },
         { NULL, 0, 0, 0 }
     };
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
-    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+    errno_t ret = memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*));
+    if (ret != EOK) {
         FI_HILOGE("call memset_s failed");
         delete[] argv;
         return;
@@ -86,13 +92,14 @@ void DeviceStatusDumper::ParseLong(int32_t fd, const std::vector<std::string> &a
             FI_HILOGE("failed to allocate memory");
             goto RELEASE_RES;
         }
-        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != RET_OK) {
+        ret = strcpy_s(argv[i], args[i].size() + 1, args[i].c_str());
+        if (ret != RET_OK) {
             FI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
         }
     }
-    while ((c = getopt_long(args.size(), argv, "hslcod", dumpOptions, &optionIndex)) != -1) {
-        ExecutDump(fd, datas, c);
+    while ((optRet = getopt_long(args.size(), argv, "hslcodm", dumpOptions, &optionIndex)) != -1) {
+        ExecutDump(fd, datas, optRet);
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
@@ -133,6 +140,10 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
         case 'd': {
             CHKPV(context_);
             context_->GetDragManager().Dump(fd);
+            break;
+        }
+        case 'm': {
+            DumpCheckDefine(fd);
             break;
         }
         default: {
@@ -176,10 +187,7 @@ void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
         MAX_DEVICE_STATUS_SIZE : deviceStatusQueue_.size();
     for (size_t i = 0; i < length; ++i) {
         auto record = deviceStatusQueue_.front();
-        if (record == nullptr) {
-            FI_HILOGE("deviceStatusQueue is nullptr");
-            continue;
-        }
+        CHKPC(record);
         deviceStatusQueue_.push(record);
         deviceStatusQueue_.pop();
         dprintf(fd, "startTime:%s | type:%s | value:%s\n",
@@ -269,6 +277,7 @@ void DeviceStatusDumper::DumpHelpInfo(int32_t fd) const
     dprintf(fd, "      -c: dump the current device status\n");
     dprintf(fd, "      -o: dump the coordination status\n");
     dprintf(fd, "      -d: dump the drag status\n");
+    dprintf(fd, "      -m, dump the macro state\n");
 }
 
 void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
@@ -359,6 +368,33 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         }
     }
     return packageName;
+}
+
+void DeviceStatusDumper::DumpCheckDefine(int32_t fd)
+{
+    ChkDefineOutput(fd);
+}
+
+void DeviceStatusDumper::ChkDefineOutput(int32_t fd)
+{
+    CheckDefineOutput(fd, "Macro switch state:\n");
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    CheckDefineOutput(fd, "%-40s", "OHOS_BUILD_ENABLE_COORDINATION");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+template<class ...Ts>
+void DeviceStatusDumper::CheckDefineOutput(int32_t fd, const char* fmt, Ts... args)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(fmt);
+    char buf[MAX_PACKET_BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
+    if (ret == -1) {
+        FI_HILOGE("Call snprintf_s failed, ret:%{public}d", ret);
+        return;
+    }
+    dprintf(fd, "%s", buf);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
 } // namespace
 
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
@@ -121,8 +121,8 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t devicestatusValue = -1;
     READINT32(reply, devicestatusType, devicestatusData);
     READINT32(reply, devicestatusValue, devicestatusData);
-    devicestatusData.type = Type(devicestatusType);
-    devicestatusData.value = OnChangedValue(devicestatusValue);
+    devicestatusData.type = static_cast<Type>(devicestatusType);
+    devicestatusData.value = static_cast<OnChangedValue>(devicestatusValue);
     FI_HILOGD("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     return devicestatusData;
 }
@@ -377,7 +377,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_CANCEL) {
+    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -395,7 +395,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
@@ -507,6 +507,32 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
         offsetX, offsetY, width, height);
     return ret;
 }
+
+int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if (!shadowInfo.pixelMap->Marshalling(data)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(UPDATE_SHADOW_PIC, data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
-} // Msdp
-} // OHOS
+} // namespace Msdp
+} // namespace OHOS

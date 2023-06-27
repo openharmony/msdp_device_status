@@ -17,15 +17,15 @@
 
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
+#include "coordination_sm.h"
 #include "devicestatus_define.h"
 #include "distributed_input_adapter.h"
-#include "coordination_sm.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "ICoordinationState" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICoordinationState" };
 } // namespace
 
 ICoordinationState::ICoordinationState()
@@ -42,7 +42,6 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
     int32_t ret = RET_ERR;
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         COOR_SM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
-        COOR_SM->SetSinkNetworkId(remoteNetworkId);
         ret = D_INPUT_ADAPTER->PrepareRemoteInput(remoteNetworkId, originNetworkId,
             [this, remoteNetworkId, startDeviceId](bool isSuccess) {
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);

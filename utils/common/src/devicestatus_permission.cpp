@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,19 +18,24 @@
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
 
+#include "fi_log.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusPermission" };
+} // namespace
+
 bool DeviceStatusPermission::CheckCallingPermission(const std::string &permissionName)
 {
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
     int32_t auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
-    if (auth == Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
-        return ERR_OK;
-    } else {
-        DEV_HILOGD(COMMON, "has no permission, permission name:%{public}s", permissionName.c_str());
+    if (auth != Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
+        FI_HILOGD("has no permission.permission name = %{public}s", permissionName.c_str());
         return ERR_NG;
     }
+    return ERR_OK;
 }
 
 std::string DeviceStatusPermission::GetAppInfo()
@@ -39,7 +44,6 @@ std::string DeviceStatusPermission::GetAppInfo()
     uid_t uid = IPCSkeleton::GetCallingUid();
     return Security::Permission::AppIdInfoHelper::CreateAppIdInfo(pid, uid);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -26,8 +26,8 @@ namespace DeviceStatus {
 class JsDragContext final {
 public:
     JsDragContext();
-    ~JsDragContext();
     DISALLOW_COPY_AND_MOVE(JsDragContext);
+    ~JsDragContext();
 
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value On(napi_env env, napi_callback_info info);
@@ -42,7 +42,6 @@ private:
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     std::shared_ptr<JsDragManager> GetJsDragMgr();
 
-private:
     std::shared_ptr<JsDragManager> mgr_ { nullptr };
     std::mutex mutex_;
     napi_ref contextRef_ { nullptr };

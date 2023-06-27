@@ -15,28 +15,28 @@
 
 #include "devicestatus_service_test.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <thread>
+
 #include <gtest/gtest.h>
 #include <if_system_ability_manager.h>
 #include <ipc_skeleton.h>
 #include <string_ex.h>
 
-#include "devicestatus_common.h"
-#include "devicestatus_dumper.h"
+#include "fi_log.h"
 #include "stationary_manager.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-using namespace std;
-
 namespace {
-const int32_t SLEEP_TIME = 2000;
-static Type g_type = Type::TYPE_INVALID;
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
+constexpr int32_t SLEEP_TIME { 2000 };
+Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
-}
+} // namespace
 
 sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;
 
@@ -59,20 +59,20 @@ void DeviceStatusServiceTest::DeviceStatusServiceTestCallback::OnDeviceStatusCha
         devicestatusData.value <= OnChangedValue::VALUE_EXIT)) << "DeviceStatusServiceTestCallback failed";
 }
 
+namespace {
 /**
  * @tc.name: DeviceStatusCallbackTest
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest001 end");
 }
 
 /**
@@ -80,9 +80,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest001, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -90,7 +90,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
         (data.value >= OnChangedValue::VALUE_ENTER && data.value <= OnChangedValue::VALUE_EXIT))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest002 end");
 }
 
 /**
@@ -98,14 +97,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_ABSOLUTE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest003 end");
 }
 
 /**
@@ -113,15 +111,14 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest003, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest004 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest004 end");
 }
 
 /**
@@ -129,9 +126,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest004, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest005 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -139,7 +136,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_CAR_BLUETOOTH &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest005 end");
 }
 
 /**
@@ -147,14 +143,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest006 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_CAR_BLUETOOTH;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest006 end");
 }
 
 /**
@@ -162,15 +157,14 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest006, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest007 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest007 end");
 }
 
 /**
@@ -178,9 +172,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest007, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest008 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -188,7 +182,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_ENTER && data.value <= OnChangedValue::VALUE_EXIT))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest008 end");
 }
 
 /**
@@ -196,14 +189,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest009 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_HORIZONTAL_POSITION;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest009 end");
 }
 
 /**
@@ -211,15 +203,14 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest009, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest010 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest010 end");
 }
 
 /**
@@ -227,9 +218,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest010, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest011 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -237,7 +228,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_RELATIVE_STILL &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest011 end");
 }
 
 /**
@@ -245,14 +235,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest012 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_RELATIVE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest012 end");
 }
 
 /**
@@ -260,15 +249,14 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest012, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest013 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest013 end");
 }
 
 /**
@@ -276,9 +264,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest013, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest014 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -286,7 +274,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_STILL &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest014 end");
 }
 
 /**
@@ -294,14 +281,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest015 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_STILL;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest015 end");
 }
 
 /**
@@ -309,15 +295,14 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest015, TestSize.Level0)
  * @tc.desc: test devicestatus callback in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest016 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Start register";
     g_client->SubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, devCallback_);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest016 end");
 }
 
 /**
@@ -325,9 +310,9 @@ HWTEST_F (DeviceStatusServiceTest, DeviceStatusCallbackTest016, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest017 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -335,7 +320,6 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT))
         << "GetDeviceStatusData failed";
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest017 end");
 }
 
 /**
@@ -343,14 +327,13 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest018 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
     EXPECT_FALSE(devCallback_ == nullptr);
     GTEST_LOG_(INFO) << "Cancel register";
     g_client->UnsubscribeCallback(g_type, ActivityEvent::ENTER_EXIT, devCallback_);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest018 end");
 }
 
 /**
@@ -358,9 +341,9 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest018, TestSize.Level0)
  * @tc.desc: test get devicestatus data in proxy
  * @tc.type: FUNC
  */
-HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
+HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
 {
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 Enter");
+    CALL_TEST_DEBUG;
     g_type = Type::TYPE_VERTICAL_POSITION;
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
@@ -374,5 +357,8 @@ HWTEST_F (DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
     invalidData.status = Status::STATUS_INVALID;
     invalidData.movement = 0.0f;
     EXPECT_TRUE(data != invalidData);
-    DEV_HILOGI(SERVICE, "GetDeviceStatusDataTest019 end");
 }
+} // namespace
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

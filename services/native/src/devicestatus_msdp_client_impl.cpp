@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,11 +29,11 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusMsdpClientImpl" };
 #ifdef __aarch64__
-const std::string DEVICESTATUS_MOCK_LIB_PATH = "/system/lib64/libdevicestatus_mock.z.so";
-const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib64/libdevicestatus_algo.z.so";
+const std::string DEVICESTATUS_MOCK_LIB_PATH { "/system/lib64/libdevicestatus_mock.z.so" };
+const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib64/libdevicestatus_algo.z.so" };
 #else
-const std::string DEVICESTATUS_MOCK_LIB_PATH = "/system/lib/libdevicestatus_mock.z.so";
-const std::string DEVICESTATUS_ALGO_LIB_PATH = "/system/lib/libdevicestatus_algo.z.so";
+const std::string DEVICESTATUS_MOCK_LIB_PATH { "/system/lib/libdevicestatus_mock.z.so" };
+const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib/libdevicestatus_algo.z.so" };
 #endif
 using ClientType = Type;
 using ClientValue = OnChangedValue;
@@ -121,10 +121,7 @@ ErrCode DeviceStatusMsdpClientImpl::StartAlgo(Type type)
         return RET_ERR;
     }
     iAlgo_ = GetAlgoInst(type);
-    if (iAlgo_ == nullptr) {
-        FI_HILOGE("Get algo module failed");
-        return RET_ERR;
-    }
+    CHKPR(iAlgo_, RET_ERR);
     return RET_OK;
 }
 
@@ -293,7 +290,7 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterAlgo()
 int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
 {
     CALL_DEBUG_ENTER;
-    DeviceStatusDumper::GetInstance().PushDeviceStatus(data);
+    DS_DUMPER->PushDeviceStatus(data);
     SaveObserverData(data);
     if (notifyManagerFlag_) {
         ImplCallback(data);

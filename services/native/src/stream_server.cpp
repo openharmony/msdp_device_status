@@ -25,8 +25,9 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
 } // namespace
 
 StreamServer::~StreamServer()
@@ -88,8 +89,7 @@ void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
-int32_t StreamServer::AddSocketPairInfo(const std::string& programName,
-    const int32_t moduleType, const int32_t uid, const int32_t pid,
+int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid, int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
 {
     CALL_DEBUG_ENTER;
@@ -214,26 +214,26 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     auto& buf = circleBufMap_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             if (!buf.Write(szBuf, size)) {
-                FI_HILOGW("Write data failed, size:%{public}zu", size);
+                FI_HILOGW("Write data failed, size:%{public}zd", size);
             }
             OnReadPackets(buf, std::bind(&StreamServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                FI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zd errno:%{public}d",
                     size, errno);
                 continue;
             }
-            FI_HILOGE("Recv return %{public}zu, errno:%{public}d", size, errno);
+            FI_HILOGE("Recv return %{public}zd, errno:%{public}d", size, errno);
             break;
         } else {
             FI_HILOGE("The client side disconnect with the server, size:0, errno:%{public}d", errno);
             ReleaseSession(fd, ev);
             break;
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
+        if (static_cast<size_t>(size) < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }
@@ -242,7 +242,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 void StreamServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    int32_t fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
         FI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
@@ -291,18 +291,18 @@ bool StreamServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
     FI_HILOGI("pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
-    auto fd = ses->GetFd();
+    int32_t fd = ses->GetFd();
     if (fd < 0) {
         FI_HILOGE("The fd is less than 0");
         return false;
     }
-    auto pid = ses->GetPid();
+    int32_t pid = ses->GetPid();
     if (pid <= 0) {
         FI_HILOGE("Get process failed");
         return false;
     }
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        FI_HILOGE("Too many clients, Warning Value:%{public}d, Current Value:%{public}zd",
+        FI_HILOGE("Too many clients, Warning Value:%{public}zu, Current Value:%{public}zu",
             MAX_SESSON_ALARM, sessionsMap_.size());
         return false;
     }
@@ -321,7 +321,7 @@ void StreamServer::DelSession(int32_t fd)
         FI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
-    auto pid = GetClientPid(fd);
+    int32_t pid = GetClientPid(fd);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }
@@ -333,18 +333,26 @@ void StreamServer::DelSession(int32_t fd)
     DumpSession("DelSession");
 }
 
-void StreamServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
+void StreamServer::AddSessionDeletedCallback(int32_t pid, std::function<void(SessionPtr)> callback)
 {
     CALL_DEBUG_ENTER;
-    callbacks_.push_back(callback);
+    auto it = callbacks_.find(pid);
+    if (it != callbacks_.end()) {
+        FI_HILOGW("Deleted session already exists");
+        return;
+    }
+    callbacks_[pid] = callback;
 }
 
 void StreamServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &callback : callbacks_) {
-        callback(ses);
+    auto it = callbacks_.find(ses->GetPid());
+    if (it != callbacks_.end()) {
+        it->second(ses);
+        callbacks_.erase(it);
     }
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

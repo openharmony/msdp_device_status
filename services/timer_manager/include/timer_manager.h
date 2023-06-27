@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
-#define OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
+#ifndef TIMER_MANAGER_H
+#define TIMER_MANAGER_H
 
 #include <future>
 #include <functional>
@@ -31,8 +31,8 @@ namespace DeviceStatus {
 class TimerManager final : public ITimerManager {
 public:
     TimerManager() = default;
-    ~TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
+    ~TimerManager() = default;
 
     int32_t Init(IContext *context);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) override;
@@ -40,7 +40,7 @@ public:
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId) const;
     void ProcessTimers();
-    int GetTimerFd() const;
+    int32_t GetTimerFd() const;
 
 private:
     struct TimerItem {
@@ -52,16 +52,13 @@ private:
         std::function<void()> callback { nullptr };
     };
 
-private:
     int32_t OnInit(IContext *context);
     int32_t OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t OnRemoveTimer(int32_t timerId);
     int32_t OnResetTimer(int32_t timerId);
     int32_t OnProcessTimers();
-
     bool OnIsExist(int32_t timerId) const;
     int32_t RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const;
-
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimerInternal(int32_t timerId);
@@ -71,17 +68,16 @@ private:
     void ProcessTimersInternal();
     int32_t ArmTimer();
 
-private:
-    int timerFd_ { -1 };
+    int32_t timerFd_ { -1 };
     IContext *context_ { nullptr };
     std::list<std::unique_ptr<TimerItem>> timers_;
 };
 
-inline int TimerManager::GetTimerFd() const
+inline int32_t TimerManager::GetTimerFd() const
 {
     return timerFd_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // OHOS_MSDP_DEVICE_STATUS_TIMER_MANAGER_H
+#endif // TIMER_MANAGER_H

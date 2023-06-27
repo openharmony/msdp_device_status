@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,6 @@ public:
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency, sptr<IRemoteDevStaCallback> callback);
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetLatestDeviceStatusData(Type type);
-    int32_t SensorDataCallback(struct SensorEvents *event);
     int32_t MsdpDataCallback(const Data &data);
     int32_t LoadAlgorithm();
     int32_t UnloadAlgorithm();
@@ -63,16 +62,17 @@ private:
             return left->AsObject() < right->AsObject();
         }
     };
+    static constexpr int32_t arg4_ { 4 };
+
     const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
-    sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_;
+    sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_ { nullptr };
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_ { nullptr };
     std::map<Type, OnChangedValue> msdpData_;
     std::map<Type, std::set<const sptr<IRemoteDevStaCallback>, classcomp>> listenerMap_;
-    int32_t type_ {};
-    int32_t event_ {};
-    static constexpr uint8_t arg4_ = 4;
-    int arrs_ [arg4_] {};
+    int32_t type_ { -1 };
+    int32_t event_ { -1 };
+    int32_t arrs_[arg4_] {};
 };
 } // namespace DeviceStatus
 } // namespace Msdp

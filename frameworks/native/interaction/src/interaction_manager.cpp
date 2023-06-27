@@ -15,8 +15,6 @@
 
 #include "interaction_manager.h"
 
-#include <string>
-
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "interaction_manager_impl.h"
@@ -113,6 +111,11 @@ int32_t InteractionManager::SetDragWindowVisible(bool visible)
 int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     return INTER_MGR_IMPL.GetShadowOffset(offsetX, offsetY, width, height);
+}
+
+int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
+{
+    return INTER_MGR_IMPL.UpdateShadowPic(shadowInfo);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,14 +22,16 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
-#include "devicestatus_common.h"
+#include "devicestatus_define.h"
 
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
-constexpr size_t EVENT_MAP_MAX = 20;
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
+constexpr size_t EVENT_MAP_MAX { 20 };
 } // namespace
+
 DeviceStatusEvent::DeviceStatusEvent(napi_env env)
 {
     env_ = env;
@@ -43,51 +45,48 @@ DeviceStatusEvent::~DeviceStatusEvent()
 
 bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 {
-    DEV_HILOGD(JS_NAPI, "On for event:%{public}d, isOnce:%{public}d", eventType, isOnce);
+    FI_HILOGD("On for event:%{public}d, isOnce:%{public}d", eventType, isOnce);
     if ((eventMap_.size() > EVENT_MAP_MAX) || (eventOnceMap_.size() > EVENT_MAP_MAX)) {
-        DEV_HILOGE(JS_NAPI, "eventMap_ or eventOnceMap_  size over");
+        FI_HILOGE("EventMap_ or eventOnceMap_ size over");
         return false;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        DEV_HILOGE(JS_NAPI, "scope is nullptr");
-        return false;
-    }
-    napi_ref onHandlerRef;
+    CHKPF(scope);
+    napi_ref onHandlerRef = nullptr;
     napi_status status = napi_ok;
     if (isOnce) {
         auto iter = eventOnceMap_.find(eventType);
         if (iter == eventOnceMap_.end()) {
-            DEV_HILOGD(JS_NAPI, "eventType:%{public}d not exists", eventType);
+            FI_HILOGD("EventType:%{public}d not exists", eventType);
             eventOnceMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
         status = napi_create_reference(env_, handler, 1, &onHandlerRef);
         if (status != napi_ok) {
-            DEV_HILOGE(JS_NAPI, "Failed to create reference");
+            FI_HILOGE("Failed to create reference");
             napi_close_handle_scope(env_, scope);
             return false;
         }
+        auto listener = std::make_shared<DeviceStatusEventListener>();
         listener->onHandlerRef = onHandlerRef;
         eventOnceMap_[eventType].push_back(listener);
-        DEV_HILOGI(JS_NAPI, "Add once handler to list %{public}d", eventType);
+        FI_HILOGI("Add once handler to list %{public}d", eventType);
     } else {
         auto iter = eventMap_.find(eventType);
         if (iter == eventMap_.end()) {
-            DEV_HILOGD(JS_NAPI, "eventType:%{public}d not exists", eventType);
+            FI_HILOGD("EventType:%{public}d not exists", eventType);
             eventMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
         status = napi_create_reference(env_, handler, 1, &onHandlerRef);
         if (status != napi_ok) {
-            DEV_HILOGE(JS_NAPI, "Failed to create reference");
+            FI_HILOGE("Failed to create reference");
             napi_close_handle_scope(env_, scope);
             return false;
         }
+        auto listener = std::make_shared<DeviceStatusEventListener>();
         listener->onHandlerRef = onHandlerRef;
         eventMap_[eventType].push_back(listener);
-        DEV_HILOGI(JS_NAPI, "Add handler to list %{public}d", eventType);
+        FI_HILOGI("Add handler to list %{public}d", eventType);
     }
     napi_close_handle_scope(env_, scope);
     return true;
@@ -95,10 +94,10 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 
 bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
 {
-    DEV_HILOGD(JS_NAPI, "DeviceStatusEvent off in for event:%{public}d", eventType);
+    FI_HILOGD("DeviceStatusEvent off in for event:%{public}d", eventType);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "eventType:%{public}d not found", eventType);
+        FI_HILOGE("EventType %{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -107,36 +106,35 @@ bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
     for (auto listener : eventMap_[eventType]) {
         napi_status status = napi_get_reference_value(env_, listener->onHandlerRef, &result);
         if (status != napi_ok) {
-            DEV_HILOGE(JS_NAPI, "Failed to get_reference_value");
+            FI_HILOGE("Failed to get_reference_value");
             return false;
         }
         status = napi_strict_equals(env_, result, handler, &equal);
         if (status != napi_ok) {
-            DEV_HILOGE(JS_NAPI, "Failed to strict_equals");
+            FI_HILOGE("Failed to strict_equals");
             return false;
         }
         if (equal) {
-            DEV_HILOGI(JS_NAPI, "delete handler from list %{public}d", eventType);
+            FI_HILOGI("Delete handler from list %{public}d", eventType);
             status = napi_delete_reference(env_, listener->onHandlerRef);
             if (status != napi_ok) {
-                DEV_HILOGW(JS_NAPI, "Delete failed");
+                FI_HILOGW("Delete failed");
             }
             eventMap_[eventType].remove(listener);
             break;
         }
     }
-    DEV_HILOGI(JS_NAPI, "%{public}zu listeners in the list of %{public}d",
+    FI_HILOGI("%{public}zu listeners in the list of %{public}d",
         eventMap_[eventType].size(), eventType);
     return eventMap_[eventType].empty();
 }
 
 bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
 {
-    DEV_HILOGD(JS_NAPI, "DeviceStatusEvent OffOnce in for event:%{public}d", eventType);
-
+    FI_HILOGD("DeviceStatusEvent OffOnce in for event:%{public}d", eventType);
     auto iter = eventOnceMap_.find(eventType);
     if (iter == eventOnceMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "eventType:%{public}d not found", eventType);
+        FI_HILOGE("EventType %{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -145,57 +143,54 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
         napi_get_reference_value(env_, listener->onHandlerRef, &result);
         napi_strict_equals(env_, result, handler, &equal);
         if (equal) {
-            DEV_HILOGI(JS_NAPI, "delete once handler from list %{public}d", eventType);
+            FI_HILOGI("Delete once handler from list %{public}d", eventType);
             napi_status status = napi_delete_reference(env_, listener->onHandlerRef);
             if (status != napi_ok) {
-                DEV_HILOGW(JS_NAPI, "Delete failed");
+                FI_HILOGW("Delete failed");
             }
             eventOnceMap_[eventType].remove(listener);
             break;
         }
     }
-    DEV_HILOGI(JS_NAPI, "%{public}zu listeners in the once list of %{public}d",
+    FI_HILOGI("%{public}zu listeners in the once list of %{public}d",
         eventOnceMap_[eventType].size(), eventType);
     return eventMap_[eventType].empty();
 }
 
 bool DeviceStatusEvent::RemoveAllCallback(int32_t eventType)
 {
-    DEV_HILOGD(JS_NAPI, "Enter");
+    CALL_DEBUG_ENTER;
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
-        DEV_HILOGE(JS_NAPI, "evenType:%{public}d not found", eventType);
+        FI_HILOGE("EvenType %{public}d not found", eventType);
         return false;
     }
     eventMap_.erase(eventType);
-    DEV_HILOGD(JS_NAPI, "Exit");
     return true;
 }
 
 void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
+    CHKPV(typeHandler);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        DEV_HILOGE(JS_NAPI, "scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value handler = nullptr;
     napi_status status = napi_ok;
     status = napi_get_reference_value(env_, typeHandler->onHandlerRef, &handler);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "OnEvent handler for %{public}d failed, status:%{public}d", eventType, status);
+        FI_HILOGE("OnEvent handler for %{public}d failed, status:%{public}d", eventType, status);
         napi_close_handle_scope(env_, scope);
         return;
     }
-    napi_value result;
+    napi_value result = nullptr;
     SendRet(eventType, value, result);
     napi_value callResult = nullptr;
-    DEV_HILOGD(JS_NAPI, "Report to hap");
+    FI_HILOGD("Report to hap");
     status = napi_call_function(env_, nullptr, handler, argc, &result, &callResult);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "CheckRet:napi_call_function for %{public}d failed, status:%{public}d", eventType, status);
+        FI_HILOGE("CheckRet:napi_call_function for %{public}d failed, status:%{public}d", eventType, status);
         napi_close_handle_scope(env_, scope);
         return;
     }
@@ -206,83 +201,79 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
 {
     napi_status status = napi_create_object(env_, &result);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to create object");
+        FI_HILOGE("Failed to create object");
         return;
     }
     napi_value tmpValue = nullptr;
     status = napi_create_int32(env_, eventType, &tmpValue);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to create object");
+        FI_HILOGE("Failed to create object");
         return;
     }
     status = napi_set_named_property(env_, result, "type", tmpValue);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to set name");
+        FI_HILOGE("Failed to set name");
         return;
     }
 
     status = napi_create_int32(env_, value, &tmpValue);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to create value");
+        FI_HILOGE("Failed to create value");
         return;
     }
     status = napi_set_named_property(env_, result, "value", tmpValue);
     if (status != napi_ok) {
-        DEV_HILOGE(JS_NAPI, "Failed to set_named");
+        FI_HILOGE("Failed to set_named");
         return;
     }
 }
 
 void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce)
 {
-    DEV_HILOGD(JS_NAPI, "OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
+    CALL_DEBUG_ENTER;
+    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        DEV_HILOGE(JS_NAPI, "scope is nullptr");
-        return;
-    }
-
+    CHKPV(scope);
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>>::iterator typeHandler;
     if (isOnce) {
         typeHandler = eventOnceMap_.find(eventType);
         if (typeHandler == eventOnceMap_.end()) {
-            DEV_HILOGE(JS_NAPI, "OnEvent, eventType:%{public}d not found", eventType);
+            FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }
     } else {
         typeHandler = eventMap_.find(eventType);
         if (typeHandler == eventMap_.end()) {
-            DEV_HILOGE(JS_NAPI, "OnEvent, eventType:%{public}d not found", eventType);
+            FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }
     }
-    DEV_HILOGD(JS_NAPI, "%{public}zu callbacks of eventType %{public}d are sent",
+    FI_HILOGD("%{public}zu callbacks of eventType %{public}d are sent",
         typeHandler->second.size(), eventType);
     for (auto handler : typeHandler->second) {
         CheckRet(eventType, argc, value, handler);
     }
     napi_close_handle_scope(env_, scope);
-    DEV_HILOGD(JS_NAPI, "Exit");
 }
 
 void DeviceStatusEvent::ClearEventMap()
 {
-    for (auto iter : eventMap_) {
-        for (auto eventListener : iter.second) {
+    for (const auto &iter : eventMap_) {
+        for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
-                DEV_HILOGW(JS_NAPI, "Failed to delete reference");
+                FI_HILOGW("Failed to delete reference");
             }
         }
     }
-    for (auto iter : eventOnceMap_) {
-        for (auto eventListener : iter.second) {
+    for (const auto &iter : eventOnceMap_) {
+        for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
-                DEV_HILOGW(JS_NAPI, "Failed to delete reference");
+                FI_HILOGW("Failed to delete reference");
                 napi_delete_reference(env_, eventListener->onHandlerRef);
             }
         }
@@ -290,3 +281,6 @@ void DeviceStatusEvent::ClearEventMap()
     eventMap_.clear();
     eventOnceMap_.clear();
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

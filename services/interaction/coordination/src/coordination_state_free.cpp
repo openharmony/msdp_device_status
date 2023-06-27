@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
 } // namespace
 
 int32_t CoordinationStateFree::ActivateCoordination(
@@ -76,13 +76,21 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
         FI_HILOGE("Stop coordination fail");
         return ret;
     }
-    
+
     if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
         FI_HILOGD("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
             preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
         if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
             FI_HILOGD("networkId:%{public}s", networkId.c_str());
-            COOR_SM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
+            bool ret = COOR_SM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
+            if (ret) {
+                COOR_SM->NotifyChainRemoved();
+                std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+                FI_HILOGD("localNetworkId:%{public}s", localNetworkId.c_str());
+                COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, networkId, ret);
+            } else {
+                FI_HILOGE("Failed to unchain coordination");
+            }
             COOR_SM->SetUnchainStatus(false);
         }
     } else {

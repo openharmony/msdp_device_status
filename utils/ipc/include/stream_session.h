@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,12 +29,12 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class StreamSession;
 using SessionPtr = std::shared_ptr<StreamSession>;
 class StreamSession : public std::enable_shared_from_this<StreamSession> {
 public:
-    StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
-               const int32_t pid);
+    StreamSession(const std::string &programName, int32_t moduleType, int32_t fd, int32_t uid, int32_t pid);
     DISALLOW_COPY_AND_MOVE(StreamSession);
     virtual ~StreamSession() = default;
 
@@ -76,4 +76,5 @@ protected:
 };
 } // namespace Msdp
 } // namespace OHOS
+} // namespace DeviceStatus
 #endif // STREAM_SESSION_H

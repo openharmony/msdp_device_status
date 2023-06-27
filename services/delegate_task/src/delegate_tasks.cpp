@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DelegateTasks" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DelegateTasks" };
 } // namespace
 
 void DelegateTasks::Task::ProcessTask()
@@ -95,10 +95,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
-    if (task == nullptr) {
-        FI_HILOGE("Post sync task failed");
-        return ETASKS_POST_SYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
@@ -118,10 +115,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
     CHKPR(callback, ERROR_NULL_POINTER);
     auto task = PostTask(callback);
-    if (task == nullptr) {
-        FI_HILOGE("Post async task failed");
-        return ETASKS_POST_ASYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_ASYNCTASK_FAIL);
     return RET_OK;
 }
 
@@ -144,16 +138,16 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
     std::lock_guard<std::mutex> guard(mux_);
-    FI_HILOGD("tasks_ size:%{public}d", static_cast<int32_t>(tasks_.size()));
+    FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
     static constexpr int32_t maxTasksLimit = 1000;
-    auto tsize = tasks_.size();
+    size_t tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
         FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
     }
     int32_t id = GenerateId();
     TaskData data = {GetThisThreadId(), id};
-    auto res = write(fds_[1], &data, sizeof(data));
+    ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
         FI_HILOGE("Pipe write failed, errno:%{public}d", errno);

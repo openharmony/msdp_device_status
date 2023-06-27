@@ -26,8 +26,8 @@
 
 #include "enumerator.h"
 #include "i_context.h"
-#include "i_epoll_event_source.h"
 #include "i_device_mgr.h"
+#include "i_epoll_event_source.h"
 #include "monitor.h"
 
 namespace OHOS {
@@ -37,13 +37,12 @@ class DeviceManager final : public IDeviceManager,
                             public IEpollEventSource {
 public:
     DeviceManager();
-    ~DeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(DeviceManager);
+    ~DeviceManager() = default;
 
     int32_t Init(IContext *context);
     int32_t Enable();
     int32_t Disable();
-
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
     std::shared_ptr<IDevice> GetDevice(int32_t id) const override;
@@ -69,26 +68,21 @@ private:
     int32_t OnEnable();
     int32_t OnDisable();
     int32_t OnEpollDispatch();
-
     int32_t ParseDeviceId(const std::string &devNode);
-    std::shared_ptr<IDevice> AddDevice(const std::string &devNode);
-    std::shared_ptr<IDevice> RemoveDevice(const std::string &devNode);
-
-    std::shared_ptr<IDevice> FindDevice(const std::string &devPath);
     void OnDeviceAdded(std::shared_ptr<IDevice> dev);
     void OnDeviceRemoved(std::shared_ptr<IDevice> dev);
-
     int32_t OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer);
-
     int32_t EpollCreate();
     int32_t EpollAdd(IEpollEventSource *source);
     void EpollDel(IEpollEventSource *source);
     void EpollClose();
-
-    std::shared_ptr<IDevice> OnGetDevice(int32_t id) const;
     int32_t RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(int32_t)> &task, int32_t id) const;
+    std::shared_ptr<IDevice> OnGetDevice(int32_t id) const;
+    std::shared_ptr<IDevice> AddDevice(const std::string &devNode);
+    std::shared_ptr<IDevice> RemoveDevice(const std::string &devNode);
+    std::shared_ptr<IDevice> FindDevice(const std::string &devPath);
 
 private:
     IContext *context_ { nullptr };

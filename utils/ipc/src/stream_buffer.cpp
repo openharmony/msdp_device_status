@@ -16,7 +16,6 @@
 #include "stream_buffer.h"
 
 #include <algorithm>
-#include <vector>
 
 namespace OHOS {
 namespace Msdp {
@@ -92,6 +91,7 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 bool StreamBuffer::Read(char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {
@@ -123,6 +123,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
     if (ChkRWError()) {
+        FI_HILOGE("Read and write status is error");
         return false;
     }
     if (buf == nullptr) {
@@ -182,7 +183,7 @@ const std::string &StreamBuffer::GetErrorStatusRemark() const
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ERROR_STATUS_OK, "OK"},
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
-        {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"},
+        {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"}
     };
     static const std::string invalidStatus { "UNKNOWN" };
 

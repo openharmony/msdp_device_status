@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
@@ -25,14 +27,13 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 using namespace testing::ext;
-using namespace OHOS::Msdp;
-using namespace OHOS::Msdp::DeviceStatus;
-using namespace OHOS;
-
 namespace {
-    std::shared_ptr<AlgoMgr> g_manager;
-}
+std::shared_ptr<AlgoMgr> g_manager { nullptr };
+} // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
 public:
@@ -69,15 +70,15 @@ void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest001 start";
-    AlgoAbsoluteStill* still = new (std::nothrow) AlgoAbsoluteStill();
-    bool ret = still->Init(TYPE_INVALID);
+    GTEST_LOG_(INFO) << "AbsolutstillTest001 start";
+    AlgoAbsoluteStill still;
+    bool ret = still.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
-    still->Unsubscribe(sensorTypeId);
+    still.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still->RegisterCallback(callback_);
+    still.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest001 end";
 }
@@ -89,15 +90,15 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest002 start";
-    AlgoHorizontal* horizontal = new (std::nothrow) AlgoHorizontal();
+    GTEST_LOG_(INFO) << "AbsolutstillTest002 start";
+    AlgoHorizontal horizontal;
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret = horizontal->Init(TYPE_INVALID);
+    bool ret = horizontal.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal->RegisterCallback(callback_);
+    horizontal.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
-    horizontal->Unsubscribe(sensorTypeId);
+    horizontal.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest002 end";
 }
@@ -109,15 +110,15 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest003 start";
-    AlgoVertical* vertical = new (std::nothrow) AlgoVertical();
-    bool ret = vertical->Init(TYPE_INVALID);
+    GTEST_LOG_(INFO) << "AbsolutstillTest003 start";
+    AlgoVertical vertical;
+    bool ret = vertical.Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     ASSERT_TRUE(ret);
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical->RegisterCallback(callback_);
+    vertical.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
-    vertical->Unsubscribe(sensorTypeId);
+    vertical.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest003 end";
 }
@@ -173,9 +174,9 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoAbsoluteStill* still = new AlgoAbsoluteStill();
+    AlgoAbsoluteStill still;
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still->RegisterCallback(callback_);
+    still.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
@@ -196,9 +197,9 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoHorizontal* horizontal = new AlgoHorizontal();
+    AlgoHorizontal horizontal;
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal->RegisterCallback(callback_);
+    horizontal.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
@@ -219,9 +220,9 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoVertical* vertical = new AlgoVertical();
+    AlgoVertical vertical;
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical->RegisterCallback(callback_);
+    vertical.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_VERTICAL_POSITION);
     ret += 1;
@@ -242,9 +243,9 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
     ASSERT_TRUE(ret);
-    AlgoVertical* vertical = new AlgoVertical();
+    AlgoVertical vertical;
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical->RegisterCallback(callback_);
+    vertical.RegisterCallback(callback_);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
@@ -263,8 +264,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest010 start";
-    int32_t TYPE_ERROR = 5;
-    int32_t ret = g_manager->Enable(static_cast<Type>(TYPE_ERROR));
+    int32_t typeError = 5;
+    int32_t ret = g_manager->Enable(static_cast<Type>(typeError));
     ASSERT_TRUE(ret);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest010 end";
 }
@@ -338,8 +339,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest014, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest015 start";
-    int32_t TYPE_ERROR = 5;
-    bool result = g_manager->StartSensor(static_cast<Type>(TYPE_ERROR));
+    int32_t typeError = 5;
+    bool result = g_manager->StartSensor(static_cast<Type>(typeError));
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest015 end";
 }
@@ -393,7 +394,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
-    int32_t sensorTypeId = SENSOR_TYPE_ID_GYROSCOPE;
+    int32_t sensorTypeId = SENSOR_TYPE_ID_MAX;
     int32_t ret = g_manager->CheckSensorTypeId(sensorTypeId);
     EXPECT_FALSE(ret);
     ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
@@ -433,8 +434,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
-    int32_t TYPE_ERROR = -100;
-    int32_t ret = g_manager->CheckSensorTypeId(static_cast<SensorTypeId>(TYPE_ERROR));
+    int32_t typeError = -100;
+    int32_t ret = g_manager->CheckSensorTypeId(static_cast<SensorTypeId>(typeError));
     EXPECT_FALSE(ret);
     ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
@@ -557,8 +558,11 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest027, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 start";
-    SensorDataCallback::GetInstance().user_.callback = nullptr;
+    SENSOR_DATA_CB.user_.callback = nullptr;
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 end";
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "FdListener" };
-}
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "FdListener" };
+} // namespace
 
 using namespace AppExecFwk;
 FdListener::FdListener(IClientPtr client) : iClient_(client) {}
@@ -44,18 +44,18 @@ void FdListener::OnReadable(int32_t fd)
             iClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                FI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, size:%{public}zu, errno:%{public}d",
+                FI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, size:%{public}zd, errno:%{public}d",
                     size, errno);
                 continue;
             }
-            FI_HILOGE("Recv return %{public}zu, errno:%{public}d", size, errno);
+            FI_HILOGE("Recv return %{public}zd, errno:%{public}d", size, errno);
             break;
         } else {
             FI_HILOGD("[Do nothing here]The service side disconnect with the client, size:0, count:%{public}d, "
                 "errno:%{public}d", i, errno);
             break;
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
+        if (static_cast<size_t>(size) < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }

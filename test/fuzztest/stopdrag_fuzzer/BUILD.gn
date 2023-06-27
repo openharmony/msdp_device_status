@@ -26,7 +26,7 @@ ohos_fuzztest("StopDragFuzzTest") {
   deps = [ "./../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "input:libmmi-client",
     "multimedia_image_framework:image_native",
   ]

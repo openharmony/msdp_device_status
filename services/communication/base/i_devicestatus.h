@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef IDEVICESTATUS_H
-#define IDEVICESTATUS_H
+#ifndef I_DEVICESTATUS_H
+#define I_DEVICESTATUS_H
 
 #include <iremote_broker.h>
 
@@ -47,6 +47,7 @@ public:
         UNREGISTER_DRAG_MONITOR,
         SET_DRAG_WINDOW_VISIBLE,
         GET_SHADOW_OFFSET,
+        UPDATE_SHADOW_PIC,
         ALLOC_SOCKET_FD = 40
     };
 
@@ -74,10 +75,11 @@ public:
     virtual int32_t GetUdKey(std::string &udKey) = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    virtual int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
     virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
+    virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual bool IsRunning() const
     {
         return true;
@@ -87,4 +89,4 @@ public:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // IDEVICESTATUS_H
+#endif // I_DEVICESTATUS_H

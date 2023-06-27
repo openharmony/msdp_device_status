@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +15,16 @@
 
 #include "devicestatusagent_fuzzer.h"
 
+#include "fi_log.h"
+
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::Msdp::DeviceStatus;
 namespace {
-const int WAIT_TIME = 1000;
-}
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusAgentFuzzTest" };
+constexpr int32_t WAIT_TIME { 1000 };
+} // namespace
+
 static std::shared_ptr<DevicestatusAgentFuzzer::DeviceStatusAgentClient> agentEvent_ =
             std::make_shared<DevicestatusAgentFuzzer::DeviceStatusAgentClient>();
 static std::shared_ptr<DeviceStatusAgent> agent_ = std::make_shared<DeviceStatusAgent>();
@@ -35,10 +39,12 @@ bool DevicestatusAgentFuzzer::DeviceStatusAgentClient::OnEventResult(
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEvent: Enter " << std::endl;
-    int32_t type[1];
+    std::cout << "TestSubscribeAgentEvent: Enter" << std::endl;
+    int32_t type[1] { -1 };
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
 
@@ -51,17 +57,19 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
 
 void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(Type type)
 {
-    std::cout << "TestUnSubscribeAgentEvent: Enter " << std::endl;
+    std::cout << "TestUnSubscribeAgentEvent: Enter" << std::endl;
 
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEventIsNullptr: Enter " << std::endl;
-    int32_t type[1];
+    std::cout << "TestSubscribeAgentEventIsNullptr: Enter" << std::endl;
+    int32_t type[1] { -1 };
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
     agentEvent_ = nullptr;
@@ -75,10 +83,12 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* da
 
 void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t* data)
 {
-    std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
+    std::cout << "TestSubscribeAgentEventTypeIsNullptr: Enter" << std::endl;
     int32_t type[1];
     int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    errno_t ret = memcpy_s(type, sizeof(type), data, idSize);
+    if (ret != EOK) {
+        FI_HILOGE("memcpy_s failed");
         return;
     }
 
@@ -91,15 +101,15 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t
 
 void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 {
-    std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter " << std::endl;
+    std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter" << std::endl;
 
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 
 bool DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    int idSize = 8;
-    if (static_cast<int>(size) > idSize) {
+    size_t idSize = 8;
+    if (size > idSize) {
         DevicestatusAgentFuzzer::TestSubscribeAgentEvent(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(data);
         DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(data);

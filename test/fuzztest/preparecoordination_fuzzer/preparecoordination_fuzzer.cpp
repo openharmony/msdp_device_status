@@ -14,17 +14,18 @@
  */
 
 #include "preparecoordination_fuzzer.h"
+
 #include "securec.h"
 
 #include "coordination_message.h"
-#include "interaction_manager.h"
 #include "devicestatus_define.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "PrepareCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PrepareCoordinationFuzzTest" };
 } // namespace
 
 template<class T>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,15 +28,14 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamSession" };
-const std::string FOUNDATION = "foundation";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSession" };
+const std::string FOUNDATION { "foundation" };
 } // namespace
 
-StreamSession::StreamSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
-    const int32_t uid, const int32_t pid)
-    : fd_(fd),
-      pid_(pid)
+StreamSession::StreamSession(const std::string &programName, int32_t moduleType, int32_t fd, int32_t uid, int32_t pid)
+    : fd_(fd), pid_(pid)
 {
     UpdateDescript();
 }
@@ -59,7 +58,7 @@ bool StreamSession::SendMsg(const char *buf, size_t size) const
     int32_t remSize = bufSize;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
-        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 usleep(SEND_RETRY_SLEEP_TIME);
@@ -115,5 +114,6 @@ bool StreamSession::SendMsg(NetPacket &pkt) const
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

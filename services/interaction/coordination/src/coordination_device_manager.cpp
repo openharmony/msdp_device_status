@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
 constexpr size_t NETWORK_ID_NUMS = 3;
 constexpr size_t DESCRIPTOR_INDEX = 2;
 } // namespace
@@ -198,7 +198,6 @@ void CoordinationDeviceManager::Init()
 
 bool CoordinationDeviceManager::IsRemote(int32_t id)
 {
-    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
         CHKPF(devIter->second);
         return devIter->second->IsRemote();
@@ -294,11 +293,10 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
-        if (devIter->second == nullptr) {
-            FI_HILOGW("Device is nullptr");
-        } else {
+        if (devIter->second != nullptr) {
             return devIter->second->GetDhid();
         }
+        FI_HILOGW("Device is nullptr");
     }
     return "";
 }

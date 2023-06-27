@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Monitor" };
-}
+} // namespace
 
 void Monitor::Dispatch(const struct epoll_event &ev)
 {
@@ -57,6 +57,7 @@ int32_t Monitor::Enable()
     if (ret == RET_OK) {
         ret = EnableReceiving();
         if (ret != RET_OK) {
+            FI_HILOGE("Enable receive failed");
             Disable();
         }
     }

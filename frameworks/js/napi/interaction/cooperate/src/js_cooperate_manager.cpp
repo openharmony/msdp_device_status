@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCooperateManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsCooperateManager" };
 } // namespace
 
 napi_value JsCooperateManager::Enable(napi_env env, bool enable, napi_value handle)

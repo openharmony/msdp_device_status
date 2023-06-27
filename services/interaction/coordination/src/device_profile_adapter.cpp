@@ -18,19 +18,20 @@
 #include <algorithm>
 #include <mutex>
 
-#include "devicestatus_define.h"
 #include "distributed_device_profile_client.h"
-#include "coordination_util.h"
 #include "service_characteristic_profile.h"
 #include "sync_options.h"
+
+#include "coordination_util.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
-const std::string SERVICE_ID = "deviceStatus";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
+const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -100,12 +101,12 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
     JsonParser parser;
-    parser.json_ = cJSON_Parse(jsonData.c_str());
-    if (!cJSON_IsObject(parser.json_)) {
-        FI_HILOGE("Parser.json_ is not object");
+    parser.json = cJSON_Parse(jsonData.c_str());
+    if (!cJSON_IsObject(parser.json)) {
+        FI_HILOGE("Parser json is not object");
         return false;
     }
-    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, characteristicsName_.c_str());
+    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());
     if (!cJSON_IsNumber(state)) {
         FI_HILOGE("State is not number type");
         return false;

@@ -51,7 +51,7 @@ int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("ActivateCoordination failed, ret:%{public}d", ret);
-        COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
         return ret;
     }
     return RET_OK;
@@ -69,7 +69,7 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, 
     int32_t ret = COOR_SM->DeactivateCoordination(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed, ret:%{public}d", ret);
-        COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
         return ret;
     }
     return RET_OK;
@@ -119,16 +119,10 @@ void Coordination::Dump(int32_t fd)
 
 ICoordination* CreateICoordination(IContext *context)
 {
-    if (context == nullptr) {
-        FI_HILOGE("Parameter error");
-        return nullptr;
-    }
+    CHKPP(context);
     COOR_EVENT_MGR->SetIContext(context);
     ICoordination *coord = new (std::nothrow) Coordination();
-    if (coord == nullptr) {
-        FI_HILOGE("Create ICoordination failed");
-        return nullptr;
-    }
+    CHKPP(coord);
     return coord;
 }
 } // namespace DeviceStatus

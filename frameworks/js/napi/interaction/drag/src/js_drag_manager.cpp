@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
 } // namespace
 
 void JsDragManager::ResetEnv()
@@ -39,10 +39,7 @@ bool JsDragManager::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     CALL_INFO_TRACE;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return false;
-    }
+    CHKPF(scope);
     napi_value handlerTemp = nullptr;
     CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
     bool isEqual = false;

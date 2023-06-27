@@ -31,13 +31,13 @@ public:
     IDragAnimation() = default;
     virtual ~IDragAnimation() = default;
     virtual void OnStartDrag(const DragAnimationData &dragAnimationData,
-        std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode,
-        std::shared_ptr<OHOS::Rosen::RSCanvasNode> styleNode) = 0;
-    virtual void OnDragStyle(std::shared_ptr<OHOS::Rosen::RSCanvasNode> styleNode,
-        std::shared_ptr<OHOS::Media::PixelMap> stylePixelMap) = 0;
-    virtual void OnStopDragSuccess(std::shared_ptr<OHOS::Rosen::RSCanvasNode> shadowNode,
-        std::shared_ptr<OHOS::Rosen::RSCanvasNode> styleNode) = 0;
-    virtual void OnStopDragFail(sptr<OHOS::Rosen::Window> window, std::shared_ptr<OHOS::Rosen::RSNode> rootNode) = 0;
+        std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
+        std::shared_ptr<Rosen::RSCanvasNode> styleNode) = 0;
+    virtual void OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> styleNode,
+        std::shared_ptr<Media::PixelMap> stylePixelMap) = 0;
+    virtual void OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
+        std::shared_ptr<Rosen::RSCanvasNode> styleNode) = 0;
+    virtual void OnStopDragFail(sptr<Rosen::Window> window, std::shared_ptr<Rosen::RSNode> rootNode) = 0;
     virtual void OnStopAnimation() = 0;
 };
 } // namespace DeviceStatus

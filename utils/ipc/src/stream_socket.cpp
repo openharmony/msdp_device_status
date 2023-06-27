@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,8 +19,9 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
 } // namespace
 
 StreamSocket::StreamSocket() {}
@@ -68,7 +69,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
     return ret;
 }
 
-int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -77,7 +78,7 @@ int32_t StreamSocket::EpollWait(struct epoll_event &events, int32_t maxevents, i
         FI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
-    auto ret = epoll_wait(epollFd, &events, maxevents, timeout);
+    int32_t ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         FI_HILOGE("epoll_wait, ret:%{public}d, errno:%{public}d", ret, errno);
     }
@@ -97,7 +98,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+        if (static_cast<int32_t>(head->size) < 0 || static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE) {
             FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
                 "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();
@@ -137,12 +138,13 @@ void StreamSocket::EpollClose()
 void StreamSocket::Close()
 {
     if (fd_ >= 0) {
-        auto rf = close(fd_);
-        if (rf > 0) {
+        int32_t rf = close(fd_);
+        if (rf < 0) {
             FI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
     }
     fd_ = -1;
 }
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

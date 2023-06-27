@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
 const char* DRAG_CLASS = "drag_class";
 const char* DRAG = "drag";
 } // namespace
@@ -69,7 +69,7 @@ napi_value JsDragContext::CreateInstance(napi_env env)
         SET_NAMED_PROPERTY);
 
     JsDragContext *jsContext = nullptr;
-    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, reinterpret_cast<void**>(&jsContext)), UNWRAP);
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
@@ -135,7 +135,7 @@ JsDragContext *JsDragContext::GetInstance(napi_env env)
     }
 
     JsDragContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
     if (instance == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");
@@ -182,6 +182,10 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
+    if (UtilNapi::TypeOf(env, argv[0], napi_undefined) || UtilNapi::TypeOf(env, argv[0], napi_null)) {
+        jsDragMgr->UnregisterListener(env);
+        return nullptr;
+    }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
@@ -209,7 +213,7 @@ void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("START", startMsg),
         DECLARE_NAPI_STATIC_PROPERTY("STOP", stopMsg),
         DECLARE_NAPI_STATIC_PROPERTY("ERROR", errorMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg)
     };
 
     napi_value eventMsg = nullptr;
@@ -222,7 +226,7 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

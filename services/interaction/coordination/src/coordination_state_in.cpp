@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,16 +18,16 @@
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_message.h"
-#include "coordination_softbus_adapter.h"
-#include "distributed_input_adapter.h"
 #include "coordination_sm.h"
+#include "coordination_softbus_adapter.h"
 #include "coordination_util.h"
+#include "distributed_input_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateIn" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateIn" };
 } // namespace
 
 CoordinationStateIn::CoordinationStateIn(const std::string &startDeviceDhid) : startDeviceDhid_(startDeviceDhid) {}
@@ -67,9 +67,8 @@ int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, in
     if (remoteNetworkId == originNetworkId) {
         ComeBack(remoteNetworkId, startDeviceId);
         return RET_OK;
-    } else {
-        return RelayComeBack(remoteNetworkId, startDeviceId);
     }
+    return RelayComeBack(remoteNetworkId, startDeviceId);
 }
 
 int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
@@ -99,6 +98,7 @@ int32_t CoordinationStateIn::ProcessStop()
             this->OnStopRemoteInput(isSuccess, originNetworkId, -1);
         });
     if (ret != RET_OK) {
+        FI_HILOGE("Stop remote input fail");
         COOR_SM->OnStopFinish(false, originNetworkId);
     }
     return RET_OK;

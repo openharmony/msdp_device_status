@@ -32,10 +32,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class SensorDataCallback : public Singleton<SensorDataCallback> {
+class SensorDataCallback final {
+    DECLARE_SINGLETON(SensorDataCallback);
 public:
-    SensorDataCallback() = default;
-    ~SensorDataCallback();
     bool RegisterCallbackSensor(int32_t sensorTypeId);
     bool UnregisterCallbackSensor(int32_t sensorTypeId);
     void Init();
@@ -49,6 +48,7 @@ private:
     void AlgorithmLoop();
     void HandleSensorEvent();
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
+
     SensorUser user_;
     std::list<AccelData> accelDataList_;
     std::unique_ptr<std::thread> algorithmThread_ { nullptr };
@@ -59,6 +59,7 @@ private:
     std::mutex sensorMutex_;
     std::atomic<bool> alive_ { true };
 };
+#define SENSOR_DATA_CB OHOS::Singleton<SensorDataCallback>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

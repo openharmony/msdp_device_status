@@ -80,6 +80,7 @@ public:
 private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
+
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };

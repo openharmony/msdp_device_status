@@ -17,10 +17,16 @@
 
 #include <optional>
 
+#include "fi_log.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-napi_value CreateNapiError(const napi_env &env, const int32_t errCode, const std::string &errMessage)
+namespace {
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapiError" };
+} // namespace
+
+napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage)
 {
     napi_value businessError = nullptr;
     napi_value code = nullptr;
@@ -38,15 +44,16 @@ std::optional <std::string> GetErrMsg(int32_t errorCode)
     if (iter != ERROR_MESSAGES.end()) {
         return iter->second;
     }
+    FI_HILOGE("Error messages not found");
     return std::nullopt;
 }
 
-void ThrowErr(const napi_env &env, const int32_t errCode, const std::string &printMsg)
+void ThrowErr(const napi_env &env, int32_t errCode, const std::string &printMsg)
 {
-    DEV_HILOGE(JS_NAPI, "message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
-    auto msg = GetErrMsg(errCode);
+    FI_HILOGE("Message:%{public}s, code:%{public}d", printMsg.c_str(), errCode);
+    std::optional<std::string> msg = GetErrMsg(errCode);
     if (!msg) {
-        DEV_HILOGE(JS_NAPI, "errCode:%{public}d is invalid", errCode);
+        FI_HILOGE("ErrCode:%{public}d is invalid", errCode);
         return;
     }
     napi_value error = CreateNapiError(env, errCode, msg.value());

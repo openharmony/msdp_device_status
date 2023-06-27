@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,11 +23,12 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "stream_socket.h"
 #include "i_stream_server.h"
+#include "stream_socket.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 enum EpollEventType {
     EPOLL_EVENT_BEGIN = 0,
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
@@ -36,7 +37,7 @@ enum EpollEventType {
     EPOLL_EVENT_ETASK,
     EPOLL_EVENT_TIMER,
     EPOLL_EVENT_DEVICE_MGR,
-    EPOLL_EVENT_END,
+    EPOLL_EVENT_END
 };
 
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
@@ -50,9 +51,9 @@ public:
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     int32_t GetClientFd(int32_t pid) const;
     int32_t GetClientPid(int32_t fd) const;
-    void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
-    int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType) override;
+    void AddSessionDeletedCallback(int32_t pid, std::function<void(SessionPtr)> callback);
+    int32_t AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid, int32_t pid,
+        int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType) override;
 
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const override;
@@ -77,8 +78,9 @@ protected:
     std::map<int32_t, SessionPtr> sessionsMap_;
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
-    std::list<std::function<void(SessionPtr)>> callbacks_;
+    std::map<int32_t, std::function<void(SessionPtr)>> callbacks_;
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // STREAM_SERVER_H

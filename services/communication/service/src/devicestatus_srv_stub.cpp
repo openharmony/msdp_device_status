@@ -32,7 +32,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
 using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
@@ -67,6 +67,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {Idevicestatus::UNREGISTER_DRAG_MONITOR, &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {Idevicestatus::SET_DRAG_WINDOW_VISIBLE, &DeviceStatusSrvStub::SetDragWindowVisibleStub},
         {Idevicestatus::GET_SHADOW_OFFSET, &DeviceStatusSrvStub::GetShadowOffsetStub},
+        {Idevicestatus::UPDATE_SHADOW_PIC, &DeviceStatusSrvStub::UpdateShadowPicStub}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -95,7 +96,8 @@ int32_t DeviceStatusSrvStub::SubscribeStub(MessageParcel& data, MessageParcel& r
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
     FI_HILOGI("Read callback successfully");
-    Subscribe(Type(type), ActivityEvent(event), ReportLatencyNs(latency), callback);
+    Subscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event),
+        static_cast<ReportLatencyNs>(latency), callback);
     return RET_OK;
 }
 
@@ -111,7 +113,7 @@ int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel& data, MessageParcel&
     CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
     CHKPR(callback, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Unsubscribe(Type(type), ActivityEvent(event), callback);
+    Unsubscribe(static_cast<Type>(type), static_cast<ActivityEvent>(event), callback);
     return RET_OK;
 }
 
@@ -120,7 +122,7 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
     CALL_DEBUG_ENTER;
     int32_t type = -1;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    Data devicestatusData = GetCache(Type(type));
+    Data devicestatusData = GetCache(static_cast<Type>(type));
     FI_HILOGD("devicestatusData.type:%{public}d", devicestatusData.type);
     FI_HILOGD("devicestatusData.value:%{public}d", devicestatusData.value);
     WRITEINT32(reply, devicestatusData.type, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
@@ -292,12 +294,6 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
     dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
-    if (dragData.shadowInfo.pixelMap->GetWidth() > MAX_PIXEL_MAP_WIDTH ||
-        dragData.shadowInfo.pixelMap->GetHeight() > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Too big pixelMap, width:%{public}d, height:%{public}d",
-            dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight());
-        return RET_ERR;
-    }
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -309,11 +305,18 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (dragData.shadowInfo.x > 0 || dragData.shadowInfo.y > 0 ||
+        dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth() ||
+        dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight()) {
+        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            dragData.shadowInfo.x, dragData.shadowInfo.y);
+        return RET_ERR;
+    }
     if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
-        dragData.displayX < 0 || dragData.displayY < 0 || dragData.displayId < 0) {
+        dragData.displayX < 0 || dragData.displayY < 0) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d, displayId:%{public}d",
-            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY, dragData.displayId);
+            "displayX:%{public}d, displayY:%{public}d",
+            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
     int32_t ret = StartDrag(dragData);
@@ -328,13 +331,13 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
 {
     CALL_DEBUG_ENTER;
     int32_t result;
-    bool hasCustomAnimation;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_CANCEL)) {
+        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
+    bool hasCustomAnimation;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
@@ -393,6 +396,29 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
+
+int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    auto pixelMap = Media::PixelMap::Unmarshalling(data);
+    CHKPR(pixelMap, RET_ERR);
+    ShadowInfo shadowInfo;
+    shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
+    READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (shadowInfo.x > 0 || shadowInfo.y > 0 ||
+        shadowInfo.x < -shadowInfo.pixelMap->GetWidth() ||
+        shadowInfo.y < -shadowInfo.pixelMap->GetHeight()) {
+        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+            shadowInfo.x, shadowInfo.y);
+        return RET_ERR;
+    }
+    int32_t ret = UpdateShadowPic(shadowInfo);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call Update shadow picture failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
-} // Msdp
-} // OHOS
+} // namespace Msdp
+} // namespace OHOS

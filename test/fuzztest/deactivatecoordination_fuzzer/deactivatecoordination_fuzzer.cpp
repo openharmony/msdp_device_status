@@ -16,14 +16,14 @@
 #include "deactivatecoordination_fuzzer.h"
 
 #include "coordination_message.h"
-#include "interaction_manager.h"
 #include "fi_log.h"
+#include "interaction_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "DeactivateCoordinationFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeactivateCoordinationFuzzTest" };
 } // namespace
 
 void DeactivateCoordinationFuzzTest()

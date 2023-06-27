@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
 } // namespace
 
 int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener)
@@ -83,7 +83,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
+    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -103,7 +103,7 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
+    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -124,7 +124,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().ActivateCoordination(
+    int32_t ret = DeviceStatusClient::GetInstance().ActivateCoordination(
         userData_, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
@@ -145,7 +145,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
+    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -166,7 +166,7 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    auto ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get Coordination State failed");
     } else {
@@ -217,7 +217,7 @@ void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool st
     FI_HILOGD("Coordination state event callback, userData:%{public}d, state:(%{public}d)", userData, state);
 }
 
-int32_t CoordinationManagerImpl::GetUserData()
+int32_t CoordinationManagerImpl::GetUserData() const
 {
     std::lock_guard<std::mutex> guard(mtx_);
     return userData_;

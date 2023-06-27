@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,18 +22,11 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum {
-    /**
-     *  Module type: DeviceStatus Service
-     */
     DEVICESTATUS_MODULE_TYPE_SERVICE = 0,
-    /**
-     *  Module type: DeviceStatus Kit
-     */
     DEVICESTATUS_MODULE_TYPE_KIT = 1,
     DEVICESTATUS_MODULE_TYPE_CLIENT = 2
 };
 
-// offset of devicestatus error, only be used in this file.
 constexpr ErrCode DEVICESTATUS_SERVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_SERVICE);
 
 enum {
@@ -49,17 +42,13 @@ enum {
     ETASKS_POST_SYNCTASK_FAIL,
     ETASKS_POST_ASYNCTASK_FAIL,
     EPOLL_CREATE_FAIL,
-    MSG_SEND_FAIL,
+    MSG_SEND_FAIL
 };
 
 enum {
-    // 文件打开失败
     FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_KIT),
-    // 流缓冲读取失败
     STREAM_BUF_READ_FAIL,
-    // 事件注册失败
     EVENT_REG_FAIL,
-    // 参数注入失败
     PARAM_INPUT_FAIL
 };
 
@@ -67,20 +56,20 @@ enum {
     NON_STD_EVENT = ErrCodeOffset(SUBSYS_MSDP, DEVICESTATUS_MODULE_TYPE_CLIENT),
     VAL_NOT_EXP,
     ERROR_UNSUPPORT,
-    ERROR_NULL_POINTER,
+    ERROR_NULL_POINTER
 };
 
 enum {
     DEVICESTATUS_OK = 0,
     DEVICESTATUS_FAILED = -1,
     DEVICESTATUS_INVALID_FD = -2,
-    DEVICESTATUS_NOT_FIND_JSON_ITEM = -3,
+    DEVICESTATUS_NOT_FIND_JSON_ITEM = -3
 };
 
 enum {
     INIT_FAIL = -1,
     INIT_SUCCESS = 0,
-    INIT_CANCEL = 1,
+    INIT_CANCEL = 1
 };
 } // namespace DeviceStatus
 } // namespace Msdp

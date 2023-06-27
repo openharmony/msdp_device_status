@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,11 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusManager" };
-}
+} // namespace
 
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
-    if (remote == nullptr) {
-        FI_HILOGE("OnRemoteDied failed, remote is nullptr");
-        return;
-    }
+    CHKPV(remote);
     FI_HILOGD("Recv death notice");
 }
 
@@ -46,10 +43,7 @@ bool DeviceStatusManager::Init()
     }
 
     msdpImpl_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    if (msdpImpl_ == nullptr) {
-        FI_HILOGE("msdpImpl_ is nullptr");
-        return false;
-    }
+    CHKPF(msdpImpl_);
 
     FI_HILOGD("Init success");
     return true;
@@ -89,10 +83,7 @@ bool DeviceStatusManager::Enable(Type type)
 bool DeviceStatusManager::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
-    if (msdpImpl_ == nullptr) {
-        FI_HILOGE("disable failed, msdpImpl is nullptr");
-        return false;
-    }
+    CHKPF(msdpImpl_);
 
     if (msdpImpl_->Disable(type) != RET_OK) {
         FI_HILOGE("disable msdp impl failed");
@@ -105,10 +96,7 @@ bool DeviceStatusManager::Disable(Type type)
 bool DeviceStatusManager::InitAlgoMngrInterface(Type type)
 {
     CALL_DEBUG_ENTER;
-    if (msdpImpl_ == nullptr) {
-        FI_HILOGE("msdpImpl_ is nullptr");
-        return false;
-    }
+    CHKPF(msdpImpl_);
 
     if (msdpImpl_->InitMsdpImpl(type) != RET_OK) {
         FI_HILOGE("init msdp impl failed");
@@ -120,10 +108,7 @@ bool DeviceStatusManager::InitAlgoMngrInterface(Type type)
 int32_t DeviceStatusManager::InitDataCallback()
 {
     CALL_DEBUG_ENTER;
-    if (msdpImpl_ == nullptr) {
-        FI_HILOGE("msdpImpl_ is nullptr");
-        return false;
-    }
+    CHKPF(msdpImpl_);
     DeviceStatusMsdpClientImpl::CallbackManager callback =
         std::bind(&DeviceStatusManager::MsdpDataCallback, this, std::placeholders::_1);
     if (msdpImpl_->RegisterImpl(callback) == RET_ERR) {

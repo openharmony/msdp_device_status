@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,20 +26,20 @@ struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
     {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-            json_ = nullptr;
+        if (json != nullptr) {
+            cJSON_Delete(json);
+            json = nullptr;
         }
     }
     operator cJSON *()
     {
-        return json_;
+        return json;
     }
-    cJSON *json_ { nullptr };
+    cJSON *json { nullptr };
 };
 namespace COORDINATION {
 std::string GetLocalNetworkId();
-}
+} // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Msdp {
-inline constexpr uint32_t MSDP_DOMAIN_ID = 0xD002220;
+inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
 } // namespace Msdp
 } // namespace OHOS
 
@@ -67,7 +67,7 @@ namespace OHOS {
 namespace Msdp {
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int(const char *)>;
+    using HilogFunc = std::function<int32_t(const char *)>;
 
 public:
     InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)

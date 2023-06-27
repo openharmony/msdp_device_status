@@ -40,9 +40,10 @@ ohos_shared_library("devicestatus_ipc") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "${device_status_part_name}"
 }

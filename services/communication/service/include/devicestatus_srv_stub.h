@@ -19,7 +19,7 @@
 #include <iremote_stub.h>
 #include <nocopyable.h>
 
-#include "idevicestatus.h"
+#include "i_devicestatus.h"
 #include "message_option.h"
 #include "message_parcel.h"
 
@@ -29,15 +29,15 @@ namespace DeviceStatus {
 class DeviceStatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
     DeviceStatusSrvStub() = default;
-    virtual ~DeviceStatusSrvStub() = default;
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);
+    virtual ~DeviceStatusSrvStub() = default;
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     int32_t SubscribeStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnsubscribeStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetLatestDeviceStatusDataStub(MessageParcel& data, MessageParcel& reply);
-
     int32_t HandleAllocSocketFdStub(MessageParcel& data, MessageParcel& reply);
     int32_t RegisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
     int32_t UnregisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply);
@@ -46,7 +46,6 @@ private:
     int32_t ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply);
     int32_t DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply);
-
     int32_t StartDragStub(MessageParcel& data, MessageParcel& reply);
     int32_t StopDragStub(MessageParcel& data, MessageParcel& reply);
     int32_t UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply);
@@ -56,6 +55,7 @@ private:
     int32_t RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply);
+    int32_t UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

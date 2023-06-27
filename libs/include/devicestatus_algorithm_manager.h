@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,14 +55,14 @@ public:
     bool StartSensor(Type type);
     int32_t GetSensorTypeId(Type type);
 private:
-    int32_t type_[Type::TYPE_MAX] = { 0 };
+    int32_t type_[Type::TYPE_MAX] { 0 };
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
     std::mutex mutex_;
     std::shared_ptr<AlgoAbsoluteStill> still_ { nullptr };
     std::shared_ptr<AlgoHorizontal> horizontalPosition_ { nullptr };
     std::shared_ptr<AlgoVertical> verticalPosition_ { nullptr };
-    std::map<Type, int32_t> callAlgoNum_ = {};
-    Type algoType_;
+    std::map<Type, int32_t> callAlgoNum_ {};
+    Type algoType_ { TYPE_INVALID };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

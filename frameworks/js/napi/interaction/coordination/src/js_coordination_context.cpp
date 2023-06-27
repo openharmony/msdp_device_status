@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,13 +23,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationContext" };
 const char* g_coordinationClass = "Coordination_class";
 const char* g_coordination = "Coordination";
-constexpr int32_t ZERO_PARAM = 0;
-constexpr int32_t ONE_PARAM = 1;
-constexpr int32_t TWO_PARAM = 2;
-constexpr int32_t THREE_PARAM = 3;
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
@@ -53,10 +49,7 @@ napi_value JsCoordinationContext::Export(napi_env env, napi_value exports)
 {
     CALL_INFO_TRACE;
     auto instance = CreateInstance(env);
-    if (instance == nullptr) {
-        FI_HILOGE("instance is nullptr");
-        return nullptr;
-    }
+    CHKPP(instance);
     DeclareDeviceCoordinationInterface(env, exports);
     DeclareDeviceCoordinationData(env, exports);
     return exports;
@@ -273,7 +266,11 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         jsCoordinationMgr->UnregisterListener(env, type_);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
+    if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
+        jsCoordinationMgr->UnregisterListener(env, type_);
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -309,7 +306,7 @@ napi_value JsCoordinationContext::CreateInstance(napi_env env)
         SET_NAMED_PROPERTY);
 
     JsCoordinationContext *jsContext = nullptr;
-    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, reinterpret_cast<void**>(&jsContext)), UNWRAP);
     CHKPP(jsContext);
     CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
@@ -362,10 +359,7 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
 
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return nullptr;
-    }
+    CHKPP(scope);
     napi_value object = nullptr;
     CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
@@ -375,7 +369,7 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
     }
 
     JsCoordinationContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, (void**)&instance), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
     if (instance == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("instance is nullptr");
@@ -420,7 +414,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE_FAIL", activateFail),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_SUCCESS", deactivateSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_FAIL", deactivateFail),
-        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed)
     };
 
     napi_value cooperateMsg = nullptr;
@@ -438,7 +432,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_val
         DECLARE_NAPI_STATIC_FUNCTION("deactivate", Deactivate),
         DECLARE_NAPI_STATIC_FUNCTION("getCrossingSwitchState", GetCrossingSwitchState),
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

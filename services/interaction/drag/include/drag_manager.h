@@ -36,8 +36,8 @@ namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
     DragManager() {}
-    ~DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
+    ~DragManager() = default;
 
     int32_t Init(IContext* context);
     void OnSessionLost(SessionPtr session);
@@ -47,22 +47,24 @@ public:
     int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey) const;
-    void SetDragTargetPid(int32_t dragTargetPid);
     void SendDragData(int32_t targetTid, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetTid);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
+    int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible) override;
+    OHOS::MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     DragResult GetDragResult() const override;
+    DragState GetDragState() const override;
+    void SetDragState(DragState state) override;
     class InterceptorConsumer final : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,
-            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb)
-        {}
+            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
@@ -81,14 +83,12 @@ private:
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static OHOS::MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
-    DragState GetDragState() const override;
 private:
-    int32_t timerId_ { 0 };
+    int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t interceptorId_ { -1 };
-    int32_t dragTargetPid_ { -1 };
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };

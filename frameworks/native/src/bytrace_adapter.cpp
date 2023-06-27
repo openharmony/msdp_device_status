@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,11 +19,11 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-    std::string clientSubscribe = "ClientSubscribe";
-    std::string clientUnsubscribe = "ClientUnsubscribe";
-    std::string serviceSubscribe = "ServiceSubscribe";
-    std::string serviceUnsubscribe = "ServiceUnsubscribe";
-}
+const std::string clientSubscribe { "ClientSubscribe" };
+const std::string clientUnsubscribe { "ClientUnsubscribe" };
+const std::string serviceSubscribe { "ServiceSubscribe" };
+const std::string serviceUnsubscribe { "ServiceUnsubscribe" };
+} // namespace
 void BytraceAdapter::StartBytrace(TraceBtn traceBtn, SubscribeType isSubscribe, SubscribeObject subscribeObject)
 {
     if (isSubscribe) {

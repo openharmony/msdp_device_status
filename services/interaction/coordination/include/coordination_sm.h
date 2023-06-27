@@ -35,7 +35,7 @@ namespace DeviceStatus {
 enum class CoordinationState {
     STATE_FREE = 0,
     STATE_IN = 1,
-    STATE_OUT = 2,
+    STATE_OUT = 2
 };
 
 enum class CoordinationMsg {
@@ -49,7 +49,7 @@ enum class CoordinationMsg {
     COORDINATION_STOP = 7,
     COORDINATION_STOP_SUCCESS = 8,
     COORDINATION_STOP_FAIL = 9,
-    COORDINATION_NULL = 10,
+    COORDINATION_NULL = 10
 };
 
 enum class CooStateChangeType {
@@ -57,7 +57,7 @@ enum class CooStateChangeType {
     STATE_FREE_TO_IN = 0,
     STATE_FREE_TO_OUT = 1,
     STATE_IN_TO_FREE = 2,
-    STATE_OUT_TO_FREE = 3,
+    STATE_OUT_TO_FREE = 3
 };
 
 struct PointerFilter : public MMI::IInputEventFilter {
@@ -160,13 +160,14 @@ public:
     bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CoordinationState, CoordinationState)> callback);
-    std::string GetRemoteId() const;
-    void UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    bool UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     void SetUnchainStatus(bool isUnchained);
-    void NotifySessionClosed();
+    void NotifyChainRemoved();
+    void NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess);
     void SetSinkNetworkId(const std::string &sinkNetworkId);
     void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
     void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
+    void RegisterNotifyDragCancel(std::function<void(void)> callback);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -179,7 +180,7 @@ private:
     void ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState);
     void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
     void NotifyMouseLocation(int32_t x, int32_t y);
-
+    void SetPointerVisible();
 private:
     std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
@@ -204,6 +205,7 @@ private:
     std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
     std::function<void(std::string)> remoteNetworkIdCallback_;
     std::function<void(int32_t, int32_t)> mouseLocationCallback_;
+    std::function<void(void)> notifyDragCancelCallback_;
 };
 
 #define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()

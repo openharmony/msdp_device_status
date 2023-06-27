@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsUtil" };
 inline constexpr std::string_view GET_BOOLEAN { "napi_get_boolean" };
 inline constexpr std::string_view COERCE_TO_BOOL { "napi_coerce_to_bool" };
 inline constexpr std::string_view CREATE_ERROR { "napi_create_error" };
@@ -100,10 +100,7 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 {
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
-        return false;
-    }
+    CHKPF(scope);
     napi_value handlerTemp = nullptr;
     CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
     bool isEqual = false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,14 +22,14 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr int32_t ENCRYPT_TAG_LEN = 32;
-constexpr int32_t MSG_MAX_SIZE = 45 * 1024;
-constexpr uint32_t SESSION_NAME_SIZE_MAX = 256;
-constexpr uint32_t DEVICE_ID_SIZE_MAX = 65;
-constexpr uint32_t INTERCEPT_STRING_LENGTH = 20;
-constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND = 5;
-constexpr int32_t SESSION_SIDE_SERVER = 0;
-constexpr int32_t SESSION_SIDE_CLIENT = 1;
+constexpr int32_t ENCRYPT_TAG_LEN { 32 };
+constexpr size_t MSG_MAX_SIZE { 45 * 1024 };
+constexpr uint32_t SESSION_NAME_SIZE_MAX { 256 };
+constexpr uint32_t DEVICE_ID_SIZE_MAX { 65 };
+constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
+constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND { 5 };
+constexpr int32_t SESSION_SIDE_SERVER { 0 };
+constexpr int32_t SESSION_SIDE_CLIENT { 1 };
 
 #define FI_SOFTBUS_KEY_CMD_TYPE "fi_softbus_key_cmd_type"
 #define FI_SOFTBUS_KEY_LOCAL_DEVICE_ID "fi_softbus_key_local_device_id"
@@ -46,7 +46,8 @@ enum {
     REMOTE_COORDINATION_START_RES = 2,
     REMOTE_COORDINATION_STOP = 3,
     REMOTE_COORDINATION_STOP_RES = 4,
-    REMOTE_COORDINATION_STOP_OTHER_RES = 5
+    REMOTE_COORDINATION_STOP_OTHER_RES = 5,
+    NOTIFY_UNCHAINED_RES = 6
 };
 } // namespace DeviceStatus
 } // namespace Msdp

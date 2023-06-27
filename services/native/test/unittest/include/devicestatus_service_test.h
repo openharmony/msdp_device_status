@@ -24,13 +24,14 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-const std::u16string ARGS_H = u"-h";
+const std::u16string ARGS_H { u"-h" };
 class DeviceStatusServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
     class DeviceStatusServiceTestCallback : public DeviceStatusCallbackStub {
     public:
         DeviceStatusServiceTestCallback() {};
