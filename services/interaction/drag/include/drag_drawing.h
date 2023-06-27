@@ -85,8 +85,7 @@ public:
     void DestroyDragWindow();
     void UpdateDrawingState();
     void UpdateDragWindowState(bool visible);
-    void OnStartDrag(const DragAnimationData &dragAnimationData,
-        std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
+    void OnStartDrag(const DragAnimationData &dragAnimationData, std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
         std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode) override;
     void OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
         std::shared_ptr<Media::PixelMap> stylePixelMap) override;

@@ -997,7 +997,12 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     CALL_DEBUG_ENTER;
     CHKPV(stylePixelMap_);
     CHKPV(g_drawingInfo.pixelMap);
-    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    float scalingValue = GetScaling();
+    if ((INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+        FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
+        return RET_ERR;
+    }
+    int32_t adjustSize = EIGHT_SIZE * scalingValue;
     int32_t svgTouchPositionX = 0;
     if ((g_drawingInfo.pixelMap->GetWidth() + adjustSize) > stylePixelMap_->GetWidth()) {
         svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
@@ -1018,6 +1023,7 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(stylePixelMap_);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
+    adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
