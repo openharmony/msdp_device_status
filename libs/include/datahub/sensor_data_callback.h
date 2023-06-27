@@ -49,10 +49,10 @@ private:
     void HandleSensorEvent();
     bool NotifyCallback(int32_t sensorTypeId, AccelData* data);
 
-    SensorUser user_;
+    struct SensorUser user_ = {.name = {0}, .callback = nullptr, .userData = nullptr};
     std::list<AccelData> accelDataList_;
     std::unique_ptr<std::thread> algorithmThread_ { nullptr };
-    sem_t sem_;
+    sem_t sem_ = {};
     std::mutex callbackMutex_;
     std::mutex dataMutex_;
     std::mutex initMutex_;

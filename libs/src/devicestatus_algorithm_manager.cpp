@@ -184,7 +184,7 @@ ErrCode AlgoMgr::Disable(Type type)
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
             if (still_) {
-                FI_HILOGE("still_ is not nullptr");
+                FI_HILOGD("still_ is not nullptr");
                 still_->Unsubscribe(type);
                 still_ = nullptr;
             }
@@ -192,7 +192,7 @@ ErrCode AlgoMgr::Disable(Type type)
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
             if (horizontalPosition_) {
-                FI_HILOGE("horizontalPosition_ is not nullptr");
+                FI_HILOGD("horizontalPosition_ is not nullptr");
                 horizontalPosition_->Unsubscribe(type);
                 horizontalPosition_ = nullptr;
             }
@@ -200,7 +200,7 @@ ErrCode AlgoMgr::Disable(Type type)
         }
         case Type::TYPE_VERTICAL_POSITION: {
             if (verticalPosition_) {
-                FI_HILOGE("verticalPosition_ is not nullptr");
+                FI_HILOGD("verticalPosition_ is not nullptr");
                 verticalPosition_->Unsubscribe(type);
                 verticalPosition_ = nullptr;
             }

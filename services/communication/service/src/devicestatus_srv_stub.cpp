@@ -156,7 +156,7 @@ int32_t DeviceStatusSrvStub::RegisterCoordinationMonitorStub(MessageParcel& data
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterCoordinationListener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
+        FI_HILOGE("Call registerCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -166,7 +166,7 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterCoordinationListener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
+        FI_HILOGE("Call unregisterCoordinationEvent failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -178,7 +178,7 @@ int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, Messag
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call PrepareCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("Call prepareCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -190,7 +190,7 @@ int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, Mess
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UnprepareCoordination(userData);
     if (ret != RET_OK) {
-        FI_HILOGE("Call UnprepareCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("Call unprepareCoordination failed, ret:%{public}d", ret);
     }
     return ret;
 }
