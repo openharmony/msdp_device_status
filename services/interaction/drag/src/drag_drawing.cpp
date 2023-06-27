@@ -125,13 +125,13 @@ bool CheckNodesValid()
 float GetScaling()
 {
     CALL_DEBUG_ENTER;
-    sptr<Rosen::DisplayInfo> displayInfo = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
-    if (displayInfo == nullptr) {
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
-        displayInfo = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
     }
-    CHKPR(displayInfo, RET_ERR);
-    int32_t deviceDpi = displayInfo->GetDpi();
+    CHKPR(display, RET_ERR);
+    int32_t deviceDpi = display->GetDpi();
     FI_HILOGD("displayId:%{public}d, deviceDpi:%{public}d", g_drawingInfo.displayId, deviceDpi);
     if (deviceDpi < -std::numeric_limits<float>::epsilon()) {
         return 0.0f;
