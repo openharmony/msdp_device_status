@@ -54,7 +54,8 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     WRITEINT32(data, latency);
     WRITEREMOTEOBJECT(data, callback->AsObject());
 
-    int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_SUBSCRIBE), data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return;
@@ -82,7 +83,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     WRITEINT32(data, event);
     WRITEREMOTEOBJECT(data, callback->AsObject());
 
-    int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_UNSUBSCRIBE),
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
@@ -111,7 +112,8 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
 
     WRITEINT32(data, type, devicestatusData);
 
-    int32_t ret = remote->SendRequest(static_cast<int32_t>(Idevicestatus::DEVICESTATUS_GETCACHE), data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return devicestatusData;
@@ -139,7 +141,8 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(REGISTER_COORDINATION_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -158,7 +161,8 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNREGISTER_COORDINATION_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -178,7 +182,8 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(PREPARE_COORDINATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -198,7 +203,8 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNPREPARE_COORDINATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COORDINATION),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -221,7 +227,8 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(START_COORDINATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COORDINATION),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -242,7 +249,8 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUn
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(STOP_COORDINATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COORDINATION),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -262,7 +270,8 @@ int32_t DeviceStatusSrvProxy::UpdateDragStyle(DragCursorStyle style)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UPDATED_DRAG_STYLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -281,7 +290,8 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_DRAG_TARGET_PID, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
         return RET_ERR;
@@ -303,7 +313,8 @@ int32_t DeviceStatusSrvProxy::GetUdKey(std::string &udKey)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_DRAG_TARGET_UDKEY, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
         return RET_ERR;
@@ -326,7 +337,8 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_COORDINATION_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -361,7 +373,8 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(START_DRAG, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -387,7 +400,8 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(STOP_DRAG, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -410,7 +424,8 @@ int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, int3
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -437,7 +452,8 @@ int32_t DeviceStatusSrvProxy::AddDraglistener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(REGISTER_DRAG_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -456,7 +472,8 @@ int32_t DeviceStatusSrvProxy::RemoveDraglistener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNREGISTER_DRAG_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -476,7 +493,8 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_DRAG_WINDOW_VISIBLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -495,7 +513,8 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_SHADOW_OFFSET, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -527,7 +546,8 @@ int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UPDATE_SHADOW_PIC, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
