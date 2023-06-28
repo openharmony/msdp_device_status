@@ -979,19 +979,6 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     }
 }
 
-DrawSVGModifier::DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(stylePixelMap);
-    stylePixelMap_ = stylePixelMap;
-}
-
-DrawSVGModifier::~DrawSVGModifier()
-{
-    CALL_DEBUG_ENTER;
-    stylePixelMap_ = nullptr;
-}
-
 void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;

@@ -34,8 +34,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
-    DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap);
-    ~DrawSVGModifier();
+    explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
+    ~DrawSVGModifier() = default;
     void Draw(Rosen::RSDrawingContext& context) const override;
 
 private:
