@@ -130,10 +130,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
 void StreamSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
-        if (close(epollFd_) < 0) {
-            FI_HILOGE("CLose epollFd_ failed");
-            return;
-        } 
+        close(epollFd_);
         epollFd_ = -1;
     }
 }
@@ -142,8 +139,7 @@ void StreamSocket::Close()
 {
     if (fd_ >= 0) {
         if (close(fd_) < 0) {
-            FI_HILOGE("CLose fd_ failed");
-            return;
+            FI_HILOGE("CLose fd failed");
         }
     }
     fd_ = -1;

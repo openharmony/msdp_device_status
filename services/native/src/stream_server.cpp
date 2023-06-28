@@ -40,8 +40,7 @@ void StreamServer::UdsStop()
 {
     if (epollFd_ != -1) {
         if (close(epollFd_) < 0) {
-            FI_HILOGE("Close epollFd_ failed");
-            return;
+            FI_HILOGE("Close epoll fd failed");
         }
         epollFd_ = -1;
     }
@@ -153,13 +152,11 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
 
 CLOSE_SOCK:
     if (close(serverFd) < 0) {
-        FI_HILOGE("Close serverFd failed");
-        return RET_ERR;
+        FI_HILOGE("Close server fd failed");
     }
     serverFd = -1;
     if (close(toReturnClientFd) < 0) {
-        FI_HILOGE("Close toReturnClientFd failed");
-        return RET_ERR;
+        FI_HILOGE("Close toReturnClient fd failed");
     }
     toReturnClientFd = -1;
     return RET_ERR;
