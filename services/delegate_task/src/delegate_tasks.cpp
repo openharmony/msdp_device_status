@@ -45,11 +45,15 @@ void DelegateTasks::Task::ProcessTask()
 DelegateTasks::~DelegateTasks()
 {
     if (fds_[0] >= 0) {
-        close(fds_[0]);
+        if (close(fds_[0]) < 0) {
+            FI_HILOGE("Close fds_[0] failed");
+        }        
         fds_[0] = -1;
     }
     if (fds_[1] >= 0) {
-        close(fds_[1]);
+        if (close(fds_[1]) < 0) {
+            FI_HILOGE("Close fds_[1] failed");
+        }    
         fds_[1] = -1;
     }
 }
@@ -64,12 +68,16 @@ bool DelegateTasks::Init()
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         FI_HILOGE("The fcntl read failed, errno:%{public}d", errno);
-        close(fds_[0]);
+        if (close(fds_[0]) < 0) {
+            FI_HILOGE("Close fds_[0] failed");
+        }    
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         FI_HILOGE("The fcntl write failed, errno:%{public}d", errno);
-        close(fds_[1]);
+        if (close(fds_[1]) < 0) {
+            FI_HILOGE("Close fds_[1] failed");
+        }    
         return false;
     }
     return true;
