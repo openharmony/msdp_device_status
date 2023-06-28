@@ -31,6 +31,7 @@ deps_ex = [
   "hilog:libhilog",
   "input:libmmi-client",
   "multimedia_image_framework:image_native",
+  "window_manager:libwm",
 ]
 
 ###############################fuzztest#################################
