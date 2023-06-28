@@ -309,7 +309,10 @@ void DeviceManager::EpollClose()
 {
     CALL_DEBUG_ENTER;
     if (epollFd_ >= 0) {
-        close(epollFd_);
+        if (close(epollFd_) < 0) {
+            FI_HILOGE("Close epollFd_ failed");
+            return;
+        }
         epollFd_ = -1;
     }
 }

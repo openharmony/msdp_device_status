@@ -98,7 +98,10 @@ void Device::Close()
 {
     CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
-        close(fd_);
+        if (close(fd_) < 0) {
+            FI_HILOGE("Close fd_ failed");
+            return;
+        }
         fd_ = -1;
     }
 }

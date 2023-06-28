@@ -39,7 +39,10 @@ StreamServer::~StreamServer()
 void StreamServer::UdsStop()
 {
     if (epollFd_ != -1) {
-        close(epollFd_);
+        if (close(epollFd_) < 0) {
+            FI_HILOGE("Close epollFd_ failed");
+            return;
+        }
         epollFd_ = -1;
     }
 
@@ -149,9 +152,15 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
     return RET_OK;
 
 CLOSE_SOCK:
-    close(serverFd);
+    if (close(serverFd) < 0) {
+        FI_HILOGE("Close serverFd failed");
+        return RET_ERR;
+    }
     serverFd = -1;
-    close(toReturnClientFd);
+    if (close(toReturnClientFd) < 0) {
+        FI_HILOGE("Close toReturnClientFd failed");
+        return RET_ERR;
+    }
     toReturnClientFd = -1;
     return RET_ERR;
 }
@@ -195,7 +204,9 @@ void StreamServer::ReleaseSession(int32_t fd, epoll_event& ev)
     }
     auto DeviceStatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DeviceStatusService>::GetInstance();
     DeviceStatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
-    close(fd);
+    if (close(fd) < 0) {
+        FI_HILOGE("Close fd failed");
+    }
 }
 
 void StreamServer::OnPacket(int32_t fd, NetPacket& pkt)

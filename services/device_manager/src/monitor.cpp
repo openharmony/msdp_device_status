@@ -75,7 +75,10 @@ void Monitor::Disable()
         devWd_ = -1;
     }
     if (inotifyFd_ >= 0) {
-        close(inotifyFd_);
+        if (close(inotifyFd_) < 0) {
+            FI_HILOGE("Close inotifyFd_ failed");
+            return;
+        }
         inotifyFd_ = -1;
     }
 }
