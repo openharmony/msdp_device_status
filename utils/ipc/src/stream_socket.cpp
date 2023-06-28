@@ -131,7 +131,7 @@ void StreamSocket::EpollClose()
 {
     if (epollFd_ >= 0) {
         if (close(epollFd_) < 0) {
-            FI_HILOGE("Close epollFd failed");
+            FI_HILOGE("Close epoll fd failed");
         }        
         epollFd_ = -1;
     }
