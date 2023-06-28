@@ -14,7 +14,9 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  fusion_interaction_coordination = false
+  fusion_interaction_coordination = true
+  fusion_drag_enable_monitor = true
+  fusion_drag_enable_interceptor = false
 }
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
@@ -31,4 +33,12 @@ device_status_default_defines = []
 
 if (fusion_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
+}
+
+if (fusion_drag_enable_monitor) {
+  device_status_default_defines += [ "OHOS_DRAG_ENABLE_MONITOR" ]
+}
+
+if (fusion_drag_enable_interceptor) {
+  device_status_default_defines += [ "OHOS_DRAG_ENABLE_INTERCEPTOR" ]
 }
