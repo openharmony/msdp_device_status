@@ -50,8 +50,10 @@ struct device_status_epoll_event {
     EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
+#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSpSingleton<DeviceStatusService>::GetInstance().GetRefPtr());
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 } // namespace
 
 DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
@@ -78,10 +80,12 @@ void DeviceStatusService::OnStart()
         FI_HILOGE("On start call init fail");
         return;
     }
+#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
     if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
     worker_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));

@@ -28,6 +28,10 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "drag_manager_impl.h"
+#ifdef OHOS_BUILD_ENABLE_RUST_IMPL
+#include "fusion_data_binding_internal.h"
+#include "fusion_frameworks_binding.h"
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
 namespace OHOS {
 namespace Msdp {
@@ -238,6 +242,24 @@ int32_t DeviceStatusClient::GetUdKey(std::string &udKey)
     return devicestatusProxy_->GetUdKey(udKey);
 }
 
+#ifdef OHOS_BUILD_ENABLE_RUST_IMPL
+
+int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
+{
+    const std::string programName(GetProgramName());
+    int32_t ret = fusion_alloc_socket_fd(programName.c_str(), moduleType, &socketFd_, &tokenType_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Fail to connect to server via socket: %{public}d", ret);
+        return RET_ERR;
+    }
+    FI_HILOGI("Connected successfully to server via socket, "
+        "socketFd_:%{public}d tokenType_:%{public}d",
+        socketFd_, tokenType_);
+    return RET_OK;
+}
+
+#else // OHOS_BUILD_ENABLE_RUST_IMPL
+
 int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
 {
     CALL_DEBUG_ENTER;
@@ -255,6 +277,8 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     return RET_OK;
 }
 
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
+
 int32_t DeviceStatusClient::GetClientSocketFdOfAllocedSocketPair() const
 {
     CALL_DEBUG_ENTER;
@@ -266,6 +290,23 @@ void DeviceStatusClient::RegisterDeathListener(std::function<void()> deathListen
     deathListener_ = deathListener;
 }
 
+#ifdef OHOS_BUILD_ENABLE_RUST_IMPL
+
+int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    CDragData cDragData;
+    if (CDragDataFrom(&dragData, &cDragData) != RET_OK) {
+        FI_HILOGE("Conversion of DragData to CDragData failed");
+        return RET_ERR;
+    }
+    int32_t ret = fusion_start_drag(&cDragData);
+    CDragDataFree(&cDragData);
+    return ret;
+}
+
+#else // OHOS_BUILD_ENABLE_RUST_IMPL
+
 int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
@@ -273,6 +314,8 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
     CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->StartDrag(dragData);
 }
+
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
 int32_t DeviceStatusClient::StopDrag(DragResult result, bool hasCustomAnimation)
 {
