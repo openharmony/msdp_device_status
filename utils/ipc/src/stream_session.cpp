@@ -89,7 +89,7 @@ void StreamSession::Close()
     if (fd_ >= 0) {
         if (close(fd_) < 0) {
             FI_HILOGE("Close fd failed");
-        }        
+        }
         fd_ = -1;
         UpdateDescript();
     }
