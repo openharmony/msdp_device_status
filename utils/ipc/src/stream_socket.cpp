@@ -138,8 +138,9 @@ void StreamSocket::EpollClose()
 void StreamSocket::Close()
 {
     if (fd_ >= 0) {
-        if (close(fd_) < 0) {
-            FI_HILOGE("CLose fd failed");
+        int32_t rf = close(fd_);
+        if (rf < 0) {
+            FI_HILOGE("Socket close failed rf:%{public}d", rf);
         }
     }
     fd_ = -1;
