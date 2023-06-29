@@ -33,11 +33,11 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DrawSVGModifier : public OHOS::Rosen::RSContentStyleModifier {
+class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawSVGModifier() = default;
     ~DrawSVGModifier() = default;
-    void Draw(OHOS::Rosen::RSDrawingContext& context) const override;
+    void Draw(Rosen::RSDrawingContext& context) const override;
 
 private:
     int32_t UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidth) const;
@@ -45,37 +45,37 @@ private:
     xmlNodePtr UpdateRectNode(xmlNodePtr curNode, int32_t extendSvgWidth) const;
     void UpdateTspanNode(xmlNodePtr curNode) const;
     int32_t ParseAndAdjustSvgInfo(xmlNodePtr curNode) const;
-    std::shared_ptr<OHOS::Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
+    std::shared_ptr<Media::PixelMap> DecodeSvgToPixelMap(const std::string &filePath) const;
     int32_t GetFilePath(std::string &filePath) const;
     bool NeedAdjustSvgInfo() const;
-    void SetDecodeOptions(OHOS::Media::DecodeOptions &decodeOpts) const;
+    void SetDecodeOptions(Media::DecodeOptions &decodeOpts) const;
 };
 
-class DrawPixelMapModifier : public OHOS::Rosen::RSContentStyleModifier {
+class DrawPixelMapModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawPixelMapModifier() = default;
     ~DrawPixelMapModifier() = default;
-    void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+    void Draw(Rosen::RSDrawingContext &context) const override;
 };
 
-class DrawMouseIconModifier : public OHOS::Rosen::RSContentStyleModifier {
+class DrawMouseIconModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
-    void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+    void Draw(Rosen::RSDrawingContext &context) const override;
 };
 
-class DrawDynamicEffectModifier : public OHOS::Rosen::RSContentStyleModifier {
+class DrawDynamicEffectModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawDynamicEffectModifier() = default;
     ~DrawDynamicEffectModifier() = default;
-    void Draw(OHOS::Rosen::RSDrawingContext &context) const override;
+    void Draw(Rosen::RSDrawingContext &context) const override;
     void SetAlpha(float alpha);
     void SetScale(float scale);
 
 private:
-    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
-    std::shared_ptr<OHOS::Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
 class DragDrawing final {
@@ -109,14 +109,14 @@ private:
 
 private:
     int64_t startNum_ { -1 };
-    std::shared_ptr<OHOS::Rosen::RSCanvasNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
     std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_ { nullptr };
-    std::shared_ptr<OHOS::Rosen::RSUIDirector> rsUiDirector_ { nullptr };
-    std::shared_ptr<OHOS::Rosen::VSyncReceiver> receiver_ { nullptr };
-    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
+    std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

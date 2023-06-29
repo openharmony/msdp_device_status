@@ -61,6 +61,16 @@ ohos_shared_library("devicestatus_client") {
 
   public_configs = [ ":devicestatus_public_config" ]
 
+  if (fusion_rust_enabled) {
+    include_dirs =
+        [ "${device_status_root_path}/rust/frameworks/binding/include" ]
+
+    deps += [
+      "${device_status_root_path}/rust/data/binding:fusion_data_binding",
+      "${device_status_root_path}/rust/frameworks/client:fusion_client_ffi",
+    ]
+  }
+
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",

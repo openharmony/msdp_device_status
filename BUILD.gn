@@ -14,6 +14,17 @@
 import("//build/ohos.gni")
 import("device_status.gni")
 
+group("devicestatus_service_group") {
+  deps = []
+
+  if (fusion_rust_enabled) {
+    deps += [
+      "${device_status_root_path}/rust/ipc/server:fusion_ipc_server_ffi",
+      "${device_status_root_path}/rust/modules/drag/server:fusion_drag_server_ffi",
+    ]
+  }
+}
+
 group("device_status_tests") {
   testonly = true
   deps = [

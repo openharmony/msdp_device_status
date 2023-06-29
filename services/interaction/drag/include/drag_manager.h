@@ -54,7 +54,7 @@ public:
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible) override;
-    OHOS::MMI::ExtraData GetExtraData(bool appended) const override;
+    MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
@@ -95,7 +95,7 @@ private:
     std::string GetDragState(DragState value) const;
     std::string GetDragResult(DragResult value) const;
     std::string GetDragCursorStyle(DragCursorStyle value) const;
-    static OHOS::MMI::ExtraData CreateExtraData(bool appended);
+    static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
 private:
     int32_t timerId_ { -1 };

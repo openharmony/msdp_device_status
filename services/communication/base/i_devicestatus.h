@@ -19,6 +19,7 @@
 #include <iremote_broker.h>
 
 #include "drag_data.h"
+#include "msdp_ipc_interface_code.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 
@@ -27,30 +28,6 @@ namespace Msdp {
 namespace DeviceStatus {
 class Idevicestatus : public IRemoteBroker {
 public:
-    enum {
-        DEVICESTATUS_SUBSCRIBE = 0,
-        DEVICESTATUS_UNSUBSCRIBE,
-        DEVICESTATUS_GETCACHE,
-        REGISTER_COORDINATION_MONITOR = 10,
-        UNREGISTER_COORDINATION_MONITOR,
-        PREPARE_COORDINATION,
-        UNPREPARE_COORDINATION,
-        START_COORDINATION,
-        STOP_COORDINATION,
-        GET_COORDINATION_STATE,
-        UPDATED_DRAG_STYLE = 20,
-        START_DRAG,
-        STOP_DRAG,
-        GET_DRAG_TARGET_PID,
-        GET_DRAG_TARGET_UDKEY,
-        REGISTER_DRAG_MONITOR,
-        UNREGISTER_DRAG_MONITOR,
-        SET_DRAG_WINDOW_VISIBLE,
-        GET_SHADOW_OFFSET,
-        UPDATE_SHADOW_PIC,
-        ALLOC_SOCKET_FD = 40
-    };
-
     virtual void Subscribe(Type type,
         ActivityEvent event,
         ReportLatencyNs latency,
