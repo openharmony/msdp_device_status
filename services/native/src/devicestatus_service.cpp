@@ -15,8 +15,6 @@
 
 #include "devicestatus_service.h"
 
-#include <csignal>
-#include <sys/signalfd.h>
 #include <unistd.h>
 #include <vector>
 
@@ -431,8 +429,6 @@ void DeviceStatusService::OnThread()
             CHKPC(epollEvent);
             if (epollEvent->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
-            } else if (epollEvent->event_type == EPOLL_EVENT_SIGNAL) {
-                OnSignalEvent(epollEvent->fd);
             } else if (epollEvent->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
             } else if (epollEvent->event_type == EPOLL_EVENT_TIMER) {
@@ -445,36 +441,6 @@ void DeviceStatusService::OnThread()
         }
     }
     FI_HILOGD("Main worker thread stop, tid:%{public}" PRId64 "", tid);
-}
-
-void DeviceStatusService::OnSignalEvent(int32_t signalFd)
-{
-    CALL_DEBUG_ENTER;
-    signalfd_siginfo sigInfo;
-    ssize_t size = read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
-    if (size != static_cast<ssize_t>(sizeof(signalfd_siginfo))) {
-        FI_HILOGE("Read signal info failed, invalid size:%{public}zd, errno:%{public}d", size, errno);
-        return;
-    }
-    int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
-    FI_HILOGD("Receive signal:%{public}d", signo);
-    switch (signo) {
-        case SIGINT:
-        case SIGQUIT:
-        case SIGILL:
-        case SIGABRT:
-        case SIGBUS:
-        case SIGFPE:
-        case SIGKILL:
-        case SIGSEGV:
-        case SIGTERM: {
-            state_ = ServiceRunningState::STATE_EXIT;
-            break;
-        }
-        default: {
-            break;
-        }
-    }
 }
 
 void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
