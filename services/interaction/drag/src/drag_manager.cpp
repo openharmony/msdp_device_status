@@ -319,7 +319,7 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> 
 {
     CALL_DEBUG_ENTER;
 }
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
 
 void DragManager::Dump(int32_t fd) const
 {
@@ -340,7 +340,7 @@ void DragManager::Dump(int32_t fd) const
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
             GetDragResult(dragResult_).c_str(), monitorId_, GetDragTargetPid(), targetTid,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     std::string udKey;
     if (RET_ERR == GetUdKey(udKey)) {
@@ -476,6 +476,7 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
 int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     uint32_t deviceTags = 0;
     if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
@@ -486,11 +487,12 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         FI_HILOGW("Drag is not supported for this device type:%{public}d", sourceType);
         return RET_ERR;
     }
+#endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     auto monitor = std::make_shared<MonitorConsumer>(std::bind(&DragManager::DragCallback, this,
         std::placeholders::_1));
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
-    if (monitorId_ < 0) {
+    if (monitorId_ <= 0) {
         FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
         return RET_ERR;
     }
@@ -502,7 +504,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
         return RET_ERR;
     }
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -528,7 +530,7 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("Failed to add drag event monitor");
 #else
         FI_HILOGE("Failed to add drag event interceptor");
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
@@ -555,7 +557,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     }
     MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
     interceptorId_ = -1;
-#endif //OHOS_DRAG_ENABLE_MONITOR
+#endif // OHOS_DRAG_ENABLE_MONITOR
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
