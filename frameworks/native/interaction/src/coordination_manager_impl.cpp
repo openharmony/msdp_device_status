@@ -85,7 +85,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
     }
     int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
     if (ret != RET_OK) {
-        FI_HILOGE("FI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);");
+        FI_HILOGE("Get coordination State failed");
     } else {
         devCoordinationEvent_[userData_] = event;
         userData_++;
