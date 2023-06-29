@@ -257,14 +257,14 @@ int32_t Client::Socket()
     CALL_DEBUG_ENTER;
     int32_t ret = DeviceStatusClient::GetInstance().AllocSocketPair(CONNECT_MODULE_TYPE_FI_CLIENT);
     if (ret != RET_OK) {
-        FI_HILOGE("Call allocSocketPair return %{public}d", ret);
+        FI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
     fd_ = DeviceStatusClient::GetInstance().GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == -1) {
-        FI_HILOGE("Call getClientSocketFdOfAllocedSocketPair return invalid fd");
+        FI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     }
-    FI_HILOGD("Call getClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+    FI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     return fd_;
 }
 

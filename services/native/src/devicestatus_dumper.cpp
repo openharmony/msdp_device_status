@@ -347,7 +347,7 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE: {
             Security::AccessToken::NativeTokenInfo tokenInfo;
             if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                FI_HILOGE("get native token info fail");
+                FI_HILOGE("Get native token info fail");
                 return packageName;
             }
             packageName = tokenInfo.processName;
@@ -356,7 +356,7 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
             Security::AccessToken::HapTokenInfo hapInfo;
             if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                FI_HILOGE("get hap token info fail");
+                FI_HILOGE("Get hap token info fail");
                 return packageName;
             }
             packageName = hapInfo.bundleName;
