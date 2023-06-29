@@ -120,7 +120,7 @@ void DeviceStatusMsdpMock::InitTimer()
     if (timerFd_ == ERR_INVALID_FD) {
         FI_HILOGE("create timer fd failed");
         if (close(epFd_) < 0) {
-            FI_HILOGE("Close epoll fd failed, epFd_: %{public}d", epFd_);
+            FI_HILOGE("Close epoll fd failed, epFd_:%{public}d", epFd_);
         }
         epFd_ = ERR_INVALID_FD;
         return;
