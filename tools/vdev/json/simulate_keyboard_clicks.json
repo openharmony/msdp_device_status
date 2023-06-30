@@ -1,0 +1,33 @@
+
+{
+    "device": "keyboard",
+    "type": "elegant",
+    "actions": [
+        { "action": "down", "key": 42 },
+        { "action": "down", "key": 35 },
+        { "action": "up", "key": 35 },
+        { "action": "up", "key": 42 },
+        { "action": "down", "key": 23 },
+        { "action": "up", "key": 23 },
+        { "action": "down", "key": 51 },
+        { "action": "up", "key": 51 },
+        { "action": "down", "key": 57 },
+        { "action": "up", "key": 57 },
+        { "action": "down", "key": 42 },
+        { "action": "down", "key": 20 },
+        { "action": "up", "key": 20 },
+        { "action": "up", "key": 42 },
+        { "action": "down", "key": 35 },
+        { "action": "up", "key": 35 },
+        { "action": "down", "key": 18 },
+        { "action": "up", "key": 18 },
+        { "action": "down", "key": 19 },
+        { "action": "up", "key": 19 },
+        { "action": "down", "key": 18 },
+        { "action": "up", "key": 18 },
+        { "action": "down", "key": 42 },
+        { "action": "down", "key": 2 },
+        { "action": "up", "key": 2 },
+        { "action": "up", "key": 42 }
+    ]
+}

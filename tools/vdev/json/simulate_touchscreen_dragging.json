@@ -1,0 +1,10 @@
+{
+    "device": "touchscreen",
+    "type": "elegant",
+    "actions": [
+        { "action": "down", "slot": 1, "x": 360, "y": 540 },
+        { "action": "wait", "duration": 500 },
+        { "action": "move-to", "slot": 1, "x": 360, "y": 100 },
+        { "action": "up", "slot": 1 }
+    ]
+}
