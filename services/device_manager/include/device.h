@@ -95,6 +95,8 @@ private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
+    bool HasMouseButton() const;
+    bool HasJoystickAxesOrButtons() const;
     void CheckPointers();
     void CheckKeys();
     std::string MakeConfigFileName() const;

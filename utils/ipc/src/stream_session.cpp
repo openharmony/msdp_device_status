@@ -87,7 +87,9 @@ void StreamSession::Close()
     CALL_DEBUG_ENTER;
     FI_HILOGD("Enter fd_:%{public}d", fd_);
     if (fd_ >= 0) {
-        close(fd_);
+        if (close(fd_) < 0) {
+            FI_HILOGE("Close fd failed, error:%{public}s, fd_:%{public}d", strerror(errno), fd_);
+        }
         fd_ = -1;
         UpdateDescript();
     }

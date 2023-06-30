@@ -75,7 +75,9 @@ void Monitor::Disable()
         devWd_ = -1;
     }
     if (inotifyFd_ >= 0) {
-        close(inotifyFd_);
+        if (close(inotifyFd_) < 0) {
+            FI_HILOGE("Close inotify fd failed, error:%{public}s, inotifyFd_:%{public}d", strerror(errno), inotifyFd_);
+        }
         inotifyFd_ = -1;
     }
 }

@@ -192,42 +192,95 @@ void Device::UpdateCapability()
     CheckKeys();
 }
 
-void Device::CheckPointers()
+bool Device::HasMouseButton() const
 {
-    CALL_DEBUG_ENTER;
-    bool hasKeys { TestBit(EV_KEY, evBitmask_) };
-    bool hasAbs { TestBit(EV_ABS, evBitmask_) };
-    bool hasRels { TestBit(EV_REL, evBitmask_) };
-    bool hasAbsCoords { TestBit(ABS_X, absBitmask_) &&
-                        TestBit(ABS_Y, absBitmask_) };
-    bool hasMtCoords { TestBit(ABS_MT_POSITION_X, absBitmask_) &&
-                       TestBit(ABS_MT_POSITION_Y, absBitmask_) };
-    bool isDirect { TestBit(INPUT_PROP_DIRECT, propBitmask_) };
-    bool hasTouch { TestBit(BTN_TOUCH, keyBitmask_) };
-    bool hasRelCoords { TestBit(REL_X, relBitmask_) &&
-                        TestBit(REL_Y, relBitmask_) };
-    bool stylusOrPen { TestBit(BTN_STYLUS, keyBitmask_) ||
-                       TestBit(BTN_TOOL_PEN, keyBitmask_) };
+    for (size_t button = BTN_MOUSE; button < BTN_JOYSTICK; ++button) {
+        if (TestBit(button, keyBitmask_)) {
+            return true;
+        }
+    }
+    return false;
+}
 
-    if (hasAbs) {
-        if (hasAbsCoords) {
-            if (hasKeys && stylusOrPen) {
-                caps_.set(DEVICE_CAP_TABLET_TOOL);
-                FI_HILOGD("This is tablet tool");
+bool Device::HasJoystickAxesOrButtons() const
+{
+    if (!TestBit(BTN_JOYSTICK - 1, keyBitmask_)) {
+        for (size_t button = BTN_JOYSTICK; button < BTN_DIGI; ++button) {
+            if (TestBit(button, keyBitmask_)) {
+                return true;
             }
         }
-        if (hasMtCoords) {
-            if (hasTouch || isDirect) {
-                caps_.set(DEVICE_CAP_TOUCH);
-                FI_HILOGD("This is touch device");
+        for (size_t button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40; ++button) {
+            if (TestBit(button, keyBitmask_)) {
+                return true;
+            }
+        }
+        for (size_t button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT; ++button) {
+            if (TestBit(button, keyBitmask_)) {
+                return true;
             }
         }
     }
-    if (hasRels) {
-        if (hasRelCoords) {
-            caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is pointer device");
+    for (size_t axis = ABS_RX; axis < ABS_PRESSURE; ++axis) {
+        if (TestBit(axis, absBitmask_)) {
+            return true;
         }
+    }
+    return false;
+}
+
+void Device::CheckPointers()
+{
+    CALL_DEBUG_ENTER;
+    bool hasAbsCoords { TestBit(ABS_X, absBitmask_) && TestBit(ABS_Y, absBitmask_) };
+    bool hasMtCoords { TestBit(ABS_MT_POSITION_X, absBitmask_) && TestBit(ABS_MT_POSITION_Y, absBitmask_) };
+    bool isDirect { TestBit(INPUT_PROP_DIRECT, propBitmask_) };
+    bool hasTouch { TestBit(BTN_TOUCH, keyBitmask_) };
+    bool hasRelCoords { TestBit(REL_X, relBitmask_) && TestBit(REL_Y, relBitmask_) };
+    bool stylusOrPen { TestBit(BTN_STYLUS, keyBitmask_) || TestBit(BTN_TOOL_PEN, keyBitmask_) };
+    bool fingerButNoPen { TestBit(BTN_TOOL_FINGER, keyBitmask_) && !TestBit(BTN_TOOL_PEN, keyBitmask_) };
+    bool hasMouseBtn { HasMouseButton() };
+    bool hasJoystickFeature { HasJoystickAxesOrButtons() };
+
+    if (hasAbsCoords) {
+        if (stylusOrPen) {
+            caps_.set(DEVICE_CAP_TABLET_TOOL);
+            FI_HILOGD("This is tablet tool");
+        } else if (fingerButNoPen && !isDirect) {
+            caps_.set(DEVICE_CAP_POINTER);
+            FI_HILOGD("This is touchpad");
+        } else if (hasMouseBtn) {
+            caps_.set(DEVICE_CAP_POINTER);
+            FI_HILOGD("This is mouse");
+        } else if (hasTouch || isDirect) {
+            caps_.set(DEVICE_CAP_TOUCH);
+            FI_HILOGD("This is touch device");
+        } else if (hasJoystickFeature) {
+            caps_.set(DEVICE_CAP_JOYSTICK);
+            FI_HILOGD("This is joystick");
+        }
+    } else if (hasJoystickFeature) {
+        caps_.set(DEVICE_CAP_JOYSTICK);
+        FI_HILOGD("This is joystick");
+    }
+    if (hasMtCoords) {
+        if (stylusOrPen) {
+            caps_.set(DEVICE_CAP_TABLET_TOOL);
+            FI_HILOGD("This is tablet tool");
+        } else if (fingerButNoPen && !isDirect) {
+            caps_.set(DEVICE_CAP_POINTER);
+            FI_HILOGD("This is touchpad");
+        } else if (hasTouch || isDirect) {
+            caps_.set(DEVICE_CAP_TOUCH);
+            FI_HILOGD("This is touch device");
+        }
+    }
+    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) &&
+        !caps_.test(DEVICE_CAP_POINTER) &&
+        !caps_.test(DEVICE_CAP_JOYSTICK) &&
+        hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
+        caps_.set(DEVICE_CAP_POINTER);
+        FI_HILOGD("This is mouse");
     }
 }
 

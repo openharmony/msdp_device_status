@@ -1,0 +1,21 @@
+{
+    "device": "mouse",
+    "type": "elegant",
+    "actions": [
+        { "action": "down", "button": "BTN_LEFT" },
+        { "action": "wait", "duration": 500 },
+        { "action": "move", "dx": 15, "dy": 15 },
+        { "action": "move", "dx": 15, "dy": 10 },
+        { "action": "move", "dx": 15, "dy": 10 },
+        { "action": "move", "dx": 15, "dy": 10 },
+        { "action": "move", "dx": 15, "dy": 10 },
+        { "action": "move", "dx": 15, "dy": 30 },
+        { "action": "move", "dx": 25, "dy": 20 },
+        { "action": "move", "dx": 35, "dy": 10 },
+        { "action": "move", "dx": 15, "dy": 40 },
+        { "action": "move", "dx": 15, "dy": 20 },
+        { "action": "move", "dx": 15, "dy": 10 },
+        { "action": "up", "button": "BTN_LEFT" },
+        { "action": "scroll", "dy": 30 }
+    ]
+}

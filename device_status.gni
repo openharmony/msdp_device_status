@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
+  fusion_rust_enabled = false
   fusion_interaction_coordination = false
 }
 
@@ -28,6 +29,10 @@ device_status_service_path = "${device_status_root_path}/services"
 device_status_utils_path = "${device_status_root_path}/utils/common"
 
 device_status_default_defines = []
+
+if (fusion_rust_enabled) {
+  device_status_default_defines += [ "OHOS_BUILD_ENABLE_RUST_IMPL" ]
+}
 
 if (fusion_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
