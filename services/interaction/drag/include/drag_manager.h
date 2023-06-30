@@ -83,7 +83,7 @@ public:
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
 private:
