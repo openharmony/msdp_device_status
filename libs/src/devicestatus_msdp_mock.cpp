@@ -167,7 +167,7 @@ void DeviceStatusMsdpMock::CloseTimer()
         return;
     }
     if (close(timerFd_) < 0) {
-        FI_HILOGE("CLose timer fd failed");
+        FI_HILOGE("Close timer fd failed, error:%{public}s, timerFd_:%{public}d", strerror(errno), timerFd_);
     }
     timerFd_ = -1;
 }

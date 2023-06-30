@@ -48,7 +48,7 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
         return DEVICESTATUS_FAILED;
     }
     if (close(fd) < 0) {
-        FI_HILOGE("Close fd failed");
+        FI_HILOGE("Close fd failed, error:%{public}s, fd:%{public}d", strerror(errno), git stafd);
     }
 
     struct stat buf;

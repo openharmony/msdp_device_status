@@ -292,7 +292,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
         FI_HILOGE("AllocSocketFd failed, pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
             if (close(clientFd) < 0) {
-                FI_HILOGE("Close client fd failed");
+                FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
             }
         }
         return ret;
@@ -301,7 +301,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     if (!reply.WriteFileDescriptor(clientFd)) {
         FI_HILOGE("Write file descriptor failed");
         if (close(clientFd) < 0) {
-            FI_HILOGE("Close client fd failed");
+            FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
         }
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
@@ -309,7 +309,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
     FI_HILOGD("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     if (close(clientFd) < 0) {
-        FI_HILOGE("Close client fd failed");
+        FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
     }
     return RET_OK;
 }
