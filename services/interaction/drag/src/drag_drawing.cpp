@@ -344,6 +344,8 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     if (visible) {
         g_drawingInfo.dragWindow->Show();
         FI_HILOGD("Drag window show success");
+        g_drawingInfo.dragWindow->SetTouchable(false);
+        FI_HILOGD("Drag window set touchable success");
     } else {
         g_drawingInfo.dragWindow->Hide();
         FI_HILOGD("Drag window hide success");
@@ -593,7 +595,6 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
     };
     option->SetWindowRect(rect);
     option->SetFocusable(false);
-    option->SetTouchable(false);
     std::string windowName = "drag window";
     g_drawingInfo.dragWindow = Rosen::Window::Create(windowName, option, nullptr);
 }
