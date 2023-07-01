@@ -46,14 +46,14 @@ int32_t StreamSocket::EpollCreate(int32_t size)
 int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
 {
     if (fd < 0) {
-        FI_HILOGE("Invalid fd");
+        FI_HILOGE("Invalid fd:%{public}d", fd);
         return RET_ERR;
     }
     if (epollFd < 0) {
         epollFd = epollFd_;
     }
     if (epollFd < 0) {
-        FI_HILOGE("Invalid param epollFd");
+        FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
         return RET_ERR;
     }
     int32_t ret;
@@ -75,7 +75,7 @@ int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll
         epollFd = epollFd_;
     }
     if (epollFd < 0) {
-        FI_HILOGE("Invalid param epollFd");
+        FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
         return RET_ERR;
     }
     int32_t ret = epoll_wait(epollFd, &events, maxevents, timeout);

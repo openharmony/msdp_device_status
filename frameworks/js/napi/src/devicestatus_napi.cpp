@@ -316,7 +316,6 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         FI_HILOGE("Failed to insert");
-        return nullptr;
     }
     return nullptr;
 }

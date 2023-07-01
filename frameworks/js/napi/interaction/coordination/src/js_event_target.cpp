@@ -263,7 +263,7 @@ void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -306,7 +306,7 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -341,7 +341,7 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -384,7 +384,7 @@ void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -419,7 +419,7 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -463,7 +463,7 @@ void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -498,7 +498,7 @@ void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -530,7 +530,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -568,7 +568,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
 

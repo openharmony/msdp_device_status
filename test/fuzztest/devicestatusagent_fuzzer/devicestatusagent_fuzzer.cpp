@@ -48,6 +48,7 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEvent(const uint8_t* data)
         return;
     }
 
+    CHKPV(agent_);
     agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
         ReportLatencyNs::LONG, agentEvent_);
 
@@ -59,6 +60,7 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEvent(Type type)
 {
     std::cout << "TestUnSubscribeAgentEvent: Enter" << std::endl;
 
+    CHKPV(agent_);
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 
@@ -74,6 +76,7 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventIsNullptr(const uint8_t* da
     }
     agentEvent_ = nullptr;
 
+    CHKPV(agent_);
     agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
         ReportLatencyNs::LONG, agentEvent_);
 
@@ -92,6 +95,7 @@ void DevicestatusAgentFuzzer::TestSubscribeAgentEventTypeIsNullptr(const uint8_t
         return;
     }
 
+    CHKPV(agent_);
     agent_->SubscribeAgentEvent(static_cast<Type>(type[0]), ActivityEvent::ENTER_EXIT,
         ReportLatencyNs::LONG, agentEvent_);
 
@@ -103,6 +107,7 @@ void DevicestatusAgentFuzzer::TestUnSubscribeAgentEventTypeIsNullptr(Type type)
 {
     std::cout << "TestUnSubscribeAgentEventTypeIsNullptr: Enter" << std::endl;
 
+    CHKPV(agent_);
     agent_->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
 }
 

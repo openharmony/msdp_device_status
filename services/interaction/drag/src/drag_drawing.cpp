@@ -191,7 +191,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 {
     CALL_DEBUG_ENTER;
     if (displayId < 0) {
-        FI_HILOGE("Invalid display:%{public}d", displayId);
+        FI_HILOGE("Invalid displayId:%{public}d", displayId);
         return;
     }
     g_drawingInfo.displayId = displayId;
@@ -418,6 +418,8 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(shadowNode);
+    CHKPV(dragStyleNode);
     RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
 }
 
@@ -425,6 +427,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     std::shared_ptr<Rosen::RSNode> rootNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(rootNode);
     RunAnimation(END_ALPHA, END_SCALE_FAIL);
 }
 
@@ -461,11 +464,11 @@ int32_t DragDrawing::InitDrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyl
     }
     std::shared_ptr<Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
     CHKPR(pixelMap, RET_ERR);
-    if (DrawStyle(dragStyleNode, pixelMap) != RET_OK) {
+    int32_t ret = DrawStyle(dragStyleNode, pixelMap);
+    if (ret != RET_OK) {
         FI_HILOGE("Drag style failed");
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
@@ -556,9 +559,8 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     ret = receiver_->SetVSyncRate(fcb, changeFreq);
     if (ret != RET_OK) {
         FI_HILOGE("Set vsync rate failed");
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 void DragDrawing::OnVsync()

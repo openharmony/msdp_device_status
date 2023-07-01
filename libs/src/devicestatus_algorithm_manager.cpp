@@ -65,11 +65,15 @@ ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
             break;
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
+            if (horizontalPosition_ != nullptr) {
             horizontalPosition_->RegisterCallback(callback);
+            }
             break;
         }
         case Type::TYPE_VERTICAL_POSITION: {
-            verticalPosition_->RegisterCallback(callback);
+            if (verticalPosition_ != nullptr) {
+                verticalPosition_->RegisterCallback(callback);
+            }
             break;
         }
         default: {
