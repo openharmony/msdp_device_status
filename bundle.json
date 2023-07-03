@@ -29,7 +29,6 @@
         "distributed_input",
         "device_manager",
         "sensor",
-        "jsoncpp",
         "init",
         "input",
         "hisysevent",
@@ -44,10 +43,11 @@
         "graphic_standard"
       ],
       "third_party": [
-        "cjson",
+        "cJSON",
         "libxml2",
         "libuv",
-        "openssl"
+        "openssl",
+        "jsoncpp"
       ]
     },
     "build": {
