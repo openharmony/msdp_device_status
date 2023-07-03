@@ -43,7 +43,7 @@ ohos_shared_library("fusion_data_binding") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "multimedia_image_framework:image_native",
   ]
 
