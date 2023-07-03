@@ -16,7 +16,6 @@
 #include "devicestatus_dumper.h"
 
 #include <cinttypes>
-#include <csignal>
 #include <cstring>
 #include <getopt.h>
 #include <iomanip>

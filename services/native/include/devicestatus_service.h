@@ -96,7 +96,6 @@ private:
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
     void OnThread();
-    void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(const epoll_event &ev);
     void OnTimeout(const epoll_event &ev);
     void OnDeviceMgr(const epoll_event &ev);
