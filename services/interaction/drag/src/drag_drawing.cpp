@@ -385,6 +385,7 @@ void DragDrawing::UpdateDragWindowState(bool visible)
         g_drawingInfo.surfaceNode->SetVisible(false);
         FI_HILOGD("Drag surfaceNode hide success");
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
