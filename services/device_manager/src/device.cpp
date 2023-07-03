@@ -98,7 +98,9 @@ void Device::Close()
 {
     CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
-        close(fd_);
+        if (close(fd_) < 0) {
+            FI_HILOGE("Close fd failed, error:%{public}s, fd_:%{public}d", strerror(errno), fd_);
+        }
         fd_ = -1;
     }
 }

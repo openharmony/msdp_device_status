@@ -291,20 +291,26 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     if (ret != RET_OK) {
         FI_HILOGE("AllocSocketFd failed, pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
-            close(clientFd);
+            if (close(clientFd) < 0) {
+                FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
+            }
         }
         return ret;
     }
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         FI_HILOGE("Write file descriptor failed");
-        close(clientFd);
+        if (close(clientFd) < 0) {
+            FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
+        }
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
     FI_HILOGD("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
-    close(clientFd);
+    if (close(clientFd) < 0) {
+        FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
+    }
     return RET_OK;
 }
 
