@@ -91,7 +91,8 @@ public:
         std::shared_ptr<Media::PixelMap> stylePixelMap) override;
     void OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
         std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode) override;
-    void OnStopDragFail(sptr<Rosen::Window> window, std::shared_ptr<Rosen::RSNode> rootNode) override;
+    void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
+        std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
 
 private:
