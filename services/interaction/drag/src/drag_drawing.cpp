@@ -694,6 +694,7 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
     g_drawingInfo.surfaceNode->SetBounds(displayX, displayY, IMAGE_WIDTH, IMAGE_HEIGHT);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
     g_drawingInfo.surfaceNode->AttachToDisplay(g_drawingInfo.displayId);
+    g_drawingInfo.surfaceNode->SetVisible(false);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
