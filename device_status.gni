@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,6 +16,8 @@ import("//build/ohos.gni")
 declare_args() {
   fusion_rust_enabled = false
   fusion_interaction_coordination = false
+  fusion_drag_enable_monitor = false
+  fusion_drag_enable_interceptor = true
 }
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
@@ -36,4 +38,12 @@ if (fusion_rust_enabled) {
 
 if (fusion_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
+}
+
+if (fusion_drag_enable_monitor) {
+  device_status_default_defines += [ "OHOS_DRAG_ENABLE_MONITOR" ]
+}
+
+if (fusion_drag_enable_interceptor) {
+  device_status_default_defines += [ "OHOS_DRAG_ENABLE_INTERCEPTOR" ]
 }
