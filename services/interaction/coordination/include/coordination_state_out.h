@@ -23,11 +23,12 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationStateOut final : public ICoordinationState {
 public:
+    CoordinationStateOut() = default;
     explicit CoordinationStateOut(const std::string &startDeviceDhid);
     int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId) override;
     void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) override;
-
+    void SetStartDeviceDhid(std::string startDeviceDhid) override;
 private:
     void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId);
     void ProcessStop(const std::string &remoteNetworkId);

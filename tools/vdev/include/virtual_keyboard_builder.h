@@ -26,7 +26,7 @@ namespace DeviceStatus {
 class VirtualKeyboardBuilder final : public VirtualDeviceBuilder {
 public:
     VirtualKeyboardBuilder();
-    ~VirtualKeyboardBuilder() = default;    
+    ~VirtualKeyboardBuilder() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKeyboardBuilder);
 
     static std::string GetDeviceName();

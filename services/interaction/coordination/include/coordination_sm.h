@@ -181,14 +181,14 @@ private:
     void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
     void NotifyMouseLocation(int32_t x, int32_t y);
     void SetPointerVisible();
+    std::shared_ptr<ICoordinationState> GetCurrentState();
 private:
-    std::shared_ptr<ICoordinationState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
     std::string remoteNetworkId_;
     std::string sinkNetworkId_;
     bool isUnchained_ { false };
-    CoordinationState coordinationState_ { CoordinationState::STATE_FREE };
+    CoordinationState currentState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
     std::vector<std::string> onlineDevice_;
@@ -206,6 +206,7 @@ private:
     std::function<void(std::string)> remoteNetworkIdCallback_;
     std::function<void(int32_t, int32_t)> mouseLocationCallback_;
     std::function<void(void)> notifyDragCancelCallback_;
+    std::map<CoordinationState, std::shared_ptr<ICoordinationState>> coordinationStates_;
 };
 
 #define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()
