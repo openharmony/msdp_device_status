@@ -31,7 +31,6 @@
 #include "pointer_event.h"
 #include "string_ex.h"
 #include "transaction/rs_interfaces.h"
-#include "transaction/rs_transaction.h"
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
@@ -97,7 +96,6 @@ struct DrawingInfo {
     int32_t displayY { -1 };
     int32_t rootNodeWidth { -1 };
     int32_t rootNodeHeight { -1 };
-    sptr<Rosen::Window> dragWindow { nullptr };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
@@ -157,7 +155,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
     }
     InitDrawingInfo(dragData);
     CreateWindow(dragData.displayX, dragData.displayY);
-    CHKPR(g_drawingInfo.dragWindow, INIT_FAIL);
+    CHKPR(g_drawingInfo.surfaceNode, INIT_FAIL);
     if (InitLayer() != RET_OK) {
         FI_HILOGE("Init layer failed");
         return INIT_FAIL;
@@ -208,12 +206,15 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     int32_t adjustSize = EIGHT_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
-    if (g_drawingInfo.dragWindow != nullptr) {
-        g_drawingInfo.dragWindow->MoveTo(positionX, positionY);
+    if (g_drawingInfo.surfaceNode != nullptr) {
+        g_drawingInfo.surfaceNode->SetBounds(positionX, positionY,
+            g_drawingInfo.surfaceNode->GetStagingProperties().GetBounds().z_,
+            g_drawingInfo.surfaceNode->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         return;
     }
     CreateWindow(positionX, positionY);
-    CHKPV(g_drawingInfo.dragWindow);
+    CHKPV(g_drawingInfo.surfaceNode);
 }
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
@@ -276,13 +277,15 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    CHKPR(g_drawingInfo.dragWindow, RET_ERR);
-    g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPR(g_drawingInfo.surfaceNode, RET_ERR);
+    g_drawingInfo.surfaceNode->SetBoundsWidth(g_drawingInfo.rootNodeWidth);
+    g_drawingInfo.surfaceNode->SetBoundsHeight(g_drawingInfo.rootNodeHeight);
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         g_drawingInfo.pixelMapX = shadowInfo.x;
         g_drawingInfo.pixelMapY = shadowInfo.y;
         DrawMouseIcon();
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     return RET_OK;
@@ -305,11 +308,11 @@ void DragDrawing::OnDragSuccess()
 void DragDrawing::OnDragFail()
 {
     CALL_DEBUG_ENTER;
-    sptr<Rosen::Window> dragWindow = g_drawingInfo.dragWindow;
-    CHKPV(dragWindow);
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode = g_drawingInfo.surfaceNode;
+    CHKPV(surfaceNode);
     std::shared_ptr<Rosen::RSNode> rootNode = g_drawingInfo.rootNode;
     CHKPV(rootNode);
-    OnStopDragFail(dragWindow, rootNode);
+    OnStopDragFail(surfaceNode, rootNode);
 }
 
 void DragDrawing::EraseMouseIcon()
@@ -337,7 +340,6 @@ void DragDrawing::DestroyDragWindow()
     startNum_ = START_TIME;
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
-    g_drawingInfo.displayId = -1;
     g_drawingInfo.pixelMapX = -1;
     g_drawingInfo.pixelMapY = -1;
     g_drawingInfo.displayX = -1;
@@ -356,10 +358,11 @@ void DragDrawing::DestroyDragWindow()
         g_drawingInfo.rootNode.reset();
         g_drawingInfo.rootNode = nullptr;
     }
-    g_drawingInfo.surfaceNode = nullptr;
-    if (g_drawingInfo.dragWindow != nullptr) {
-        g_drawingInfo.dragWindow->Destroy();
-        g_drawingInfo.dragWindow = nullptr;
+    if (g_drawingInfo.surfaceNode != nullptr) {
+        g_drawingInfo.surfaceNode->DetachToDisplay(g_drawingInfo.displayId);
+        g_drawingInfo.surfaceNode = nullptr;
+        g_drawingInfo.displayId = -1;
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
     CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
@@ -375,18 +378,15 @@ void DragDrawing::UpdateDrawingState()
 void DragDrawing::UpdateDragWindowState(bool visible)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(g_drawingInfo.dragWindow);
+    CHKPV(g_drawingInfo.surfaceNode);
     if (visible) {
-        g_drawingInfo.dragWindow->Show();
-        FI_HILOGD("Drag window show success");
-        g_drawingInfo.dragWindow->SetTouchable(false);
-        FI_HILOGD("Drag window set touchable success");
-        g_drawingInfo.dragWindow->SetFocusable(false);
-        FI_HILOGD("Drag window set focusable success");
+        g_drawingInfo.surfaceNode->SetVisible(true);
+        FI_HILOGD("Drag surfaceNode show success");
     } else {
-        g_drawingInfo.dragWindow->Hide();
-        FI_HILOGD("Drag window hide success");
+        g_drawingInfo.surfaceNode->SetVisible(false);
+        FI_HILOGD("Drag surfaceNode hide success");
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
@@ -421,7 +421,8 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
 }
 
-void DragDrawing::OnStopDragFail(sptr<Rosen::Window> window, std::shared_ptr<Rosen::RSNode> rootNode)
+void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
+    std::shared_ptr<Rosen::RSNode> rootNode)
 {
     CALL_DEBUG_ENTER;
     RunAnimation(END_ALPHA, END_SCALE_FAIL);
@@ -614,22 +615,16 @@ int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 int32_t DragDrawing::InitLayer()
 {
     CALL_DEBUG_ENTER;
-    if (g_drawingInfo.dragWindow == nullptr) {
-        FI_HILOGE("Init layer failed, dragWindow is nullptr");
-        return RET_ERR;
-    }
-    g_drawingInfo.surfaceNode = g_drawingInfo.dragWindow->GetSurfaceNode();
     if (g_drawingInfo.surfaceNode == nullptr) {
-        g_drawingInfo.dragWindow->Destroy();
-        g_drawingInfo.dragWindow = nullptr;
         FI_HILOGE("Init layer failed, surfaceNode is nullptr");
         return RET_ERR;
     }
     auto surface = g_drawingInfo.surfaceNode->GetSurface();
     if (surface == nullptr) {
-        g_drawingInfo.dragWindow->Destroy();
-        g_drawingInfo.dragWindow = nullptr;
+        g_drawingInfo.surfaceNode->DetachToDisplay(g_drawingInfo.displayId);
+        g_drawingInfo.surfaceNode = nullptr;
         FI_HILOGE("Init layer failed, surface is nullptr");
+        Rosen::RSTransaction::FlushImplicitTransaction();
         return RET_ERR;
     }
     if (g_drawingInfo.isInitUiDirector) {
@@ -691,19 +686,18 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
 void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 {
     CALL_DEBUG_ENTER;
-    sptr<Rosen::WindowOption> option = new (std::nothrow) Rosen::WindowOption();
-    CHKPV(option);
-    option->SetWindowType(Rosen::WindowType::WINDOW_TYPE_DRAGGING_EFFECT);
-    option->SetWindowMode(Rosen::WindowMode::WINDOW_MODE_FLOATING);
-    Rosen::Rect rect = {
-        .posX_ = displayX,
-        .posY_ = displayY,
-        .width_ = IMAGE_WIDTH,
-        .height_ = IMAGE_HEIGHT
-    };
-    option->SetWindowRect(rect);
-    std::string windowName = "drag window";
-    g_drawingInfo.dragWindow = Rosen::Window::Create(windowName, option, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "drag window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    g_drawingInfo.surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    CHKPV(g_drawingInfo.surfaceNode);
+    g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    g_drawingInfo.surfaceNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+    g_drawingInfo.surfaceNode->SetBounds(displayX, displayY, IMAGE_WIDTH, IMAGE_HEIGHT);
+    g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
+    g_drawingInfo.surfaceNode->AttachToDisplay(g_drawingInfo.displayId);
+    g_drawingInfo.surfaceNode->SetVisible(false);
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DragDrawing::RemoveModifier()
@@ -1018,8 +1012,9 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    CHKPV(g_drawingInfo.dragWindow);
-    g_drawingInfo.dragWindow->Resize(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPV(g_drawingInfo.surfaceNode);
+    g_drawingInfo.surfaceNode->SetBoundsWidth(g_drawingInfo.rootNodeWidth);
+    g_drawingInfo.surfaceNode->SetBoundsHeight(g_drawingInfo.rootNodeHeight);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 

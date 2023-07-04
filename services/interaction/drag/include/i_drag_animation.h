@@ -16,8 +16,8 @@
 #ifndef I_DRAG_ANIMATION_H
 #define I_DRAG_ANIMATION_H
 
-#include "../wm/window.h"
 #include "pixel_map.h"
+#include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_node.h"
 #include "ui/rs_root_node.h"
 
@@ -37,7 +37,8 @@ public:
         std::shared_ptr<Media::PixelMap> stylePixelMap) = 0;
     virtual void OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
         std::shared_ptr<Rosen::RSCanvasNode> styleNode) = 0;
-    virtual void OnStopDragFail(sptr<Rosen::Window> window, std::shared_ptr<Rosen::RSNode> rootNode) = 0;
+    virtual void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
+        std::shared_ptr<Rosen::RSNode> rootNode) = 0;
     virtual void OnStopAnimation() = 0;
 };
 } // namespace DeviceStatus
