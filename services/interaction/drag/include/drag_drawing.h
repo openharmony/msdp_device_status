@@ -32,6 +32,15 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+using DragSuccessExtFunc = void (*)(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
+using DragFailExtFunc = void (*)(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
+        std::shared_ptr<Rosen::RSNode> rootNode);
+using DragStartExtFunc = void (*)(const DragAnimationData &dragAnimationData,
+    std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
+using DragStyleExtFunc = void (*)(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
+    std::shared_ptr<Media::PixelMap> stylePixelMap);
+using DragStopExtFunc = void (*)();
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
