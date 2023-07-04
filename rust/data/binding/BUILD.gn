@@ -35,8 +35,6 @@ ohos_shared_library("fusion_data_binding") {
 
   deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]
 
-  public_deps = [ "${device_status_root_path}/rust/subsystem/binding:fusion_subsystem_binding" ]
-
   configs = [ ":fusion_data_binding_config" ]
 
   public_configs = [ ":fusion_data_binding_public_config" ]

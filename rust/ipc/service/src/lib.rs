@@ -24,8 +24,6 @@ extern crate fusion_utils_rust;
 
 mod identity;
 
-use std::ops::Deref;
-
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use crate::ipc_rust::{
@@ -121,13 +119,13 @@ define_remote_object!(
 );
 
 impl FusionIpcProxy {
-    fn transfer_data(&self, src: &MsgParcel, borrowed_target: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>
+    fn transfer_data(&self, src: &dyn IMsgParcel, target: &mut dyn IMsgParcel) -> FusionResult<i32>
     {
         call_debug_enter!("FusionIpcProxy::transfer_data");
         let data_size = src.get_data_size();
         match src.read_buffer(data_size) {
             Ok(data_vec) => {
-                if borrowed_target.write_buffer(data_vec.as_slice()) {
+                if target.write_buffer(data_vec.as_slice()) {
                     Ok(0)
                 } else {
                     error!(LOG_LABEL, "write_buffer() failed");
@@ -145,12 +143,12 @@ impl FusionIpcProxy {
         data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>
     {
         call_debug_enter!("FusionIpcProxy::send_request");
-        match MsgParcel::from_borrow(data) {
-            Some(manually_drop_parcel) => {
+        match MsgParcel::new() {
+            Some(mut data_parcel) => {
+                self.transfer_data(data, &mut data_parcel)?;
                 let code = compose_param_id(action, intention, id);
-                let parcel = manually_drop_parcel.deref();
                 let rep = {
-                    match self.remote.send_request(code, parcel, false) {
+                    match self.remote.send_request(code, &data_parcel, false) {
                         Ok(tr) => {
                             tr
                         }
