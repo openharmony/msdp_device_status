@@ -285,6 +285,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         g_drawingInfo.pixelMapY = shadowInfo.y;
         DrawMouseIcon();
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     return RET_OK;
