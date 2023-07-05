@@ -291,7 +291,8 @@ void Device::CheckKeys()
         FI_HILOGD("No EV_KEY capability");
         return;
     }
-    for (size_t block { 0U }; block < (sizeof(KEY_BLOCKS) / sizeof(struct Range)); ++block) {
+    size_t length = sizeof(KEY_BLOCKS) / sizeof(struct Range);
+    for (size_t block { 0U }; block < length; ++block) {
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
                 FI_HILOGD("Found key:%{public}zx", key);

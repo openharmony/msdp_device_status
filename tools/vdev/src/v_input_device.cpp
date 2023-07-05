@@ -140,7 +140,7 @@ int32_t VInputDevice::SendEvent(uint16_t type, uint16_t code, int32_t value)
 void VInputDevice::QueryDeviceInfo()
 {
     CALL_DEBUG_ENTER;
-    char buffer[PATH_MAX] {};
+    char buffer[PATH_MAX] { 0 };
 
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {

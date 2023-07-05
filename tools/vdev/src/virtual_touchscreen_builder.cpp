@@ -44,9 +44,6 @@ constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
 constexpr uint32_t SY_OFFSET { 1 };
 constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
-constexpr size_t ARG_1 { 1 };
-constexpr size_t ARG_2 { 2 };
-constexpr size_t ARG_3 { 3 };
 
 AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
     { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
@@ -334,9 +331,9 @@ void VirtualTouchScreenBuilder::ReadDragToAction(int argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(optarg) || (optind + ARG_3 >= argc) || !Utility::IsInteger(argv[optind]) ||
-        !Utility::IsInteger(argv[optind + ARG_1]) || !Utility::IsInteger(argv[optind + ARG_2]) ||
-        !Utility::IsInteger(argv[optind + ARG_3])) {
+    if (!Utility::IsInteger(optarg) || (optind + TY_OFFSET >= argc) || !Utility::IsInteger(argv[optind]) ||
+        !Utility::IsInteger(argv[optind + SY_OFFSET]) || !Utility::IsInteger(argv[optind + TX_OFFSET]) ||
+        !Utility::IsInteger(argv[optind + TY_OFFSET])) {
         std::cout << "Invalid arguments for Option \'-D\'." << std::endl;
         ShowUsage();
         return;
