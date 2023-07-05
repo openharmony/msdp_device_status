@@ -222,7 +222,7 @@ static void Act(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     static const struct option options[] { { "help", no_argument, nullptr, 'h' }, {} };
-    int32_t opt = getopt_long(argc, argv, "+h", options, NULL);
+    int32_t opt = getopt_long(argc, argv, "+h", options, nullptr);
     if (opt >= 0) {
         ShowUsage();
     } else {

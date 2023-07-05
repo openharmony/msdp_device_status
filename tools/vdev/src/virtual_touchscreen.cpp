@@ -139,7 +139,6 @@ int32_t VirtualTouchScreen::Move(int32_t slot, int32_t dx, int32_t dy)
 
     while (tcoord.x != slots_[slot].coord.x || tcoord.y != slots_[slot].coord.y) {
         double total = ::hypot(tcoord.x - slots_[slot].coord.x, tcoord.y - slots_[slot].coord.y);
-
         if (total <= STEP_LENGTH) {
             slots_[slot].coord.x = tcoord.x;
             slots_[slot].coord.y = tcoord.y;

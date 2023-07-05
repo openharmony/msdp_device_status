@@ -16,6 +16,7 @@
 #include "virtual_device_builder.h"
 
 #include <cerrno>
+#include <csignal>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -25,7 +26,6 @@
 
 #include <dirent.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>

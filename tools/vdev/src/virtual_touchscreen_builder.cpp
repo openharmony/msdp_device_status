@@ -41,6 +41,12 @@ constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
 constexpr int32_t ABS_MT_BLOB_ID_MAX = 10;
 constexpr int32_t ABS_MT_TRACKING_ID_MAX = 9;
 constexpr int32_t ABS_TOOL_TYPE_MAX = 15;
+constexpr uint32_t SY_OFFSET { 1 };
+constexpr uint32_t TX_OFFSET { 2 };
+constexpr uint32_t TY_OFFSET { 3 };
+constexpr size_t ARG_1 { 1 };
+constexpr size_t ARG_2 { 2 };
+constexpr size_t ARG_3 { 3 };
 
 AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
     { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
@@ -64,11 +70,11 @@ VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(Ge
 {
     eventTypes_ = { EV_ABS, EV_KEY };
     properties_ = { INPUT_PROP_DIRECT };
-    keys_ = { BTN_TOUCH,BTN_TOOL_RUBBER, BTN_TOOL_BRUSH, BTN_TOOL_PENCIL,BTN_TOOL_AIRBRUSH,
+    keys_ = { BTN_TOUCH, BTN_TOOL_RUBBER, BTN_TOOL_BRUSH, BTN_TOOL_PENCIL, BTN_TOOL_AIRBRUSH,
             BTN_TOOL_FINGER, BTN_TOOL_MOUSE, BTN_TOOL_LENS };
     abs_ = { ABS_X, ABS_Y, ABS_PRESSURE, ABS_MT_TOUCH_MAJOR, ABS_MT_TOUCH_MINOR, ABS_MT_ORIENTATION,
             ABS_MT_POSITION_X, ABS_MT_POSITION_Y, ABS_MT_BLOB_ID, ABS_MT_TRACKING_ID, ABS_MT_PRESSURE,
-            ABS_MT_WIDTH_MAJOR, ABS_MT_WIDTH_MINOR, ABS_MT_TOOL_X, ABS_MT_TOOL_Y, ABS_MT_TOOL_TYPE};
+            ABS_MT_WIDTH_MAJOR, ABS_MT_WIDTH_MINOR, ABS_MT_TOOL_X, ABS_MT_TOOL_Y, ABS_MT_TOOL_TYPE };
     for (const auto &item : absInfos) {
         SetAbsValue(item);
     }
@@ -328,19 +334,19 @@ void VirtualTouchScreenBuilder::ReadDragToAction(int argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-
-    if (!Utility::IsInteger(optarg) || (optind + 3 >= argc) || !Utility::IsInteger(argv[optind]) ||
-        !Utility::IsInteger(argv[optind + 1]) || !Utility::IsInteger(argv[optind + 2]) ||
-        !Utility::IsInteger(argv[optind + 3])) {
+    if (!Utility::IsInteger(optarg) || (optind + ARG_3 >= argc) || !Utility::IsInteger(argv[optind]) ||
+        !Utility::IsInteger(argv[optind + ARG_1]) || !Utility::IsInteger(argv[optind + ARG_2]) ||
+        !Utility::IsInteger(argv[optind + ARG_3])) {
         std::cout << "Invalid arguments for Option \'-D\'." << std::endl;
         ShowUsage();
         return;
     }
+
     int32_t slot = std::atoi(optarg);
     int32_t sx = std::atoi(argv[optind]);
-    int32_t sy = std::atoi(argv[optind + 1]);
-    int32_t tx = std::atoi(argv[optind + 2]);
-    int32_t ty = std::atoi(argv[optind + 3]);
+    int32_t sy = std::atoi(argv[optind + SY_OFFSET]);
+    int32_t tx = std::atoi(argv[optind + TX_OFFSET]);
+    int32_t ty = std::atoi(argv[optind + TY_OFFSET]);
 
     std::cout << "[touchscreen] drag-to: [" << slot << ", (" << tx << "," << ty << ")]" << std::endl;
     auto vTouch = VirtualTouchScreen::GetDevice();
