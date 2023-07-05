@@ -17,7 +17,6 @@
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
-#include "fusion_image_framework_internal.h"
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_data_binding" };
@@ -26,8 +25,6 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOM
 struct CDragData* CDragDataFree(struct CDragData *cdrag)
 {
     CHKPP(cdrag);
-    CPixelMapUnref(cdrag->shadowInfo.pixelMap);
-    cdrag->shadowInfo.pixelMap = nullptr;
     return nullptr;
 }
 
@@ -36,12 +33,6 @@ int32_t CDragDataFrom(const ::OHOS::Msdp::DeviceStatus::DragData *drag, CDragDat
     CALL_DEBUG_ENTER;
     CHKPR(drag, RET_ERR);
     CHKPR(cdrag, RET_ERR);
-    CPixelMap *cImg = nullptr;
-    if (drag->shadowInfo.pixelMap != nullptr) {
-        cImg = CPixelMapFrom(drag->shadowInfo.pixelMap);
-        CHKPR(cImg, RET_ERR);
-    }
-    cdrag->shadowInfo.pixelMap = cImg;
     cdrag->shadowInfo.x = drag->shadowInfo.x;
     cdrag->shadowInfo.y = drag->shadowInfo.y;
     cdrag->buffer = drag->buffer.data();

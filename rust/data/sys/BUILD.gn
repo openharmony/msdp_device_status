@@ -17,10 +17,7 @@ import("//build/ohos.gni")
 ohos_rust_shared_library("fusion_data_rust") {
   sources = [ "src/lib.rs" ]
 
-  deps = [
-    "${device_status_root_path}/rust/subsystem/binding:fusion_subsystem_binding",
-    "${device_status_root_path}/rust/utils:fusion_utils_rust",
-  ]
+  deps = [ "${device_status_root_path}/rust/utils:fusion_utils_rust" ]
 
   external_deps = [
     "access_token:libnativetoken",

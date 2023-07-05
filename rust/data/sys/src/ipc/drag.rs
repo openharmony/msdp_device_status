@@ -18,8 +18,8 @@
 use std::ffi::{ c_char, CString };
 use std::fmt::{ Display, Formatter, Error };
 use crate::fusion_utils_rust::{ call_debug_enter };
-use crate::hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult, IpcStatusCode, AsRawPtr, CParcel };
+use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
+use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
 
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -28,22 +28,9 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragData"
 };
 
-#[repr(C)]
-pub struct CPixelMap {
-    _private: [u8; 0],
-}
-
-extern "C" {
-    fn CPixelMapRef(pixelMap: *mut CPixelMap) -> *mut CPixelMap;
-    fn CPixelMapUnref(pixelMap: *mut CPixelMap) -> *mut CPixelMap;
-    fn CPixelMapSerialize(pixelMap: *const CPixelMap, parcel: *mut CParcel) -> i32;
-    fn CPixelMapDeserialize(parcel: *const CParcel) -> *mut CPixelMap;
-}
-
 /// TODO: add documentation.
 #[repr(C)]
 pub struct CShadowInfo {
-    pixel_map: *mut CPixelMap,
     x: i32,
     y: i32,
 }
@@ -64,47 +51,7 @@ pub struct CDragData {
 }
 
 /// TODO: add documentation.
-pub struct PixelMap {
-    pixel_map: *mut CPixelMap,
-}
-
-impl Serialize for PixelMap {
-    fn serialize(&self, parcel: &mut BorrowedMsgParcel<'_>) -> IpcResult<()>
-    {
-        call_debug_enter!("PixelMap::serialize");
-        let ret = unsafe {
-            CPixelMapSerialize(self.pixel_map, parcel.as_mut_raw())
-        };
-        if ret == 0 {
-            Ok(())
-        } else {
-            error!(LOG_LABEL, "Fail to serialize PixelMap");
-            Err(IpcStatusCode::Failed)
-        }
-    }
-}
-
-impl Deserialize for PixelMap {
-    fn deserialize(parcel: &BorrowedMsgParcel<'_>) -> IpcResult<Self>
-    {
-        call_debug_enter!("PixelMap::deserialize");
-        let pixel_map = unsafe {
-            CPixelMapDeserialize(parcel.as_raw())
-        };
-        if pixel_map.is_null() {
-            error!(LOG_LABEL, "Fail to deserialize PixelMap");
-            Err(IpcStatusCode::Failed)
-        } else {
-            Ok(Self {
-                pixel_map
-            })
-        }
-    }
-}
-
-/// TODO: add documentation.
 pub struct ShadowInfo {
-    pixel_map: Box<PixelMap>,
     x: i32,
     y: i32,
 }
@@ -115,22 +62,8 @@ impl ShadowInfo {
     {
         call_debug_enter!("ShadowInfo::from_c");
         Self {
-            pixel_map: Box::new(PixelMap {
-                pixel_map: unsafe {
-                    CPixelMapRef(value.pixel_map)
-                },
-            }),
             x: value.x,
             y: value.y,
-        }
-    }
-}
-
-impl Drop for ShadowInfo {
-    fn drop(&mut self)
-    {
-        unsafe {
-            CPixelMapUnref(self.pixel_map.pixel_map);
         }
     }
 }
@@ -139,7 +72,6 @@ impl Serialize for ShadowInfo {
     fn serialize(&self, parcel: &mut BorrowedMsgParcel<'_>) -> IpcResult<()>
     {
         call_debug_enter!("ShadowInfo::serialize");
-        self.pixel_map.serialize(parcel)?;
         self.x.serialize(parcel)?;
         self.y.serialize(parcel)?;
         Ok(())
@@ -151,7 +83,6 @@ impl Deserialize for ShadowInfo {
     {
         call_debug_enter!("ShadowInfo::deserialize");
         let shadow_info = Self {
-            pixel_map: Box::<PixelMap>::deserialize(parcel)?,
             x: i32::deserialize(parcel)?,
             y: i32::deserialize(parcel)?,
         };
