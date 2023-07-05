@@ -102,7 +102,11 @@ void VInputDevice::Close()
 bool VInputDevice::QueryAbsInfo(size_t abs, struct input_absinfo &absInfo)
 {
     CALL_DEBUG_ENTER;
-    memset_s(&absInfo, sizeof(absInfo), 0, sizeof(absInfo));
+    errno_t ret = (&absInfo, sizeof(absInfo), 0, sizeof(absInfo));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return false;
+    }
     return (ioctl(fd_, EVIOCGABS(abs), &absInfo) >= 0);
 }
 
@@ -149,14 +153,22 @@ void VInputDevice::QueryDeviceInfo()
     if (rc < 0) {
         FI_HILOGE("Could not get device input id: %{public}s", strerror(errno));
     }
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    errno_t ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get location: %{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
