@@ -44,6 +44,7 @@ public:
     }
     virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
     virtual void SetStartDeviceDhid(std::string startDeviceDhid) {}
+    
 protected:
     int32_t PrepareAndStart(const std::string &remoteNetworkId, int32_t startDeviceId);
     bool NeedPrepare(const std::string &remoteNetworkId, const std::string &originNetworkId);

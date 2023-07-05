@@ -28,6 +28,7 @@ public:
     int32_t DeactivateCoordination(const std::string &networkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId) override;
     void SetStartDeviceDhid(std::string startDeviceDhid) override {}
+    
 private:
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);
 };

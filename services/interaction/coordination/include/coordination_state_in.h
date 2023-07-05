@@ -29,6 +29,7 @@ public:
     int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId) override;
     void SetStartDeviceDhid(std::string startDeviceDhid) override;
+    
 private:
     void ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t RelayComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
