@@ -18,7 +18,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 // FIXME: need abi_stable crate or thin_trait_object crate
-#![allow(improper_ctypes_definitions)] 
+#![allow(improper_ctypes_definitions)]
 
 extern crate fusion_data_rust;
 extern crate fusion_utils_rust;

@@ -103,7 +103,7 @@ impl IDeviceStatus for FusionIpcDelegator {
         reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
         call_debug_enter!("FusionIpcDelegator::disable");
         self.check_interface_token(data)?;
-    
+
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
         info!(LOG_LABEL, "call plugin.disable()");
