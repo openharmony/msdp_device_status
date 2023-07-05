@@ -182,6 +182,7 @@ private:
     void NotifyMouseLocation(int32_t x, int32_t y);
     void SetPointerVisible();
     std::shared_ptr<ICoordinationState> GetCurrentState();
+    
 private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDeviceDhid_;
