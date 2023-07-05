@@ -28,7 +28,7 @@ public:
     int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId) override;
     void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) override;
-    void SetStartDeviceDhid(std::string startDeviceDhid) override;
+    void SetStartDeviceDhid(const std::string &startDeviceDhid) override;
 
 private:
     void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId);
