@@ -102,7 +102,7 @@ void VInputDevice::Close()
 bool VInputDevice::QueryAbsInfo(size_t abs, struct input_absinfo &absInfo)
 {
     CALL_DEBUG_ENTER;
-    errno_t ret = (&absInfo, sizeof(absInfo), 0, sizeof(absInfo));
+    errno_t ret = memset_s(&absInfo, sizeof(absInfo), 0, sizeof(absInfo));
     if (ret != EOK) {
         FI_HILOGE("Call memset_s failed");
         return false;
