@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct range {
+struct Range {
     size_t start { 0 };
     size_t end { 0 };
 };
@@ -47,7 +47,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Device"
 constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 constexpr ssize_t MAX_FILE_SIZE_ALLOWED { 0x5000 };
 
-const struct range KEY_BLOCKS[] {
+const struct Range KEY_BLOCKS[] {
     { KEY_ESC, BTN_MISC },
     { KEY_OK, BTN_DPAD_UP },
     { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY }
@@ -291,7 +291,8 @@ void Device::CheckKeys()
         FI_HILOGD("No EV_KEY capability");
         return;
     }
-    for (size_t block { 0U }; block < (sizeof(KEY_BLOCKS) / sizeof(struct range)); ++block) {
+    size_t length = sizeof(KEY_BLOCKS) / sizeof(struct Range);
+    for (size_t block { 0U }; block < length; ++block) {
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
                 FI_HILOGD("Found key:%{public}zx", key);
