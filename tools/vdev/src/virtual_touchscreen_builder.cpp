@@ -32,15 +32,15 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreenBuilder" };
-constexpr int32_t MAXIMUM_LEVEL_ALLOWED = 3;
-constexpr int32_t ABS_MAX_X = 720;
-constexpr int32_t ABS_MAX_Y = 1280;
-constexpr int32_t ABS_PRESSURE_MAX = 100;
-constexpr int32_t ABS_MT_ORIENTATION_MIN = -90;
-constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
-constexpr int32_t ABS_MT_BLOB_ID_MAX = 10;
-constexpr int32_t ABS_MT_TRACKING_ID_MAX = 9;
-constexpr int32_t ABS_TOOL_TYPE_MAX = 15;
+constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
+constexpr int32_t ABS_MAX_X { 720 };
+constexpr int32_t ABS_MAX_Y { 1280 };
+constexpr int32_t ABS_PRESSURE_MAX { 100 };
+constexpr int32_t ABS_MT_ORIENTATION_MIN { -90 };
+constexpr int32_t ABS_MT_ORIENTATION_MAX { 90 };
+constexpr int32_t ABS_MT_BLOB_ID_MAX { 10 };
+constexpr int32_t ABS_MT_TRACKING_ID_MAX { 9 };
+constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
 constexpr uint32_t SY_OFFSET { 1 };
 constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
