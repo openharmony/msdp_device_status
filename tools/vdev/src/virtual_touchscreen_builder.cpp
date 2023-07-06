@@ -23,6 +23,7 @@
 #include <linux/input.h>
 
 #include "devicestatus_define.h"
+#include "display_manager.h"
 #include "fi_log.h"
 #include "utility.h"
 #include "virtual_touchscreen.h"
@@ -33,8 +34,8 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreenBuilder" };
 constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
-constexpr int32_t ABS_MAX_X { 720 };
-constexpr int32_t ABS_MAX_Y { 1280 };
+int32_t ABS_MAX_X { 720 };
+int32_t ABS_MAX_Y { 1280 };
 constexpr int32_t ABS_PRESSURE_MAX { 100 };
 constexpr int32_t ABS_MT_ORIENTATION_MIN { -90 };
 constexpr int32_t ABS_MT_ORIENTATION_MAX { 90 };
@@ -44,8 +45,14 @@ constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
 constexpr uint32_t SY_OFFSET { 1 };
 constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
+} // namespace
 
-AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
+VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x6006, 0x6006)
+{
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    ABS_MAX_X = display->GetWidth();
+    ABS_MAX_Y = display->GetHeight();
+    AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
     { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
     { ABS_PRESSURE, 0, ABS_PRESSURE_MAX, 0, 0 },
     { ABS_MT_TOUCH_MAJOR, 0, 1, 0, 0 },
@@ -61,10 +68,7 @@ AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
     { ABS_MT_WIDTH_MINOR, 0, 1, 0, 0 },
     { ABS_MT_TOOL_X, 0, ABS_MAX_X, 0, 0 },
     { ABS_MT_TOOL_Y, 0, 1, 0, 0 } };
-} // namespace
 
-VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x6006, 0x6006)
-{
     eventTypes_ = { EV_ABS, EV_KEY };
     properties_ = { INPUT_PROP_DIRECT };
     keys_ = { BTN_TOUCH, BTN_TOOL_RUBBER, BTN_TOOL_BRUSH, BTN_TOOL_PENCIL, BTN_TOOL_AIRBRUSH,
