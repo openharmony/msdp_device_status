@@ -36,6 +36,7 @@ public:
     void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
     DragData GetDragData() const;
     void SetDragStyle(DragCursorStyle style);
+    void SetShadowInfo(const ShadowInfo &shadowInfo);
     DragCursorStyle GetDragStyle() const;
     std::u16string GetDragMessage() const;
     void SetDragWindowVisible(bool visible);
