@@ -282,7 +282,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed = false;
-    for (auto item : pointerEvent->GetPressedButtons()) {
+    for (const auto &item : pointerEvent->GetPressedButtons()) {
         if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
             isPointerButtonPressed = true;
             break;

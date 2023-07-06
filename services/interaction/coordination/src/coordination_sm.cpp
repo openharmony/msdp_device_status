@@ -1043,7 +1043,7 @@ bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent
     FI_HILOGD("PointerFilter OnInputEvent enter");
     CHKPF(pointerEvent);
     if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        FI_HILOGi("Current event type: down");
+        FI_HILOGi("Current event is down");
         auto *context = COOR_EVENT_MGR->GetIContext();
         CHKPV(context);
         int32_t ret = context->GetDelegateTasks().PostAsyncTask(
