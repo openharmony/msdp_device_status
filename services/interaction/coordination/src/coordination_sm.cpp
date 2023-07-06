@@ -101,7 +101,6 @@ void CoordinationSM::Reset(const std::string &networkId)
         }
     }
     if (needReset) {
-        preparedNetworkId_ = std::make_pair("", "");
         Reset(true);
         SetPointerVisible();
     }
@@ -700,6 +699,7 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     CALL_INFO_TRACE;
     DP_ADAPTER->UnregisterCrossingStateListener(networkId);
     Reset(networkId);
+    preparedNetworkId_ = std::make_pair("", "");
     std::lock_guard<std::mutex> guard(mutex_);
     if (!onlineDevice_.empty()) {
         auto it = std::find(onlineDevice_.begin(), onlineDevice_.end(), networkId);
@@ -1016,6 +1016,8 @@ void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, b
         COOR_SM->NotifyChainRemoved();
     }
     isUnchained_ = false;
+    isStopping_ = false;
+    preparedNetworkId_ = std::make_pair("", "");
     COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
 }
 

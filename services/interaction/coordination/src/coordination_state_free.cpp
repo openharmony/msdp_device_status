@@ -93,12 +93,11 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
             }
             COOR_SM->SetUnchainStatus(false);
         }
-    } else {
-        ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordinationResult(networkId, false);
-        if (ret != RET_OK) {
-            FI_HILOGE("Failed to stop the process");
-            return ret;
-        }
+    }
+    ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordinationResult(networkId, false);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to stop the process");
+        return ret;
     }
     return RET_OK;
 }
