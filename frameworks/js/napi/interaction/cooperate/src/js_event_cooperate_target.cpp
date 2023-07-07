@@ -235,7 +235,6 @@ void JsEventCooperateTarget::ResetEnv()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    coordinationListener_.clear();
     INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
