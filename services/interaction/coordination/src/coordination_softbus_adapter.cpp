@@ -386,12 +386,14 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_UNCHAINED_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(result));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *smsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
+    CHKPR(smsg, RET_ERR);
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {

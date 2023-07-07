@@ -490,8 +490,9 @@ void VirtualDeviceBuilder::CopyAbsInfo(std::shared_ptr<VirtualDevice> vDev)
             FI_HILOGE("Failed to get abs info for axis %{public}zu", abs);
             continue;
         }
-        if (absSetup.absinfo.value == 0 && absSetup.absinfo.minimum == 0 && absSetup.absinfo.maximum == 0 &&
-            absSetup.absinfo.fuzz == 0 && absSetup.absinfo.flat == 0 && absSetup.absinfo.resolution == 0) {
+        if (absSetup.absinfo.value == 0 && absSetup.absinfo.minimum == 0 &&
+            absSetup.absinfo.maximum <= absSetup.absinfo.minimum && absSetup.absinfo.fuzz == 0 &&
+            absSetup.absinfo.flat == 0 && absSetup.absinfo.resolution == 0) {
             continue;
         }
         absInit_.push_back(absSetup);
