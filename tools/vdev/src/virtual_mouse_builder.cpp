@@ -34,7 +34,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualMouseBuilder" };
-constexpr int32_t MAXIMUM_LEVEL_ALLOWED = 3;
+constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
+constexpr uint32_t IO_FLAG_WIDTH { 6 };
 const std::unordered_map<std::string, int32_t> mouseBtns {
     { "BTN_LEFT", BTN_LEFT }, { "BTN_RIGHT", BTN_RIGHT },
     { "BTN_MIDDLE", BTN_MIDDLE }, { "BTN_SIDE", BTN_SIDE },
@@ -70,8 +71,8 @@ void MouseEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerE
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         return;
     }
-    std::cout << "\rcurrent pointer position - x: " << std::setw(6) << std::left << pointerItem.GetDisplayX() <<
-        "y: " << pointerItem.GetDisplayY() << "            ";
+    std::cout << "\rcurrent pointer position - x: " << std::setw(IO_FLAG_WIDTH) << std::left <<
+    pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
     std::cout.flush();
 }
 

@@ -175,7 +175,6 @@ int32_t DeviceStatusClient::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->RegisterCoordinationListener();
 }
 
@@ -183,7 +182,6 @@ int32_t DeviceStatusClient::UnregisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->UnregisterCoordinationListener();
 }
 
@@ -191,7 +189,6 @@ int32_t DeviceStatusClient::PrepareCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->PrepareCoordination(userData);
 }
 
@@ -199,7 +196,6 @@ int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->UnprepareCoordination(userData);
 }
 
@@ -208,7 +204,6 @@ int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId);
 }
 
@@ -216,7 +211,6 @@ int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnch
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->DeactivateCoordination(userData, isUnchained);
 }
 
@@ -224,7 +218,6 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->GetCoordinationState(userData, deviceId);
 }
 
@@ -232,7 +225,6 @@ int32_t DeviceStatusClient::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->UpdateDragStyle(style);
 }
 
@@ -240,7 +232,6 @@ int32_t DeviceStatusClient::GetDragTargetPid()
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->GetDragTargetPid();
 }
 
@@ -248,7 +239,6 @@ int32_t DeviceStatusClient::GetUdKey(std::string &udKey)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->GetUdKey(udKey);
 }
 
@@ -339,7 +329,6 @@ int32_t DeviceStatusClient::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->AddDraglistener();
 }
 
@@ -347,7 +336,6 @@ int32_t DeviceStatusClient::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->RemoveDraglistener();
 }
 
@@ -355,7 +343,6 @@ int32_t DeviceStatusClient::SetDragWindowVisible(bool visible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->SetDragWindowVisible(visible);
 }
 
@@ -363,7 +350,6 @@ int32_t DeviceStatusClient::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, 
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->GetShadowOffset(offsetX, offsetY, width, height);
 }
 
@@ -371,7 +357,6 @@ int32_t DeviceStatusClient::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    CHKPR(devicestatusProxy_, RET_ERR);
     return devicestatusProxy_->UpdateShadowPic(shadowInfo);
 }
 } // namespace DeviceStatus

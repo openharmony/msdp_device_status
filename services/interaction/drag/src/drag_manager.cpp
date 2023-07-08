@@ -178,6 +178,7 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
         FI_HILOGE("No drag instance running, can not update shadow picture");
         return RET_ERR;
     }
+    DRAG_DATA_MGR.SetShadowInfo(shadowInfo);
     return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 

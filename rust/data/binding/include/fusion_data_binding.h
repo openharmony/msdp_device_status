@@ -18,14 +18,12 @@
 #include <cinttypes>
 
 #include "drag_data.h"
-#include "fusion_image_framework.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct CShadowInfo {
-    struct CPixelMap *pixelMap;
     int32_t x;
     int32_t y;
 };

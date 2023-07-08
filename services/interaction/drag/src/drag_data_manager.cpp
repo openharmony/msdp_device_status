@@ -50,6 +50,11 @@ void DragDataManager::SetDragStyle(DragCursorStyle style)
     dragStyle_ = style;
 }
 
+void DragDataManager::SetShadowInfo(const ShadowInfo &shadowInfo)
+{
+    dragData_.shadowInfo = shadowInfo;
+}
+
 DragCursorStyle DragDataManager::GetDragStyle() const
 {
     return dragStyle_;

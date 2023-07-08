@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include <fcntl.h>
+#include <securec.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -34,7 +35,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct range {
+struct Range {
     size_t start = 0;
     size_t end = 0;
 };
@@ -42,7 +43,7 @@ struct range {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VInputDevice" };
 
-const struct range KEY_BLOCKS[] { { KEY_ESC, BTN_MISC },
+const struct Range KEY_BLOCKS[] { { KEY_ESC, BTN_MISC },
     { KEY_OK, BTN_DPAD_UP },
     { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY } };
 } // namespace
@@ -101,7 +102,11 @@ void VInputDevice::Close()
 bool VInputDevice::QueryAbsInfo(size_t abs, struct input_absinfo &absInfo)
 {
     CALL_DEBUG_ENTER;
-    memset(&absInfo, 0, sizeof(absInfo));
+    errno_t ret = memset_s(&absInfo, sizeof(absInfo), 0, sizeof(absInfo));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return false;
+    }
     return (ioctl(fd_, EVIOCGABS(abs), &absInfo) >= 0);
 }
 
@@ -135,7 +140,7 @@ int32_t VInputDevice::SendEvent(uint16_t type, uint16_t code, int32_t value)
 void VInputDevice::QueryDeviceInfo()
 {
     CALL_DEBUG_ENTER;
-    char buffer[PATH_MAX] {};
+    char buffer[PATH_MAX] { 0 };
 
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
@@ -148,16 +153,22 @@ void VInputDevice::QueryDeviceInfo()
     if (rc < 0) {
         FI_HILOGE("Could not get device input id: %{public}s", strerror(errno));
     }
-
-    memset(buffer, 0, sizeof(buffer));
+    errno_t ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get location: %{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
-
-    memset(buffer, 0, sizeof(buffer));
+    ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    if (ret != EOK) {
+        FI_HILOGE("Call memset_s failed");
+        return;
+    }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
         FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
@@ -309,7 +320,7 @@ void VInputDevice::CheckKeys()
         FI_HILOGD("No EV_KEY capability");
         return;
     }
-    for (size_t block = 0U; block < (sizeof(KEY_BLOCKS) / sizeof(struct range)); ++block) {
+    for (size_t block = 0U; block < (sizeof(KEY_BLOCKS) / sizeof(struct Range)); ++block) {
         for (size_t key = KEY_BLOCKS[block].start; key < KEY_BLOCKS[block].end; ++key) {
             if (TestBit(key, keyBitmask_)) {
                 FI_HILOGD("Found key %{public}zx", key);
