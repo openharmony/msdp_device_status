@@ -72,13 +72,12 @@ bool DelegateTasks::Init()
             FI_HILOGE("Close fds_[0] failed, error:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
             return false;
         }
-        
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         FI_HILOGE("The fcntl write failed, errno:%{public}d", errno);
         if (close(fds_[1]) < 0) {
             FI_HILOGE("Close fds_[1] failed, error:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
-            return false;   
+            return false;
         }
     }
     return true;

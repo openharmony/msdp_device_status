@@ -23,10 +23,12 @@ namespace Msdp {
 namespace DeviceStatus {
 class CoordinationStateIn final : public ICoordinationState {
 public:
+    CoordinationStateIn() = default;
     explicit CoordinationStateIn(const std::string &startDeviceDhid);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId) override;
     int32_t DeactivateCoordination(const std::string &remoteNetworkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId) override;
+    void SetStartDeviceDhid(const std::string &startDeviceDhid) override;
 
 private:
     void ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
