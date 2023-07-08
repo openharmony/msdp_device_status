@@ -30,6 +30,7 @@ constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND { 5 };
 constexpr int32_t SESSION_SIDE_SERVER { 0 };
 constexpr int32_t SESSION_SIDE_CLIENT { 1 };
+constexpr int32_t FILTER_WAIT_TIMEOUT_SECOND { 1 };
 
 #define FI_SOFTBUS_KEY_CMD_TYPE "fi_softbus_key_cmd_type"
 #define FI_SOFTBUS_KEY_LOCAL_DEVICE_ID "fi_softbus_key_local_device_id"
@@ -47,7 +48,8 @@ enum {
     REMOTE_COORDINATION_STOP = 3,
     REMOTE_COORDINATION_STOP_RES = 4,
     REMOTE_COORDINATION_STOP_OTHER_RES = 5,
-    NOTIFY_UNCHAINED_RES = 6
+    NOTIFY_UNCHAINED_RES = 6,
+    NOTIFY_FILTER_ADDED = 7
 };
 } // namespace DeviceStatus
 } // namespace Msdp

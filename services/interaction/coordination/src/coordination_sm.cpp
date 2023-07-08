@@ -289,7 +289,9 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     }
     isStarting_ = true;
     if (buttonIsPressed) {
+        MMI::InputManager::GetInstance()->EnableInputDevice(true);
         StartPointerEventFilter();
+        COOR_SOFTBUS_ADAPTER->NotifyFilterAdded(sinkNetworkId_);
     }
     NotifyRemoteNetworkId(remoteNetworkId);
 }
@@ -299,7 +301,11 @@ void CoordinationSM::StartPointerEventFilter()
     CALL_INFO_TRACE;
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
-    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_MAX);
+    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
+    FI_HILOGE("Touchtags: %{public}d", static_cast<int32_t>(touchTags));
+    if (filterId_ >= 0) {
+        MMI::InputManager::GetInstance()->RemoveInputEventFilter(filterId_);
+    }
     filterId_ =
         MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
     if (0 > filterId_) {
@@ -1051,6 +1057,24 @@ std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
     return it->second;
 }
 
+bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    FI_HILOGD("PointerFilter OnInputEvent enter");
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        FI_HILOGi("Current event is down");
+        auto *context = COOR_EVENT_MGR->GetIContext();
+        CHKPV(context);
+        int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+            std::bind(&MMI::InputManager::RemoveInputEventFilter, MMI::InputManager::GetInstance(), filterId_));
+        if (ret != RET_OK) {
+            FI_HILOGE("Posting async task failed");
+        }
+        filterId_ = -1;
+        return true;
+    }
+    return false;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

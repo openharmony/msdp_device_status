@@ -65,24 +65,11 @@ struct PointerFilter : public MMI::IInputEventFilter {
     {
         return false;
     }
-
-    bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
-    {
-        if (pointerEvent == nullptr) {
-            return false;
-        }
-        if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-            OHOS::MMI::InputManager::GetInstance()->RemoveInputEventFilter(filterId_);
-            filterId_ = -1;
-            return true;
-        }
-        return false;
-    }
-
     inline void UpdateCurrentFilterId(int32_t filterId)
     {
         filterId_ = filterId;
     }
+    bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
 private:
     mutable int32_t filterId_ { -1 };
 };
