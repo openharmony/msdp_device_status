@@ -173,7 +173,7 @@ int32_t CoordinationStateIn::RelayComeBack(const std::string &remoteNetworkId, i
     return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
 
-void CoordinationStateIn::SetStartDeviceDhid(std::string startDeviceDhid)
+void CoordinationStateIn::SetStartDeviceDhid(const std::string &startDeviceDhid)
 {
     startDeviceDhid_ = startDeviceDhid;
 }
