@@ -281,7 +281,14 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     CHKPR(pointerEvent, RET_ERR);
-    bool isPointerButtonPressed = pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN;
+    bool isPointerButtonPressed = false;
+    for (const auto &item : pointerEvent->GetPressedButtons()) {
+        if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
+            isPointerButtonPressed = true;
+            break;
+        }
+    }
+    FI_HILOGD("IsPointerButtonPressed: %{public}d", IsPointerButtonPressed);
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
@@ -294,6 +301,14 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     if (ret != RET_OK) {
         FI_HILOGE("Start remote coordination send session msg failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    if (isPointerButtonPressed) {
+        FI_HILOGD("Across with button down, waiting")
+        auto status = openSessionWaitCond_.wait_for(sessionLock, std::chrono::seconds(FILTER_WAIT_TIMEOUT_SECOND));
+        if (status == std::cv_status::timeout) {
+            FI_HILOGE("Filter add timeout")
+            return RET_ERR;
+        }
     }
     return RET_OK;
 }
@@ -403,6 +418,30 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     return RET_OK;
 }
 
+int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    if (sessionDevMap_.find(remoteNetworkId) == sessionDevMap_.end()) {
+        FI_HILOGE("Stop remote coordination result error, not found this device");
+        return RET_ERR;
+    }
+    int32_t sessionId = sessionDevMap_[remoteNetworkId];
+    cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_FILTER_ADDED));
+    char *smsg = cJSON_Print(jsonStr);
+    cJSON_Delete(jsonStr);
+    CHKPR(smsg, RET_ERR);
+    int32_t ret = SendMsg(sessionId, smsg);
+    cJSON_free(smsg);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send filter added msg failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::string &originNetworkId,
     const std::string &remoteNetworkId)
 {
@@ -487,6 +526,10 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         case NOTIFY_UNCHAINED_RES: {
             ResponseNotifyUnchainedResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_FILTER_ADDED: {
+            ResponseNotifyFilterAdded();
             break;
         }
         default: {
@@ -614,6 +657,13 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, Messag
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void CoordinationSoftbusAdapter::ResponseNotifyFilterAdded()
+{
+    CALL_DEBUG_ENTER;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    openSessionWaitCond_.notify_all();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
