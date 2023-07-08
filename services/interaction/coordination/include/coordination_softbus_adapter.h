@@ -62,6 +62,7 @@ public:
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
+    int32_t NotifyFilterAdded(const std::string &remoteNetworkId);
 
 private:
     CoordinationSoftbusAdapter() = default;
@@ -71,6 +72,7 @@ private:
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
+    void ResponseNotifyFilterAdded();
 
     std::map<std::string, int32_t> sessionDevMap_;
     std::map<std::string, bool> channelStatusMap_;
