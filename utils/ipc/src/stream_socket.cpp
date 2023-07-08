@@ -56,17 +56,13 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
         FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
         return RET_ERR;
     }
-    int32_t ret;
-    if (op == EPOLL_CTL_DEL) {
-        ret = epoll_ctl(epollFd, op, fd, NULL);
-    } else {
-        ret = epoll_ctl(epollFd, op, fd, &event);
-    }
+    int32_t ret = (op == EPOLL_CTL_DEL ? epoll_ctl(epollFd, op, fd, NULL) : epoll_ctl(epollFd, op, fd, &event));
     if (ret < 0) {
         FI_HILOGE("epoll_ctl, return:%{public}d, epollFd_:%{public}d, op:%{public}d, fd:%{public}d, errno:%{public}d",
             ret, epollFd, op, fd, errno);
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events, int32_t epollFd)
@@ -81,8 +77,9 @@ int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll
     int32_t ret = epoll_wait(epollFd, &events, maxevents, timeout);
     if (ret < 0) {
         FI_HILOGE("epoll_wait, ret:%{public}d, errno:%{public}d", ret, errno);
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::PacketCallBackFun callbackFun)

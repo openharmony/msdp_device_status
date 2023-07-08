@@ -346,14 +346,14 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
-    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, -1);
-    if (ret < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_ADD, ev, -1) < 0) {
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
         FI_HILOGE("EpollCtl failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
@@ -367,11 +367,11 @@ int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
         return RET_ERR;
     }
     struct epoll_event ev {};
-    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, -1);
-    if (ret < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_DEL, ev, -1) < 0) {
         FI_HILOGE("DelEpoll failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 bool DeviceStatusService::IsRunning() const

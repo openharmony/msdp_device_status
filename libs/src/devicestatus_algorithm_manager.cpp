@@ -66,7 +66,7 @@ ErrCode AlgoMgr::RegisterCallback(std::shared_ptr<MsdpAlgoCallback> callback)
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
             if (horizontalPosition_ != nullptr) {
-            horizontalPosition_->RegisterCallback(callback);
+                horizontalPosition_->RegisterCallback(callback);
             }
             break;
         }
