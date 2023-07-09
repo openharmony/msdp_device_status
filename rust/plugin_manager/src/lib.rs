@@ -67,7 +67,7 @@ impl PluginManager {
                 Path::new("/system/lib/libfusion_drag_server_ffi.z.so")
             }
             Intention::Coordination => {
-                Path::new("/system/lib/libfusion_drag_server_ffi.z.so")
+                Path::new("/system/lib/libfusion_coordination_server_ffi.z.so")
             }
             _ => {
                 return;

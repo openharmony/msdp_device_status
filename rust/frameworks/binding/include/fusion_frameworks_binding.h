@@ -28,6 +28,20 @@ int32_t fusion_alloc_socket_fd(const char *program_name, int32_t module_type,
 
 int32_t fusion_start_drag(CDragData *dragData);
 
+int32_t fusion_register_coordination_listener();
+
+int32_t fusion_unregister_coordination_listener();
+
+int32_t fusion_enable_coordination(int32_t userData);
+
+int32_t fusion_disable_coordination(int32_t userData);
+
+int32_t fusion_start_coordination(int32_t userData, const char *remoteNetworkId, int32_t startDeviceId);
+
+int32_t fusion_stop_coordination(int32_t userData, int32_t isUnchained);
+
+int32_t fusion_get_coordination_state(int32_t userData, const char *deviceId);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

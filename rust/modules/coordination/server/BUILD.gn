@@ -14,15 +14,12 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-ohos_rust_shared_ffi("fusion_client_ffi") {
+ohos_rust_shared_ffi("fusion_coordination_server_ffi") {
   sources = [ "src/lib.rs" ]
 
   deps = [
     "${device_status_root_path}/rust/data/sys:fusion_data_rust",
-    "${device_status_root_path}/rust/ipc/client:fusion_ipc_client_rust",
-    "${device_status_root_path}/rust/modules/basic/client:fusion_basic_client_rust",
-    "${device_status_root_path}/rust/modules/coordination/client:fusion_coordination_client_rust",
-    "${device_status_root_path}/rust/modules/drag/client:fusion_drag_client_rust",
+    "${device_status_root_path}/rust/plugin_manager:fusion_plugin_manager_rust",
     "${device_status_root_path}/rust/utils:fusion_utils_rust",
   ]
 
@@ -33,7 +30,7 @@ ohos_rust_shared_ffi("fusion_client_ffi") {
     "ipc:ipc_rust",
   ]
 
-  crate_name = "fusion_client_ffi"
+  crate_name = "fusion_coordination_server_ffi"
   crate_type = "cdylib"
 
   subsystem_name = "${device_status_subsystem_name}"

@@ -1,0 +1,12 @@
+{
+    "process": "msdp",
+    "systemability": [
+        {
+            "name": 2902,
+            "libpath": "libfusion_ipc_server_ffi.z.so",
+            "run-on-create": true,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}

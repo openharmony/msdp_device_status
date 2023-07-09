@@ -25,6 +25,8 @@ mod plugin_manager;
 
 pub use errors::{ FusionErrorCode, FusionResult };
 pub use ipc::basic::{ BasicParamID, AllocSocketPairParam };
+pub use ipc::coordination::{ GeneralCoordinationParam, StartCoordinationParam,
+    StopCoordinationParam, GetCoordinationStateParam };
 pub use ipc::default::{ CallingContext, DefaultReply };
 pub use ipc::drag::{ CDragData, DragData };
 pub use plugin_manager::{ Intention, IPlugin };
