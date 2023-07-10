@@ -225,7 +225,7 @@ impl FusionServiceProxy {
                 } else {
                     error!(LOG_LABEL, "Failed to allocate socket pair");
                     Err(ret)
-                }                
+                }
             }
             Err(_) => {
                 error!(LOG_LABEL, "Locking error");

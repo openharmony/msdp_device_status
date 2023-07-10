@@ -288,7 +288,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
             break;
         }
     }
-    FI_HILOGD("IsPointerButtonPressed: %{public}d", IsPointerButtonPressed);
+    FI_HILOGD("isPointerButtonPressed: %{public}d", isPointerButtonPressed);
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
@@ -303,10 +303,10 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
         return RET_ERR;
     }
     if (isPointerButtonPressed) {
-        FI_HILOGD("Across with button down, waiting")
+        FI_HILOGD("Across with button down, waiting");
         auto status = openSessionWaitCond_.wait_for(sessionLock, std::chrono::seconds(FILTER_WAIT_TIMEOUT_SECOND));
         if (status == std::cv_status::timeout) {
-            FI_HILOGE("Filter add timeout")
+            FI_HILOGE("Filter add timeout");
             return RET_ERR;
         }
     }

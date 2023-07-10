@@ -172,6 +172,11 @@ int32_t CoordinationStateIn::RelayComeBack(const std::string &remoteNetworkId, i
     CALL_DEBUG_ENTER;
     return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
+
+void CoordinationStateIn::SetStartDeviceDhid(const std::string &startDeviceDhid)
+{
+    startDeviceDhid_ = startDeviceDhid;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

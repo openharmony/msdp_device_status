@@ -89,6 +89,11 @@ void CoordinationStateOut::OnKeyboardOnline(const std::string &dhid,
     inputDeviceDhids.push_back(dhid);
     D_INPUT_ADAPTER->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids, [](bool isSuccess) {});
 }
+
+void CoordinationStateOut::SetStartDeviceDhid(const std::string &startDeviceDhid)
+{
+    startDeviceDhid_ = startDeviceDhid;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

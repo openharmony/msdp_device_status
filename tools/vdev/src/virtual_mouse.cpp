@@ -232,7 +232,7 @@ int32_t VirtualMouse::MoveTo(int32_t x, int32_t y)
     }
 CLEANUP:
     inputMgr->RemoveMonitor(monitorId);
-    return ret;   
+    return ret;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

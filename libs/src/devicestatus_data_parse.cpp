@@ -107,7 +107,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     if (mockvalue == nullptr || !cJSON_IsNumber(mockvalue)) {
         FI_HILOGE("json parser number is failed");
         return false;
-    } 
+    }
     data.value = static_cast<OnChangedValue>(mockvalue->valueint);
     FI_HILOGD("type:%{public}d, status:%{public}d", data.type, data.value);
     return true;
