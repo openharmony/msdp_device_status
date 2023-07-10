@@ -81,7 +81,7 @@ public:
     bool SupportProperty(size_t prop) const;
     bool QueryAbsInfo(size_t abs, struct input_absinfo &absInfo);
     int32_t SendEvent(uint16_t type, uint16_t code, int32_t value);
-    
+
     int32_t GetFd() const;
     std::string GetDevPath() const;
     std::string GetSysPath() const;
