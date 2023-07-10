@@ -27,6 +27,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
 const char* DRAG_CLASS = "drag_class";
 const char* DRAG = "drag";
+inline constexpr size_t MAX_STRING_LEN { 1024 };
 } // namespace
 
 JsDragContext::JsDragContext()
@@ -163,6 +164,13 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    if ((COOPERATE.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
+        return nullptr;
+    }
     if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
@@ -184,6 +192,13 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     CHKPP(jsDragMgr);
     if ((argc == ZERO_PARAM) || (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string))) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return nullptr;
+    }
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    if ((DRAG.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;
     }
     if (argc == ONE_PARAM) {

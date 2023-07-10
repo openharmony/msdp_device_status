@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("../../../../../device_status.gni")
 
-ohos_shared_library("drag") {
+ohos_shared_library("dragInteraction") {
   sources = [
     "src/js_drag_context.cpp",
     "src/js_drag_manager.cpp",
