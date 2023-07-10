@@ -198,7 +198,7 @@ void VInputDevice::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
     // get events mask
-    GetEventMask("", 0, evBitmask_, GetArrayLength(evBitmask_));   
+    GetEventMask("", 0, evBitmask_, GetArrayLength(evBitmask_));
 
     // get key events
     GetEventMask("key", EV_KEY, keyBitmask_, GetArrayLength(keyBitmask_));
