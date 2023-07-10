@@ -177,20 +177,20 @@ void VInputDevice::QueryDeviceInfo()
     }
 }
 
-void VInputDevice::GetEventMask(const std::string &eventName, uint32_t event,
-    uint8_t *whichBitMask, std::size_t arrayLength) const
+void VInputDevice::GetEventMask(const std::string &eventName, uint32_t type,
+    std::size_t arrayLength, uint8_t *whichBitMask) const
 {
-    int32_t rc = ioctl(fd_, EVIOCGBIT(event, arrayLength), whichBitMask);
+    int32_t rc = ioctl(fd_, EVIOCGBIT(type, arrayLength), whichBitMask);
     if (rc < 0) {
-        FI_HILOGE("Could not get events %{public}s mask: %{public}s", std::string(eventName).c_str(), strerror(errno));
+        FI_HILOGE("Could not get events %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
     }
 }
 
-void VInputDevice::GetPropMask(const std::string &eventName, uint8_t *whichBitMask, std::size_t arrayLength) const
+void VInputDevice::GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const
 {
     int32_t rc = ioctl(fd_, EVIOCGPROP(arrayLength), whichBitMask);
     if (rc < 0) {
-        FI_HILOGE("Could not get %{public}s mask: %{public}s", std::string(eventName).c_str(), strerror(errno));
+        FI_HILOGE("Could not get %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
     }
 }
 
@@ -198,28 +198,28 @@ void VInputDevice::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
     // get events mask
-    GetEventMask("", 0, evBitmask_, GetArrayLength(evBitmask_));
+    GetEventMask("", 0, GetArrayLength(evBitmask_), evBitmask_);
 
     // get key events
-    GetEventMask("key", EV_KEY, keyBitmask_, GetArrayLength(keyBitmask_));
+    GetEventMask("key", EV_KEY, GetArrayLength(keyBitmask_), keyBitmask_);
 
     // get abs events
-    GetEventMask("abs", EV_ABS, absBitmask_, GetArrayLength(absBitmask_));
+    GetEventMask("abs", EV_ABS, GetArrayLength(absBitmask_), absBitmask_);
 
     // get rel events
-    GetEventMask("rel", EV_REL, relBitmask_, GetArrayLength(relBitmask_));
+    GetEventMask("rel", EV_REL, GetArrayLength(relBitmask_), relBitmask_);
 
     // get msc events
-    GetEventMask("msc", EV_MSC, mscBitmask_, GetArrayLength(mscBitmask_));
+    GetEventMask("msc", EV_MSC, GetArrayLength(mscBitmask_), mscBitmask_);
 
     // get led events
-    GetEventMask("led", EV_LED, ledBitmask_, GetArrayLength(ledBitmask_));
+    GetEventMask("led", EV_LED, GetArrayLength(ledBitmask_), ledBitmask_);
 
     // get rep events
-    GetEventMask("rep", EV_REP, repBitmask_, GetArrayLength(repBitmask_));
+    GetEventMask("rep", EV_REP, GetArrayLength(repBitmask_), repBitmask_);
 
     // get properties mask
-    GetPropMask("properties", propBitmask_, GetArrayLength(propBitmask_));
+    GetPropMask("properties", GetArrayLength(propBitmask_), propBitmask_);
 }
 
 void VInputDevice::UpdateCapability()
