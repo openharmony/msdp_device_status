@@ -182,18 +182,15 @@ void VInputDevice::GetEventMask(const std::string &eventName, uint32_t event,
 {
     int32_t rc = ioctl(fd_, EVIOCGBIT(event, arrayLength), whichBitMask);
     if (rc < 0) {
-        FI_HILOGE("Could not get events %{public}s mask: %{public}s",
-            std::string(eventName).c_str(), strerror(errno));
+        FI_HILOGE("Could not get events %{public}s mask: %{public}s", std::string(eventName).c_str(), strerror(errno));
     }
 }
 
-void VInputDevice::GetPropMask(const std::string &eventName, uint8_t *whichBitMask,
-    std::size_t arrayLength) const
+void VInputDevice::GetPropMask(const std::string &eventName, uint8_t *whichBitMask, std::size_t arrayLength) const
 {
     int32_t rc = ioctl(fd_, EVIOCGPROP(arrayLength), whichBitMask);
     if (rc < 0) {
-        FI_HILOGE("Could not get %{public}s mask: %{public}s",
-            std::string(eventName).c_str(), strerror(errno));
+        FI_HILOGE("Could not get %{public}s mask: %{public}s", std::string(eventName).c_str(), strerror(errno));
     }
 }
 
