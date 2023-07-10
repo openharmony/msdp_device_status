@@ -167,7 +167,7 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
-    if ((DRAG.compare(type)) != 0) {
+    if ((DRAG_TYPE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;
     }
@@ -197,7 +197,7 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
-    if ((DRAG.compare(type)) != 0) {
+    if ((DRAG_TYPE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;
     }
