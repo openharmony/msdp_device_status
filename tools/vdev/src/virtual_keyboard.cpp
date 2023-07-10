@@ -40,7 +40,8 @@ VirtualKeyboard *VirtualKeyboard::GetDevice()
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualKeyboardBuilder::GetDeviceName(), node)) {
-            auto vKeyboard = new VirtualKeyboard(node);
+            auto vKeyboard = new (std::nothrow) VirtualKeyboard(node);
+            CHKPP(vKeyboard);
             if (vKeyboard->IsActive()) {
                 device_ = vKeyboard;
             }

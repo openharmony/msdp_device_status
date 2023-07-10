@@ -216,7 +216,7 @@ void StreamServer::OnPacket(int32_t fd, NetPacket& pkt)
 void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
-        FI_HILOGE("Invalid input param fd:%{public}d", fd);
+        FI_HILOGE("Invalid fd:%{public}d", fd);
         return;
     }
     auto& buf = circleBufMap_[fd];

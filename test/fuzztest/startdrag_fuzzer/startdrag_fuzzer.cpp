@@ -56,6 +56,7 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
     opts.size.width = width;
     opts.size.height = height;
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
+    CHKPL(pixelMap);
     return pixelMap;
 }
 

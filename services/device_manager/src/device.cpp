@@ -357,11 +357,7 @@ int32_t Device::ConfigItemSwitch(const std::string &configItem, const std::strin
 {
     CALL_DEBUG_ENTER;
     const std::string CONFIG_ITEM_KEYBOARD_TYPE { "Key.keyboard.type" };
-    if (configItem.empty() || value.empty()) {
-        FI_HILOGE("Invalid configuration encountered");
-        return RET_ERR;
-    }
-    if (!Utility::IsInteger(value)) {
+    if (configItem.empty() || value.empty() || !Utility::IsInteger(value)) {
         FI_HILOGE("Invalid configuration encountered");
         return RET_ERR;
     }
