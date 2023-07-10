@@ -81,6 +81,7 @@ public:
     bool SupportProperty(size_t prop) const;
     bool QueryAbsInfo(size_t abs, struct input_absinfo &absInfo);
     int32_t SendEvent(uint16_t type, uint16_t code, int32_t value);
+    
 
     int32_t GetFd() const;
     std::string GetDevPath() const;
@@ -99,7 +100,14 @@ private:
     bool HasJoystickAxesOrButtons() const;
     void CheckPointers();
     void CheckKeys();
-
+    void GetEventMask(const std::string &eventName, uint32_t event, uint8_t *whichBitMask,
+        std::size_t arrayLength) const;
+    void GetPropMask(const std::string &eventName, uint8_t *whichBitMask, std::size_t arrayLength) const;
+    template<typename T, std::size_t N>
+    inline constexpr std::size_t GetArrayLength(T (&)[N]) noexcept
+    {
+        return N;
+    }
 private:
     int32_t fd_ { -1 };
     struct input_id inputId_ {};
