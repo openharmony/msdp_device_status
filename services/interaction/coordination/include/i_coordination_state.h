@@ -43,6 +43,7 @@ public:
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
+    virtual void SetStartDeviceDhid(const std::string &startDeviceDhid) {}
 
 protected:
     int32_t PrepareAndStart(const std::string &remoteNetworkId, int32_t startDeviceId);
