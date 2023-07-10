@@ -140,7 +140,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
         DS_DUMPER->DumpHelpInfo(fd);
         return RET_NG;
     }
-    std::vector<std::string> argList = { "" };
+    std::vector<std::string> argList;
     std::transform(args.begin(), args.end(), std::back_inserter(argList),
         [](const std::u16string &arg) {
         return Str16ToStr8(arg);

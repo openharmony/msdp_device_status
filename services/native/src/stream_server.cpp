@@ -162,24 +162,6 @@ CLOSE_SOCK:
     return RET_ERR;
 }
 
-void StreamServer::OnConnected(SessionPtr sess)
-{
-    CHKPV(sess);
-    FI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
-}
-
-void StreamServer::OnDisconnected(SessionPtr sess)
-{
-    CHKPV(sess);
-    FI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
-}
-
-int32_t StreamServer::AddEpoll(EpollEventType type, int32_t fd)
-{
-    FI_HILOGE("This information should not exist, subclasses should implement this function.");
-    return RET_ERR;
-}
-
 void StreamServer::SetRecvFun(MsgServerFunCallback fun)
 {
     recvFun_ = fun;
