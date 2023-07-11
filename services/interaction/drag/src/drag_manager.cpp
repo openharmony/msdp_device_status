@@ -212,12 +212,14 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
-    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-        OnDragUp(pointerEvent);
-    } else {
-        FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-            pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
+        return;
     }
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        OnDragUp(pointerEvent);
+        return;
+    }
+    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)

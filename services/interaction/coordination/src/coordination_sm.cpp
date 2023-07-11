@@ -882,7 +882,9 @@ void CoordinationSM::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyE
             keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);
             MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
         }
-    } else if (state == CoordinationState::STATE_OUT) {
+        return;
+    }
+    if (state == CoordinationState::STATE_OUT) {
         std::string networkId = COORDINATION::GetLocalNetworkId();
         if (COOR_SM->IsNeedFilterOut(networkId, keyEvent)) {
             keyEvent->AddFlag(MMI::AxisEvent::EVENT_FLAG_NO_INTERCEPT);

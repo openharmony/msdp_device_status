@@ -68,13 +68,13 @@ void ICoordinationState::OnPrepareDistributedInput(bool isSuccess, const std::st
     if (!isSuccess) {
         COOR_SM->UpdatePreparedDevices("", "");
         COOR_SM->OnStartFinish(false, remoteNetworkId, startDeviceId);
-    } else {
-        std::string taskName = "start_dinput_task";
-        std::function<void()> handleStartDinputFunc =
-            std::bind(&ICoordinationState::StartRemoteInput, this, startDeviceId);
-        CHKPV(eventHandler_);
-        eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
+        return;
     }
+    std::string taskName = "start_dinput_task";
+    std::function<void()> handleStartDinputFunc =
+        std::bind(&ICoordinationState::StartRemoteInput, this, startDeviceId);
+    CHKPV(eventHandler_);
+    eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
 }
 
 int32_t ICoordinationState::StartRemoteInput(int32_t startDeviceId)

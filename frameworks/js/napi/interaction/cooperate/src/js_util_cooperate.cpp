@@ -68,20 +68,20 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errCode
     napi_value object = nullptr;
     if (result) {
         napi_get_undefined(env, &object);
-    } else {
-        NapiError napiError;
-        if (!UtilNapiError::GetApiError(errCode, napiError)) {
-            FI_HILOGE("This error code could not be found");
-            return nullptr;
-        }
-        napi_value resultCode = nullptr;
-        CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
-        napi_value resultMessage = nullptr;
-        CHKRP(napi_create_string_utf8(env, napiError.msg.data(), NAPI_AUTO_LENGTH, &resultMessage),
-            CREATE_STRING_UTF8);
-        CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
-        CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
+        return object;
     }
+    NapiError napiError;
+    if (!UtilNapiError::GetApiError(errCode, napiError)) {
+        FI_HILOGE("This error code could not be found");
+        return nullptr;
+    }
+    napi_value resultCode = nullptr;
+    CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+    napi_value resultMessage = nullptr;
+    CHKRP(napi_create_string_utf8(env, napiError.msg.data(), NAPI_AUTO_LENGTH, &resultMessage),
+        CREATE_STRING_UTF8);
+    CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
+    CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return object;
 }
 

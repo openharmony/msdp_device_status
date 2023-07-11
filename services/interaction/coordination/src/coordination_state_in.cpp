@@ -142,7 +142,9 @@ void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
             COOR_SM, isSuccess, remoteNetworkId, startDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
-    } else if (COOR_SM->IsStopping()) {
+        return;
+    }
+    if (COOR_SM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&CoordinationSM::OnStopFinish, COOR_SM, isSuccess, remoteNetworkId);
