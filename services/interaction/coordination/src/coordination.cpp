@@ -52,9 +52,8 @@ int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     if (ret != RET_OK) {
         FI_HILOGE("ActivateCoordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, bool isUnchained)
@@ -70,9 +69,8 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, 
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId)

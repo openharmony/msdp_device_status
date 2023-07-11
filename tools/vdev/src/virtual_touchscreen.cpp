@@ -39,7 +39,8 @@ VirtualTouchScreen *VirtualTouchScreen::GetDevice()
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualTouchScreenBuilder::GetDeviceName(), node)) {
-            auto vTouch = new VirtualTouchScreen(node);
+            auto vTouch = new (std::nothrow) VirtualTouchScreen(node);
+            CHKPP(vTouch);
             if (vTouch->IsActive()) {
                 device_ = vTouch;
             }

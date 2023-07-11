@@ -272,7 +272,7 @@ void JsEventCooperateTarget::CallEnablePromiseWork(uv_work_t *work, int32_t stat
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -315,7 +315,7 @@ void JsEventCooperateTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -350,7 +350,7 @@ void JsEventCooperateTarget::CallStartPromiseWork(uv_work_t *work, int32_t statu
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -393,7 +393,7 @@ void JsEventCooperateTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -428,7 +428,7 @@ void JsEventCooperateTarget::CallStopPromiseWork(uv_work_t *work, int32_t status
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -472,7 +472,7 @@ void JsEventCooperateTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -507,7 +507,7 @@ void JsEventCooperateTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t st
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -539,7 +539,7 @@ void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t stat
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
     sptr<JsUtilCooperate::CallbackInfo> cb(static_cast<JsUtilCooperate::CallbackInfo *>(work->data));
@@ -577,7 +577,7 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is null");
+        FI_HILOGE("Check data is nullptr");
         return;
     }
 

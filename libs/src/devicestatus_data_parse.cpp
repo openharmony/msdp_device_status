@@ -124,28 +124,28 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
 {
     if (filePath.empty()) {
         FI_HILOGE("Path is empty");
-        return "";
+        return {};
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         FI_HILOGE("Path is error, %{public}d", errno);
-        return "";
+        return {};
     }
     if (!CheckFileDir(realPath, MSDP_DATA_DIR)) {
         FI_HILOGE("File dir is invalid");
-        return "";
+        return {};
     }
     if (!CheckFileExtendName(realPath, "json")) {
         FI_HILOGE("Unable to parse files other than json format");
-        return "";
+        return {};
     }
     if (!Utility::DoesFileExist(filePath.c_str())) {
         FI_HILOGE("File not exist");
-        return "";
+        return {};
     }
     if (!CheckFileSize(filePath)) {
         FI_HILOGE("File size out of read range");
-        return "";
+        return {};
     }
     return ReadFile(realPath);
 }
@@ -195,7 +195,7 @@ std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)
     FILE* fp = fopen(filePath.c_str(), "r");
     if (fp == nullptr) {
         FI_HILOGE("Open failed");
-        return "";
+        return {};
     }
     std::string dataStr;
     char buf[READ_DATA_BUFF_SIZE] = {};

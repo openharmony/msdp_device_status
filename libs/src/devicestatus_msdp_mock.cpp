@@ -94,6 +94,7 @@ ErrCode DeviceStatusMsdpMock::Disable(Type type)
 ErrCode DeviceStatusMsdpMock::DisableCount(Type type)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(dataParse_, RET_ERR);
     dataParse_->DisableCount(type);
     return RET_OK;
 }

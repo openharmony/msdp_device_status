@@ -140,7 +140,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
         DS_DUMPER->DumpHelpInfo(fd);
         return RET_NG;
     }
-    std::vector<std::string> argList = { "" };
+    std::vector<std::string> argList;
     std::transform(args.begin(), args.end(), std::back_inserter(argList),
         [](const std::u16string &arg) {
         return Str16ToStr8(arg);
@@ -161,7 +161,7 @@ bool DeviceStatusService::Init()
 {
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
-        FI_HILOGW("devicestatusManager_ is null");
+        FI_HILOGW("devicestatusManager_ is nullptr");
         auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
@@ -276,6 +276,7 @@ void DeviceStatusService::ReportSensorSysEvent(int32_t type, bool enable)
 {
     auto callerToken = GetCallingTokenID();
     std::string packageName;
+    CHKPV(devicestatusManager_);
     devicestatusManager_->GetPackageName(callerToken, packageName);
     auto uid = GetCallingUid();
     std::string str = enable ? "Subscribe" : "Unsubscribe";
@@ -326,11 +327,11 @@ void DeviceStatusService::OnDisconnected(SessionPtr s)
 int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
 {
     if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
-        FI_HILOGE("Invalid param type");
+        FI_HILOGE("Invalid type:%{public}d", type);
         return RET_ERR;
     }
     if (fd < 0) {
-        FI_HILOGE("Invalid param fd_");
+        FI_HILOGE("Invalid fd:%{public}d", fd);
         return RET_ERR;
     }
     auto eventData = static_cast<device_status_epoll_event*>(malloc(sizeof(device_status_epoll_event)));
@@ -345,13 +346,12 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
-    auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, -1);
-    if (ret < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_ADD, ev, -1) < 0) {
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
         FI_HILOGE("EpollCtl failed");
-        return ret;
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -359,18 +359,17 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
 int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
 {
     if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
-        FI_HILOGE("Invalid param type");
+        FI_HILOGE("Invalid type:%{public}d", type);
         return RET_ERR;
     }
     if (fd < 0) {
-        FI_HILOGE("Invalid param fd_");
+        FI_HILOGE("Invalid fd:%{public}d", fd);
         return RET_ERR;
     }
     struct epoll_event ev {};
-    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, -1);
-    if (ret < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_DEL, ev, -1) < 0) {
         FI_HILOGE("DelEpoll failed");
-        return ret;
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -390,10 +389,9 @@ int32_t DeviceStatusService::InitDelegateTasks()
     auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
     if (ret != RET_OK) {
         FI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        return ret;
     }
     FI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
-    return RET_OK;
+    return ret;
 }
 
 
@@ -408,9 +406,8 @@ int32_t DeviceStatusService::InitTimerMgr()
     ret = AddEpoll(EPOLL_EVENT_TIMER, timerMgr_.GetTimerFd());
     if (ret != RET_OK) {
         FI_HILOGE("AddEpoll for timer fail");
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 void DeviceStatusService::OnThread()
@@ -679,9 +676,8 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
         std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
     if (ret != RET_OK) {
         FI_HILOGE("On start drag failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation)
@@ -691,9 +687,8 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
         std::bind(&DeviceStatusService::OnStopDrag, this, result, hasCustomAnimation));
     if (ret != RET_OK) {
         FI_HILOGE("On stop drag failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
@@ -866,9 +861,8 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained)
@@ -887,9 +881,8 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
     if (ret != RET_OK) {
         FI_HILOGE("On deactivate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, CoordinationMessage(ret));
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::OnGetCoordinationState(
@@ -921,9 +914,8 @@ int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
     int32_t ret = dragMgr_.StartDrag(dragData, sess);
     if (ret != RET_OK) {
         FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimation)
@@ -932,9 +924,8 @@ int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimati
     int32_t ret = dragMgr_.StopDrag(result, hasCustomAnimation);
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

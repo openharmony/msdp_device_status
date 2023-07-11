@@ -95,7 +95,8 @@ VirtualMouse *VirtualMouse::GetDevice()
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualMouseBuilder::GetDeviceName(), node)) {
-            auto vMouse = new VirtualMouse(node);
+            auto vMouse = new (std::nothrow) VirtualMouse(node);
+            CHKPP(vMouse);
             if (vMouse->IsActive()) {
                 device_ = vMouse;
             }

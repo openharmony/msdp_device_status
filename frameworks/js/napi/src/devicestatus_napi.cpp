@@ -295,7 +295,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
             DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
             delete devicestatus;
         },
-        nullptr, &(g_obj->callbackRef_));
+        nullptr, &g_obj->callbackRef_);
     if (!g_obj->On(type, handler, false)) {
         FI_HILOGE("Type:%{public}d already exists", type);
         return nullptr;
@@ -316,7 +316,6 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         FI_HILOGE("Failed to insert");
-        return nullptr;
     }
     return nullptr;
 }
@@ -444,7 +443,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
                 DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
                 delete devicestatus;
             },
-            nullptr, &(g_obj->callbackRef_));
+            nullptr, &g_obj->callbackRef_);
     }
     if (!g_obj->On(type, handler, true)) {
         FI_HILOGE("Type:%{public}d already exists", type);
