@@ -102,11 +102,6 @@ private:
     void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
         uint8_t *whichBitMask) const;
     void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
-    template<typename T, std::size_t N>
-    inline constexpr std::size_t GetArrayLength(T (&)[N]) noexcept
-    {
-        return N;
-    }
 
 private:
     int32_t fd_ { -1 };

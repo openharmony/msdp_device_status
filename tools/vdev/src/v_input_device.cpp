@@ -198,28 +198,28 @@ void VInputDevice::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
     // get events mask
-    GetEventMask("", 0, GetArrayLength(evBitmask_), evBitmask_);
+    GetEventMask("", 0, sizeof(evBitmask_), evBitmask_);
 
     // get key events
-    GetEventMask("key", EV_KEY, GetArrayLength(keyBitmask_), keyBitmask_);
+    GetEventMask("key", EV_KEY, sizeof(keyBitmask_), keyBitmask_);
 
     // get abs events
-    GetEventMask("abs", EV_ABS, GetArrayLength(absBitmask_), absBitmask_);
+    GetEventMask("abs", EV_ABS, sizeof(absBitmask_), absBitmask_);
 
     // get rel events
-    GetEventMask("rel", EV_REL, GetArrayLength(relBitmask_), relBitmask_);
+    GetEventMask("rel", EV_REL, sizeof(relBitmask_), relBitmask_);
 
     // get msc events
-    GetEventMask("msc", EV_MSC, GetArrayLength(mscBitmask_), mscBitmask_);
+    GetEventMask("msc", EV_MSC, sizeof(mscBitmask_), mscBitmask_);
 
     // get led events
-    GetEventMask("led", EV_LED, GetArrayLength(ledBitmask_), ledBitmask_);
+    GetEventMask("led", EV_LED, sizeof(ledBitmask_), ledBitmask_);
 
     // get rep events
-    GetEventMask("rep", EV_REP, GetArrayLength(repBitmask_), repBitmask_);
+    GetEventMask("rep", EV_REP, sizeof(repBitmask_), repBitmask_);
 
     // get properties mask
-    GetPropMask("properties", GetArrayLength(propBitmask_), propBitmask_);
+    GetPropMask("properties", sizeof(propBitmask_), propBitmask_);
 }
 
 void VInputDevice::UpdateCapability()
