@@ -16,9 +16,9 @@
 #include "coordination.h"
 
 #include "coordination_event_manager.h"
-#include "distributed_input_adapter.h"
 #include "coordination_sm.h"
 #include "coordination_util.h"
+#include "distributed_input_adapter.h"
 #include "proto.h"
 
 namespace OHOS {

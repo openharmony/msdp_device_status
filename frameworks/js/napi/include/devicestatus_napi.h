@@ -18,10 +18,10 @@
 
 #include <map>
 #include <tuple>
+#include <uv.h>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include <uv.h>
 
 #include "devicestatus_callback_stub.h"
 #include "devicestatus_event.h"
