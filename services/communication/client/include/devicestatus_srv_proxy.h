@@ -17,7 +17,6 @@
 #define DEVICESTATUS_SRV_PROXY_H
 
 #include "iremote_proxy.h"
-
 #include <nocopyable.h>
 
 #include "drag_data.h"
