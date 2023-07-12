@@ -74,12 +74,7 @@ int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll
         FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
         return RET_ERR;
     }
-    int32_t ret = epoll_wait(epollFd, &events, maxevents, timeout);
-    if (ret < 0) {
-        FI_HILOGE("epoll_wait, ret:%{public}d, errno:%{public}d", ret, errno);
-        return RET_ERR;
-    }
-    return RET_OK;
+    return epoll_wait(epollFd, &events, maxevents, timeout);
 }
 
 void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::PacketCallBackFun callbackFun)
