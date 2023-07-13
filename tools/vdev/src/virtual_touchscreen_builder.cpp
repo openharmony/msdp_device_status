@@ -86,16 +86,6 @@ std::string VirtualTouchScreenBuilder::GetDeviceName()
     return std::string("Virtual TouchScreen");
 }
 
-int32_t VirtualTouchScreenBuilder::GetScreenWidth()
-{
-    return ABS_MAX_X;
-}
-
-int32_t VirtualTouchScreenBuilder::GetScreenHeight()
-{
-    return ABS_MAX_Y;
-}
-
 void VirtualTouchScreenBuilder::ShowUsage()
 {
     std::cout << "Usage: vdevadm act -t T [-d<SLOT>  <x> <y>] [-u<SLOT>] [-m<SLOT> <dx> [<dy>]]" << std::endl;
