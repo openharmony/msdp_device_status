@@ -170,7 +170,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     sptr<JsUtil::CallbackInfo> monitor = new (std::nothrow) JsUtil::CallbackInfo();
-    CHKRV(monitor);
+    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(monitor);
@@ -574,7 +574,6 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         return;
     }
 
-    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
