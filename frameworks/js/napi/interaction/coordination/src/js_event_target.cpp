@@ -36,7 +36,7 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
     }
@@ -169,10 +169,11 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     }
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_unique<JsUtil::CallbackInfo>();
+    sptr<JsUtil::CallbackInfo> monitor = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKRV(monitor);
     monitor->env = env;
     monitor->ref = ref;
-    iter->second.push_back(std::move(monitor));
+    iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
         INTERACTION_MGR->RegisterCoordinationListener(shared_from_this());
@@ -247,10 +248,12 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         CHKPV(work);
         item->data.msg = msg;
         item->data.deviceDescriptor = deviceId;
-        work->data = static_cast<void*>(&item);
+        item->IncStrongRef(nullptr);
+        work->data = item.GetRefPtr();
         int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCoordinationMessageEvent);
         if (result != 0) {
             FI_HILOGE("uv_queue_work failed");
+            item->DecStrongRef(nullptr);
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
     }
@@ -572,8 +575,9 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     }
 
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
+    sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
-
+    temp->DecStrongRef(nullptr);
     auto messageEvent = coordinationListener_.find(COOPERATE);
     if (messageEvent == coordinationListener_.end()) {
         FI_HILOGE("Find messageEvent failed");
@@ -584,7 +588,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         CHKPC(item->env);
-        if (item->ref != (*temp)->ref) {
+        if (item->ref !=  temp->ref) {
             continue;
         }
         napi_value deviceDescriptor = nullptr;
