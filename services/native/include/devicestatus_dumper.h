@@ -34,8 +34,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr int32_t RET_NG { -1 };
-constexpr size_t MAX_DEVICE_STATUS_SIZE { 10 };
+inline constexpr int32_t RET_NG { -1 };
+
 struct AppInfo {
     std::string startTime;
     int32_t uid {};
@@ -45,39 +45,43 @@ struct AppInfo {
     Type type { TYPE_INVALID };
     sptr<IRemoteDevStaCallback> callback { nullptr };
 };
+
 struct DeviceStatusRecord {
     std::string startTime;
     Data data;
 };
+
 class DeviceStatusDumper final : public RefBase {
     DECLARE_DELAYED_SINGLETON(DeviceStatusDumper);
 public:
     int32_t Init(IContext *context);
     void ParseCommand(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
-    void ParseLong(int32_t fd, const std::vector<std::string> &args, const std::vector<Data> &datas);
-    void ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t info);
     void DumpHelpInfo(int32_t fd) const;
-    void DumpDeviceStatusSubscriber(int32_t fd);
-    void DumpDeviceStatusChanges(int32_t fd);
-    void DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const;
     void SaveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void RemoveAppInfo(std::shared_ptr<AppInfo> appInfo);
     void PushDeviceStatus(const Data &data);
-    void DumpCheckDefine(int32_t fd);
-    void ChkDefineOutput(int32_t fd);
-    template<class ...Ts>
-    void CheckDefineOutput(int32_t fd, const char* fmt, Ts... args);
     std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
+
 private:
     DISALLOW_COPY_AND_MOVE(DeviceStatusDumper);
     std::string GetStatusType(Type type) const;
     std::string GetDeviceState(OnChangedValue type) const;
+    void ExecutDump(int32_t fd, const std::vector<Data> &datas, int32_t opt);
+    void DumpDeviceStatusSubscriber(int32_t fd);
+    void DumpDeviceStatusChanges(int32_t fd);
+    void DumpDeviceStatusCurrentStatus(int32_t fd, const std::vector<Data> &datas) const;
+    void DumpCheckDefine(int32_t fd);
+    void ChkDefineOutput(int32_t fd);
+    template<class ...Ts>
+    void CheckDefineOutput(int32_t fd, const char* fmt, Ts... args);
 
+private:
     std::map<Type, std::set<std::shared_ptr<AppInfo>>> appInfoMap_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;
     IContext *context_ { nullptr };
 };
+
 #define DS_DUMPER OHOS::DelayedSingleton<DeviceStatusDumper>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp

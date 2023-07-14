@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef COORDINATION_MANAGER_IMPL_H
 #define COORDINATION_MANAGER_IMPL_H
 
@@ -21,8 +22,8 @@
 #include <mutex>
 #include <optional>
 
-#include "i_coordination_listener.h"
 #include "client.h"
+#include "i_coordination_listener.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -39,7 +39,8 @@ VirtualTouchScreen *VirtualTouchScreen::GetDevice()
     if (device_ == nullptr) {
         std::string node;
         if (VirtualDevice::FindDeviceNode(VirtualTouchScreenBuilder::GetDeviceName(), node)) {
-            auto vTouch = new VirtualTouchScreen(node);
+            auto vTouch = new (std::nothrow) VirtualTouchScreen(node);
+            CHKPP(vTouch);
             if (vTouch->IsActive()) {
                 device_ = vTouch;
             }
@@ -51,6 +52,30 @@ VirtualTouchScreen *VirtualTouchScreen::GetDevice()
 VirtualTouchScreen::VirtualTouchScreen(const std::string &node) : VirtualDevice(node), slots_(N_SLOTS_AVAILABLE)
 {
     VirtualDevice::SetMinimumInterval(MINIMUM_INTERVAL);
+    QueryScreenSize();
+}
+
+void VirtualTouchScreen::QueryScreenSize()
+{
+    struct input_absinfo absInfo {};
+
+    if (QueryAbsInfo(ABS_X, absInfo)) {
+        screenWidth_ = (absInfo.maximum - absInfo.minimum + 1);
+    }
+    if (QueryAbsInfo(ABS_MT_POSITION_X, absInfo) &&
+        ((screenWidth_ == std::numeric_limits<int32_t>::max()) ||
+         ((absInfo.maximum - absInfo.minimum + 1) > screenWidth_))) {
+        screenWidth_ = (absInfo.maximum - absInfo.minimum + 1);
+    }
+
+    if (QueryAbsInfo(ABS_Y, absInfo)) {
+        screenHeight_ = (absInfo.maximum - absInfo.minimum + 1);
+    }
+    if (QueryAbsInfo(ABS_MT_POSITION_Y, absInfo) &&
+        ((screenHeight_ == std::numeric_limits<int32_t>::max()) ||
+         ((absInfo.maximum - absInfo.minimum + 1) > screenHeight_))) {
+        screenHeight_ = (absInfo.maximum - absInfo.minimum + 1);
+    }
 }
 
 void VirtualTouchScreen::SendTouchEvent()
@@ -77,8 +102,8 @@ int32_t VirtualTouchScreen::DownButton(int32_t slot, int32_t x, int32_t y)
     }
     bool firstTouchDown = std::none_of(slots_.cbegin(), slots_.cend(), [](const auto &slot) { return slot.active; });
 
-    slots_[slot].coord.x = std::min(std::max(x, 0), VirtualTouchScreenBuilder::GetScreenWidth() - 1);
-    slots_[slot].coord.y = std::min(std::max(y, 0), VirtualTouchScreenBuilder::GetScreenHeight() - 1);
+    slots_[slot].coord.x = std::min(std::max(x, 0), screenWidth_ - 1);
+    slots_[slot].coord.y = std::min(std::max(y, 0), screenHeight_ - 1);
     slots_[slot].active = true;
     FI_HILOGD("Press down [%{public}d], (%{public}d, %{public}d)", slot, slots_[slot].coord.x, slots_[slot].coord.y);
     SendTouchEvent();
@@ -131,11 +156,11 @@ int32_t VirtualTouchScreen::Move(int32_t slot, int32_t dx, int32_t dy)
         return RET_ERR;
     }
     Coordinate tcoord {
-        .x = std::min(std::max(slots_[slot].coord.x + dx, 0), VirtualTouchScreenBuilder::GetScreenWidth() - 1),
-        .y = std::min(std::max(slots_[slot].coord.y + dy, 0), VirtualTouchScreenBuilder::GetScreenHeight() - 1)
+        .x = std::min(std::max(slots_[slot].coord.x + dx, 0), screenWidth_ - 1),
+        .y = std::min(std::max(slots_[slot].coord.y + dy, 0), screenHeight_ - 1)
     };
-    FI_HILOGD("Move [%{public}d] from (%{public}d, %{public}d) to (%{public}d, %{public}d)", slot, slots_[slot].coord.x,
-        slots_[slot].coord.y, tcoord.x, tcoord.y);
+    FI_HILOGD("Move [%{public}d] from (%{public}d, %{public}d) to (%{public}d, %{public}d)",
+        slot, slots_[slot].coord.x, slots_[slot].coord.y, tcoord.x, tcoord.y);
 
     while (tcoord.x != slots_[slot].coord.x || tcoord.y != slots_[slot].coord.y) {
         double total = ::hypot(tcoord.x - slots_[slot].coord.x, tcoord.y - slots_[slot].coord.y);

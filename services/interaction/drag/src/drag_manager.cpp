@@ -553,7 +553,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     monitorId_ = -1;
 #else
     if (interceptorId_ <= 0) {
-        FI_HILOGE("Invalid interceptor to be removed, interceptorId_:%{public}d", interceptorId_);
+        FI_HILOGE("Invalid interceptorId_:%{public}d", interceptorId_);
         return RET_ERR;
     }
     MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);

@@ -82,7 +82,7 @@ class DragDrawing : public IDragAnimation {
 public:
     DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
-    ~DragDrawing() = default;
+    ~DragDrawing();
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
@@ -139,6 +139,7 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    void* dragExtHandle_ = nullptr;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

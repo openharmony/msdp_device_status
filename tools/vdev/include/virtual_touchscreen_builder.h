@@ -32,8 +32,6 @@ public:
     DISALLOW_COPY_AND_MOVE(VirtualTouchScreenBuilder);
 
     static std::string GetDeviceName();
-    static int32_t GetScreenWidth();
-    static int32_t GetScreenHeight();
     static void ShowUsage();
     static void Mount();
     static void Unmount();

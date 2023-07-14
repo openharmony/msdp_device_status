@@ -20,6 +20,7 @@ group("devicestatus_service_group") {
   if (fusion_rust_enabled) {
     deps += [
       "${device_status_root_path}/rust/ipc/server:fusion_ipc_server_ffi",
+      "${device_status_root_path}/rust/modules/coordination/server:fusion_coordination_server_ffi",
       "${device_status_root_path}/rust/modules/drag/server:fusion_drag_server_ffi",
     ]
   }

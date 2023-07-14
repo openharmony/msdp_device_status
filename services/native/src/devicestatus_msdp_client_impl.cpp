@@ -94,10 +94,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         FI_HILOGE("Start algo Library failed");
         return RET_ERR;
     }
-    if (iAlgo_ == nullptr) {
-        FI_HILOGE("Start algo Library failed, iAlgo_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(iAlgo_, RET_ERR);
     if ((iAlgo_->Enable(type)) == RET_ERR) {
         FI_HILOGE("Enable algo Library failed");
         return RET_ERR;
@@ -157,16 +154,8 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 ErrCode DeviceStatusMsdpClientImpl::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
-    if (SensorHdiDisable(type) == RET_OK) {
-        return RET_OK;
-    }
-    if (AlgoDisable(type) == RET_OK) {
-        return RET_OK;
-    }
-    if (MockDisable(type) == RET_OK) {
-        return RET_OK;
-    }
-    return RET_ERR;
+    return ((SensorHdiDisable(type) == RET_OK || AlgoDisable(type) == RET_OK || MockDisable(type) == RET_OK) ?
+        RET_OK : RET_ERR);
 }
 
 ErrCode DeviceStatusMsdpClientImpl::SensorHdiDisable(Type type)

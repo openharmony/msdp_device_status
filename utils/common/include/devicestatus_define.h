@@ -59,7 +59,7 @@ namespace DeviceStatus {
     do { \
         if ((cond) == nullptr) { \
             FI_HILOGE("CHKPS(%{public}s) is null", #cond); \
-            return ""; \
+            return {}; \
         } \
     } while (0)
 

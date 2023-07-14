@@ -42,8 +42,8 @@ ohos_shared_library("interaction_drag") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "graphic_standard:libcomposer",
-    "graphic_standard:window_animation",
+    "graphic_2d:libcomposer",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "init:libbegetutil",

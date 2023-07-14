@@ -42,10 +42,13 @@ private:
     };
 
     explicit VirtualTouchScreen(const std::string &name);
+    void QueryScreenSize();
 
 private:
     static VirtualTouchScreen *device_;
     std::vector<Slot> slots_;
+    int32_t screenWidth_ { std::numeric_limits<int32_t>::max() };
+    int32_t screenHeight_ { std::numeric_limits<int32_t>::max() };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

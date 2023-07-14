@@ -130,11 +130,11 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
     }
     callbacks_[deviceId] = callback;
     FI_HILOGI("Register crossing state listener success");
-    if (RegisterProfileListener(deviceId) != RET_OK) {
+    int32_t ret = RegisterProfileListener(deviceId);
+    if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &deviceId)
