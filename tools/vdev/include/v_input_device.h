@@ -99,6 +99,9 @@ private:
     bool HasJoystickAxesOrButtons() const;
     void CheckPointers();
     void CheckKeys();
+    void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
+        uint8_t *whichBitMask) const;
+    void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
 
 private:
     int32_t fd_ { -1 };
