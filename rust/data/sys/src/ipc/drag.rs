@@ -92,15 +92,24 @@ impl Deserialize for ShadowInfo {
 
 /// TODO: add documentation.
 pub struct DragData {
-    shadow_info: ShadowInfo,
-    buffer: Vec<u8>,
-    source_type: i32,
-    drag_num: i32,
-    pointer_id: i32,
-    display_x: i32,
-    display_y: i32,
-    display_id: i32,
-    has_canceled_animation: bool,
+    /// add struct field documentation.
+    pub shadow_info: ShadowInfo,
+    /// add struct field documentation.
+    pub buffer: Vec<u8>,
+    /// add struct field documentation.
+    pub source_type: i32,
+    /// add struct field documentation.
+    pub drag_num: i32,
+    /// add struct field documentation.
+    pub pointer_id: i32,
+    /// add struct field documentation.
+    pub display_x: i32,
+    /// add struct field documentation.
+    pub display_y: i32,
+    /// add struct field documentation.
+    pub display_id: i32,
+    /// add struct field documentation.
+    pub has_canceled_animation: bool,
 }
 
 impl DragData {
