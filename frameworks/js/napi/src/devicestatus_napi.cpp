@@ -396,15 +396,15 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         return nullptr;
     }
     FI_HILOGD("type: %{public}d, event: %{public}d", type, event);
-    if (IsMatchType(env, args[2], napi_function)) {
-        if (!g_obj->Off(type, args[2])) {
-            FI_HILOGE("Not ready to unsubscribe for type:%{public}d", type);
-            return nullptr;
-        }
-        UnsubscribeCallback(env, type, event);
-    } else {
+    if (!IsMatchType(env, args[2], napi_function)) {
         ThrowErr(env, PARAM_ERROR, "get error callback type");
+        return nullptr;
     }
+    if (!g_obj->Off(type, args[2])) {
+        FI_HILOGE("Not ready to unsubscribe for type:%{public}d", type);
+        return nullptr;
+    }
+    UnsubscribeCallback(env, type, event);
     return nullptr;
 }
 

@@ -135,45 +135,45 @@ void Utility::ShowFileAttributes(const char *path)
     struct stat buf {};
     if (stat(path, &buf) != 0) {
         FI_HILOGE("stat(\'%{public}s\') failed:%{public}s", path, strerror(errno));
-    } else {
-        if (S_ISDIR(buf.st_mode)) {
-            FI_HILOGD("%{public}20s: directory", "TYPE");
-        } else if (S_ISCHR(buf.st_mode)) {
-            FI_HILOGD("%{public}20s: character special file", "TYPE");
-        } else if (S_ISREG(buf.st_mode)) {
-            FI_HILOGD("%{public}20s: regular file", "TYPE");
-        }
-
-        std::ostringstream ss;
-        if (buf.st_mode & S_IRUSR) {
-            ss << "U+R ";
-        }
-        if (buf.st_mode & S_IWUSR) {
-            ss << "U+W ";
-        }
-        if (buf.st_mode & S_IXUSR) {
-            ss << "U+X ";
-        }
-        if (buf.st_mode & S_IRGRP) {
-            ss << "G+R ";
-        }
-        if (buf.st_mode & S_IWGRP) {
-            ss << "G+W ";
-        }
-        if (buf.st_mode & S_IXGRP) {
-            ss << "G+X ";
-        }
-        if (buf.st_mode & S_IROTH) {
-            ss << "O+R ";
-        }
-        if (buf.st_mode & S_IWOTH) {
-            ss << "O+W ";
-        }
-        if (buf.st_mode & S_IXOTH) {
-            ss << "O+X ";
-        }
-        FI_HILOGD("%{public}20s:%{public}s", "PERMISSIONS", ss.str().c_str());
+        return;
     }
+    if (S_ISDIR(buf.st_mode)) {
+        FI_HILOGD("%{public}20s: directory", "TYPE");
+    } else if (S_ISCHR(buf.st_mode)) {
+        FI_HILOGD("%{public}20s: character special file", "TYPE");
+    } else if (S_ISREG(buf.st_mode)) {
+        FI_HILOGD("%{public}20s: regular file", "TYPE");
+    }
+
+    std::ostringstream ss;
+    if (buf.st_mode & S_IRUSR) {
+        ss << "U+R ";
+    }
+    if (buf.st_mode & S_IWUSR) {
+        ss << "U+W ";
+    }
+    if (buf.st_mode & S_IXUSR) {
+        ss << "U+X ";
+    }
+    if (buf.st_mode & S_IRGRP) {
+        ss << "G+R ";
+    }
+    if (buf.st_mode & S_IWGRP) {
+        ss << "G+W ";
+    }
+    if (buf.st_mode & S_IXGRP) {
+        ss << "G+X ";
+    }
+    if (buf.st_mode & S_IROTH) {
+        ss << "O+R ";
+    }
+    if (buf.st_mode & S_IWOTH) {
+        ss << "O+W ";
+    }
+    if (buf.st_mode & S_IXOTH) {
+        ss << "O+X ";
+    }
+    FI_HILOGD("%{public}20s:%{public}s", "PERMISSIONS", ss.str().c_str());
 }
 
 void Utility::ShowUserAndGroup()

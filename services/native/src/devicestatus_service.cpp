@@ -497,14 +497,14 @@ int32_t DeviceStatusService::EnableDevMgr(int32_t nRetries)
         } else {
             FI_HILOGE("Maximum number of retries exceeded, Failed to enable device manager");
         }
-    } else {
-        AddEpoll(EPOLL_EVENT_DEVICE_MGR, devMgr_.GetFd());
-        if (timerId >= 0) {
-            timerMgr_.RemoveTimer(timerId);
-            timerId = -1;
-        }
+        return ret;
     }
-    return ret;
+    AddEpoll(EPOLL_EVENT_DEVICE_MGR, devMgr_.GetFd());
+    if (timerId >= 0) {
+        timerMgr_.RemoveTimer(timerId);
+        timerId = -1;
+    }
+    return RET_OK;
 }
 
 void DeviceStatusService::DisableDevMgr()
