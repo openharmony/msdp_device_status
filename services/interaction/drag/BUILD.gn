@@ -32,6 +32,10 @@ ohos_shared_library("interaction_drag") {
 
   defines = device_status_default_defines
 
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+
   deps = [
     "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
