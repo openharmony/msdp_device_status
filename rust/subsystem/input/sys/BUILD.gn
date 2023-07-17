@@ -17,15 +17,13 @@ import("//build/ohos.gni")
 ohos_rust_shared_library("input_ffi") {
   sources = [ "src/lib.rs" ]
 
-  deps = [ 
+  deps = [
     "${device_status_root_path}/rust/data/sys:fusion_data_rust",
+    "${device_status_root_path}/rust/subsystem/input/binding:fusion_input_binding",
     "${device_status_root_path}/rust/utils:fusion_utils_rust",
-    "${device_status_root_path}/rust/subsystem/input/binding:fusion_input_binding"
   ]
 
-  external_deps = [
-    "hilog:hilog_rust",
-  ]
+  external_deps = [ "hilog:hilog_rust" ]
 
   crate_name = "input_ffi"
   crate_type = "dylib"
