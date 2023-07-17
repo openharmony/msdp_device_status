@@ -67,9 +67,8 @@ void CoordinationSM::Init()
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
-        COOR_SOFTBUS_ADAPTER->Init();
     });
-    context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
+    context->GetTimerManager().AddTimer(SOFTBUS_TIME, 1, [this]() {
         FI_HILOGE("COOR_SOFTBUS_ADAPTER start");
         COOR_SOFTBUS_ADAPTER->Init();
     });
