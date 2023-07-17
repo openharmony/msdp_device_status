@@ -54,7 +54,7 @@ public:
     void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);
-    int32_t GetUserData();
+    int32_t GetUserData() const;
     int32_t OnCoordinationListener(const StreamClient& client, NetPacket& pkt);
     int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
     int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
@@ -66,7 +66,7 @@ private:
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
-    std::mutex mtx_;
+    mutable std::mutex mtx_;
     int32_t userData_ { 0 };
     bool isListeningProcess_ { false };
     IClientPtr client_ { nullptr };

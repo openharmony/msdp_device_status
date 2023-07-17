@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-inline constexpr size_t BITS_PER_UINT8 = 8;
+inline constexpr size_t BITS_PER_UINT8 { 8 };
 
 inline constexpr size_t OFFSET(size_t bit)
 {

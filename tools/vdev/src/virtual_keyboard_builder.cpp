@@ -29,8 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualKeyboardBuilder" };
-constexpr int32_t MAXIMUM_LEVEL_ALLOWED = 3;
-constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED = 0x100000;
+constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
+constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED { 0x100000 };
 } // namespace
 
 VirtualKeyboardBuilder::VirtualKeyboardBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x24ae, 0x4035)

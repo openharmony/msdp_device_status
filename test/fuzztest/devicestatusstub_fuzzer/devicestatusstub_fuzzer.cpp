@@ -28,9 +28,9 @@
 using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-constexpr size_t FOO_MAX_LEN = 1024;
-constexpr size_t MIN_SIZE = 4;
-const std::u16string FORMMGR_DEVICE_TOKEN = u"ohos.msdp.Idevicestatus";
+constexpr size_t FOO_MAX_LEN { 1024 };
+constexpr size_t MIN_SIZE { 4 };
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 uint32_t GetU32Data(const char* ch, size_t size)
 {

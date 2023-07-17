@@ -45,9 +45,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualDeviceBuilder" };
-constexpr int32_t MAXIMUM_WAIT_TIME_ALLOWED = 3000;
-constexpr int32_t MINIMUM_WAIT_TIME_ALLOWED = 5;
-constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED = 0x100000;
+constexpr int32_t MAXIMUM_WAIT_TIME_ALLOWED { 3000 };
+constexpr int32_t MINIMUM_WAIT_TIME_ALLOWED { 5 };
+constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED { 0x100000 };
 } // namespace
 
 VirtualDeviceBuilder::VirtualDeviceBuilder(const std::string &name, uint16_t bustype,
