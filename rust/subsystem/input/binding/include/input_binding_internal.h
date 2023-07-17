@@ -21,7 +21,8 @@
 struct CPointerEvent {
     std::shared_ptr<OHOS::MMI::PointerEvent> event;
 
-    CPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent) {
+    CPointerEvent(std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+    {
         event = pointerEvent;
     }
 };
@@ -29,7 +30,8 @@ struct CPointerEvent {
 struct CKeyEvent {
     std::shared_ptr<OHOS::MMI::KeyEvent> event;
 
-    CKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent) {
+    CKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+    {
         event = keyEvent;
     }
 };

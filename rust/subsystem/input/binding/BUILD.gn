@@ -15,9 +15,7 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("fusion_input_config") {
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 
   defines = device_status_default_defines
 }
