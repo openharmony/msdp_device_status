@@ -70,7 +70,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
             if (ret > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \
-                FI_HILOGE("Failed to convert string type to char type, errorCode:%{public}s", (#code)); \
+                FI_HILOGE("Failed to convert string type to char type, error code:%{public}s", (#code)); \
             } \
         } \
     } while (0)

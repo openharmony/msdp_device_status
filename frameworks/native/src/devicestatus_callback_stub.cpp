@@ -30,11 +30,11 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    FI_HILOGD("cmd:%{public}u,flags:%{public}d", code, option.GetFlags());
+    FI_HILOGD("cmd:%{public}u, flags:%{public}d", code, option.GetFlags());
     std::u16string descripter = DeviceStatusCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        FI_HILOGE("Device Status Callback Stub::On remote request failed, descriptor mismatch");
+        FI_HILOGE("DeviceStatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 

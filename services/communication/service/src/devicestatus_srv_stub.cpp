@@ -43,7 +43,7 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        FI_HILOGE("Device status srv stub::On remote request failed, descriptor is not matched");
+        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
     const std::map<uint32_t, ConnFunc> mapConnFunc = {
@@ -246,7 +246,7 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
-        FI_HILOGE("Call Update drag style failed, ret:%{public}d", ret);
+        FI_HILOGE("Call update drag style failed, ret:%{public}d", ret);
     }
     return ret;
 }

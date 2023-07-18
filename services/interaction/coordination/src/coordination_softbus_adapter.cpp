@@ -39,8 +39,7 @@ const SessionAttribute g_sessionAttr = {
     .linkType = {
         LINK_TYPE_WIFI_WLAN_2G,
         LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_BR
+        LINK_TYPE_WIFI_P2P
     }
 };
 
