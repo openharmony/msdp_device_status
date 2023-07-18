@@ -37,14 +37,14 @@ public:
     static void Unmount();
     static void Clone();
     static void Monitor();
-    static void Act(int argc, char *argv[]);
+    static void Act(int32_t argc, char *argv[]);
 
 private:
-    static void ReadDownAction(int argc, char *argv[]);
-    static void ReadMoveAction(int argc, char *argv[]);
+    static void ReadDownAction(int32_t argc, char *argv[]);
+    static void ReadMoveAction(int32_t argc, char *argv[]);
     static void ReadUpAction();
-    static void ReadMoveToAction(int argc, char *argv[]);
-    static void ReadDragToAction(int argc, char *argv[]);
+    static void ReadMoveToAction(int32_t argc, char *argv[]);
+    static void ReadDragToAction(int32_t argc, char *argv[]);
     static void ReadActions(const char *path);
     static void ReadModel(const nlohmann::json &model, int32_t level);
     static void ReadAction(const nlohmann::json &model);

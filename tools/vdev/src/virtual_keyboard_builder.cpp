@@ -111,7 +111,7 @@ void VirtualKeyboardBuilder::Clone()
     std::cout << "Unsupported." << std::endl;
 }
 
-void VirtualKeyboardBuilder::Act(int argc, char *argv[])
+void VirtualKeyboardBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:f:r:w:");
