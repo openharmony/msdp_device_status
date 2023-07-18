@@ -77,7 +77,6 @@ void UpdateShadowPicFuzzTest(const uint8_t* data, size_t  size)
     ShadowInfo shadowInfo = CreateShadowInfo(data, size);
     InteractionManager::GetInstance()->UpdateShadowPic(shadowInfo);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
