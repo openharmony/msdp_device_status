@@ -22,6 +22,8 @@
 #include <getopt.h>
 #include <linux/input.h>
 
+#include "input_manager.h"
+
 #include "devicestatus_define.h"
 #include "display_manager.h"
 #include "fi_log.h"
@@ -46,6 +48,31 @@ constexpr uint32_t SY_OFFSET { 1 };
 constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
 } // namespace
+
+class PointerEventMonitor final : public ::OHOS::MMI::IInputEventConsumer {
+public:
+    PointerEventMonitor() = default;
+    ~PointerEventMonitor() = default;
+
+    void OnInputEvent(std::shared_ptr<::OHOS::MMI::KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<::OHOS::MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<::OHOS::MMI::AxisEvent> axisEvent) const override {};
+};
+
+void PointerEventMonitor::OnInputEvent(std::shared_ptr<::OHOS::MMI::PointerEvent> pointerEvent) const
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != ::OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return;
+    }
+    ::OHOS::MMI::PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        return;
+    }
+    std::cout << "\rcurrent touch position - x: " << std::setw(6) << std::left
+        << pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
+    std::cout.flush();
+}
 
 VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x6006, 0x6006)
 {
@@ -184,7 +211,17 @@ void VirtualTouchScreenBuilder::Clone()
 void VirtualTouchScreenBuilder::Monitor()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    ::OHOS::MMI::InputManager* inputMgr = ::OHOS::MMI::InputManager::GetInstance();
+    CHKPV (inputMgr);
+    auto monitor = std::make_shared<PointerEventMonitor> ();
+    int32_t monitorId = inputMgr->AddMonitor(monitor);
+    if (monitorId < 0) {
+        std::cout << "Failed to add monitor." << std::endl;
+        return;
+    }
+    for (;;) {
+        std::this_thread::sleep_for (std::chrono::minutes (1));
+    }
 }
 
 void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
