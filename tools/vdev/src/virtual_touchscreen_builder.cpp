@@ -49,23 +49,23 @@ constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
 } // namespace
 
-class PointerEventMonitor final : public ::OHOS::MMI::IInputEventConsumer {
+class PointerEventMonitor final : public MMI::IInputEventConsumer {
 public:
     PointerEventMonitor() = default;
     ~PointerEventMonitor() = default;
 
-    void OnInputEvent(std::shared_ptr<::OHOS::MMI::KeyEvent> keyEvent) const override {};
-    void OnInputEvent(std::shared_ptr<::OHOS::MMI::PointerEvent> pointerEvent) const override;
-    void OnInputEvent(std::shared_ptr<::OHOS::MMI::AxisEvent> axisEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
 };
 
-void PointerEventMonitor::OnInputEvent(std::shared_ptr<::OHOS::MMI::PointerEvent> pointerEvent) const
+void PointerEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() != ::OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         return;
     }
-    ::OHOS::MMI::PointerEvent::PointerItem pointerItem;
+    MMI::PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
         return;
     }
@@ -211,7 +211,7 @@ void VirtualTouchScreenBuilder::Clone()
 void VirtualTouchScreenBuilder::Monitor()
 {
     CALL_DEBUG_ENTER;
-    ::OHOS::MMI::InputManager* inputMgr = ::OHOS::MMI::InputManager::GetInstance();
+    MMI::InputManager* inputMgr = MMI::InputManager::GetInstance();
     CHKPV(inputMgr);
     auto monitor = std::make_shared<PointerEventMonitor>();
     int32_t monitorId = inputMgr->AddMonitor(monitor);
