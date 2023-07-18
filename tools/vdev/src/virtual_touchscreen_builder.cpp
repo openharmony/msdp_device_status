@@ -212,15 +212,15 @@ void VirtualTouchScreenBuilder::Monitor()
 {
     CALL_DEBUG_ENTER;
     ::OHOS::MMI::InputManager* inputMgr = ::OHOS::MMI::InputManager::GetInstance();
-    CHKPV (inputMgr);
-    auto monitor = std::make_shared<PointerEventMonitor> ();
+    CHKPV(inputMgr);
+    auto monitor = std::make_shared<PointerEventMonitor>();
     int32_t monitorId = inputMgr->AddMonitor(monitor);
     if (monitorId < 0) {
         std::cout << "Failed to add monitor." << std::endl;
         return;
     }
     for (;;) {
-        std::this_thread::sleep_for (std::chrono::minutes (1));
+        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
 }
 
