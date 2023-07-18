@@ -181,9 +181,9 @@ public:
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
 
     /**
-     * @brief 更新拖拽使用的阴影缩略图信息
-     * @param shadowInfo 待更新的阴影缩略图信息
-     * @return 返回0表示成功,返回非0表示失败
+     * @brief Updates the shadow thumbnail information used for dragging.
+     * @param shadowInfo Indicates the new shadow thumbnail information.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);

@@ -37,12 +37,14 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t PIXEL_MAP_WIDTH { 300 };
 constexpr int32_t PIXEL_MAP_HEIGHT { 300 };
+constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
+constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t POINTER_ID { 0 };
 constexpr int32_t DISPLAY_ID { 0 };
-constexpr int32_t DISPLAY_X { 300 };
-constexpr int32_t DISPLAY_Y { 300 };
+constexpr int32_t DISPLAY_X { 50 };
+constexpr int32_t DISPLAY_Y { 50 };
 constexpr int32_t DRAG_NUM_ONE { 1 };
 constexpr int32_t DRAG_NUM_MULTIPLE { 10 };
 constexpr int32_t INT32_BYTE { 4 };
@@ -287,6 +289,42 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionDragDrawingTest_UpdateShadowPic
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateShadowPic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    ASSERT_NE(pixelMap, nullptr);
+    ShadowInfo shadowInfo = { pixelMap, 0, 0 };
+    ret = InteractionManager::GetInstance()->UpdateShadowPic(shadowInfo);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
 }
 
 /**
