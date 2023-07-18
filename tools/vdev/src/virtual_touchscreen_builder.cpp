@@ -187,7 +187,7 @@ void VirtualTouchScreenBuilder::Monitor()
     std::cout << "Unsupported." << std::endl;
 }
 
-void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
+void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:");
@@ -242,7 +242,7 @@ void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
     } while ((opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:")) >= 0);
 }
 
-void VirtualTouchScreenBuilder::ReadDownAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadDownAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
@@ -263,7 +263,7 @@ void VirtualTouchScreenBuilder::ReadDownAction(int argc, char *argv[])
     }
 }
 
-void VirtualTouchScreenBuilder::ReadMoveAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadMoveAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
@@ -300,7 +300,7 @@ void VirtualTouchScreenBuilder::ReadUpAction()
     VirtualTouchScreen::GetDevice()->UpButton(slot);
 }
 
-void VirtualTouchScreenBuilder::ReadMoveToAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadMoveToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
@@ -321,7 +321,7 @@ void VirtualTouchScreenBuilder::ReadMoveToAction(int argc, char *argv[])
     }
 }
 
-void VirtualTouchScreenBuilder::ReadDragToAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadDragToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
