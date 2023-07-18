@@ -36,11 +36,11 @@
         "hitrace",
         "ability_base",
         "huks",
-        "graphic_standard",
+        "graphic_2d",
         "udmf",
         "device_info_manager",
         "dsoftbus",
-        "graphic_standard",
+        "graphic_2d",
         "common"
       ],
       "third_party": [

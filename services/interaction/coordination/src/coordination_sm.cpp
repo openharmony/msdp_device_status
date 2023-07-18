@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "coordination_sm.h"
 
 #include <cstdio>
@@ -44,6 +45,7 @@ constexpr float MOUSE_ABS_LOCATION { 100 };
 constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
 constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
+constexpr int32_t SOFTBUS_TIME { 8000 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
 } // namespace
 
@@ -65,6 +67,9 @@ void CoordinationSM::Init()
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
+    });
+    context->GetTimerManager().AddTimer(SOFTBUS_TIME, 1, [this]() {
+        FI_HILOGE("COOR_SOFTBUS_ADAPTER start");
         COOR_SOFTBUS_ADAPTER->Init();
     });
     COOR_DEV_MGR->Init();

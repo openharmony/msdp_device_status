@@ -25,108 +25,22 @@ extern crate fusion_ipc_client_rust;
 extern crate fusion_data_rust;
 extern crate fusion_basic_client_rust;
 extern crate fusion_drag_client_rust;
+extern crate fusion_coordination_client_rust;
 
-use std::rc::Rc;
-use std::sync::Once;
+mod frameworks;
+
+use std::ffi::{ c_char, CStr, CString };
 use std::os::fd::AsRawFd;
-use std::ffi::{ c_char, CString };
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
-use ipc_rust::FileDesc;
 use fusion_utils_rust::call_debug_enter;
-use fusion_ipc_client_rust::FusionIpcClient;
-use fusion_data_rust::{ AllocSocketPairParam, CDragData, DragData, FusionResult };
-use fusion_basic_client_rust::FusionBasicClient;
-use fusion_drag_client_rust::DragClient;
+use fusion_data_rust::{ AllocSocketPairParam, CDragData, DragData };
+use frameworks::FusionFrameworks;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
-    tag: "FusionFrameworks"
+    tag: "fusion_client"
 };
-
-static mut FRAMEWORKS: Option<FusionFrameworks> = None;
-static INIT: Once = Once::new();
-
-fn init_global_values() {
-    unsafe {
-        INIT.call_once(|| {
-            FRAMEWORKS = Some(FusionFrameworks {
-                ipc_client: None,
-                basic: FusionBasicClient::default(),
-                drag: DragClient::default()
-            });
-        });
-    }
-}
-
-/// struct FusionFrameworks
-#[derive(Default)]
-pub struct FusionFrameworks {
-    ipc_client: Option<Rc<FusionIpcClient>>,
-    basic: FusionBasicClient,
-    drag: DragClient,
-}
-
-impl<'a> FusionFrameworks {
-    /// TODO: add documentation.
-    pub fn get_instance() -> Option<&'static FusionFrameworks> {
-        init_global_values();
-        unsafe {
-            FRAMEWORKS.as_ref()
-        }
-    }
-
-    /// TODO: add documentation.
-    pub fn get_mut_instance() -> Option<&'static mut FusionFrameworks> {
-        init_global_values();
-        unsafe {
-            FRAMEWORKS.as_mut()
-        }
-    }
-
-    /// TODO: add documentation.
-    pub fn set_ipc_connect(&'a mut self) {
-        if self.ipc_client.is_some() {
-            return;
-        }
-        info!(LOG_LABEL, "trying to connect server");
-        match FusionIpcClient::connect() {
-            Ok(client) => {
-                info!(LOG_LABEL, "Connect to server successfully");
-                self.ipc_client = Some(Rc::new(client));
-            }
-            Err(_) => {
-                error!(LOG_LABEL, "Can not connect to server.");
-            }
-        }
-    }
-
-    /// TODO: add documentation.
-    pub fn alloc_socket_pair(&self, param: &AllocSocketPairParam) -> FusionResult<(FileDesc, i32)> {
-        match self.ipc_client.as_ref() {
-            Some(ipc_client_ref) => {
-                info!(LOG_LABEL, "in FusionFrameworks::start_drag(): call basic.start_drag()");
-                self.basic.alloc_socket_pair(param, ipc_client_ref.clone())
-            }
-            None => {
-                Err(-1)
-            }
-        }
-    }
-
-    /// TODO: add documentation.
-    pub fn start_drag(&self, drag_data: &DragData) -> FusionResult<i32> {
-        match self.ipc_client.as_ref() {
-            Some(ipc_client_ref) => {
-                info!(LOG_LABEL, "in FusionFrameworks::start_drag(): call drag.start_drag()");
-                self.drag.start_drag(drag_data, ipc_client_ref.clone())
-            }
-            None => {
-                Err(-1)
-            }
-        }
-    }
-}
 
 /// fusion_start_drag()
 /// # Safety
@@ -196,7 +110,7 @@ pub unsafe extern "C" fn fusion_start_drag(c_drag_data: *mut CDragData) -> i32
                 fw_mut.set_ipc_connect();
             }
             None => {
-                error!(LOG_LABEL, "in fusion_start_drag(): can not dereference mutable FusionFrameworks instance");
+                error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
                 return -1;
             }
         }
@@ -204,21 +118,223 @@ pub unsafe extern "C" fn fusion_start_drag(c_drag_data: *mut CDragData) -> i32
         let drag_data = DragData::from_c(c_drag_data_ref);
         match FusionFrameworks::get_instance() {
             Some(fw) => {
-                info!(LOG_LABEL, "in fusion_start_drag(): call start_drag()");
+                info!(LOG_LABEL, "Call start_drag()");
                 match fw.start_drag(&drag_data) {
                     Ok(_) => {
                         0
                     }
                     Err(err) => {
-                        error!(LOG_LABEL, "in fusion_start_drag(): error happened when starting drag");
+                        error!(LOG_LABEL, "Error happened when starting drag");
                         err
                     }
                 }
             }
             None => {
-                error!(LOG_LABEL, "in fusion_start_drag(): can not dereference FusionFrameworks instance");
+                error!(LOG_LABEL, "Can not dereference FusionFrameworks instance");
                 -1
             }
         }
     })
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_register_coordination_listener() -> i32
+{
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.register_coordination_listener() {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Fail to register coordination listener: {}", @public(err));
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_unregister_coordination_listener() -> i32
+{
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.unregister_coordination_listener() {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Fail to unregister coordination listener: {}", @public(err));
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_enable_coordination(user_data: i32) -> i32
+{
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.enable_coordination(user_data) {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Error in enable coordination");
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_disable_coordination(user_data: i32) -> i32
+{
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.disable_coordination(user_data) {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Error in enable coordination");
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_start_coordination(user_data: i32,
+    remote_network_id: *const c_char, start_device_id: i32) -> i32
+{
+    if remote_network_id.is_null() {
+        error!(LOG_LABEL, "remote_network_id is null");
+        return -1;
+    }
+    let remote_network_id: String = match CStr::from_ptr(remote_network_id).to_str() {
+        Ok(id) => {
+            id.to_string()
+        }
+        Err(_) => {
+            error!(LOG_LABEL, "Invalid network id");
+            return -1;
+        }
+    };
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.start_coordination(user_data, remote_network_id, start_device_id) {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Error happened when starting coordination");
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_stop_coordination(user_data: i32, is_unchained: i32) -> i32
+{
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.stop_coordination(user_data, is_unchained) {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Fail to stop coordination");
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
+}
+
+/// TODO: add documentation.
+/// # Safety
+#[no_mangle]
+pub unsafe extern "C" fn fusion_get_coordination_state(user_data: i32, device_id: *const c_char) -> i32
+{
+    if device_id.is_null() {
+        error!(LOG_LABEL, "device_id is null");
+        return -1;
+    }
+    let device_id: String = match CStr::from_ptr(device_id).to_str() {
+        Ok(id) => {
+            id.to_string()
+        }
+        Err(_) => {
+            error!(LOG_LABEL, "Invalid device id");
+            return -1;
+        }
+    };
+    match FusionFrameworks::get_mut_instance() {
+        Some(fw_mut) => {
+            fw_mut.set_ipc_connect();
+            match fw_mut.get_coordination_state(user_data, device_id) {
+                Ok(_) => {
+                    0
+                }
+                Err(err) => {
+                    error!(LOG_LABEL, "Fail to get coordination state: {}", @public(err));
+                    err
+                }
+            }
+        }
+        None => {
+            error!(LOG_LABEL, "Can not dereference mutable FusionFrameworks instance");
+            -1
+        }
+    }
 }

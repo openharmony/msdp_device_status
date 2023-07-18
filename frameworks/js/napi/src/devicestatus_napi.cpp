@@ -295,7 +295,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
             DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
             delete devicestatus;
         },
-        nullptr, &(g_obj->callbackRef_));
+        nullptr, &g_obj->callbackRef_);
     if (!g_obj->On(type, handler, false)) {
         FI_HILOGE("Type:%{public}d already exists", type);
         return nullptr;
@@ -316,7 +316,6 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
     auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         FI_HILOGE("Failed to insert");
-        return nullptr;
     }
     return nullptr;
 }
@@ -397,15 +396,15 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         return nullptr;
     }
     FI_HILOGD("type:%{public}d, event:%{public}d", type, event);
-    if (IsMatchType(env, args[2], napi_function)) {
-        if (!g_obj->Off(type, args[2])) {
-            FI_HILOGE("Not ready to unsubscribe for type:%{public}d", type);
-            return nullptr;
-        }
-        UnsubscribeCallback(env, type, event);
-    } else {
+    if (!IsMatchType(env, args[2], napi_function)) {
         ThrowErr(env, PARAM_ERROR, "get error callback type");
+        return nullptr;
     }
+    if (!g_obj->Off(type, args[2])) {
+        FI_HILOGE("Not ready to unsubscribe for type:%{public}d", type);
+        return nullptr;
+    }
+    UnsubscribeCallback(env, type, event);
     return nullptr;
 }
 
@@ -444,7 +443,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
                 DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
                 delete devicestatus;
             },
-            nullptr, &(g_obj->callbackRef_));
+            nullptr, &g_obj->callbackRef_);
     }
     if (!g_obj->On(type, handler, true)) {
         FI_HILOGE("Type:%{public}d already exists", type);

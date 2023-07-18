@@ -225,27 +225,27 @@ int main(int argc, char *argv[])
     int32_t opt = getopt_long(argc, argv, "+h", options, nullptr);
     if (opt >= 0) {
         ShowUsage();
+        return EXIT_SUCCESS;
+    }
+    const char *command = argv[optind++];
+    if (command == nullptr) {
+        std::cout << "vdevadm: command required" << std::endl;
+        ShowUsage();
+        return EXIT_FAILURE;
+    }
+    if (strcmp(command, "mount") == 0) {
+        Mount(argc, argv);
+    } else if (strcmp(command, "unmount") == 0) {
+        Unmount(argc, argv);
+    } else if (strcmp(command, "clone") == 0) {
+        Clone(argc, argv);
+    } else if (strcmp(command, "monitor") == 0) {
+        Monitor(argc, argv);
+    } else if (strcmp(command, "act") == 0) {
+        Act(argc, argv);
     } else {
-        const char *command = argv[optind++];
-        if (command == nullptr) {
-            std::cout << "vdevadm: command required" << std::endl;
-            ShowUsage();
-            return EXIT_FAILURE;
-        }
-        if (strcmp(command, "mount") == 0) {
-            Mount(argc, argv);
-        } else if (strcmp(command, "unmount") == 0) {
-            Unmount(argc, argv);
-        } else if (strcmp(command, "clone") == 0) {
-            Clone(argc, argv);
-        } else if (strcmp(command, "monitor") == 0) {
-            Monitor(argc, argv);
-        } else if (strcmp(command, "act") == 0) {
-            Act(argc, argv);
-        } else {
-            std::cout << "vdevadm: invalid command \'" << command << "\'" << std::endl;
-            ShowUsage();
-        }
+        std::cout << "vdevadm: invalid command \'" << command << "\'" << std::endl;
+        ShowUsage();
     }
     return EXIT_SUCCESS;
 }

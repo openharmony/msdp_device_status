@@ -76,6 +76,7 @@ napi_value JsCooperateContext::Enable(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (argc == ONE_PARAM) {
         return jsCooperateManager->Enable(env, enable);
     }
@@ -115,6 +116,7 @@ napi_value JsCooperateContext::Start(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (argc == TWO_PARAM) {
         return jsCooperateManager->Start(env, remoteNetworkDescriptor, startDeviceId);
     }
@@ -135,6 +137,7 @@ napi_value JsCooperateContext::Stop(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (argc == ZERO_PARAM) {
         return jsCooperateManager->Stop(env);
     }
@@ -169,6 +172,7 @@ napi_value JsCooperateContext::GetState(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (argc == ONE_PARAM) {
         return jsCooperateManager->GetState(env, deviceDescriptor_);
     }
@@ -204,6 +208,7 @@ napi_value JsCooperateContext::On(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
@@ -235,6 +240,7 @@ napi_value JsCooperateContext::Off(napi_env env, napi_callback_info info)
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCooperateManager);
     if (argc == ONE_PARAM) {
         jsCooperateManager->UnregisterListener(env, type_);
         return nullptr;

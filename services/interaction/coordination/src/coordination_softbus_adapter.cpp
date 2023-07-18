@@ -39,8 +39,7 @@ const SessionAttribute g_sessionAttr = {
     .linkType = {
         LINK_TYPE_WIFI_WLAN_2G,
         LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_BR
+        LINK_TYPE_WIFI_P2P
     }
 };
 
@@ -221,6 +220,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     }
 
     std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
+    FI_HILOGE("PeerSessionName:%{public}s", peerSessionName.c_str());
     int32_t sessionId = OpenSession(localSessionName_.c_str(), peerSessionName.c_str(), remoteNetworkId.c_str(),
         GROUP_ID.c_str(), &g_sessionAttr);
     if (sessionId < 0) {

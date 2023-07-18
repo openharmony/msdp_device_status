@@ -212,12 +212,14 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
-    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-        OnDragUp(pointerEvent);
-    } else {
-        FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-            pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
+        return;
     }
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        OnDragUp(pointerEvent);
+        return;
+    }
+    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -553,7 +555,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     monitorId_ = -1;
 #else
     if (interceptorId_ <= 0) {
-        FI_HILOGE("Invalid interceptor to be removed, interceptorId_:%{public}d", interceptorId_);
+        FI_HILOGE("Invalid interceptorId_:%{public}d", interceptorId_);
         return RET_ERR;
     }
     MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);

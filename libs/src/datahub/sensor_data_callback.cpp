@@ -64,6 +64,7 @@ bool SensorDataCallback::Unregister()
         return false;
     }
     alive_ = false;
+    CHKPF(algorithmThread_);
     if (!algorithmThread_->joinable()) {
         FI_HILOGE("thread join fail");
         return false;

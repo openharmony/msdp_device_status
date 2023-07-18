@@ -62,7 +62,7 @@ VirtualDeviceBuilder::VirtualDeviceBuilder(const std::string &name, uint16_t bus
     }
 {
     if (strcpy_s(uinputDev_.name, sizeof(uinputDev_.name), name.c_str()) != EOK) {
-        FI_HILOGE("Invalid device name: \'%{public}s\'", name.c_str());
+        FI_HILOGE("Invalid device name:\'%{public}s\'", name.c_str());
     }
 }
 
@@ -473,15 +473,17 @@ void VirtualDeviceBuilder::CopyProperties(const std::string &name, std::shared_p
 void VirtualDeviceBuilder::CopyIdentity(const std::string &name, std::shared_ptr<VirtualDevice> vDev)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(vDev);
     uinputDev_.id = vDev->GetInputId();
     if (strcpy_s(uinputDev_.name, sizeof(uinputDev_.name), name.c_str()) != EOK) {
-        FI_HILOGE("Invalid device name: \'%{public}s\'", name.c_str());
+        FI_HILOGE("Invalid device name:\'%{public}s\'", name.c_str());
     }
 }
 
 void VirtualDeviceBuilder::CopyAbsInfo(std::shared_ptr<VirtualDevice> vDev)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(vDev);
     for (size_t abs = ABS_X; abs < ABS_CNT; ++abs) {
         struct uinput_abs_setup absSetup {
             .code = static_cast<__u16>(abs),
@@ -506,6 +508,7 @@ void VirtualDeviceBuilder::CopyAbsInfo(std::shared_ptr<VirtualDevice> vDev)
 void VirtualDeviceBuilder::CopyEvents(std::shared_ptr<VirtualDevice> vDev)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(vDev);
     for (uint32_t ev = EV_SYN; ev < EV_MAX; ++ev) {
         if (vDev->SupportEventType(ev)) {
             eventTypes_.push_back(ev);

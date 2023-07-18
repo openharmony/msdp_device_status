@@ -16,5 +16,6 @@
 //! IPC data definitions.
 
 pub mod basic;
+pub mod coordination;
 pub mod default;
 pub mod drag;

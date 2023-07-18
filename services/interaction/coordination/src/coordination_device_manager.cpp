@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "coordination_device_manager.h"
 
 #include <openssl/sha.h>
@@ -128,7 +129,7 @@ std::string CoordinationDeviceManager::Device::MakeNetworkId(const std::string &
     if (idParts.size() == NETWORK_ID_NUMS) {
         return idParts[1];
     }
-    return "";
+    return {};
 }
 
 std::string CoordinationDeviceManager::Device::GenerateDescriptor()
@@ -262,7 +263,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
         FI_HILOGE("Failed to search for the device, id:%{public}d", id);
-        return "";
+        return {};
     }
     CHKPS(devIter->second);
     auto OriginNetworkId = devIter->second->GetNetworkId();
@@ -277,7 +278,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
     CALL_INFO_TRACE;
     if (dhid.empty()) {
         FI_HILOGD("The current netWorkId is an empty string");
-        return "";
+        return {};
     }
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
@@ -286,7 +287,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
         }
     }
     FI_HILOGD("The current netWorkId is an empty string");
-    return "";
+    return {};
 }
 
 std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
@@ -298,7 +299,7 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
         }
         FI_HILOGW("Device is nullptr");
     }
-    return "";
+    return {};
 }
 
 bool CoordinationDeviceManager::HasLocalPointerDevice() const

@@ -171,6 +171,53 @@ Data DeviceStatusClient::GetDeviceStatusData(Type type)
     return devicestatusData;
 }
 
+#ifdef OHOS_BUILD_ENABLE_RUST_IMPL
+
+int32_t DeviceStatusClient::RegisterCoordinationListener()
+{
+    CALL_DEBUG_ENTER;
+    return fusion_register_coordination_listener();
+}
+
+int32_t DeviceStatusClient::UnregisterCoordinationListener()
+{
+    CALL_DEBUG_ENTER;
+    return fusion_unregister_coordination_listener();
+}
+
+int32_t DeviceStatusClient::PrepareCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    return fusion_enable_coordination(userData);
+}
+
+int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    return fusion_disable_coordination(userData);
+}
+
+int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
+    const std::string &remoteNetworkId, int32_t startDeviceId)
+{
+    CALL_DEBUG_ENTER;
+    return fusion_start_coordination(userData, remoteNetworkId.c_str(), startDeviceId);
+}
+
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained)
+{
+    CALL_DEBUG_ENTER;
+    return fusion_stop_coordination(userData, isUnchained);
+}
+
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    return fusion_get_coordination_state(userData, deviceId.c_str());
+}
+
+#else // OHOS_BUILD_ENABLE_RUST_IMPL
+
 int32_t DeviceStatusClient::RegisterCoordinationListener()
 {
     CALL_DEBUG_ENTER;
@@ -220,6 +267,8 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->GetCoordinationState(userData, deviceId);
 }
+
+#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
 int32_t DeviceStatusClient::UpdateDragStyle(DragCursorStyle style)
 {

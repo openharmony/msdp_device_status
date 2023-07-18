@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include "napi/native_node_api.h"
 #include "js_coordination_manager.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace Msdp {

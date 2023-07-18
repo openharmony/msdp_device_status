@@ -67,6 +67,7 @@ void InteractionManagerImpl::InitMsgHandler()
         {MessageId::DRAG_STATE_LISTENER,
             MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)}
     };
+    CHKPV(client_);
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {
             FI_HILOGI("RegistER event handler msg:%{publid}d already exists", it.id);

@@ -34,16 +34,16 @@ void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
         });
     if (it != msgInfos_.end()) {
         *it = info;
-    } else {
-        msgInfos_.emplace_back(info);
+        return;
     }
+    msgInfos_.emplace_back(info);
 }
 
 void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
     CALL_DEBUG_ENTER;
     if (msgInfos_.empty() || info == nullptr) {
-        FI_HILOGW("Remove listener failed");
+        FI_HILOGE("Remove listener failed");
         return;
     }
     auto it = std::find_if(msgInfos_.begin(), msgInfos_.end(),

@@ -20,8 +20,8 @@
 #include <mutex>
 #include <map>
 
-#include "stationary_data.h"
 #include "devicestatus_msdp_interface.h"
+#include "stationary_data.h"
 
 namespace OHOS {
 namespace Msdp {
