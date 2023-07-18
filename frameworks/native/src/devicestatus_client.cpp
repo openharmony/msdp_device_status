@@ -127,7 +127,7 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("UNevent: %{public}d", event);
+    FI_HILOGI("UNevent:%{public}d", event);
     typeMap_.erase(type);
     FI_HILOGD("typeMap_ %{public}d", typeMap_[type]);
     CHKPR(callback, RET_ERR);
@@ -249,7 +249,7 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     const std::string programName(GetProgramName());
     int32_t ret = fusion_alloc_socket_fd(programName.c_str(), moduleType, &socketFd_, &tokenType_);
     if (ret != RET_OK) {
-        FI_HILOGE("Fail to connect to server via socket: %{public}d", ret);
+        FI_HILOGE("Fail to connect to server via socket:%{public}d", ret);
         return RET_ERR;
     }
     FI_HILOGI("Connected successfully to server via socket, "

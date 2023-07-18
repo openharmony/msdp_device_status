@@ -180,7 +180,7 @@ void VirtualDeviceBuilder::Unmount(const char *name, const char *id)
     std::cout << "Mo backing process for virtual " << name << " was found." << std::endl;
 EXIT:
     if (closedir(procDir) != 0) {
-        FI_HILOGE("closedir error: %{public}s", strerror(errno));
+        FI_HILOGE("closedir error:%{public}s", strerror(errno));
     }
 }
 
@@ -201,7 +201,7 @@ void VirtualDeviceBuilder::SetSupportedEvents()
         const auto &events = setEvents.second();
         for (const auto &e : events) {
             if (ioctl(fd_, setEvents.first, e) < 0) {
-                FI_HILOGE("Failed while setting event type: %{public}s", strerror(errno));
+                FI_HILOGE("Failed while setting event type:%{public}s", strerror(errno));
             }
         }
     }
@@ -211,7 +211,7 @@ void VirtualDeviceBuilder::SetAbsResolution()
 {
     for (const auto &item : absInit_) {
         if (ioctl(fd_, UI_ABS_SETUP, &item) < 0) {
-            FI_HILOGE("Failed while setting abs info: %{public}s", strerror(errno));
+            FI_HILOGE("Failed while setting abs info:%{public}s", strerror(errno));
         }
     }
 }
@@ -238,14 +238,14 @@ void VirtualDeviceBuilder::SetPhys()
     }
 
     if (ioctl(fd_, UI_SET_PHYS, phys.c_str()) < 0) {
-        FI_HILOGE("Failed while setting phys: %{public}s", strerror(errno));
+        FI_HILOGE("Failed while setting phys:%{public}s", strerror(errno));
     }
 }
 
 void VirtualDeviceBuilder::SetIdentity()
 {
     if (write(fd_, &uinputDev_, sizeof(uinputDev_)) < 0) {
-        FI_HILOGE("Unable to set uinput device info: %{public}s", strerror(errno));
+        FI_HILOGE("Unable to set uinput device info:%{public}s", strerror(errno));
     }
 }
 
@@ -266,7 +266,7 @@ bool VirtualDeviceBuilder::SetUp()
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
         FI_HILOGE("Failed to setup uinput device");
         if (close(fd_) != 0) {
-            FI_HILOGE("close error: %{public}s", strerror(errno));
+            FI_HILOGE("close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
         return false;
@@ -278,10 +278,10 @@ void VirtualDeviceBuilder::Close()
 {
     if (fd_ >= 0) {
         if (ioctl(fd_, UI_DEV_DESTROY) < 0) {
-            FI_HILOGE("ioctl error: %{public}s", strerror(errno));
+            FI_HILOGE("ioctl error:%{public}s", strerror(errno));
         }
         if (close(fd_) != 0) {
-            FI_HILOGE("close error: %{public}s", strerror(errno));
+            FI_HILOGE("close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }
@@ -403,7 +403,7 @@ int32_t VirtualDeviceBuilder::ScanFor(std::function<bool(std::shared_ptr<Virtual
     CALL_DEBUG_ENTER;
     DIR *dir = opendir(DEV_INPUT_PATH.c_str());
     if (dir == nullptr) {
-        FI_HILOGE("Failed to open directory \'%{public}s\': %{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
+        FI_HILOGE("Failed to open directory \'%{public}s\':%{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
         return RET_ERR;
     }
     struct dirent *dent;
@@ -428,7 +428,7 @@ int32_t VirtualDeviceBuilder::ScanFor(std::function<bool(std::shared_ptr<Virtual
         }
     }
     if (closedir(dir) != 0) {
-        FI_HILOGE("closedir error: %{public}s", strerror(errno));
+        FI_HILOGE("closedir error:%{public}s", strerror(errno));
     }
     return RET_OK;
 }

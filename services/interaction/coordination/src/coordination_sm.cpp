@@ -302,7 +302,7 @@ void CoordinationSM::StartPointerEventFilter()
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>();
     uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
-    FI_HILOGE("Touchtags: %{public}d", static_cast<int32_t>(touchTags));
+    FI_HILOGE("Touchtags:%{public}d", static_cast<int32_t>(touchTags));
     if (filterId_ >= 0) {
         MMI::InputManager::GetInstance()->RemoveInputEventFilter(filterId_);
     }
@@ -534,8 +534,8 @@ bool CoordinationSM::UpdateMouseLocation()
     }
     int32_t xPercent = displayX_ * MOUSE_ABS_LOCATION / width;
     int32_t yPercent = displayY_ * MOUSE_ABS_LOCATION / height;
-    FI_HILOGI("displayWidth: %{public}d, displayHeight: %{public}d, "
-        "physicalX: %{public}d, physicalY: %{public}d,",
+    FI_HILOGI("displayWidth:%{public}d, displayHeight:%{public}d, "
+        "physicalX:%{public}d, physicalY:%{public}d,",
         width, height, displayX_, displayY_);
     mouseLocation_ = std::make_pair(xPercent, yPercent);
     return true;

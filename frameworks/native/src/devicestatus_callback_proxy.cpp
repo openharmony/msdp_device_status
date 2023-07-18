@@ -49,7 +49,7 @@ void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusDa
     int32_t ret = remote->SendRequest(static_cast<int32_t>(IRemoteDevStaCallback::DEVICESTATUS_CHANGE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code: %{public}d", ret);
+        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
         return;
     }
 }

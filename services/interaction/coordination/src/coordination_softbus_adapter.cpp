@@ -288,7 +288,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
             break;
         }
     }
-    FI_HILOGD("isPointerButtonPressed: %{public}d", isPointerButtonPressed);
+    FI_HILOGD("isPointerButtonPressed:%{public}d", isPointerButtonPressed);
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));

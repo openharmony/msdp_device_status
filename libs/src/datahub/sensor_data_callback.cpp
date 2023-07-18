@@ -149,7 +149,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
-    FI_HILOGI("SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
+    FI_HILOGI("SensorDataCallbackImpl sensorTypeId:%{public}d", event->sensorTypeId);
     SENSOR_DATA_CB.PushData(event->sensorTypeId, event->data);
 }
 

@@ -113,7 +113,7 @@ int32_t VirtualMouse::DownButton(int32_t button)
 {
     CALL_DEBUG_ENTER;
     if (button < BTN_MOUSE || button > BTN_TASK) {
-        FI_HILOGE("Not mouse button: %{public}d", button);
+        FI_HILOGE("Not mouse button:%{public}d", button);
         return RET_ERR;
     }
 
@@ -127,7 +127,7 @@ int32_t VirtualMouse::UpButton(int32_t button)
 {
     CALL_DEBUG_ENTER;
     if (button < BTN_MOUSE || button > BTN_TASK) {
-        FI_HILOGE("Not mouse button: %{public}d", button);
+        FI_HILOGE("Not mouse button:%{public}d", button);
         return RET_ERR;
     }
 

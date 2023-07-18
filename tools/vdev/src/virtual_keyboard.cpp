@@ -59,7 +59,7 @@ int32_t VirtualKeyboard::Down(int32_t key)
 {
     CALL_DEBUG_ENTER;
     if (!SupportKey(key)) {
-        FI_HILOGE("Unsupported key code: %{public}d", key);
+        FI_HILOGE("Unsupported key code:%{public}d", key);
         return RET_ERR;
     }
 
@@ -73,7 +73,7 @@ int32_t VirtualKeyboard::Up(int32_t key)
 {
     CALL_DEBUG_ENTER;
     if (!SupportKey(key)) {
-        FI_HILOGE("Unsupported key code: %{public}d", key);
+        FI_HILOGE("Unsupported key code:%{public}d", key);
         return RET_ERR;
     }
 
