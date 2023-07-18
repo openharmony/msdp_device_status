@@ -57,7 +57,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("Send request is failed, error code:%{public}d", ret);
         return;
     }
 }
@@ -86,7 +86,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("Send request is failed, error code:%{public}d", ret);
         return;
     }
 }
@@ -115,7 +115,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("Send request is failed, error code:%{public}d", ret);
         return devicestatusData;
     }
 

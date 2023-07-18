@@ -496,7 +496,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         std::placeholders::_1));
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
     if (monitorId_ <= 0) {
-        FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
+        FI_HILOGE("Failed to add monitor, error code:%{public}d", monitorId_);
         return RET_ERR;
     }
 #else
@@ -504,7 +504,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
     auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
     interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
     if (interceptorId_ <= 0) {
-        FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+        FI_HILOGE("Failed to add interceptor, error code:%{public}d", interceptorId_);
         return RET_ERR;
     }
 #endif // OHOS_DRAG_ENABLE_MONITOR

@@ -39,11 +39,11 @@ using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessagePa
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    FI_HILOGD("cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
+    FI_HILOGD("cmd:%{public}d, flags:%{public}d", code, option.GetFlags());
     std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
+        FI_HILOGE("Device status srv stub::On remote request failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
     const std::map<uint32_t, ConnFunc> mapConnFunc = {
@@ -246,7 +246,7 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
-        FI_HILOGE("Call UpdateDragStyle failed, ret:%{public}d", ret);
+        FI_HILOGE("Call Update drag style failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -289,7 +289,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     int32_t ret = AllocSocketFd(clientName, moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
-        FI_HILOGE("AllocSocketFd failed, pid:%{public}d, go switch default", pid);
+        FI_HILOGE("Alloc socket fd failed, pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
             if (close(clientFd) < 0) {
                 FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);
@@ -368,7 +368,7 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
-        FI_HILOGE("Call StopDrag failed, ret:%{public}d", ret);
+        FI_HILOGE("Call stop drag failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
@@ -379,7 +379,7 @@ int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t ret = AddDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call AddDraglistener failed, ret:%{public}d", ret);
+        FI_HILOGE("Call add drag listener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -389,7 +389,7 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
     CALL_DEBUG_ENTER;
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call RemoveDraglistener failed, ret:%{public}d", ret);
+        FI_HILOGE("Call remove drag listener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -401,7 +401,7 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {
-        FI_HILOGE("Call SetDragWindowVisible failed, ret:%{public}d", ret);
+        FI_HILOGE("Call set drag window visible failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -415,7 +415,7 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     int32_t height = 0;
     int32_t ret = GetShadowOffset(offsetX, offsetY, width, height);
     if (ret != RET_OK) {
-        FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
+        FI_HILOGE("Call get shadow offset stub failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);

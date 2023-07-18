@@ -318,11 +318,11 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     const std::string programName(GetProgramName());
     int32_t result = devicestatusProxy_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
-        FI_HILOGE("AllocSocketFd has error:%{public}d", result);
+        FI_HILOGE("Alloc socket fd has error:%{public}d", result);
         return RET_ERR;
     }
 
-    FI_HILOGI("AllocSocketPair success, socketFd_:%{public}d, tokenType_:%{public}d", socketFd_, tokenType_);
+    FI_HILOGI("Alloc socket pair success, socketFd_:%{public}d, tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 

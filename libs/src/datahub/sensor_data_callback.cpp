@@ -47,10 +47,10 @@ SensorDataCallback::~SensorDataCallback()
 
 void SensorDataCallback::Init()
 {
-    FI_HILOGI("SensorDataCallback is initiated");
+    FI_HILOGI("Sensor data callback is initiated");
     std::lock_guard lock(initMutex_);
     if (algorithmThread_ == nullptr) {
-        FI_HILOGI("create algorithem thread");
+        FI_HILOGI("Create algorithem thread");
         algorithmThread_ = std::make_unique<std::thread>(&SensorDataCallback::AlgorithmLoop, this);
     }
 }
@@ -66,7 +66,7 @@ bool SensorDataCallback::Unregister()
     alive_ = false;
     CHKPF(algorithmThread_);
     if (!algorithmThread_->joinable()) {
-        FI_HILOGE("thread join fail");
+        FI_HILOGE("Thread join fail");
         return false;
     }
     sem_post(&sem_);
@@ -92,7 +92,7 @@ bool SensorDataCallback::UnsubscribeSensorEvent(int32_t sensorTypeId, SensorCall
     std::lock_guard lock(callbackMutex_);
     auto callbackIter = algoMap_.find(sensorTypeId);
     if (callbackIter != algoMap_.end()) {
-        FI_HILOGE("erase sensorTypeId:%{public}d", sensorTypeId);
+        FI_HILOGE("Erase sensorTypeId:%{public}d", sensorTypeId);
         algoMap_.erase(sensorTypeId);
     }
     return true;
@@ -131,7 +131,7 @@ bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData& data)
 {
     CALL_DEBUG_ENTER;
     if (sensorTypeId != SENSOR_TYPE_ID_ACCELEROMETER) {
-        FI_HILOGE("invalid sensorTypeId:%{public}d", sensorTypeId);
+        FI_HILOGE("Invalid sensorTypeId:%{public}d", sensorTypeId);
         return false;
     }
     std::lock_guard lock(dataMutex_);
@@ -150,7 +150,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
-    FI_HILOGI("SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
+    FI_HILOGI("Sensor data callback impl sensorTypeId: %{public}d", event->sensorTypeId);
     SENSOR_DATA_CB.PushData(event->sensorTypeId, event->data);
 }
 
@@ -160,17 +160,17 @@ bool SensorDataCallback::RegisterCallbackSensor(int32_t sensorTypeId)
     user_.callback = SensorDataCallbackImpl;
     int32_t ret = SubscribeSensor(sensorTypeId, &user_);
     if (ret != 0) {
-        FI_HILOGE("SubscribeSensor failed");
+        FI_HILOGE("Subscribe sensor failed");
         return false;
     }
     ret = SetBatch(sensorTypeId, &user_, RATE_MILLISEC, RATE_MILLISEC);
     if (ret != 0) {
-        FI_HILOGE("SetBatch failed");
+        FI_HILOGE("Set batch failed");
         return false;
     }
     ret = ActivateSensor(sensorTypeId, &user_);
     if (ret != 0) {
-        FI_HILOGE("ActivateSensor failed");
+        FI_HILOGE("Activate sensor failed");
         return false;
     }
     return true;
@@ -183,12 +183,12 @@ bool SensorDataCallback::UnregisterCallbackSensor(int32_t sensorTypeId)
     CHKPF(user_.callback);
     int32_t ret = DeactivateSensor(sensorTypeId, &user_);
     if (ret != 0) {
-        FI_HILOGE("DeactivateSensor failed");
+        FI_HILOGE("Deactivate sensor failed");
         return false;
     }
     ret = UnsubscribeSensor(sensorTypeId, &user_);
     if (ret != 0) {
-        FI_HILOGE("UnsubscribeSensor failed");
+        FI_HILOGE("Unsubscribe sensor failed");
         return false;
     }
     return true;

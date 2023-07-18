@@ -98,7 +98,7 @@ int32_t DeviceManager::OnEnable()
     CALL_DEBUG_ENTER;
     int32_t ret = EpollCreate();
     if (ret != RET_OK) {
-        FI_HILOGE("EpollCreate failed");
+        FI_HILOGE("Epoll create failed");
         return ret;
     }
     ret = monitor_.Enable();
@@ -108,7 +108,7 @@ int32_t DeviceManager::OnEnable()
     }
     ret = EpollAdd(&monitor_);
     if (ret != RET_OK) {
-        FI_HILOGE("EpollAdd failed");
+        FI_HILOGE("Epoll add failed");
         goto DISABLE_MONITOR;
     }
     enumerator_.ScanDevices();
@@ -129,7 +129,7 @@ int32_t DeviceManager::Disable()
     int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnDisable, this));
     if (ret != RET_OK) {
-        FI_HILOGE("PostSyncTask failed");
+        FI_HILOGE("Post sync task failed");
     }
     return ret;
 }
@@ -324,7 +324,7 @@ void DeviceManager::Dispatch(const struct epoll_event &ev)
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
             std::bind(&DeviceManager::OnEpollDispatch, this));
         if (ret != RET_OK) {
-            FI_HILOGE("PostAsyncTask failed");
+            FI_HILOGE("Post async task failed");
         }
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));

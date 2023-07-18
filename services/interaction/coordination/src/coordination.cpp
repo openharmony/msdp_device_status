@@ -50,7 +50,7 @@ int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("ActivateCoordination failed, ret:%{public}d", ret);
+        FI_HILOGE("Activate coordination failed, ret:%{public}d", ret);
         COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
     }
     return ret;

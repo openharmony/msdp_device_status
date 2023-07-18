@@ -31,10 +31,10 @@ std::string GetLocalNetworkId()
     auto localNode = std::make_unique<NodeBasicInfo>();
     int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
     if (ret != RET_OK) {
-        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        FI_HILOGE("Get local node device info ret:%{public}d", ret);
         return {};
     }
-    FI_HILOGE("GetLocalNodeDeviceInfo networkId: %{public}s", localNode->networkId);
+    FI_HILOGE("Get local node device info networkId: %{public}s", localNode->networkId);
     return localNode->networkId;
 }
 } // namespace COORDINATION

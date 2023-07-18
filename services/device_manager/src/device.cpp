@@ -108,7 +108,7 @@ void Device::Close()
 void Device::Dispatch(const struct epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == EPOLLIN) {
-        FI_HILOGD("input data received");
+        FI_HILOGD("Input data received");
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
@@ -386,7 +386,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         return RET_ERR;
     }
     if (ReadConfigFile(std::string(temp)) != RET_OK) {
-        FI_HILOGE("ReadConfigFile failed");
+        FI_HILOGE("Read config file failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -419,7 +419,7 @@ void Device::LoadDeviceConfig()
 {
     CALL_DEBUG_ENTER;
     if (ReadTomlFile(MakeConfigFileName()) != RET_OK) {
-        FI_HILOGE("ReadTomlFile failed");
+        FI_HILOGE("Read toml file failed");
         keyboardType_ = IDevice::KEYBOARD_TYPE_NONE;
     }
     if (IsKeyboard()) {

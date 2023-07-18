@@ -189,7 +189,7 @@ void CoordinationSoftbusAdapter::Release()
         FI_HILOGD("Close session success");
     });
     int32_t ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
-    FI_HILOGD("RemoveSessionServer ret:%{public}d", ret);
+    FI_HILOGD("Remove session server ret:%{public}d", ret);
     sessionDevMap_.clear();
     channelStatusMap_.clear();
 }
@@ -596,7 +596,7 @@ int32_t CoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t r
     }
 
     int32_t sessionSide = GetSessionSide(sessionId);
-    FI_HILOGI("session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
+    FI_HILOGI("Session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
         sessionId, sessionSide);
     std::lock_guard<std::mutex> notifyLock(operationMutex_);
     if (sessionSide == SESSION_SIDE_SERVER) {

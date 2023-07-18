@@ -34,7 +34,7 @@ int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     std::u16string descripter = DeviceStatusCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        FI_HILOGE("DeviceStatusCallbackStub::OnRemoteRequest failed, descriptor mismatch");
+        FI_HILOGE("Device Status Callback Stub::On remote request failed, descriptor mismatch");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 

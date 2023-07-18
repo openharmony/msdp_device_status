@@ -114,12 +114,12 @@ void DeviceStatusMsdpMock::InitTimer()
     CALL_DEBUG_ENTER;
     epFd_ = epoll_create1(EPOLL_CLOEXEC);
     if (epFd_ == -1) {
-        FI_HILOGE("create epoll fd failed");
+        FI_HILOGE("Create epoll fd failed");
         return;
     }
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (timerFd_ == ERR_INVALID_FD) {
-        FI_HILOGE("create timer fd failed");
+        FI_HILOGE("Create timer fd failed");
         if (close(epFd_) < 0) {
             FI_HILOGE("Close epoll fd failed, error:%{public}s, epFd_:%{public}d", strerror(errno), epFd_);
         }
@@ -130,10 +130,10 @@ void DeviceStatusMsdpMock::InitTimer()
     fcntl(timerFd_, F_SETFL, O_NONBLOCK);
     auto [_, ret] = callbacks_.insert(std::make_pair(timerFd_, &DeviceStatusMsdpMock::TimerCallback));
     if (!ret) {
-        FI_HILOGW("insert timer fd failed");
+        FI_HILOGW("Insert timer fd failed");
     }
     if (RegisterTimerCallback(timerFd_, EVENT_TIMER_FD)) {
-        FI_HILOGE("register timer fd failed");
+        FI_HILOGE("Register timer fd failed");
         return;
     }
 }
@@ -141,7 +141,7 @@ void DeviceStatusMsdpMock::InitTimer()
 int32_t DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
 {
     if (timerFd_ == ERR_INVALID_FD) {
-        FI_HILOGE("create timer fd failed");
+        FI_HILOGE("Create timer fd failed");
         return RET_ERR;
     }
 
@@ -155,7 +155,7 @@ int32_t DeviceStatusMsdpMock::SetTimerInterval(int32_t interval)
     itval.it_value.tv_sec = interval;
     itval.it_value.tv_nsec = 0;
     if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
-        FI_HILOGE("set timer failed");
+        FI_HILOGE("Set timer failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -177,7 +177,7 @@ void DeviceStatusMsdpMock::TimerCallback()
 {
     uint64_t timers;
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
-        FI_HILOGE("read timer fd failed");
+        FI_HILOGE("Read timer fd failed");
         return;
     }
     GetDeviceStatusData();
@@ -190,7 +190,7 @@ int32_t DeviceStatusMsdpMock::GetDeviceStatusData()
         CHKPR(dataParse_, RET_ERR);
         Data data;
         dataParse_->ParseDeviceStatusData(type, data);
-        FI_HILOGD("mock type:%{public}d, value:%{public}d", data.type, data.value);
+        FI_HILOGD("Mock type:%{public}d, value:%{public}d", data.type, data.value);
         NotifyMsdpImpl(data);
     }
     return RET_OK;

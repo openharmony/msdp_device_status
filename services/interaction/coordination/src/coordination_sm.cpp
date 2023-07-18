@@ -195,7 +195,7 @@ void CoordinationSM::PrepareCoordination()
             std::bind(&CoordinationSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
         monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
         if (monitorId_ <= 0) {
-            FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
+            FI_HILOGE("Failed to add monitor, error code:%{public}d", monitorId_);
             monitorId_ = -1;
             return;
         }
