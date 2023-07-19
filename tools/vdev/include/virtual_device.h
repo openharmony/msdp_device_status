@@ -37,6 +37,8 @@ public:
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
 
     bool IsActive() const;
+    bool IsMouse() const;
+    bool IsKeyboard() const;
     bool IsTouchscreen() const;
     bool SupportEventType(size_t ev) const;
     bool SupportKey(size_t key) const;
@@ -70,6 +72,16 @@ private:
 inline bool VirtualDevice::IsActive() const
 {
     return ((inputDev_ != nullptr) && inputDev_->IsActive());
+}
+
+inline bool VirtualDevice::IsMouse() const
+{
+    return ((inputDev_ != nullptr) && inputDev_->IsTouchscreen());
+}
+
+inline bool VirtualDevice::IsKeyboard() const
+{
+    return ((inputDev_ != nullptr) && inputDev_->IsKeyboard());
 }
 
 inline bool VirtualDevice::IsTouchscreen() const
