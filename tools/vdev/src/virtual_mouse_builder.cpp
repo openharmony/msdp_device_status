@@ -157,10 +157,10 @@ void VirtualMouseBuilder::Clone()
         return;
     }
     auto vDev = VirtualDeviceBuilder::Select(vDevs, "mouse");
-    CHKPV (vDev);
+    CHKPV(vDev);
 
     std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
-    VirtualDeviceBuilder vBuilder (GetDeviceName(), vDev);
+    VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
     if (!vBuilder.SetUp()) {
         std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
         return;
@@ -168,7 +168,7 @@ void VirtualMouseBuilder::Clone()
 
     int32_t nTries = 3;
     do {
-        std::this_thread::sleep_for (std::chrono::seconds (1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     } while ((nTries-- > 0) && (VirtualMouse::GetDevice() == nullptr));
     if (VirtualMouse::GetDevice() == nullptr) {
         std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
@@ -178,7 +178,7 @@ void VirtualMouseBuilder::Clone()
     std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
     VirtualDeviceBuilder::Daemonize();
     for (;;) {
-        std::this_thread::sleep_for (std::chrono::minutes (1));
+        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
 }
 
