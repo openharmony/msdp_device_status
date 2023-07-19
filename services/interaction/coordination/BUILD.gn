@@ -61,9 +61,9 @@ ohos_shared_library("coordination") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "window_manager:libdm",
   ]
 
