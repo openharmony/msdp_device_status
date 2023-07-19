@@ -76,7 +76,7 @@ inline bool VirtualDevice::IsActive() const
 
 inline bool VirtualDevice::IsMouse() const
 {
-    return ((inputDev_ != nullptr) && inputDev_->IsTouchscreen());
+    return ((inputDev_ != nullptr) && inputDev_->IsMouse());
 }
 
 inline bool VirtualDevice::IsKeyboard() const
