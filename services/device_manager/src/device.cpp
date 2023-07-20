@@ -108,7 +108,7 @@ void Device::Close()
 void Device::Dispatch(const struct epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == EPOLLIN) {
-        FI_HILOGD("input data received");
+        FI_HILOGD("Input data received");
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
     }
@@ -375,7 +375,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         FI_HILOGE("Not real path (\'%{public}s\'):%{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
-    FI_HILOGD("config file path:%{public}s", temp);
+    FI_HILOGD("Config file path:%{public}s", temp);
 
     if (!Utility::DoesFileExist(temp)) {
         FI_HILOGE("File does not exist:%{public}s", temp);

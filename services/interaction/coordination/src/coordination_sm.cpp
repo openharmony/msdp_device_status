@@ -650,7 +650,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (currentState_ == CoordinationState::STATE_FREE) {
-        FI_HILOGI("Current State: free");
+        FI_HILOGI("Current state: free");
         return;
     }
     if ((currentState_ == CoordinationState::STATE_IN) && (startDeviceDhid_ == dhid)) {
