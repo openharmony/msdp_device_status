@@ -15,6 +15,7 @@
 
 #include "coordination_util.h"
 
+#include "coordination_sm.h"
 #include "softbus_bus_center.h"
 
 #include "devicestatus_define.h"
@@ -28,13 +29,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Coordin
 } // namespace
 std::string GetLocalNetworkId()
 {
+    CALL_DEBUG_ENTER;
     auto localNode = std::make_unique<NodeBasicInfo>();
     int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
     if (ret != RET_OK) {
         FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
         return {};
     }
-    FI_HILOGE("GetLocalNodeDeviceInfo networkId: %{public}s", localNode->networkId);
+    std::string networkId(localNode->networkId, sizeof(localNode->networkId));
+    FI_HILOGD("GetLocalNodeDeviceInfo networkId:%{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     return localNode->networkId;
 }
 } // namespace COORDINATION

@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+static constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
 enum class CoordinationState {
     STATE_FREE = 0,
     STATE_IN = 1,
