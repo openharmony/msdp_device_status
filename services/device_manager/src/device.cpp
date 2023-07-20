@@ -58,6 +58,11 @@ Device::Device(int32_t deviceId)
     : deviceId_(deviceId)
 {}
 
+Device::~Device()
+{
+    Close();
+}
+
 int32_t Device::Open()
 {
     CALL_DEBUG_ENTER;
