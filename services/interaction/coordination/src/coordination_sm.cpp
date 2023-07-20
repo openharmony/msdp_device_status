@@ -561,6 +561,7 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
 void CoordinationSM::UpdateState(CoordinationState state)
 {
     FI_HILOGI("state:%{public}d", state);
+    currentState_ = state;
     switch (state) {
         case CoordinationState::STATE_FREE: {
             Reset();
@@ -601,7 +602,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
         default:
             break;
     }
-    currentState_ = state;
 }
 
 CoordinationState CoordinationSM::GetCurrentCoordinationState() const
