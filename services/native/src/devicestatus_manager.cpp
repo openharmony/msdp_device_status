@@ -183,7 +183,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     auto dtTypeIter = listenerMap_.find(type);
     if (dtTypeIter == listenerMap_.end()) {
         if (listeners.insert(callback).second) {
-            FI_HILOGI("no found set list of type, insert success");
+            FI_HILOGI("No found set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
         listenerMap_.insert(std::make_pair(type, listeners));
@@ -194,7 +194,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
             return;
         }
         if (listenerMap_[dtTypeIter->first].insert(callback).second) {
-            FI_HILOGI("find set list of type, insert success");
+            FI_HILOGI("Find set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
     }
@@ -232,7 +232,7 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     if (listenerMap_.empty()) {
         Disable(type);
     } else {
-        FI_HILOGI("other subscribe exist");
+        FI_HILOGI("Other subscribe exist");
     }
 }
 

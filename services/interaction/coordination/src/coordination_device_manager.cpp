@@ -324,7 +324,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     if (dev->IsKeyboard()) {
         COOR_SM->OnKeyboardOnline(dev->GetDhid());
     }
-    FI_HILOGD("add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
+    FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
         "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
         dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
