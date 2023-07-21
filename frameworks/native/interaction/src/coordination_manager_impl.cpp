@@ -86,11 +86,11 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
     int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Prepare coordination failed");
-    } else {
-        devCoordinationEvent_[userData_] = event;
-        userData_++;
+        return ret;
     }
-    return ret;
+    devCoordinationEvent_[userData_] = event;
+    userData_++;
+    return RET_OK;
 }
 
 int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage callback)
@@ -106,11 +106,11 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
     int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_);
     if (ret != RET_OK) {
         FI_HILOGE("Unprepare coordination failed");
-    } else {
-        devCoordinationEvent_[userData_] = event;
-        userData_++;
+        return ret;
     }
-    return ret;
+    devCoordinationEvent_[userData_] = event;
+    userData_++;
+    return RET_OK;
 }
 
 int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteNetworkId,
@@ -128,11 +128,11 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
         userData_, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Activate coordination failed");
-    } else {
-        devCoordinationEvent_[userData_] = event;
-        userData_++;
+        return ret;
     }
-    return ret;
+    devCoordinationEvent_[userData_] = event;
+    userData_++;
+    return RET_OK;
 }
 
 int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback)
@@ -148,11 +148,11 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
     int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed");
-    } else {
-        devCoordinationEvent_[userData_] = event;
-        userData_++;
+        return ret;
     }
-    return ret;
+    devCoordinationEvent_[userData_] = event;
+    userData_++;
+    return RET_OK;
 }
 
 int32_t CoordinationManagerImpl::GetCoordinationState(
@@ -169,11 +169,11 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
     int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, deviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
-    } else {
-        devCoordinationEvent_[userData_] = event;
-        userData_++;
+        return ret;
     }
-    return ret;
+    devCoordinationEvent_[userData_] = event;
+    userData_++;
+    return RET_OK;
 }
 
 void CoordinationManagerImpl::OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg)

@@ -162,7 +162,6 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
             return std::stoi(mr[EXPECTED_SUBMATCH].str());
         }
     }
-    FI_HILOGE("Parse device id failed");
     return RET_ERR;
 }
 
@@ -208,14 +207,12 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
         FI_HILOGE("Unable to open \'%{public}s\'", devPath.c_str());
         return nullptr;
     }
-    auto ret = devices_.emplace(dev->GetId(), dev);
+    auto ret = devices_.insert_or_assign(dev->GetId(), dev);
     if (ret.second) {
         FI_HILOGD("\'%{public}s\' added", dev->GetName().c_str());
         OnDeviceAdded(dev);
-        return dev;
     }
-    FI_HILOGE("\'%{public}s\' added failed", dev->GetName().c_str());
-    return nullptr;
+    return dev;
 }
 
 std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
@@ -234,7 +231,7 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
             return dev;
         }
     }
-    FI_HILOGE("Device not found");
+    FI_HILOGD("\'%{public}s\' was not found", devNode.c_str());
     return nullptr;
 }
 

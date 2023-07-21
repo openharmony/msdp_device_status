@@ -177,41 +177,49 @@ void VInputDevice::QueryDeviceInfo()
     }
 }
 
+void VInputDevice::GetEventMask(const std::string &eventName, uint32_t type,
+    std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGBIT(type, arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get events %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
+void VInputDevice::GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGPROP(arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
 void VInputDevice::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
-    int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get key events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_MSC, sizeof(mscBitmask_)), mscBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get msc events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_LED, sizeof(ledBitmask_)), ledBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get led events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_REP, sizeof(repBitmask_)), repBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get rep events mask: %{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get properties mask: %{public}s", strerror(errno));
-    }
+    // get events mask
+    GetEventMask("", 0, sizeof(evBitmask_), evBitmask_);
+
+    // get key events
+    GetEventMask("key", EV_KEY, sizeof(keyBitmask_), keyBitmask_);
+
+    // get abs events
+    GetEventMask("abs", EV_ABS, sizeof(absBitmask_), absBitmask_);
+
+    // get rel events
+    GetEventMask("rel", EV_REL, sizeof(relBitmask_), relBitmask_);
+
+    // get msc events
+    GetEventMask("msc", EV_MSC, sizeof(mscBitmask_), mscBitmask_);
+
+    // get led events
+    GetEventMask("led", EV_LED, sizeof(ledBitmask_), ledBitmask_);
+
+    // get rep events
+    GetEventMask("rep", EV_REP, sizeof(repBitmask_), repBitmask_);
+
+    // get properties mask
+    GetPropMask("properties", sizeof(propBitmask_), propBitmask_);
 }
 
 void VInputDevice::UpdateCapability()

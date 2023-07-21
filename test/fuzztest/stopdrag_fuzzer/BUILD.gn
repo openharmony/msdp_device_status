@@ -27,8 +27,8 @@ ohos_fuzztest("StopDragFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_native",
     "input:libmmi-client",
-    "multimedia_image_framework:image_native",
   ]
 }
 

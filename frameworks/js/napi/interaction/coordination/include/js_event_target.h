@@ -59,9 +59,8 @@ private:
     static void CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
-    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 
-    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
+    inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
         coordinationListener_ {};
     bool isListeningProcess_ { false };
 };

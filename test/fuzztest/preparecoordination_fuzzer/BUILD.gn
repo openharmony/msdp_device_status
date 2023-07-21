@@ -30,7 +30,7 @@ ohos_fuzztest("PrepareCoordinationFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
   ]
 }
 

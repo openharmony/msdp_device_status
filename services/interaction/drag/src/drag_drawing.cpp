@@ -88,7 +88,7 @@ const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Dra
 #ifdef __aarch64__
 const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so";
 #else
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so";
+const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib/drag_drop_ext/libdrag_drop.z.so";
 #endif
 struct DrawingInfo {
     std::atomic_bool isRunning { false };
@@ -1214,9 +1214,9 @@ void DrawDynamicEffectModifier::SetAlpha(float alpha)
     if (alpha_ == nullptr) {
         alpha_ = std::make_shared<Rosen::RSAnimatableProperty<float>>(alpha);
         Rosen::RSModifier::AttachProperty(alpha_);
-    } else {
-        alpha_->Set(alpha);
+        return;
     }
+    alpha_->Set(alpha);
 }
 
 void DrawDynamicEffectModifier::SetScale(float scale)
@@ -1225,9 +1225,9 @@ void DrawDynamicEffectModifier::SetScale(float scale)
     if (scale_ == nullptr) {
         scale_ = std::make_shared<Rosen::RSAnimatableProperty<float>>(scale);
         Rosen::RSModifier::AttachProperty(scale_);
-    } else {
-        scale_->Set(scale);
+        return;
     }
+    scale_->Set(scale);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

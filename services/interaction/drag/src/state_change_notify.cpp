@@ -34,9 +34,9 @@ void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
         });
     if (it != msgInfos_.end()) {
         *it = info;
-    } else {
-        msgInfos_.emplace_back(info);
+        return;
     }
+    msgInfos_.emplace_back(info);
 }
 
 void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)

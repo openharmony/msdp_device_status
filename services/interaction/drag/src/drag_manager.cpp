@@ -212,12 +212,14 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
         OnDragMove(pointerEvent);
-    } else if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-        OnDragUp(pointerEvent);
-    } else {
-        FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
-            pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
+        return;
     }
+    if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        OnDragUp(pointerEvent);
+        return;
+    }
+    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -261,7 +263,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGD("Target window drag tid: %{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
-    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+    int32_t repeatCount = 1;
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
 }
