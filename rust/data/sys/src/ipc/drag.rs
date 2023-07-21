@@ -28,14 +28,14 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragData"
 };
 
-/// TODO: add documentation.
+/// Struct CShadowInfo
 #[repr(C)]
 pub struct CShadowInfo {
     x: i32,
     y: i32,
 }
 
-/// TODO: add documentation.
+/// Struct CDragData
 #[repr(C)]
 pub struct CDragData {
     shadow_info: CShadowInfo,
@@ -50,14 +50,14 @@ pub struct CDragData {
     has_canceled_animation: bool,
 }
 
-/// TODO: add documentation.
+/// Struct ShadowInfo
 pub struct ShadowInfo {
     x: i32,
     y: i32,
 }
 
 impl ShadowInfo {
-    /// TODO: add documentation.
+    /// Converts `CShadowInfo` type to `ShadowInfo` type
     pub fn from_c(value: &mut CShadowInfo) -> Self
     {
         call_debug_enter!("ShadowInfo::from_c");
@@ -90,30 +90,30 @@ impl Deserialize for ShadowInfo {
     }
 }
 
-/// TODO: add documentation.
+/// Struct DragData
 pub struct DragData {
-    /// add struct field documentation.
+    /// Represents `ShadowInfo` information in the `DragData` struct
     pub shadow_info: ShadowInfo,
-    /// add struct field documentation.
+    /// Represents `buffer` information in the `DragData` struct
     pub buffer: Vec<u8>,
-    /// add struct field documentation.
+    /// Represents `source_type` information in the `DragData` struct
     pub source_type: i32,
-    /// add struct field documentation.
+    /// Represents `drag_num` information in the `DragData` struct
     pub drag_num: i32,
-    /// add struct field documentation.
+    /// Represents `pointer_id` information in the `DragData` struct
     pub pointer_id: i32,
-    /// add struct field documentation.
+    /// Represents `display_x` information in the `DragData` struct
     pub display_x: i32,
-    /// add struct field documentation.
+    /// Represents `display_y` information in the `DragData` struct
     pub display_y: i32,
-    /// add struct field documentation.
+    /// Represents `display_id` information in the `DragData` struct
     pub display_id: i32,
-    /// add struct field documentation.
+    /// Represents `has_canceled_animation` information in the `DragData` struct
     pub has_canceled_animation: bool,
 }
 
 impl DragData {
-    /// TODO: add documentation.
+    /// Converts `CDragData` type to `DragData` type
     pub fn from_c(value: &mut CDragData) -> Self
     {
         call_debug_enter!("DragData::from_c");

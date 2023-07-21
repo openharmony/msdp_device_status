@@ -15,13 +15,8 @@
 
 //! rust base event sys
 
-/// add struct field documentation.
 pub mod extra_data;
-/// add struct field documentation.
 pub mod input_manager;
-/// add struct field documentation.
 pub mod key_event;
-/// add struct field documentation.
 pub mod pointer_event;
-/// add struct field documentation.
 pub mod pointer_style;

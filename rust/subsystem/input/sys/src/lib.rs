@@ -19,7 +19,9 @@ extern crate hilog_rust;
 extern crate fusion_data_rust;
 
 mod input_binding;
-mod cextra_data;
-mod cpointer_style;
-/// add struct field documentation.
-pub mod interaction;
+mod interaction;
+
+pub use interaction::{
+    extra_data::ExtraData, input_manager::InputManager, key_event::KeyEvent,
+    pointer_event::PointerEvent, pointer_style::PointerStyle
+};

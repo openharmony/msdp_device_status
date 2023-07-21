@@ -27,20 +27,18 @@ impl KeyEvent {
         Self(key_event)
     }
     
-    /// Extract a raw `CKeyEvent` pointer from this wrapper.
+    /// Extract a raw `CKeyEvent` pointer from this wrapper
     /// # Safety
     pub unsafe fn as_inner(&self) -> *const CKeyEvent {
         self.0
     }
 
     /// Create an `KeyEvent` wrapper object from a raw `CKeyEvent` pointer.
-    /// # Safety
-    pub unsafe fn from_raw(c_key_event: *const CKeyEvent) -> Option<Self> {
+    pub fn from_raw(c_key_event: *const CKeyEvent) -> Option<Self> {
         if c_key_event.is_null() {
-            None
-        } else {
-            Some(Self(c_key_event))
+            return None;
         }
+        Some(Self(c_key_event))
     }
 }
 

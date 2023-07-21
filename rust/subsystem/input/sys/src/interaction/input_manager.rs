@@ -24,75 +24,61 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     domain: 0xD002220,
     tag: "RustInputManager"
 };
+const INPUT_BINDING_OK: i32 = 0;
 
-struct InputManager;
+/// struct ExtraData
+pub struct InputManager;
 
 impl InputManager {
-    // add monitor.
+    /// add monitor.
     pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<i32> {
         // SAFETY: no `None` here, cause `callback` is valid
         unsafe {
-            match input_binding::CAddMonitor(callback) {
-                0 => {
-                    Ok(0)
-                }
-                _ => {
-                    error!(LOG_LABEL, "failed to add monitor");
-                    Err(-1)
-                }
+            if input_binding::CAddMonitor(callback) != INPUT_BINDING_OK {
+                error!(LOG_LABEL, "failed to add monitor");
+                return Err(-1);
             }
+            Ok(0)
         }
     }
 
-    // set pointer visible.
+    /// set pointer visible.
     pub fn set_pointer_visible(visible: bool) -> FusionResult<i32> {
         // SAFETY: set pointer event visible
         unsafe {
-            match input_binding::CSetPointerVisible(visible) {
-                0 => {
-                    Ok(0)
-                }
-                _ => {
-                    error!(LOG_LABEL, "failed to set pointer visible");
-                    Err(-1)
-                }
+            if input_binding::CSetPointerVisible(visible) != INPUT_BINDING_OK {
+                error!(LOG_LABEL, "failed to set pointer visible");
+                return Err(-1);
             }
+            Ok(0)
         }
     }
 
-    // enable input device.
+    /// enable input device.
     pub fn enable_input_device(enable: bool) -> FusionResult<i32> {
         // SAFETY: enable input device
         unsafe {
-            match input_binding::CEnableInputDevice(enable) {
-                0 => {
-                    Ok(0)
-                }
-                _ => {
-                    error!(LOG_LABEL, "failed to enable input device");
-                    Err(-1)
-                }
+            if input_binding::CEnableInputDevice(enable) != INPUT_BINDING_OK {
+                error!(LOG_LABEL, "failed to enable input device");
+                return Err(-1);
             }
+            Ok(0)
         }
     }
 
-    // remove input event filter.
+    /// remove input event filter.
     pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<i32> {
         // SAFETY: remove input event filter
         unsafe {
-            match input_binding::CRemoveInputEventFilter(filter_id) {
-                0 => {
-                    Ok(0)
-                }
-                _ => {
-                    error!(LOG_LABEL, "failed to remove input event filter");
-                    Err(-1)
-                }
+            if input_binding::CRemoveInputEventFilter(filter_id) != INPUT_BINDING_OK {
+                error!(LOG_LABEL, "failed to remove input event filter");
+                return Err(-1);
             }
+            Ok(0)
         }
     }
 
-    // remove monitor.
+    /// remove monitor.
     pub fn remove_monitor(monitor_id: i32) {
         // SAFETY: remove monitor
         unsafe {
@@ -100,7 +86,7 @@ impl InputManager {
         }
     }
 
-    // remove interceptor.
+    /// remove interceptor.
     pub fn remove_interceptor(interceptor_id: i32) {
         // SAFETY: remove interceptor
         unsafe {
@@ -108,7 +94,7 @@ impl InputManager {
         }
     }
 
-    // set pointer location.
+    /// set pointer location.
     pub fn set_pointer_location(physical_x: i32, physical_y: i32) {
         // SAFETY: remove monitor
         unsafe {

@@ -20,55 +20,58 @@
 /// struct CPointerEvent
 #[repr(C)]
 pub struct CPointerEvent {
+    /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
 /// struct CKeyEvent
 #[repr(C)]
 pub struct CKeyEvent {
+    /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
 /// struct CAxisEvent
 #[repr(C)]
 pub struct CAxisEvent {
+    /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
 /// struct CPointerStyleColor
 #[repr(C)]
 pub struct CPointerStyleColor {
-    /// add struct field documentation.
+    /// Pointer style color r property
     pub r: u8,
-    /// add struct field documentation.
+    /// Pointer style color g property
     pub g: u8,
-    /// add struct field documentation.
+    /// Pointer style color b property
     pub b: u8,
 }
 
 /// struct CPointerStyle
 #[repr(C)]
 pub struct CPointerStyle {
-    /// add struct field documentation.
+    /// Pointer style size property
     pub size: i32,
-    /// add struct field documentation.
+    /// Pointer style color property
     pub color: CPointerStyleColor,
-    /// add struct field documentation.
+    /// Pointer style id property
     pub id: i32,
 }
 
 /// struct CExtraData
 #[repr(C)]
 pub struct CExtraData {
-    /// add struct field documentation.
+    /// Extra data appended property
     pub appended: bool,
-    /// add struct field documentation.
+    /// Extra data buffer property
     pub buffer: *const u8,
-    /// add struct field documentation.
+    /// Extra data buffer_size property
     pub buffer_size: usize,
-    /// add struct field documentation.
+    /// Extra data source_type property
     pub source_type: i32,
-    /// add struct field documentation.
+    /// Extra data pointer_id property
     pub pointer_id: i32,
 }
 

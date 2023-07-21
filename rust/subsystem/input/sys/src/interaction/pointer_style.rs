@@ -14,7 +14,7 @@
  */
 
 use crate::{
-    input_binding, input_binding::CPointerStyle
+    input_binding, input_binding::{ CPointerStyle, CPointerStyleColor }
 };
 use fusion_data_rust::FusionResult;
 use std::ffi::{ c_char, CString };
@@ -24,8 +24,30 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     domain: 0xD002220,
     tag: "RustPointerStyle"
 };
+const INPUT_BINDING_OK: i32 = 0;
 
-/// struct PointerStyle.
+impl Default for CPointerStyle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CPointerStyle {
+    /// Create a CPointerStyle object
+    pub fn new() -> Self {
+        Self {
+            size: -1, 
+            color: { CPointerStyleColor {
+                r: 0,
+                g: 0,
+                b: 0,
+            } },
+            id: 0,
+        }
+    }
+}
+
+/// struct PointerStyle
 pub struct PointerStyle {
     inner: CPointerStyle,
 }
@@ -37,27 +59,23 @@ impl Default for PointerStyle {
 }
 
 impl PointerStyle {
-    /// TODO: add documentation.
+    /// Create a PointerStyle object
     pub fn new() -> Self {
         Self {
             inner: CPointerStyle::default()
         }
     }
 
-    /// TODO: add documentation.
+    /// Get pointer style
     pub fn pointer_style(&mut self) -> FusionResult<i32> {
         // SAFETY:  no `None` here, cause `CPointerStyle` is valid
         unsafe {
-            match input_binding::CGetPointerStyle(&mut self.inner) {
-                0 => {
-                    debug!(LOG_LABEL, "get pointer style success");
-                    Ok(0)
-                }
-                _ => {
-                    error!(LOG_LABEL, "get pointer style failed");
-                    Err(-1)
-                }
+            if input_binding::CGetPointerStyle(&mut self.inner) != INPUT_BINDING_OK {
+                error!(LOG_LABEL, "get pointer style failed");
+                return Err(-1);
             }
+            debug!(LOG_LABEL, "get pointer style success");
+            Ok(0)
         }
     }
 }
