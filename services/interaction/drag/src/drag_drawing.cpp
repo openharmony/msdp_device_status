@@ -51,6 +51,7 @@ constexpr int32_t DEVICE_INDEPENDENT_PIXEL { 40 };
 constexpr int32_t DRAG_NUM_ONE { 1 };
 constexpr int32_t STRING_PX_LENGTH { 2 };
 constexpr int32_t EIGHT_SIZE { 8 };
+constexpr int32_t TWELVE_SIZE { 12 };
 constexpr int32_t IMAGE_WIDTH { 400 };
 constexpr int32_t IMAGE_HEIGHT { 500 };
 constexpr int64_t START_TIME { 181154000809 };
@@ -88,26 +89,9 @@ const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Dra
 #ifdef __aarch64__
 const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so";
 #else
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib/drag_drop_ext/libdrag_drop.z.so";
+const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so";
 #endif
-struct DrawingInfo {
-    std::atomic_bool isRunning { false };
-    bool isInitUiDirector { true };
-    int32_t sourceType { -1 };
-    int32_t currentDragNum { -1 };
-    DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
-    int32_t displayId { -1 };
-    int32_t pixelMapX { -1 };
-    int32_t pixelMapY { -1 };
-    int32_t displayX { -1 };
-    int32_t displayY { -1 };
-    int32_t rootNodeWidth { -1 };
-    int32_t rootNodeHeight { -1 };
-    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
-    std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
-    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
-    std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
-} g_drawingInfo;
+struct DrawingInfo g_drawingInfo;
 
 bool CheckNodesValid()
 {
@@ -214,7 +198,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
     if (g_drawingInfo.surfaceNode != nullptr) {
@@ -251,6 +235,10 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
     }
     std::shared_ptr<Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
     CHKPR(pixelMap, RET_ERR);
+    bool isPreviousDefaultStyle = g_drawingInfo.isCurrentDefaultStyle;
+    g_drawingInfo.isPreviousDefaultStyle = isPreviousDefaultStyle;
+    g_drawingInfo.isCurrentDefaultStyle = (filePath == DEFAULT_DRAG_PATH);
+    g_drawingInfo.stylePixelMap = pixelMap;
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
@@ -278,11 +266,11 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CHKPR(shadowNode, RET_ERR);
     DrawShadow(shadowNode);
     float scalingValue = GetScaling();
-    if ((1.0 * INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+    if ((1.0 * INT32_MAX / (SVG_WIDTH + TWELVE_SIZE)) <= scalingValue) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
         return RET_ERR;
     }
-    int32_t adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
+    int32_t adjustSize = (SVG_WIDTH + TWELVE_SIZE) * scalingValue;
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
@@ -358,6 +346,9 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.rootNodeWidth = -1;
     g_drawingInfo.rootNodeHeight = -1;
     g_drawingInfo.pixelMap = nullptr;
+    g_drawingInfo.stylePixelMap = nullptr;
+    g_drawingInfo.isPreviousDefaultStyle = false;
+    g_drawingInfo.isCurrentDefaultStyle = false;
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
     RemoveModifier();
     if (!g_drawingInfo.nodes.empty()) {
@@ -418,7 +409,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Failed to open drag extension library");
         return;
     }
-    auto animationExtFunc = reinterpret_cast<DragStartExtFunc>(dlsym(dragExtHandle_, "OnStartDragExt"));
+    auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStartDragExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
         dlclose(dragExtHandle_);
@@ -430,7 +421,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(animationExtFunc, dragAnimationData, shadowNode, dragStyleNode))) {
+    if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
     }
 }
@@ -446,7 +437,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         DrawStyle(dragStyleNode, stylePixelMap);
         return;
     }
-    auto animationExtFunc = reinterpret_cast<DragStyleExtFunc>(dlsym(dragExtHandle_, "OnDragStyleExt"));
+    auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnDragStyleExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
         DrawStyle(dragStyleNode, stylePixelMap);
@@ -459,7 +450,11 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(animationExtFunc, dragStyleNode, stylePixelMap))) {
+    if (drawSVGModifier_ != nullptr) {
+        dragStyleNode->RemoveModifier(drawSVGModifier_);
+        drawSVGModifier_ = nullptr;
+    }
+    if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
         DrawStyle(dragStyleNode, stylePixelMap);
     }
@@ -474,7 +469,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
         return;
     }
-    auto animationExtFunc = reinterpret_cast<DragSuccessExtFunc>(dlsym(dragExtHandle_, "OnStopDragSuccessExt"));
+    auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragSuccessExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
         RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
@@ -487,9 +482,11 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(animationExtFunc, shadowNode, dragStyleNode))) {
+    if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
         RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+    } else {
+        StartVsync();
     }
 }
 
@@ -502,7 +499,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         RunAnimation(END_ALPHA, END_SCALE_FAIL);
         return;
     }
-    auto animationExtFunc = reinterpret_cast<DragFailExtFunc>(dlsym(dragExtHandle_, "OnStopDragFailExt"));
+    auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragFailExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
         RunAnimation(END_ALPHA, END_SCALE_FAIL);
@@ -515,9 +512,11 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(animationExtFunc, surfaceNode, rootNode))) {
+    if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
         RunAnimation(END_ALPHA, END_SCALE_FAIL);
+    } else {
+        StartVsync();
     }
 }
 
@@ -552,6 +551,7 @@ int32_t DragDrawing::InitDrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyl
         FI_HILOGE("Svg file is invalid");
         return RET_ERR;
     }
+    g_drawingInfo.isCurrentDefaultStyle = (filePath == DEFAULT_DRAG_PATH);
     std::shared_ptr<Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
     CHKPR(pixelMap, RET_ERR);
     int32_t ret = DrawStyle(dragStyleNode, pixelMap);
@@ -627,7 +627,11 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     });
+    return StartVsync();
+}
 
+int32_t DragDrawing::StartVsync()
+{
     CHKPR(g_drawingInfo.surfaceNode, RET_ERR);
     g_drawingInfo.surfaceNode->SetPivot(PIVOT_X, PIVOT_Y);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -738,7 +742,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
         g_drawingInfo.rootNode = Rosen::RSRootNode::Create();
         CHKPV(g_drawingInfo.rootNode);
     }
-    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
     g_drawingInfo.rootNode->SetBounds(g_drawingInfo.displayX, g_drawingInfo.displayY - adjustSize, width, height);
     g_drawingInfo.rootNode->SetFrame(g_drawingInfo.displayX, g_drawingInfo.displayY - adjustSize, width, height);
     g_drawingInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -1096,8 +1100,10 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
-    dragStyleNode->SetBounds(svgTouchPositionX, 0, stylePixelMap_->GetWidth(), stylePixelMap_->GetHeight());
-    dragStyleNode->SetFrame(svgTouchPositionX, 0, stylePixelMap_->GetWidth(), stylePixelMap_->GetHeight());
+    dragStyleNode->SetBounds(svgTouchPositionX, (TWELVE_SIZE - EIGHT_SIZE) * scalingValue, stylePixelMap_->GetWidth(),
+        stylePixelMap_->GetHeight());
+    dragStyleNode->SetFrame(svgTouchPositionX, (TWELVE_SIZE - EIGHT_SIZE) * scalingValue, stylePixelMap_->GetWidth(),
+        stylePixelMap_->GetHeight());
     dragStyleNode->SetBgImageWidth(stylePixelMap_->GetWidth());
     dragStyleNode->SetBgImageHeight(stylePixelMap_->GetHeight());
     dragStyleNode->SetBgImagePositionX(0);
@@ -1106,7 +1112,7 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(stylePixelMap_);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    adjustSize = (SVG_WIDTH + EIGHT_SIZE) * scalingValue;
+    adjustSize = (SVG_WIDTH + TWELVE_SIZE) * scalingValue;
     g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
@@ -1165,7 +1171,7 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
-    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
     mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
         pixelMap->GetWidth(), pixelMap->GetHeight());
     mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
