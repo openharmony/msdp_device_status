@@ -295,12 +295,13 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
-    CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed = false;
-    for (const auto &item : pointerEvent->GetPressedButtons()) {
-        if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
-            isPointerButtonPressed = true;
-            break;
+    if (pointerEvent != nullptr) {
+        for (const auto &item : pointerEvent->GetPressedButtons()) {
+            if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
+                isPointerButtonPressed = true;
+                break;
+            }
         }
     }
     FI_HILOGD("isPointerButtonPressed: %{public}d", isPointerButtonPressed);
