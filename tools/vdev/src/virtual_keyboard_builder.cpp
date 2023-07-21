@@ -109,7 +109,7 @@ void VirtualKeyboardBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
     if (VirtualKeyboard::GetDevice() != nullptr) {
-        std::cout << "Virtual keyboard has been mounted." << std::endl;
+        std::cout << "Virtual keyboard has been mounted" << std::endl;
         return;
     }
 
@@ -117,7 +117,7 @@ void VirtualKeyboardBuilder::Clone()
     int32_t ret = VirtualDeviceBuilder::ScanFor(
         [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsKeyboard()); }, vDevs);
     if (ret != RET_OK) {
-        std::cout << "Failed while scanning for keyboard." << std::endl;
+        std::cout << "Failed while scanning for keyboard" << std::endl;
         return;
     }
     auto vDev = VirtualDeviceBuilder::Select(vDevs, "keyboard");
@@ -139,7 +139,7 @@ void VirtualKeyboardBuilder::Clone()
         return;
     }
 
-    std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully" << std::endl;
     VirtualDeviceBuilder::Daemonize();
     for (;;) {
         std::this_thread::sleep_for(std::chrono::minutes(1));
