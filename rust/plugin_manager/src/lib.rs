@@ -31,7 +31,7 @@ use std::ffi::{ c_char, CString };
 use fusion_data_rust::{ Intention, IPlugin };
 use fusion_utils_rust::{ call_debug_enter };
 use fusion_basic_server_rust::FusionBasicServer;
-use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
+use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -138,7 +138,12 @@ impl PluginManager {
     }
 
     /// TODO: add documentation
-    pub fn unload_plugin(&self, intention: Intention) {
-        todo!()
+    pub fn unload_plugin(&mut self, intention: Intention) {
+        call_debug_enter!("PluginManager::unload_plugin");
+        if let Some(loader) = self.loaders.remove(&intention) {
+            info!(LOG_LABEL, "Library({}) is unloaded", @public(intention as u32));
+        } else {
+            debug!(LOG_LABEL, "Library({}) has not been loaded", @public(intention as u32));
+        }
     }
 }

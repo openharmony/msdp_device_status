@@ -24,26 +24,26 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_services_binding" };
 } // namespace
 
-struct FusionService {
+struct NativeService {
     int32_t refCnt;
 };
 
-struct FusionService* FusionServiceNew()
+struct NativeService* NativeService_New()
 {
     CALL_DEBUG_ENTER;
-    struct FusionService *service = new FusionService;
+    struct NativeService *service = new NativeService;
     service->refCnt = 1;
     return service;
 }
 
-struct FusionService* FusionServiceRef(struct FusionService *service)
+struct NativeService* NativeService_Ref(struct NativeService *service)
 {
     CHKPP(service);
     service->refCnt++;
     return service;
 }
 
-struct FusionService* FusionServiceUnref(struct FusionService *service)
+struct NativeService* NativeService_Unref(struct NativeService *service)
 {
     CHKPP(service);
     if (service->refCnt > 0) {
@@ -57,25 +57,25 @@ struct FusionService* FusionServiceUnref(struct FusionService *service)
     return nullptr;
 }
 
-void FusionService_OnDump(struct FusionService *service)
+void NativeService_OnDump(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-void FusionService_OnStart(struct FusionService *service)
+void NativeService_OnStart(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-void FusionService_OnStop(struct FusionService *service)
+void NativeService_OnStop(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-int32_t FusionService_AllocSocketFd(struct FusionService *service, const char *programName,
+int32_t NativeService_AllocSocketFd(struct NativeService *service, const char *programName,
     int32_t moduleType, int32_t *toReturnClientFd, int32_t *tokenType)
 {
     CALL_DEBUG_ENTER;
