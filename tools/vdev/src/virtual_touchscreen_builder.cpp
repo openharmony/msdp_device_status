@@ -172,7 +172,7 @@ void VirtualTouchScreenBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
     if (VirtualTouchScreen::GetDevice() != nullptr) {
-        std::cout << "Virtual touchscreen has been mounted." << std::endl;
+        std::cout << "Virtual touchscreen has been mounted" << std::endl;
         return;
     }
 
@@ -180,7 +180,7 @@ void VirtualTouchScreenBuilder::Clone()
     int32_t ret = VirtualDeviceBuilder::ScanFor(
         [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsTouchscreen()); }, vDevs);
     if (ret != RET_OK) {
-        std::cout << "Failed while scanning for touchscreen." << std::endl;
+        std::cout << "Failed while scanning for touchscreen" << std::endl;
         return;
     }
     auto vDev = VirtualDeviceBuilder::Select(vDevs, "touchscreen");
@@ -202,7 +202,7 @@ void VirtualTouchScreenBuilder::Clone()
         return;
     }
 
-    std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully" << std::endl;
     VirtualDeviceBuilder::Daemonize();
     for (;;) {
         std::this_thread::sleep_for(std::chrono::minutes(1));

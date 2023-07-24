@@ -89,6 +89,8 @@ public:
     struct input_id GetInputId() const;
     std::string GetPhys() const;
     std::string GetUniq() const;
+    bool IsMouse() const;
+    bool IsKeyboard() const;
     bool IsTouchscreen() const;
 
 private:
@@ -202,6 +204,16 @@ inline std::string VInputDevice::GetPhys() const
 inline std::string VInputDevice::GetUniq() const
 {
     return uniq_;
+}
+
+inline bool VInputDevice::IsMouse() const
+{
+    return caps_.test(DEVICE_CAP_POINTER);
+}
+
+inline bool VInputDevice::IsKeyboard() const
+{
+    return caps_.test(DEVICE_CAP_KEYBOARD);
 }
 
 inline bool VInputDevice::IsTouchscreen() const

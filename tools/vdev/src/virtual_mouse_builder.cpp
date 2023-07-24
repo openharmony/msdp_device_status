@@ -144,7 +144,42 @@ void VirtualMouseBuilder::Unmount()
 void VirtualMouseBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    if (VirtualMouse::GetDevice() != nullptr) {
+        std::cout << "Virtual mouse has been mounted." << std::endl;
+        return;
+    }
+
+    std::vector<std::shared_ptr<VirtualDevice>> vDevs;
+    int32_t ret = VirtualDeviceBuilder::ScanFor(
+        [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsMouse()); }, vDevs);
+    if (ret != RET_OK) {
+        std::cout << "Failed while scanning for mouse." << std::endl;
+        return;
+    }
+    auto vDev = VirtualDeviceBuilder::Select(vDevs, "mouse");
+    CHKPV(vDev);
+
+    std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
+    VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
+    if (!vBuilder.SetUp()) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    int32_t nTries = 3;
+    do {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } while ((nTries-- > 0) && (VirtualMouse::GetDevice() == nullptr));
+    if (VirtualMouse::GetDevice() == nullptr) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
+    VirtualDeviceBuilder::Daemonize();
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
 }
 
 void VirtualMouseBuilder::Monitor()
