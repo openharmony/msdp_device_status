@@ -14,6 +14,7 @@
  */
 
 #include <memory>
+#include <dlfcn.h>
 
 #include <gtest/gtest.h>
 
@@ -33,6 +34,12 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 std::shared_ptr<AlgoMgr> g_manager { nullptr };
+constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAlgorithmTest" };
+#ifdef __aarch64__
+const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib64/libdevicestatus_algo.z.so" };
+#else
+const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib/libdevicestatus_algo.z.so" };
+#endif
 } // namespace
 
 class DeviceStatusAlgorithmTest : public testing::Test {
@@ -47,6 +54,8 @@ public:
         virtual ~DeviceStatusMock() = default;
         void OnResult(const Data& data) {};
     };
+    int32_t LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler);
+    int32_t UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler);
 };
 
 void DeviceStatusAlgorithmTest::SetUpTestCase()
@@ -62,6 +71,63 @@ void DeviceStatusAlgorithmTest::TearDownTestCase()
 void DeviceStatusAlgorithmTest::SetUp() {}
 
 void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
+
+int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler)
+{
+    FI_HILOGI("Enter");
+    if (algoHandler == nullptr) {
+        FI_HILOGE("algoHandler is nullptr");
+        return RET_ERR;
+    }
+    if (algoHandler->handle != nullptr) {
+        FI_HILOGE("handle has exists");
+        return RET_OK;
+    }
+
+    std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
+    char libRealPath[PATH_MAX] = {};
+    if (realpath(dlName.c_str(), libRealPath) == nullptr) {
+        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
+        return RET_ERR;
+    }
+
+    algoHandler->handle = dlopen(libRealPath, RTLD_LAZY);
+    if (algoHandler->handle == nullptr) {
+        FI_HILOGE("Cannot load library error:%{public}s", dlerror());
+        return RET_ERR;
+    }
+
+    algoHandler->create = reinterpret_cast<IMsdp* (*)()>(dlsym(algoHandler->handle, "Create"));
+    algoHandler->destroy = reinterpret_cast<void *(*)(IMsdp*)>(dlsym(algoHandler->handle, "Destroy"));
+    if (algoHandler->create == nullptr || algoHandler->destroy == nullptr) {
+        FI_HILOGE("%{public}s dlsym Create or Destroy failed", dlName.c_str());
+        dlclose(algoHandler->handle);
+        algoHandler->Clear();
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler)
+{
+    FI_HILOGI("Enter");
+    if (algoHandler == nullptr) {
+        FI_HILOGE("algoHandler is nullptr");
+        return RET_ERR;
+    }
+    if (algoHandler->handle == nullptr) {
+        FI_HILOGE("handle is nullptr");
+        return RET_ERR;
+    }
+
+    if (algoHandler->pAlgorithm != nullptr) {
+        algoHandler->destroy(algoHandler->pAlgorithm);
+        algoHandler->pAlgorithm = nullptr;
+    }
+    dlclose(algoHandler->handle);
+    algoHandler->Clear();
+    return RET_OK;
+}
 
 /**
  * @tc.name: DeviceStatusAlgoAbsoluteStillTest
@@ -267,6 +333,10 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level
     int32_t typeError = 5;
     int32_t ret = g_manager->Enable(static_cast<Type>(typeError));
     ASSERT_TRUE(ret);
+    bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_TRUE(result);
+    ret = g_manager->Enable(static_cast<Type>(typeError));
+    ASSERT_EQ(ret, RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest010 end";
 }
 
@@ -562,6 +632,84 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
     GTEST_LOG_(INFO) << "DeviceStatusAlgorithmTest028 end";
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test Enable
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest029, TestSize.Level1)
+{
+    FI_HILOGI("DeviceStatusAlgorithmTest029 start.");
+    std::shared_ptr<MsdpAlgoHandle> algo = std::make_shared<MsdpAlgoHandle>();
+    int32_t ret = LoadAlgoLibrary(algo);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(algo->handle, nullptr);
+    algo->pAlgorithm = algo->create();
+
+    ret = algo->pAlgorithm->Enable(Type::TYPE_LID_OPEN);
+    ASSERT_TRUE(ret);
+
+    ret = UnloadAlgoLibrary(algo);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test RegisterCallback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest030, TestSize.Level1)
+{
+    FI_HILOGI("DeviceStatusAlgorithmTest030 start.");
+    int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_EQ(ret, RET_OK);
+
+    std::shared_ptr<DeviceStatusMock> callback = std::make_shared<DeviceStatusMock>();
+    ret = g_manager->RegisterCallback(callback);
+    EXPECT_EQ(ret, RET_OK);
+
+    ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test RegisterCallback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest031, TestSize.Level1)
+{
+    FI_HILOGI("DeviceStatusAlgorithmTest031 start.");
+    int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
+    EXPECT_EQ(ret, RET_OK);
+
+    std::shared_ptr<DeviceStatusMock> callback = std::make_shared<DeviceStatusMock>();
+    ret = g_manager->RegisterCallback(callback);
+    EXPECT_EQ(ret, RET_OK);
+
+    ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DeviceStatusAlgorithmManagerTest
+ * @tc.desc: test RegisterCallback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest032, TestSize.Level1)
+{
+    FI_HILOGI("DeviceStatusAlgorithmTest032 start.");
+    int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
+    EXPECT_EQ(ret, RET_OK);
+
+    std::shared_ptr<DeviceStatusMock> callback = std::make_shared<DeviceStatusMock>();
+    ret = g_manager->RegisterCallback(callback);
+    EXPECT_EQ(ret, RET_OK);
+
+    ret = g_manager->Disable(Type::TYPE_VERTICAL_POSITION);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
