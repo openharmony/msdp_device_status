@@ -58,6 +58,11 @@ Device::Device(int32_t deviceId)
     : deviceId_(deviceId)
 {}
 
+Device::~Device()
+{
+    Close();
+}
+
 int32_t Device::Open()
 {
     CALL_DEBUG_ENTER;
@@ -375,7 +380,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         FI_HILOGE("Not real path (\'%{public}s\'):%{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
-    FI_HILOGD("config file path:%{public}s", temp);
+    FI_HILOGD("Config file path:%{public}s", temp);
 
     if (!Utility::DoesFileExist(temp)) {
         FI_HILOGE("File does not exist:%{public}s", temp);

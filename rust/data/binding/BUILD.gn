@@ -42,7 +42,7 @@ ohos_shared_library("fusion_data_binding") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

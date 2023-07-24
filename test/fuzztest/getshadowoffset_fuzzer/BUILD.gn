@@ -27,7 +27,7 @@ ohos_fuzztest("GetShadowOffsetFuzzTest") {
   deps = [ "../../../interfaces/innerkits:devicestatus_client" ]
   external_deps = [
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
   ]
 }
 

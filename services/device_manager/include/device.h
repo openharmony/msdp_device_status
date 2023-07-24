@@ -56,7 +56,7 @@ class Device final : public IDevice,
                      public IEpollEventSource {
 public:
     enum Capability {
-        DEVICE_CAP_KEYBOARD,
+        DEVICE_CAP_KEYBOARD = 0,
         DEVICE_CAP_POINTER,
         DEVICE_CAP_TOUCH,
         DEVICE_CAP_TABLET_TOOL,
@@ -69,7 +69,7 @@ public:
 
     explicit Device(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(Device);
-    ~Device() = default;
+    ~Device();
 
     int32_t Open() override;
     void Close() override;

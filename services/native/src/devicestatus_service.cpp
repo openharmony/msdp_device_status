@@ -99,7 +99,7 @@ void DeviceStatusService::OnStop()
     state_ = ServiceRunningState::STATE_EXIT;
 
     delegateTasks_.PostAsyncTask([]() -> int32_t {
-        FI_HILOGD("no op");
+        FI_HILOGD("No op");
         return RET_OK;
     });
     if (worker_.joinable()) {

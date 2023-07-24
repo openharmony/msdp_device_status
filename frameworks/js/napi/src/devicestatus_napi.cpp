@@ -395,7 +395,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
         UnsubscribeCallback(env, type, event);
         return nullptr;
     }
-    FI_HILOGD("type: %{public}d, event: %{public}d", type, event);
+    FI_HILOGD("type:%{public}d, event:%{public}d", type, event);
     if (!IsMatchType(env, args[2], napi_function)) {
         ThrowErr(env, PARAM_ERROR, "get error callback type");
         return nullptr;

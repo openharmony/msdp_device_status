@@ -24,7 +24,7 @@
         "samgr",
         "c_utils",
         "napi",
-        "multimedia_image_framework",
+        "image_framework",
         "eventhandler",
         "distributed_input",
         "device_manager",
