@@ -60,7 +60,7 @@ int32_t VInputDevice::Open()
     CALL_DEBUG_ENTER;
     char buf[PATH_MAX] {};
     if (realpath(devPath_.c_str(), buf) == nullptr) {
-        FI_HILOGE("Not real path: %{public}s", devPath_.c_str());
+        FI_HILOGE("Not real path:%{public}s", devPath_.c_str());
         return RET_ERR;
     }
 
@@ -70,7 +70,7 @@ int32_t VInputDevice::Open()
         Utility::ShowFileAttributes(buf);
         fd_ = open(buf, O_RDWR | O_NONBLOCK | O_CLOEXEC);
         if (fd_ < 0) {
-            FI_HILOGE("Unable to open device \'%{public}s\': %{public}s", buf, strerror(errno));
+            FI_HILOGE("Unable to open device \'%{public}s\':%{public}s", buf, strerror(errno));
             if (nRetries-- > 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
                 FI_HILOGI("Retry opening device \'%{public}s\'", buf);
@@ -93,7 +93,7 @@ void VInputDevice::Close()
     CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         if (close(fd_) != 0) {
-            FI_HILOGE("close error: %{public}s", strerror(errno));
+            FI_HILOGE("close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }
@@ -131,7 +131,7 @@ int32_t VInputDevice::SendEvent(uint16_t type, uint16_t code, int32_t value)
     event.input_event_usec = tv.tv_usec;
     ssize_t ret = ::write(fd_, &event, sizeof(struct input_event));
     if (ret < 0) {
-        FI_HILOGE("Failed to send event: %{public}s", strerror(errno));
+        FI_HILOGE("Failed to send event:%{public}s", strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
@@ -144,14 +144,14 @@ void VInputDevice::QueryDeviceInfo()
 
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get device name: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get device name:%{public}s", strerror(errno));
     } else {
         name_.assign(buffer);
     }
 
     rc = ioctl(fd_, EVIOCGID, &inputId_);
     if (rc < 0) {
-        FI_HILOGE("Could not get device input id: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get device input id:%{public}s", strerror(errno));
     }
     errno_t ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (ret != EOK) {
@@ -160,7 +160,7 @@ void VInputDevice::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get location: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get location:%{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
@@ -171,7 +171,7 @@ void VInputDevice::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get uniq: %{public}s", strerror(errno));
+        FI_HILOGE("Could not get uniq:%{public}s", strerror(errno));
     } else {
         uniq_.assign(buffer);
     }
