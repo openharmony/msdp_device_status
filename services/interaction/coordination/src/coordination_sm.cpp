@@ -45,7 +45,6 @@ constexpr float MOUSE_ABS_LOCATION { 100 };
 constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
 constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
-constexpr int32_t SOFTBUS_TIME { 8000 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
 } // namespace
 
@@ -67,10 +66,6 @@ void CoordinationSM::Init()
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
-        COOR_SOFTBUS_ADAPTER->Init();
-    });
-    context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
-        FI_HILOGE("COOR_SOFTBUS_ADAPTER start");
         COOR_SOFTBUS_ADAPTER->Init();
     });
     COOR_DEV_MGR->Init();
@@ -562,6 +557,7 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
 void CoordinationSM::UpdateState(CoordinationState state)
 {
     FI_HILOGI("state:%{public}d", state);
+    currentState_ = state;
     switch (state) {
         case CoordinationState::STATE_FREE: {
             Reset();
@@ -602,7 +598,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
         default:
             break;
     }
-    currentState_ = state;
 }
 
 CoordinationState CoordinationSM::GetCurrentCoordinationState() const
@@ -651,7 +646,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (currentState_ == CoordinationState::STATE_FREE) {
-        FI_HILOGI("Current State: free");
+        FI_HILOGI("Current state: free");
         return;
     }
     if ((currentState_ == CoordinationState::STATE_IN) && (startDeviceDhid_ == dhid)) {
@@ -713,6 +708,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
     onlineDevice_.push_back(networkId);
     DP_ADAPTER->RegisterCrossingStateListener(networkId,
         std::bind(&CoordinationSM::OnCoordinationChanged, COOR_SM, std::placeholders::_1, std::placeholders::_2));
+    COOR_SOFTBUS_ADAPTER->Init();
 }
 
 void CoordinationSM::OnDeviceOffline(const std::string &networkId)

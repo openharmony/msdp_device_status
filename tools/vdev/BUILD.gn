@@ -79,8 +79,8 @@ ohos_source_set("devicestatus_vdev_builders") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_native",
     "input:libmmi-client",
-    "multimedia_image_framework:image_native",
     "window_manager:libdm",
   ]
 

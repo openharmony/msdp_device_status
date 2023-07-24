@@ -30,7 +30,7 @@ deps_ex = [
   "hitrace:hitrace_meter",
   "hilog:libhilog",
   "input:libmmi-client",
-  "multimedia_image_framework:image_native",
+  "image_framework:image_native",
   "window_manager:libwm",
 ]
 

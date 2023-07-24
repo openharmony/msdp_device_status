@@ -263,7 +263,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGD("Target window drag tid: %{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
-    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+    int32_t repeatCount = 1;
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
 }
