@@ -33,20 +33,11 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
-using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
-int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageOption &option)
+DeviceStatusSrvStub::DeviceStatusSrvStub()
 {
-    FI_HILOGD("cmd = %{public}d, flags = %{public}d", code, option.GetFlags());
-    std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
-    std::u16string remoteDescriptor = data.ReadInterfaceToken();
-    if (descriptor != remoteDescriptor) {
-        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
-        return E_DEVICESTATUS_GET_SERVICE_FAILED;
-    }
-    const std::map<uint32_t, ConnFunc> mapConnFunc = {
+    mapConnFunc_ = {
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
             &DeviceStatusSrvStub::SubscribeStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
@@ -90,8 +81,20 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
             &DeviceStatusSrvStub::UpdateShadowPicStub}
     };
-    auto it = mapConnFunc.find(code);
-    if (it != mapConnFunc.end()) {
+}
+
+int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    FI_HILOGD("cmd:%{public}d, flags:%{public}d", code, option.GetFlags());
+    std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (descriptor != remoteDescriptor) {
+        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
+        return E_DEVICESTATUS_GET_SERVICE_FAILED;
+    }
+    auto it = mapConnFunc_.find(code);
+    if (it != mapConnFunc_.end()) {
         return (this->*it->second)(data, reply);
     }
     FI_HILOGE("Unknown code:%{public}u", code);
