@@ -27,6 +27,9 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDatahubTest" };
+} // namespace
 
 class DeviceStatusDatahubTest : public testing::Test {
 public:
@@ -59,7 +62,7 @@ void SensorAccelCallbackData(int32_t sensorTypeId, AccelData* data)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest001 start";
+    FI_HILOGI("DeviceStatusDatahubTest001 start");
     using SensorCallback = std::function<void(int32_t, AccelData*)>;
     SensorCallback callback = SensorAccelCallbackData;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
@@ -67,7 +70,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest001, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnsubscribeSensorEvent(sensorTypeId, callback);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest001 end";
 }
 
 /**
@@ -77,7 +79,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest001, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest002 start";
+    FI_HILOGI("DeviceStatusDatahubTest002 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -89,7 +91,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest002 end";
 }
 
 /**
@@ -99,7 +100,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest003 start";
+    FI_HILOGI("DeviceStatusDatahubTest003 start");
     using SensorCallback = std::function<void(int32_t, AccelData*)>;
     SensorCallback callback = SensorAccelCallbackData;
     int32_t SENSOR_TYPE_ID_ERROR = 300;
@@ -107,7 +108,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest003, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnsubscribeSensorEvent(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR), callback);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest003 end";
 }
 
 /**
@@ -117,7 +117,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest003, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest004 start";
+    FI_HILOGI("DeviceStatusDatahubTest004 start");
     using SensorCallback = std::function<void(int32_t, AccelData*)>;
     SensorCallback callback = SensorAccelCallbackData;
     int32_t SENSOR_TYPE_ID_ERROR = -1;
@@ -125,7 +125,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest004, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnsubscribeSensorEvent(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR), callback);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest004 end";
 }
 
 /**
@@ -135,7 +134,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest004, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest005 start";
+    FI_HILOGI("DeviceStatusDatahubTest005 start");
     using SensorCallback = std::function<void(int32_t, AccelData*)>;
     SensorCallback callback;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
@@ -143,7 +142,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest005, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnsubscribeSensorEvent(sensorTypeId, callback);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest005 end";
 }
 
 /**
@@ -153,7 +151,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest005, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest006 start";
+    FI_HILOGI("DeviceStatusDatahubTest006 start");
     using SensorCallback = std::function<void(int32_t, AccelData*)>;
     SensorCallback callback = nullptr;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
@@ -161,7 +159,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest006, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnsubscribeSensorEvent(sensorTypeId, callback);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest006 end";
 }
 
 /**
@@ -171,13 +168,12 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest006, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest007 start";
+    FI_HILOGI("DeviceStatusDatahubTest007 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest007 end";
 }
 
 /**
@@ -187,7 +183,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest007, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest008 start";
+    FI_HILOGI("DeviceStatusDatahubTest008 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -196,7 +192,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest008, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest008 end";
 }
 
 /**
@@ -206,7 +201,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest008, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest009 start";
+    FI_HILOGI("DeviceStatusDatahubTest009 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -215,7 +210,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest009, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest009 end";
 }
 
 /**
@@ -225,7 +219,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest009, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest010 start";
+    FI_HILOGI("DeviceStatusDatahubTest010 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -234,7 +228,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest010, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest010 end";
 }
 
 /**
@@ -244,13 +237,12 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest010, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest011, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest011 start";
+    FI_HILOGI("DeviceStatusDatahubTest011 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_TEMPERATURE;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     EXPECT_FALSE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest011 end";
 }
 
 /**
@@ -260,13 +252,12 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest011, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest012, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest012 start";
+    FI_HILOGI("DeviceStatusDatahubTest012 start");
     int32_t SENSOR_TYPE_ID_ERROR = 300;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest012 end";
 }
 
 /**
@@ -276,13 +267,12 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest012, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest013, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest013 start";
+    FI_HILOGI("DeviceStatusDatahubTest013 start");
     int32_t SENSOR_TYPE_ID_ERROR = -1;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest013 end";
 }
 
 /**
@@ -292,11 +282,10 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest013, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest014, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest014 start";
+    FI_HILOGI("DeviceStatusDatahubTest014 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     EXPECT_FALSE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest014 end";
 }
 
 /**
@@ -306,7 +295,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest014, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest015, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest015 start";
+    FI_HILOGI("DeviceStatusDatahubTest015 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -318,7 +307,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest015, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest015 end";
 }
 
 /**
@@ -328,7 +316,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest015, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest016, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest016 start";
+    FI_HILOGI("DeviceStatusDatahubTest016 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -340,7 +328,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest016, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest016 end";
 }
 
 /**
@@ -350,7 +337,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest016, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest017, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest017 start";
+    FI_HILOGI("DeviceStatusDatahubTest017 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -362,7 +349,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest017, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest017 end";
 }
 
 /**
@@ -372,7 +358,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest017, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest018, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest018 start";
+    FI_HILOGI("DeviceStatusDatahubTest018 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -384,7 +370,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest018, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest018 end";
 }
 
 /**
@@ -394,7 +379,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest018, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest019, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest019 start";
+    FI_HILOGI("DeviceStatusDatahubTest019 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -406,7 +391,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest019, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest019 end";
 }
 
 /**
@@ -416,7 +400,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest019, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest020, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest020 start";
+    FI_HILOGI("DeviceStatusDatahubTest020 start");
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -428,7 +412,6 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest020, TestSize.Level1)
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
-    GTEST_LOG_(INFO) << "DeviceStatusDatahubTest020 end";
 }
 } // namespace DeviceStatus
 } // namespace Msdp
