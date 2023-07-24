@@ -27,6 +27,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
 const char* DRAG_CLASS = "drag_class";
 const char* DRAG = "drag";
+inline constexpr size_t MAX_STRING_LEN { 1024 };
 } // namespace
 
 JsDragContext::JsDragContext()
@@ -148,10 +149,10 @@ JsDragContext *JsDragContext::GetInstance(napi_env env)
 napi_value JsDragContext::On(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 1;
-    napi_value argv[1] = { nullptr };
+    size_t argc = TWO_PARAM;
+    napi_value argv[TWO_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < TWO_PARAM) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
@@ -159,38 +160,60 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
     CHKPP(jsDev);
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
-    if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return nullptr;
+    }
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    if ((DRAG_TYPE.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->RegisterListener(env, argv[0]);
+    jsDragMgr->RegisterListener(env, argv[ONE_PARAM]);
     return nullptr;
 }
 
 napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 1;
-    napi_value argv[1] = { nullptr };
+    size_t argc = TWO_PARAM;
+    napi_value argv[TWO_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsDragContext *jsDev = JsDragContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
-    if (argc == 0) {
+    if ((argc == ZERO_PARAM) || (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string))) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return nullptr;
+    }
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    if ((DRAG_TYPE.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
+        return nullptr;
+    }
+    if (argc == ONE_PARAM) {
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
-    if (UtilNapi::TypeOf(env, argv[0], napi_undefined) || UtilNapi::TypeOf(env, argv[0], napi_null)) {
+    if (UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_undefined) || UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_null)) {
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->UnregisterListener(env, argv[0]);
+    jsDragMgr->UnregisterListener(env, argv[ONE_PARAM]);
     return nullptr;
 }
 
@@ -202,24 +225,20 @@ void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
     napi_value stopMsg = nullptr;
     CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::STOP), &stopMsg),
         CREATE_INT32);
-    napi_value errorMsg = nullptr;
-    CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::ERROR), &errorMsg),
-        CREATE_INT32);
     napi_value cancelMsg = nullptr;
     CHKRV(napi_create_int32(env, static_cast<int32_t>(DragState::CANCEL), &cancelMsg),
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("START", startMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("STOP", stopMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("ERROR", errorMsg),
-        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", cancelMsg)
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_START", startMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_STOP", stopMsg),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_DRAG_STATE_CANCEL", cancelMsg)
     };
 
     napi_value eventMsg = nullptr;
-    CHKRV(napi_define_class(env, "NotifyMsg", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRV(napi_define_class(env, "DragState", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(msg) / sizeof(*msg), msg, &eventMsg), DEFINE_CLASS);
-    CHKRV(napi_set_named_property(env, exports, "NotifyMsg", eventMsg), SET_NAMED_PROPERTY);
+    CHKRV(napi_set_named_property(env, exports, "DragState", eventMsg), SET_NAMED_PROPERTY);
 }
 
 void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
