@@ -325,7 +325,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     CALL_DEBUG_ENTER;
     const auto [ret, handler, typeMode, event, latency] = CheckSubscribeParam(env, info);
     if (!ret) {
-        FI_HILOGE("On:Subscribe device status is failed");
+        FI_HILOGE("On:SubscribeDeviceStatus is failed");
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
@@ -419,7 +419,7 @@ napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int
     int32_t unsubscribeRet = StationaryManager::GetInstance()->UnsubscribeCallback(static_cast<Type>(type),
         static_cast<ActivityEvent>(event), callbackIter->second);
     if (unsubscribeRet != RET_OK) {
-        ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to unsubscribe callback");
+        ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
     }
     callbackMap_.erase(type);
     return nullptr;
