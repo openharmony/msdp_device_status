@@ -72,7 +72,7 @@ void MouseEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerE
         return;
     }
     std::cout << "\rcurrent pointer position - x: " << std::setw(IO_FLAG_WIDTH) << std::left <<
-    pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
+        pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
     std::cout.flush();
 }
 
@@ -281,7 +281,7 @@ void VirtualMouseBuilder::ReadMoveAction(int argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(std::string(optarg))) {
+    if (!Utility::IsInteger(std::string(optarg)) || (optind < 0) || (optind >= argc)) {
         std::cout << "Invalid arguments for Option \'-m\'." << std::endl;
         ShowUsage();
         return;
@@ -301,7 +301,7 @@ void VirtualMouseBuilder::ReadMoveToAction(int argc, char *argv[])
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-M\'." << std::endl;
         ShowUsage();
         return;
@@ -319,7 +319,7 @@ void VirtualMouseBuilder::ReadDragToAction(int argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(optarg) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-D\'." << std::endl;
         ShowUsage();
         return;

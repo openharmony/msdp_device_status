@@ -170,7 +170,7 @@ void VirtualMouse::Move(int32_t dx, int32_t dy)
     double total = std::min(delta, MAXIMUM_STEP_LENGTH);
     double step = FAST_STEP;
 
-    for (; total > PRECISION; total -= step) {
+    while (total > PRECISION) {
         if (total < TWICE_FAST_STEP) {
             if (total > FAST_STEP) {
                 step = total / HALF_VALUE;
@@ -193,6 +193,7 @@ void VirtualMouse::Move(int32_t dx, int32_t dy)
             ((std::abs(ty) >= STEP_UNIT) && (std::abs(ty) <= MAXIMUM_STEP_LENGTH))) {
             SendEvent(EV_SYN, SYN_REPORT, SYNC_VALUE);
         }
+        total -= step;
     }
 }
 
