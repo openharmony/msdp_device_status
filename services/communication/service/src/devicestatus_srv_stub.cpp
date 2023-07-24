@@ -289,7 +289,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
     int32_t tokenType = AccessTokenKit::GetTokenTypeFlag(tokenId);
     int32_t ret = AllocSocketFd(clientName, moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
-        FI_HILOGE("Alloc socket fd failed, pid:%{public}d, go switch default", pid);
+        FI_HILOGE("AllocSocketFd failed, pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
             if (close(clientFd) < 0) {
                 FI_HILOGE("Close client fd failed, error:%{public}s, clientFd:%{public}d", strerror(errno), clientFd);

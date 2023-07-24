@@ -98,7 +98,7 @@ int32_t DeviceManager::OnEnable()
     CALL_DEBUG_ENTER;
     int32_t ret = EpollCreate();
     if (ret != RET_OK) {
-        FI_HILOGE("Epoll create failed");
+        FI_HILOGE("EpollCreate failed");
         return ret;
     }
     ret = monitor_.Enable();
@@ -108,7 +108,7 @@ int32_t DeviceManager::OnEnable()
     }
     ret = EpollAdd(&monitor_);
     if (ret != RET_OK) {
-        FI_HILOGE("Epoll add failed");
+        FI_HILOGE("EpollAdd failed");
         goto DISABLE_MONITOR;
     }
     enumerator_.ScanDevices();
