@@ -22,6 +22,8 @@
 #include <getopt.h>
 #include <linux/input.h>
 
+#include "input_manager.h"
+
 #include "devicestatus_define.h"
 #include "display_manager.h"
 #include "fi_log.h"
@@ -42,10 +44,36 @@ constexpr int32_t ABS_MT_ORIENTATION_MAX { 90 };
 constexpr int32_t ABS_MT_BLOB_ID_MAX { 10 };
 constexpr int32_t ABS_MT_TRACKING_ID_MAX { 9 };
 constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
+constexpr uint32_t IO_FLAG_WIDTH { 6 };
 constexpr uint32_t SY_OFFSET { 1 };
 constexpr uint32_t TX_OFFSET { 2 };
 constexpr uint32_t TY_OFFSET { 3 };
 } // namespace
+
+class PointerEventMonitor final : public MMI::IInputEventConsumer {
+public:
+    PointerEventMonitor() = default;
+    ~PointerEventMonitor() = default;
+
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
+};
+
+void PointerEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return;
+    }
+    MMI::PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        return;
+    }
+    std::cout << "\rcurrent touch position - x: " << std::setw(IO_FLAG_WIDTH) << std::left
+        << pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
+    std::cout.flush();
+}
 
 VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x6006, 0x6006)
 {
@@ -184,7 +212,17 @@ void VirtualTouchScreenBuilder::Clone()
 void VirtualTouchScreenBuilder::Monitor()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    MMI::InputManager* inputMgr = MMI::InputManager::GetInstance();
+    CHKPV(inputMgr);
+    auto monitor = std::make_shared<PointerEventMonitor>();
+    int32_t monitorId = inputMgr->AddMonitor(monitor);
+    if (monitorId < 0) {
+        std::cout << "Failed to add monitor." << std::endl;
+        return;
+    }
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
 }
 
 void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
