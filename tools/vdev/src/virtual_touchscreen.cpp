@@ -26,10 +26,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreen" };
-constexpr int32_t MINIMUM_INTERVAL = 18;
-constexpr int32_t N_SLOTS_AVAILABLE = 10;
-constexpr int32_t STEP_LENGTH = 10;
-constexpr int32_t TWICE_STEP_LENGTH = 2 * STEP_LENGTH;
+constexpr int32_t MINIMUM_INTERVAL { 18 };
+constexpr int32_t N_SLOTS_AVAILABLE { 10 };
+constexpr int32_t STEP_LENGTH { 10 };
+constexpr int32_t TWICE_STEP_LENGTH { 2 * STEP_LENGTH };
 } // namespaces
 
 VirtualTouchScreen *VirtualTouchScreen::device_ = nullptr;

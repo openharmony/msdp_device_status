@@ -31,15 +31,15 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualMouse" };
-constexpr int32_t REL_WHEEL_VALUE = 1;
-constexpr int32_t REL_WHEEL_HI_RES_VALUE = 120;
-constexpr int32_t MAX_SCROLL_LENGTH = 10;
-constexpr int32_t MINIMUM_INTERVAL = 8;
-constexpr double FAST_STEP = 5.0;
-constexpr double TWICE_FAST_STEP = 2.0 * FAST_STEP;
-constexpr double MAXIMUM_STEP_LENGTH = 5000.0;
-constexpr double PRECISION = 0.1;
-constexpr double STEP_UNIT = 1.0;
+constexpr int32_t REL_WHEEL_VALUE { 1 };
+constexpr int32_t REL_WHEEL_HI_RES_VALUE { 120 };
+constexpr int32_t MAX_SCROLL_LENGTH { 10 };
+constexpr int32_t MINIMUM_INTERVAL { 8 };
+constexpr double FAST_STEP { 5.0 };
+constexpr double TWICE_FAST_STEP { 2.0 * FAST_STEP };
+constexpr double MAXIMUM_STEP_LENGTH { 5000.0 };
+constexpr double PRECISION { 0.1 };
+constexpr double STEP_UNIT { 1.0 };
 } // namespace
 
 class PointerPositionMonitor final : public MMI::IInputEventConsumer {

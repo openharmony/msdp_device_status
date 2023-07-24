@@ -30,15 +30,15 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr double HALF_VALUE = 2.0;
-constexpr double DEFAULT_PRECISION = 0.1;
-constexpr int32_t SLEEP_TIME = 500;
-constexpr int32_t DOWN_VALUE = 1;
-constexpr int32_t UP_VALUE = 0;
-constexpr int32_t SYNC_VALUE = 0;
-constexpr int32_t OBFUSCATED = 30;
-constexpr int32_t MOVE_VALUE_X = 1;
-constexpr int32_t MOVE_VALUE_Y = -1;
+constexpr double HALF_VALUE { 2.0 };
+constexpr double DEFAULT_PRECISION { 0.1 };
+constexpr int32_t SLEEP_TIME { 500 };
+constexpr int32_t DOWN_VALUE { 1 };
+constexpr int32_t UP_VALUE { 0 };
+constexpr int32_t SYNC_VALUE { 0 };
+constexpr int32_t OBFUSCATED { 30 };
+constexpr int32_t MOVE_VALUE_X { 1 };
+constexpr int32_t MOVE_VALUE_Y { -1 };
 
 struct ResolutionInfo {
     int16_t axisCode { 0 };
