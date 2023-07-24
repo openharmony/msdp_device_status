@@ -198,7 +198,7 @@ void VirtualMouseBuilder::Monitor()
     }
 }
 
-void VirtualMouseBuilder::Act(int argc, char *argv[])
+void VirtualMouseBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:s:m:M:f:r:w:D:");
@@ -277,7 +277,7 @@ void VirtualMouseBuilder::ReadDownAction()
     }
 }
 
-void VirtualMouseBuilder::ReadMoveAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadMoveAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
@@ -296,7 +296,7 @@ void VirtualMouseBuilder::ReadMoveAction(int argc, char *argv[])
     VirtualMouse::GetDevice()->Move(dx, dy);
 }
 
-void VirtualMouseBuilder::ReadMoveToAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadMoveToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
@@ -315,7 +315,7 @@ void VirtualMouseBuilder::ReadMoveToAction(int argc, char *argv[])
     }
 }
 
-void VirtualMouseBuilder::ReadDragToAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadDragToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
