@@ -260,7 +260,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("Target window drag tid: %{public}d", targetTid);
+    FI_HILOGD("Target window drag tid:%{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
     int32_t repeatCount = 1;

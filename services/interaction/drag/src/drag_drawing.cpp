@@ -87,9 +87,9 @@ const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Fo
 const std::string MOUSE_DRAG_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag.svg" };
 const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 #ifdef __aarch64__
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so";
+const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 #else
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH = "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so";
+const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so" };
 #endif
 struct DrawingInfo g_drawingInfo;
 
