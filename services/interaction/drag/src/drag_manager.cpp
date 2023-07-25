@@ -567,37 +567,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
-    switch (result) {
-        case DragResult::DRAG_SUCCESS: {
-            if (!hasCustomAnimation) {
-                dragDrawing_.OnDragSuccess();
-            } else {
-                dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDrawingState();
-            }
-            break;
-        }
-        case DragResult::DRAG_FAIL:
-        case DragResult::DRAG_CANCEL: {
-            if (!hasCustomAnimation) {
-                dragDrawing_.OnDragFail();
-            } else {
-                dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDrawingState();
-            }
-            break;
-        }
-        case DragResult::DRAG_EXCEPTION: {
-            dragDrawing_.DestroyDragWindow();
-            dragDrawing_.UpdateDrawingState();
-            break;
-        }
-        default: {
-            FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
-            break;
-        }
-    }
-    return RET_OK;
+    return HandleDragResult(result, hasCustomAnimation);
 }
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
@@ -650,6 +620,42 @@ DragResult DragManager::GetDragResult() const
 {
     CALL_DEBUG_ENTER;
     return dragResult_;
+}
+
+int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation)
+{
+    CALL_DEBUG_ENTER;
+    switch (result) {
+        case DragResult::DRAG_SUCCESS: {
+            if (!hasCustomAnimation) {
+                dragDrawing_.OnDragSuccess();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDrawingState();
+            }
+            break;
+        }
+        case DragResult::DRAG_FAIL:
+        case DragResult::DRAG_CANCEL: {
+            if (!hasCustomAnimation) {
+                dragDrawing_.OnDragFail();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDrawingState();
+            }
+            break;
+        }
+        case DragResult::DRAG_EXCEPTION: {
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            break;
+        }
+        default: {
+            FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
+            break;
+        }
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -513,46 +513,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         return;
     }
-    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_CMD_TYPE);
-    if (!cJSON_IsNumber(comType)) {
-        FI_HILOGE("OnBytesReceived cmdType is not number type");
-        return;
-    }
-    FI_HILOGD("valueint:%{public}d", comType->valueint);
-    switch (comType->valueint) {
-        case REMOTE_COORDINATION_START: {
-            ResponseStartRemoteCoordination(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_START_RES: {
-            ResponseStartRemoteCoordinationResult(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP: {
-            ResponseStopRemoteCoordination(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP_RES: {
-            ResponseStopRemoteCoordinationResult(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP_OTHER_RES: {
-            ResponseStartCoordinationOtherResult(sessionId, parser);
-            break;
-        }
-        case NOTIFY_UNCHAINED_RES: {
-            ResponseNotifyUnchainedResult(sessionId, parser);
-            break;
-        }
-        case NOTIFY_FILTER_ADDED: {
-            ResponseNotifyFilterAdded();
-            break;
-        }
-        default: {
-            FI_HILOGE("OnBytesReceived cmdType is undefined");
-            break;
-        }
-    }
+    HandleCoordinationSessionData(sessionId, parser);
 }
 
 void CoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
@@ -680,6 +641,50 @@ void CoordinationSoftbusAdapter::ResponseNotifyFilterAdded()
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     openSessionWaitCond_.notify_all();
+}
+
+void CoordinationSoftbusAdapter::HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser)
+{
+    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_CMD_TYPE);
+    if (!cJSON_IsNumber(comType)) {
+        FI_HILOGE("OnBytesReceived cmdType is not number type");
+        return;
+    }
+    FI_HILOGD("valueint:%{public}d", comType->valueint);
+    switch (comType->valueint) {
+        case REMOTE_COORDINATION_START: {
+            ResponseStartRemoteCoordination(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_START_RES: {
+            ResponseStartRemoteCoordinationResult(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP: {
+            ResponseStopRemoteCoordination(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP_RES: {
+            ResponseStopRemoteCoordinationResult(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP_OTHER_RES: {
+            ResponseStartCoordinationOtherResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_UNCHAINED_RES: {
+            ResponseNotifyUnchainedResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_FILTER_ADDED: {
+            ResponseNotifyFilterAdded();
+            break;
+        }
+        default: {
+            FI_HILOGE("OnBytesReceived cmdType is undefined");
+            break;
+        }
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp
