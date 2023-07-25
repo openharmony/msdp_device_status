@@ -129,7 +129,7 @@ int32_t DeviceManager::Disable()
     int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnDisable, this));
     if (ret != RET_OK) {
-        FI_HILOGE("Post sync task failed");
+        FI_HILOGE("PostSyncTask failed");
     }
     return ret;
 }
