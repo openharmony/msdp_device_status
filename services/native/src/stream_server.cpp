@@ -247,7 +247,7 @@ void StreamServer::OnEpollEvent(epoll_event& ev)
 
 void StreamServer::DumpSession(const std::string &title)
 {
-    FI_HILOGD("in %s: %s", __func__, title.c_str());
+    FI_HILOGD("in %s:%s", __func__, title.c_str());
     int32_t i = 0;
     for (auto &[key, value] : sessionsMap_) {
         CHKPV(value);
