@@ -413,7 +413,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest018, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest019, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusMsdpMocKTest018 start.Test the abnormal branch");
+    FI_HILOGI("DeviceStatusMsdpMocKTest019 start.Test the abnormal branch");
     g_testMock->TimerCallback();
     constexpr int32_t TIMER_INTERVAL = 0;
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
