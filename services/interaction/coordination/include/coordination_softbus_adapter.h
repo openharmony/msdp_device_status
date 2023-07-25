@@ -71,6 +71,7 @@ private:
     int32_t SendMsg(int32_t sessionId, const std::string &message);
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
+    void HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();
 

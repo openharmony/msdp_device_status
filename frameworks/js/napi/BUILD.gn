@@ -46,8 +46,8 @@ ohos_shared_library("stationary") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "napi:ace_napi",
   ]
 

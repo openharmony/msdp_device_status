@@ -31,15 +31,15 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualMouse" };
-constexpr int32_t REL_WHEEL_VALUE = 1;
-constexpr int32_t REL_WHEEL_HI_RES_VALUE = 120;
-constexpr int32_t MAX_SCROLL_LENGTH = 10;
-constexpr int32_t MINIMUM_INTERVAL = 8;
-constexpr double FAST_STEP = 5.0;
-constexpr double TWICE_FAST_STEP = 2.0 * FAST_STEP;
-constexpr double MAXIMUM_STEP_LENGTH = 5000.0;
-constexpr double PRECISION = 0.1;
-constexpr double STEP_UNIT = 1.0;
+constexpr int32_t REL_WHEEL_VALUE { 1 };
+constexpr int32_t REL_WHEEL_HI_RES_VALUE { 120 };
+constexpr int32_t MAX_SCROLL_LENGTH { 10 };
+constexpr int32_t MINIMUM_INTERVAL { 8 };
+constexpr double FAST_STEP { 5.0 };
+constexpr double TWICE_FAST_STEP { 2.0 * FAST_STEP };
+constexpr double MAXIMUM_STEP_LENGTH { 5000.0 };
+constexpr double PRECISION { 0.1 };
+constexpr double STEP_UNIT { 1.0 };
 } // namespace
 
 class PointerPositionMonitor final : public MMI::IInputEventConsumer {
@@ -170,7 +170,7 @@ void VirtualMouse::Move(int32_t dx, int32_t dy)
     double total = std::min(delta, MAXIMUM_STEP_LENGTH);
     double step = FAST_STEP;
 
-    for (; total > PRECISION; total -= step) {
+    while (total > PRECISION) {
         if (total < TWICE_FAST_STEP) {
             if (total > FAST_STEP) {
                 step = total / HALF_VALUE;
@@ -193,6 +193,7 @@ void VirtualMouse::Move(int32_t dx, int32_t dy)
             ((std::abs(ty) >= STEP_UNIT) && (std::abs(ty) <= MAXIMUM_STEP_LENGTH))) {
             SendEvent(EV_SYN, SYN_REPORT, SYNC_VALUE);
         }
+        total -= step;
     }
 }
 

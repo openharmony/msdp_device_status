@@ -152,6 +152,7 @@ static void StreamReceived(int32_t sessionId, const StreamData *data, const Stre
 int32_t CoordinationSoftbusAdapter::Init()
 {
     CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
     const std::string SESSION_NAME = "ohos.msdp.device_status.";
     sessListener_ = {
         .OnSessionOpened = SessionOpened,
@@ -165,8 +166,22 @@ int32_t CoordinationSoftbusAdapter::Init()
         FI_HILOGE("Local networkid is empty");
         return RET_ERR;
     }
-    localSessionName_ = SESSION_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
-    int32_t ret = CreateSessionServer(FI_PKG_NAME, localSessionName_.c_str(), &sessListener_);
+    std::string sessionName = SESSION_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
+    if (sessionName == localSessionName_) {
+        FI_HILOGI("Session server has already created");
+        return  RET_OK;
+    }
+    int32_t ret = RET_ERR;
+    if (!localSessionName_.empty()) {
+        FI_HILOGD("Remove last sesison server, sessionName: %{public}s", localSessionName_.c_str());
+        ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
+        if (ret != RET_OK) {
+            FI_HILOGE("Remove session server failed, error code: %{public}d", ret);
+        }
+    }
+    
+    localSessionName_ = sessionName;
+    ret = CreateSessionServer(FI_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
         FI_HILOGE("Create session server failed, error code:%{public}d", ret);
         return RET_ERR;
@@ -280,15 +295,16 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     }
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
-    CHKPR(pointerEvent, RET_ERR);
     bool isPointerButtonPressed = false;
-    for (const auto &item : pointerEvent->GetPressedButtons()) {
-        if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
-            isPointerButtonPressed = true;
-            break;
+    if (pointerEvent != nullptr) {
+        for (const auto &item : pointerEvent->GetPressedButtons()) {
+            if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
+                isPointerButtonPressed = true;
+                break;
+            }
         }
     }
-    FI_HILOGD("isPointerButtonPressed: %{public}d", isPointerButtonPressed);
+    FI_HILOGD("isPointerButtonPressed:%{public}d", isPointerButtonPressed);
     cJSON *jsonStr = cJSON_CreateObject();
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
@@ -497,46 +513,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         return;
     }
-    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_CMD_TYPE);
-    if (!cJSON_IsNumber(comType)) {
-        FI_HILOGE("OnBytesReceived cmdType is not number type");
-        return;
-    }
-    FI_HILOGD("valueint:%{public}d", comType->valueint);
-    switch (comType->valueint) {
-        case REMOTE_COORDINATION_START: {
-            ResponseStartRemoteCoordination(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_START_RES: {
-            ResponseStartRemoteCoordinationResult(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP: {
-            ResponseStopRemoteCoordination(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP_RES: {
-            ResponseStopRemoteCoordinationResult(sessionId, parser);
-            break;
-        }
-        case REMOTE_COORDINATION_STOP_OTHER_RES: {
-            ResponseStartCoordinationOtherResult(sessionId, parser);
-            break;
-        }
-        case NOTIFY_UNCHAINED_RES: {
-            ResponseNotifyUnchainedResult(sessionId, parser);
-            break;
-        }
-        case NOTIFY_FILTER_ADDED: {
-            ResponseNotifyFilterAdded();
-            break;
-        }
-        default: {
-            FI_HILOGE("OnBytesReceived cmdType is undefined");
-            break;
-        }
-    }
+    HandleCoordinationSessionData(sessionId, parser);
 }
 
 void CoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
@@ -664,6 +641,50 @@ void CoordinationSoftbusAdapter::ResponseNotifyFilterAdded()
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     openSessionWaitCond_.notify_all();
+}
+
+void CoordinationSoftbusAdapter::HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser)
+{
+    cJSON* comType = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_CMD_TYPE);
+    if (!cJSON_IsNumber(comType)) {
+        FI_HILOGE("OnBytesReceived cmdType is not number type");
+        return;
+    }
+    FI_HILOGD("valueint:%{public}d", comType->valueint);
+    switch (comType->valueint) {
+        case REMOTE_COORDINATION_START: {
+            ResponseStartRemoteCoordination(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_START_RES: {
+            ResponseStartRemoteCoordinationResult(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP: {
+            ResponseStopRemoteCoordination(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP_RES: {
+            ResponseStopRemoteCoordinationResult(sessionId, parser);
+            break;
+        }
+        case REMOTE_COORDINATION_STOP_OTHER_RES: {
+            ResponseStartCoordinationOtherResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_UNCHAINED_RES: {
+            ResponseNotifyUnchainedResult(sessionId, parser);
+            break;
+        }
+        case NOTIFY_FILTER_ADDED: {
+            ResponseNotifyFilterAdded();
+            break;
+        }
+        default: {
+            FI_HILOGE("OnBytesReceived cmdType is undefined");
+            break;
+        }
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

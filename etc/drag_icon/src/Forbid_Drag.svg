@@ -5,14 +5,14 @@
         <g id="HarmonyOS-cursor-symbol" transform="translate(-309.000000, -71.000000)">
             <g id="Cursor/Forbid" transform="translate(301.000000, 70.000000)">
                 <g id="编组" transform="translate(1.000000, 1.344847)">
-                    <g id="角标" transform="translate(7.000000, 0.655153)" fill="#E84026">
-                        <rect id="矩形" x="0" y="0" width="40" height="24" rx="12"></rect>
-                        <text id="8" font-family="HarmonyHeiTi" font-size="16" font-weight="normal" fill="#FFFFFF">
-                            <tspan x="22" y="18">1</tspan>
+                    <g id="角标" transform="translate(7.000000, 0.655153)">
+                        <rect id="矩形" x="10" y="0" width="30" height="24" rx="12" fill="#000000" fill-opacity="0.380392157"></rect>
+                        <text id="8" font-family="HarmonyHeiTi" font-size="14" font-weight="normal" fill="#FFFFFF">
+                            <tspan x="25" y="17.9">1</tspan>
                         </text>
                     </g>
-                    <circle id="椭圆形" stroke="#FFFFFF" stroke-width="1.5" cx="19" cy="12.6551527" r="7"></circle>
-                    <line x1="14" y1="8" x2="24" y2="16.5551527" id="路径-14" stroke="#FFFFFF" stroke-width="1.5"></line>
+                    <circle id="椭圆形" stroke="#FFFFFF" stroke-width="1" cx="26.5" cy="13.5" r="4.3"></circle>
+                    <line x1="23.5" y1="10.5" x2="29.5" y2="16.5" id="路径-14" stroke="#FFFFFF" stroke-width="1"></line>
                 </g>
             </g>
         </g>
