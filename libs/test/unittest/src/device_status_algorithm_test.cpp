@@ -229,7 +229,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest005, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest006 start)";
+    FI_HILOGI("DeviceStatusAlgorithmTest006 start");
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
