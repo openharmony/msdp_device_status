@@ -66,7 +66,7 @@ int32_t DeviceManager::Init(IContext *context)
     int32_t ret = context->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnInit, this, context));
     if (ret != RET_OK) {
-        FI_HILOGE("PostSyncTask failed");
+        FI_HILOGE("Post sync task failed");
     }
     return ret;
 }
@@ -88,7 +88,7 @@ int32_t DeviceManager::Enable()
     int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnEnable, this));
     if (ret != RET_OK) {
-        FI_HILOGE("PostSyncTask failed");
+        FI_HILOGE("Post sync task failed");
     }
     return ret;
 }
@@ -129,7 +129,7 @@ int32_t DeviceManager::Disable()
     int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnDisable, this));
     if (ret != RET_OK) {
-        FI_HILOGE("PostSyncTask failed");
+        FI_HILOGE("Post sync task failed");
     }
     return ret;
 }
@@ -321,7 +321,7 @@ void DeviceManager::Dispatch(const struct epoll_event &ev)
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
             std::bind(&DeviceManager::OnEpollDispatch, this));
         if (ret != RET_OK) {
-            FI_HILOGE("Post async task failed");
+            FI_HILOGE("PostAsyncTask failed");
         }
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
