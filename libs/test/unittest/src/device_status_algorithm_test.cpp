@@ -500,7 +500,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest021, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest021 start";
+    FI_HILOGI("DeviceStatusAlgorithmTest021 start");
     bool result = g_manager->StartSensor(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_HORIZONTAL_POSITION);
