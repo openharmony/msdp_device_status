@@ -31,7 +31,7 @@ int32_t CoordinationStateFree::ActivateCoordination(
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
-        FI_HILOGE("Remote network id is empty");
+        FI_HILOGE("RemoteNetworkId is empty");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();

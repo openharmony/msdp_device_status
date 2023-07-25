@@ -103,7 +103,7 @@ static void ShowUsage()
     std::cout << std::endl;
 }
 
-static void Mount(int argc, char *argv[])
+static void Mount(int32_t argc, char *argv[])
 {
     int32_t opt = getopt(argc, argv, "t:");
     if ((opt != 't') || (optarg == nullptr)) {
@@ -127,7 +127,7 @@ static void Mount(int argc, char *argv[])
     }
 }
 
-static void Unmount(int argc, char *argv[])
+static void Unmount(int32_t argc, char *argv[])
 {
     int32_t opt = getopt(argc, argv, "t:");
     if ((opt != 't') || (optarg == nullptr)) {
@@ -150,7 +150,7 @@ static void Unmount(int argc, char *argv[])
     }
 }
 
-static void Clone(int argc, char *argv[])
+static void Clone(int32_t argc, char *argv[])
 {
     int32_t opt = getopt(argc, argv, "t:");
     if ((opt != 't') || (optarg == nullptr)) {
@@ -174,9 +174,9 @@ static void Clone(int argc, char *argv[])
     }
 }
 
-static void Monitor(int argc, char *argv[])
+static void Monitor(int32_t argc, char *argv[])
 {
-    int opt = getopt(argc, argv, "t:");
+    int32_t opt = getopt(argc, argv, "t:");
     if ((opt != 't') || (optarg == nullptr)) {
         std::cout << "vdevadm monitor: required option is missing" << std::endl;
         ShowMonitorHelp();
@@ -195,7 +195,7 @@ static void Monitor(int argc, char *argv[])
     }
 }
 
-static void Act(int argc, char *argv[])
+static void Act(int32_t argc, char *argv[])
 {
     int32_t opt = getopt(argc, argv, "t:");
     if ((opt != 't') || (optarg == nullptr)) {
@@ -219,7 +219,7 @@ static void Act(int argc, char *argv[])
     }
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
     static const struct option options[] { { "help", no_argument, nullptr, 'h' }, {} };
     int32_t opt = getopt_long(argc, argv, "+h", options, nullptr);

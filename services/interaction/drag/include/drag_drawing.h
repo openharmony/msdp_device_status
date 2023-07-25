@@ -32,15 +32,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using DragSuccessExtFunc = void (*)(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
-using DragFailExtFunc = void (*)(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
-        std::shared_ptr<Rosen::RSNode> rootNode);
-using DragStartExtFunc = void (*)(const DragAnimationData &dragAnimationData,
-    std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
-using DragStyleExtFunc = void (*)(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
-    std::shared_ptr<Media::PixelMap> stylePixelMap);
-using DragStopExtFunc = void (*)();
+struct DrawingInfo;
+class DragDrawing;
+using DragExtFunc = void (*)(DragDrawing *drawingObj, DrawingInfo *drawingInfo);
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
@@ -78,6 +72,28 @@ private:
     std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
+struct DrawingInfo {
+    std::atomic_bool isRunning { false };
+    std::atomic_bool isPreviousDefaultStyle { false };
+    std::atomic_bool isCurrentDefaultStyle { false };
+    bool isInitUiDirector { true };
+    int32_t sourceType { -1 };
+    int32_t currentDragNum { -1 };
+    DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
+    int32_t displayId { -1 };
+    int32_t pixelMapX { -1 };
+    int32_t pixelMapY { -1 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t rootNodeWidth { -1 };
+    int32_t rootNodeHeight { -1 };
+    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
+    std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
+    std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
+    std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+};
+
 class DragDrawing : public IDragAnimation {
 public:
     DragDrawing() = default;
@@ -88,6 +104,7 @@ public:
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t StartVsync();
     void OnDragSuccess();
     void OnDragFail();
     void EraseMouseIcon();

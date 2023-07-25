@@ -16,6 +16,8 @@
 #ifndef DEVICESTATUS_SRV_STUB_H
 #define DEVICESTATUS_SRV_STUB_H
 
+#include <map>
+
 #include <iremote_stub.h>
 #include <nocopyable.h>
 
@@ -28,7 +30,9 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
-    DeviceStatusSrvStub() = default;
+    using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
+
+    DeviceStatusSrvStub();
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);
     virtual ~DeviceStatusSrvStub() = default;
 
@@ -56,6 +60,9 @@ private:
     int32_t SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply);
     int32_t UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply);
+
+private:
+    std::map<uint32_t, ConnFunc> mapConnFunc_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

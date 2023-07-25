@@ -165,7 +165,7 @@ bool SensorDataCallback::RegisterCallbackSensor(int32_t sensorTypeId)
     }
     ret = SetBatch(sensorTypeId, &user_, RATE_MILLISEC, RATE_MILLISEC);
     if (ret != 0) {
-        FI_HILOGE("Set batch failed");
+        FI_HILOGE("SetBatch failed");
         return false;
     }
     ret = ActivateSensor(sensorTypeId, &user_);

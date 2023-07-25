@@ -29,8 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualKeyboardBuilder" };
-constexpr int32_t MAXIMUM_LEVEL_ALLOWED = 3;
-constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED = 0x100000;
+constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
+constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED { 0x100000 };
 } // namespace
 
 VirtualKeyboardBuilder::VirtualKeyboardBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x24ae, 0x4035)
@@ -146,7 +146,7 @@ void VirtualKeyboardBuilder::Clone()
     }
 }
 
-void VirtualKeyboardBuilder::Act(int argc, char *argv[])
+void VirtualKeyboardBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:f:r:w:");

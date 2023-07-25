@@ -34,7 +34,7 @@ public:
     static void Mount();
     static void Unmount();
     static void Clone();
-    static void Act(int argc, char *argv[]);
+    static void Act(int32_t argc, char *argv[]);
 
 private:
     static void ReadDownAction();

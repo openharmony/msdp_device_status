@@ -97,6 +97,7 @@ private:
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
+    int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
