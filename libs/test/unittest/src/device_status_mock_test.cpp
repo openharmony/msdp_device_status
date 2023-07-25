@@ -131,12 +131,11 @@ int32_t DeviceStatusMsdpMocKTest::UnloadMockLibrary(const std::shared_ptr<MsdpAl
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest001 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest001 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest001 end";
 }
 
 /**
@@ -146,14 +145,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest001, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest002 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest002 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_INVALID) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_INVALID) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest002 end";
 }
 
 /**
@@ -163,14 +161,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest002, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest003 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest003 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest003 end";
 }
 
 /**
@@ -180,14 +177,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest003, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest004 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest004 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest004 end";
 }
 
 /**
@@ -197,14 +193,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest004, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest005 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest005 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest005 end";
 }
 
 /**
@@ -214,14 +209,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest005, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest006 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest006 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_LID_OPEN) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_LID_OPEN) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest006 end";
 }
 
 /**
@@ -231,14 +225,13 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest006, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest007 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest007 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_MAX) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_MAX) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest007 end";
 }
 
 /**
@@ -248,7 +241,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest007, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest008 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest008 start");
     EXPECT_TRUE(g_testMock->Init());
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
@@ -256,7 +249,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest008, TestSize.Level1)
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
     EXPECT_TRUE(g_testMock->DisableCount(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest008 end";
 }
 
 /**
@@ -266,9 +258,8 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest008, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest009 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest009 start");
     EXPECT_FALSE(g_testMock->NotifyMsdpImpl({}) == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest009 end";
 }
 
 /**
@@ -278,7 +269,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest009, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest010, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest010 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest010 start");
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
@@ -286,7 +277,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest010, TestSize.Level1)
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest011 end";
 }
 
 /**
@@ -296,7 +286,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest010, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest011, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest011 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest011 start");
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
@@ -304,7 +294,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest011, TestSize.Level1)
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == RET_ERR);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest011 end";
 }
 
 /**
@@ -314,7 +303,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest011, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest012, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest012 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest012 start");
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
@@ -322,7 +311,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest012, TestSize.Level1)
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest012 end";
 }
 
 /**
@@ -332,7 +320,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest012, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest013, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest013 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest013 start");
     g_testMock->InitTimer();
     g_testMock->StartThread();
     std::make_unique<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, g_testMock)->detach();
@@ -343,7 +331,6 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest013, TestSize.Level1)
     ret = g_testMock->GetDeviceStatusData();
     g_testMock->CloseTimer();
     EXPECT_TRUE(ret == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest013 end";
 }
 
 /**
@@ -353,10 +340,9 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest013, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest014, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest014 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest014 start");
     g_testMock->GetCallbackImpl() = nullptr;
     EXPECT_FALSE(g_testMock->NotifyMsdpImpl({}) == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest014 end";
 }
 
 /**
@@ -366,11 +352,10 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest014, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest015, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest015 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest015 start");
     std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback_) == ERR_OK);
     EXPECT_FALSE(g_testMock->NotifyMsdpImpl({TYPE_INVALID, VALUE_INVALID}) == ERR_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest015 end";
 }
 
 /**
@@ -380,11 +365,10 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest015, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest016, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest016 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest016 start");
     g_testMock->dataParse_ = nullptr;
     int32_t ret = g_testMock->GetDeviceStatusData();
     EXPECT_TRUE(ret == RET_ERR);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest016 end";
 }
 
 /**
@@ -394,11 +378,10 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest016, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest017, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest017 start";
+    FI_HILOGI("DeviceStatusMsdpMocKTest017 start");
     constexpr int32_t TIMER_INTERVAL = 0;
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
     EXPECT_TRUE(ret == RET_ERR);
-    GTEST_LOG_(INFO) << "DeviceStatusMsdpMocKTest017 end";
 }
 
 /**
@@ -408,7 +391,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest017, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest018, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusMsdpMocKTest018 start.");
+    FI_HILOGI("DeviceStatusMsdpMocKTest018 start");
     std::shared_ptr<MsdpAlgoHandle> mock = std::make_shared<MsdpAlgoHandle>();
     int32_t ret = LoadMockLibrary(mock);
     ASSERT_EQ(ret, RET_OK);
@@ -430,7 +413,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest018, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest019, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusMsdpMocKTest018 start.Test the abnormal branch");
+    FI_HILOGI("DeviceStatusMsdpMocKTest019 start.Test the abnormal branch");
     g_testMock->TimerCallback();
     constexpr int32_t TIMER_INTERVAL = 0;
     int32_t ret = g_testMock->SetTimerInterval(TIMER_INTERVAL);
