@@ -34,7 +34,7 @@ std::string GetLocalNetworkId()
         FI_HILOGE("Get local node device info ret:%{public}d", ret);
         return {};
     }
-    FI_HILOGE("Get local node device info networkId: %{public}s", localNode->networkId);
+    FI_HILOGE("GetLocalNodeDeviceInfo networkId:%{public}s", localNode->networkId);
     return localNode->networkId;
 }
 } // namespace COORDINATION
