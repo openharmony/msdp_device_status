@@ -26,12 +26,11 @@ extern crate ipc_rust;
 
 use std::ffi::{ c_char, CString };
 use std::fs::File;
-use std::ops::Deref;
 use std::os::fd::{ FromRawFd, RawFd };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize, FileDesc, Serialize };
 use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext, FusionResult };
-use fusion_services_rust::{ FusionServiceProxy };
+use fusion_services_rust::{ FusionService };
 use fusion_utils_rust::{ call_debug_enter };
 
 
@@ -51,32 +50,27 @@ impl FusionBasicServer {
     fn alloc_socket_pair(&self, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>
     {
         if let Ok(call_param) = AllocSocketPairParam::deserialize(data) {
-            if let Ok(guard) = FusionServiceProxy::get_instance().lock() {
-                if let Some(proxy) = guard.deref() {
-                    let mut client_fd: RawFd = 0;
-                    let mut token_type: i32 = 0;
+            if let Some(proxy) = FusionService::get_instance() {
+                let mut client_fd: RawFd = 0;
+                let mut token_type: i32 = 0;
 
-                    proxy.alloc_socket_fd(call_param.program_name.as_str(),
-                        call_param.module_type, &mut client_fd, &mut token_type)?;
+                proxy.alloc_socket_fd(call_param.program_name.as_str(),
+                    call_param.module_type, &mut client_fd, &mut token_type)?;
 
-                    let f = unsafe {
-                        File::from_raw_fd(client_fd)
-                    };
-                    let fdesc = FileDesc::new(f);
+                let f = unsafe {
+                    File::from_raw_fd(client_fd)
+                };
+                let fdesc = FileDesc::new(f);
 
-                    if fdesc.serialize(reply).is_err() {
-                        return Err(-1);
-                    }
-                    if token_type.serialize(reply).is_err() {
-                        return Err(-1);
-                    }
-                    Ok(0)
-                } else {
-                    error!(LOG_LABEL, "No proxy");
-                    Err(-1)
+                if fdesc.serialize(reply).is_err() {
+                    return Err(-1);
                 }
+                if token_type.serialize(reply).is_err() {
+                    return Err(-1);
+                }
+                Ok(0)
             } else {
-                error!(LOG_LABEL, "Locking error of proxy");
+                error!(LOG_LABEL, "No proxy");
                 Err(-1)
             }
         } else {
