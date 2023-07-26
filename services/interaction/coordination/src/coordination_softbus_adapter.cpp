@@ -572,7 +572,7 @@ int32_t CoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t r
     }
 
     int32_t sessionSide = GetSessionSide(sessionId);
-    FI_HILOGI("session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
+    FI_HILOGI("Session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
         sessionId, sessionSide);
     std::lock_guard<std::mutex> notifyLock(operationMutex_);
     if (sessionSide == SESSION_SIDE_SERVER) {
