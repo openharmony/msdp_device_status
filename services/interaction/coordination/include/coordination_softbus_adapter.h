@@ -25,6 +25,8 @@
 #include "nocopyable.h"
 #include "session.h"
 
+#include "coordination_util.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -58,7 +60,7 @@ public:
     void OnSessionClosed(int32_t sessionId);
     void OnBytesReceived(int32_t sessionId, const void* data, uint32_t dataLen);
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
-    int32_t SendData(const std::string& deviceId, MessageId messageId, void* data, uint32_t dataLen);
+    int32_t SendData(const std::string &deviceId, MessageId messageId, void* data, uint32_t dataLen);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
@@ -70,7 +72,7 @@ private:
     std::string FindDevice(int32_t sessionId);
     int32_t SendMsg(int32_t sessionId, const std::string &message);
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
-    void HandleSessionData(int32_t sessionId, const std::string& messageData);
+    void HandleSessionData(int32_t sessionId, const std::string &messageData);
     void HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();

@@ -22,7 +22,6 @@
 #include "softbus_common.h"
 
 #include "coordination_sm.h"
-#include "coordination_util.h"
 #include "device_coordination_softbus_define.h"
 #include "devicestatus_define.h"
 
@@ -43,7 +42,7 @@ const SessionAttribute g_sessionAttr = {
     }
 };
 
-void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser& parser)
+void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
@@ -55,7 +54,7 @@ void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser& parser
     COOR_SM->StartRemoteCoordination(deviceId->valuestring, cJSON_IsTrue(buttonIsPressed));
 }
 
-void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
+void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
@@ -69,7 +68,7 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser& 
     COOR_SM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
 }
 
-void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
+void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
@@ -81,7 +80,7 @@ void ResponseStopRemoteCoordination(int32_t sessionId, const JsonParser& parser)
     COOR_SM->StopRemoteCoordination(cJSON_IsTrue(result));
 }
 
-void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& parser)
+void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
@@ -93,7 +92,7 @@ void ResponseStopRemoteCoordinationResult(int32_t sessionId, const JsonParser& p
     COOR_SM->StopRemoteCoordinationResult(cJSON_IsTrue(result));
 }
 
-void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser& parser)
+void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
@@ -105,7 +104,7 @@ void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser& parser)
     COOR_SM->NotifyUnchainedResult(deviceId->valuestring, cJSON_IsTrue(result));
 }
 
-void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser& parser)
+void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
     cJSON* deviceId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
@@ -173,10 +172,10 @@ int32_t CoordinationSoftbusAdapter::Init()
     }
     int32_t ret = RET_ERR;
     if (!localSessionName_.empty()) {
-        FI_HILOGD("Remove last sesison server, sessionName: %{public}s", localSessionName_.c_str());
+        FI_HILOGD("Remove last sesison server, sessionName:%{public}s", localSessionName_.c_str());
         ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
         if (ret != RET_OK) {
-            FI_HILOGE("Remove session server failed, error code: %{public}d", ret);
+            FI_HILOGE("Remove session server failed, error code:%{public}d", ret);
         }
     }
     
@@ -483,7 +482,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     return RET_OK;
 }
 
-void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string& message)
+void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string &message)
 {
     if (message.empty()) {
         FI_HILOGE("Message is empty");
@@ -613,7 +612,7 @@ void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::func
     registerRecvMap_[messageId] = callback;
 }
 
-int32_t CoordinationSoftbusAdapter::SendData(const std::string& deviceId, MessageId messageId,
+int32_t CoordinationSoftbusAdapter::SendData(const std::string &deviceId, MessageId messageId,
     void* data, uint32_t dataLen)
 {
     CALL_DEBUG_ENTER;

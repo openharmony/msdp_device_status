@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ActivateCoordinationFuzzTest" };
 } // namespace
 
-void ActivateCoordinationFuzzTest(const uint8_t* data, size_t  size)
+void ActivateCoordinationFuzzTest(const uint8_t* data, size_t size)
 {
     CALL_DEBUG_ENTER;
     if (data == nullptr) {
