@@ -249,7 +249,7 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
-        FI_HILOGE("Call update drag style failed, ret:%{public}d", ret);
+        FI_HILOGE("Call UpdateDragStyle failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -371,7 +371,7 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
-        FI_HILOGE("Call stop drag failed, ret:%{public}d", ret);
+        FI_HILOGE("Call StopDrag failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
@@ -382,7 +382,7 @@ int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessagePar
     CALL_DEBUG_ENTER;
     int32_t ret = AddDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call add drag listener failed, ret:%{public}d", ret);
+        FI_HILOGE("Call AddDraglistener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -392,7 +392,7 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
     CALL_DEBUG_ENTER;
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
-        FI_HILOGE("Call remove drag listener failed, ret:%{public}d", ret);
+        FI_HILOGE("Call RemoveDraglistener failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -404,7 +404,7 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {
-        FI_HILOGE("Call set drag window visible failed, ret:%{public}d", ret);
+        FI_HILOGE("Call SetDragWindowVisible failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -418,7 +418,7 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
     int32_t height = 0;
     int32_t ret = GetShadowOffset(offsetX, offsetY, width, height);
     if (ret != RET_OK) {
-        FI_HILOGE("Call get shadow offset stub failed, ret:%{public}d", ret);
+        FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
     }
     WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);

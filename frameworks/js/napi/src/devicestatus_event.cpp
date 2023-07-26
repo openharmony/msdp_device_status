@@ -180,7 +180,7 @@ void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     napi_status status = napi_ok;
     status = napi_get_reference_value(env_, typeHandler->onHandlerRef, &handler);
     if (status != napi_ok) {
-        FI_HILOGE("On event handler for %{public}d failed, status:%{public}d", eventType, status);
+        FI_HILOGE("OnEvent handler for %{public}d failed, status:%{public}d", eventType, status);
         napi_close_handle_scope(env_, scope);
         return;
     }
@@ -231,7 +231,7 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
 void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("On event for %{public}d, isOnce:%{public}d", eventType, isOnce);
+    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     CHKPV(scope);
@@ -239,14 +239,14 @@ void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, b
     if (isOnce) {
         typeHandler = eventOnceMap_.find(eventType);
         if (typeHandler == eventOnceMap_.end()) {
-            FI_HILOGE("On event eventType %{public}d not found", eventType);
+            FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }
     } else {
         typeHandler = eventMap_.find(eventType);
         if (typeHandler == eventMap_.end()) {
-            FI_HILOGE("On event eventType %{public}d not found", eventType);
+            FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
             napi_close_handle_scope(env_, scope);
             return;
         }

@@ -391,7 +391,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         return RET_ERR;
     }
     if (ReadConfigFile(std::string(temp)) != RET_OK) {
-        FI_HILOGE("Read config file failed");
+        FI_HILOGE("ReadConfigFile failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -424,7 +424,7 @@ void Device::LoadDeviceConfig()
 {
     CALL_DEBUG_ENTER;
     if (ReadTomlFile(MakeConfigFileName()) != RET_OK) {
-        FI_HILOGE("Read toml file failed");
+        FI_HILOGE("ReadTomlFile failed");
         keyboardType_ = IDevice::KEYBOARD_TYPE_NONE;
     }
     if (IsKeyboard()) {

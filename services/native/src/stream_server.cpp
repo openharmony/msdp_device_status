@@ -140,7 +140,7 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
     sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
-        FI_HILOGE("Add session fail errCode:%{public}d", ADD_SESSION_FAIL);
+        FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
         goto CLOSE_SOCK;
     }
     if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {

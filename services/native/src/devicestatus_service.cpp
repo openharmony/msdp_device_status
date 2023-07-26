@@ -388,9 +388,9 @@ int32_t DeviceStatusService::InitDelegateTasks()
     }
     auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
     if (ret != RET_OK) {
-        FI_HILOGE("Add epoll error ret:%{public}d", ret);
+        FI_HILOGE("AddEpoll error ret:%{public}d", ret);
     }
-    FI_HILOGI("Add epoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
+    FI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
     return ret;
 }
 
@@ -405,7 +405,7 @@ int32_t DeviceStatusService::InitTimerMgr()
     }
     ret = AddEpoll(EPOLL_EVENT_TIMER, timerMgr_.GetTimerFd());
     if (ret != RET_OK) {
-        FI_HILOGE("Add epoll for timer fail");
+        FI_HILOGE("AddEpoll for timer fail");
     }
     return ret;
 }
@@ -913,7 +913,7 @@ int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
     CHKPR(sess, RET_ERR);
     int32_t ret = dragMgr_.StartDrag(dragData, sess);
     if (ret != RET_OK) {
-        FI_HILOGE("Start drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -923,7 +923,7 @@ int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimati
     CALL_DEBUG_ENTER;
     int32_t ret = dragMgr_.StopDrag(result, hasCustomAnimation);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
