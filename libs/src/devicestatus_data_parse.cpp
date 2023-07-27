@@ -68,7 +68,7 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(Type type, Data& data)
 {
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
-        FI_HILOGE("read json failed, errno is %{public}d", errno);
+        FI_HILOGE("Read json failed, errno is %{public}d", errno);
         data.type = type;
         data.value = OnChangedValue::VALUE_INVALID;
         return false;
@@ -97,7 +97,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     cJSON* mockarray = cJSON_GetObjectItem(parser.json, DeviceStatusJson[type].json.c_str());
     int32_t jsonsize = cJSON_GetArraySize(mockarray);
     if (jsonsize == 0) {
-        FI_HILOGE("json size is zero");
+        FI_HILOGE("Json size is zero");
         return false;
     }
     tempcount_[type] = tempcount_[type] % jsonsize;
@@ -105,7 +105,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     tempcount_[type]++;
     data.type = type;
     if (mockvalue == nullptr || !cJSON_IsNumber(mockvalue)) {
-        FI_HILOGE("json parser number is failed");
+        FI_HILOGE("Json parser number is failed");
         return false;
     }
     data.value = static_cast<OnChangedValue>(mockvalue->valueint);

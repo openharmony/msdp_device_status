@@ -29,8 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualKeyboardBuilder" };
-constexpr int32_t MAXIMUM_LEVEL_ALLOWED = 3;
-constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED = 0x100000;
+constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
+constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED { 0x100000 };
 } // namespace
 
 VirtualKeyboardBuilder::VirtualKeyboardBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x24ae, 0x4035)
@@ -108,10 +108,45 @@ void VirtualKeyboardBuilder::Unmount()
 void VirtualKeyboardBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    if (VirtualKeyboard::GetDevice() != nullptr) {
+        std::cout << "Virtual keyboard has been mounted" << std::endl;
+        return;
+    }
+
+    std::vector<std::shared_ptr<VirtualDevice>> vDevs;
+    int32_t ret = VirtualDeviceBuilder::ScanFor(
+        [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsKeyboard()); }, vDevs);
+    if (ret != RET_OK) {
+        std::cout << "Failed while scanning for keyboard" << std::endl;
+        return;
+    }
+    auto vDev = VirtualDeviceBuilder::Select(vDevs, "keyboard");
+    CHKPV(vDev);
+
+    std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
+    VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
+    if (!vBuilder.SetUp()) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    int32_t nTries = 3;
+    do {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } while ((nTries-- > 0) && (VirtualKeyboard::GetDevice() == nullptr));
+    if (VirtualKeyboard::GetDevice() == nullptr) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully" << std::endl;
+    VirtualDeviceBuilder::Daemonize();
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
 }
 
-void VirtualKeyboardBuilder::Act(int argc, char *argv[])
+void VirtualKeyboardBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:f:r:w:");

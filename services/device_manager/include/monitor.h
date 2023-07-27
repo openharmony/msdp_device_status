@@ -34,7 +34,7 @@ class Monitor final : public IEpollEventSource {
 public:
     Monitor() = default;
     DISALLOW_COPY_AND_MOVE(Monitor);
-    ~Monitor() = default;
+    ~Monitor();
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;

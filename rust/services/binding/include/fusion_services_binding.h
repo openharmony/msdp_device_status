@@ -21,17 +21,17 @@
 extern "C" {
 #endif
 
-struct FusionService;
+struct NativeService;
 
-struct FusionService* FusionServiceNew();
-struct FusionService* FusionServiceRef(struct FusionService *service);
-struct FusionService* FusionServiceUnref(struct FusionService *service);
+struct NativeService* NativeService_New();
+struct NativeService* NativeService_Ref(struct NativeService *service);
+struct NativeService* NativeService_Unref(struct NativeService *service);
 
-void FusionService_OnDump(struct FusionService *service);
-void FusionService_OnStart(struct FusionService *service);
-void FusionService_OnStop(struct FusionService *service);
+void NativeService_OnDump(struct NativeService *service);
+void NativeService_OnStart(struct NativeService *service);
+void NativeService_OnStop(struct NativeService *service);
 
-int32_t FusionService_AllocSocketFd(struct FusionService *service, const char *programName,
+int32_t NativeService_AllocSocketFd(struct NativeService *service, const char *programName,
     int32_t moduleType, int32_t *toReturnClientFd, int32_t *tokenType);
 
 #ifdef __cplusplus

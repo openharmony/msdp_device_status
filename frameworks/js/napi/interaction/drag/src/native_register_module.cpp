@@ -25,7 +25,7 @@ static napi_module msdpDragModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsDragContext::Export,
-    .nm_modname = "device_status.drag",
+    .nm_modname = "deviceStatus.dragInteraction",
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };

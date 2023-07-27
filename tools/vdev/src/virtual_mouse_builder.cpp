@@ -72,7 +72,7 @@ void MouseEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerE
         return;
     }
     std::cout << "\rcurrent pointer position - x: " << std::setw(IO_FLAG_WIDTH) << std::left <<
-    pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
+        pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
     std::cout.flush();
 }
 
@@ -144,7 +144,42 @@ void VirtualMouseBuilder::Unmount()
 void VirtualMouseBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    if (VirtualMouse::GetDevice() != nullptr) {
+        std::cout << "Virtual mouse has been mounted." << std::endl;
+        return;
+    }
+
+    std::vector<std::shared_ptr<VirtualDevice>> vDevs;
+    int32_t ret = VirtualDeviceBuilder::ScanFor(
+        [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsMouse()); }, vDevs);
+    if (ret != RET_OK) {
+        std::cout << "Failed while scanning for mouse." << std::endl;
+        return;
+    }
+    auto vDev = VirtualDeviceBuilder::Select(vDevs, "mouse");
+    CHKPV(vDev);
+
+    std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
+    VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
+    if (!vBuilder.SetUp()) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    int32_t nTries = 3;
+    do {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } while ((nTries-- > 0) && (VirtualMouse::GetDevice() == nullptr));
+    if (VirtualMouse::GetDevice() == nullptr) {
+        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        return;
+    }
+
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
+    VirtualDeviceBuilder::Daemonize();
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
 }
 
 void VirtualMouseBuilder::Monitor()
@@ -163,7 +198,7 @@ void VirtualMouseBuilder::Monitor()
     }
 }
 
-void VirtualMouseBuilder::Act(int argc, char *argv[])
+void VirtualMouseBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:s:m:M:f:r:w:D:");
@@ -242,11 +277,11 @@ void VirtualMouseBuilder::ReadDownAction()
     }
 }
 
-void VirtualMouseBuilder::ReadMoveAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadMoveAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(std::string(optarg))) {
+    if (!Utility::IsInteger(std::string(optarg)) || (optind < 0) || (optind >= argc)) {
         std::cout << "Invalid arguments for Option \'-m\'." << std::endl;
         ShowUsage();
         return;
@@ -261,12 +296,12 @@ void VirtualMouseBuilder::ReadMoveAction(int argc, char *argv[])
     VirtualMouse::GetDevice()->Move(dx, dy);
 }
 
-void VirtualMouseBuilder::ReadMoveToAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadMoveToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-M\'." << std::endl;
         ShowUsage();
         return;
@@ -280,11 +315,11 @@ void VirtualMouseBuilder::ReadMoveToAction(int argc, char *argv[])
     }
 }
 
-void VirtualMouseBuilder::ReadDragToAction(int argc, char *argv[])
+void VirtualMouseBuilder::ReadDragToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(optarg) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-D\'." << std::endl;
         ShowUsage();
         return;

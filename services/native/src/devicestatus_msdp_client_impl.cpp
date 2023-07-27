@@ -336,9 +336,9 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
         FI_HILOGE("Cannot load library error:%{public}s", dlerror());
         return RET_ERR;
     }
-    FI_HILOGI("start create pointer");
+    FI_HILOGI("Start create pointer");
     mock_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(mock_.handle, "Create"));
-    FI_HILOGI("start destroy pointer");
+    FI_HILOGI("Start destroy pointer");
     mock_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(mock_.handle, "Destroy"));
     if (mock_.create == nullptr || mock_.destroy == nullptr) {
         FI_HILOGE("%{public}s dlsym Create or Destroy failed",
@@ -397,9 +397,9 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
         FI_HILOGE("Cannot load library error:%{public}s", dlerror());
         return RET_ERR;
     }
-    FI_HILOGI("start create pointer");
+    FI_HILOGI("Start create pointer");
     algo_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(algo_.handle, "Create"));
-    FI_HILOGI("start destroy pointer");
+    FI_HILOGI("Start destroy pointer");
     algo_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(algo_.handle, "Destroy"));
     if (algo_.create == nullptr || algo_.destroy == nullptr) {
         FI_HILOGE("%{public}s dlsym Create or Destroy failed",

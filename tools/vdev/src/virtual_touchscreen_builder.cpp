@@ -22,6 +22,8 @@
 #include <getopt.h>
 #include <linux/input.h>
 
+#include "input_manager.h"
+
 #include "devicestatus_define.h"
 #include "display_manager.h"
 #include "fi_log.h"
@@ -34,39 +36,66 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreenBuilder" };
 constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
-int32_t ABS_MAX_X { 720 };
-int32_t ABS_MAX_Y { 1280 };
+int32_t g_absMaxWidth { 720 };
+int32_t g_absMaxHeight { 1280 };
 constexpr int32_t ABS_PRESSURE_MAX { 100 };
 constexpr int32_t ABS_MT_ORIENTATION_MIN { -90 };
 constexpr int32_t ABS_MT_ORIENTATION_MAX { 90 };
 constexpr int32_t ABS_MT_BLOB_ID_MAX { 10 };
 constexpr int32_t ABS_MT_TRACKING_ID_MAX { 9 };
 constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
-constexpr uint32_t SY_OFFSET { 1 };
-constexpr uint32_t TX_OFFSET { 2 };
-constexpr uint32_t TY_OFFSET { 3 };
+constexpr int32_t SY_OFFSET { 1 };
+constexpr int32_t TX_OFFSET { 2 };
+constexpr int32_t TY_OFFSET { 3 };
+constexpr uint32_t IO_FLAG_WIDTH { 6 };
 } // namespace
+
+class PointerEventMonitor final : public MMI::IInputEventConsumer {
+public:
+    PointerEventMonitor() = default;
+    ~PointerEventMonitor() = default;
+
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
+};
+
+void PointerEventMonitor::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return;
+    }
+    MMI::PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        return;
+    }
+    std::cout << "\rcurrent touch position - x: " << std::setw(IO_FLAG_WIDTH) << std::left
+        << pointerItem.GetDisplayX() << "y: " << pointerItem.GetDisplayY() << "            ";
+    std::cout.flush();
+}
 
 VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x6006, 0x6006)
 {
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
-    ABS_MAX_X = display->GetWidth();
-    ABS_MAX_Y = display->GetHeight();
-    AbsInfo absInfos[] { { ABS_X, 0, ABS_MAX_X, 0, 0 },
-    { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
+    CHKPV(display);
+    g_absMaxWidth = display->GetWidth();
+    g_absMaxHeight = display->GetHeight();
+    AbsInfo absInfos[] { { ABS_X, 0, g_absMaxWidth, 0, 0 },
+    { ABS_Y, 0, g_absMaxHeight, 0, 0 },
     { ABS_PRESSURE, 0, ABS_PRESSURE_MAX, 0, 0 },
     { ABS_MT_TOUCH_MAJOR, 0, 1, 0, 0 },
     { ABS_MT_TOUCH_MINOR, 0, 1, 0, 0 },
     { ABS_MT_ORIENTATION, ABS_MT_ORIENTATION_MIN, ABS_MT_ORIENTATION_MAX, 0, 0 },
-    { ABS_MT_POSITION_X, 0, ABS_MAX_X, 0, 0 },
-    { ABS_MT_POSITION_Y, 0, ABS_MAX_Y, 0, 0 },
+    { ABS_MT_POSITION_X, 0, g_absMaxWidth, 0, 0 },
+    { ABS_MT_POSITION_Y, 0, g_absMaxHeight, 0, 0 },
     { ABS_MT_BLOB_ID, 0, ABS_MT_BLOB_ID_MAX, 0, 0 },
     { ABS_MT_TRACKING_ID, 0, ABS_MT_TRACKING_ID_MAX, 0, 0 },
     { ABS_MT_PRESSURE, 0, ABS_PRESSURE_MAX, 0, 0 },
     { ABS_MT_TOOL_TYPE, 0, ABS_TOOL_TYPE_MAX, 0, 0 },
     { ABS_MT_WIDTH_MAJOR, 0, 1, 0, 0 },
     { ABS_MT_WIDTH_MINOR, 0, 1, 0, 0 },
-    { ABS_MT_TOOL_X, 0, ABS_MAX_X, 0, 0 },
+    { ABS_MT_TOOL_X, 0, g_absMaxWidth, 0, 0 },
     { ABS_MT_TOOL_Y, 0, 1, 0, 0 } };
 
     eventTypes_ = { EV_ABS, EV_KEY };
@@ -144,7 +173,7 @@ void VirtualTouchScreenBuilder::Clone()
 {
     CALL_DEBUG_ENTER;
     if (VirtualTouchScreen::GetDevice() != nullptr) {
-        std::cout << "Virtual touchscreen has been mounted." << std::endl;
+        std::cout << "Virtual touchscreen has been mounted" << std::endl;
         return;
     }
 
@@ -152,7 +181,7 @@ void VirtualTouchScreenBuilder::Clone()
     int32_t ret = VirtualDeviceBuilder::ScanFor(
         [](std::shared_ptr<VirtualDevice> vDev) { return ((vDev != nullptr) && vDev->IsTouchscreen()); }, vDevs);
     if (ret != RET_OK) {
-        std::cout << "Failed while scanning for touchscreen." << std::endl;
+        std::cout << "Failed while scanning for touchscreen" << std::endl;
         return;
     }
     auto vDev = VirtualDeviceBuilder::Select(vDevs, "touchscreen");
@@ -174,7 +203,7 @@ void VirtualTouchScreenBuilder::Clone()
         return;
     }
 
-    std::cout << "Clone \'" << vDev->GetName() << "\' successfully." << std::endl;
+    std::cout << "Clone \'" << vDev->GetName() << "\' successfully" << std::endl;
     VirtualDeviceBuilder::Daemonize();
     for (;;) {
         std::this_thread::sleep_for(std::chrono::minutes(1));
@@ -184,10 +213,20 @@ void VirtualTouchScreenBuilder::Clone()
 void VirtualTouchScreenBuilder::Monitor()
 {
     CALL_DEBUG_ENTER;
-    std::cout << "Unsupported." << std::endl;
+    MMI::InputManager* inputMgr = MMI::InputManager::GetInstance();
+    CHKPV(inputMgr);
+    auto monitor = std::make_shared<PointerEventMonitor>();
+    int32_t monitorId = inputMgr->AddMonitor(monitor);
+    if (monitorId < 0) {
+        std::cout << "Failed to add monitor." << std::endl;
+        return;
+    }
+    for (;;) {
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
 }
 
-void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
+void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     int32_t opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:");
@@ -242,12 +281,12 @@ void VirtualTouchScreenBuilder::Act(int argc, char *argv[])
     } while ((opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:")) >= 0);
 }
 
-void VirtualTouchScreenBuilder::ReadDownAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadDownAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
         !Utility::IsInteger(argv[optind + 1])) {
         std::cout << "Require arguments for Option \'-d\'." << std::endl;
         ShowUsage();
@@ -263,12 +302,12 @@ void VirtualTouchScreenBuilder::ReadDownAction(int argc, char *argv[])
     }
 }
 
-void VirtualTouchScreenBuilder::ReadMoveAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadMoveAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind >= argc) || !Utility::IsInteger(argv[optind])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-m\'." << std::endl;
         ShowUsage();
         return;
@@ -300,12 +339,12 @@ void VirtualTouchScreenBuilder::ReadUpAction()
     VirtualTouchScreen::GetDevice()->UpButton(slot);
 }
 
-void VirtualTouchScreenBuilder::ReadMoveToAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadMoveToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
         !Utility::IsInteger(argv[optind + 1])) {
         std::cout << "Invalid arguments for Option \'-M\'." << std::endl;
         ShowUsage();
@@ -321,13 +360,13 @@ void VirtualTouchScreenBuilder::ReadMoveToAction(int argc, char *argv[])
     }
 }
 
-void VirtualTouchScreenBuilder::ReadDragToAction(int argc, char *argv[])
+void VirtualTouchScreenBuilder::ReadDragToAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(optarg) || (optind + TY_OFFSET >= argc) || !Utility::IsInteger(argv[optind]) ||
-        !Utility::IsInteger(argv[optind + SY_OFFSET]) || !Utility::IsInteger(argv[optind + TX_OFFSET]) ||
-        !Utility::IsInteger(argv[optind + TY_OFFSET])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + TY_OFFSET >= argc) ||
+        !Utility::IsInteger(argv[optind]) || !Utility::IsInteger(argv[optind + SY_OFFSET]) ||
+        !Utility::IsInteger(argv[optind + TX_OFFSET]) || !Utility::IsInteger(argv[optind + TY_OFFSET])) {
         std::cout << "Invalid arguments for Option \'-D\'." << std::endl;
         ShowUsage();
         return;

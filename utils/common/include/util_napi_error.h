@@ -57,7 +57,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         napi_create_error(env, nullptr, errorMsg, &businessError); \
         napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
         napi_throw(env, businessError); \
-        FI_HILOGE("Raising exceptions, ErrorCode:%{public}s, ErrorMsg:%{public}s", \
+        FI_HILOGE("Raising exceptions, errorCode:%{public}s, errorMsg:%{public}s", \
             (#code), std::string(msg).c_str()); \
     } while (0)
 
@@ -70,7 +70,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
             if (ret > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \
-                FI_HILOGE("Failed to convert string type to char type, ErrorCode:%{public}s", (#code)); \
+                FI_HILOGE("Failed to convert string type to char type, error code:%{public}s", (#code)); \
             } \
         } \
     } while (0)

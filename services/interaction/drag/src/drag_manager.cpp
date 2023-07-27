@@ -260,10 +260,11 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("Target window drag tid: %{public}d", targetTid);
+    FI_HILOGD("Target window drag tid:%{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
-    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, 1, [this]() {
+    int32_t repeatCount = 1;
+    timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
 }
@@ -496,7 +497,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         std::placeholders::_1));
     monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
     if (monitorId_ <= 0) {
-        FI_HILOGE("Failed to add monitor, Error code:%{public}d", monitorId_);
+        FI_HILOGE("Failed to add monitor, error code:%{public}d", monitorId_);
         return RET_ERR;
     }
 #else
@@ -504,7 +505,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
     auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
     interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, DRAG_PRIORITY, deviceTags);
     if (interceptorId_ <= 0) {
-        FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+        FI_HILOGE("Failed to add interceptor, error code:%{public}d", interceptorId_);
         return RET_ERR;
     }
 #endif // OHOS_DRAG_ENABLE_MONITOR
@@ -566,37 +567,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
-    switch (result) {
-        case DragResult::DRAG_SUCCESS: {
-            if (!hasCustomAnimation) {
-                dragDrawing_.OnDragSuccess();
-            } else {
-                dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDrawingState();
-            }
-            break;
-        }
-        case DragResult::DRAG_FAIL:
-        case DragResult::DRAG_CANCEL: {
-            if (!hasCustomAnimation) {
-                dragDrawing_.OnDragFail();
-            } else {
-                dragDrawing_.DestroyDragWindow();
-                dragDrawing_.UpdateDrawingState();
-            }
-            break;
-        }
-        case DragResult::DRAG_EXCEPTION: {
-            dragDrawing_.DestroyDragWindow();
-            dragDrawing_.UpdateDrawingState();
-            break;
-        }
-        default: {
-            FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
-            break;
-        }
-    }
-    return RET_OK;
+    return HandleDragResult(result, hasCustomAnimation);
 }
 
 int32_t DragManager::OnSetDragWindowVisible(bool visible)
@@ -649,6 +620,42 @@ DragResult DragManager::GetDragResult() const
 {
     CALL_DEBUG_ENTER;
     return dragResult_;
+}
+
+int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation)
+{
+    CALL_DEBUG_ENTER;
+    switch (result) {
+        case DragResult::DRAG_SUCCESS: {
+            if (!hasCustomAnimation) {
+                dragDrawing_.OnDragSuccess();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDrawingState();
+            }
+            break;
+        }
+        case DragResult::DRAG_FAIL:
+        case DragResult::DRAG_CANCEL: {
+            if (!hasCustomAnimation) {
+                dragDrawing_.OnDragFail();
+            } else {
+                dragDrawing_.DestroyDragWindow();
+                dragDrawing_.UpdateDrawingState();
+            }
+            break;
+        }
+        case DragResult::DRAG_EXCEPTION: {
+            dragDrawing_.DestroyDragWindow();
+            dragDrawing_.UpdateDrawingState();
+            break;
+        }
+        default: {
+            FI_HILOGW("Unsupported DragResult type, DragResult:%{public}d", result);
+            break;
+        }
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

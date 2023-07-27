@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,7 @@ void SensorDataCallback::Init()
     FI_HILOGI("SensorDataCallback is initiated");
     std::lock_guard lock(initMutex_);
     if (algorithmThread_ == nullptr) {
-        FI_HILOGI("create algorithem thread");
+        FI_HILOGI("Create algorithem thread");
         algorithmThread_ = std::make_unique<std::thread>(&SensorDataCallback::AlgorithmLoop, this);
     }
 }
@@ -66,7 +66,7 @@ bool SensorDataCallback::Unregister()
     alive_ = false;
     CHKPF(algorithmThread_);
     if (!algorithmThread_->joinable()) {
-        FI_HILOGE("thread join fail");
+        FI_HILOGE("Thread join fail");
         return false;
     }
     sem_post(&sem_);
@@ -92,7 +92,7 @@ bool SensorDataCallback::UnsubscribeSensorEvent(int32_t sensorTypeId, SensorCall
     std::lock_guard lock(callbackMutex_);
     auto callbackIter = algoMap_.find(sensorTypeId);
     if (callbackIter != algoMap_.end()) {
-        FI_HILOGE("erase sensorTypeId:%{public}d", sensorTypeId);
+        FI_HILOGE("Erase sensorTypeId:%{public}d", sensorTypeId);
         algoMap_.erase(sensorTypeId);
     }
     return true;
@@ -131,7 +131,7 @@ bool SensorDataCallback::PopData(int32_t sensorTypeId, AccelData& data)
 {
     CALL_DEBUG_ENTER;
     if (sensorTypeId != SENSOR_TYPE_ID_ACCELEROMETER) {
-        FI_HILOGE("invalid sensorTypeId:%{public}d", sensorTypeId);
+        FI_HILOGE("Invalid sensorTypeId:%{public}d", sensorTypeId);
         return false;
     }
     std::lock_guard lock(dataMutex_);
@@ -150,7 +150,7 @@ static void SensorDataCallbackImpl(SensorEvent *event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
-    FI_HILOGI("SensorDataCallbackImpl sensorTypeId: %{public}d", event->sensorTypeId);
+    FI_HILOGI("SensorDataCallbackImpl sensorTypeId:%{public}d", event->sensorTypeId);
     SENSOR_DATA_CB.PushData(event->sensorTypeId, event->data);
 }
 

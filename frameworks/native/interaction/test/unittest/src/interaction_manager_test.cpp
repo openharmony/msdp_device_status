@@ -58,7 +58,7 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
-const std::string UD_KEY = "Unified data key";
+const std::string UD_KEY { "Unified data key" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 } // namespace

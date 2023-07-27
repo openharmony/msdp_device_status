@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,7 +28,9 @@ config("interaction_config") {
 }
 
 group("interaction_jsapi_group") {
-  deps = [ "${device_status_frameworks_path}/js/napi/interaction/drag:drag" ]
+  deps = [
+    "${device_status_frameworks_path}/js/napi/interaction/drag:dragInteraction",
+  ]
   if (fusion_interaction_coordination) {
     deps += [ "${device_status_frameworks_path}/js/napi/interaction/cooperate:inputdevicecooperate" ]
     deps += [ "${device_status_frameworks_path}/js/napi/interaction/coordination:cooperate" ]

@@ -28,9 +28,9 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualDevice" };
-constexpr size_t DEFAULT_BUF_SIZE = 1024;
-constexpr int32_t MINIMUM_INTERVAL_ALLOWED = 1;
-constexpr int32_t MAXIMUM_INTERVAL_ALLOWED = 100;
+constexpr size_t DEFAULT_BUF_SIZE { 1024 };
+constexpr int32_t MINIMUM_INTERVAL_ALLOWED { 1 };
+constexpr int32_t MAXIMUM_INTERVAL_ALLOWED { 100 };
 } // namespace
 
 VirtualDevice::VirtualDevice(const std::string &node)
@@ -61,9 +61,14 @@ bool VirtualDevice::FindDeviceNode(const std::string &name, std::string &node)
 void VirtualDevice::Execute(const std::string &command, std::vector<std::string> &results)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("Execute command:%{public}s.", command.c_str());
+    char comRealPath[PATH_MAX] = {};
+    if (realpath(command.c_str(), comRealPath) == nullptr) {
+        FI_HILOGE("Invalid command:%{public}s", command.c_str());
+        return;
+    }
+    FI_HILOGD("Execute comRealPath:%{public}s.", comRealPath);
     char buffer[DEFAULT_BUF_SIZE] {};
-    FILE *pin = popen(command.c_str(), "r");
+    FILE *pin = popen(comRealPath, "r");
     if (pin == nullptr) {
         FI_HILOGE("Failed to popen command.");
         return;

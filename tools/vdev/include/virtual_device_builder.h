@@ -33,8 +33,8 @@ namespace DeviceStatus {
 using json = nlohmann::json;
 class VirtualDeviceBuilder {
 public:
-    explicit VirtualDeviceBuilder(const std::string &name, uint16_t bustype, uint16_t vendor, uint16_t product);
-    explicit VirtualDeviceBuilder(const std::string &name, std::shared_ptr<VirtualDevice> vDev);
+    VirtualDeviceBuilder(const std::string &name, uint16_t bustype, uint16_t vendor, uint16_t product);
+    VirtualDeviceBuilder(const std::string &name, std::shared_ptr<VirtualDevice> vDev);
     virtual ~VirtualDeviceBuilder();
     DISALLOW_COPY_AND_MOVE(VirtualDeviceBuilder);
     bool SetUp();
