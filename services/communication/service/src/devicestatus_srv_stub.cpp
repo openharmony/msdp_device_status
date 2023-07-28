@@ -335,15 +335,15 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (dragData.shadowInfo.x > 0 || dragData.shadowInfo.y > 0 ||
-        dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth() ||
-        dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight()) {
+    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
+        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
+        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
         FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             dragData.shadowInfo.x, dragData.shadowInfo.y);
         return RET_ERR;
     }
-    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
-        dragData.displayX < 0 || dragData.displayY < 0) {
+    if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
+        (dragData.displayX < 0) || (dragData.displayY < 0)) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
@@ -362,8 +362,8 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
     CALL_DEBUG_ENTER;
     int32_t result;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
+    if ((result < static_cast<int32_t>(DragResult::DRAG_SUCCESS)) ||
+        (result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION))) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
@@ -436,9 +436,9 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessagePar
     shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
     READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (shadowInfo.x > 0 || shadowInfo.y > 0 ||
-        shadowInfo.x < -shadowInfo.pixelMap->GetWidth() ||
-        shadowInfo.y < -shadowInfo.pixelMap->GetHeight()) {
+    if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+        (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
+        (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
         FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             shadowInfo.x, shadowInfo.y);
         return RET_ERR;

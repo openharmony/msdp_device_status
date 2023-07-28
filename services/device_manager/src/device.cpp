@@ -332,16 +332,16 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
     while (std::getline(cfgFile, tmp)) {
         Utility::RemoveSpace(tmp);
         size_t pos = tmp.find('#');
-        if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
+        if ((pos != tmp.npos) && (pos != COMMENT_SUBSCRIPT)) {
             FI_HILOGE("File format is error");
             cfgFile.close();
             return RET_ERR;
         }
-        if (tmp.empty() || tmp.front() == '#') {
+        if (tmp.empty() || (tmp.front() == '#')) {
             continue;
         }
         pos = tmp.find('=');
-        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
+        if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
             FI_HILOGE("Find config item error");
             cfgFile.close();
             return RET_ERR;
