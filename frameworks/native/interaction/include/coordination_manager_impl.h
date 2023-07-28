@@ -68,7 +68,7 @@ private:
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
     mutable std::mutex mtx_;
     int32_t userData_ { 0 };
-    bool isListeningProcess_ { false };
+    std::atomic_bool isListeningProcess_ { false };
     IClientPtr client_ { nullptr };
 };
 } // namespace DeviceStatus

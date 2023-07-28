@@ -52,7 +52,7 @@ std::mutex DelayedSpSingleton<T>::mutex_;
 template<typename T>
 sptr<T> DelayedSpSingleton<T>::GetInstance()
 {
-    if (!instance_) {
+    if (instance_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = new T();
@@ -66,7 +66,7 @@ template<typename T>
 void DelayedSpSingleton<T>::DestroyInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (instance_) {
+    if (instance_ != nullptr) {
         instance_.clear();
         instance_ = nullptr;
     }

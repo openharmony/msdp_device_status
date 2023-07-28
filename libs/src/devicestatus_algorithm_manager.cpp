@@ -138,7 +138,7 @@ ErrCode AlgoMgr::Enable(Type type)
     }
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
-            if (!still_) {
+            if (still_ == nullptr) {
                 FI_HILOGE("still_ is nullptr");
                 still_ = std::make_shared<AlgoAbsoluteStill>();
                 still_->Init(type);
@@ -148,7 +148,7 @@ ErrCode AlgoMgr::Enable(Type type)
             break;
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
-            if (!horizontalPosition_) {
+            if (horizontalPosition_ == nullptr) {
                 FI_HILOGE("horizontalPosition_ is nullptr");
                 horizontalPosition_ = std::make_shared<AlgoHorizontal>();
                 horizontalPosition_->Init(type);
@@ -158,7 +158,7 @@ ErrCode AlgoMgr::Enable(Type type)
             break;
         }
         case Type::TYPE_VERTICAL_POSITION: {
-            if (!verticalPosition_) {
+            if (verticalPosition_ == nullptr) {
                 FI_HILOGE("verticalPosition_ is nullptr");
                 verticalPosition_ = std::make_shared<AlgoVertical>();
                 verticalPosition_->Init(type);
@@ -187,7 +187,7 @@ ErrCode AlgoMgr::Disable(Type type)
     }
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
-            if (still_) {
+            if (still_ != nullptr) {
                 FI_HILOGD("still_ is not nullptr");
                 still_->Unsubscribe(type);
                 still_ = nullptr;
@@ -195,7 +195,7 @@ ErrCode AlgoMgr::Disable(Type type)
             break;
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
-            if (horizontalPosition_) {
+            if (horizontalPosition_ != nullptr) {
                 FI_HILOGD("horizontalPosition_ is not nullptr");
                 horizontalPosition_->Unsubscribe(type);
                 horizontalPosition_ = nullptr;
@@ -203,7 +203,7 @@ ErrCode AlgoMgr::Disable(Type type)
             break;
         }
         case Type::TYPE_VERTICAL_POSITION: {
-            if (verticalPosition_) {
+            if (verticalPosition_ != nullptr) {
                 FI_HILOGD("verticalPosition_ is not nullptr");
                 verticalPosition_->Unsubscribe(type);
                 verticalPosition_ = nullptr;

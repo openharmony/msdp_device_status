@@ -62,7 +62,7 @@ private:
 
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
         coordinationListener_ {};
-    bool isListeningProcess_ { false };
+    std::atomic_bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

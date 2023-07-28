@@ -239,7 +239,7 @@ void Client::OnConnected()
     CALL_DEBUG_ENTER;
     FI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
-    if (funConnected_) {
+    if (funConnected_ != nullptr) {
         funConnected_(*this);
     }
     if (hasClient_ && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
