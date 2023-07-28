@@ -294,7 +294,7 @@ void Client::OnMsgHandler(const StreamClient& client, NetPacket& pkt)
         FI_HILOGE("Unknown msg id:%{public}d", id);
         return;
     }
-    auto ret = (*callback)(client, pkt);
+    int32_t ret = (*callback)(client, pkt);
     if (ret < 0) {
         FI_HILOGE("Msg handling failed, id:%{public}d, ret:%{public}d", id, ret);
         return;
