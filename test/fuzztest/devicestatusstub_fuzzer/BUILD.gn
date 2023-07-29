@@ -67,12 +67,12 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
     "${device_status_utils_path}:devicestatus_util",
   ]
 
+  external_deps = deps_ex
+
   if (defined(fusion_interaction_motion_drag) &&
       fusion_interaction_motion_drag) {
-    deps += [ "${motion_service_path}:motion_drag" ]
+    external_deps += [ "${motion_service_path}:motion_drag" ]
   }
-
-  external_deps = deps_ex
 }
 
 group("fuzztest") {
