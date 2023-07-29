@@ -77,7 +77,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     if (iter == mockCallCount_.end()) {
         auto ret = mockCallCount_.emplace(type, 0);
         if (!ret.second) {
-            FI_HILOGE("Insert the Container failed");
+            FI_HILOGW("type is duplicated");
             return RET_ERR;
         }
     } else {
@@ -108,7 +108,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
     if (iter == algoCallCount_.end()) {
         auto ret =  algoCallCount_.emplace(type, 0);
         if (!ret.second) {
-            FI_HILOGE("Insert the Container failed");
+            FI_HILOGW("type is duplicated");
             return RET_ERR;
         }
     } else {
@@ -309,7 +309,7 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
     }
     auto ret = deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
     if (!ret.second) {
-        FI_HILOGE("Insert the Container failed");
+        FI_HILOGW("type is duplicated");
         return data;
     }
     notifyManagerFlag_ = true;
