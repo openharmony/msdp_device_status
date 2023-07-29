@@ -75,10 +75,10 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     iMock_->Enable(type);
     auto iter = mockCallCount_.find(type);
     if (iter == mockCallCount_.end()) {
-       auto ret =  mockCallCount_.emplace(type, 0);
-       if(!ret.second){
-           return RET_ERR;
-       }
+        auto ret =  mockCallCount_.emplace(type, 0);
+        if(!ret.second){
+            return RET_ERR;
+        }
     } else {
         iter->second++;
     }
@@ -105,10 +105,10 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
 
     auto iter = algoCallCount_.find(type);
     if (iter == algoCallCount_.end()) {
-       auto ret =  algoCallCount_.emplace(type, 0);
-       if(!ret.second){
-           return RET_ERR;
-       }
+        auto ret =  algoCallCount_.emplace(type, 0);
+        if(!ret.second){
+            return RET_ERR;
+        }
     } else {
         iter->second++;
     }
