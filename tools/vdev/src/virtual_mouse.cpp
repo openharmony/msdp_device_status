@@ -38,7 +38,6 @@ constexpr int32_t MINIMUM_INTERVAL { 8 };
 constexpr double FAST_STEP { 5.0 };
 constexpr double TWICE_FAST_STEP { 2.0 * FAST_STEP };
 constexpr double MAXIMUM_STEP_LENGTH { 5000.0 };
-constexpr double PRECISION { 0.1 };
 constexpr double STEP_UNIT { 1.0 };
 } // namespace
 
@@ -169,8 +168,8 @@ void VirtualMouse::Move(int32_t dx, int32_t dy)
     }
     double total = std::min(delta, MAXIMUM_STEP_LENGTH);
     double step = FAST_STEP;
-
-    while (total > PRECISION) {
+    int32_t count = static_cast<int32_t>(ceil(total / FAST_STEP));
+    while (count-- > 0) {
         if (total < TWICE_FAST_STEP) {
             if (total > FAST_STEP) {
                 step = total / HALF_VALUE;
