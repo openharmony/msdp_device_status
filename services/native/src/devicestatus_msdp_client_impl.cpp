@@ -76,7 +76,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     auto iter = mockCallCount_.find(type);
     if (iter == mockCallCount_.end()) {
         auto ret = mockCallCount_.emplace(type, 0);
-        if(!ret.second){
+        if (!ret.second) {
             FI_HILOGE("Insert the Container failed");
             return RET_ERR;
         }
@@ -107,7 +107,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
     auto iter = algoCallCount_.find(type);
     if (iter == algoCallCount_.end()) {
         auto ret =  algoCallCount_.emplace(type, 0);
-        if(!ret.second){
+        if (!ret.second) {
             FI_HILOGE("Insert the Container failed");
             return RET_ERR;
         }
@@ -308,9 +308,9 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
         }
     }
     auto ret = deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
-    if(!ret.second){
+    if (!ret.second) {
         FI_HILOGE("Insert the Container failed");
-        return data;  
+        return data;
     }
     notifyManagerFlag_ = true;
     return data;
