@@ -386,7 +386,7 @@ int32_t DeviceStatusService::InitDelegateTasks()
         FI_HILOGE("The delegate task init failed");
         return RET_ERR;
     }
-    auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
+    int32_t ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
     if (ret != RET_OK) {
         FI_HILOGE("AddEpoll error ret:%{public}d", ret);
     }
