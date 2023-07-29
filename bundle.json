@@ -41,7 +41,8 @@
         "device_info_manager",
         "dsoftbus",
         "graphic_2d",
-        "common"
+        "common",
+        "motion"
       ],
       "third_party": [
         "cJSON",
@@ -71,29 +72,41 @@
       },
       "inner_kits": [
         {
-            "name": "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
-            "header": {
-              "header_files": [
-                "include/stationary_data.h",
-                "include/stationary_callback.h",
-                "include/stationary_manager.h",
-                "interaction/include/coordination_message.h",
-                "interaction/include/drag_data.h",
-                "interaction/include/i_coordination_listener.h",
-                "interaction/include/i_drag_listener.h",
-                "interaction/include/interaction_manager.h"
-              ],
-              "header_base": "//base/msdp/device_status/interfaces/innerkits"
+          "name": "//base/msdp/device_status/interfaces/innerkits:devicestatus_client",
+          "header": {
+            "header_files": [
+              "include/stationary_data.h",
+              "include/stationary_callback.h",
+              "include/stationary_manager.h",
+              "interaction/include/coordination_message.h",
+              "interaction/include/drag_data.h",
+              "interaction/include/i_coordination_listener.h",
+              "interaction/include/i_drag_listener.h",
+              "interaction/include/interaction_manager.h"
+            ],
+            "header_base": "//base/msdp/device_status/interfaces/innerkits"
           }
         },
         {
           "name": "//base/msdp/device_status/services/interaction/drag:interaction_drag",
           "header": {
             "header_files": [
-              "i_drag_animation.h",
-              "drag_drawing.h"
+              "interaction/drag/include/i_drag_animation.h",
+              "interaction/drag/include/drag_drawing.h",
+              "interaction/drag/include/drag_data_manager.h",
+              "context/include/i_context.h"
             ],
-            "header_base": "//base/msdp/device_status/services/interaction/drag/include/"
+            "header_base": "//base/msdp/device_status/services"
+          }
+        },
+        {
+          "name": "//base/msdp/device_status/services/interaction/coordination:coordination",
+          "header": {
+            "header_files": [
+              "interaction/coordination/include/coordination_softbus_adapter.h",
+              "interaction/coordination/include/coordination_sm.h"
+            ],
+            "header_base": "//base/msdp/device_status/services"
           }
         }
       ],
