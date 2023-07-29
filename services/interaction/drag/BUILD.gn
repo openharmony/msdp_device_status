@@ -19,13 +19,6 @@ config("interaction_drag_public_config") {
     "include",
     "${device_status_service_path}/context/include",
   ]
-
-  if (defined(fusion_interaction_motion_drag) &&
-      fusion_interaction_motion_drag) {
-    include_dirs += [ "${motion_service_path}/native/include" ]
-  }
-
-  defines = device_status_default_defines
 }
 
 ohos_shared_library("interaction_drag") {
