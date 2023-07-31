@@ -267,6 +267,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
+    CHKPV(notifyPUllUpCallback_);
+    notifyPUllUpCallback_();
 }
 
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -591,6 +593,13 @@ void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
     CALL_DEBUG_ENTER;
     CHKPV(callback);
     stateChangedCallback_ = callback;
+}
+
+void DragManager::RegisterNotifyPullUp(std::function<void(void)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    notifyPUllUpCallback_ = callback;
 }
 
 void DragManager::StateChangedNotify(DragState state)

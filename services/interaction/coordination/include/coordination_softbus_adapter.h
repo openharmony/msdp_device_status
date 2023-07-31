@@ -38,6 +38,7 @@ public:
         MIN_ID = 0,
         DRAGGING_DATA = 1,
         STOPDRAG_DATA = 2,
+        IS_PULL_UP = 3,
         MAX_ID = 50
     };
     struct DataPacket {
