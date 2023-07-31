@@ -29,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragMan
 int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
-    if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
+    if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
@@ -41,15 +41,15 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if (dragData.shadowInfo.x > 0 || dragData.shadowInfo.y > 0 ||
-        dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth() ||
-        dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight()) {
+    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
+        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
+        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
         FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             dragData.shadowInfo.x, dragData.shadowInfo.y);
         return RET_ERR;
     }
-    if (dragData.dragNum <= 0 || dragData.buffer.size() > MAX_BUFFER_SIZE ||
-        dragData.displayX < 0 || dragData.displayY < 0) {
+    if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
+        (dragData.displayX < 0) || (dragData.displayY < 0)) {
         FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
@@ -90,8 +90,8 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
     }
-    if (result < static_cast<int32_t>(DragResult::DRAG_SUCCESS) ||
-        result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION)) {
+    if ((result < static_cast<int32_t>(DragResult::DRAG_SUCCESS)) ||
+        (result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION))) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
@@ -180,9 +180,9 @@ int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPR(shadowInfo.pixelMap, RET_ERR);
-    if (shadowInfo.x > 0 || shadowInfo.y > 0 ||
-        shadowInfo.x < -shadowInfo.pixelMap->GetWidth() ||
-        shadowInfo.y < -shadowInfo.pixelMap->GetHeight()) {
+    if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+        (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
+        (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
         FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             shadowInfo.x, shadowInfo.y);
         return RET_ERR;

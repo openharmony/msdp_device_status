@@ -506,7 +506,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
             return;
         }
         FI_HILOGI("Message:%{public}d", dataPacket->messageId);
-        if (dataPacket->messageId == DRAGGING_DATA || dataPacket->messageId == STOPDRAG_DATA) {
+        if ((dataPacket->messageId == DRAGGING_DATA) || (dataPacket->messageId == STOPDRAG_DATA)) {
             CHKPV(registerRecvMap_[dataPacket->messageId]);
             registerRecvMap_[dataPacket->messageId](dataPacket->data, dataPacket->dataLen);
         }
@@ -518,7 +518,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
 void CoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
 {
     FI_HILOGD("dataLen:%{public}d", dataLen);
-    if (sessionId < 0 || data == nullptr || dataLen <= 0) {
+    if ((sessionId < 0) || (data == nullptr) || (dataLen <= 0)) {
         FI_HILOGE("Param check failed");
         return;
     }

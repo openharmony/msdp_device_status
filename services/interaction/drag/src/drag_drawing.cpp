@@ -215,7 +215,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
-    if (style < DragCursorStyle::DEFAULT || style > DragCursorStyle::MOVE) {
+    if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
