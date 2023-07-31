@@ -66,7 +66,7 @@ int32_t DeviceStatusAgent::UnsubscribeAgentEvent(Type type, ActivityEvent event)
 }
 
 void DeviceStatusAgent::RegisterServiceEvent(Type type, ActivityEvent event,
-    const ReportLatencyNs latency)
+    ReportLatencyNs latency)
 {
     CALL_DEBUG_ENTER;
     callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
