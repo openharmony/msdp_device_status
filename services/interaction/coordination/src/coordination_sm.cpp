@@ -727,6 +727,12 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
             onlineDevice_.erase(it);
         }
     }
+    if (currentState_ == CoordinationState::STATE_IN && sinkNetworkId_ == networkId) {
+        COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::SESSION_CLOSED);
+    }
+    if (currentState_ == CoordinationState::STATE_OUT && remoteNetworkId_ == networkId) {
+        COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::SESSION_CLOSED);
+    }
 }
 
 std::string CoordinationSM::GetDeviceCoordinationState(CoordinationState value) const
