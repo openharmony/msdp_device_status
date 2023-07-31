@@ -75,7 +75,11 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     iMock_->Enable(type);
     auto iter = mockCallCount_.find(type);
     if (iter == mockCallCount_.end()) {
-        mockCallCount_.emplace(type, 0);
+        auto ret = mockCallCount_.emplace(type, 0);
+        if (!ret.second) {
+            FI_HILOGW("type is duplicated");
+            return RET_ERR;
+        }
     } else {
         iter->second++;
     }
@@ -102,7 +106,11 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
 
     auto iter = algoCallCount_.find(type);
     if (iter == algoCallCount_.end()) {
-        algoCallCount_.emplace(type, 0);
+        auto ret =  algoCallCount_.emplace(type, 0);
+        if (!ret.second) {
+            FI_HILOGW("type is duplicated");
+            return RET_ERR;
+        }
     } else {
         iter->second++;
     }
@@ -299,7 +307,11 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
             return data;
         }
     }
-    deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
+    auto ret = deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
+    if (!ret.second) {
+        FI_HILOGW("type is duplicated");
+        return data;
+    }
     notifyManagerFlag_ = true;
     return data;
 }

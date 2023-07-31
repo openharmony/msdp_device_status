@@ -14,6 +14,13 @@
 import("//build/ohos.gni")
 import("../../../device_status.gni")
 
+config("interaction_drag_public_config") {
+  include_dirs = [
+    "include",
+    "${device_status_service_path}/context/include",
+  ]
+}
+
 ohos_shared_library("interaction_drag") {
   include_dirs = [
     "include",
@@ -31,6 +38,8 @@ ohos_shared_library("interaction_drag") {
   ]
 
   defines = device_status_default_defines
+
+  public_configs = [ ":interaction_drag_public_config" ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
