@@ -287,6 +287,9 @@ void Device::CheckPointers()
         caps_.set(DEVICE_CAP_POINTER);
         FI_HILOGD("This is mouse");
     }
+    if (name_ == "M-Pencil Mouse") {
+        caps_.set(DEVICE_CAP_POINTER, 0);
+    }
 }
 
 void Device::CheckKeys()
