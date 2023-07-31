@@ -579,6 +579,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 DeactivateCoordination(isUnchained_);
                 return;
             }
+            COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
             break;
         }
         case CoordinationState::STATE_OUT: {
@@ -594,6 +595,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 DeactivateCoordination(isUnchained_);
                 return;
             }
+            COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
             break;
         }
         default:

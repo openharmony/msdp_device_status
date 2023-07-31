@@ -65,6 +65,7 @@ public:
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
     int32_t NotifyFilterAdded(const std::string &remoteNetworkId);
+    void ConfigTcpAlive();
 
 private:
     CoordinationSoftbusAdapter() = default;
@@ -84,6 +85,7 @@ private:
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
     std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvMap_;
+    int32_t sessionId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
