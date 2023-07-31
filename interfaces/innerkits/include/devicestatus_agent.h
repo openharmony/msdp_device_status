@@ -46,13 +46,13 @@ public:
     };
 
     int32_t SubscribeAgentEvent(const Type type, const ActivityEvent event, const ReportLatencyNs latency,
-        const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
+        const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent> agentEvent);
     int32_t UnsubscribeAgentEvent(const Type type, const ActivityEvent event);
     friend class DeviceStatusAgentCallback;
 
 private:
-    void RegisterServiceEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency);
-    void UnRegisterServiceEvent(const Type& type, const ActivityEvent& event);
+    void RegisterServiceEvent(const Type type, const ActivityEvent event, const ReportLatencyNs latency);
+    void UnRegisterServiceEvent(const Type type, const ActivityEvent event);
 
     sptr<IRemoteDevStaCallback> callback_ { nullptr };
     std::shared_ptr<DeviceStatusAgentEvent> agentEvent_ { nullptr };

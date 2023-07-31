@@ -65,8 +65,8 @@ int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const Type type, const Activity
     return ERR_INVALID_VALUE;
 }
 
-void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEvent& event,
-    const ReportLatencyNs& latency)
+void DeviceStatusAgent::RegisterServiceEvent(const Type type, const ActivityEvent event,
+    const ReportLatencyNs latency)
 {
     CALL_DEBUG_ENTER;
     callback_ = new (std::nothrow) DeviceStatusAgentCallback(shared_from_this());
@@ -74,8 +74,8 @@ void DeviceStatusAgent::RegisterServiceEvent(const Type& type, const ActivityEve
     StationaryManager::GetInstance()->SubscribeCallback(type, event, latency, callback_);
 }
 
-void DeviceStatusAgent::UnRegisterServiceEvent(const Type& type,
-    const ActivityEvent& event)
+void DeviceStatusAgent::UnRegisterServiceEvent(const Type type,
+    const ActivityEvent event)
 {
     CALL_DEBUG_ENTER;
     StationaryManager::GetInstance()->UnsubscribeCallback(type, event, callback_);
