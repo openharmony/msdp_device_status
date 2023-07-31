@@ -27,7 +27,7 @@ config("fusion_device_profile_binding_public_config") {
 ohos_shared_library("fusion_device_profile_binding") {
   sources = [
     "src/fusion_device_profile.cpp",
-    "src/fusion_device_profile_adapter.cpp"
+    "src/fusion_device_profile_adapter.cpp",
   ]
 
   deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]
