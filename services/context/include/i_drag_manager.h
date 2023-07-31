@@ -41,6 +41,7 @@ public:
     virtual DragResult GetDragResult() const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
+    virtual void RegisterNotifyPullUp(std::function<void(void)> callback) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
