@@ -45,9 +45,9 @@ public:
         std::weak_ptr<DeviceStatusAgent> agent_;
     };
 
-    int32_t SubscribeAgentEvent(const Type& type, const ActivityEvent& event, const ReportLatencyNs& latency,
+    int32_t SubscribeAgentEvent(const Type type, const ActivityEvent event, const ReportLatencyNs latency,
         const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent);
-    int32_t UnsubscribeAgentEvent(const Type& type, const ActivityEvent& event);
+    int32_t UnsubscribeAgentEvent(const Type type, const ActivityEvent event);
     friend class DeviceStatusAgentCallback;
 
 private:

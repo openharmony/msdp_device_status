@@ -37,10 +37,10 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
     agent->agentEvent_->OnEventResult(devicestatusData);
 }
 
-int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
-    const ActivityEvent& event,
-    const ReportLatencyNs& latency,
-    const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent>& agentEvent)
+int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type type,
+    const ActivityEvent event,
+    const ReportLatencyNs latency,
+    const std::shared_ptr<DeviceStatusAgent::DeviceStatusAgentEvent> agentEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(agentEvent, ERR_INVALID_VALUE);
@@ -54,7 +54,7 @@ int32_t DeviceStatusAgent::SubscribeAgentEvent(const Type& type,
     return RET_OK;
 }
 
-int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const Type& type, const ActivityEvent& event)
+int32_t DeviceStatusAgent::UnsubscribeAgentEvent(const Type type, const ActivityEvent event)
 {
     if (type > Type::TYPE_INVALID && type <= Type::TYPE_LID_OPEN && event > ActivityEvent::EVENT_INVALID
         && event <= ActivityEvent::ENTER_EXIT) {
