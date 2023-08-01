@@ -71,7 +71,7 @@ ohos_fuzztest("DevicestatusstubFuzzTest") {
 
   if (defined(fusion_interaction_motion_drag) &&
       fusion_interaction_motion_drag) {
-    external_deps += [ "${motion_service_path}:motion_drag" ]
+    external_deps += [ "motion:motion_drag" ]
   }
 }
 
