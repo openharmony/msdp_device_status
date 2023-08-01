@@ -117,7 +117,10 @@ void VirtualDevice::GetInputDeviceNodes(std::map<std::string, std::string> &node
                 while (std::isalnum(item[tpos])) {
                     ++tpos;
                 }
-                nodes.emplace(name, item.substr(spos, tpos - spos));
+                auto ref = nodes.emplace(name, item.substr(spos, tpos - spos));
+                if (!ref.second) {
+                    FI_HILOGW("name is duplicated");
+                }
                 name.clear();
             }
         }
