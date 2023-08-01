@@ -44,30 +44,30 @@ pub enum CDmAuthForm {
 /// struct CDmDeviceInfo
 #[repr(C)]
 pub struct CDmDeviceInfo {
-    /// The device id property of the `CDmDeviceInfo`.
+    /// Device Id of the device.
     pub device_id: *const c_char,
-    /// The device name property of the `CDmDeviceInfo`.
+    /// Device name of the device.
     pub device_name: *const c_char,
-    /// The device type id property of the `CDmDeviceInfo`.
+    /// Device type of the device.
     pub device_type_id: u16,
-    /// The network id property of the `CDmDeviceInfo`.
+    /// NetworkId of the device.
     pub network_id: *const c_char,
-    /// The range property of the `CDmDeviceInfo`.
+    /// The distance of discovered device.
     pub range: i32,
-    /// The auth form property of the `CDmDeviceInfo`.
+    /// Device authentication form.
     pub auth_form: CDmAuthForm,
 }
 
 /// struct CRegisterDevStateCallback
 #[repr(C)]
 pub struct CRegisterDevStateCallback {
-    /// The `on_device_online` form property of the `CRegisterDevStateCallback`.
+    /// Device online callback of the device.
     pub on_device_online: OnRegisterDevState,
-    /// The `on_device_changed` form property of the `CRegisterDevStateCallback`.
+    /// Device changed callback of the device.
     pub on_device_changed: OnRegisterDevState,
-    /// The `on_device_ready` form property of the `CRegisterDevStateCallback`.
+    /// Device ready callback of the device.
     pub on_device_ready: OnRegisterDevState,
-    /// The `on_device_offline` form property of the `CRegisterDevStateCallback`.
+    /// Device offline callback of the device.
     pub on_device_offline: OnRegisterDevState,
 }
 
