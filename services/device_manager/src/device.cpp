@@ -280,10 +280,8 @@ void Device::CheckPointers()
             FI_HILOGD("This is touch device");
         }
     }
-    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) &&
-        !caps_.test(DEVICE_CAP_POINTER) &&
-        !caps_.test(DEVICE_CAP_JOYSTICK) &&
-        hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
+    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) && !caps_.test(DEVICE_CAP_POINTER) &&
+        !caps_.test(DEVICE_CAP_JOYSTICK) && hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
         caps_.set(DEVICE_CAP_POINTER);
         FI_HILOGD("This is mouse");
     }

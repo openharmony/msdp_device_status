@@ -111,7 +111,7 @@ ohos_shared_library("devicestatus_service") {
 
   if (defined(fusion_interaction_motion_drag) &&
       fusion_interaction_motion_drag) {
-    external_deps += [ "${motion_service_path}:motion_drag" ]
+    external_deps += [ "motion:motion_drag" ]
   }
 
   subsystem_name = "${device_status_subsystem_name}"
@@ -149,7 +149,7 @@ ohos_static_library("devicestatus_static_service") {
 
   if (defined(fusion_interaction_motion_drag) &&
       fusion_interaction_motion_drag) {
-    external_deps += [ "${motion_service_path}:motion_drag" ]
+    external_deps += [ "motion:motion_drag" ]
   }
 
   subsystem_name = "${device_status_subsystem_name}"
