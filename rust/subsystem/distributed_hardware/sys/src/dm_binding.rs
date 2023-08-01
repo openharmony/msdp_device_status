@@ -104,6 +104,8 @@ pub unsafe extern "C" fn on_device_online(device_info_ptr: *const CDmDeviceInfo)
             return;
         }
     };
+
+    CDestroyDmDeviceInfo(device_info_ptr);
 }
 
 /// Callback when the device changed.
@@ -140,4 +142,5 @@ extern "C" {
         extra: *const c_char,
         on_register_dev_state: CRegisterDevStateCallback,
     ) -> bool;
+    pub fn CDestroyDmDeviceInfo(device_info: *const CDmDeviceInfo);
 }

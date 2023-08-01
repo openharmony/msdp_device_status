@@ -147,3 +147,11 @@ bool CRegisterDevState(const char* pkgName, const char* extra, CRegisterDevState
     }
     return true;
 }
+
+void CDestroyDmDeviceInfo(CDmDeviceInfo* deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(deviceInfo);
+    deviceInfo = nullptr;
+    delete deviceInfo;
+}

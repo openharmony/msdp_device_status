@@ -33,6 +33,8 @@ struct CRegisterDevStateCallback;
 bool CInitDeviceManager(const char* pkgName, void (*callback)());
 bool CRegisterDevState(const char* pkgName, const char* extra, CRegisterDevStateCallback callbacks);
 
+void CDestroyDmDeviceInfo(CDmDeviceInfo* deviceInfo);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
