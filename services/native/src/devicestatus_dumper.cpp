@@ -280,8 +280,8 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
         if (appInfos.insert(appInfo).second) {
-            auto ret = appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
-            if(!ret.second){
+            auto [_, ret] = appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
+            if (!ret) {
                 FI_HILOGW("type is duplicated");     
             }   
         }
