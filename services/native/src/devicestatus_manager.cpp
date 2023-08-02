@@ -186,7 +186,10 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
             FI_HILOGI("No found set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
-        listenerMap_.insert(std::make_pair(type, listeners));
+        auto [_, ret] = listenerMap_.insert(std::make_pair(type, listeners));
+        if (!ret) {
+            FI_HILOGW("type is duplicated");
+        }
     } else {
         FI_HILOGI("callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());
         auto iter = listenerMap_[dtTypeIter->first].find(callback);
