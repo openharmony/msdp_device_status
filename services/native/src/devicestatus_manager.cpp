@@ -188,7 +188,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
         }
         auto [_, ret] = listenerMap_.insert(std::make_pair(type, listeners));
         if (!ret) {
-            FI_HILOGW("type is duplicated");  
+            FI_HILOGW("type is duplicated");
         }
     } else {
         FI_HILOGI("callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());
