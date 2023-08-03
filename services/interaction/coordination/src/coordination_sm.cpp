@@ -605,8 +605,8 @@ void CoordinationSM::UpdateState(CoordinationState state)
 
 CoordinationState CoordinationSM::GetCurrentCoordinationState() const
 {
-    std::lock_guard<std::mutex> guard(mutex_);
-    return currentState_;
+    CoordinationState state = currentState_.load();
+    return state;
 }
 
 void CoordinationSM::UpdatePreparedDevices(const std::string &remoteNetworkId, const std::string &originNetworkId)
