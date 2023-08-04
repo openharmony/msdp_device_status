@@ -578,6 +578,10 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
         FI_HILOGW("Currently in motion dragging");
         return RET_OK;
     }
+    if (dragState_ == DragState::STOP) {
+        FI_HILOGW("No drag instance running, can not set drag window visible");
+        return RET_ERR;
+    }
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
     return RET_OK;

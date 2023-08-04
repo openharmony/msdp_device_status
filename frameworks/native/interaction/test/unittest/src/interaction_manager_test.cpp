@@ -977,10 +977,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, Te
     CALL_TEST_DEBUG;
     int32_t ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     FI_HILOGD("ret:%{public}d", ret);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(ret, RET_ERR);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(false);
     FI_HILOGD("ret:%{public}d", ret);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(ret, RET_ERR);
 }
 
 /**
