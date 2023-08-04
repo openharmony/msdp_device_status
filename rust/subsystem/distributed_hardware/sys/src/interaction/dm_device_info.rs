@@ -26,7 +26,10 @@ impl DmDeviceInfo {
     }
 
     /// Extract a raw `CDmDeviceInfo` pointer from this wrapper
+    /// 
     /// # Safety
+    /// 
+    /// Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
     pub unsafe fn as_inner(&self) -> *const CDmDeviceInfo {
         self.0
     }

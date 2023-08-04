@@ -148,6 +148,19 @@ bool CRegisterDevState(const char* pkgName, const char* extra, CRegisterDevState
     return true;
 }
 
+bool CUnRegisterDevState(const char* pkgName, const char* extra)
+{
+    CALL_DEBUG_ENTER;
+    std::string sPkgName(pkgName);
+    std::string sExtra(extra);
+    int32_t ret = DIS_HARDWARE.UnRegisterDevStateCallback(sPkgName, sExtra);
+    if (ret != 0) {
+        FI_HILOGE("UnRegister devStateCallback failed, ret:%{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
 void CDestroyDmDeviceInfo(CDmDeviceInfo* deviceInfo)
 {
     CALL_DEBUG_ENTER;

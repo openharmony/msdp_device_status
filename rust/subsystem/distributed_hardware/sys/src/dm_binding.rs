@@ -142,5 +142,6 @@ extern "C" {
         extra: *const c_char,
         on_register_dev_state: CRegisterDevStateCallback,
     ) -> bool;
+    pub fn CUnRegisterDevState(pkg_name: *const c_char, extra: *const c_char) -> bool;
     pub fn CDestroyDmDeviceInfo(device_info: *const CDmDeviceInfo);
 }

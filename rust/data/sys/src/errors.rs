@@ -24,6 +24,12 @@ pub enum FusionErrorCode {
     InvalidParam,
 }
 
+impl From<NulError> for FusionErrorCode {
+    fn from(_: NulError) -> Self {
+        FusionErrorCode::Fail
+    }
+}
+
 impl From<FusionErrorCode> for i32 {
     fn from(value: FusionErrorCode) -> Self
     {
