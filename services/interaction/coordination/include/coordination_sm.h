@@ -177,7 +177,7 @@ private:
     std::string remoteNetworkId_;
     std::string sinkNetworkId_;
     bool isUnchained_ { false };
-    CoordinationState currentState_ { CoordinationState::STATE_FREE };
+    std::atomic<CoordinationState> currentState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
     std::vector<std::string> onlineDevice_;
