@@ -23,7 +23,7 @@ mod errors;
 mod ipc;
 mod plugin_manager;
 
-pub use errors::{ FusionErrorCode, FusionResult };
+pub use errors::{ FusionErrorCode, FusionResult, FusionInteractionResult };
 pub use ipc::basic::{ BasicParamID, AllocSocketPairParam };
 pub use ipc::coordination::{ GeneralCoordinationParam, StartCoordinationParam,
     StopCoordinationParam, GetCoordinationStateParam };
