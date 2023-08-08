@@ -98,6 +98,7 @@ private:
     bool HasMouseButton() const;
     bool HasJoystickAxesOrButtons() const;
     void CheckPointers();
+    void CheckPencilMouse();
     void CheckKeys();
     std::string MakeConfigFileName() const;
     int32_t ReadConfigFile(const std::string &filePath);
