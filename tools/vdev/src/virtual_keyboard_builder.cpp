@@ -200,7 +200,7 @@ void VirtualKeyboardBuilder::ReadDownAction()
     }
 
     int32_t key = std::atoi(optarg);
-    std::cout << "[keyboard] down key: [" << key << std::endl;
+    std::cout << "[keyboard] down key: [" << key << "]" << std::endl;
     VirtualKeyboard::GetDevice()->Down(key);
 }
 
@@ -215,7 +215,7 @@ void VirtualKeyboardBuilder::ReadUpAction()
     }
 
     int32_t key = std::atoi(optarg);
-    std::cout << "[keyboard] release key: [" << key << std::endl;
+    std::cout << "[keyboard] release key: [" << key << "]" << std::endl;
     VirtualKeyboard::GetDevice()->Up(key);
 }
 

@@ -61,14 +61,13 @@ bool VirtualDevice::FindDeviceNode(const std::string &name, std::string &node)
 void VirtualDevice::Execute(const std::string &command, std::vector<std::string> &results)
 {
     CALL_DEBUG_ENTER;
-    char comRealPath[PATH_MAX] = {};
-    if (realpath(command.c_str(), comRealPath) == nullptr) {
-        FI_HILOGE("Invalid command:%{public}s", command.c_str());
+    if (command.empty()) {
+        FI_HILOGE("Variable command is empty");
         return;
     }
-    FI_HILOGD("Execute comRealPath:%{public}s.", comRealPath);
+    FI_HILOGD("Execute command:%{public}s.", command.c_str());
     char buffer[DEFAULT_BUF_SIZE] {};
-    FILE *pin = popen(comRealPath, "r");
+    FILE *pin = popen(command.c_str(), "r");
     if (pin == nullptr) {
         FI_HILOGE("Failed to popen command.");
         return;
