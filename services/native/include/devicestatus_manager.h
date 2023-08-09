@@ -62,7 +62,7 @@ private:
             return left->AsObject() < right->AsObject();
         }
     };
-    static constexpr int32_t arg4_ { 4 };
+    static constexpr int32_t argSize_ { TYPE_MAX };
 
     const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
@@ -72,7 +72,7 @@ private:
     std::map<Type, std::set<const sptr<IRemoteDevStaCallback>, classcomp>> listenerMap_;
     int32_t type_ { -1 };
     int32_t event_ { -1 };
-    int32_t arrs_[arg4_] {};
+    int32_t arrs_[argSize_] {};
 };
 } // namespace DeviceStatus
 } // namespace Msdp

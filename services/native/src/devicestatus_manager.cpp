@@ -53,6 +53,10 @@ Data DeviceStatusManager::GetLatestDeviceStatusData(Type type)
 {
     CALL_DEBUG_ENTER;
     Data data = {type, OnChangedValue::VALUE_EXIT};
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
+        FI_HILOGE(":GetLatestDeviceStatusData type_:%{public}d is error", type);
+        return data;
+    }
     if (msdpImpl_ == nullptr) {
         FI_HILOGE("GetObserverData func is nullptr, return default");
         data.value = OnChangedValue::VALUE_INVALID;
@@ -173,8 +177,16 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     CHKPV(callback);
     event_ = event;
     type_ = type;
+    if ((type_ <= TYPE_INVALID) || (type_ >= TYPE_MAX)) {
+        FI_HILOGE("Subscribe type_:%{public}d is error", type_);
+        return;
+    }
+    if ((event_ < ENTER) || (event_ > ENTER_EXIT)) {
+        FI_HILOGE("Subscribe event_:%{public}d is error", event_);
+        return;
+    }
     arrs_ [type_] = event_;
-    FI_HILOGI("arr save:%{public}d, event:%{public}d", type_, event);
+    FI_HILOGI("type_:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     FI_HILOGI("listenerMap_.size:%{public}zu", listenerMap_.size());
     auto object = callback->AsObject();
@@ -211,6 +223,14 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
+        FI_HILOGE("Unsubscribe type_:%{public}d is error", type);
+        return;
+    }
+    if ((event < ENTER) || (event > ENTER_EXIT)) {
+        FI_HILOGE("Unsubscribe event_:%{public}d is error", event);
+        return;
+    }
     auto object = callback->AsObject();
     CHKPV(object);
     FI_HILOGE("listenerMap_.size:%{public}zu, arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
