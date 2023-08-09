@@ -68,6 +68,7 @@ constexpr int32_t MOUSE_ICON_INDEX { 2 };
 constexpr size_t TOUCH_NODE_MIN_COUNT { 2 };
 constexpr size_t MOUSE_NODE_MIN_COUNT { 3 };
 constexpr double ONETHOUSAND { 1000.0 };
+constexpr float DEFAULT_SCALING { 1.0f };
 constexpr float BEGIN_ALPHA { 1.0f };
 constexpr float END_ALPHA { 0.0f };
 constexpr float BEGIN_SCALE { 1.0f };
@@ -116,12 +117,17 @@ float GetScaling()
     if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
         display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        if (display == nullptr) {
+            FI_HILOGE("Get display info failed, display is nullptr");
+            return DEFAULT_SCALING;
+        }
     }
-    CHKPR(display, RET_ERR);
+
     int32_t deviceDpi = display->GetDpi();
     FI_HILOGD("displayId:%{public}d, deviceDpi:%{public}d", g_drawingInfo.displayId, deviceDpi);
     if (deviceDpi < -std::numeric_limits<float>::epsilon()) {
-        return 0.0f;
+        FI_HILOGE("Invalid deviceDpi:%{public}d", deviceDpi);
+        return DEFAULT_SCALING;
     }
     return (1.0 * deviceDpi * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
 }
