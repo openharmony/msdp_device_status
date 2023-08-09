@@ -28,6 +28,7 @@
 #include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -843,7 +844,8 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     event->sess = sess;
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
-    if (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT) {
+    if (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT ||
+        (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_FREE && !COOR_DEV_MGR->HasLocalPointerDevice())) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);

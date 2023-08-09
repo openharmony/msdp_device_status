@@ -156,6 +156,9 @@ public:
     void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
     void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
     void RegisterNotifyDragCancel(std::function<void(void)> callback);
+    void OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
+    void OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -169,6 +172,9 @@ private:
     void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
     void NotifyMouseLocation(int32_t x, int32_t y);
     void SetPointerVisible();
+    void OnPostInterceptorKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
+    void OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     std::shared_ptr<ICoordinationState> GetCurrentState();
 
 private:
@@ -177,7 +183,7 @@ private:
     std::string remoteNetworkId_;
     std::string sinkNetworkId_;
     bool isUnchained_ { false };
-    std::atomic<CoordinationState> currentState_ { CoordinationState::STATE_FREE };
+    CoordinationState currentState_ { CoordinationState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
     std::vector<std::string> onlineDevice_;
@@ -196,6 +202,8 @@ private:
     std::function<void(int32_t, int32_t)> mouseLocationCallback_;
     std::function<void(void)> notifyDragCancelCallback_;
     std::map<CoordinationState, std::shared_ptr<ICoordinationState>> coordinationStates_;
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
+    std::shared_ptr<CoordinationEventHandler> eventHandler_ { nullptr };
 };
 
 #define DIS_HARDWARE DistributedHardware::DeviceManager::GetInstance()
