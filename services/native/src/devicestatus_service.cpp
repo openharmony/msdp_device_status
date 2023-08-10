@@ -845,7 +845,8 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     event->msgId = MessageId::COORDINATION_MESSAGE;
     event->userData = userData;
     if (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_OUT ||
-        (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_FREE && !COOR_DEV_MGR->HasLocalPointerDevice())) {
+        (COOR_SM->GetCurrentCoordinationState() == CoordinationState::STATE_FREE &&
+        !COOR_DEV_MGR->HasLocalPointerDevice())) {
         FI_HILOGW("It is currently worn out");
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
