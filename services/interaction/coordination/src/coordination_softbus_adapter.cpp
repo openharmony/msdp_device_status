@@ -607,7 +607,7 @@ void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
     if (GetSessionSide(sessionId) != 0) {
         channelStatusMap_.erase(deviceId);
     }
-    COOR_SM->Reset(deviceId);
+    COOR_SM->OnSoftbusSessionClosed(deviceId);
     sessionId_ = -1;
 }
 
