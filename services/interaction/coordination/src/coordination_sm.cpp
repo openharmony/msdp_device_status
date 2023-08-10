@@ -73,6 +73,21 @@ void CoordinationSM::Init()
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
+void CoordinationSM::OnSoftbusSessionClosed(const std::string &NetworkId)
+{
+    CALL_INFO_TRACE;
+    CHKPV(eventHandler_);
+    std::string taskName = "process_coordinition_reset";
+    std::function<void()> handlePFunc =
+        std::bind(&CoordinationSM::OnReset, this, NetworkId);
+    eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
+}
+
+void CoordinationSM::OnReset(const std::string &NetworkId)
+{
+    CALL_INFO_TRACE;
+    Reset(NetworkId);
+}
 
 void CoordinationSM::OnSessionLost(SessionPtr session)
 {
@@ -875,28 +890,31 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
 
 void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
+    CHKPV(eventHandler_);
+    CHKPV(keyEvent);
     std::string taskName = "process_interceptor_keyevent";
     std::function<void()> handlePFunc =
         std::bind(&CoordinationSM::OnPostInterceptorKeyEvent, this, keyEvent);
-    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
 }
 
 void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
+    CHKPV(eventHandler_);
+    CHKPV(pointerEvent);
     std::string taskName = "process_interceptor_pointerevent";
     std::function<void()> handlePFunc =
         std::bind(&CoordinationSM::OnPostInterceptorPointerEvent, this, pointerEvent);
-    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
 }
 
 void CoordinationSM::OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
+    CHKPV(eventHandler_);
+    CHKPV(pointerEvent);
     std::string taskName = "process_monitor_pointerevent";
     std::function<void()> handlePFunc =
         std::bind(&CoordinationSM::OnPostMonitorInputEvent, this, pointerEvent);
-    CHKPV(eventHandler_);
     eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
 }
 

@@ -159,6 +159,7 @@ public:
     void OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnSoftbusSessionClosed(const std::string &NetworkId);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -175,6 +176,7 @@ private:
     void OnPostInterceptorKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    void OnReset(const std::string &NetworkId);
     std::shared_ptr<ICoordinationState> GetCurrentState();
 
 private:
