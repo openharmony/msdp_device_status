@@ -78,9 +78,9 @@ void CoordinationSM::OnSoftbusSessionClosed(const std::string &NetworkId)
     CALL_INFO_TRACE;
     CHKPV(eventHandler_);
     std::string taskName = "process_coordinition_reset";
-    std::function<void()> handlePFunc =
+    std::function<void()> handleFunc =
         std::bind(&CoordinationSM::OnReset, this, NetworkId);
-    eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
+    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 }
 
 void CoordinationSM::OnReset(const std::string &NetworkId)
@@ -893,9 +893,9 @@ void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyE
     CHKPV(eventHandler_);
     CHKPV(keyEvent);
     std::string taskName = "process_interceptor_keyevent";
-    std::function<void()> handlePFunc =
+    std::function<void()> handleFunc =
         std::bind(&CoordinationSM::OnPostInterceptorKeyEvent, this, keyEvent);
-    eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
+    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 }
 
 void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -903,9 +903,9 @@ void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     CHKPV(eventHandler_);
     CHKPV(pointerEvent);
     std::string taskName = "process_interceptor_pointerevent";
-    std::function<void()> handlePFunc =
+    std::function<void()> handleFunc =
         std::bind(&CoordinationSM::OnPostInterceptorPointerEvent, this, pointerEvent);
-    eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
+    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 }
 
 void CoordinationSM::OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
@@ -913,9 +913,9 @@ void CoordinationSM::OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> poin
     CHKPV(eventHandler_);
     CHKPV(pointerEvent);
     std::string taskName = "process_monitor_pointerevent";
-    std::function<void()> handlePFunc =
+    std::function<void()> handleFunc =
         std::bind(&CoordinationSM::OnPostMonitorInputEvent, this, pointerEvent);
-    eventHandler_->ProxyPostTask(handlePFunc, taskName, 0);
+    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 }
 
 void CoordinationSM::OnPostInterceptorKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
