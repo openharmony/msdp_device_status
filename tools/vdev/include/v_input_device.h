@@ -51,8 +51,8 @@ inline constexpr size_t NBYTES(size_t nbits)
 
 class VInputDevice final {
 public:
-    enum Capability {
-        DEVICE_CAP_KEYBOARD,
+    enum class Capability {
+        DEVICE_CAP_KEYBOARD = 0,
         DEVICE_CAP_TOUCH,
         DEVICE_CAP_POINTER,
         DEVICE_CAP_TABLET_TOOL,
@@ -104,6 +104,7 @@ private:
     void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
         uint8_t *whichBitMask) const;
     void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
+    void PrintCapsDevice() const;
 
 private:
     int32_t fd_ { -1 };
@@ -115,7 +116,7 @@ private:
     std::string uniq_;
     std::string dhid_;
     std::string networkId_;
-    std::bitset<DEVICE_CAP_MAX> caps_;
+    std::bitset<static_cast<size_t>(VInputDevice::Capability::DEVICE_CAP_MAX)> caps_;
     uint8_t evBitmask_[NBYTES(EV_MAX)] {};
     uint8_t keyBitmask_[NBYTES(KEY_MAX)] {};
     uint8_t absBitmask_[NBYTES(ABS_MAX)] {};
@@ -208,17 +209,17 @@ inline std::string VInputDevice::GetUniq() const
 
 inline bool VInputDevice::IsMouse() const
 {
-    return caps_.test(DEVICE_CAP_POINTER);
+    return caps_.test(static_cast<size_t>(VInputDevice::Capability::DEVICE_CAP_POINTER));
 }
 
 inline bool VInputDevice::IsKeyboard() const
 {
-    return caps_.test(DEVICE_CAP_KEYBOARD);
+    return caps_.test(static_cast<size_t>(VInputDevice::Capability::DEVICE_CAP_KEYBOARD));
 }
 
 inline bool VInputDevice::IsTouchscreen() const
 {
-    return caps_.test(DEVICE_CAP_TOUCH);
+    return caps_.test(static_cast<size_t>(VInputDevice::Capability::DEVICE_CAP_TOUCH));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
