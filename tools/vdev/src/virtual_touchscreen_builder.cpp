@@ -286,8 +286,8 @@ void VirtualTouchScreenBuilder::ReadDownAction(int32_t argc, char *argv[])
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
-        !Utility::IsInteger(argv[optind + 1])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) ||
+        !Utility::IsInteger(argv[optind]) || !Utility::IsInteger(argv[optind + 1])) {
         std::cout << "Require arguments for Option \'-d\'." << std::endl;
         ShowUsage();
         return;

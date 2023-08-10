@@ -224,7 +224,7 @@ int32_t VirtualMouse::MoveTo(int32_t x, int32_t y)
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(MINIMUM_INTERVAL));
         }
-        FI_HILOGD("current position: (%{public}d, %{public}d)", monitor->GetX(), monitor->GetY());
+        FI_HILOGD("Current position: (%{public}d, %{public}d)", monitor->GetX(), monitor->GetY());
         if (x == monitor->GetX() && y == monitor->GetY()) {
             ret = RET_OK;
             goto CLEANUP;
