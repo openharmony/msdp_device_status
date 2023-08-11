@@ -52,7 +52,7 @@ inline constexpr size_t NBYTES(size_t nbits)
 class VInputDevice final {
 public:
     enum Capability {
-        DEVICE_CAP_KEYBOARD,
+        DEVICE_CAP_KEYBOARD = 0,
         DEVICE_CAP_TOUCH,
         DEVICE_CAP_POINTER,
         DEVICE_CAP_TABLET_TOOL,
@@ -104,6 +104,7 @@ private:
     void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
         uint8_t *whichBitMask) const;
     void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
+    void PrintCapsDevice() const;
 
 private:
     int32_t fd_ { -1 };

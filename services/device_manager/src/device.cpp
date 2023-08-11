@@ -17,13 +17,13 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <regex>
 #include <sstream>
-
-#include <sys/ioctl.h>
 
 #include <openssl/sha.h>
 #include <securec.h>
@@ -235,6 +235,24 @@ bool Device::HasJoystickAxesOrButtons() const
     return false;
 }
 
+void Device::PrintCapsDevice() const
+{
+    std::map<int32_t, std::string> deviceComparisonTable {
+        {DEVICE_CAP_KEYBOARD, "keyboard"},
+        {DEVICE_CAP_TOUCH, "touch device"},
+        {DEVICE_CAP_POINTER, "pointer"},
+        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
+        {DEVICE_CAP_TABLET_PAD, "pad"},
+        {DEVICE_CAP_GESTURE, "gesture"},
+        {DEVICE_CAP_SWITCH, "switch"},
+        {DEVICE_CAP_JOYSTICK, "joystick"}};
+    for (int32_t i = 0; i < DEVICE_CAP_MAX; ++i) {
+        if (caps_[i] == 1) {
+            FI_HILOGD("This is %{public}s", deviceComparisonTable[i].c_str());
+        }
+    }
+}
+
 void Device::CheckPointers()
 {
     CALL_DEBUG_ENTER;
@@ -251,41 +269,32 @@ void Device::CheckPointers()
     if (hasAbsCoords) {
         if (stylusOrPen) {
             caps_.set(DEVICE_CAP_TABLET_TOOL);
-            FI_HILOGD("This is tablet tool");
         } else if (fingerButNoPen && !isDirect) {
             caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is touchpad");
         } else if (hasMouseBtn) {
             caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is mouse");
         } else if (hasTouch || isDirect) {
             caps_.set(DEVICE_CAP_TOUCH);
-            FI_HILOGD("This is touch device");
         } else if (hasJoystickFeature) {
             caps_.set(DEVICE_CAP_JOYSTICK);
-            FI_HILOGD("This is joystick");
         }
     } else if (hasJoystickFeature) {
         caps_.set(DEVICE_CAP_JOYSTICK);
-        FI_HILOGD("This is joystick");
     }
     if (hasMtCoords) {
         if (stylusOrPen) {
             caps_.set(DEVICE_CAP_TABLET_TOOL);
-            FI_HILOGD("This is tablet tool");
         } else if (fingerButNoPen && !isDirect) {
             caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is touchpad");
         } else if (hasTouch || isDirect) {
             caps_.set(DEVICE_CAP_TOUCH);
-            FI_HILOGD("This is touch device");
         }
     }
     if (!caps_.test(DEVICE_CAP_TABLET_TOOL) && !caps_.test(DEVICE_CAP_POINTER) &&
         !caps_.test(DEVICE_CAP_JOYSTICK) && hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
         caps_.set(DEVICE_CAP_POINTER);
-        FI_HILOGD("This is mouse");
     }
+    PrintCapsDevice();
 }
 
 void Device::CheckPencilMouse()
