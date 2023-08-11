@@ -22,9 +22,9 @@
 
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <regex>
 #include <sstream>
-#include <map>
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"

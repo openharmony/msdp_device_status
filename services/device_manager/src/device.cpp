@@ -21,9 +21,9 @@
 
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <regex>
 #include <sstream>
-#include <map>
 
 #include <openssl/sha.h>
 #include <securec.h>
