@@ -273,7 +273,7 @@ void VInputDevice::PrintCapsDevice() const
         {DEVICE_CAP_KEYBOARD, "keyboard"},
         {DEVICE_CAP_TOUCH, "touch device"},
         {DEVICE_CAP_POINTER, "pointer"},
-        {DEVICE_CAP_TABLET_TOOL,"tablet tool"},
+        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
         {DEVICE_CAP_TABLET_PAD, "pad"},
         {DEVICE_CAP_GESTURE, "gesture"},
         {DEVICE_CAP_SWITCH, "switch"},
