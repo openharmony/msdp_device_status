@@ -55,17 +55,17 @@ void InteractionManagerImpl::InitMsgHandler()
     CALL_DEBUG_ENTER;
     Client::MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::COORDINATION_ADD_LISTENER,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationListener, &coordinationManagerImpl_)},
-        {MessageId::COORDINATION_MESSAGE,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationMessage, &coordinationManagerImpl_)},
-        {MessageId::COORDINATION_GET_STATE,
-            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
+        { MessageId::COORDINATION_ADD_LISTENER,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationListener, &coordinationManagerImpl_) },
+        { MessageId::COORDINATION_MESSAGE,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationMessage, &coordinationManagerImpl_) },
+        { MessageId::COORDINATION_GET_STATE,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_) },
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-        {MessageId::DRAG_NOTIFY_RESULT,
-            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
-        {MessageId::DRAG_STATE_LISTENER,
-            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)}
+        { MessageId::DRAG_NOTIFY_RESULT,
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_) },
+        { MessageId::DRAG_STATE_LISTENER,
+            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_) }
     };
     CHKPV(client_);
     for (auto &it : funs) {

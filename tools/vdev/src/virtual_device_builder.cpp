@@ -266,7 +266,7 @@ bool VirtualDeviceBuilder::SetUp()
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
         FI_HILOGE("Failed to setup uinput device");
         if (close(fd_) != 0) {
-            FI_HILOGE("close error:%{public}s", strerror(errno));
+            FI_HILOGE("Close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
         return false;
@@ -281,7 +281,7 @@ void VirtualDeviceBuilder::Close()
             FI_HILOGE("ioctl error:%{public}s", strerror(errno));
         }
         if (close(fd_) != 0) {
-            FI_HILOGE("close error:%{public}s", strerror(errno));
+            FI_HILOGE("Close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }

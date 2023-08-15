@@ -55,7 +55,7 @@ static std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            FI_HILOGE("call sprintf_s failed, ret:%{public}d", ret);
+            FI_HILOGE("Call sprintf_s failed, ret:%{public}d", ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';

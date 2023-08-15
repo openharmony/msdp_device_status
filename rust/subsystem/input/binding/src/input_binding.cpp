@@ -63,7 +63,7 @@ int32_t CGetPointerAction(const CPointerEvent* cPointerEvent)
     CHKPR(cPointerEvent, RET_ERR);
     CHKPR(cPointerEvent->event, RET_ERR);
     auto ret = cPointerEvent->event->GetPointerAction();
-    FI_HILOGD("action: %{public}d", ret);
+    FI_HILOGD("action:%{public}d", ret);
     return ret;
 }
 

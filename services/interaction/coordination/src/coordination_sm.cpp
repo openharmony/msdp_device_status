@@ -328,7 +328,7 @@ void CoordinationSM::StartPointerEventFilter()
     }
     filterId_ =
         MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
-    if (0 > filterId_) {
+    if (filterId_ < 0) {
         FI_HILOGE("Add Event Filter Failed");
     }
     filter->UpdateCurrentFilterId(filterId_);
