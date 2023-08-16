@@ -61,8 +61,7 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallEnablePromiseWork, uv_qos_default);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork, uv_qos_default);
     } else {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallEnableAsyncWork, uv_qos_default);
     }

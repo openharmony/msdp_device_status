@@ -57,11 +57,9 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallPreparePromiseWork, uv_qos_default);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallPrepareAsyncWork, uv_qos_default);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
