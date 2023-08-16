@@ -60,7 +60,7 @@ protected:
     void SetMinimumInterval(int32_t interval);
 
 private:
-    static void Execute(const std::string &command, std::vector<std::string> &results);
+    static void Execute(std::vector<std::string> &results);
     static void GetInputDeviceNodes(std::map<std::string, std::string> &nodes);
 
 private:
