@@ -161,7 +161,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    if ((!preparedNetworkId_.first.empty()) && (!preparedNetworkId_.second.empty())) {
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if ((networkId == preparedNetworkId_.first) || (networkId == preparedNetworkId_.second)) {
             if (currentState_ != CoordinationState::STATE_FREE) {
                 D_INPUT_ADAPTER->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
@@ -182,7 +182,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
         SetPointerVisible();
         return;
     }
-    if ((COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_)) == networkId) {
+    if (COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_) == networkId) {
         Reset();
         SetPointerVisible();
     }
@@ -353,7 +353,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         FI_HILOGE("Posting async task failed");
     }
 
-    if ((!isSuccess) || (currentState_ == CoordinationState::STATE_IN)) {
+    if (!isSuccess || (currentState_ == CoordinationState::STATE_IN)) {
         isStarting_ = false;
         return;
     }
@@ -402,7 +402,7 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         Reset(true);
         SetPointerVisible();
     }
-    if ((!preparedNetworkId_.first.empty()) && (!preparedNetworkId_.second.empty()) && isUnchained_) {
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The sink preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
             preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
@@ -448,7 +448,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
         } else if (currentState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
-            if ((!originNetworkId.empty()) && (remoteNetworkId != originNetworkId)) {
+            if (!originNetworkId.empty() && (remoteNetworkId != originNetworkId)) {
                 COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
             }
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
@@ -494,7 +494,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
             FI_HILOGI("Current state is free");
         }
     }
-    if ((!preparedNetworkId_.first.empty()) && (!preparedNetworkId_.second.empty()) && isUnchained_) {
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The local preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
             preparedNetworkId_.first.c_str(), preparedNetworkId_.second.c_str());
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
