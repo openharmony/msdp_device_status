@@ -170,11 +170,10 @@ bool DeviceStatusService::Init()
         FI_HILOGE("OnStart init fail");
         return false;
     }
-    if (EpollCreate(MAX_EVENT_SIZE) < 0) {
+    if (EpollCreate() != RET_OK) {
         FI_HILOGE("Create epoll failed");
         return false;
     }
-
     if (InitDelegateTasks() != RET_OK) {
         FI_HILOGE("Delegate tasks init failed");
         goto INIT_FAIL;
@@ -347,7 +346,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev {};
     ev.events = EPOLLIN;
     ev.data.ptr = eventData;
-    if (EpollCtl(fd, EPOLL_CTL_ADD, ev, -1) < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_ADD, ev) != RET_OK) {
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
@@ -368,7 +367,7 @@ int32_t DeviceStatusService::DelEpoll(EpollEventType type, int32_t fd)
         return RET_ERR;
     }
     struct epoll_event ev {};
-    if (EpollCtl(fd, EPOLL_CTL_DEL, ev, -1) < 0) {
+    if (EpollCtl(fd, EPOLL_CTL_DEL, ev) != RET_OK) {
         FI_HILOGE("DelEpoll failed");
         return RET_ERR;
     }
