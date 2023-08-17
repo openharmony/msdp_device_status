@@ -88,6 +88,42 @@ ohos_unittest("DeviceStatusAgentTest") {
   ]
 }
 
+ohos_unittest("DragDataManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
+
+  sources = [ "src/drag_data_manager_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_service_path}/interaction/drag:interaction_drag",
+    "//third_party/libxml2:xml2",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "graphic_2d:libcomposer",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "ipc:ipc_single",
+    "udmf:udmf_client",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = []
@@ -95,5 +131,6 @@ group("unittest") {
   deps += [
     ":DeviceStatusAgentTest",
     ":test_devicestatus_service",
+    ":DragDataManagerTest",
   ]
 }

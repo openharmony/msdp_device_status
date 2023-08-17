@@ -60,11 +60,6 @@ DragCursorStyle DragDataManager::GetDragStyle() const
     return dragStyle_;
 }
 
-std::u16string DragDataManager::GetDragMessage() const
-{
-    return dragMessage_;
-}
-
 DragData DragDataManager::GetDragData() const
 {
     return dragData_;
