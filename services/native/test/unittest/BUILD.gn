@@ -22,9 +22,12 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "${device_status_root_path}/libs/interface",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
     "${device_status_service_path}/delegate_task/include",
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/communication/service/include",
+    "${device_status_service_path}/interaction/drag/src/include",
+    "${device_status_utils_path}/include",
   ]
 }
 
