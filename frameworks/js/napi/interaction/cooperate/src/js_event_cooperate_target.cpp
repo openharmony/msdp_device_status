@@ -89,10 +89,9 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallStartPromiseWork, uv_qos_user_initiated);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallStartPromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallStartAsyncWork, uv_qos_user_initiated);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallStartAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
@@ -144,11 +143,9 @@ void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> 
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallGetStatePromiseWork, uv_qos_default);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallGetStatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallGetStateAsyncWork, uv_qos_default);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallGetStateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
@@ -262,7 +259,7 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &deviceId, 
         item->data.deviceDescriptor = deviceId;
         work->data = static_cast<void*>(&item);
         int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            EmitCoordinationMessageEvent, uv_qos_user_initiated);
+            EmitCoordinationMessageEvent, uv_qos_default);
         if (result != 0) {
             FI_HILOGE("uv_queue_work_with_qos failed");
             JsUtilCooperate::DeletePtr<uv_work_t*>(work);

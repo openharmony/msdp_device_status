@@ -84,11 +84,9 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallActivatePromiseWork, uv_qos_user_initiated);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            CallActivateAsyncWork, uv_qos_user_initiated);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
@@ -255,7 +253,7 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
         int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
-            EmitCoordinationMessageEvent, uv_qos_user_initiated);
+            EmitCoordinationMessageEvent, uv_qos_default);
         if (result != 0) {
             FI_HILOGE("uv_queue_work_with_qos failed");
             item->DecStrongRef(nullptr);

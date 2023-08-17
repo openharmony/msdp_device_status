@@ -116,7 +116,7 @@ void JsDragManager::OnDragMessage(DragState state)
         CHKPV(work);
         item->state = state;
         work->data = static_cast<void*>(&item);
-        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t* work) {}, CallDragMsg, uv_qos_user_initiated);
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t* work) {}, CallDragMsg, uv_qos_default);
         if (result != 0) {
             FI_HILOGE("uv_queue_work_with_qos failed");
             DeletePtr<uv_work_t*>(work);
