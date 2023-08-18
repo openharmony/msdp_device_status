@@ -598,6 +598,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 return;
             }
             COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
+            preparedNetworkId_ = std::make_pair("", "");
             break;
         }
         case CoordinationState::STATE_OUT: {
@@ -1086,6 +1087,7 @@ void CoordinationSM::SetUnchainStatus(bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     isUnchained_ = isUnchained;
+    isStopping_ = false;
 }
 
 void CoordinationSM::NotifyChainRemoved()
