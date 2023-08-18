@@ -672,10 +672,12 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     AddSessionDeletedCallback(pid, std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
+    auto session = GetSession(GetClientFd(pid));
+    CHKPR(session, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
+        std::bind(&DragManager::StartDrag, &dragMgr_, std::cref(dragData), session));
     if (ret != RET_OK) {
-        FI_HILOGE("On start drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -684,9 +686,9 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopDrag, this, result, hasCustomAnimation));
+        std::bind(&DragManager::StopDrag, &dragMgr_, result, hasCustomAnimation));
     if (ret != RET_OK) {
-        FI_HILOGE("On stop drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -908,27 +910,6 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
-    CHKPR(sess, RET_ERR);
-    int32_t ret = dragMgr_.StartDrag(dragData, sess);
-    if (ret != RET_OK) {
-        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimation)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = dragMgr_.StopDrag(result, hasCustomAnimation);
-    if (ret != RET_OK) {
-        FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
