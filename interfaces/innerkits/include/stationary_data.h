@@ -99,14 +99,14 @@ typedef struct DeviceStatusJsonData {
 }DeviceStatusJsonD;
 
 static DeviceStatusJsonD DeviceStatusJson[] = {
-    {Type::TYPE_ABSOLUTE_STILL, "absoluteStill"},
-    {Type::TYPE_HORIZONTAL_POSITION, "horizontalPosition"},
-    {Type::TYPE_VERTICAL_POSITION, "verticalPosition"},
-    {Type::TYPE_STILL, "still"},
-    {Type::TYPE_RELATIVE_STILL, "relativeStill"},
-    {Type::TYPE_CAR_BLUETOOTH, "carBluetooth"},
-    {Type::TYPE_LID_OPEN, "LID_OPEN"},
-    {Type::TYPE_MAX, "MAX"}
+    { Type::TYPE_ABSOLUTE_STILL, "absoluteStill" },
+    { Type::TYPE_HORIZONTAL_POSITION, "horizontalPosition" },
+    { Type::TYPE_VERTICAL_POSITION, "verticalPosition" },
+    { Type::TYPE_STILL, "still" },
+    { Type::TYPE_RELATIVE_STILL, "relativeStill" },
+    { Type::TYPE_CAR_BLUETOOTH, "carBluetooth" },
+    { Type::TYPE_LID_OPEN, "LID_OPEN" },
+    { Type::TYPE_MAX, "MAX" }
 };
 } // namespace DeviceStatus
 } // namespace Msdp

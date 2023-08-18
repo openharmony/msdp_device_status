@@ -238,14 +238,15 @@ bool Device::HasJoystickAxesOrButtons() const
 void Device::PrintCapsDevice() const
 {
     std::map<int32_t, std::string> deviceComparisonTable {
-        {DEVICE_CAP_KEYBOARD, "keyboard"},
-        {DEVICE_CAP_TOUCH, "touch device"},
-        {DEVICE_CAP_POINTER, "pointer"},
-        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
-        {DEVICE_CAP_TABLET_PAD, "pad"},
-        {DEVICE_CAP_GESTURE, "gesture"},
-        {DEVICE_CAP_SWITCH, "switch"},
-        {DEVICE_CAP_JOYSTICK, "joystick"}};
+        { DEVICE_CAP_KEYBOARD, "keyboard" },
+        { DEVICE_CAP_TOUCH, "touch device" },
+        { DEVICE_CAP_POINTER, "pointer" },
+        { DEVICE_CAP_TABLET_TOOL, "tablet tool" },
+        { DEVICE_CAP_TABLET_PAD, "pad" },
+        { DEVICE_CAP_GESTURE, "gesture" },
+        { DEVICE_CAP_SWITCH, "switch" },
+        { DEVICE_CAP_JOYSTICK, "joystick" }
+    };
     for (int32_t i = 0; i < DEVICE_CAP_MAX; ++i) {
         if (caps_[i] == 1) {
             FI_HILOGD("This is %{public}s", deviceComparisonTable[i].c_str());
