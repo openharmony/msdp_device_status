@@ -132,10 +132,10 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
     CALL_INFO_TRACE;
     startDeviceDhid_ = "";
     remoteNetworkId_ = "";
-    currentState_ = CoordinationState::STATE_FREE;
-    if (adjustAbsolutionLocation) {
+    if (adjustAbsolutionLocation && currentState_ != CoordinationState::STATE_FREE) {
         SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
     }
+    currentState_ = CoordinationState::STATE_FREE;
     isStarting_ = false;
     isStopping_ = false;
     RemoveInterceptor();
