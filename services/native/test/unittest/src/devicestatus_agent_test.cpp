@@ -70,7 +70,7 @@ bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest001, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest001 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -90,7 +90,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest001, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest002, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest002 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -119,7 +119,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest002, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest003, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest003 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent1 =
@@ -148,7 +148,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest003, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest004, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest004 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -168,7 +168,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest004, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest005 start");
+    CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
     int32_t ret = g_agent1->SubscribeAgentEvent(Type::TYPE_INVALID, ActivityEvent::ENTER_EXIT,
@@ -187,7 +187,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest006 start");
+    CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
     int32_t ret = g_agent1->SubscribeAgentEvent(static_cast<Type>(10), ActivityEvent::ENTER_EXIT,
@@ -206,7 +206,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest007 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -232,7 +232,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest008 start");
+    CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent = nullptr;
     int32_t ret = g_agent1->SubscribeAgentEvent(Type::TYPE_STILL, ActivityEvent::ENTER_EXIT,
         ReportLatencyNs::LONG, agentEvent);
@@ -247,7 +247,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest009 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_HORIZONTAL_POSITION;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -279,7 +279,7 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
  */
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAgentTest010 start");
+    CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
     Type type = g_agentTest;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
