@@ -17,6 +17,7 @@
 #define DRAG_DATA_MAMAGER_TEST_H
 
 #include <gtest/gtest.h>
+
 #include "drag_data_manager.h"
 
 namespace OHOS {
