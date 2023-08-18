@@ -15,7 +15,6 @@
 
 #include "drag_data_manager_test.h"
 #include "fi_log.h"
-#include "stationary_manager.h"
 
 namespace OHOS {
 namespace Msdp {
