@@ -103,27 +103,16 @@ ohos_unittest("DragDataManagerTest") {
   ]
 
   deps = [
-    "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/drag:interaction_drag",
     "${device_status_utils_path}:devicestatus_util",
     "//third_party/googletest:gtest_main",
-    "//third_party/libxml2:xml2",
   ]
 
   external_deps = [
-    "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "graphic_2d:libcomposer",
-    "graphic_2d:window_animation",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
-    "udmf:udmf_client",
-    "window_manager:libdm",
-    "window_manager:libwm",
   ]
 }
 

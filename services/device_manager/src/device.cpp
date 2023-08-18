@@ -246,7 +246,8 @@ void Device::PrintCapsDevice() const
         {DEVICE_CAP_GESTURE, "gesture"},
         {DEVICE_CAP_SWITCH, "switch"},
         {DEVICE_CAP_JOYSTICK, "joystick"}};
-    for (int32_t i = 0; i < DEVICE_CAP_MAX; ++i) {
+    int32_t size = deviceComparisonTable.size();
+    for (int32_t i = 0; i < size; ++i) {
         if (caps_[i] == 1) {
             FI_HILOGD("This is %{public}s", deviceComparisonTable[i].c_str());
         }

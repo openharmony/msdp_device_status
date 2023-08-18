@@ -17,8 +17,6 @@
 #include "fi_log.h"
 #include "stationary_manager.h"
 
-#include <cerrno>
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
