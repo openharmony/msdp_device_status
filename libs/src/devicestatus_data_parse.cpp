@@ -44,7 +44,7 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
 {
     int32_t fd = open(MSDP_DATA_PATH.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP);
     if (fd < 0) {
-        FI_HILOGE("open failed");
+        FI_HILOGE("Open failed");
         return DEVICESTATUS_FAILED;
     }
     if (close(fd) < 0) {
@@ -53,11 +53,11 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
 
     struct stat buf;
     if (stat(MSDP_DATA_DIR.c_str(), &buf) != 0) {
-        FI_HILOGE("stat folder path is invalid %{public}d", errno);
+        FI_HILOGE("Start folder path is invalid %{public}d", errno);
         return DEVICESTATUS_FAILED;
     }
     if (chown(MSDP_DATA_PATH.c_str(), buf.st_uid, buf.st_gid) != 0) {
-        FI_HILOGE("chown failed, errno is %{public}d", errno);
+        FI_HILOGE("Chown failed, errno is %{public}d", errno);
         return DEVICESTATUS_FAILED;
     }
 

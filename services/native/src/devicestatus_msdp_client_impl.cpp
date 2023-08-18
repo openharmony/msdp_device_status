@@ -151,8 +151,8 @@ ErrCode DeviceStatusMsdpClientImpl::GetSensorHdi(Type type)
 
 ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 {
-    if (type == Type::TYPE_ABSOLUTE_STILL ||type == Type::TYPE_HORIZONTAL_POSITION ||
-        type == Type::TYPE_VERTICAL_POSITION) {
+    if ((type == Type::TYPE_ABSOLUTE_STILL) || (type == Type::TYPE_HORIZONTAL_POSITION) ||
+        (type == Type::TYPE_VERTICAL_POSITION)) {
         return RET_OK;
     }
     FI_HILOGI("Not support ability");
@@ -162,7 +162,7 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 ErrCode DeviceStatusMsdpClientImpl::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
-    return ((SensorHdiDisable(type) == RET_OK || AlgoDisable(type) == RET_OK || MockDisable(type) == RET_OK) ?
+    return (((SensorHdiDisable(type) == RET_OK) || (AlgoDisable(type) == RET_OK) || (MockDisable(type) == RET_OK)) ?
         RET_OK : RET_ERR);
 }
 
@@ -352,7 +352,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
     mock_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(mock_.handle, "Create"));
     FI_HILOGI("Start destroy pointer");
     mock_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(mock_.handle, "Destroy"));
-    if (mock_.create == nullptr || mock_.destroy == nullptr) {
+    if ((mock_.create == nullptr) || (mock_.destroy == nullptr)) {
         FI_HILOGE("%{public}s dlsym Create or Destroy failed",
             dlName.c_str());
         dlclose(mock_.handle);
@@ -413,7 +413,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
     algo_.create = reinterpret_cast<LoadMockLibraryFunc>(dlsym(algo_.handle, "Create"));
     FI_HILOGI("Start destroy pointer");
     algo_.destroy = reinterpret_cast<LoadMockLibraryPtr>(dlsym(algo_.handle, "Destroy"));
-    if (algo_.create == nullptr || algo_.destroy == nullptr) {
+    if ((algo_.create == nullptr) || (algo_.destroy == nullptr)) {
         FI_HILOGE("%{public}s dlsym Create or Destroy failed",
             dlName.c_str());
         dlclose(algo_.handle);

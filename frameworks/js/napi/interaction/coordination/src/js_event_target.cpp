@@ -57,13 +57,13 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -84,13 +84,13 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -112,13 +112,13 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallDeactivateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -138,13 +138,15 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     work->data = cb.GetRefPtr();
     int32_t result;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            CallGetCrossingSwitchStatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            CallGetCrossingSwitchStateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -250,9 +252,10 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         item->data.deviceDescriptor = deviceId;
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
-        int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCoordinationMessageEvent);
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            EmitCoordinationMessageEvent, uv_qos_default);
         if (result != 0) {
-            FI_HILOGE("uv_queue_work failed");
+            FI_HILOGE("uv_queue_work_with_qos failed");
             item->DecStrongRef(nullptr);
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
@@ -600,7 +603,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "message", eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

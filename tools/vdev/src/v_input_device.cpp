@@ -94,7 +94,7 @@ void VInputDevice::Close()
     CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         if (close(fd_) != 0) {
-            FI_HILOGE("close error:%{public}s", strerror(errno));
+            FI_HILOGE("Close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }

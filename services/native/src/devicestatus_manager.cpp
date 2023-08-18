@@ -76,7 +76,7 @@ bool DeviceStatusManager::Enable(Type type)
 {
     CALL_DEBUG_ENTER;
     if (type == Type::TYPE_INVALID) {
-        FI_HILOGE("enable is failed");
+        FI_HILOGE("Enable is failed");
         return false;
     }
     InitAlgoMngrInterface(type);
@@ -90,7 +90,7 @@ bool DeviceStatusManager::Disable(Type type)
     CHKPF(msdpImpl_);
 
     if (msdpImpl_->Disable(type) != RET_OK) {
-        FI_HILOGE("disable msdp impl failed");
+        FI_HILOGE("Disable msdp impl failed");
         return false;
     }
 
@@ -103,7 +103,7 @@ bool DeviceStatusManager::InitAlgoMngrInterface(Type type)
     CHKPF(msdpImpl_);
 
     if (msdpImpl_->InitMsdpImpl(type) != RET_OK) {
-        FI_HILOGE("init msdp impl failed");
+        FI_HILOGE("Init msdp impl failed");
         return false;
     };
     return true;
@@ -116,7 +116,7 @@ int32_t DeviceStatusManager::InitDataCallback()
     DeviceStatusMsdpClientImpl::CallbackManager callback =
         std::bind(&DeviceStatusManager::MsdpDataCallback, this, std::placeholders::_1);
     if (msdpImpl_->RegisterImpl(callback) == RET_ERR) {
-        FI_HILOGE("register impl failed");
+        FI_HILOGE("Register impl failed");
     }
     return true;
 }

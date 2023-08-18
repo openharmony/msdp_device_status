@@ -58,16 +58,11 @@ bool VirtualDevice::FindDeviceNode(const std::string &name, std::string &node)
     return true;
 }
 
-void VirtualDevice::Execute(const std::string &command, std::vector<std::string> &results)
+void VirtualDevice::Execute(std::vector<std::string> &results)
 {
     CALL_DEBUG_ENTER;
-    if (command.empty()) {
-        FI_HILOGE("Variable command is empty");
-        return;
-    }
-    FI_HILOGD("Execute command:%{public}s.", command.c_str());
     char buffer[DEFAULT_BUF_SIZE] {};
-    FILE *pin = popen(command.c_str(), "r");
+    FILE *pin = popen("cat /proc/bus/input/devices", "r");
     if (pin == nullptr) {
         FI_HILOGE("Failed to popen command.");
         return;
@@ -84,9 +79,8 @@ void VirtualDevice::Execute(const std::string &command, std::vector<std::string>
 void VirtualDevice::GetInputDeviceNodes(std::map<std::string, std::string> &nodes)
 {
     CALL_DEBUG_ENTER;
-    std::string command = "cat /proc/bus/input/devices";
     std::vector<std::string> results;
-    Execute(command, results);
+    Execute(results);
     if (results.empty()) {
         FI_HILOGE("Failed to list devices.");
         return;
