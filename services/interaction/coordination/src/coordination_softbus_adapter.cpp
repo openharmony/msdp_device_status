@@ -734,7 +734,6 @@ void CoordinationSoftbusAdapter::ConfigTcpAlive()
         FI_HILOGE("Setsockopt enable alive falied");
         return;
     }
-
 }
 } // namespace DeviceStatus
 } // namespace Msdp
