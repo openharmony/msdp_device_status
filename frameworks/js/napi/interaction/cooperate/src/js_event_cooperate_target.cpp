@@ -218,16 +218,12 @@ napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
     CALL_INFO_TRACE;
     CHKPP(cb);
     cb->env = env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    CHKPP(scope);
     napi_value promise = nullptr;
     if (handle == nullptr) {
-        CHKRP_SCOPE(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE, scope);
+        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP_SCOPE(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE, scope);
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
-    napi_close_handle_scope(env, scope);
     return promise;
 }
 

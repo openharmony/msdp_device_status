@@ -598,6 +598,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 return;
             }
             COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
+            preparedNetworkId_ = std::make_pair("", "");
             break;
         }
         case CoordinationState::STATE_OUT: {
@@ -788,8 +789,9 @@ void CoordinationSM::Dump(int32_t fd)
         "coordinationState:%s | startDeviceDhid:%s | remoteNetworkId:%s | isStarting:%s | isStopping:%s\n"
         "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d | interceptorId:%d | monitorId:%d | filterId:%d\n",
         GetDeviceCoordinationState(currentState_).c_str(), startDeviceDhid_.c_str(),
-        remoteNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str(), isStarting_ ? "true" : "false", isStopping_ ? "true" : "false",
-        mouseLocation_.first, mouseLocation_.second, displayX_, displayY_, interceptorId_, monitorId_, filterId_);
+        remoteNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str(), isStarting_ ? "true" : "false",
+        isStopping_ ? "true" : "false", mouseLocation_.first, mouseLocation_.second, displayX_,
+        displayY_, interceptorId_, monitorId_, filterId_);
     if (onlineDevice_.empty()) {
         dprintf(fd, "onlineDevice:%s\n", "None");
         return;
@@ -1086,6 +1088,7 @@ void CoordinationSM::SetUnchainStatus(bool isUnchained)
 {
     CALL_DEBUG_ENTER;
     isUnchained_ = isUnchained;
+    isStopping_ = false;
 }
 
 void CoordinationSM::NotifyChainRemoved()
