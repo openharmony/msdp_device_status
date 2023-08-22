@@ -125,13 +125,15 @@ extern "C" {
 
 type CIStringVectorClone = extern "C" fn (*mut CIStringVector) -> *mut CIStringVector;
 type CIStringVectorDestruct = extern "C" fn (*mut CIStringVector);
+type CIStringVectorAt = extern "C" fn (*mut CIStringVector, usize) -> *const c_char;
+type CIStringVectorSize = extern "C" fn (*mut CIStringVector) -> usize;
 
 #[repr(C)]
 pub struct CIStringVector {
-    clone: Option<CIStringVectorClone>,
-    destruct: Option<CIStringVectorDestruct>,
-    str_vec: *mut *const c_char,
-    num_of_strs: usize,
+    pub clone: Option<CIStringVectorClone>,
+    pub destruct: Option<CIStringVectorDestruct>,
+    pub at: Option<CIStringVectorAt>,
+    pub size: Option<CIStringVectorSize>,
 }
 
 type CICrossStateListenerClone = extern "C" fn (listener: *mut CICrossStateListener) -> *mut CICrossStateListener;
@@ -147,7 +149,7 @@ pub struct CICrossStateListener {
 
 extern "C" {
     pub fn UpdateCrossSwitchState(state: i32) -> i32;
-    pub fn SyncCrossSwitchState(state: i32, device_ids: *const CIStringVector) -> i32;
+    pub fn SyncCrossSwitchState(state: i32, device_ids: *mut CIStringVector) -> i32;
     pub fn GetCrossSwitchState(device_id: *const c_char) -> i32;
     pub fn RegisterCrossStateListener(device_id: *const c_char, listener: *mut CICrossStateListener) -> i32;
     pub fn UnregisterCrossStateListener(device_id: *const c_char) -> i32;

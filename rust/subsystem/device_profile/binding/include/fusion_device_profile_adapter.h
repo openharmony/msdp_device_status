@@ -21,8 +21,8 @@
 struct CIStringVector {
     CIStringVector* (*clone)(CIStringVector *);
     void (*destruct)(CIStringVector *);
-    const char **strVec;
-    size_t numOfStrs;
+    const char* (*at)(CIStringVector *, size_t);
+    size_t (*size)(CIStringVector *);
 };
 
 struct CICrossStateListener {
@@ -38,7 +38,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 int32_t UpdateCrossSwitchState(int32_t state);
-int32_t SyncCrossSwitchState(int32_t state, const CIStringVector *deviceIds);
+int32_t SyncCrossSwitchState(int32_t state, CIStringVector *deviceIds);
 int32_t GetCrossSwitchState(const char *deviceId);
 int32_t RegisterCrossStateListener(const char *deviceId, CICrossStateListener *listener);
 int32_t UnregisterCrossStateListener(const char *deviceId);

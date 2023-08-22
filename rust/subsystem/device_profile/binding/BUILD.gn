@@ -28,9 +28,13 @@ ohos_shared_library("fusion_device_profile_binding") {
   sources = [
     "src/fusion_device_profile.cpp",
     "src/fusion_device_profile_adapter.cpp",
+    "src/fusion_security.cpp",
   ]
 
-  deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]
+  deps = [
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "//third_party/cJSON:cjson",
+  ]
 
   configs = [ ":fusion_device_profile_binding_config" ]
 
@@ -40,6 +44,10 @@ ohos_shared_library("fusion_device_profile_binding") {
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
     "hilog:libhilog",
+    "dsoftbus:softbus_client",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
