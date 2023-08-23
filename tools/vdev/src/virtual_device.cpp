@@ -44,14 +44,14 @@ bool VirtualDevice::FindDeviceNode(const std::string &name, std::string &node)
     CALL_DEBUG_ENTER;
     std::map<std::string, std::string> nodes;
     GetInputDeviceNodes(nodes);
-    FI_HILOGD("There are %{public}zu device nodes.", nodes.size());
+    FI_HILOGD("There are %{public}zu device nodes", nodes.size());
 
     std::map<std::string, std::string>::const_iterator cItr = nodes.find(name);
     if (cItr == nodes.cend()) {
-        FI_HILOGE("No virtual stylus is found.");
+        FI_HILOGE("No virtual stylus were found");
         return false;
     }
-    FI_HILOGD("Node name : \'%{public}s\'.", cItr->second.c_str());
+    FI_HILOGD("Node name : \'%{public}s\'", cItr->second.c_str());
     std::ostringstream ss;
     ss << "/dev/input/" << cItr->second;
     node = ss.str();
@@ -64,7 +64,7 @@ void VirtualDevice::Execute(std::vector<std::string> &results)
     char buffer[DEFAULT_BUF_SIZE] {};
     FILE *pin = popen("cat /proc/bus/input/devices", "r");
     if (pin == nullptr) {
-        FI_HILOGE("Failed to popen command.");
+        FI_HILOGE("Failed to popen command");
         return;
     }
     while (!feof(pin)) {
@@ -72,7 +72,7 @@ void VirtualDevice::Execute(std::vector<std::string> &results)
             results.push_back(buffer);
         }
     }
-    FI_HILOGD("Close phandle.");
+    FI_HILOGD("Close phandle");
     pclose(pin);
 }
 
@@ -82,14 +82,14 @@ void VirtualDevice::GetInputDeviceNodes(std::map<std::string, std::string> &node
     std::vector<std::string> results;
     Execute(results);
     if (results.empty()) {
-        FI_HILOGE("Failed to list devices.");
+        FI_HILOGE("Failed to list devices");
         return;
     }
     const std::string kname { "Name=\"" };
     const std::string kevent { "event" };
     std::string name;
     for (const auto &item : results) {
-        FI_HILOGD("item:%{public}s.", item.c_str());
+        FI_HILOGD("item:%{public}s", item.c_str());
         if (item[0] == 'N') {
             std::string::size_type spos = item.find(kname);
             if (spos != std::string::npos) {
