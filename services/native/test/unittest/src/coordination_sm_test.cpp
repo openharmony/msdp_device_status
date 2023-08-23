@@ -59,4 +59,4 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
 } // namespace
 } // namespace DeviceStatus
 } // namespace Msdp
-} // namespace OH
+} // namespace OHOS
