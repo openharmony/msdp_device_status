@@ -15,10 +15,6 @@
 
 #include "adddraglistener_fuzzer.h"
 
-#include <cstddef>
-#include <cstdint>
-
-#include "securec.h"
 #include "singleton.h"
 
 #define private public
