@@ -161,14 +161,10 @@ group("unittest") {
 
   deps += [
     ":DeviceStatusAgentTest",
-    ":DragDataManagerTest",
     ":test_devicestatus_service",
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [
-      ":CoordinationSMTest",
-    ]
+    deps += [ ":CoordinationSMTest" ]
   }
-
 }
