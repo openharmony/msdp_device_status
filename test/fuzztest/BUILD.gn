@@ -22,6 +22,7 @@ group("device_status_fuzztest") {
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
     "devicestatusstub_fuzzer:fuzztest",
+    "devicesubscribestub_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
@@ -30,7 +31,6 @@ group("device_status_fuzztest") {
     "stopdrag_fuzzer:fuzztest",
     "updatedragstyle_fuzzer:fuzztest",
     "updateshadowpic_fuzzer:fuzztest",
-    "devicesubscribestub_fuzzer:fuzztest",
   ]
   if (fusion_interaction_coordination) {
     deps += [
