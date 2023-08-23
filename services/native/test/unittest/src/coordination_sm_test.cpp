@@ -14,6 +14,7 @@
  */
 
 #include "coordination_sm_test.h"
+
 #include "coordination_util.h"
 #include "coordination_sm.h"
 #include "fi_log.h"
