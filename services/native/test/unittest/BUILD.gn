@@ -118,7 +118,7 @@ ohos_unittest("DragDataManagerTest") {
 
 ohos_unittest("CoordinationSMTest") {
   module_out_path = module_output_path
-  include_dirs = [ 
+  include_dirs = [
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_service_path}/context/include",
@@ -131,11 +131,11 @@ ohos_unittest("CoordinationSMTest") {
   ]
 
   deps = [
-    "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/googletest:gtest_main",
     "//third_party/cJSON:cjson",
+    "//third_party/googletest:gtest_main",
     "//third_party/openssl:libcrypto_shared",
   ]
 
