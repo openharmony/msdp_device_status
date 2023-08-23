@@ -27,6 +27,8 @@ group("device_status_fuzztest") {
     "getdragtargetpid_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
+    "handleallocsocketfd_fuzzer:fuzztest",
+    "removedraglistener_fuzzer:fuzztest",
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
