@@ -15,10 +15,6 @@
 
 #include "registercoordinationlistener_fuzzer.h"
 
-#include <cstddef>
-#include <cstdint>
-
-#include "securec.h"
 #include "singleton.h"
 
 #define private public
@@ -27,12 +23,12 @@
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
     datas.WriteBuffer(data, size);
     datas.RewindRead(0);
     MessageParcel reply;
