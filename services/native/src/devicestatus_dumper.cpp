@@ -287,7 +287,7 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
         }
     } else {
         if (!appInfoMap_[iter->first].insert(appInfo).second) {
-            FI_HILOGW("appInfo is Duplicated");
+            FI_HILOGW("appInfo is duplicated");
         }
     }
 }
