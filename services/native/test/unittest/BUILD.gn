@@ -140,18 +140,12 @@ ohos_unittest("CoordinationSMTest") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
     "device_manager:devicemanagersdk",
     "distributed_input:libdinput_sdk",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "input:libmmi-client",
-    "ipc:ipc_single",
-    "window_manager:libdm",
   ]
 }
 

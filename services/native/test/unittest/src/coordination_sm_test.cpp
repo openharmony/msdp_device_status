@@ -16,7 +16,6 @@
 #include "coordination_sm_test.h"
 #include "coordination_util.h"
 #include "coordination_sm.h"
-#include "distributed_input_adapter.h"
 #include "fi_log.h"
 
 namespace OHOS {
