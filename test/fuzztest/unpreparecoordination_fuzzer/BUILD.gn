@@ -32,10 +32,10 @@ deps_ex = [
 ]
 
 ###############################fuzztest#################################
-ohos_fuzztest("DeactivateCoordinationFuzzTest") {
+ohos_fuzztest("UnPrepareCoordinationFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "${device_status_root_path}/test/fuzztest/deactivatecoordination_fuzzer"
+      "${device_status_root_path}/test/fuzztest/unpreparecoordination_fuzzer"
   include_dirs = [
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/interaction/drag/include",
@@ -56,7 +56,7 @@ ohos_fuzztest("DeactivateCoordinationFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "deactivatecoordination_fuzzer.cpp" ]
+  sources = [ "unpreparecoordination_fuzzer.cpp" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -71,5 +71,5 @@ ohos_fuzztest("DeactivateCoordinationFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":DeactivateCoordinationFuzzTest" ]
+  deps += [ ":UnPrepareCoordinationFuzzTest" ]
 }

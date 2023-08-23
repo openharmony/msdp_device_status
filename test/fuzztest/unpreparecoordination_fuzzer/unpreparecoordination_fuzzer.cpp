@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "deactivatecoordination_fuzzer.h"
+#include "unpreparecoordination_fuzzer.h"
 
 #include "singleton.h"
 
@@ -34,12 +34,12 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::STOP_COORDINATION), datas, reply, option);
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UNPREPARE_COORDINATION), datas, reply, option);
     return true;
 }
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
@@ -48,3 +48,4 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
+
