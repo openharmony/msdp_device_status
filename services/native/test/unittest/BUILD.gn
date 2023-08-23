@@ -161,6 +161,7 @@ group("unittest") {
 
   deps += [
     ":DeviceStatusAgentTest",
+    ":DragDataManagerTest",
     ":test_devicestatus_service",
   ]
 
