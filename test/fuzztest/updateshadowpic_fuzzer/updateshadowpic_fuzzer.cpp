@@ -15,78 +15,42 @@
 
 #include "updateshadowpic_fuzzer.h"
 
-#include <memory>
-#include <utility>
+#include <cstddef>
+#include <cstdint>
 
 #include "securec.h"
+#include "singleton.h"
 
-#include "devicestatus_define.h"
-#include "drag_data.h"
-#include "fi_log.h"
-#include "interaction_manager.h"
+#define private public
+#include "devicestatus_service.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UpdateShadowPicFuzzTest" };
-constexpr int32_t PIXEL_MAP_WIDTH { 300 };
-constexpr int32_t PIXEL_MAP_HEIGHT { 300 };
-} // namespace
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    CALL_DEBUG_ENTER;
-    OHOS::Media::InitializationOptions opts;
-    opts.size.width = width;
-    opts.size.height = height;
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
-    CHKPL(pixelMap);
-    return pixelMap;
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UPDATE_SHADOW_PIC), datas, reply, option);
+    return true;
 }
-
-ShadowInfo CreateShadowInfo(const uint8_t* data, size_t size)
-{
-    size_t startPos = 0;
-    ShadowInfo shadowInfo;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.x);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.y);
-    shadowInfo.pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
-    return shadowInfo;
-}
-
-void UpdateShadowPicFuzzTest(const uint8_t* data, size_t  size)
-{
-    CALL_DEBUG_ENTER;
-    if (data == nullptr) {
-        return;
-    }
-    ShadowInfo shadowInfo = CreateShadowInfo(data, size);
-    InteractionManager::GetInstance()->UpdateShadowPic(shadowInfo);
-}
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (size < sizeof(int32_t)) {
+    /* Run your code on data */
+    if (data == nullptr) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::UpdateShadowPicFuzzTest(data, size);
+
+    OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
-
