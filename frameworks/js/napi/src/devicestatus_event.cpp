@@ -30,6 +30,7 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
 constexpr size_t EVENT_MAP_MAX { 20 };
+constexpr size_t EVENT_LIST_MAX { 30 };
 } // namespace
 
 DeviceStatusEvent::DeviceStatusEvent(napi_env env)
@@ -46,55 +47,104 @@ DeviceStatusEvent::~DeviceStatusEvent()
 bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
 {
     FI_HILOGD("On for event:%{public}d, isOnce:%{public}d", eventType, isOnce);
+    std::lock_guard<std::mutex> guard(mutex_);
     if ((eventMap_.size() > EVENT_MAP_MAX) || (eventOnceMap_.size() > EVENT_MAP_MAX)) {
         FI_HILOGE("EventMap_ or eventOnceMap_ size over");
+        return false;
+    }
+    if (eventMap_[eventType].size() > EVENT_LIST_MAX || eventOnceMap_[eventType].size() > EVENT_LIST_MAX) {
+        FI_HILOGE("list size over");
         return false;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env_, &scope);
     CHKPF(scope);
-    napi_ref onHandlerRef = nullptr;
-    napi_status status = napi_ok;
     if (isOnce) {
-        auto iter = eventOnceMap_.find(eventType);
-        if (iter == eventOnceMap_.end()) {
-            FI_HILOGD("EventType:%{public}d not exists", eventType);
-            eventOnceMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
-        }
-        status = napi_create_reference(env_, handler, 1, &onHandlerRef);
-        if (status != napi_ok) {
-            FI_HILOGE("Failed to create reference");
+        if (!SaveCallbackByEvent(eventType, handler, isOnce, eventOnceMap_)) {
             napi_close_handle_scope(env_, scope);
+            FI_HILOGE("Failed to save eventOnceMap_ callback");
             return false;
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
-        listener->onHandlerRef = onHandlerRef;
-        eventOnceMap_[eventType].push_back(listener);
-        FI_HILOGI("Add once handler to list %{public}d", eventType);
     } else {
-        auto iter = eventMap_.find(eventType);
-        if (iter == eventMap_.end()) {
-            FI_HILOGD("EventType:%{public}d not exists", eventType);
-            eventMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
-        }
-        status = napi_create_reference(env_, handler, 1, &onHandlerRef);
-        if (status != napi_ok) {
-            FI_HILOGE("Failed to create reference");
+        if (!SaveCallbackByEvent(eventType, handler, isOnce, eventMap_)) {
             napi_close_handle_scope(env_, scope);
+            FI_HILOGE("Failed to save eventMap_ callback");
             return false;
         }
-        auto listener = std::make_shared<DeviceStatusEventListener>();
-        listener->onHandlerRef = onHandlerRef;
-        eventMap_[eventType].push_back(listener);
-        FI_HILOGI("Add handler to list %{public}d", eventType);
     }
     napi_close_handle_scope(env_, scope);
     return true;
 }
 
+bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handler, bool isOnce,
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_)
+{
+    CALL_DEBUG_ENTER;
+    napi_ref onHandlerRef = nullptr;
+    napi_status status = napi_create_reference(env_, handler, 1, &onHandlerRef);
+    if (status != napi_ok) {
+        FI_HILOGE("Failed to create reference");
+        return false;
+    }
+    auto iter = eventMap_.find(eventType);
+    if (iter == eventMap_.end()) {
+        FI_HILOGE("EventType:%{public}d not exists", eventType);
+        eventMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
+    }
+    if (eventMap_[eventType].empty()) {
+        FI_HILOGE("eventMap_ save callback");
+        SaveCallback(eventType, onHandlerRef, isOnce);
+        return true;
+    }
+    if (!IsNoExistCallback(eventMap_[eventType], handler, eventType)) {
+        FI_HILOGE("callback already exists");
+        return false;
+    }
+    SaveCallback(eventType, onHandlerRef, isOnce);
+    return true;
+}
+
+bool DeviceStatusEvent::IsNoExistCallback(std::list<std::shared_ptr<DeviceStatusEventListener>>,
+    napi_value handler, int32_t eventType)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    bool equal = false;
+    for (const auto& item : eventMap_[eventType]) {
+        napi_status status = napi_get_reference_value(env_, item->onHandlerRef, &result);
+        if (status != napi_ok) {
+            FI_HILOGE("napi_get_reference_value failed");
+            return false;
+        }
+        status = napi_strict_equals(env_, result, handler, &equal);
+        if (status != napi_ok) {
+            FI_HILOGE("napi_strict_equals failed");
+            return false;
+        }
+        if (equal) {
+            FI_HILOGE("Map callback is exist");
+            return false;
+        }
+    }
+    return true;
+}
+
+void DeviceStatusEvent::SaveCallback(int32_t eventType, napi_ref onHandlerRef, bool isOnce)
+{
+    auto listener = std::make_shared<DeviceStatusEventListener>();
+    listener->onHandlerRef = onHandlerRef;
+    if (isOnce) {
+        eventOnceMap_[eventType].push_back(listener);
+    } else {
+        eventMap_[eventType].push_back(listener);
+    }
+    FI_HILOGD("Add handler to list %{public}d", eventType);
+}
+
 bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
 {
     FI_HILOGD("DeviceStatusEvent off in for event:%{public}d", eventType);
+    std::lock_guard<std::mutex> guard(mutex_);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         FI_HILOGE("EventType %{public}d not found", eventType);
