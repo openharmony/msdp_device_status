@@ -94,7 +94,7 @@ napi_value JsDragContext::JsConstructor(napi_env env, napi_callback_info info)
     JsDragContext *jsContext = new (std::nothrow) JsDragContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void *data, void *hin) {
-        FI_HILOGI("jsvm ends");
+        FI_HILOGI("Jsvm ends");
         JsDragContext *context = static_cast<JsDragContext*>(data);
         delete context;
     }, nullptr, nullptr);

@@ -287,7 +287,7 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
         }
     } else {
         if (!appInfoMap_[iter->first].insert(appInfo).second) {
-            FI_HILOGW("duplicated app info");
+            FI_HILOGW("appInfo is duplicated");
         }
     }
 }
@@ -301,7 +301,7 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
 
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
-        FI_HILOGE("not exist %{public}d type appInfo", appInfo->type);
+        FI_HILOGE("Not exist %{public}d type appInfo", appInfo->type);
         return;
     }
     FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu",
