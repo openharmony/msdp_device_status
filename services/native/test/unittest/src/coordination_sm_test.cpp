@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "coordination_sm_test.h"
+#include <gtest/gtest.h>
 
-#include "coordination_util.h"
 #include "coordination_sm.h"
+#include "coordination_util.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -25,16 +25,16 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSMTest" };
-}
-void CoordinationSMTest::SetUpTestCase() {}
+} // namespace
 
-void CoordinationSMTest::TearDownTestCase() {}
+class CoordinationSMTest : public testing::Test {
+public:
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    void SetUp() {}
+    void TearDown() {}
+};
 
-void CoordinationSMTest::SetUp() {}
-
-void CoordinationSMTest::TearDown() {}
-
-namespace {
 /**
  * @tc.name: CoordinationSMTest
  * @tc.desc: test IsNeedFilterOut state == CoordinationState::STATE_OUT
@@ -45,6 +45,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     std::shared_ptr<MMI::KeyEvent> keyEvent = MMI::KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
     keyEvent->SetActionTime(1);
     keyEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
@@ -54,9 +55,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
     bool ret = COOR_SM->IsNeedFilterOut(localNetworkId, keyEvent);
-    EXPECT_TRUE(ret == true);
+    EXPECT_TRUE(ret);
 }
-} // namespace
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
