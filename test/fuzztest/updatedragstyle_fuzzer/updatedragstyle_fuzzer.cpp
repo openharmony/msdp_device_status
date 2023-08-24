@@ -17,6 +17,7 @@
 
 #include "singleton.h"
 
+#define private public
 #include "devicestatus_service.h"
 #include "message_parcel.h"
 
