@@ -31,6 +31,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -80,7 +80,7 @@ DragData CreateDragData(const uint8_t* data, size_t size)
     return dragData;
 }
 
-void StartDragFuzzTest(const uint8_t* data, size_t  size)
+void StartDragFuzzTest(const uint8_t* data, size_t size)
 {
     CALL_DEBUG_ENTER;
     if (data == nullptr) {
