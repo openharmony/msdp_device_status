@@ -340,7 +340,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
     std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName .c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
+        FI_HILOGE("Get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
     mock_.handle = dlopen(libRealPath, RTLD_LAZY);
@@ -401,7 +401,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
     std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName .c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
+        FI_HILOGE("Get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
     algo_.handle = dlopen(libRealPath, RTLD_LAZY);
