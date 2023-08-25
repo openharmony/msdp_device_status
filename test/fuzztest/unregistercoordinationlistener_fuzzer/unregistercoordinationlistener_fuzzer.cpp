@@ -28,9 +28,18 @@ const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        FI_HILOGE("Write failed");
+        return false;
+    }
+    if (!datas.WriteBuffer(data, size)) {
+        FI_HILOGE("Write data failed");
+        return false;
+    }
+    if (!datas.RewindRead(0)) {
+        FI_HILOGE("Read failed");
+        return false;
+    }
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
