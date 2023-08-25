@@ -29,15 +29,15 @@ bool ActivateCoordinationFuzzTest(const uint8_t* data, size_t size)
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
         FI_HILOGE("Write failed");
-        return;
+        return false;
     }
     if (!datas.WriteBuffer(data, size)) {
         FI_HILOGE("Write data failed");
-        return;
+        return false;
     }
     if (!datas.RewindRead(0)) {
         FI_HILOGE("Read failed");
-        return;
+        return false;
     }
     MessageParcel reply;
     MessageOption option;
