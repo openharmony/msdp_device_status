@@ -15,10 +15,6 @@
 
 #include "getcoordinationstate_fuzzer.h"
 
-#include <cstddef>
-#include <cstdint>
-
-#include "securec.h"
 #include "singleton.h"
 
 #define private public
@@ -33,15 +29,12 @@ bool GetCoordinationStateFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        FI_HILOGE("Write failed");
         return;
     }
     if (!datas.WriteBuffer(data, size)) {
-        FI_HILOGE("Write data failed");
         return;
     }
     if (!datas.RewindRead(0)) {
-        FI_HILOGE("Read failed");
         return;
     }
     MessageParcel reply;
