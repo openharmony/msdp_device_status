@@ -24,7 +24,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-bool ActiveCoordinationFuzzTest(const uint8_t* data, size_t size)
+bool ActivateCoordinationFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
@@ -44,7 +44,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::ActiveCoordinationFuzzTest(data, size);
+    OHOS::ActivateCoordinationFuzzTest(data, size);
     return 0;
 }
 
