@@ -28,14 +28,8 @@ const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 bool GetCoordinationStateFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        return;
-    }
-    if (!datas.WriteBuffer(data, size)) {
-        return;
-    }
-    if (!datas.RewindRead(0)) {
-        return;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        return false;
     }
     MessageParcel reply;
     MessageOption option;
