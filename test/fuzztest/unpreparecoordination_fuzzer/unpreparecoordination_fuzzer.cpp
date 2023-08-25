@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getdragtargetpid_fuzzer.h"
+#include "unpreparecoordination_fuzzer.h"
 
 #include "singleton.h"
 
@@ -34,18 +34,18 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::GET_DRAG_TARGET_PID), datas, reply, option);
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UNPREPARE_COORDINATION), datas, reply, option);
     return true;
 }
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
+

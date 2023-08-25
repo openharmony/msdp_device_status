@@ -640,7 +640,7 @@ int32_t DeviceStatusService::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    auto session = GetSession(GetClientFd(pid));
+    SessionPtr session = GetSession(GetClientFd(pid));
     CHKPR(session, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::AddListener, &dragMgr_, session));
@@ -654,7 +654,7 @@ int32_t DeviceStatusService::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    auto session = GetSession(GetClientFd(pid));
+    SessionPtr session = GetSession(GetClientFd(pid));
     if (session == nullptr) {
         FI_HILOGW("Session is nullptr");
         return RET_OK;
@@ -672,10 +672,12 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     AddSessionDeletedCallback(pid, std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
+    SessionPtr session = GetSession(GetClientFd(pid));
+    CHKPR(session, RET_ERR);
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStartDrag, this, std::cref(dragData), pid));
+        std::bind(&DragManager::StartDrag, &dragMgr_, std::cref(dragData), session));
     if (ret != RET_OK) {
-        FI_HILOGE("On start drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -684,9 +686,9 @@ int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnStopDrag, this, result, hasCustomAnimation));
+        std::bind(&DragManager::StopDrag, &dragMgr_, result, hasCustomAnimation));
     if (ret != RET_OK) {
-        FI_HILOGE("On stop drag failed, ret:%{public}d", ret);
+        FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -763,7 +765,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -777,7 +779,7 @@ int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 int32_t DeviceStatusService::OnUnregisterCoordinationListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
     event->type = CoordinationEventManager::EventType::LISTENER;
@@ -798,7 +800,7 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
     }
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     if (!sess->SendMsg(pkt)) {
         FI_HILOGE("Sending failed");
@@ -822,7 +824,7 @@ int32_t DeviceStatusService::OnUnprepareCoordination(int32_t pid, int32_t userDa
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
     }
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     if (!sess->SendMsg(pkt)) {
         FI_HILOGE("Sending failed");
@@ -835,7 +837,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -870,7 +872,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
 int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -891,7 +893,7 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     int32_t pid, int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
+    SessionPtr sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -908,27 +910,6 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
-int32_t DeviceStatusService::OnStartDrag(const DragData &dragData, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    auto sess = GetSession(GetClientFd(pid));
-    CHKPR(sess, RET_ERR);
-    int32_t ret = dragMgr_.StartDrag(dragData, sess);
-    if (ret != RET_OK) {
-        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t DeviceStatusService::OnStopDrag(DragResult result, bool hasCustomAnimation)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = dragMgr_.StopDrag(result, hasCustomAnimation);
-    if (ret != RET_OK) {
-        FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

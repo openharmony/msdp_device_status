@@ -15,33 +15,39 @@
 
 #include "getshadowoffset_fuzzer.h"
 
-#include "fi_log.h"
-#include "interaction_manager.h"
+#include "singleton.h"
+
+#define private public
+#include "devicestatus_service.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "GetShadowOffsetFuzzTest" };
-} // namespace
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-void GetShadowOffsetFuzzTest()
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    CALL_DEBUG_ENTER;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    int32_t width = 0;
-    int32_t height = 0;
-    InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
-    FI_HILOGD("offsetX:%{public}d,offsetY:%{public}d,width:%{public}d,height:%{public}d",
-        offsetX, offsetY, width, height);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::GET_SHADOW_OFFSET), datas, reply, option);
+    return true;
 }
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
-extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Msdp::DeviceStatus::GetShadowOffsetFuzzTest();
+    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+
+    OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
+

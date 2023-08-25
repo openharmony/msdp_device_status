@@ -330,7 +330,7 @@ napi_value JsCoordinationContext::JsConstructor(napi_env env, napi_callback_info
     JsCoordinationContext *jsContext = new (std::nothrow) JsCoordinationContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void *data, void *hin) {
-        FI_HILOGI("jsvm ends");
+        FI_HILOGI("Jsvm ends");
         JsCoordinationContext *context = static_cast<JsCoordinationContext*>(data);
         delete context;
     }, nullptr, nullptr);

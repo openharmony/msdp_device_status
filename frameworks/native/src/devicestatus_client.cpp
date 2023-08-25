@@ -89,7 +89,7 @@ void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
         devicestatusProxy_ = nullptr;
     }
     if (deathListener_ != nullptr) {
-        FI_HILOGI("notify death listner");
+        FI_HILOGI("Notify death listener");
         deathListener_();
     }
 }

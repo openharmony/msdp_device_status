@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getdragtargetpid_fuzzer.h"
+#include "deviceunsubscribestub_fuzzer.h"
 
 #include "singleton.h"
 
@@ -22,11 +22,12 @@
 #include "message_parcel.h"
 
 using namespace OHOS::Msdp::DeviceStatus;
-namespace OHOS {
-const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+namespace OHOS {
+
+void DoSomethingWithMyAPI(const uint8_t* data, size_t size)
 {
+    const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
     datas.WriteBuffer(data, size);
@@ -34,11 +35,11 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::GET_DRAG_TARGET_PID), datas, reply, option);
-    return true;
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE), datas, reply, option);
 }
-} // namespace OHOS
+}
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
@@ -46,6 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::DoSomethingWithMyAPI(data, size);
     return 0;
 }
+

@@ -539,7 +539,7 @@ int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
-        FI_HILOGW("error:message.size() > MSG_MAX_SIZE message size:%{public}zu", message.size());
+        FI_HILOGW("Error:the message size:%{public}zu beyond the maximum limit", message.size());
         return RET_ERR;
     }
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));

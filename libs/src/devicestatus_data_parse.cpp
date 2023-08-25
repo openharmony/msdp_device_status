@@ -90,7 +90,7 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
     }
 
     if (type < Type::TYPE_ABSOLUTE_STILL || type >= Type::TYPE_MAX) {
-        FI_HILOGE("Type error");
+        FI_HILOGE("type error");
         return false;
     }
 

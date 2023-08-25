@@ -305,7 +305,7 @@ napi_value JsCooperateContext::JsConstructor(napi_env env, napi_callback_info in
     JsCooperateContext *jsContext = new (std::nothrow) JsCooperateContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void *data, void *hin) {
-        FI_HILOGI("jsvm ends");
+        FI_HILOGI("Jsvm ends");
         JsCooperateContext *context = static_cast<JsCooperateContext*>(data);
         delete context;
     }, nullptr, nullptr);

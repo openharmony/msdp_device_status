@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getdragtargetpid_fuzzer.h"
+#include "handleallocsocketfd_fuzzer.h"
 
 #include "singleton.h"
 
@@ -34,7 +34,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::GET_DRAG_TARGET_PID), datas, reply, option);
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::ALLOC_SOCKET_FD), datas, reply, option);
     return true;
 }
 } // namespace OHOS

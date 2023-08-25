@@ -32,10 +32,10 @@ deps_ex = [
 ]
 
 ###############################fuzztest#################################
-ohos_fuzztest("GetShadowOffsetFuzzTest") {
+ohos_fuzztest("HandleAllocSocketFdFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "${device_status_root_path}/test/fuzztest/getshadowoffset_fuzzer"
+      "${device_status_root_path}/test/fuzztest/handleallocsocketfd_fuzzer"
   include_dirs = [
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/interaction/drag/include",
@@ -50,7 +50,7 @@ ohos_fuzztest("GetShadowOffsetFuzzTest") {
     "-O0",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "getshadowoffset_fuzzer.cpp" ]
+  sources = [ "handleallocsocketfd_fuzzer.cpp" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -65,5 +65,5 @@ ohos_fuzztest("GetShadowOffsetFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":GetShadowOffsetFuzzTest" ]
+  deps += [ ":HandleAllocSocketFdFuzzTest" ]
 }
