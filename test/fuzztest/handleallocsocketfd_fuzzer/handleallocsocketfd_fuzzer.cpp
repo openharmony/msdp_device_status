@@ -19,18 +19,21 @@
 
 #define private public
 #include "devicestatus_service.h"
+#include "fi_log.h"
 #include "message_parcel.h"
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "HandleAllocSocketFdFuzzTest" };    
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool HandleAllocSocketFdFuzzTest(const uint8_t* data, size_t size)
 {
+    const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failure");
+        return false;
+    }
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
@@ -46,6 +49,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingInterestingWithMyAPI(data, size);
+    OHOS::HandleAllocSocketFdFuzzTest(data, size);
     return 0;
 }

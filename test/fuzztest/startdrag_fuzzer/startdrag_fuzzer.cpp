@@ -15,95 +15,42 @@
 
 #include "startdrag_fuzzer.h"
 
-#include <memory>
-#include <utility>
+#include "singleton.h"
 
-#include "pointer_event.h"
-#include "securec.h"
-
-#include "devicestatus_define.h"
-#include "drag_data.h"
+#define private public
+#include "devicestatus_service.h"
 #include "fi_log.h"
-#include "interaction_manager.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StartDragFuzzTest" };
-constexpr int32_t POINTER_ID { 0 };
-constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
-constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
-} // namespace
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "StartDragFuzzTest" };
+
+bool StartDragFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
+    const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failure");
+        return false;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::START_DRAG), datas, reply, option);
+    return true;
 }
-
-std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
-{
-    CALL_DEBUG_ENTER;
-    OHOS::Media::InitializationOptions opts;
-    opts.size.width = width;
-    opts.size.height = height;
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(opts);
-    CHKPL(pixelMap);
-    return pixelMap;
-}
-
-DragData CreateDragData(const uint8_t* data, size_t size)
-{
-    size_t startPos = 0;
-    ShadowInfo shadowInfo;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.x);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, shadowInfo.y);
-    shadowInfo.pixelMap = CreatePixelMap(MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT);
-
-    DragData dragData;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.dragNum);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayX);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayY);
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, dragData.displayId);
-    dragData.hasCanceledAnimation = true;
-    dragData.shadowInfo = shadowInfo;
-    dragData.pointerId = POINTER_ID;
-    dragData.sourceType = OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE;
-    return dragData;
-}
-
-void StartDragFuzzTest(const uint8_t* data, size_t  size)
-{
-    CALL_DEBUG_ENTER;
-    if (data == nullptr) {
-        return;
-    }
-    auto func = [](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("Start drag fuzz test:displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-    };
-    DragData dragData = CreateDragData(data, size);
-    InteractionManager::GetInstance()->StartDrag(dragData, func);
-}
-
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if (size < sizeof(int32_t)) {
+    /* Run your code on data */
+    if (data == nullptr) {
         return 0;
     }
-    OHOS::Msdp::DeviceStatus::StartDragFuzzTest(data, size);
+
+    OHOS::StartDragFuzzTest(data, size);
     return 0;
 }
-
