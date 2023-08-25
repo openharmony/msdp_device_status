@@ -136,7 +136,7 @@ int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>&
         return RET_NG;
     }
     if (args.empty()) {
-        FI_HILOGE("param cannot be empty");
+        FI_HILOGE("Param cannot be empty");
         dprintf(fd, "param cannot be empty\n");
         DS_DUMPER->DumpHelpInfo(fd);
         return RET_NG;

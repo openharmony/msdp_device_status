@@ -32,7 +32,7 @@ bool DeviceStatusPermission::CheckCallingPermission(const std::string &permissio
     Security::AccessToken::AccessTokenID callingToken = IPCSkeleton::GetCallingTokenID();
     int32_t auth = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callingToken, permissionName);
     if (auth != Security::AccessToken::TypePermissionState::PERMISSION_GRANTED) {
-        FI_HILOGD("has no permission.permission name = %{public}s", permissionName.c_str());
+        FI_HILOGD("Has no permission.permission name = %{public}s", permissionName.c_str());
         return ERR_NG;
     }
     return ERR_OK;

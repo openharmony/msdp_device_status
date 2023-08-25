@@ -238,7 +238,7 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    FI_HILOGI("add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
