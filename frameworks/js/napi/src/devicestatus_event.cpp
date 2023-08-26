@@ -56,23 +56,17 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
         FI_HILOGE("list size over");
         return false;
     }
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    CHKPF(scope);
     if (isOnce) {
         if (!SaveCallbackByEvent(eventType, handler, isOnce, eventOnceMap_)) {
-            napi_close_handle_scope(env_, scope);
             FI_HILOGE("Failed to save eventOnceMap_ callback");
             return false;
         }
     } else {
         if (!SaveCallbackByEvent(eventType, handler, isOnce, eventMap_)) {
-            napi_close_handle_scope(env_, scope);
             FI_HILOGE("Failed to save eventMap_ callback");
             return false;
         }
     }
-    napi_close_handle_scope(env_, scope);
     return true;
 }
 
