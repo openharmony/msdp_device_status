@@ -200,7 +200,11 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
-    CHKPL(pixelMap);
+    if (pixelMap == nullptr) {
+        FI_HILOGE("Create pixelMap failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
     delete[] colorPixels;
     return pixelMap;
 }

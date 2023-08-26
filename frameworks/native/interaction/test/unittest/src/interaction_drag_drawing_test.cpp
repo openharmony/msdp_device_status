@@ -101,7 +101,11 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
-    CHKPL(pixelMap);
+    if (pixelMap == nullptr) {
+        FI_HILOGE("Create pixelMap failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
     delete[] colorPixels;
     return pixelMap;
 }
