@@ -40,7 +40,6 @@
         "udmf",
         "device_info_manager",
         "dsoftbus",
-        "graphic_2d",
         "common",
         "motion"
       ],
