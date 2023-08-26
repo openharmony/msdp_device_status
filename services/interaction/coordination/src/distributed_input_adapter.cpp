@@ -114,6 +114,20 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }
 
+int32_t DistributedInputAdapter::RegisterSessionStateCb(std::function<void(uint32_t)> callback)
+{
+    CALL_INFO_TRACE;
+    sptr<SessionStateCallback> cb = new (std::nothrow) SessionStateCallback(callback);
+    CHKPR(callback, ERROR_NULL_POINTER);
+    return DistributedInputKit::RegisterSessionStateCb(cb);
+}
+
+int32_t DistributedInputAdapter::UnregisterSessionStateCb()
+{
+    CALL_INFO_TRACE;
+    return DistributedInputKit::UnregisterSessionStateCb();
+}
+
 void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
@@ -223,6 +237,12 @@ void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
+}
+
+void DistributedInputAdapter::SessionStateCallback::OnResult(const std::string &devId, const uint32_t status)
+{
+    CHKPV(callback_);
+    callback_(status);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
