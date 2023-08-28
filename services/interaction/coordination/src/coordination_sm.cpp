@@ -46,6 +46,7 @@ constexpr int32_t MOUSE_ABS_LOCATION_X { 50 };
 constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
+constexpr uint32_t P2P_SESSION_CLOSED { 1 };
 } // namespace
 
 CoordinationSM::CoordinationSM() {}
@@ -103,6 +104,7 @@ void CoordinationSM::OnSessionLost(SessionPtr session)
     if (currentState_ != CoordinationState::STATE_FREE) {
         DeactivateCoordination(COOR_SM->isUnchained_);
     }
+    D_INPUT_ADAPTER->UnregisterSessionStateCb();
 }
 
 void CoordinationSM::Reset(const std::string &networkId)
@@ -223,6 +225,7 @@ void CoordinationSM::UnprepareCoordination()
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     OnCloseCoordination(localNetworkId, true);
     RemoveMonitor();
+    D_INPUT_ADAPTER->UnregisterSessionStateCb();
 }
 
 int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
@@ -599,6 +602,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             }
             COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
             preparedNetworkId_ = std::make_pair("", "");
+            RegisterSessionCallback();
             break;
         }
         case CoordinationState::STATE_OUT: {
@@ -615,6 +619,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 return;
             }
             COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
+            RegisterSessionCallback();
             break;
         }
         default:
@@ -1138,6 +1143,19 @@ std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
         return nullptr;
     }
     return it->second;
+}
+
+void CoordinationSM::RegisterSessionCallback()
+{
+    CALL_DEBUG_ENTER;
+    D_INPUT_ADAPTER->RegisterSessionStateCb([this](uint32_t status) {
+        FI_HILOGI("Recv session callback status: %{public}u", status);
+        if (status == P2P_SESSION_CLOSED) {
+            preparedNetworkId_ = std::pair("", "");
+            COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::SESSION_CLOSED);
+            Reset();
+        }
+    });
 }
 
 bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const

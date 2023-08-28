@@ -56,23 +56,17 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
         FI_HILOGE("list size over");
         return false;
     }
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    CHKPF(scope);
     if (isOnce) {
         if (!SaveCallbackByEvent(eventType, handler, isOnce, eventOnceMap_)) {
-            napi_close_handle_scope(env_, scope);
             FI_HILOGE("Failed to save eventOnceMap_ callback");
             return false;
         }
     } else {
         if (!SaveCallbackByEvent(eventType, handler, isOnce, eventMap_)) {
-            napi_close_handle_scope(env_, scope);
             FI_HILOGE("Failed to save eventMap_ callback");
             return false;
         }
     }
-    napi_close_handle_scope(env_, scope);
     return true;
 }
 
@@ -223,15 +217,11 @@ void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     std::shared_ptr<DeviceStatusEventListener> &typeHandler)
 {
     CHKPV(typeHandler);
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    CHKPV(scope);
     napi_value handler = nullptr;
     napi_status status = napi_ok;
     status = napi_get_reference_value(env_, typeHandler->onHandlerRef, &handler);
     if (status != napi_ok) {
         FI_HILOGE("OnEvent handler for %{public}d failed, status:%{public}d", eventType, status);
-        napi_close_handle_scope(env_, scope);
         return;
     }
     napi_value result = nullptr;
@@ -241,10 +231,8 @@ void DeviceStatusEvent::CheckRet(int32_t eventType, size_t argc, int32_t value,
     status = napi_call_function(env_, nullptr, handler, argc, &result, &callResult);
     if (status != napi_ok) {
         FI_HILOGE("CheckRet:napi_call_function for %{public}d failed, status:%{public}d", eventType, status);
-        napi_close_handle_scope(env_, scope);
         return;
     }
-    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &result)
@@ -281,23 +269,18 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
 void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    CHKPV(scope);
+    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);;
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>>::iterator typeHandler;
     if (isOnce) {
         typeHandler = eventOnceMap_.find(eventType);
         if (typeHandler == eventOnceMap_.end()) {
             FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
-            napi_close_handle_scope(env_, scope);
             return;
         }
     } else {
         typeHandler = eventMap_.find(eventType);
         if (typeHandler == eventMap_.end()) {
             FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
-            napi_close_handle_scope(env_, scope);
             return;
         }
     }
@@ -306,7 +289,6 @@ void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, b
     for (auto handler : typeHandler->second) {
         CheckRet(eventType, argc, value, handler);
     }
-    napi_close_handle_scope(env_, scope);
 }
 
 void DeviceStatusEvent::ClearEventMap()

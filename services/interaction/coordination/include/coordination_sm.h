@@ -178,6 +178,7 @@ private:
     void OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnReset(const std::string &NetworkId);
     std::shared_ptr<ICoordinationState> GetCurrentState();
+    void RegisterSessionCallback();
 
 private:
     std::pair<std::string, std::string> preparedNetworkId_;

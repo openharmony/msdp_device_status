@@ -13,20 +13,7 @@
  * limitations under the License.
  */
 
-//! data definitions.
+//! rust distributed hardware sys.
 
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate fusion_utils_rust;
-
-mod errors;
-mod ipc;
-mod plugin_manager;
-
-pub use errors::{ FusionErrorCode, FusionResult, FusionInteractionResult };
-pub use ipc::basic::{ BasicParamID, AllocSocketPairParam };
-pub use ipc::coordination::{ GeneralCoordinationParam, StartCoordinationParam,
-    StopCoordinationParam, GetCoordinationStateParam };
-pub use ipc::default::{ CallingContext, DefaultReply };
-pub use ipc::drag::{ CDragData, DragData };
-pub use plugin_manager::{ Intention, IPlugin };
+pub mod dis_handware;
+pub mod dm_device_info;

@@ -173,7 +173,7 @@ int32_t CoordinationSoftbusAdapter::Init()
     std::string sessionName = SESSION_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
     if (sessionName == localSessionName_) {
         FI_HILOGI("Session server has already created");
-        return  RET_OK;
+        return RET_OK;
     }
     int32_t ret = RET_ERR;
     if (!localSessionName_.empty()) {
@@ -228,7 +228,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     const std::string SESSION_NAME = "ohos.msdp.device_status.";
     const std::string GROUP_ID = "fi_softbus_group_id";
     if (CheckDeviceSessionState(remoteNetworkId)) {
-        FI_HILOGD("Softbus session has already  opened");
+        FI_HILOGD("Softbus session has already opened");
         return RET_OK;
     }
 

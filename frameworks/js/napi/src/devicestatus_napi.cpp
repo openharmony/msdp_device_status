@@ -57,9 +57,9 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
         devicestatusData.type, devicestatusData.value);
     data_ = devicestatusData;
     work->data = static_cast<void *>(&data_);
-    int32_t ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, EmitOnEvent);
+    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, EmitOnEvent, uv_qos_default);
     if (ret != 0) {
-        FI_HILOGE("Failed to execute work queue");
+        FI_HILOGE("uv_queue_work_with_qos failed");
     }
 }
 

@@ -35,12 +35,12 @@ StationaryManager *StationaryManager::GetInstance()
 int32_t StationaryManager::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
-    return  DeviceStatusClient::GetInstance().SubscribeCallback(type, event, latency, callback);
+    return DeviceStatusClient::GetInstance().SubscribeCallback(type, event, latency, callback);
 }
 
 int32_t StationaryManager::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    return  DeviceStatusClient::GetInstance().UnsubscribeCallback(type, event, callback);
+    return DeviceStatusClient::GetInstance().UnsubscribeCallback(type, event, callback);
 }
 
 Data StationaryManager::GetDeviceStatusData(Type type)
