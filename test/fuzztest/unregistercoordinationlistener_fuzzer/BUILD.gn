@@ -32,10 +32,9 @@ deps_ex = [
 ]
 
 ###############################fuzztest#################################
-ohos_fuzztest("UpdateDragStyleFuzzTest") {
+ohos_fuzztest("UnRegisterCoordinationListenerFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "${device_status_root_path}/test/fuzztest/updatedragstyle_fuzzer"
+  fuzz_config_file = "${device_status_root_path}/test/fuzztest/unregistercoordinationlistener_fuzzer"
   include_dirs = [
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/interaction/drag/include",
@@ -56,7 +55,7 @@ ohos_fuzztest("UpdateDragStyleFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "updatedragstyle_fuzzer.cpp" ]
+  sources = [ "unregistercoordinationlistener_fuzzer.cpp" ]
 
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
@@ -71,5 +70,5 @@ ohos_fuzztest("UpdateDragStyleFuzzTest") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":UpdateDragStyleFuzzTest" ]
+  deps += [ ":UnRegisterCoordinationListenerFuzzTest" ]
 }

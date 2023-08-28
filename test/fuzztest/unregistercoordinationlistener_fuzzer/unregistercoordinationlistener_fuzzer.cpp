@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "updatedragstyle_fuzzer.h"
+#include "unregistercoordinationlistener_fuzzer.h"
 
 #include "singleton.h"
 #include "fi_log.h"
@@ -24,10 +24,10 @@
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "UpdateDragStyleFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "UnRegisterCoordinationListenerFuzzTest" };
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-bool UpdateDragStyleFuzzTest(const uint8_t* data, size_t size)
+bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
@@ -45,7 +45,7 @@ bool UpdateDragStyleFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UPDATED_DRAG_STYLE), datas, reply, option);
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR), datas, reply, option);
     return true;
 }
 } // namespace OHOS
@@ -56,6 +56,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    OHOS::UpdateDragStyleFuzzTest(data, size);
+    OHOS::UnRegisterCoordinationListenerFuzzTest(data, size);
     return 0;
 }

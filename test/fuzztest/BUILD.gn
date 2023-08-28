@@ -33,6 +33,7 @@ group("device_status_fuzztest") {
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
+    "unregistercoordinationlistener_fuzzer:fuzztest",
     "updatedragstyle_fuzzer:fuzztest",
     "updateshadowpic_fuzzer:fuzztest",
   ]
