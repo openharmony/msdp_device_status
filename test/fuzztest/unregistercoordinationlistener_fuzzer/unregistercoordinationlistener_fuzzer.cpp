@@ -23,6 +23,7 @@
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UnRegisterCoordinationListenerFuzzTest" };
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
