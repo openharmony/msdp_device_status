@@ -24,7 +24,7 @@
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "GetUdKeyFuzzTest" };    
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "GetUdKeyFuzzTest" };
 
 bool GetUdKeyFuzzTest(const uint8_t* data, size_t size)
 {

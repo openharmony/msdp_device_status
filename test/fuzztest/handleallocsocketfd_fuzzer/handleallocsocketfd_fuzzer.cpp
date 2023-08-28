@@ -24,7 +24,7 @@
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "HandleAllocSocketFdFuzzTest" };    
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "HandleAllocSocketFdFuzzTest" };
 
 bool HandleAllocSocketFdFuzzTest(const uint8_t* data, size_t size)
 {
