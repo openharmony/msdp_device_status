@@ -163,4 +163,4 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
 } // namespace
 } // namespace DeviceStatus
 } // namespace Msdp
-} // namespace OH
+} // namespace OHOS
