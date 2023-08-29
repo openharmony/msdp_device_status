@@ -39,7 +39,7 @@ bool StopDragFuzzTest(const uint8_t* data, size_t size)
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(Msdp::DeviceInterfaceCode::STOP_DRAG), datas, reply, option);
-    return ture;
+    return true;
 }
 }
 
