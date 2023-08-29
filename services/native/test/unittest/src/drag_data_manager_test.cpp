@@ -15,9 +15,11 @@
 
 #include "drag_data_manager_test.h"
 
+#include "pointer_event.h"
 #include "securec.h"
 
-#include "fi_log.h"
+#include "devicestatus_define.h"
+#include "drag_drawing.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -29,12 +31,17 @@ constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t PIXEL_MAP_WIDTH { 300 };
 constexpr int32_t PIXEL_MAP_HEIGHT { 300 };
+constexpr int32_t POINTER_ID { 0 };
+constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t SHADOWINFO_X { 10 };
 constexpr int32_t SHADOWINFO_Y { 10 };
 constexpr int32_t DISPLAY_X { 50 };
 constexpr int32_t DISPLAY_Y { 50 };
+constexpr int32_t DRAG_NUM_ONE { 1 };
+constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+const std::string UD_KEY { "Unified data key" };
 }
 void DragDataManagerTest::SetUpTestCase() {}
 
@@ -78,6 +85,31 @@ std::shared_ptr<Media::PixelMap> DragDataManagerTest::CreatePixelMap(int32_t wid
     }
     delete[] colorPixels;
     return pixelMap;
+}
+
+std::optional<DragData> DragDataManagerTest::CreateDragData(int32_t sourceType,
+    int32_t pointerId, int32_t dragNum)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
+    if (pixelMap == nullptr) {
+        FI_HILOGE("Create pixelmap failed");
+        return std::nullopt;
+    }
+    DragData dragData;
+    dragData.shadowInfo.pixelMap = pixelMap;
+    dragData.shadowInfo.x = 0;
+    dragData.shadowInfo.y = 0;
+    dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
+    dragData.udKey = UD_KEY;
+    dragData.sourceType = sourceType;
+    dragData.pointerId = pointerId;
+    dragData.dragNum = dragNum;
+    dragData.displayX = DISPLAY_X;
+    dragData.displayY = DISPLAY_Y;
+    dragData.displayId = DISPLAY_ID;
+    dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
+    return dragData;
 }
 
 namespace {
@@ -159,6 +191,52 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
     int32_t height = 0;
     auto ret = DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
     EXPECT_TRUE(ret == -1);
+}
+
+/**
+ * @tc.name: DragDataManagerTest006
+ * @tc.desc: abnormal test DragDrawing initialization
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
+{
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHPAD, POINTER_ID, DRAG_NUM_ONE);
+    EXPECT_FALSE(dragData == std::nullopt);
+    DragDrawing dragDrawing;
+    int32_t ret = dragDrawing.Init(dragData.value());
+    ASSERT_EQ(ret, INIT_FAIL);
+}
+
+/**
+ * @tc.name: DragDataManagerTest007
+ * @tc.desc: normal test DragDrawing initialization
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
+{
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
+    EXPECT_FALSE(dragData == std::nullopt);
+    DragDrawing dragDrawing;
+    int32_t ret = dragDrawing.Init(dragData.value());
+    ASSERT_EQ(ret, INIT_SUCCESS);
+}
+
+/**
+ * @tc.name: DragDataManagerTest008
+ * @tc.desc: normal test DragDrawing initialization
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
+{
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
+    EXPECT_FALSE(dragData == std::nullopt);
+    struct DrawingInfo g_drawingInfo;
+    DragDrawing dragDrawing;
+    int32_t ret = dragDrawing.Init(dragData.value());
+    ASSERT_EQ(ret, INIT_CANCEL);
 }
 } // namespace
 } // namespace DeviceStatus

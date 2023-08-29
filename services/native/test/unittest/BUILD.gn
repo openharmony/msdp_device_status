@@ -110,6 +110,7 @@ ohos_unittest("DragDataManagerTest") {
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
