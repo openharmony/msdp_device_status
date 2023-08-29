@@ -235,6 +235,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->SaveAppInfo(appInfo);
+    StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
     devicestatusManager_->Subscribe(type, event, latency, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
