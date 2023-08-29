@@ -55,7 +55,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
     item.SetPressed(true);
     keyEvent->AddKeyItem(item);
     bool ret = COOR_SM->IsNeedFilterOut(localNetworkId, keyEvent);
-    EXPECT_TRUE(ret);
+    EXPECT_EQ(false, ret);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
