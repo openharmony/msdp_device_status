@@ -147,8 +147,8 @@ void Utility::ShowFileAttributes(const char *path)
     }
 
     std::ostringstream ss;
-    std::map<mode_t, std::string> modes {{S_IRUSR, "U+R"}, {S_IWUSR, "U+W"}, {S_IXUSR, "U+X"}, {S_IRGRP, "G+R"}, {S_IWGRP, "G+W"},
-        {S_IXGRP, "G+X"}, {S_IROTH, "O+R"}, {S_IWOTH, "O+W"}, {S_IXOTH, "O+X"}};
+    std::map<mode_t, std::string> modes {{S_IRUSR, "U+R "}, {S_IWUSR, "U+W "}, {S_IXUSR, "U+X "}, {S_IRGRP, "G+R "}, {S_IWGRP, "G+W "},
+        {S_IXGRP, "G+X "}, {S_IROTH, "O+R "}, {S_IWOTH, "O+W "}, {S_IXOTH, "O+X "}};
     for (auto element : modes) {
         if (buf.st_mode & element.first) {
             ss << element.second;
