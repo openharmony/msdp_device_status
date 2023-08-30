@@ -15,20 +15,21 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 config("fusion_subsystem_dsoftbus_binding_config") {
-  include_dirs = [ "include",
-                   "${device_status_interfaces_path}/innerkits/interaction/include",
-                   "${device_status_service_path}/context/include",
-                   "//third_party/openssl:libcrypto_shared",
-                 ]
+  include_dirs = [ 
+    "include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/context/include",
+    "//third_party/openssl:libcrypto_shared",
+  ]
   defines = device_status_default_defines
 }
 
 config("fusion_subsystem_dsoftbus_binding_public_config") {
   include_dirs = [ "include",
-                   "${device_status_interfaces_path}/innerkits/interaction/include",
-                   "${device_status_service_path}/context/include",
-                   "//third_party/openssl:libcrypto_shared",
-                 ]
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/context/include",
+    "//third_party/openssl:libcrypto_shared",
+  ]
 }
 
 ohos_shared_library("fusion_subsystem_dsoftbus_binding") {
@@ -38,11 +39,12 @@ ohos_shared_library("fusion_subsystem_dsoftbus_binding") {
     "src/message_packing.cpp",
   ]
 
-  deps = [ "${device_status_root_path}/utils/common:devicestatus_util",
-           "${device_status_root_path}/services/interaction/coordination:coordination",
-           "${device_status_utils_path}:devicestatus_util",
-           "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-         ]
+  deps = [ 
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/services/interaction/coordination:coordination",
+    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
 
   configs = [ ":fusion_subsystem_dsoftbus_binding_config" ]
 
