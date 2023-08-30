@@ -18,16 +18,16 @@ ohos_rust_shared_library("fusion_dsoftbus_rust") {
 
   deps = [
     "${device_status_root_path}/rust/data/sys:fusion_data_rust",
-    "${device_status_root_path}/rust/utils:fusion_utils_rust",
     "${device_status_root_path}/rust/subsystem/dsoftbus/binding:fusion_subsystem_dsoftbus_binding",
+    "${device_status_root_path}/rust/utils:fusion_utils_rust",
   ]
 
   external_deps = [
-    "dsoftbus:softbus_client",
-    "hilog:hilog_rust",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "dsoftbus:softbus_client",
+    "hilog:hilog_rust",
   ]
 
   crate_name = "fusion_dsoftbus_rust"
@@ -38,20 +38,16 @@ ohos_rust_shared_library("fusion_dsoftbus_rust") {
 }
 
 ohos_rust_executable("rust_main") {
-  sources = [
-    "src/main.rs",
-  ]
-  
-  deps = [
-    "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust",
-  ]
+  sources = [ "src/main.rs" ]
+
+  deps = [ "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust" ]
 
   external_deps = [
-    "hilog:hilog_rust",
-    "dsoftbus:softbus_client",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "dsoftbus:softbus_client",
+    "hilog:hilog_rust",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
