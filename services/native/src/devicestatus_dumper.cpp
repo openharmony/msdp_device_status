@@ -33,7 +33,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "drag_manager.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
