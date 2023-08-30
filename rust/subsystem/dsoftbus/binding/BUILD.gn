@@ -41,10 +41,10 @@ ohos_shared_library("fusion_subsystem_dsoftbus_binding") {
   ]
 
   deps = [
-    "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/services/interaction/coordination:coordination",
-    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
   ]
 
   configs = [ ":fusion_subsystem_dsoftbus_binding_config" ]
@@ -52,15 +52,15 @@ ohos_shared_library("fusion_subsystem_dsoftbus_binding") {
   public_configs = [ ":fusion_subsystem_dsoftbus_binding_public_config" ]
 
   external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "input:libmmi-client",
+    "c_utils:utils",
     "device_manager:devicemanagersdk",
     "distributed_input:libdinput_sdk",
+    "hilog:libhilog",
     "image_framework:image_native",
+    "input:libmmi-client",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
