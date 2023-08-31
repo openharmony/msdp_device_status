@@ -15,6 +15,8 @@
 
 #include "drag_data_manager_test.h"
 
+#include <ipc_skeleton.h>
+
 #include "pointer_event.h"
 #include "securec.h"
 
@@ -114,8 +116,8 @@ std::optional<DragData> DragDataManagerTest::CreateDragData(int32_t sourceType,
 
 namespace {
 /**
- * @tc.name: DragDataManagerTest
- * @tc.desc: test devicestatus callback in proxy
+ * @tc.name: DragDataManagerTest001
+ * @tc.desc: test normal SetDragStyle and GetDragStyle in devicestatus
  * @tc.type: FUNC
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest001, TestSize.Level0)
@@ -135,11 +137,66 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: DragDataManagerTest002
+ * @tc.desc: test abnormal SetDragStyle and GetDragStyle in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest002, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::DEFAULT);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::DEFAULT);
+
+    DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::FORBIDDEN);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::FORBIDDEN);
+
+    DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::COPY);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::COPY);
+
+    DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::MOVE);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE);
+}
+
+/**
+ * @tc.name: DragDataManagerTest003
+ * @tc.desc: test normal get devicestatus data in ipc
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest003, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t targetTid = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    DRAG_DATA_MGR.SetTargetTid(targetTid);
+    EXPECT_TRUE(targetTid == DRAG_DATA_MGR.GetTargetTid());
+
+    int32_t targetPid = IPCSkeleton::GetCallingPid();
+    DRAG_DATA_MGR.SetTargetPid(targetPid);
+    EXPECT_TRUE(targetPid == DRAG_DATA_MGR.GetTargetPid());
+}
+
+/**
  * @tc.name: DragDataManagerTest004
- * @tc.desc: test get devicestatus drag data
+ * @tc.desc: test abnormal get devicestatus data in ipc
  * @tc.type: FUNC
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest004, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t targetTid = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    DRAG_DATA_MGR.SetTargetTid(targetTid);
+    EXPECT_FALSE(targetTid != DRAG_DATA_MGR.GetTargetTid());
+
+    int32_t targetPid = IPCSkeleton::GetCallingPid();
+    DRAG_DATA_MGR.SetTargetPid(targetPid);
+    EXPECT_FALSE(targetPid != DRAG_DATA_MGR.GetTargetPid());
+}
+
+/**
+ * @tc.name: DragDataManagerTest005
+ * @tc.desc: test get devicestatus drag data
+ * @tc.type: FUNC
+ */
+HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
@@ -171,11 +228,11 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest004, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDataManagerTest005
+ * @tc.name: DragDataManagerTest006
  * @tc.desc: test pixelMap is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
+HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
 {
     DragData dragData;
     dragData.shadowInfo.pixelMap = nullptr;
@@ -194,11 +251,11 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDataManagerTest006
+ * @tc.name: DragDataManagerTest007
  * @tc.desc: abnormal test DragDrawing initialization
  * @tc.type: FUNC
  */
-HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
+HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
 {
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHPAD, POINTER_ID, DRAG_NUM_ONE);
@@ -209,11 +266,11 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDataManagerTest007
+ * @tc.name: DragDataManagerTest008
  * @tc.desc: normal test DragDrawing initialization
  * @tc.type: FUNC
  */
-HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
+HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
 {
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
@@ -224,11 +281,11 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
 }
 
 /**
- * @tc.name: DragDataManagerTest008
+ * @tc.name: DragDataManagerTest009
  * @tc.desc: normal test DragDrawing initialization
  * @tc.type: FUNC
  */
-HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
+HWTEST_F(DragDataManagerTest, DragDataManagerTest009, TestSize.Level0)
 {
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
