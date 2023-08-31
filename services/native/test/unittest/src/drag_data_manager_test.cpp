@@ -145,16 +145,16 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::DEFAULT);
-    EXPECT_TRUE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::DEFAULT);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::DEFAULT);
 
     DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::FORBIDDEN);
-    EXPECT_TRUE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::FORBIDDEN);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::FORBIDDEN);
 
     DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::COPY);
-    EXPECT_TRUE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::COPY);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::COPY);
 
     DRAG_DATA_MGR.SetDragStyle(DragCursorStyle::MOVE);
-    EXPECT_TRUE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE);
+    EXPECT_FALSE(DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE);
 }
 
 /**
