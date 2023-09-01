@@ -22,8 +22,7 @@ use std::ffi::{ c_char, CString };
 use std::os::fd::RawFd;
 use std::sync::{ Mutex, Once };
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_data_rust::{ FusionResult };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use crate::binding::FusionNativeService;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -113,7 +112,7 @@ impl FusionService {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {}", err);
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

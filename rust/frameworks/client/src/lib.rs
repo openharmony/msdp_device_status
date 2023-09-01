@@ -73,7 +73,7 @@ pub unsafe extern "C" fn fusion_alloc_socket_fd(program_name: *const c_char, mod
         }
         Err(err) => {
             error!(LOG_LABEL, "Fail parsing AllocSocketPairParam");
-            return err;
+            return i32::from(err);
         }
     };
     match FusionFrameworks::get_instance() {
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn fusion_start_drag(c_drag_data: *mut CDragData) -> i32
                     }
                     Err(err) => {
                         error!(LOG_LABEL, "Error happened when starting drag");
-                        err
+                        i32::from(err)
                     }
                 }
             }
@@ -151,7 +151,7 @@ pub unsafe extern "C" fn fusion_register_coordination_listener() -> i32
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Fail to register coordination listener: {}", @public(err));
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -176,7 +176,7 @@ pub unsafe extern "C" fn fusion_unregister_coordination_listener() -> i32
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Fail to unregister coordination listener: {}", @public(err));
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -201,7 +201,7 @@ pub unsafe extern "C" fn fusion_enable_coordination(user_data: i32) -> i32
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Error in enable coordination");
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -226,7 +226,7 @@ pub unsafe extern "C" fn fusion_disable_coordination(user_data: i32) -> i32
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Error in enable coordination");
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -265,7 +265,7 @@ pub unsafe extern "C" fn fusion_start_coordination(user_data: i32,
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Error happened when starting coordination");
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -290,7 +290,7 @@ pub unsafe extern "C" fn fusion_stop_coordination(user_data: i32, is_unchained: 
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Fail to stop coordination");
-                    err
+                    i32::from(err)
                 }
             }
         }
@@ -328,7 +328,7 @@ pub unsafe extern "C" fn fusion_get_coordination_state(user_data: i32, device_id
                 }
                 Err(err) => {
                     error!(LOG_LABEL, "Fail to get coordination state: {}", @public(err));
-                    err
+                    i32::from(err)
                 }
             }
         }

@@ -16,7 +16,7 @@
 use crate::{
     input_binding, input_binding::{ CPointerStyle, CPointerStyleColor }
 };
-use fusion_data_rust::FusionResult;
+use crate::fusion_utils_rust::{ FusionResult, FusionErrorCode };
 use std::ffi::{ c_char, CString };
 use hilog_rust::{debug, error, hilog, HiLogLabel, LogType};
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -72,7 +72,7 @@ impl PointerStyle {
         unsafe {
             if input_binding::CGetPointerStyle(&mut self.inner) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "get pointer style failed");
-                return Err(-1);
+                return Err(FusionErrorCode::Fail);
             }
             debug!(LOG_LABEL, "get pointer style success");
             Ok(0)

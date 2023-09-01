@@ -16,8 +16,7 @@
 #![allow(dead_code)]
 
 use std::ffi::{ c_char, CString };
-use crate::fusion_utils_rust::{ call_info_trace };
-use fusion_data_rust::{FusionInteractionResult, FusionErrorCode};
+use crate::fusion_utils_rust::{ call_info_trace, FusionResult, FusionErrorCode };
 use crate::dm_binding;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -32,7 +31,7 @@ pub struct DisHandware;
 
 impl DisHandware {
     /// Init device manager.
-    pub fn init_device_manager() -> FusionInteractionResult<i32> {
+    pub fn init_device_manager() -> FusionResult<i32> {
         call_info_trace!("DisHandware::init_device_manager");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         // SAFETY: no `None` here, cause `callback` and  `pkg_name` is valid.
@@ -46,7 +45,7 @@ impl DisHandware {
     }
 
     /// Register device state
-    pub fn register_device_state() -> FusionInteractionResult<i32> {
+    pub fn register_device_state() -> FusionResult<i32> {
         call_info_trace!("DisHandware::register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;
@@ -67,7 +66,7 @@ impl DisHandware {
     }
 
     /// UnRegister device state
-    pub fn un_register_device_state() -> FusionInteractionResult<i32> {
+    pub fn un_register_device_state() -> FusionResult<i32> {
         call_info_trace!("DisHandware::un_register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;

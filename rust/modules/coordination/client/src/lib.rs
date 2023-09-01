@@ -24,9 +24,9 @@ extern crate ipc_rust;
 
 use fusion_data_rust::{
     Intention, DefaultReply, GeneralCoordinationParam, StartCoordinationParam,
-    StopCoordinationParam, GetCoordinationStateParam, FusionResult
+    StopCoordinationParam, GetCoordinationStateParam
 };
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ MsgParcel, Deserialize };
 use std::ffi::{ c_char, CString };
@@ -61,7 +61,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -81,7 +81,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -104,7 +104,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -126,7 +126,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -152,13 +152,13 @@ impl FusionCoordinationClient {
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Fail to deserialize DefaultReply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -176,7 +176,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -194,7 +194,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

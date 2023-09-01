@@ -17,8 +17,8 @@
 
 use std::any::Any;
 use ipc_rust::{ BorrowedMsgParcel };
-use crate::{ CallingContext, FusionResult };
-use crate::fusion_utils_rust::{ define_enum };
+use crate::CallingContext;
+use crate::fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
 
 define_enum! {
     Intention {

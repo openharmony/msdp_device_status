@@ -30,8 +30,8 @@ use crate::ipc_rust::{
     BorrowedMsgParcel, IRemoteBroker, IRemoteObj, MsgParcel, IMsgParcel,
     RemoteObj, RemoteStub, define_remote_object
 };
-use crate::fusion_data_rust::{ FusionResult, Intention };
-use crate::fusion_utils_rust::call_debug_enter;
+use crate::fusion_data_rust::Intention;
+use crate::fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use crate::identity::{ CommonAction, compose_param_id, split_action, split_intention, split_param };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -129,12 +129,12 @@ impl FusionIpcProxy {
                     Ok(0)
                 } else {
                     error!(LOG_LABEL, "write_buffer() failed");
-                    Err(-1)
+                    Err(FusionErrorCode::Fail)
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "read_buffer() failed");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -154,7 +154,7 @@ impl FusionIpcProxy {
                         }
                         Err(_) => {
                             error!(LOG_LABEL, "Fail to send request");
-                            return Err(-1);
+                            return Err(FusionErrorCode::Fail);
                         }
                     }
                 };
@@ -163,7 +163,7 @@ impl FusionIpcProxy {
             }
             None => {
                 error!(LOG_LABEL, "Can not deref data");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

@@ -29,9 +29,9 @@ use std::fs::File;
 use std::os::fd::{ FromRawFd, RawFd };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize, FileDesc, Serialize };
-use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext, FusionResult };
+use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext};
 use fusion_services_rust::{ FusionService };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -63,19 +63,19 @@ impl FusionBasicServer {
                 let fdesc = FileDesc::new(f);
 
                 if fdesc.serialize(reply).is_err() {
-                    return Err(-1);
+                    return Err(FusionErrorCode::Fail);
                 }
                 if token_type.serialize(reply).is_err() {
-                    return Err(-1);
+                    return Err(FusionErrorCode::Fail);
                 }
                 Ok(0)
             } else {
                 error!(LOG_LABEL, "No proxy");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         } else {
             info!(LOG_LABEL, "Can not deserialize AllocSocketPairParam");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         }
     }
 }
@@ -97,7 +97,7 @@ impl IPlugin for FusionBasicServer {
         reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
         call_debug_enter!("FusionBasicServer::start");
         error!(LOG_LABEL, "FusionBasicServer::start");
-        Err(-1)
+        Err(FusionErrorCode::Fail)
     }
 
     fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel,
@@ -144,7 +144,7 @@ impl IPlugin for FusionBasicServer {
             }
             Err(_) => {
                 error!(LOG_LABEL, "Invalid param id: {}", id);
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

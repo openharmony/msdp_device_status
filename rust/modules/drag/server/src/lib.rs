@@ -29,8 +29,8 @@ extern crate ipc_rust;
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize };
-use fusion_data_rust::{ IPlugin, CallingContext, DragData, FusionResult };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_data_rust::{ IPlugin, CallingContext, DragData};
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_plugin_manager_rust::{ export_plugin };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -90,13 +90,13 @@ impl IPlugin for FusionDragServer {
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Failed to serialize reply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "in FusionDragServer::start(): DragData::deserialize() failed");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

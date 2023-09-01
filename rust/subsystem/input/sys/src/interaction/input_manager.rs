@@ -15,10 +15,10 @@
 
 #![allow(dead_code)]
 
-use crate::{input_binding, input_binding::OnPointerEventCallback};
-use fusion_data_rust::FusionResult;
+use crate::{ input_binding, input_binding::OnPointerEventCallback };
+use crate::fusion_utils_rust::{ FusionResult, FusionErrorCode };
 use std::ffi::{ c_char, CString };
-use hilog_rust::{error, hilog, HiLogLabel, LogType};
+use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
@@ -36,7 +36,7 @@ impl InputManager {
         unsafe {
             if input_binding::CAddMonitor(callback) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to add monitor");
-                return Err(-1);
+                return Err(FusionErrorCode::Fail);
             }
             Ok(0)
         }
@@ -48,7 +48,7 @@ impl InputManager {
         unsafe {
             if input_binding::CSetPointerVisible(visible) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to set pointer visible");
-                return Err(-1);
+                return Err(FusionErrorCode::Fail);
             }
             Ok(0)
         }
@@ -60,7 +60,7 @@ impl InputManager {
         unsafe {
             if input_binding::CEnableInputDevice(enable) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to enable input device");
-                return Err(-1);
+                return Err(FusionErrorCode::Fail);
             }
             Ok(0)
         }
@@ -72,7 +72,7 @@ impl InputManager {
         unsafe {
             if input_binding::CRemoveInputEventFilter(filter_id) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to remove input event filter");
-                return Err(-1);
+                return Err(FusionErrorCode::Fail);
             }
             Ok(0)
         }

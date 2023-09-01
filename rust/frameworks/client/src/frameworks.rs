@@ -23,9 +23,9 @@ use std::sync::Once;
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
 use ipc_rust::FileDesc;
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
-use fusion_data_rust::{ AllocSocketPairParam, DragData, FusionResult };
+use fusion_data_rust::{ AllocSocketPairParam, DragData};
 use fusion_basic_client_rust::FusionBasicClient;
 use fusion_drag_client_rust::DragClient;
 use fusion_coordination_client_rust::FusionCoordinationClient;
@@ -105,7 +105,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -119,7 +119,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -133,7 +133,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -147,7 +147,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -161,7 +161,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -175,7 +175,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -192,7 +192,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -207,7 +207,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -222,7 +222,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

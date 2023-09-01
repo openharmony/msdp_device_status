@@ -15,12 +15,9 @@
 
 //! ExtraData data definitions of DRAG module.
 
-use crate::{
-    input_binding, input_binding::CExtraData
-};
-use fusion_data_rust::{
-    DragData, FusionResult
-};
+use crate::{ input_binding, input_binding::CExtraData };
+use fusion_data_rust::DragData;
+use crate::fusion_utils_rust::{ FusionResult, FusionErrorCode };
 
 impl CExtraData {
     /// Create a CExtraData object
@@ -78,7 +75,7 @@ impl ExtraData {
     pub fn appended_extra_data(&mut self, allow_appended: bool, drag_data: DragData) -> FusionResult<i32> {
         let buffer: &Vec<u8>= &drag_data.buffer;
         if buffer.is_empty() {
-            return Err(-1)
+            return Err(FusionErrorCode::Fail);
         }
         self.inner.set_appended(allow_appended)
                   .set_buffer(buffer)

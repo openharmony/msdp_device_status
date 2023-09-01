@@ -54,8 +54,17 @@ impl TryFrom<i32> for FusionErrorCode {
     }
 }
 
-/// IPC specific Result, error is i32 type
-pub type FusionResult<T> = std::result::Result<T, i32>;
+impl std::fmt::Display for FusionErrorCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FusionErrorCode::Fail => write!(f, "-1"),
+            FusionErrorCode::InvalidParam => write!(f, "-2")
+        }
+    }
+}
 
-/// Fusion Interaction specific Result, error is FusionErrorCode type
-pub type FusionInteractionResult<T> = std::result::Result<T, FusionErrorCode>;
+/// IPC specific Result, error is FusionErrorCode type
+pub type FusionResult<T> = std::result::Result<T, FusionErrorCode>;
+
+// Fusion Interaction specific Result, error is FusionErrorCode type
+// pub type FusionInteractionResult<T> = std::result::Result<T, FusionErrorCode>;

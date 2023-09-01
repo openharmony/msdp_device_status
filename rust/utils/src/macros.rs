@@ -37,7 +37,7 @@ macro_rules! define_enum {
         }
 
         impl TryFrom<u32> for $name {
-            type Error = i32;
+            type Error = FusionErrorCode;
             fn try_from(code: u32) -> std::result::Result<Self, Self::Error> {
                 match code {
                     $(
@@ -46,7 +46,7 @@ macro_rules! define_enum {
                         }
                     )*
                     _ => {
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }

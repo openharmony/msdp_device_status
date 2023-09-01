@@ -22,8 +22,8 @@ use std::sync::Mutex;
 use std::ffi::{ c_char, CString };
 use crate::hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
 use crate::ipc_rust::{ BorrowedMsgParcel, Deserialize, InterfaceToken, IRemoteBroker, IRemoteStub };
-use crate::fusion_data_rust::{ Intention, IPlugin, CallingContext, FusionResult };
-use crate::fusion_utils_rust::call_debug_enter;
+use crate::fusion_data_rust::{ Intention, IPlugin, CallingContext };
+use crate::fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use crate::fusion_ipc_service_rust::{ IDeviceStatus, FusionIpcStub };
 use crate::fusion_plugin_manager_rust::PluginManager;
 
@@ -51,14 +51,14 @@ impl FusionIpcDelegator {
                 debug!(LOG_LABEL, "check interface token");
                 if token.get_token() != FusionIpcStub::get_descriptor() {
                     error!(LOG_LABEL, "unexpected token");
-                    Err(-1)
+                    Err(FusionErrorCode::Fail)
                 } else {
                     Ok(0)
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "Deserialization of interface token fail");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -75,13 +75,13 @@ impl FusionIpcDelegator {
                     }
                     None => {
                         error!(LOG_LABEL, "Fail to load intention module");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "error locking");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
