@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-//! rust input binding sys
+//! rust dsoftbus binding sys
 
 #![allow(dead_code)]
 #![allow(missing_docs)]
 
 use std::ffi::{ c_void, c_char };
 
-///for dsoftbus
+///Constant for dsoftbus
 pub const INTERCEPT_STRING_LENGTH: usize = 20;
 pub const DINPUT_LINK_TYPE_MAX: i32 = 4;
 pub const DEVICE_ID_SIZE_MAX: usize = 65;
@@ -35,19 +35,22 @@ pub const TYPE_BYTES: i32 = 2;
 pub const TYPE_FILE: i32 = 3;
 pub const TYPE_STREAM: i32 = 4;
 pub const TYPE_BUTT: i32 = 5;
-pub const NETWORK_ID_BUF_LEN: i32 = 65;
-pub const DEVICE_NAME_BUF_LEN: i32 = 128;
+pub const NETWORK_ID_BUF_LEN: usize = 65;
+pub const DEVICE_NAME_BUF_LEN: usize = 128;
 pub const RET_OK: i32 = 0;
 
-/// struct for dsoftbus
+/// struct NodeBasicInfo
 #[repr(C)]
 pub struct NodeBasicInfo {
-    pub network_id: [i8; NETWORK_ID_BUF_LEN as usize],
-    pub device_name: [i8; DEVICE_NAME_BUF_LEN as usize],
+    /// network id of the device 
+    pub network_id: [i8; NETWORK_ID_BUF_LEN],
+    /// device name of the device 
+    pub device_name: [i8; DEVICE_NAME_BUF_LEN],
+    /// device type id of the device 
     pub device_type_id: u16,
 }
 
-/// struct for dsoftbus
+/// struct SessionAttribute
 #[repr(C)]
 pub struct SessionAttribute {
     pub data_type: i32,
@@ -58,34 +61,44 @@ pub struct SessionAttribute {
     pub fast_trans_data_size: u16,
 }
 
-/// struct for dsoftbus
+/// struct StreamData
 #[repr(C)]
 pub struct StreamData {
+    /// content of the buf
     pub buf_data: c_char,
+    /// length of the buf
     pub buf_len: i32,
 }
 
-/// struct for dsoftbus
+/// struct DataPacket
 #[repr(C)]
 pub struct DataPacket {
+    /// message id of the message
     pub message_id: MessageId,
+    /// length of the message
     pub buf_len: u32,
+    /// content of the message
     pub data: Vec<*const c_char>,
 }
 
-/// enum for adapter and MessageId
+/// enum MessageId
 #[repr(C)]
 #[derive(Eq, Hash, PartialEq)]
 #[derive(Copy, Clone)]
 pub enum MessageId {
+    /// min id
     MinId,
+    /// dragging data
     DraggingData,
+    /// stopdrag data
     StopdragData,
+    /// is pull up
     IsPullUp,
+    /// max id
     MaxId,
 }
 
-/// struct for dsoftbus
+/// struct StreamFrameInfo
 #[repr(C)]
 pub struct StreamFrameInfo {
     pub frame_type: i32,
@@ -98,37 +111,48 @@ pub struct StreamFrameInfo {
     pub tv_list: i32,
 }
 
-/// struct for dsoftbus
+/// struct ISessionListener
 #[repr(C)]
 #[derive(Default)]
 pub struct ISessionListener {
+    /// The callback function is used to do something after listening that a session has been opened.
     pub on_session_opened: Option<OnSessionOpened>,
+    /// The callback function is used to do something after listening that a session has been closed.
     pub on_session_closed: Option<OnSessionClosed>,
+    /// The callback function is used to do something when listening to receive some byte messages.
     pub on_bytes_received: Option<OnBytesReceived>,
+    /// The callback function is used to do something when listening to receive some string messages.
     pub on_message_received: Option<OnMessageReceived>,
+    /// The callback function is used to do something when listening to receive some stream messages.
     pub on_stream_received: Option<OnstreamReceived>,
 }
 
-/// callback type OnSessionOpened
+// Callback function type for OnSessionOpened() from native, this callback will be called after listening
+// that a session has been opened.
 pub type OnSessionOpened = extern "C" fn (session_id: i32, resultValue: i32) -> i32;
-/// callback type OnSessionClosed
+// Callback function type for OnSessionClosed() from native, this callback will be called after listening
+// that a session has been opened.
 pub type OnSessionClosed = extern "C" fn (session_id: i32);
-/// callback type OnBytesReceived
+// Callback function type for OnBytesReceived() from native, this callback will be called after listening
+// to receive some byte messages.
 pub type OnBytesReceived = extern "C" fn (session_id: i32, byteData: *const c_void, data_len: u32);
-/// callback type OnMessageReceived
+// Callback function type for OnMessageReceived() from native, this callback will be called after listening
+// to receive some string messages.
 pub type OnMessageReceived = extern "C" fn (session_id: i32, byteData: *const c_void, data_len: u32);
-/// callback type OnstreamReceived
+// Callback function type for OnstreamReceived() from native, this callback will be called after listening
+// to receive some stream messages.
 pub type OnstreamReceived = extern "C" fn (session_id: i32, byteData: *const StreamData,
     extData: *const StreamData, paramData: *const StreamFrameInfo);
+// Callback function type for OnHandleRecvData() from other, this callback will be called when callback
+// functions that receive the message have been called.
 pub type OnHandleRecvData = extern "C" fn (session_id: i32, message: *const c_char);
 
-// C interface for main
 extern "C" {
-    /// interface of GetAccessToken
+    /// This function is used to get permission:DISTRIBUTED_DATASYNC, it will be called in main.rs.
     pub fn GetAccessToken();
 }
 
-// C interface for dsoftbus,function definition in lib: dsoftbus:softbus_client
+// These C interfaces are defined in lib: dsoftbus:softbus_client
 extern "C" {
     /// interface of CreateSessionServer
     pub fn CreateSessionServer(pkg_name: *const c_char, session_name: *const c_char, session_listener: *const ISessionListener) -> i32;
@@ -147,10 +171,18 @@ extern "C" {
     pub fn GetLocalNodeDeviceInfo(pkg_name: *const c_char, info: *mut NodeBasicInfo) -> i32;
     /// interface of SendBytes
     pub fn SendBytes(session_id: i32, data: *const c_void, len: u32) -> i32;
-    /// interface of CReset
-    pub fn CReset(network_id: *const c_char);
-    /// interface of CSaveHandleCb
+}
+
+extern "C" {
+    /// The function is used to save callback function.
     pub fn CSaveHandleCb(call_back: Option<OnHandleRecvData>);
-    /// interface of CGetHandleCb
+    /// The function is used to get callback function.
     pub fn CGetHandleCb() -> Option<OnHandleRecvData>;
 }
+
+// These C interfaces wrapper some c++ functions defined in 'coordination_sm_rust.cpp'.
+extern "C" {
+    /// interface of CReset
+    pub fn CReset(network_id: *const c_char);
+}
+
