@@ -18,11 +18,6 @@
 
 #include <gtest/gtest.h>
 
-#include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
-#include "nocopyable.h"
-#include "token_setproc.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
