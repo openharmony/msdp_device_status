@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "coordination_sm.h"
+#include "coordination_sm_test.h"
 #include "coordination_util.h"
 #include "fi_log.h"
 
@@ -27,13 +28,15 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSMTest" };
 } // namespace
 
-class CoordinationSMTest : public testing::Test {
-public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
-    void SetUp() {}
-    void TearDown() {}
-};
+void CoordinationSMTest::SetUpTestCase() {}
+
+void CoordinationSMTest::TearDownTestCase() {}
+
+void CoordinationSMTest::SetUp() {
+    AddPermission();
+}
+
+void CoordinationSMTest::TearDown() {}
 
 /**
  * @tc.name: CoordinationSMTest
@@ -56,6 +59,32 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
     keyEvent->AddKeyItem(item);
     bool ret = COOR_SM->IsNeedFilterOut(localNetworkId, keyEvent);
     EXPECT_EQ(false, ret);
+}
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test GetCoordinationState when localNetworkId is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string localNetworkId = "";
+    int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
+    ASSERT_TRUE(ret == static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR));
+}
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test GetCoordinationState when localNetworkId is right
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+    int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
+    ASSERT_TRUE(ret == 0);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
