@@ -109,7 +109,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t ret = COOR_SM->GetCoordinationState("");
-    ASSERT_TRUE(ret == static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR));
+    EXPECT_TRUE(ret == static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR));
 }
 
 /**
@@ -122,7 +122,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
-    ASSERT_TRUE(ret == 0);
+    EXPECT_TRUE(ret == 0);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
