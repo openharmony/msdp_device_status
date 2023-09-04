@@ -62,7 +62,6 @@ void CoordinationSMTest::SetAceessTokenPermission(const std::string &processName
     if (perms == nullptr || permCount == 0) {
         return;
     }
-    uint64_t tokenId;
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
         .permsNum = permCount,
@@ -73,7 +72,7 @@ void CoordinationSMTest::SetAceessTokenPermission(const std::string &processName
         .processName = processName.c_str(),
         .aplStr = "system_basic",
     };
-    tokenId = GetAccessTokenId(&infoInstance);
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(tokenId);
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
