@@ -123,10 +123,7 @@ ohos_unittest("CoordinationSMTest") {
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_service_path}/context/include",
   ]
-  sources = [
-    "src/add_permission.cpp",
-    "src/coordination_sm_test.cpp",
-  ]
+  sources = [ "src/coordination_sm_test.cpp" ]
 
   configs = [
     "${device_status_service_path}/interaction/coordination:coordination_public_config",
