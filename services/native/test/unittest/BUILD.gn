@@ -151,6 +151,36 @@ ohos_unittest("CoordinationSMTest") {
   ]
 }
 
+ohos_unittest("CoordinationSoftbusAdapterTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
+
+  sources = [ "src/coordination_softbus_adapter_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gtest_main",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  external_deps = [
+    "device_info_manager:distributed_device_profile_client",
+    "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = []
@@ -162,6 +192,9 @@ group("unittest") {
   ]
 
   if (fusion_interaction_coordination) {
-    deps += [ ":CoordinationSMTest" ]
+    deps += [
+      ":CoordinationSMTest",
+      ":CoordinationSoftbusAdapterTest",
+    ]
   }
 }
