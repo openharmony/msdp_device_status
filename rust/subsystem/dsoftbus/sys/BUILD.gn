@@ -40,7 +40,10 @@ ohos_rust_shared_library("fusion_dsoftbus_rust") {
 ohos_rust_executable("rust_main") {
   sources = [ "src/main.rs" ]
 
-  deps = [ "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust" ]
+  deps = [
+    "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust",
+    "${device_status_root_path}/rust/data/sys:fusion_data_rust",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

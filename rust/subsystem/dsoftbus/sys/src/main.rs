@@ -26,6 +26,7 @@ use std::env;
 use std::vec::Vec;
 use std::io::Read;
 use std::io::Stdin;
+use fusion_data_rust::{FusionErrorCode};
 
 use hilog_rust::{error, hilog, debug, HiLogLabel, LogType};
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -34,7 +35,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "main"
 };
 
-use fusion_dsoftbus_rust::{ dsoftbus::DSoftbus, binding::{GetAccessToken, MessageId} };
+use fusion_dsoftbus_rust::{ dsoftbus::DSoftbus, binding::{GetAccessToken, MessageId, RET_OK} };
 
 fn main() {
     debug!(LOG_LABEL, "Main:test");
@@ -55,11 +56,11 @@ fn main() {
                             println!("DSoftbus init failed");
                         }
                     };
-                    0
+                    RET_OK
                 }
                 None => {
                     error!(LOG_LABEL, "DSoftbus init failed");
-                    -1
+                    FusionErrorCode::Fail.into()
                 }
             };
             println!("init is sleeping");
@@ -106,11 +107,11 @@ fn main() {
                         };        
                         println!("after send_data is sleeping");                  
                         std::thread::sleep(std::time::Duration::from_millis(1000*60*10));
-                        0
+                        RET_OK
                     }
                     None => {
                         error!(LOG_LABEL, "DSoftbus open_input_softbus failed");
-                        -1
+                        FusionErrorCode::Fail.into()
                     }
                 };
             } else {

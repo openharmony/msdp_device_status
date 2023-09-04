@@ -23,6 +23,7 @@ use std::ffi::{c_void, c_char, CString, CStr};
 use std::sync::{Once, Mutex, Arc, Condvar};
 use std::collections::HashMap;
 use std::time::Duration;
+use std::vec::Vec;
 use fusion_data_rust::{FusionResult, FusionErrorCode};
 use fusion_utils_rust::{ call_debug_enter };
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
@@ -324,11 +325,16 @@ impl Inner {
     /// OnSessionOpened
     fn on_session_opened(&mut self, session_id: i32, result: i32) -> FusionResult<i32> {
         call_debug_enter!("DSoftbus::on_session_opened");
-        let mut peer_dev_id: String = String::from("00000000000000000000000000000000000000000000000000000000000000000");
+        let mut peer_dev_id: Vec<c_char> = Vec::with_capacity(65);
         self.session_id = session_id;
+        let peer_dev_id_ptr = peer_dev_id.as_mut_ptr() as *mut c_char;
         // SAFETY: no `None` here
-        let get_peer_device_id_result: i32 = unsafe { GetPeerDeviceId(session_id, peer_dev_id.as_mut_ptr() as *mut c_char,
+        let get_peer_device_id_result: i32 = unsafe { GetPeerDeviceId(session_id, peer_dev_id_ptr,
             ((std::mem::size_of::<c_char>()) * DEVICE_ID_SIZE_MAX).try_into().unwrap()) };
+        
+        let peer_dev_id_str = unsafe {CStr::from_ptr(peer_dev_id_ptr)};
+        let peer_dev_id_slice: &str = peer_dev_id_str.to_str().unwrap();
+        let peer_dev_id = peer_dev_id_slice.to_owned();
 
         if result != RET_OK {
             let device_id: String = self.find_device(session_id);
@@ -338,7 +344,7 @@ impl Inner {
             }
 
             if get_peer_device_id_result == RET_OK {
-                self.channel_status_map.insert(peer_dev_id.clone(), true);
+                self.channel_status_map.insert(peer_dev_id, true);
             }
             self.wait_cond.1.notify_all();
             return Ok(RET_OK);
@@ -347,7 +353,7 @@ impl Inner {
         let session_side: i32 = unsafe { GetSessionSide(session_id) };
         if session_side == SESSION_SIDE_SERVER {
             if get_peer_device_id_result == RET_OK {
-                self.session_dev_map.insert(peer_dev_id.clone(), session_id);
+                self.session_dev_map.insert(peer_dev_id, session_id);
             }
         }
         else if get_peer_device_id_result == RET_OK {         
