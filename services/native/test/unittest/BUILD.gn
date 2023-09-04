@@ -142,6 +142,9 @@ ohos_unittest("CoordinationSMTest") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "device_info_manager:distributed_device_profile_client",
     "device_manager:devicemanagersdk",
     "distributed_input:libdinput_sdk",
