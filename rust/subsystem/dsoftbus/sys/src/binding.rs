@@ -39,7 +39,7 @@ pub const NETWORK_ID_BUF_LEN: usize = 65;
 pub const DEVICE_NAME_BUF_LEN: usize = 128;
 pub const RET_OK: i32 = 0;
 
-/// struct NodeBasicInfo
+/// TODO: add documentation. 
 #[repr(C)]
 pub struct NodeBasicInfo {
     /// network id of the device 
@@ -50,7 +50,7 @@ pub struct NodeBasicInfo {
     pub device_type_id: u16,
 }
 
-/// struct SessionAttribute
+/// TODO: add documentation. 
 #[repr(C)]
 pub struct SessionAttribute {
     pub data_type: i32,
@@ -61,7 +61,7 @@ pub struct SessionAttribute {
     pub fast_trans_data_size: u16,
 }
 
-/// struct StreamData
+/// TODO: add documentation. 
 #[repr(C)]
 pub struct StreamData {
     /// content of the buf
@@ -81,7 +81,7 @@ pub struct DataPacket {
     pub data: Vec<*const c_char>,
 }
 
-/// enum MessageId
+/// TODO: add documentation. 
 #[repr(C)]
 #[derive(Eq, Hash, PartialEq)]
 #[derive(Copy, Clone)]
@@ -98,7 +98,7 @@ pub enum MessageId {
     MaxId,
 }
 
-/// struct StreamFrameInfo
+/// TODO: add documentation. 
 #[repr(C)]
 pub struct StreamFrameInfo {
     pub frame_type: i32,
@@ -111,7 +111,7 @@ pub struct StreamFrameInfo {
     pub tv_list: i32,
 }
 
-/// struct ISessionListener
+/// TODO: add documentation. 
 #[repr(C)]
 #[derive(Default)]
 pub struct ISessionListener {
