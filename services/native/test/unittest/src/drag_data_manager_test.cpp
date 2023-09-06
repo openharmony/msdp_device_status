@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
 #include "drag_data_manager_test.h"
 
 #include <ipc_skeleton.h>
@@ -21,6 +20,7 @@
 #include "securec.h"
 
 #include "devicestatus_define.h"
+#define private public
 #include "drag_drawing.h"
 
 namespace OHOS {
