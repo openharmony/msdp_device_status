@@ -38,6 +38,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragMan
 constexpr int32_t TIMEOUT_MS { 2000 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
+std::atomic<int64_t> g_startFilterTime { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
@@ -281,6 +282,16 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (g_startFilterTime > 0) {
+        auto actionTime = pointerEvent->GetActionTime();
+        if (g_startFilterTime >= actionTime
+            && pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
+            FI_HILOGW("Invalid event");
+            return;
+        } else {
+            g_startFilterTime = -1;
+        }
+    }
     CHKPV(callback_);
     CHKPV(context_);
     callback_(pointerEvent);
@@ -669,6 +680,24 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         }
     }
     return RET_OK;
+}
+
+void DragManager::SetPointerEventFilterTime(int64_t filterTime)
+{
+    CALL_DEBUG_ENTER;
+    g_startFilterTime = filterTime;
+}
+
+void DragManager::MoveTo(int32_t x ,int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running")
+        return;
+    }
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    FI_HILOGI("DisplayId: %{public}d, x: %{public}d, y: %{public}d", dragData.displayId, x, y);
+    dragDrawing_.Draw(dragData.displayId, x, y);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
