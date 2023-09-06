@@ -59,6 +59,8 @@ public:
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(void)> callback) override;
+    void SetPointerEventFilterTime(int64_t filterTime) override;
+    void MoveTo(int32_t x ,int32_t y) override;
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;

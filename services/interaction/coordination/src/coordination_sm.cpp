@@ -373,7 +373,6 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
     }
     if (currentState_ == CoordinationState::STATE_OUT) {
         NotifyMouseLocation(xPercent, yPercent);
-        UpdateState(CoordinationState::STATE_FREE);
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
         NotifyRemoteNetworkId(remoteNetworkId_);
         StateChangedNotify(CoordinationState::STATE_OUT, CoordinationState::STATE_FREE);
@@ -381,6 +380,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+        UpdateState(CoordinationState::STATE_FREE);
     }
     isStarting_ = false;
 }

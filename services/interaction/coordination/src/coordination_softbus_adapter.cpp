@@ -41,9 +41,9 @@ const SessionAttribute g_sessionAttr = {
     .dataType = SessionType::TYPE_BYTES,
     .linkTypeNum = DINPUT_LINK_TYPE_MAX,
     .linkType = {
+        LINK_TYPE_WIFI_P2P,
         LINK_TYPE_WIFI_WLAN_2G,
-        LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_P2P
+        LINK_TYPE_WIFI_WLAN_5G
     }
 };
 
