@@ -32,21 +32,21 @@ define_enum! {
 /// TOTO: add documentation.
 pub trait IPlugin: Any + Send + Sync + std::panic::RefUnwindSafe {
     /// TODO: add documentation
-    fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
     /// TODO: add documentation
-    fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
 }

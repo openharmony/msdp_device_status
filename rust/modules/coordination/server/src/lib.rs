@@ -54,7 +54,7 @@ pub struct FusionCoordinationServer(Coordination);
 
 impl IPlugin for FusionCoordinationServer {
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::enable");
         match GeneralCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -68,7 +68,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::disable");
         match GeneralCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -82,7 +82,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::start");
         match StartCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -96,7 +96,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::stop");
         match StopCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -110,7 +110,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::add_watch");
         match GeneralCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -124,7 +124,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::remove_watch");
         match GeneralCoordinationParam::deserialize(data) {
             Ok(param) => {
@@ -138,13 +138,13 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::set_param");
         Err(FusionErrorCode::Fail)
     }
 
     fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::get_param");
         match GetCoordinationStateParam::deserialize(data) {
             Ok(param) => {
@@ -158,7 +158,7 @@ impl IPlugin for FusionCoordinationServer {
     }
 
     fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionCoordinationServer::control");
         Err(FusionErrorCode::Fail)
     }

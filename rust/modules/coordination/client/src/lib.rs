@@ -47,7 +47,7 @@ pub struct FusionCoordinationClient {
 
 impl FusionCoordinationClient {
     /// TODO: add documentation.
-    pub fn enable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn enable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::enable_coordination");
         match MsgParcel::new() {
@@ -67,7 +67,7 @@ impl FusionCoordinationClient {
     }
 
     /// TODO: add documentation.
-    pub fn disable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn disable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::disable_coordination");
         match MsgParcel::new() {
@@ -88,7 +88,7 @@ impl FusionCoordinationClient {
 
     /// TODO: add documentation.
     pub fn start_coordination(&self, user_data: i32, remote_network_id: String,
-        start_device_id: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+        start_device_id: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::start_coordination");
         match MsgParcel::new() {
@@ -111,7 +111,7 @@ impl FusionCoordinationClient {
 
     /// TODO: add documentation.
     pub fn stop_coordination(&self, user_data: i32, is_unchained: i32,
-        ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+        ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::stop_coordination");
         match MsgParcel::new() {
@@ -164,7 +164,7 @@ impl FusionCoordinationClient {
     }
 
     /// TODO: add documentation.
-    pub fn register_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn register_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::register_coordination_listener");
         match MsgParcel::new() {
@@ -182,7 +182,7 @@ impl FusionCoordinationClient {
     }
 
     /// TODO: add documentation.
-    pub fn unregister_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn unregister_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::unregister_coordination_listener");
         match MsgParcel::new() {

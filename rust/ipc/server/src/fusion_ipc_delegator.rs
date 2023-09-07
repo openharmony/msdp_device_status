@@ -44,7 +44,7 @@ impl FusionIpcDelegator {
         }
     }
 
-    fn check_interface_token(&self, data: &BorrowedMsgParcel) -> FusionResult<i32> {
+    fn check_interface_token(&self, data: &BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::check_interface_token");
         match InterfaceToken::deserialize(data) {
             Ok(token) => {
@@ -53,7 +53,7 @@ impl FusionIpcDelegator {
                     error!(LOG_LABEL, "unexpected token");
                     Err(FusionErrorCode::Fail)
                 } else {
-                    Ok(0)
+                    Ok(())
                 }
             }
             Err(_) => {
@@ -89,7 +89,7 @@ impl FusionIpcDelegator {
 
 impl IDeviceStatus for FusionIpcDelegator {
     fn enable(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::enable");
         self.check_interface_token(data)?;
 
@@ -100,7 +100,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn disable(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::disable");
         self.check_interface_token(data)?;
 
@@ -111,7 +111,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn start(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::start");
         self.check_interface_token(data)?;
 
@@ -122,7 +122,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn stop(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::stop");
         self.check_interface_token(data)?;
 
@@ -133,7 +133,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::add_watch");
         self.check_interface_token(data)?;
 
@@ -144,7 +144,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::remove_watch");
         self.check_interface_token(data)?;
 
@@ -155,7 +155,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::set_param");
         self.check_interface_token(data)?;
 
@@ -166,7 +166,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::get_param");
         self.check_interface_token(data)?;
 
@@ -177,7 +177,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::control");
         self.check_interface_token(data)?;
 

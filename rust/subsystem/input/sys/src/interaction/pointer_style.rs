@@ -67,7 +67,7 @@ impl PointerStyle {
     }
 
     /// Get pointer style
-    pub fn pointer_style(&mut self) -> FusionResult<i32> {
+    pub fn pointer_style(&mut self) -> FusionResult<()> {
         // SAFETY:  no `None` here, cause `CPointerStyle` is valid
         unsafe {
             if input_binding::CGetPointerStyle(&mut self.inner) != INPUT_BINDING_OK {
@@ -75,7 +75,7 @@ impl PointerStyle {
                 return Err(FusionErrorCode::Fail);
             }
             debug!(LOG_LABEL, "get pointer style success");
-            Ok(0)
+            Ok(())
         }
     }
 }

@@ -50,7 +50,7 @@ impl FusionServiceImpl {
     }
 
     fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionServiceImpl:alloc_socket_fd");
         self.native_service.alloc_socket_fd(program_name, module_type, client_fd, token_type)
@@ -104,7 +104,7 @@ impl FusionService {
 
     /// Call to allocate socket pair for client/server communication.
     pub fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         match self.service_impl.lock() {
             Ok(guard) => {

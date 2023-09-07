@@ -31,50 +31,50 @@ pub struct InputManager;
 
 impl InputManager {
     /// add monitor.
-    pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<i32> {
+    pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<()> {
         // SAFETY: no `None` here, cause `callback` is valid
         unsafe {
             if input_binding::CAddMonitor(callback) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to add monitor");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
     /// set pointer visible.
-    pub fn set_pointer_visible(visible: bool) -> FusionResult<i32> {
+    pub fn set_pointer_visible(visible: bool) -> FusionResult<()> {
         // SAFETY: set pointer event visible
         unsafe {
             if input_binding::CSetPointerVisible(visible) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to set pointer visible");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
     /// enable input device.
-    pub fn enable_input_device(enable: bool) -> FusionResult<i32> {
+    pub fn enable_input_device(enable: bool) -> FusionResult<()> {
         // SAFETY: enable input device
         unsafe {
             if input_binding::CEnableInputDevice(enable) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to enable input device");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
     /// remove input event filter.
-    pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<i32> {
+    pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<()> {
         // SAFETY: remove input event filter
         unsafe {
             if input_binding::CRemoveInputEventFilter(filter_id) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to remove input event filter");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 

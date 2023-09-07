@@ -77,7 +77,7 @@ impl FusionNativeService {
     }
 
     pub fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionNativeService:alloc_socket_fd");
         let mut fd: c_int = 0;
@@ -88,7 +88,7 @@ impl FusionNativeService {
         };
         if ret == 0 {
             *client_fd = fd as RawFd;
-            Ok(0)
+            Ok(())
         } else {
             error!(LOG_LABEL, "Failed to allocate socket pair");
             Err(FusionErrorCode::Fail)

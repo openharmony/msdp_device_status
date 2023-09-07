@@ -72,7 +72,7 @@ impl ExtraData {
     }
 
     /// The extra data information is sent to the external subsystem
-    pub fn appended_extra_data(&mut self, allow_appended: bool, drag_data: DragData) -> FusionResult<i32> {
+    pub fn appended_extra_data(&mut self, allow_appended: bool, drag_data: DragData) -> FusionResult<()> {
         let buffer: &Vec<u8>= &drag_data.buffer;
         if buffer.is_empty() {
             return Err(FusionErrorCode::Fail);
@@ -86,6 +86,6 @@ impl ExtraData {
         unsafe {
             input_binding::CAppendExtraData(&self.inner);
         }
-        Ok(0)
+        Ok(())
     }
 }

@@ -63,5 +63,5 @@ impl std::fmt::Display for FusionErrorCode {
     }
 }
 
-/// IPC specific Result, error is FusionErrorCode type
+/// Fusion Interaction specific Result, error is FusionErrorCode type
 pub type FusionResult<T> = std::result::Result<T, FusionErrorCode>;

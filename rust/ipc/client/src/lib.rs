@@ -68,12 +68,12 @@ impl FusionIpcClient {
         }
     }
 
-    fn add_interface_token(&self, data_parcel: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+    fn add_interface_token(&self, data_parcel: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::add_interface_token");
         let token = InterfaceToken::new(FusionIpcProxy::get_descriptor());
         match token.serialize(data_parcel) {
             Ok(_) => {
-                Ok(0)
+                Ok(())
             }
             Err(_) => {
                 error!(LOG_LABEL, "Fail to serialize interface token");
@@ -84,7 +84,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn enable(&self, intention: Intention, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::enable");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -107,7 +107,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn disable(&self, intention: Intention, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::disable");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -130,7 +130,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn start(&self, intention: Intention, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::start");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -153,7 +153,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn stop(&self, intention: Intention, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::stop");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -176,7 +176,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn add_watch(&self, intention: Intention, id: u32, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::add_watch");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -199,7 +199,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn remove_watch(&self, intention: Intention, id: u32, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::remove_watch");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -222,7 +222,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn set_param(&self, intention: Intention, id: u32, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::set_param");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -245,7 +245,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn get_param(&self, intention: Intention, id: u32, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::get_param");
         match MsgParcel::new() {
             Some(mut data_parcel) => {
@@ -268,7 +268,7 @@ impl FusionIpcClient {
 
     /// TODO: add documentation.
     pub fn control(&self, intention: Intention, id: u32, data: &dyn Serialize,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::control");
         match MsgParcel::new() {
             Some(mut data_parcel) => {

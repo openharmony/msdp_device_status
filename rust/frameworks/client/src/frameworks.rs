@@ -125,7 +125,7 @@ impl<'a> FusionFrameworks {
     }
 
     /// TODO: add documentation.
-    pub fn register_coordination_listener(&self) -> FusionResult<i32> {
+    pub fn register_coordination_listener(&self) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::register_coordination_listener");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -139,7 +139,7 @@ impl<'a> FusionFrameworks {
     }
 
     /// TODO: add documentation.
-    pub fn unregister_coordination_listener(&self) -> FusionResult<i32> {
+    pub fn unregister_coordination_listener(&self) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::unregister_coordination_listener");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -153,7 +153,7 @@ impl<'a> FusionFrameworks {
     }
 
     /// TODO: add documentation.
-    pub fn enable_coordination(&self, user_data: i32) -> FusionResult<i32> {
+    pub fn enable_coordination(&self, user_data: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::enable_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -167,7 +167,7 @@ impl<'a> FusionFrameworks {
     }
 
     /// TODO: add documentation.
-    pub fn disable_coordination(&self, user_data: i32) -> FusionResult<i32> {
+    pub fn disable_coordination(&self, user_data: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::disable_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -182,7 +182,7 @@ impl<'a> FusionFrameworks {
 
     /// TODO: add documentation.
     pub fn start_coordination(&self, user_data: i32, remote_network_id: String,
-        start_device_id: i32) -> FusionResult<i32> {
+        start_device_id: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::start_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -198,7 +198,7 @@ impl<'a> FusionFrameworks {
     }
 
     /// TODO: add documentation.
-    pub fn stop_coordination(&self, user_data: i32, is_unchained: i32) -> FusionResult<i32>
+    pub fn stop_coordination(&self, user_data: i32, is_unchained: i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionFrameworks::stop_coordination");
         match self.ipc_client.as_ref() {

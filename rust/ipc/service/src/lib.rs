@@ -46,27 +46,27 @@ pub const MSDP_DEVICESTATUS_SERVICE_ID: i32 = 2902;
 /// trait IDeviceStatus
 pub trait IDeviceStatus: IRemoteBroker {
     /// TODO:
-    fn enable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn enable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn disable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn disable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn start(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn start(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn stop(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn stop(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
     /// TODO:
-    fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>;
+    fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
 }
 
 fn on_remote_request(stub: &dyn IDeviceStatus, code: u32, data: &BorrowedMsgParcel<'_>,
-    reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+    reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
     call_debug_enter!("FusionIpcService::on_remote_request");
     let intention = split_intention(code)?;
     let id = split_param(code);
@@ -119,14 +119,14 @@ define_remote_object!(
 );
 
 impl FusionIpcProxy {
-    fn transfer_data(&self, src: &dyn IMsgParcel, target: &mut dyn IMsgParcel) -> FusionResult<i32>
+    fn transfer_data(&self, src: &dyn IMsgParcel, target: &mut dyn IMsgParcel) -> FusionResult<()>
     {
         call_debug_enter!("FusionIpcProxy::transfer_data");
         let data_size = src.get_data_size();
         match src.read_buffer(data_size) {
             Ok(data_vec) => {
                 if target.write_buffer(data_vec.as_slice()) {
-                    Ok(0)
+                    Ok(())
                 } else {
                     error!(LOG_LABEL, "write_buffer() failed");
                     Err(FusionErrorCode::Fail)
@@ -140,7 +140,7 @@ impl FusionIpcProxy {
     }
 
     fn send_request(&self, action: CommonAction, intention: Intention, id: u32,
-        data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32>
+        data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>
     {
         call_debug_enter!("FusionIpcProxy::send_request");
         match MsgParcel::new() {
@@ -171,55 +171,55 @@ impl FusionIpcProxy {
 
 impl IDeviceStatus for FusionIpcProxy {
     fn enable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::enable");
         self.send_request(CommonAction::Enable, intention, 0u32, data, reply)
     }
 
     fn disable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::disable");
         self.send_request(CommonAction::Disable, intention, 0u32, data, reply)
     }
 
     fn start(&self, intention: Intention, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::start");
         self.send_request(CommonAction::Start, intention, 0u32, data, reply)
     }
 
     fn stop(&self, intention: Intention, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::stop");
         self.send_request(CommonAction::Stop, intention, 0u32, data, reply)
     }
 
     fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::add_watch");
         self.send_request(CommonAction::AddWatch, intention, id, data, reply)
     }
 
     fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::remove_watch");
         self.send_request(CommonAction::RemoveWatch, intention, id, data, reply)
     }
 
     fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::set_param");
         self.send_request(CommonAction::SetParam, intention, id, data, reply)
     }
 
     fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::get_param");
         self.send_request(CommonAction::GetParam, intention, id, data, reply)
     }
 
     fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>,
-        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcProxy::control");
         self.send_request(CommonAction::Control, intention, id, data, reply)
     }

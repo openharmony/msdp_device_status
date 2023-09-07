@@ -38,7 +38,7 @@ pub struct Coordination {
 impl Coordination {
     /// TODO: add documentation.
     pub fn enable(&self, context: &CallingContext,
-        param: &GeneralCoordinationParam) -> FusionResult<i32>
+        param: &GeneralCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::enable");
         Err(FusionErrorCode::Fail)
@@ -46,7 +46,7 @@ impl Coordination {
 
     /// TODO: add documentation.
     pub fn disable(&self, context: &CallingContext,
-        param: &GeneralCoordinationParam) -> FusionResult<i32>
+        param: &GeneralCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::disable");
         Err(FusionErrorCode::Fail)
@@ -54,7 +54,7 @@ impl Coordination {
 
     /// TODO: add documentation.
     pub fn start(&self, context: &CallingContext,
-        param: &StartCoordinationParam) -> FusionResult<i32>
+        param: &StartCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::start");
         Err(FusionErrorCode::Fail)
@@ -62,7 +62,7 @@ impl Coordination {
 
     /// TODO: add documentation.
     pub fn stop(&self, context: &CallingContext,
-        param: &StopCoordinationParam) -> FusionResult<i32>
+        param: &StopCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::stop");
         Err(FusionErrorCode::Fail)
@@ -70,21 +70,21 @@ impl Coordination {
 
     /// TODO: add documentation.
     pub fn get_state(&self, context: &CallingContext,
-        param: &GetCoordinationStateParam) -> FusionResult<i32>
+        param: &GetCoordinationStateParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::get_state");
         Err(FusionErrorCode::Fail)
     }
 
     pub fn register_listener(&self, context: &CallingContext,
-        param: &GeneralCoordinationParam) -> FusionResult<i32>
+        param: &GeneralCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::register_listener");
         Err(FusionErrorCode::Fail)
     }
 
     pub fn unregister_listener(&self, context: &CallingContext,
-        param: &GeneralCoordinationParam) -> FusionResult<i32>
+        param: &GeneralCoordinationParam) -> FusionResult<()>
     {
         call_debug_enter!("Coordination::unregister_listener");
         Err(FusionErrorCode::Fail)

@@ -31,7 +31,7 @@ pub struct DisHandware;
 
 impl DisHandware {
     /// Init device manager.
-    pub fn init_device_manager() -> FusionResult<i32> {
+    pub fn init_device_manager() -> FusionResult<()> {
         call_info_trace!("DisHandware::init_device_manager");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         // SAFETY: no `None` here, cause `callback` and  `pkg_name` is valid.
@@ -40,12 +40,12 @@ impl DisHandware {
                 error!(LOG_LABEL, "Init device manager failed");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
     /// Register device state
-    pub fn register_device_state() -> FusionResult<i32> {
+    pub fn register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;
@@ -61,12 +61,12 @@ impl DisHandware {
                 error!(LOG_LABEL, "Register devStateCallback failed");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
     /// UnRegister device state
-    pub fn un_register_device_state() -> FusionResult<i32> {
+    pub fn un_register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::un_register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;
@@ -77,6 +77,6 @@ impl DisHandware {
                 return Err(FusionErrorCode::Fail);
             }
         }
-        Ok(0)
+        Ok(())
     }
 }
