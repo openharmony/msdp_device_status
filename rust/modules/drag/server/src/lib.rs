@@ -77,7 +77,7 @@ impl IPlugin for FusionDragServer {
                 //     })
                 // };
                 // if ret == 0 {
-                //     Ok(())
+                //     Ok(0)
                 // } else {
                 //     error!(LOG_LABEL, "in FusionDragServer::start(): call_start_drag() failed");
                 //     Err(-1)
