@@ -55,7 +55,7 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork, uv_qos_default);
     } else {
@@ -82,7 +82,7 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork, uv_qos_default);
     } else {
@@ -110,7 +110,7 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork, uv_qos_default);
     } else {
@@ -136,7 +136,7 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
             CallGetCrossingSwitchStatePromiseWork, uv_qos_default);
