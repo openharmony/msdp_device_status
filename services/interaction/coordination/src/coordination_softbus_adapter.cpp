@@ -290,7 +290,7 @@ std::shared_ptr<CoordinationSoftbusAdapter> CoordinationSoftbusAdapter::GetInsta
 }
 
 int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &localNetworkId,
-    const std::string &remoteNetworkId)
+    const std::string &remoteNetworkId, bool checkButtonDown)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -301,7 +301,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     bool isPointerButtonPressed = false;
-    if (pointerEvent != nullptr) {
+    if (pointerEvent != nullptr && checkButtonDown) {
         for (const auto &item : pointerEvent->GetPressedButtons()) {
             if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
                 isPointerButtonPressed = true;
