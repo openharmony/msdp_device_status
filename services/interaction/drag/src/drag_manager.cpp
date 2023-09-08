@@ -688,7 +688,7 @@ void DragManager::SetPointerEventFilterTime(int64_t filterTime)
     g_startFilterTime = filterTime;
 }
 
-void DragManager::MoveTo(int32_t x ,int32_t y)
+void DragManager::MoveTo(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {

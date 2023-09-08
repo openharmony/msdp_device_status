@@ -48,7 +48,8 @@ public:
         uint8_t data[0];
     };
 
-    int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    int32_t StartRemoteCoordination(const std::string &localNetworkId,
+        const std::string &remoteNetworkId, bool checkButtonDown);
     int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained);

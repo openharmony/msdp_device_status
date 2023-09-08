@@ -43,7 +43,7 @@ public:
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
     virtual void RegisterNotifyPullUp(std::function<void(void)> callback) = 0;
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
-    virtual void MoveTo(int32_t x ,int32_t y) = 0;
+    virtual void MoveTo(int32_t x, int32_t y) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
