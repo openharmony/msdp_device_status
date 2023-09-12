@@ -82,6 +82,8 @@ private:
     void CopyIdentity(const std::string &name, std::shared_ptr<VirtualDevice> vDev);
     void CopyAbsInfo(std::shared_ptr<VirtualDevice> vDev);
     void CopyEvents(std::shared_ptr<VirtualDevice> vDev);
+    static void ConcatenationName(std::string &sLine);
+    static bool ExecuteUnmount(const char *id, const char *name, const std::string &direntName);
 
 private:
     int32_t fd_ { -1 };
