@@ -183,13 +183,14 @@ void VirtualDeviceBuilder::Unmount(const char *name, const char *id)
     while ((dent = readdir(procDir)) != nullptr) {
         std::string direntName { dent->d_name };
         if (ExecuteUnmount(id, name, direntName)) {
-            if (closedir(procDir) != 0) {
-                FI_HILOGE("closedir error:%{public}s", strerror(errno));
-            }
-            return;
+            goto EXIT;
         }
     }
     std::cout << "The backing process for virtual " << name << "can't be found." << std::endl;
+EXIT:
+    if (closedir(procDir) != 0) {
+        FI_HILOGE("closedir error:%{public}s", strerror(errno));
+    }
 }
 
 void VirtualDeviceBuilder::SetSupportedEvents()
