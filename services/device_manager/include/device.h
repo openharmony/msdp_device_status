@@ -91,13 +91,26 @@ public:
     bool IsPointerDevice() const override;
     bool IsKeyboard() const override;
 
+    bool HasAbs(size_t abs) const;
+    bool HasRel(size_t rel) const;
+    bool HasKey(size_t key) const;
+    bool HasProperty(size_t property) const;
+    bool HasCapability(Capability capability) const;
+
 private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
     bool HasMouseButton() const;
     bool HasJoystickAxesOrButtons() const;
+    bool HasAbsCoord() const;
+    bool HasMtCoord() const;
+    bool HasRelCoord() const;
     void CheckPointers();
+    void CheckAbs();
+    void CheckJoystick();
+    void CheckMt();
+    void CheckAdditional();
     void CheckPencilMouse();
     void CheckKeys();
     std::string MakeConfigFileName() const;
@@ -208,6 +221,31 @@ inline bool Device::IsPointerDevice() const
 inline bool Device::IsKeyboard() const
 {
     return caps_.test(DEVICE_CAP_KEYBOARD);
+}
+
+inline bool Device::HasAbs(size_t abs) const
+{
+    return TestBit(abs, absBitmask_);
+}
+
+inline bool Device::HasRel(size_t rel) const
+{
+    return TestBit(rel, relBitmask_);
+}
+
+inline bool Device::HasKey(size_t key) const
+{
+    return TestBit(key, keyBitmask_);
+}
+
+inline bool Device::HasProperty(size_t property) const
+{
+    return TestBit(property, propBitmask_);
+}
+
+inline bool Device::HasCapability(Capability capability) const
+{
+    return caps_.test(capability);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

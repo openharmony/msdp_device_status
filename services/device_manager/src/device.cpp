@@ -235,21 +235,36 @@ bool Device::HasJoystickAxesOrButtons() const
     return false;
 }
 
+bool Device::HasAbsCoord() const
+{
+    return (HasAbs(ABS_X) && HasAbs(ABS_Y));
+}
+
+bool Device::HasMtCoord() const
+{
+    return (HasAbs(ABS_MT_POSITION_X) && HasAbs(ABS_MT_POSITION_Y));
+}
+
+bool Device::HasRelCoord() const
+{
+    return (HasRel(REL_X) && HasRel(REL_Y));
+}
+
 void Device::PrintCapsDevice() const
 {
-    std::map<int32_t, std::string> deviceComparisonTable {
-        {DEVICE_CAP_KEYBOARD, "keyboard"},
-        {DEVICE_CAP_TOUCH, "touch device"},
-        {DEVICE_CAP_POINTER, "pointer"},
-        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
-        {DEVICE_CAP_TABLET_PAD, "pad"},
-        {DEVICE_CAP_GESTURE, "gesture"},
-        {DEVICE_CAP_SWITCH, "switch"},
-        {DEVICE_CAP_JOYSTICK, "joystick"}};
-    size_t size = deviceComparisonTable.size();
-    for (size_t i = 0; i < size; ++i) {
-        if (caps_.test(i)) {
-            FI_HILOGD("This is %{public}s", deviceComparisonTable[i].c_str());
+    const std::map<std::size_t, std::string> deviceComparisonTable {
+        { DEVICE_CAP_KEYBOARD, "keyboard" },
+        { DEVICE_CAP_TOUCH, "touch device" },
+        { DEVICE_CAP_POINTER, "pointer" },
+        { DEVICE_CAP_TABLET_TOOL, "tablet tool" },
+        { DEVICE_CAP_TABLET_PAD, "pad" },
+        { DEVICE_CAP_GESTURE, "gesture" },
+        { DEVICE_CAP_SWITCH, "switch" },
+        { DEVICE_CAP_JOYSTICK, "joystick" }
+    };
+    for (const auto &[cap, name]: deviceComparisonTable) {
+        if (caps_.test(cap)) {
+            FI_HILOGD("This is %{public}s", name.c_str());
         }
     }
 }
@@ -257,45 +272,64 @@ void Device::PrintCapsDevice() const
 void Device::CheckPointers()
 {
     CALL_DEBUG_ENTER;
-    bool hasAbsCoords { TestBit(ABS_X, absBitmask_) && TestBit(ABS_Y, absBitmask_) };
-    bool hasMtCoords { TestBit(ABS_MT_POSITION_X, absBitmask_) && TestBit(ABS_MT_POSITION_Y, absBitmask_) };
-    bool isDirect { TestBit(INPUT_PROP_DIRECT, propBitmask_) };
-    bool hasTouch { TestBit(BTN_TOUCH, keyBitmask_) };
-    bool hasRelCoords { TestBit(REL_X, relBitmask_) && TestBit(REL_Y, relBitmask_) };
-    bool stylusOrPen { TestBit(BTN_STYLUS, keyBitmask_) || TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool fingerButNoPen { TestBit(BTN_TOOL_FINGER, keyBitmask_) && !TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool hasMouseBtn { HasMouseButton() };
-    bool hasJoystickFeature { HasJoystickAxesOrButtons() };
+    if (HasAbsCoord()) {
+        CheckAbs();
+    } else {
+        CheckJoystick();
+    }
+    if (HasMtCoord()) {
+        CheckMt();
+    }
+    CheckAdditional();
+    PrintCapsDevice();
+}
 
-    if (hasAbsCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasMouseBtn) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-        } else if (hasJoystickFeature) {
-            caps_.set(DEVICE_CAP_JOYSTICK);
-        }
-    } else if (hasJoystickFeature) {
+void Device::CheckAbs()
+{
+    CALL_DEBUG_ENTER;
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasMouseButton()) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    } else if (HasJoystickAxesOrButtons()) {
         caps_.set(DEVICE_CAP_JOYSTICK);
     }
-    if (hasMtCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-        }
+}
+
+void Device::CheckJoystick()
+{
+    CALL_DEBUG_ENTER;
+    if (HasJoystickAxesOrButtons()) {
+        caps_.set(DEVICE_CAP_JOYSTICK);
     }
-    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) && !caps_.test(DEVICE_CAP_POINTER) &&
-        !caps_.test(DEVICE_CAP_JOYSTICK) && hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
+}
+
+void Device::CheckMt()
+{
+    CALL_DEBUG_ENTER;
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    }
+}
+
+void Device::CheckAdditional()
+{
+    CALL_DEBUG_ENTER;
+    if (!HasCapability(DEVICE_CAP_TABLET_TOOL) &&
+        !HasCapability(DEVICE_CAP_POINTER) &&
+        !HasCapability(DEVICE_CAP_JOYSTICK) &&
+        HasMouseButton() &&
+        (HasRelCoord() || !HasAbsCoord())) {
         caps_.set(DEVICE_CAP_POINTER);
     }
-    PrintCapsDevice();
 }
 
 void Device::CheckPencilMouse()
