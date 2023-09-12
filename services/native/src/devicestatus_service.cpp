@@ -395,7 +395,6 @@ int32_t DeviceStatusService::InitDelegateTasks()
     return ret;
 }
 
-
 int32_t DeviceStatusService::InitTimerMgr()
 {
     CALL_INFO_TRACE;
@@ -420,7 +419,7 @@ void DeviceStatusService::OnThread()
     EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        epoll_event ev[MAX_EVENT_SIZE] {};
+        struct epoll_event ev[MAX_EVENT_SIZE] {};
         int32_t count = EpollWait(MAX_EVENT_SIZE, -1, ev[0]);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
@@ -441,7 +440,7 @@ void DeviceStatusService::OnThread()
     FI_HILOGD("Main worker thread stop, tid:%{public}" PRId64 "", tid);
 }
 
-void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
+void DeviceStatusService::OnDelegateTask(const struct epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
         FI_HILOGW("Not epollin");
@@ -457,7 +456,7 @@ void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
     delegateTasks_.ProcessTasks();
 }
 
-void DeviceStatusService::OnTimeout(const epoll_event &ev)
+void DeviceStatusService::OnTimeout(const struct epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
@@ -472,7 +471,7 @@ void DeviceStatusService::OnTimeout(const epoll_event &ev)
     }
 }
 
-void DeviceStatusService::OnDeviceMgr(const epoll_event &ev)
+void DeviceStatusService::OnDeviceMgr(const struct epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {

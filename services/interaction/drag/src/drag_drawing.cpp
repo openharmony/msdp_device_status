@@ -27,8 +27,6 @@
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
-#include "libxml/tree.h"
-#include "libxml/parser.h"
 #include "parameters.h"
 #include "pointer_event.h"
 #include "string_ex.h"

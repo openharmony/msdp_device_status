@@ -16,11 +16,10 @@
 #include "monitor.h"
 
 #include <cstring>
-#include <unistd.h>
-
 #include <string_view>
 
 #include <sys/epoll.h>
+#include <unistd.h>
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
