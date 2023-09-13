@@ -73,7 +73,7 @@ void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
     stationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DeviceStatusClientFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t idSize = 8;
     if (static_cast<int32_t>(size) > idSize) {
@@ -86,6 +86,6 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    DoSomethingInterestingWithMyAPI(data, size);
+    DeviceStatusClientFuzzTest(data, size);
     return 0;
 }
