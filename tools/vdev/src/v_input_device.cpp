@@ -301,7 +301,7 @@ bool VInputDevice::HasRelCoord() const
 }
 
 void VInputDevice::CheckAbs()
-{   
+{
     if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
         caps_.set(DEVICE_CAP_TABLET_TOOL);
     } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
