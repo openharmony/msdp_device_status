@@ -363,6 +363,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.arkExtraInfo, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);

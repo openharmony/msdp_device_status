@@ -37,6 +37,7 @@ struct DragData {
     std::vector<uint8_t> buffer;
     std::string udKey;
     std::string extraInfo;
+    std::string arkExtraInfo;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };

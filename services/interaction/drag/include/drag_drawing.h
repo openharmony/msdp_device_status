@@ -73,9 +73,9 @@ private:
     std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
-struct FilterInfoParser {
-    FilterInfoParser() = default;
-    ~FilterInfoParser()
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
     {
         if (json != nullptr) {
             cJSON_Delete(json);
@@ -110,13 +110,14 @@ struct DrawingInfo {
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
     std::string filterInfo;
+    std::string arkExtraInfo;
 };
 
 struct FilterInfo {
     std::string componentType;
     int32_t blurStyle;
     int32_t cornerRadius;
-    int32_t dipScale;
+    float dipScale;
 };
 
 class DragDrawing : public IDragAnimation {
@@ -171,6 +172,7 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(FilterInfo& filterInfo);
+    void ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };

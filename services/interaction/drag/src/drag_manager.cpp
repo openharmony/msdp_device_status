@@ -365,8 +365,8 @@ void DragManager::Dump(int32_t fd) const
         udKey = "";
     }
     dprintf(fd, "dragData = {\n"
-            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\textraInfo:%d\n\tsourceType:%d\n\tdragNum:%d\n\tpointerId:%d\n"
-            "\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
+            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\textraInfo:%d\n\tarkExtraInfo:%d\n\tsourceType:%d"
+            "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
             dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.extraInfo.c_str(),
             dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY,
             dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
@@ -551,7 +551,8 @@ int32_t DragManager::OnStartDrag()
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
+        (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     return RET_OK;
@@ -578,6 +579,9 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
+        MMI::InputManager::GetInstance()->SetPointerVisible(true);
+    }
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     return HandleDragResult(result, hasCustomAnimation);

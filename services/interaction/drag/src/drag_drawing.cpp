@@ -66,8 +66,8 @@ constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
 constexpr int32_t DRAG_STYLE_INDEX { 2 };
 constexpr int32_t MOUSE_ICON_INDEX { 3 };
-constexpr size_t TOUCH_NODE_MIN_COUNT { 2 };
-constexpr size_t MOUSE_NODE_MIN_COUNT { 3 };
+constexpr size_t TOUCH_NODE_MIN_COUNT { 3 };
+constexpr size_t MOUSE_NODE_MIN_COUNT { 4 };
 constexpr double ONETHOUSAND { 1000.0 };
 constexpr float DEFAULT_SCALING { 1.0f };
 constexpr float BEGIN_ALPHA { 1.0f };
@@ -703,6 +703,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
     g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
     g_drawingInfo.filterInfo = dragData.extraInfo;
+    g_drawingInfo.arkExtraInfo = dragData.arkExtraInfo;
 }
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
@@ -755,41 +756,27 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     g_drawingInfo.rootNode->SetBounds(g_drawingInfo.displayX, g_drawingInfo.displayY - adjustSize, width, height);
     g_drawingInfo.rootNode->SetFrame(g_drawingInfo.displayX, g_drawingInfo.displayY - adjustSize, width, height);
     g_drawingInfo.rootNode->SetBackgroundColor(SK_ColorTRANSPARENT);
-    CHKPV(g_drawingInfo.pixelMap);
-    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
-    int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = Rosen::RSCanvasNode::Create();
-    if (FilterInfo filterInfo; ParserFilterInfo(filterInfo) && filterInfo.componentType == BIG_FOLDER_LABEL) {
-        if (std::shared_ptr<Rosen::RSFilter> backFilter =
-            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale); backFilter != nullptr) {
-            filterNode->SetBackgroundFilter(backFilter);
-            filterNode->SetBounds(0, adjustSize, pixelMapWidth, pixelMapHeight);
-            filterNode->SetFrame(0, adjustSize, pixelMapWidth, pixelMapHeight);
-            filterNode->SetCornerRadius(filterInfo.cornerRadius);
-        } else {
-            FI_HILOGE("Create backgroundFilter failed");
-        }
-    }
+    ProcessFilter(filterNode);
+    CHKPV(filterNode);
     g_drawingInfo.nodes.emplace_back(filterNode);
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
-    pixelMapNode->SetBounds(0, adjustSize, pixelMapWidth, pixelMapHeight);
-    pixelMapNode->SetFrame(0, adjustSize, pixelMapWidth, pixelMapHeight);
+    CHKPV(g_drawingInfo.pixelMap);
+    pixelMapNode->SetBounds(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetFrame(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);
     dragStyleNode->SetBounds(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     dragStyleNode->SetFrame(0, 0, SVG_HEIGHT, SVG_HEIGHT);
     g_drawingInfo.nodes.emplace_back(dragStyleNode);
-
     CHKPV(rsUiDirector_);
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
-        mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY,
-            SVG_HEIGHT, SVG_HEIGHT);
-        mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY,
-            SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
+        mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY, SVG_HEIGHT, SVG_HEIGHT);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
         g_drawingInfo.rootNode->AddChild(filterNode);
         g_drawingInfo.rootNode->AddChild(pixelMapNode);
@@ -1099,34 +1086,65 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
     CALL_DEBUG_ENTER;
-    FilterInfoParser parser;
-    parser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
-    if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("Parser on is not object");
+    JsonParser filterParser;
+    filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
         return false;
     }
-    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(parser.json, "drag_data_type");
+    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_data_type");
     if (!cJSON_IsString(componentType)) {
         FI_HILOGE("Parser componentType failed");
         return false;
     }
-    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(parser.json, "drag_blur_style");
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_blur_style");
     if (!cJSON_IsNumber(blurStyle)) {
         FI_HILOGE("Parser blurStyle failed");
         return false;
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(parser.json, "drag_corner_radius");
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_corner_radius");
     if (!cJSON_IsNumber(cornerRadius)) {
         FI_HILOGE("Parser cornerRadius failed");
         return false;
     }
-    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(parser.json, "dip_scale");
+
+    JsonParser arkInfoParser;
+    arkInfoParser.json = cJSON_Parse(g_drawingInfo.arkExtraInfo.c_str());
+    FI_HILOGD("ArkExtraInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.arkExtraInfo.size(), g_drawingInfo.arkExtraInfo.c_str());
+    if (!cJSON_IsObject(arkInfoParser.json)) {
+        FI_HILOGE("ArkExtraInfo is not json object");
+        return false;
+    }
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(arkInfoParser.json, "dip_scale");
     if (!cJSON_IsNumber(dipScale)) {
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
-    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valueint };
+    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valuedouble };
     return true;
+}
+
+void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    if (FilterInfo filterInfo; ParserFilterInfo(filterInfo) && filterInfo.componentType == BIG_FOLDER_LABEL) {
+        if (std::shared_ptr<Rosen::RSFilter> backFilter =
+            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale); backFilter != nullptr) {
+            filterNode->SetBackgroundFilter(backFilter);
+            filterNode->SetBounds(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                g_drawingInfo.pixelMap->GetHeight());
+            filterNode->SetFrame(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                g_drawingInfo.pixelMap->GetHeight());
+            filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
+        } else {
+            FI_HILOGE("Add backgroundFilter failed");
+        }
+    }
 }
 
 DragDrawing::~DragDrawing() 
