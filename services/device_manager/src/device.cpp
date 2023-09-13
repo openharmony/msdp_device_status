@@ -115,7 +115,7 @@ void Device::Dispatch(const struct epoll_event &ev)
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         FI_HILOGD("Input data received");
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup, errno:%{public}s", strerror(errno));
     }
 }
 
@@ -125,7 +125,7 @@ void Device::QueryDeviceInfo()
     char buffer[PATH_MAX] = { 0 };
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get device name:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get device name, errno:%{public}s", strerror(errno));
     } else {
         name_.assign(buffer);
     }
@@ -133,7 +133,7 @@ void Device::QueryDeviceInfo()
     struct input_id inputId;
     rc = ioctl(fd_, EVIOCGID, &inputId);
     if (rc < 0) {
-        FI_HILOGE("Could not get device input id:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get device input id, errno:%{public}s", strerror(errno));
     } else {
         bus_ = inputId.bustype;
         product_ = inputId.product;
@@ -159,7 +159,7 @@ void Device::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get uniq:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get uniq, errno:%{public}s", strerror(errno));
     } else {
         uniq_.assign(buffer);
     }
@@ -170,23 +170,23 @@ void Device::QuerySupportedEvents()
     CALL_DEBUG_ENTER;
     int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get key events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get key events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get abs events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get rel events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get properties mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get properties mask, errno:%{public}s", strerror(errno));
     }
 }
 

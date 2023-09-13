@@ -44,7 +44,7 @@ void Monitor::Dispatch(const struct epoll_event &ev)
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         ReceiveDevice();
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup, errno:%{public}s", strerror(errno));
     }
 }
 
@@ -92,7 +92,7 @@ int32_t Monitor::OpenConnection()
     CALL_DEBUG_ENTER;
     inotifyFd_ = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
     if (inotifyFd_ < 0) {
-        FI_HILOGE("Initializing inotify failed:%{public}s", strerror(errno));
+        FI_HILOGE("Initializing inotify , errno:%{public}s", strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
@@ -103,7 +103,7 @@ int32_t Monitor::EnableReceiving()
     CALL_DEBUG_ENTER;
     devWd_ = inotify_add_watch(inotifyFd_, DEV_INPUT_PATH.c_str(), IN_CREATE | IN_DELETE);
     if (devWd_ < 0) {
-        FI_HILOGE("Watching (\'%{public}s\') failed:%{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
+        FI_HILOGE("Watching (\'%{public}s\') failed, errno:%{public}s", DEV_INPUT_PATH.c_str(), strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
@@ -123,7 +123,7 @@ void Monitor::ReceiveDevice()
              (bufSize + sizeof(struct inotify_event) <= sizeof(buf)));
 
     if (numRead < 0) {
-        FI_HILOGE("Reading failed:%{public}s", strerror(errno));
+        FI_HILOGE("Reading failed, errno:%{public}s", strerror(errno));
         return;
     }
     if (numRead == 0) {

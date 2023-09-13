@@ -37,7 +37,7 @@ SensorDataCallback::~SensorDataCallback()
     alive_ = false;
     CHKPV(algorithmThread_);
     if (!algorithmThread_->joinable()) {
-        FI_HILOGE("thread join fail");
+        FI_HILOGE("Thread join fail");
         return;
     }
     sem_post(&sem_);
@@ -60,7 +60,7 @@ bool SensorDataCallback::Unregister()
     CALL_DEBUG_ENTER;
     bool ret = UnregisterCallbackSensor(SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER);
     if (!ret) {
-        FI_HILOGE("ret failed");
+        FI_HILOGE("UnregisterCallbackSensor failed");
         return false;
     }
     alive_ = false;

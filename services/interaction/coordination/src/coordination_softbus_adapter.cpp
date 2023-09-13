@@ -616,7 +616,7 @@ void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::func
 {
     CALL_DEBUG_ENTER;
     if (messageId <= MIN_ID || messageId >= MAX_ID) {
-        FI_HILOGE("Message id is invalid:%{public}d", messageId);
+        FI_HILOGE("Message id is invalid, messageId:%{public}d", messageId);
         return;
     }
     CHKPV(callback);
