@@ -113,6 +113,10 @@ bool CheckNodesValid()
 float GetScaling()
 {
     CALL_DEBUG_ENTER;
+    if (g_drawingInfo.isExistScalingVallue) {
+        FI_HILOGD("deviceDpi:%{public}f", g_drawingInfo.scalingValue);
+        return g_drawingInfo.scalingValue;
+    }
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (display == nullptr) {
         FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
@@ -129,7 +133,9 @@ float GetScaling()
         FI_HILOGE("Invalid deviceDpi:%{public}d", deviceDpi);
         return DEFAULT_SCALING;
     }
-    return (1.0 * deviceDpi * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
+    g_drawingInfo.scalingValue = (1.0 * deviceDpi * DEVICE_INDEPENDENT_PIXEL / BASELINE_DENSITY) / SVG_ORIGINAL_SIZE;
+    g_drawingInfo.isExistScalingVallue = true;
+    return g_drawingInfo.scalingValue;
 }
 } // namespace
 
@@ -221,6 +227,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;

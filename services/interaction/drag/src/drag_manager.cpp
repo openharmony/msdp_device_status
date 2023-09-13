@@ -481,12 +481,7 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
 int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
-    MMI::PointerStyle pointerStyle;
-    if (MMI::InputManager::GetInstance()->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
-        FI_HILOGE("Get pointer style failed");
-        return RET_ERR;
-    }
-    DRAG_DATA_MGR.Init(dragData, pointerStyle);
+    DRAG_DATA_MGR.Init(dragData);
     return RET_OK;
 }
 
@@ -540,7 +535,6 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
-    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
     ret = AddDragEventHandler(dragData.sourceType);
     if (ret != RET_OK) {
 #ifdef OHOS_DRAG_ENABLE_MONITOR
