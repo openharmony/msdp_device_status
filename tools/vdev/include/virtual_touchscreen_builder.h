@@ -56,6 +56,13 @@ private:
     static void ReadRawInput(const char *path);
     static void ReadRawModel(const nlohmann::json &model, int32_t level);
     static void ReadRawData(const nlohmann::json &model);
+
+    using InterfaceParameterLess = void(*)();
+    using InterfaceParameterOne = void(*)(const char*);
+    using InterfaceParameterTwo = void(*)(int32_t, char**);
+    static std::map<const char, InterfaceParameterLess> readActionParameterLess_;
+    static std::map<const char, InterfaceParameterOne> readActionParameterOne_;
+    static std::map<const char, InterfaceParameterTwo> readActionParameterTwo_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
