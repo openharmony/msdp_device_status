@@ -58,7 +58,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest001, Test
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(g_adapter != nullptr);
-    int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_ERR);
 }
 
@@ -73,10 +73,10 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest002, Test
     ASSERT_TRUE(g_adapter != nullptr);
     g_adapter->sessionDevMap_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
-    int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_ERR);
     g_sendable = true;
-    ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_OK);
     g_adapter->sessionDevMap_.clear();
 }

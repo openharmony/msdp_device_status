@@ -551,7 +551,8 @@ int32_t DragManager::OnStartDrag()
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+    if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
+        (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     return RET_OK;
@@ -578,6 +579,9 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
+        MMI::InputManager::GetInstance()->SetPointerVisible(true);
+    }
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     return HandleDragResult(result, hasCustomAnimation);
