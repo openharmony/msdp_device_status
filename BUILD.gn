@@ -23,7 +23,6 @@ group("devicestatus_service_group") {
       "${device_status_root_path}/rust/modules/coordination/server:fusion_coordination_server_ffi",
       "${device_status_root_path}/rust/modules/drag/server:fusion_drag_server_ffi",
       "${device_status_root_path}/rust/subsystem/dsoftbus/sys:fusion_dsoftbus_rust",
-      "${device_status_root_path}/rust/subsystem/dsoftbus/sys:rust_main",
     ]
   }
 }

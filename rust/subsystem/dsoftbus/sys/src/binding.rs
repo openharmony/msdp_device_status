@@ -39,79 +39,65 @@ pub const NETWORK_ID_BUF_LEN: usize = 65;
 pub const DEVICE_NAME_BUF_LEN: usize = 128;
 pub const RET_OK: i32 = 0;
 
-/// TODO: add documentation. 
+/// NodeBasicInfo is a structure that represents basic information about a node.
 #[repr(C)]
 pub struct NodeBasicInfo {
-    /// network id of the device 
+    /// The network ID of the device.
     pub network_id: [i8; NETWORK_ID_BUF_LEN],
-    /// device name of the device 
+    /// The device name of the device.
     pub device_name: [i8; DEVICE_NAME_BUF_LEN],
-    /// device type id of the device 
+    /// The device type ID of the device.
     pub device_type_id: u16,
 }
 
-/// TODO: add documentation. 
+/// SessionAttribute is a structure that represents session attributes.
 #[repr(C)]
 pub struct SessionAttribute {
+    /// The data type of the session attribute.
     pub data_type: i32,
+    /// The number of link types in the session attribute.
     pub link_type_num: i32,
+    /// The array of link types in the session attribute.
     pub link_type: [i32; LINK_TYPE_MAX],
+    /// The stream attribute of the session.
     pub stream_attr: i32,
+    /// The pointer to the fast transmission data.
     pub fast_trans_data: *const u8,
+    /// The size of the fast transmission data.
     pub fast_trans_data_size: u16,
 }
 
-/// TODO: add documentation. 
+/// StreamData is a structure that represents stream data.
 #[repr(C)]
 pub struct StreamData {
-    /// content of the buf
+    /// The content of the buffer.
     pub buf_data: c_char,
-    /// length of the buf
+    /// The length of the buffer.
     pub buf_len: i32,
 }
 
-/// struct DataPacket
-#[repr(C)]
-pub struct DataPacket {
-    /// message id of the message
-    pub message_id: MessageId,
-    /// length of the message
-    pub buf_len: u32,
-    /// content of the message
-    pub data: Vec<*const c_char>,
-}
-
-/// TODO: add documentation. 
-#[repr(C)]
-#[derive(Eq, Hash, PartialEq)]
-#[derive(Copy, Clone)]
-pub enum MessageId {
-    /// min id
-    MinId,
-    /// dragging data
-    DraggingData,
-    /// stopdrag data
-    StopdragData,
-    /// is pull up
-    IsPullUp,
-    /// max id
-    MaxId,
-}
-
-/// TODO: add documentation. 
+/// StreamFrameInfo is a structure that contains information about a stream frame.
 #[repr(C)]
 pub struct StreamFrameInfo {
+    /// The type of the frame.
     pub frame_type: i32,
+    /// The time stamp of the frame.
     pub time_stamp: i64,
+    /// The sequence number of the frame.
     pub seq_num: i32,
+    /// The sub-sequence number of the frame.
     pub seq_sub_num: i32,
+    /// The level number of the frame.
     pub level_num: i32,
+    /// The bit map of the frame.
     pub bit_map: i32,
+    /// The number of TV (Television) in the frame.
     pub tv_count: i32,
+    /// The list of TV (Television) in the frame.
     pub tv_list: i32,
 }
 
-/// TODO: add documentation. 
+/// ISessionListener is a structure that defines the callbacks for session events.
 #[repr(C)]
 #[derive(Default)]
 pub struct ISessionListener {
@@ -143,46 +129,103 @@ pub type OnMessageReceived = extern "C" fn (session_id: i32, byteData: *const c_
 // to receive some stream messages.
 pub type OnstreamReceived = extern "C" fn (session_id: i32, byteData: *const StreamData,
     extData: *const StreamData, paramData: *const StreamFrameInfo);
-// Callback function type for OnHandleRecvData() from other, this callback will be called when callback
-// functions that receive the message have been called.
-pub type OnHandleRecvData = extern "C" fn (session_id: i32, message: *const c_char);
-
-extern "C" {
-    /// This function is used to get permission:DISTRIBUTED_DATASYNC, it will be called in main.rs.
-    pub fn GetAccessToken();
-}
 
 // These C interfaces are defined in lib: dsoftbus:softbus_client
 extern "C" {
-    /// interface of CreateSessionServer
+    /// Creates a session server.
+    ///
+    /// # Arguments
+    ///
+    /// * `pkg_name` - The package name of the server.
+    /// * `session_name` - The name of the session.
+    /// * `session_listener` - A pointer to the session listener.
+    ///
+    /// # Returns
+    ///
+    /// The session ID if successful, otherwise an error code.
     pub fn CreateSessionServer(pkg_name: *const c_char, session_name: *const c_char, session_listener: *const ISessionListener) -> i32;
-    /// interface of RemoveSessionServer
+
+    /// Removes a session server.
+    ///
+    /// # Arguments
+    ///
+    /// * `pkg_name` - The package name of the server.
+    /// * `session_name` - The name of the session.
+    ///
+    /// # Returns
+    ///
+    /// An error code indicating the result of the operation.
     pub fn RemoveSessionServer(pkg_name: *const c_char, session_name: *const c_char) -> i32;
-    /// interface of CloseSession
+
+    /// Closes a session.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session to be closed.
     pub fn CloseSession(session_id: i32);
-    /// interface of OpenSession
+
+    /// Opens a session.
+    ///
+    /// # Arguments
+    ///
+    /// * `my_session_name` - The name of the local session.
+    /// * `peer_session_name` - The name of the remote session.
+    /// * `peer_device_id` - The ID of the remote device.
+    /// * `groupId` - The group ID of the session.
+    /// * `attr` - A pointer to the session attribute.
+    ///
+    /// # Returns
+    ///
+    /// The session ID if successful, otherwise an error code.
     pub fn OpenSession(my_session_name: *const c_char, peer_session_name: *const c_char, peer_device_id: *const c_char,
         groupId: *const c_char, attr: *const SessionAttribute) -> i32;
-    /// interface of GetPeerDeviceId
+
+    /// Gets the ID of the remote device for a given session.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session.
+    /// * `peer_dev_id` - A mutable buffer to store the remote device ID.
+    /// * `len` - The length of the buffer.
+    ///
+    /// # Returns
+    ///
+    /// An error code indicating the result of the operation.
     pub fn GetPeerDeviceId(session_id: i32, peer_dev_id: *mut c_char, len: u32) -> i32;
-    /// interface of GetSessionSide
+
+    /// Gets the session side (server or client) for a given session.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session.
+    ///
+    /// # Returns
+    ///
+    /// The session side if successful, otherwise an error code.
     pub fn GetSessionSide(session_id: i32) -> i32;
-    /// interface of GetLocalNodeDeviceInfo
+
+    /// Gets the local node's device information.
+    ///
+    /// # Arguments
+    ///
+    /// * `pkg_name` - The package name of the local node.
+    /// * `info` - A mutable pointer to the node's basic information structure.
+    ///
+    /// # Returns
+    ///
+    /// An error code indicating the result of the operation.
     pub fn GetLocalNodeDeviceInfo(pkg_name: *const c_char, info: *mut NodeBasicInfo) -> i32;
-    /// interface of SendBytes
+
+    /// Sends bytes over a session.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session.
+    /// * `data` - A pointer to the data to be sent.
+    /// * `len` - The length of the data.
+    ///
+    /// # Returns
+    ///
+    /// An error code indicating the result of the operation.
     pub fn SendBytes(session_id: i32, data: *const c_void, len: u32) -> i32;
 }
-
-extern "C" {
-    /// The function is used to save callback function.
-    pub fn CSaveHandleCb(call_back: Option<OnHandleRecvData>);
-    /// The function is used to get callback function.
-    pub fn CGetHandleCb() -> Option<OnHandleRecvData>;
-}
-
-// These C interfaces wrapper some c++ functions defined in 'coordination_sm_rust.cpp'.
-extern "C" {
-    /// interface of CReset
-    pub fn CReset(network_id: *const c_char);
-}
-

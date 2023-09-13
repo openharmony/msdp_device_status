@@ -18,11 +18,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use std::cell::RefCell;
 use std::ffi::{c_void, c_char, CString, CStr};
 use std::sync::{Once, Mutex, Arc, Condvar};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::Duration;
+use std::hash::{Hash, Hasher};
+use std::ptr;
 use std::vec::Vec;
 use fusion_data_rust::{FusionResult, FusionErrorCode};
 use fusion_utils_rust::{ call_debug_enter };
@@ -45,7 +46,6 @@ use crate::binding::{
     StreamFrameInfo,
     SessionAttribute,
     NodeBasicInfo,
-    MessageId,
     GetPeerDeviceId,
     GetSessionSide,
     OpenSession,
@@ -54,9 +54,6 @@ use crate::binding::{
     RemoveSessionServer,
     GetLocalNodeDeviceInfo,
     SendBytes,
-    CGetHandleCb,
-    OnHandleRecvData,
-    CReset,
 };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -107,66 +104,70 @@ extern "C" fn on_bytes_received(session_id: i32, data: *const c_void, data_len: 
         }
     }
 }
-    
-/// Provide for C lib to call
-/// # Safety
-extern "C" fn on_message_received(session_id: i32, data: *const c_void, data_len: u32) {
-    let _id = session_id;
-    let _dt = data;
-    let _len = data_len;
+
+/// Callback trait used for handling events in the DSoftbus instance. 
+pub trait IDSoftbufCallback {
+    /// Handles the event when a session is closed.
+    fn on_session_closed(&self, device_id: &str);
+
+    /// Handles some things when messages are received from a session.
+    fn on_handle_msg(&self, session_id: i32, data: &str);
 }
 
-/// Provide for C lib to call
-/// # Safety
-extern "C" fn on_stream_received(session_id: i32, data: *const StreamData, ext: *const StreamData,
-    param: *const StreamFrameInfo) {
-    let _id = session_id;
-    let _dt = data;
-    let _ext1 = ext;
-    let _param1 = param;
-}
-
-impl From<MessageId> for i32 {
-    fn from(value: MessageId) -> Self {
-        match value {
-            MessageId::MinId => 0,
-            MessageId::DraggingData => 1,
-            MessageId::StopdragData => 2,
-            MessageId::IsPullUp => 3,
-            MessageId::MaxId => 50,
-        }
+impl Hash for Box<dyn IDSoftbufCallback> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let raw_ptr = self.as_ref() as *const dyn IDSoftbufCallback;
+        raw_ptr.hash(state);
     }
 }
 
-/// TODO: add documentation.
+impl PartialEq for Box<dyn IDSoftbufCallback> {
+    fn eq(&self, other: &Self) -> bool {
+        let self_data_ptr = self.as_ref() as *const dyn IDSoftbufCallback as *const ();
+        let other_data_ptr = other.as_ref() as *const dyn IDSoftbufCallback as *const ();
+        ptr::eq(self_data_ptr, other_data_ptr)
+    }
+}
+
+impl Eq for Box<dyn IDSoftbufCallback> {}
+
+/// Inner is a struct that represents inner data.
 #[derive(Default)]
 struct Inner {
+    /// The session ID.
     session_id: i32,
+    /// The session listener.
     sess_listener: ISessionListener,
+    /// The local session name.
     local_session_name: String,
+    /// The session device map.
     session_dev_map: HashMap<String, i32>,
+    /// The channel status map.
     channel_status_map: HashMap<String, bool>,
+    /// The operation mutex.
     operation_mutex: Mutex<HashMap<String, i32>>,
+    /// The wait condition.
     wait_cond: Arc<(Mutex<bool>, Condvar)>,
-    call_back_handle_msg: Option<OnHandleRecvData>,
+    /// The set of callback functions.
+    callback: HashSet<Box<dyn IDSoftbufCallback>>,
 }
 
 impl Inner {
-    /// TODO: add documentation.
+    /// Initializes the `DSoftbus` instance.
+    ///
+    /// # Returns
+    ///
+    /// A `FusionResult` which can either be `Ok(())` if the operation was successful or an error wrapped in a
+    /// `FusionErrorCode`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// softbus.init();
+    /// ```
     fn init(&mut self) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::init");
-
-        // SAFETY: no `None` here
-        match unsafe { CGetHandleCb() } {
-            Some(callback) => {
-                self.call_back_handle_msg = Some(callback);
-            }
-            None => {
-                error!(LOG_LABEL, "call_back_handle_msg is null ");
-                return Err(FusionErrorCode::Fail.into());
-            }
-        };
-
         let session_name_head = String::from("ohos.msdp.device_status");
         let local_network_id = match self.local_network_id() {
             Ok(local_network_id) => local_network_id,
@@ -214,7 +215,19 @@ impl Inner {
         Ok(())
     }
 
-    /// TODO: add documentation.
+    /// Retrieves the local network ID.
+    ///
+    /// # Returns
+    ///
+    /// A `FusionResult` which can either be `Ok(String)` containing the local network ID if the operation was
+    /// successful or an error wrapped in a `FusionErrorCode`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// let local_network_id = softbus.local_network_id();
+    /// ```
     fn local_network_id(&mut self) -> FusionResult<String> {
         call_debug_enter!("DSoftbus::local_network_id");
         let mut local_node = NodeBasicInfo {
@@ -243,7 +256,14 @@ impl Inner {
         Ok(network_id_slice.to_owned())
     }
 
-    /// TODO: add documentation.
+    /// Releases all resources associated with the `DSoftbus` instance.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// softbus.release();
+    /// ```
     fn release(&mut self) {
         call_debug_enter!("DSoftbus::release");
         for (_key, value) in self.session_dev_map.iter() {
@@ -258,7 +278,23 @@ impl Inner {
         self.channel_status_map.clear();
     }
 
-    /// TODO: add documentation. 
+    /// Opens the input softbus connection for the specified remote network ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - A `String` representing the ID of the remote network.
+    ///
+    /// # Returns
+    ///
+    /// A `FusionResult` which can either be `Ok(())` if the operation was successful or an error wrapped in a
+    /// `FusionErrorCode`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// softbus.open_input_softbus(&"network_id".to_string());
+    /// ```
     fn open_input_softbus(&mut self, remote_network_id: &String) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::open_input_softbus");
         let session_name = String::from("ohos.msdp.device_status");
@@ -303,7 +339,18 @@ impl Inner {
         self.wait_session_opend(remote_network_id, session_id)
     }
 
-    /// TODO: add documentation.
+    /// Closes the input softbus connection for the specified remote network ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - A `String` representing the ID of the remote network.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// softbus.close_input_softbus(&"network_id".to_string());
+    /// ```
     fn close_input_softbus(&mut self, remote_network_id: &String) {
         call_debug_enter!("DSoftbus::close_input_softbus");
         let get_result: Option<&i32> = self.session_dev_map.get(remote_network_id);
@@ -318,7 +365,24 @@ impl Inner {
         self.session_id = -1;
     }
 
-    /// TODO: add documentation. 
+    /// Waits for a session to be opened with the given remote network ID and session ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - A `String` representing the ID of the remote network.
+    /// * `session_id` - An integer representing the ID of the session.
+    ///
+    /// # Returns
+    ///
+    /// A `FusionResult` which can either be `Ok(())` if the operation was successful or an error wrapped in a
+    /// `FusionErrorCode`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// softbus.wait_session_opend(&"network_id".to_string(), 1);
+    /// ```
     fn wait_session_opend(&mut self, remote_network_id: &String, session_id: i32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::wait_session_opend");
         self.session_dev_map.insert(remote_network_id.to_string(), session_id);
@@ -328,15 +392,39 @@ impl Inner {
         let result = (cvar.wait_timeout(self.operation_mutex.lock().unwrap(), Duration::from_secs(5))).unwrap();
 
         let get_result = self.channel_status_map.get(remote_network_id);
-        if get_result.is_some() && !get_result.copied().unwrap(){
-            error!(LOG_LABEL, "OpenSession timeout");    
+        if get_result.is_some() && !get_result.copied().unwrap() {
+            error!(LOG_LABEL, "OpenSession timeout");
             return Err(FusionErrorCode::Fail.into());
         }
         self.channel_status_map.insert(remote_network_id.to_string(), false);
         Ok(())
     }
 
-    /// TODO: add documentation.
+    /// Handles the event when a session is opened.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - An integer representing the ID of the session.
+    /// * `result` - An integer indicating the result of the session opening.
+    ///
+    /// # Returns
+    ///
+    /// A `FusionResult` which can either be `Ok(())` if the operation was successful or an error wrapped in a
+    /// `FusionErrorCode`.
+    ///
+    /// # Safety
+    ///
+    /// This function makes use of unsafe Rust code to call external functions, such as `GetPeerDeviceId` and
+    /// `GetSessionSide`, which are assumed to be implemented safely and correctly. Additionally, it assumes that
+    /// there are no null pointers returned by these functions.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let mut softbus = DSoftbus::default();
+    /// let session_id: i32 = 1;
+    /// softbus.on_session_opened(1, RET_OK);
+    /// ```
     fn on_session_opened(&mut self, session_id: i32, result: i32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::on_session_opened");
         let mut peer_dev_id: Vec<c_char> = Vec::with_capacity(65);
@@ -377,18 +465,42 @@ impl Inner {
                 self.session_dev_map.insert(peer_dev_id, session_id);
             }
         }
-        else if get_peer_device_id_result == RET_OK {         
+        else if get_peer_device_id_result == RET_OK {
             self.channel_status_map.insert(peer_dev_id, true);
             self.wait_cond.1.notify_all();
         }
         Ok(())
     }
 
-    /// TODO: add documentation.
+    /// Finds the device ID associated with a session ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session.
+    ///
+    /// # Returns
+    ///
+    /// The device ID associated with the session ID, wrapped in a `Result`. If the device ID is found, it is returned
+    /// as an `Ok` variant. If the device ID is not found, an error is returned as an `Err` variant.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let dsoftbus = DSoftbus::default();
+    /// let session_id = 123;
+    /// match dsoftbus.find_device(session_id) {
+    ///     Ok(device_id) => {
+    ///         println!("Device ID: {}", device_id);
+    ///     },
+    ///     Err(err) => {
+    ///         println!("Error finding device: {:?}", err);
+    ///     }
+    /// }
+    /// ```
     fn find_device(&self, session_id: i32) -> FusionResult<String> {
         call_debug_enter!("DSoftbus::find_device");
         for (key, value) in self.session_dev_map.iter() {
-            if *value == session_id{
+            if *value == session_id {
                 return Ok(key.to_string());
             }
         }
@@ -396,7 +508,19 @@ impl Inner {
         Err(FusionErrorCode::Fail.into())
     }
 
-    /// TODO: add documentation.
+    /// Handles the event when a session is closed.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session that was closed.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let mut dsoftbus = DSoftbus::default();
+    /// let session_id = 123;
+    /// dsoftbus.on_session_closed(session_id);
+    /// ```
     fn on_session_closed(&mut self, session_id: i32) {
         call_debug_enter!("DSoftbus::on_session_closed");
         let device_id = match self.find_device(session_id) {
@@ -414,25 +538,74 @@ impl Inner {
         if unsafe { GetSessionSide(session_id) } != RET_OK {
             self.channel_status_map.remove(&device_id);
         }
-        // SAFETY: no `None` here, `device_id` is valid.
-        unsafe { CReset(device_id.as_ptr() as *const c_char) };
+
+        for callback in &self.callback {
+            callback.on_session_closed(&device_id);
+        }
+
         self.session_id = -1;
     }
 
-    /// TODO: add documentation.
+    /// Handles received bytes when bytes are received from a session.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session.
+    /// * `data` - A pointer to the received data.
+    /// * `data_len` - The length of the received data in bytes.
+    ///
+    /// # Safety
+    ///
+    /// This function is marked as unsafe because it accesses and interprets raw pointers and assumes the validity of
+    /// the `data` parameter. The caller needs to ensure that `session_id` is a valid session ID, and `data` is a valid pointer to the received data.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let dsoftbus = DSoftbus::default();
+    /// let session_id = 123;
+    /// let data: *const c_void = ...; // Initialize the data pointer
+    /// let data_len = 10;
+    /// dsoftbus.on_bytes_received(session_id, data, data_len);
+    /// ```
     fn on_bytes_received(&self, session_id: i32, data: *const c_void, data_len: u32) {
         call_debug_enter!("DSoftbus::on_bytes_received");
         if session_id < 0 || data.is_null() || data_len == 0 {
            error!(LOG_LABEL, "Param check failed");
-           return;
         }
 
-        if let Some(call_back) = self.call_back_handle_msg {
-            call_back(session_id, data as *const c_char);
+        // SAFETY: no `None` here, cause `network_id_ptr` is valid.
+        let data_str = unsafe {CStr::from_ptr(data as *const c_char)};
+        let data_slice: &str = data_str.to_str().unwrap();
+        let data = data_slice.to_owned();
+
+        for callback in &self.callback {
+            callback.on_handle_msg(session_id, &data);
         }
     }
 
-    /// TODO: add documentation.
+    /// Checks the session state of a remote device.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - A reference to a String representing the network ID of the remote device.
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the session state of the remote device exists in the session device map, or `false` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let dsoftbus = DSoftbus::default();
+    /// let remote_network_id = "target_network".to_string();
+    /// let session_state = dsoftbus.check_device_session_state(&remote_network_id);
+    /// if session_state {
+    ///     println!("The session state of the remote device exists.");
+    /// } else {
+    ///     println!("The session state of the remote device does not exist.");
+    /// }
+    /// ```
     fn check_device_session_state(&self, remote_network_id: &String) -> bool {
         call_debug_enter!("DSoftbus::check_device_session_state");
         let get_result: Option<&i32> = self.session_dev_map.get(remote_network_id);
@@ -443,8 +616,34 @@ impl Inner {
         true
     }
 
-    /// TODO: add documentation.
-    fn send_msg(&self, device_id: &String, message_id: MessageId, data: *const c_void, data_len: u32) -> FusionResult<()>{
+    /// Sends a message to a specified device.
+    ///
+    /// # Arguments
+    ///
+    /// * `device_id` - A reference to a String representing the ID of the target device.
+    /// * `data` - A pointer to the data to be sent.
+    /// * `data_len` - The length of the data in bytes.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the message was sent successfully, or an error of type `FusionResult<()>` if sending the
+    /// message failed.
+    ///
+    /// # Safety
+    ///
+    /// This function is marked as unsafe because it internally calls an external unsafe function `SendBytes`. The
+    /// caller needs to ensure that `device_id`, `data`, and `data_len` are valid and properly initialized.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let dsoftbus = DSoftbus::default();
+    /// let device_id = "target_device".to_string();
+    /// let data: *const c_void = ...; // Initialize the data pointer
+    /// let data_len = 10;
+    /// dsoftbus.send_msg(&device_id, data, data_len).unwrap();
+    /// ```
+    fn send_msg(&self, device_id: &String, data: *const c_void, data_len: u32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::send_msg");
         let session_id = self.session_dev_map.get(device_id).copied().unwrap_or(0);
         // SAFETY: no `None` here, `session_id`, `data` and `data_len` is valid.
@@ -456,30 +655,79 @@ impl Inner {
         Ok(())
     }
 
-    /// TODO: add documentation.
-    fn get_session_dev_map(&self) -> HashMap<String, i32>{
+    /// Returns a clone of the session device map.
+    ///
+    /// The session device map is a HashMap that maps session IDs to device IDs. Each session ID is represented as a
+    /// String, and each device ID is represented as an i32.
+    ///
+    /// # Returns
+    ///
+    /// Returns a clone of the session device map.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let dsoftbus = DSoftbus::default();
+    /// let session_dev_map = dsoftbus.get_session_dev_map();
+    /// // Use the session_dev_map here...
+    /// ```
+    fn get_session_dev_map(&self) -> HashMap<String, i32> {
         self.session_dev_map.clone()
     }
 
-    /// TODO: add documentation.
-    fn get_wait_cond(&self) -> Arc<(Mutex<bool>, Condvar)>{
-        self.wait_cond.clone()
-    }
-
-    /// TODO: add documentation.
-    fn get_operation_mutex(&self) -> Mutex<HashMap<String, i32>> {
-        self.operation_mutex.lock().unwrap().clone().into()
+    /// Registers a callback to receive SoftBus events.
+    ///
+    /// # Arguments
+    ///
+    /// * `callback` - A Boxed trait object implementing the IDSoftbufCallback trait. This callback will be called when
+    /// SoftBus events occur.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let mut dsoftbus = DSoftbus::default();
+    /// let callback = Box::new(MyCallback {});
+    /// dsoftbus.register_callback(callback);
+    /// ```
+    fn register_callback(&mut self, callback: Box<dyn IDSoftbufCallback>) {
+        call_debug_enter!("DeviceProfileAdapter::register_callback");
+        self.callback.insert(callback);
     }
 }
 
-/// TODO: add documentation.
+/// DSoftbus is a struct that represents the DSoftbus object.
 #[derive(Default)]
 pub struct DSoftbus {
-    dsoftbus_impl: Mutex<RefCell<Inner>>,
+    /// The implementation of DSoftbus.
+    dsoftbus_impl: Mutex<Inner>,
 }
 
 impl DSoftbus {
-    /// interface of get_instance
+    /// Returns a reference to the SoftBus singleton instance.
+    ///
+    /// # Returns
+    ///
+    /// Returns an `Option<&'static Self>` containing a reference to the SoftBus singleton instance, or `None` if the
+    /// singleton has not yet been initialized.
+    ///
+    /// # Safety
+    ///
+    /// This function is marked as unsafe because it modifies static variables. It is expected that the caller is aware
+    /// of the risks and takes appropriate measures to ensure safety.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// match DSoftbus::get_instance() {
+    ///     Some(instance) => {
+    ///         println!("SoftBus singleton instance found.");
+    ///         // Use the instance here...
+    ///     }
+    ///     None => {
+    ///         println!("SoftBus singleton instance not yet initialized.");
+    ///     }
+    /// }
+    /// ```
     pub fn get_instance() -> Option<&'static Self> {
         static mut DSOFTBUS: Option<DSoftbus> = None;
         static INIT_ONCE: Once = Once::new();
@@ -492,11 +740,34 @@ impl DSoftbus {
         }
     }
 
-    /// interface of init
+    /// Initializes the SoftBus instance.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Result<(), FusionError>` indicating the success or failure of the initialization. An `Err` value is
+    /// returned if there was a lock error during the execution.
+    ///
+    /// # Note
+    ///
+    /// This function initializes the SoftBus instance. It should be called before using any SoftBus functionality to
+    /// ensure proper setup and initialization.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// match my_instance.init() {
+    ///     Ok(()) => {
+    ///         println!("SoftBus initialized successfully");
+    ///     }
+    ///     Err(err) => {
+    ///         eprintln!("Failed to initialize SoftBus: {:?}", err);
+    ///     }
+    /// }
+    /// ```
     pub fn init(&self) -> FusionResult<()> {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().init()
+            Ok(mut guard) => {
+                guard.init()
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -505,11 +776,22 @@ impl DSoftbus {
         }
     }
    
-   /// interface of release
-   pub fn release(&self){
+    /// Releases the resources held by the SoftBus instance.
+    ///
+    /// # Note
+    ///
+    /// This function releases the resources held by the SoftBus instance. It should be called when you no longer need
+    /// to use the SoftBus functionality and want to free up any associated resources.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// my_instance.release();
+    /// ```
+    pub fn release(&self) {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().release();
+            Ok(mut guard) => {
+                guard.release();
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -517,11 +799,40 @@ impl DSoftbus {
         }
     }
 
-    /// interface of open_input_softbus
+    /// Opens an input SoftBus connection for a specified remote network ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - The remote network ID for which to open the input SoftBus connection.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Result<(), FusionError>` indicating the success or failure of the operation. An `Err` value is
+    /// returned if there was a lock error during the execution.
+    ///
+    /// # Note
+    ///
+    /// This function opens an input SoftBus connection for the specified remote network ID. It should be called when
+    /// you want to establish communication with the remote network.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let remote_network_id = String::from("example_network_id");
+    ///
+    /// match my_instance.open_input_softbus(&remote_network_id) {
+    ///     Ok(()) => {
+    ///         println!("Input SoftBus connection opened successfully");
+    ///     }
+    ///     Err(err) => {
+    ///         eprintln!("Failed to open input SoftBus connection: {:?}", err);
+    ///     }
+    /// }
+    /// ```
     pub fn open_input_softbus(&self, remote_network_id: &String) -> FusionResult<()> {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().open_input_softbus(remote_network_id)
+            Ok(mut guard) => {
+                guard.open_input_softbus(remote_network_id)
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -530,11 +841,27 @@ impl DSoftbus {
         }
     }
 
-    /// interface of close_input_softbus
+    /// Closes the input SoftBus connection for a specified remote network ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - The remote network ID for which to close the input SoftBus connection.
+    ///
+    /// # Note
+    ///
+    /// This function closes the input SoftBus connection for the specified remote network ID. It should be called when
+    /// you want to terminate the communication with the remote network.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let remote_network_id = String::from("example_network_id");
+    /// my_instance.close_input_softbus(&remote_network_id);
+    /// ```
     pub fn close_input_softbus(&self, remote_network_id: &String) {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().close_input_softbus(remote_network_id);
+            Ok(mut guard) => {
+                guard.close_input_softbus(remote_network_id);
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -542,11 +869,42 @@ impl DSoftbus {
         }
     }   
 
-    /// interface of on_session_opened
-    pub fn on_session_opened(&self, session_id: i32, result: i32) -> FusionResult<()>{
+    /// Callback function triggered when a session is opened.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the opened session.
+    /// * `result` - The result of the session opening operation.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Result<(), FusionError>` indicating the success or failure of the operation. An `Err` value is
+    /// returned if there was a lock error during the callback execution.
+    ///
+    /// # Note
+    ///
+    /// This function is called when a session is opened, allowing you to perform any necessary handling or operations
+    /// related to the opened session. The `result` parameter provides the outcome of the session opening operation.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let session_id = 123;
+    /// let result = 0; // Assume the session opening was successful
+    ///
+    /// match callback.on_session_opened(session_id, result) {
+    ///     Ok(()) => {
+    ///         println!("Session opened successfully");
+    ///     }
+    ///     Err(err) => {
+    ///         eprintln!("Failed to open session: {:?}", err);
+    ///     }
+    /// }
+    /// ```
+    fn on_session_opened(&self, session_id: i32, result: i32) -> FusionResult<()> {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().on_session_opened(session_id, result)
+            Ok(mut guard) => {
+                guard.on_session_opened(session_id, result)
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -555,11 +913,28 @@ impl DSoftbus {
         }
     }
 
-    /// interface of on_session_closed
-    pub fn on_session_closed(&self, session_id: i32) {
+    /// Callback function triggered when a session is closed.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the closed session.
+    ///
+    /// # Note
+    ///
+    /// This function is called when a session is closed, allowing you to perform any necessary cleanup or handling
+    /// related to the closed session.
+    /// 
+    /// # Example
+    ///
+    /// ```rust
+    /// let session_id = 123;
+    ///
+    /// callback.on_session_closed(session_id);
+    /// ```
+    fn on_session_closed(&self, session_id: i32) {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                guard.borrow_mut().on_session_closed(session_id);
+            Ok(mut guard) => {
+                guard.on_session_closed(session_id);
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -567,11 +942,34 @@ impl DSoftbus {
         }
     }
 
-    /// interface of on_bytes_received
-    pub fn on_bytes_received(&self, session_id: i32, data: *const c_void, data_len: u32) {
+    /// Callback function triggered when bytes are received.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session related to the received bytes.
+    /// * `data` - The pointer to the received bytes data.
+    /// * `data_len` - The length of the received bytes data in bytes.
+    ///
+    /// # Note
+    ///
+    /// This function is called when bytes are received, allowing you to handle and process the received data.
+    /// Please note that the pointer `data` is a raw pointer that needs to be handled carefully to avoid memory safety
+    /// issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let session_id = 123;
+    /// let data_ptr: *const c_void = ...; // Obtain the actual pointer to the received bytes data
+    /// let data_len = ...; // Obtain the length of the received bytes data
+    ///
+    /// callback.on_bytes_received(session_id, data_ptr, data_len);
+    /// ```
+    fn on_bytes_received(&self, session_id: i32, data: *const c_void, data_len: u32) {
         match self.dsoftbus_impl.lock() {
             Ok(guard) => {
-                guard.borrow_mut().on_bytes_received(session_id, data, data_len);
+                guard.on_bytes_received(session_id, data, data_len);
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -579,12 +977,42 @@ impl DSoftbus {
         }
     }
 
-    /// interface of send_msg
-    pub fn send_msg(&self, device_id: &String, message_id: MessageId, data: *const c_void,
-        data_len: u32) -> FusionResult<()>{
+    /// Sends a message to the specified device.
+    ///
+    /// # Arguments
+    ///
+    /// * `device_id` - The ID of the target device to send the message to.
+    /// * `data` - The pointer to the message data.
+    /// * `data_len` - The length of the message data in bytes.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the message is successfully sent, otherwise returns an `Err` containing an error code.
+    ///
+    /// # Note
+    ///
+    /// This function sends the message to the specified device using the internal `dsoftbus_impl` instance.
+    /// The pointer `data` is a raw pointer that needs to be handled carefully to avoid memory safety issues and
+    /// undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let device_id = String::from("example_device");
+    /// let data_ptr: *const c_void = ...; // Obtain the actual pointer to the message data
+    /// let data_len = ...; // Obtain the length of the message data
+    ///
+    /// match my_instance.send_msg(&device_id, data_ptr, data_len) {
+    ///     Ok(()) => println!("Message sent successfully"),
+    ///     Err(err) => eprintln!("Failed to send message: {:?}", err),
+    /// }
+    /// ```
+    pub fn send_msg(&self, device_id: &String, data: *const c_void,
+        data_len: u32) -> FusionResult<()> {
         match self.dsoftbus_impl.lock() {
             Ok(guard) => {
-                guard.borrow_mut().send_msg(device_id, message_id, data, data_len)
+                guard.send_msg(device_id, data, data_len)
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -593,22 +1021,90 @@ impl DSoftbus {
         }
     }
 
-    /// interface of on_message_received
-    pub fn on_message_received(&self, session_id: i32, data: *const c_void, data_len: u32) {
-
+    /// Callback function triggered when a message is received.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session related to the received message.
+    /// * `data` - The pointer to the message data.
+    /// * `data_len` - The length of the message data in bytes.
+    ///
+    /// # Note
+    ///
+    /// This function is called when a message is received, allowing you to handle and process the received message
+    /// data.
+    /// Please note that the pointer `data` is a raw pointer that needs to be handled carefully to avoid memory safety
+    /// issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let session_id = 123;
+    /// let data_ptr: *const c_void = ...; // Obtain the actual pointer to the message data
+    /// let data_len = ...; // Obtain the length of the message data
+    ///
+    /// callback.on_message_received(session_id, data_ptr, data_len);
+    /// ```
+    fn on_message_received(&self, session_id: i32, data: *const c_void, data_len: u32) {
     }
 
-    /// interface of on_stream_received
-    pub fn on_stream_received(&self, session_id: i32, data: *const StreamData,
+    /// Callback function triggered when a stream is received.
+    ///
+    /// # Arguments
+    ///
+    /// * `session_id` - The ID of the session related to the received stream.
+    /// * `data` - The pointer to the stream data.
+    /// * `ext` - The pointer to the extended stream data.
+    /// * `param` - The pointer to the stream frame information.
+    ///
+    /// # Note
+    ///
+    /// This function is called when a stream is received, allowing you to handle and process the received stream data.
+    /// Please note that the pointers `data`, `ext`, and `param` are raw pointers that need to be handled carefully to
+    /// avoid memory safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let session_id = 123;
+    /// let data_ptr: *const StreamData = ...; // Obtain the actual pointer to the stream data
+    /// let ext_ptr: *const StreamData = ...; // Obtain the actual pointer to the extended stream data
+    /// let param_ptr: *const StreamFrameInfo = ...; // Obtain the actual pointer to the stream frame information
+    ///
+    /// callback.on_stream_received(session_id, data_ptr, ext_ptr, param_ptr);
+    /// ```
+    fn on_stream_received(&self, session_id: i32, data: *const StreamData,
         ext: *const StreamData, param: *const StreamFrameInfo) {
-
     }
 
-    /// interface of get_session_dev_map
+    /// Get the session device mapping from the DSoftbus instance.
+    ///
+    /// # Returns
+    /// Returns a `HashMap` that maps session IDs to device IDs.
+    ///
+    /// # Errors
+    /// Returns an error of type `FusionError` if the lock cannot be acquired.
+    ///
+    /// # Example
+    /// ```rust
+    /// match my_instance.get_session_dev_map() {
+    ///     Ok(map) => {
+    ///         // Process the session device map
+    ///         for (session_id, device_id) in map {
+    ///             println!("Session ID: {}, Device ID: {}", session_id, device_id);
+    ///         }
+    ///     }
+    ///     Err(err) => {
+    ///         eprintln!("Error: {:?}", err);
+    ///     }
+    /// }
+    /// ```
     pub fn get_session_dev_map(&self) -> FusionResult<HashMap<String, i32>> {
         match self.dsoftbus_impl.lock() {
             Ok(guard) => {
-                Ok(guard.borrow_mut().get_session_dev_map())
+                Ok(guard.get_session_dev_map())
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
@@ -617,28 +1113,26 @@ impl DSoftbus {
         }
     }
 
-    /// interface of get_wait_cond
-    pub fn get_wait_cond(&self) -> FusionResult<Arc<(Mutex<bool>, Condvar)>> {
+    /// Register a callback function to the DSoftbus instance.
+    /// 
+    /// # Arguments
+    /// - `callback`: A callback function that implements the `IDSoftbufCallback` trait.
+    /// 
+    /// # Returns
+    /// This function does not return anything.
+    ///
+    /// # Example
+    /// ```rust
+    /// let callback = Box::new(MyCallback {});
+    /// my_instance.register_callback(callback);
+    /// ```
+    pub fn register_callback(&self, callback: Box<dyn IDSoftbufCallback>) {
         match self.dsoftbus_impl.lock() {
-            Ok(guard) => {
-                Ok(guard.borrow_mut().get_wait_cond())
+            Ok(mut guard) => {
+                guard.register_callback(callback);
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
-            }
-        }
-    }
-
-    /// interface of get_operation_mutex
-    pub fn get_operation_mutex(&self) -> FusionResult<Mutex<HashMap<String, i32>>> {
-        match self.dsoftbus_impl.lock() {
-            Ok(guard) => {               
-                Ok(guard.borrow_mut().get_operation_mutex())
-            }
-            Err(err) => {
-                error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
             }
         }
     }
