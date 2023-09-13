@@ -15,7 +15,7 @@ import("//base/msdp/device_status/device_status.gni")
 ###############################hydra_fuzz#################################
 import("//build/config/features.gni")
 import("//build/test.gni")
-module_output_path = "device_status/device_status_test"
+module_output_path = "${device_status_fuzz_output_path}"
 deps_ex = [
   "distributed_input:libdinput_sdk",
   "device_manager:devicemanagersdk",
