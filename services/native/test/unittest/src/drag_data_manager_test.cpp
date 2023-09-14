@@ -210,8 +210,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
     dragData.shadowInfo.y = SHADOWINFO_Y;
     dragData.displayX = DISPLAY_X;
     dragData.displayY = DISPLAY_Y;
-    MMI::PointerStyle pointerStyle;
-    DRAG_DATA_MGR.Init(dragData, pointerStyle);
+    DRAG_DATA_MGR.Init(dragData);
     DragData dragDataFirst = DRAG_DATA_MGR.GetDragData();
     EXPECT_TRUE(dragDataFirst.displayX == DISPLAY_X);
     EXPECT_TRUE(dragDataFirst.displayY == DISPLAY_Y);
@@ -243,8 +242,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
     dragData.shadowInfo.y = SHADOWINFO_Y;
     dragData.displayX = DISPLAY_X;
     dragData.displayY = DISPLAY_Y;
-    MMI::PointerStyle pointerStyle;
-    DRAG_DATA_MGR.Init(dragData, pointerStyle);
+    DRAG_DATA_MGR.Init(dragData);
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     int32_t width = 0;

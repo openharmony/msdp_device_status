@@ -32,7 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDat
 DragDataManager::DragDataManager() = default;
 DragDataManager::~DragDataManager() = default;
 
-void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
+void DragDataManager::Init(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
@@ -40,7 +40,6 @@ void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &po
         dragData_.displayId = 0;
         FI_HILOGW("The value of displayId(%{public}d) is correcting to 0", dragData.displayId);
     }
-    pointerStyle_ = pointerStyle;
     targetTid_ = -1;
     targetPid_ = -1;
 }
