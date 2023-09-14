@@ -27,6 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDataManager" };
+constexpr int32_t DEFAULT_DISPLAY_ID { 0 };
 } // namespace
 
 DragDataManager::DragDataManager() = default;
@@ -36,8 +37,8 @@ void DragDataManager::Init(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
-    if (dragData.displayId < 0) {
-        dragData_.displayId = 0;
+    if (dragData.displayId < DEFAULT_DISPLAY_ID) {
+        dragData_.displayId = DEFAULT_DISPLAY_ID;
         FI_HILOGW("The value of displayId(%{public}d) is correcting to 0", dragData.displayId);
     }
     targetTid_ = -1;

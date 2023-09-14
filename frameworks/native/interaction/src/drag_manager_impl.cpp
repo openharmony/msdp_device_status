@@ -30,9 +30,10 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
-        FI_HILOGE("Invalid style:%{public}d", style);
+        FI_HILOGE("Invalid style:%{public}d", static_cast<int32_t>(style));
         return RET_ERR;
     }
+    FI_HILOGD("Ready to modify the style(%{public}d)", static_cast<int32_t>(style));
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
 }
 

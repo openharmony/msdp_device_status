@@ -74,6 +74,7 @@ void CoordinationSM::Init()
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
+
 void CoordinationSM::OnSoftbusSessionClosed(const std::string &NetworkId)
 {
     CALL_INFO_TRACE;
