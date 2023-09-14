@@ -208,6 +208,38 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, Test
     EXPECT_TRUE(ret == RET_OK);
     g_adapter->sessionDevMap_.clear();
 }
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest011
+ * @tc.desc: Test func named NotifyFilterAdded, sessionDevMap_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    int32_t ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
+    EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest012
+ * @tc.desc: Test func named NotifyFilterAdded, sessionDevMap_ is not null, sendMsg is err or ok
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_adapter->sessionDevMap_[REMOTE_NETWORKID] = 1;
+    g_sendable = false;
+    int32_t ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
+    EXPECT_TRUE(ret == RET_ERR);
+    g_sendable = true;
+    ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
+    EXPECT_TRUE(ret == RET_OK);
+    g_adapter->sessionDevMap_.clear();  
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
