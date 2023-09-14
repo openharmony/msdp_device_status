@@ -42,12 +42,6 @@ const std::unordered_map<std::string, int32_t> mouseBtns {
     { "BTN_EXTRA", BTN_EXTRA }, { "BTN_FORWARD", BTN_FORWARD },
     { "BTN_BACK", BTN_BACK }, { "BTN_TASK", BTN_TASK } };
 } // namespace
-using InterfaceParameterLess = void(*)();
-using InterfaceParameterOne = void(*)(const char*);
-using InterfaceParameterTwo = void(*)(int32_t, char**);
-std::map<const char, InterfaceParameterLess> VirtualMouseBuilder::readActionParameterLess_;
-std::map<const char, InterfaceParameterOne> VirtualMouseBuilder::readActionParameterOne_;
-std::map<const char, InterfaceParameterTwo> VirtualMouseBuilder::readActionParameterTwo_;
 
 VirtualMouseBuilder::VirtualMouseBuilder() : VirtualDeviceBuilder(GetDeviceName(), BUS_USB, 0x93a, 0x2510)
 {
@@ -55,14 +49,6 @@ VirtualMouseBuilder::VirtualMouseBuilder() : VirtualDeviceBuilder(GetDeviceName(
     keys_ = { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA, BTN_FORWARD, BTN_BACK, BTN_TASK };
     relBits_ = { REL_X, REL_Y, REL_WHEEL, REL_WHEEL_HI_RES };
     miscellaneous_ = { MSC_SCAN };
-    readActionParameterLess_['d'] = &VirtualMouseBuilder::ReadDownAction;
-    readActionParameterLess_['u'] = &VirtualMouseBuilder::ReadUpAction;
-    readActionParameterLess_['s'] = &VirtualMouseBuilder::ReadScrollAction;
-    readActionParameterOne_['f'] = &VirtualMouseBuilder::ReadActions;
-    readActionParameterOne_['r'] = &VirtualMouseBuilder::ReadRawInput;
-    readActionParameterTwo_['m'] = &VirtualMouseBuilder::ReadMoveAction;
-    readActionParameterTwo_['M'] = &VirtualMouseBuilder::ReadMoveToAction;
-    readActionParameterTwo_['D'] = &VirtualMouseBuilder::ReadDragToAction;
 }
 
 class MouseEventMonitor final : public MMI::IInputEventConsumer {
@@ -247,7 +233,7 @@ void VirtualMouseBuilder::Act(int32_t argc, char *argv[])
                 continue;
             }
         }
-        if (opt == 'W') {
+        if (opt == 'w') {
             VirtualDeviceBuilder::WaitFor(optarg, "mouse");
         } else {
             ShowUsage();

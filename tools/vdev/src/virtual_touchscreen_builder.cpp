@@ -49,12 +49,6 @@ constexpr int32_t TX_OFFSET { 2 };
 constexpr int32_t TY_OFFSET { 3 };
 constexpr uint32_t IO_FLAG_WIDTH { 6 };
 } // namespace
-using InterfaceParameterLess = void(*)();
-using InterfaceParameterOne = void(*)(const char*);
-using InterfaceParameterTwo = void(*)(int32_t, char**);
-std::map<const char, InterfaceParameterLess> VirtualTouchScreenBuilder::readActionParameterLess_;
-std::map<const char, InterfaceParameterOne> VirtualTouchScreenBuilder::readActionParameterOne_;
-std::map<const char, InterfaceParameterTwo> VirtualTouchScreenBuilder::readActionParameterTwo_;
 
 class PointerEventMonitor final : public MMI::IInputEventConsumer {
 public:
@@ -103,13 +97,6 @@ VirtualTouchScreenBuilder::VirtualTouchScreenBuilder() : VirtualDeviceBuilder(Ge
     { ABS_MT_WIDTH_MINOR, 0, 1, 0, 0 },
     { ABS_MT_TOOL_X, 0, g_absMaxWidth, 0, 0 },
     { ABS_MT_TOOL_Y, 0, 1, 0, 0 } };
-    readActionParameterLess_['u'] = &VirtualTouchScreenBuilder::ReadUpAction;
-    readActionParameterOne_['f'] = &VirtualTouchScreenBuilder::ReadActions;
-    readActionParameterOne_['r'] = &VirtualTouchScreenBuilder::ReadRawInput;
-    readActionParameterTwo_['d'] = &VirtualTouchScreenBuilder::ReadDownAction;
-    readActionParameterTwo_['m'] = &VirtualTouchScreenBuilder::ReadMoveAction;
-    readActionParameterTwo_['M'] = &VirtualTouchScreenBuilder::ReadMoveToAction;
-    readActionParameterTwo_['D'] = &VirtualTouchScreenBuilder::ReadDragToAction;
 
     eventTypes_ = { EV_ABS, EV_KEY };
     properties_ = { INPUT_PROP_DIRECT };
@@ -274,7 +261,7 @@ void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
                 continue;
             }
         }
-        if (opt == 'W') {
+        if (opt == 'w') {
             VirtualDeviceBuilder::WaitFor(optarg, "touchscreen");
         } else {
             ShowUsage();

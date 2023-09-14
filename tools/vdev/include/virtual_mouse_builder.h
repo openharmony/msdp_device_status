@@ -61,9 +61,15 @@ private:
     using InterfaceParameterLess = void(*)();
     using InterfaceParameterOne = void(*)(const char*);
     using InterfaceParameterTwo = void(*)(int32_t, char**);
-    static std::map<const char, InterfaceParameterLess> readActionParameterLess_;
-    static std::map<const char, InterfaceParameterOne> readActionParameterOne_;
-    static std::map<const char, InterfaceParameterTwo> readActionParameterTwo_;
+    inline static std::map<const char, InterfaceParameterLess> readActionParameterLess_ {
+        { 'd', &ReadDownAction }, { 'u', &ReadUpAction }, { 's', &ReadScrollAction }
+    };
+    inline static std::map<const char, InterfaceParameterOne> readActionParameterOne_ {
+        { 'f', &ReadActions }, { 'r', &ReadRawInput}
+    };
+    inline static std::map<const char, InterfaceParameterTwo> readActionParameterTwo_ {
+        { 'm', &ReadMoveAction }, { 'M', &ReadMoveToAction }, { 'D', &ReadDragToAction }
+    };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
