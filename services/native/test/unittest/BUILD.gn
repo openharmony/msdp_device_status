@@ -93,10 +93,7 @@ ohos_unittest("DeviceStatusAgentTest") {
 
 ohos_unittest("DragDataManagerTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${device_status_interfaces_path}/innerkits/include",
-    "//third_party/cJSON",
-  ]
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
 
   sources = [ "src/drag_data_manager_test.cpp" ]
 
@@ -108,7 +105,6 @@ ohos_unittest("DragDataManagerTest") {
   deps = [
     "${device_status_service_path}/interaction/drag:interaction_drag",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 

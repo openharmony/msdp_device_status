@@ -365,9 +365,9 @@ void DragManager::Dump(int32_t fd) const
         udKey = "";
     }
     dprintf(fd, "dragData = {\n"
-            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tfilterInfo:%d\n\textraInfo:%d\n\tsourceType:%d"
+            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
             "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.filterInfo.c_str(), 
+            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.filterInfo.c_str(),
             dragData.extraInfo.c_str(), dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX,
             dragData.displayY, dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {

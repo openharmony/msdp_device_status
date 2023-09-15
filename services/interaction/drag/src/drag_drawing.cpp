@@ -97,9 +97,9 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
 
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
+struct JsonInfoParser {
+    JsonInfoParser() = default;
+    ~JsonInfoParser()
     {
         if (json != nullptr) {
             cJSON_Delete(json);
@@ -780,8 +780,10 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     CHKPV(g_drawingInfo.pixelMap);
-    pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
-    pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);
@@ -1103,11 +1105,11 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
     CALL_DEBUG_ENTER;
-    JsonParser filterParser;
     if (g_drawingInfo.filterInfo.empty()) {
         FI_HILOGD("FilterInfo is empty.");
-        return;
+        return false;
     }
+    JsonInfoParser filterParser;
     filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
@@ -1130,17 +1132,16 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGE("Parser cornerRadius failed");
         return false;
     }
-
     if (g_drawingInfo.extraInfo.empty()) {
         FI_HILOGD("ExtraInfo is empty.");
-        return;
+        return false;
     }
-    JsonParser extraInfoParser;
+    JsonInfoParser extraInfoParser;
     extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
-    FI_HILOGD("ArkExtraInfo size:%{public}zu, filterInfo:%{public}s",
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s",
         g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
     if (!cJSON_IsObject(extraInfoParser.json)) {
-        FI_HILOGE("ArkExtraInfo is not json object");
+        FI_HILOGE("ExtraInfo is not json object");
         return false;
     }
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_scale");
@@ -1159,16 +1160,18 @@ void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     if (FilterInfo filterInfo; ParserFilterInfo(filterInfo) && filterInfo.componentType == BIG_FOLDER_LABEL) {
         std::shared_ptr<Rosen::RSFilter> backFilter =
-            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale); 
+            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale);
         if (backFilter == nullptr) {
-            FI_HILOGE("Add backgroundFilter failed");
+            FI_HILOGE("Create backgroundFilter failed");
             return;
         }
         filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+            g_drawingInfo.pixelMap->GetHeight());
+        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+            g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
-        }
+        FI_HILOGD("Add filter successfully");
     }
 }
 
