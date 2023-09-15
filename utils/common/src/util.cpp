@@ -178,12 +178,12 @@ const char* GetProgramName()
     int32_t ret = sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid()));
     if (ret == -1) {
         FI_HILOGE("GetProcessInfo sprintf_s cmdline error");
-        return {};
+        return "";
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
         FI_HILOGE("The fp is nullptr, filename:%{public}s", buf);
-        return {};
+        return "";
     }
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
@@ -193,7 +193,7 @@ const char* GetProgramName()
             FI_HILOGW("Close file failed");
         }
         fp = nullptr;
-        return {};
+        return "";
     }
     if (fclose(fp) != 0) {
         FI_HILOGW("Close file:%{public}s failed", buf);
@@ -204,17 +204,17 @@ const char* GetProgramName()
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
         FI_HILOGE("tempName is empty");
-        return {};
+        return "";
     }
     size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         FI_HILOGE("The copySize is 0");
-        return {};
+        return "";
     }
     errno_t result = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
     if (result != EOK) {
         FI_HILOGE("memcpy_s failed");
-        return {};
+        return "";
     }
     FI_HILOGI("Get program name success, programName:%{public}s", programName);
 
