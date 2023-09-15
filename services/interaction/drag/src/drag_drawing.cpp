@@ -1142,7 +1142,7 @@ void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
                 g_drawingInfo.pixelMap->GetHeight());
             filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         } else {
-            FI_HILOGE("Add backgroundFilter failed");
+            FI_HILOGE("Create backgroundFilter failed");
         }
     }
 }
