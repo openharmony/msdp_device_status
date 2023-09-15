@@ -94,6 +94,15 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+    std::string filterInfo;
+    std::string extraInfo;
+};
+
+struct FilterInfo {
+    std::string componentType;
+    int32_t blurStyle;
+    int32_t cornerRadius;
+    float dipScale;
 };
 
 class DragDrawing : public IDragAnimation {
@@ -147,7 +156,8 @@ private:
     int32_t GetFilePath(std::string &filePath);
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
-
+    bool ParserFilterInfo(FilterInfo& filterInfo);
+    void ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
