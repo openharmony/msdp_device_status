@@ -241,23 +241,23 @@ void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
     }
     do {
         {
-            auto readAction = readActionParameterLess_.find(opt);
-            if (readAction != readActionParameterLess_.end()) {
-                readAction->second();
+            auto action = regularActions_.find(opt);
+            if (action != regularActions_.end()) {
+                action->second();
                 continue;
             }
         }
         {
-            auto readAction = readActionParameterOne_.find(opt);
-            if (readAction != readActionParameterOne_.end()) {
-                readAction->second(optarg);
+            auto action = readActions_.find(opt);
+            if (action != readActions_.end()) {
+                action->second(optarg);
                 continue;
             }
         }
         {
-            auto readAction = readActionParameterTwo_.find(opt);
-            if (readAction != readActionParameterTwo_.end()) {
-                readAction->second(argc, argv);
+            auto action = moveActions_.find(opt);
+            if (action != moveActions_.end()) {
+                action->second(argc, argv);
                 continue;
             }
         }
