@@ -22,6 +22,7 @@
 
 #include <dlfcn.h>
 
+#include "cJSON.h"
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
@@ -37,7 +38,6 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
-
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
 #include "util.h"
@@ -77,7 +77,8 @@ constexpr float END_SCALE_FAIL { 1.2f };
 constexpr float END_SCALE_SUCCESS { 0.1f };
 constexpr float PIVOT_X { 0.5f };
 constexpr float PIVOT_Y { 0.5f };
-constexpr float SVG_ORIGINAL_SIZE { 40.0f };;
+constexpr float SVG_ORIGINAL_SIZE { 40.0f };
+constexpr float DEFAULT_POSITION_X { 0.0f };
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "AnimationEventRunner" };
@@ -95,6 +96,22 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 #endif
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
+
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json != nullptr) {
+            cJSON_Delete(json);
+            json = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json;
+    }
+    cJSON *json = nullptr;
+};
 
 bool CheckNodesValid()
 {
@@ -702,8 +719,8 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
     g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
-    g_drawingInfo.filterInfo = dragData.extraInfo;
-    g_drawingInfo.arkExtraInfo = dragData.arkExtraInfo;
+    g_drawingInfo.filterInfo = dragData.filterInfo;
+    g_drawingInfo.extraInfo = dragData.extraInfo;
 }
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
@@ -763,8 +780,8 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     CHKPV(g_drawingInfo.pixelMap);
-    pixelMapNode->SetBounds(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
-    pixelMapNode->SetFrame(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+    pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);
@@ -1087,6 +1104,10 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
     CALL_DEBUG_ENTER;
     JsonParser filterParser;
+    if (g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("FilterInfo is empty.");
+        return;
+    }
     filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
@@ -1110,15 +1131,19 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         return false;
     }
 
-    JsonParser arkInfoParser;
-    arkInfoParser.json = cJSON_Parse(g_drawingInfo.arkExtraInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty()) {
+        FI_HILOGD("ExtraInfo is empty.");
+        return;
+    }
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     FI_HILOGD("ArkExtraInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.arkExtraInfo.size(), g_drawingInfo.arkExtraInfo.c_str());
-    if (!cJSON_IsObject(arkInfoParser.json)) {
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
         FI_HILOGE("ArkExtraInfo is not json object");
         return false;
     }
-    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(arkInfoParser.json, "dip_scale");
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_scale");
     if (!cJSON_IsNumber(dipScale)) {
         FI_HILOGE("Parser dipScale failed");
         return false;
@@ -1133,16 +1158,16 @@ void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
     CHKPV(g_drawingInfo.pixelMap);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     if (FilterInfo filterInfo; ParserFilterInfo(filterInfo) && filterInfo.componentType == BIG_FOLDER_LABEL) {
-        if (std::shared_ptr<Rosen::RSFilter> backFilter =
-            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale); backFilter != nullptr) {
-            filterNode->SetBackgroundFilter(backFilter);
-            filterNode->SetBounds(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                g_drawingInfo.pixelMap->GetHeight());
-            filterNode->SetFrame(0, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                g_drawingInfo.pixelMap->GetHeight());
-            filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
-        } else {
-            FI_HILOGE("Create backgroundFilter failed");
+        std::shared_ptr<Rosen::RSFilter> backFilter =
+            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale); 
+        if (backFilter == nullptr) {
+            FI_HILOGE("Add backgroundFilter failed");
+            return;
+        }
+        filterNode->SetBackgroundFilter(backFilter);
+        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(), g_drawingInfo.pixelMap->GetHeight());
+        filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         }
     }
 }
