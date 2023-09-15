@@ -143,7 +143,8 @@ extern "C" {
     /// # Returns
     ///
     /// The session ID if successful, otherwise an error code.
-    pub fn CreateSessionServer(pkg_name: *const c_char, session_name: *const c_char, session_listener: *const ISessionListener) -> i32;
+    pub fn CreateSessionServer(pkg_name: *const c_char, session_name: *const c_char,
+        session_listener: *const ISessionListener) -> i32;
 
     /// Removes a session server.
     ///

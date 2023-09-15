@@ -557,7 +557,8 @@ impl Inner {
     /// # Safety
     ///
     /// This function is marked as unsafe because it accesses and interprets raw pointers and assumes the validity of
-    /// the `data` parameter. The caller needs to ensure that `session_id` is a valid session ID, and `data` is a valid pointer to the received data.
+    /// the `data` parameter. The caller needs to ensure that `session_id` is a valid session ID, and `data` is a valid
+    /// pointer to the received data.
     ///
     /// # Example
     ///
