@@ -41,7 +41,8 @@
         "device_info_manager",
         "dsoftbus",
         "common",
-        "motion"
+        "motion",
+        "build_framework"
       ],
       "third_party": [
         "cJSON",

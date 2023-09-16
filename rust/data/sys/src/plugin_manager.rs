@@ -28,25 +28,25 @@ define_enum! {
     }
 }
 
-/// trait IPlugin
-/// TOTO: add documentation.
+/// Interface between service modules and intention framework.
 pub trait IPlugin: Any + Send + Sync + std::panic::RefUnwindSafe {
-    /// TODO: add documentation
+    /// Enable this service.
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Disable this service.
     fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Start work of this service.
     fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Stop work of this service.
     fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Add a watch to a state of this service.
     fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Remove a watch to a state of this service.
     fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Set a paramenter of this service.
     fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Get a parameter of this service.
     fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
+    /// Interact with this service. This interface supplements functions of previous intefaces.
+    /// Functionalities of this interface is service spicific.
     fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
 }
