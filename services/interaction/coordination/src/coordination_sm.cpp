@@ -333,7 +333,7 @@ void CoordinationSM::StartPointerEventFilter()
     filterId_ =
         MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
     if (filterId_ < 0) {
-        FI_HILOGE("Add Event Filter Failed");
+        FI_HILOGE("Add Event Filter failed");
     }
     filter->UpdateCurrentFilterId(filterId_);
 }
@@ -597,7 +597,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
-                FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+                FI_HILOGE("Failed to add interceptor, error code:%{public}d", interceptorId_);
                 DeactivateCoordination(isUnchained_);
                 return;
             }
@@ -615,7 +615,7 @@ void CoordinationSM::UpdateState(CoordinationState state)
             CHKPV(state);
             state->SetStartDeviceDhid(startDeviceDhid_);
             if (interceptorId_ <= 0) {
-                FI_HILOGE("Failed to add interceptor, Error code:%{public}d", interceptorId_);
+                FI_HILOGE("Failed to add interceptor, error code:%{public}d", interceptorId_);
                 DeactivateCoordination(isUnchained_);
                 return;
             }
@@ -675,7 +675,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (currentState_ == CoordinationState::STATE_FREE) {
-        FI_HILOGI("Current state: free");
+        FI_HILOGI("Current state:free");
         return;
     }
     if ((currentState_ == CoordinationState::STATE_IN) && (startDeviceDhid_ == dhid)) {
@@ -1150,7 +1150,7 @@ void CoordinationSM::RegisterSessionCallback()
 {
     CALL_DEBUG_ENTER;
     D_INPUT_ADAPTER->RegisterSessionStateCb([this](uint32_t status) {
-        FI_HILOGI("Recv session callback status: %{public}u", status);
+        FI_HILOGI("Recv session callback status:%{public}u", status);
         if (status == P2P_SESSION_CLOSED) {
             preparedNetworkId_ = std::pair("", "");
             COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::SESSION_CLOSED);

@@ -47,14 +47,14 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);
             });
         if (ret != RET_OK) {
-            FI_HILOGE("Prepare remote input fail");
+            FI_HILOGE("Prepare remote input failed");
             COOR_SM->OnStartFinish(false, originNetworkId, startDeviceId);
             COOR_SM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartRemoteInput(startDeviceId);
         if (ret != RET_OK) {
-            FI_HILOGE("Start remoteNetworkId input fail");
+            FI_HILOGE("Start remoteNetworkId input failed");
             COOR_SM->OnStartFinish(false, originNetworkId, startDeviceId);
         }
     }

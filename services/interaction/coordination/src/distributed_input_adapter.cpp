@@ -155,7 +155,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
         callbackMap_.erase(type);
     });
     if (timerId < 0) {
-        FI_HILOGE("Add timer failed timeId:%{public}d", timerId);
+        FI_HILOGE("Add timer failed, timeId:%{public}d", timerId);
         return;
     }
     watchingMap_[type].timerId = timerId;
