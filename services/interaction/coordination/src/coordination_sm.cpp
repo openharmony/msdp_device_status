@@ -237,6 +237,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("In transition state, not process");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
+    UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus fail");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
@@ -251,7 +252,6 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         isStarting_ = false;
         return ret;
     }
-    UpdateMouseLocation();
     if (currentState_ == CoordinationState::STATE_FREE) {
         remoteNetworkId_ = remoteNetworkId;
     }
