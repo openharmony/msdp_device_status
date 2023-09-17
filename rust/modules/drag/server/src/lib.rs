@@ -20,18 +20,12 @@
 // FIXME: need abi_stable crate or thin_trait_object crate
 #![allow(improper_ctypes_definitions)]
 
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_plugin_manager_rust;
-extern crate hilog_rust;
-extern crate ipc_rust;
-
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize };
 use fusion_data_rust::{ IPlugin, CallingContext, DragData, FusionResult };
-use fusion_utils_rust::{ call_debug_enter };
-use fusion_plugin_manager_rust::{ export_plugin };
+use fusion_utils_rust::call_debug_enter;
+use fusion_plugin_manager_rust::export_plugin;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -39,18 +33,36 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragServer"
 };
 
-/// struct FusionDragServer
+/// Implementation of drag service.
+///
+/// # Functions provided by drag service:
+///
+///     * Start drag and put service in DRAG mode.
+///     * Stop drag and reset mode of service.
+///     * Add listener for drag events.
+///     * Remove listener of drag events.
+///     * Set visibility of drag window.
+///     * Update shadow.
+///
+/// For integration with `intention framework`, we have to map functions
+/// mention above to [`IPlugin`] as:
+///
+///     * `IPlugin::start` to start drag and put service in DRAG mode.
+///     * `IPlugin::stop` to start drag and reset mode of service.
+///     * `IPlugin::add_watch` to add listener for drag events.
+///     * `IPlugin::remove_watch` to remove listener of drag events.
+///     * `IPlugin::set_param` to set visibility of drag window, using
+///       [`DRAG_WINDOW_VISIBILITY`] as parameter ID.
+///     * `IPlugin::set_param` to update shadow, using [`UPDATE_SHADOW`]
+///       as parameter ID.
+///
+/// Default action for unmapped interfaces of [`IPlugin`] is simply to
+/// fail and return error.
+///
 #[derive(Default)]
 pub struct FusionDragServer {
     dummy: i32
 }
-
-// impl FusionDragServer {
-//     /// TODO: add documentation.
-//     pub fn new(ops: &FusionDragOperations) -> Self {
-//         Self(ops.clone())
-//     }
-// }
 
 impl IPlugin for FusionDragServer {
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
@@ -70,18 +82,6 @@ impl IPlugin for FusionDragServer {
         call_debug_enter!("FusionDragServer::start");
         match DragData::deserialize(data) {
             Ok(drag_data) => {
-                // let ret = unsafe {
-                //     self.0.on_start_drag.map_or(-1, |call_start_drag| {
-                //         info!(LOG_LABEL, "call on_start_drag()");
-                //         call_start_drag(&dragData)
-                //     })
-                // };
-                // if ret == 0 {
-                //     Ok(0)
-                // } else {
-                //     error!(LOG_LABEL, "in FusionDragServer::start(): call_start_drag() failed");
-                //     Err(-1)
-                // }
                 info!(LOG_LABEL, "in FusionDragServer::start(): call start_drag()");
                 info!(LOG_LABEL, "{}", drag_data);
                 match 0u32.serialize(reply) {
@@ -142,16 +142,5 @@ fn start(context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut Borrowe
     info!(LOG_LABEL, "in start()");
     Ok(0)
 }
-
-// #[no_mangle]
-// pub unsafe extern "C" fn _create_plugin1() -> *mut IPluginInterface {
-//     info!(LOG_LABEL, "in FusionDragServer::_create_plugin1(): enter");
-//     let boxed = Box::new(IPluginInterface {
-//         on_start_drag: start
-//     });
-//     let ptr = Box::into_raw(boxed);
-//     info!(LOG_LABEL, "in FusionDragServer::export_plugin(): Box::into return");
-//     ptr
-// }
 
 export_plugin!(FusionDragServer);
