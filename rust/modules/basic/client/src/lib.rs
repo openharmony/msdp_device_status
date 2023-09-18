@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! Drag client implementation.
+//! Proxy for general functionality of service.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -36,14 +36,14 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionBasicClient"
 };
 
-/// struct FusionBasicClient
+/// Definition of proxy for general functionality of service.
 #[derive(Default)]
 pub struct FusionBasicClient {
     dummy: i32
 }
 
 impl FusionBasicClient {
-    /// TODO: add documentation.
+    /// Request connection of service via socket.
     pub fn alloc_socket_pair(&self, param: &AllocSocketPairParam, ipc_client: Rc<FusionIpcClient>)
         -> FusionResult<(FileDesc, i32)>
     {
@@ -51,7 +51,7 @@ impl FusionBasicClient {
         match MsgParcel::new() {
             Some(mut reply_parcel) => {
                 let mut borrowed_reply_parcel = reply_parcel.borrowed();
-                debug!(LOG_LABEL, "in DragClient::start_drag(): call ipc_client::start()");
+                debug!(LOG_LABEL, "Call ipc_client::start()");
                 ipc_client.control(Intention::Basic, u32::from(BasicParamID::AllocSocketPair),
                     param, &mut borrowed_reply_parcel)?;
 
@@ -65,7 +65,7 @@ impl FusionBasicClient {
                 Err(-1)
             }
             None => {
-                error!(LOG_LABEL, "in DragClient::start_drag(): can not instantiate MsgParcel");
+                error!(LOG_LABEL, "Can not instantiate MsgParcel");
                 Err(-1)
             }
         }

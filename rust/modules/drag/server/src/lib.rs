@@ -138,9 +138,4 @@ impl IPlugin for FusionDragServer {
     }
 }
 
-fn start(context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
-    info!(LOG_LABEL, "in start()");
-    Ok(0)
-}
-
 export_plugin!(FusionDragServer);
