@@ -27,7 +27,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "RustDmBinding"
 };
 
-/// Enum CDmAuthForm.
+/// C representation of [`DmAuthForm`].
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
 pub enum CDmAuthForm {
@@ -41,7 +41,7 @@ pub enum CDmAuthForm {
     ACROSSACCOUNT = 2,
 }
 
-/// Struct CDmDeviceInfo.
+/// C representation of [`DmDeviceInfo`].
 #[repr(C)]
 pub struct CDmDeviceInfo {
     /// Device Id of the device.
@@ -58,7 +58,7 @@ pub struct CDmDeviceInfo {
     pub auth_form: CDmAuthForm,
 }
 
-/// Struct CRegisterDevStateCallback.
+/// Used to hold callbacks.
 #[repr(C)]
 pub struct CRegisterDevStateCallback {
     /// Device online callback of the device.

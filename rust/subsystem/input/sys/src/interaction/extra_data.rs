@@ -58,7 +58,7 @@ impl CExtraData {
     }
 }
 
-/// struct ExtraData.
+/// Struct extra data.
 pub struct ExtraData {
     inner: CExtraData,
 }

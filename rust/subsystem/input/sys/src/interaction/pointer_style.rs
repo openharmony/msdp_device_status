@@ -47,7 +47,7 @@ impl CPointerStyle {
     }
 }
 
-/// Struct PointerStyle.
+/// Struct pointer style.
 pub struct PointerStyle {
     inner: CPointerStyle,
 }

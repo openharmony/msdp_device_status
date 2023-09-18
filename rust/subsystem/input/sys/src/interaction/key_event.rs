@@ -17,7 +17,7 @@ use crate::{
     input_binding, input_binding::CKeyEvent
 };
 
-/// KeyEvent packed the native CKeyEvent
+/// KeyEvent packed the native CKeyEvent.
 #[repr(C)]
 pub struct KeyEvent(*const CKeyEvent);
 

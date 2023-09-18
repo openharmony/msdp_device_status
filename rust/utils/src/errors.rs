@@ -58,8 +58,8 @@ impl TryFrom<i32> for FusionErrorCode {
 impl std::fmt::Display for FusionErrorCode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FusionErrorCode::Fail => write!(f, "-1"),
-            FusionErrorCode::InvalidParam => write!(f, "-2")
+            FusionErrorCode::Fail => write!(f, "Operation failed."),
+            FusionErrorCode::InvalidParam => write!(f, "Invalid input parameter(s).")
         }
     }
 }

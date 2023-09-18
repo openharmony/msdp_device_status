@@ -26,11 +26,11 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 const INPUT_BINDING_OK: i32 = 0;
 
-/// Struct ExtraData.
+/// Call the input manager interface.
 pub struct InputManager;
 
 impl InputManager {
-    /// Add monitor.
+    /// Call the AddMonitor interface of the input subsystem to add monitor.
     pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<()> {
         // SAFETY: No `None` here, cause `callback` is valid.
         unsafe {
@@ -42,7 +42,7 @@ impl InputManager {
         }
     }
 
-    /// Set pointer visible.
+    /// Call the SetPointerVisible interface of the input subsystem to set pointer visible.
     pub fn set_pointer_visible(visible: bool) -> FusionResult<()> {
         // SAFETY: Set pointer event visible.
         unsafe {
@@ -54,7 +54,7 @@ impl InputManager {
         }
     }
 
-    /// Enable input device.
+    /// Call the EnableInputDevice interface of the input subsystem to enable input device.
     pub fn enable_input_device(enable: bool) -> FusionResult<()> {
         // SAFETY: Enable input device.
         unsafe {
@@ -66,7 +66,7 @@ impl InputManager {
         }
     }
 
-    /// Remove input event filter.
+    /// Call the RemoveInputEventFilter interface of the input subsystem to remove filter.
     pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<()> {
         // SAFETY: Remove input event filter.
         unsafe {
@@ -78,7 +78,7 @@ impl InputManager {
         }
     }
 
-    /// Remove monitor.
+    /// Call the RemoveMonitor interface of the input subsystem to remove monitor.
     pub fn remove_monitor(monitor_id: i32) {
         // SAFETY: Remove monitor.
         unsafe {
@@ -86,7 +86,7 @@ impl InputManager {
         }
     }
 
-    /// Remove interceptor.
+    /// Call the RemoveInterceptor interface of the input subsystem to remove Interceptor.
     pub fn remove_interceptor(interceptor_id: i32) {
         // SAFETY: Remove interceptor.
         unsafe {
@@ -94,7 +94,7 @@ impl InputManager {
         }
     }
 
-    /// Set pointer location.
+    /// Call the SetPointerLocation interface of the input subsystem to set pointer location.
     pub fn set_pointer_location(physical_x: i32, physical_y: i32) {
         // SAFETY: Remove monitor.
         unsafe {

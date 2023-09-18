@@ -26,11 +26,11 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 static FI_PKG_NAME: &str = "ohos.msdp.fusioninteraction";
 
-/// Struct DisHandware.
+/// Call the DisHandware interface.
 pub struct DisHandware;
 
 impl DisHandware {
-    /// Init device manager.
+    /// Call the InitDeviceManager interface of the dishandware subsystem to init device manager.
     pub fn init_device_manager() -> FusionResult<()> {
         call_info_trace!("DisHandware::init_device_manager");
         let pkg_name = CString::new(FI_PKG_NAME)?;
@@ -44,7 +44,7 @@ impl DisHandware {
         }
     }
 
-    /// Register device state.
+    /// Call the InitDeviceManager interface of the dishandware subsystem to register device state.
     pub fn register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
@@ -65,7 +65,7 @@ impl DisHandware {
         }
     }
 
-    /// UnRegister device state.
+    /// Call the InitDeviceManager interface of the dishandware subsystem to unregister device state.
     pub fn un_register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::un_register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
