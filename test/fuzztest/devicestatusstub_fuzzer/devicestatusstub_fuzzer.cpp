@@ -44,7 +44,7 @@ uint32_t GetU32Data(const char* ch, size_t size)
     return (ch[0] << 24) | (ch[1] << 16) | (ch[2] << 8) | (ch[3]);
 }
 
-bool DoSomethingWithMyAPI(const char* data, size_t size)
+bool DeviceStatusStubFuzzTest(const char* data, size_t size)
 {
     uint32_t code = GetU32Data(data, size);
     MessageParcel datas;
@@ -71,7 +71,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
     const char* ch = reinterpret_cast<const char*>(data);
-    OHOS::DoSomethingWithMyAPI(ch, size);
+    OHOS::DeviceStatusStubFuzzTest(ch, size);
     return 0;
 }
 

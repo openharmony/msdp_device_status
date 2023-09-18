@@ -39,7 +39,7 @@ JsEventCooperateTarget::JsEventCooperateTarget()
 {
     CALL_DEBUG_ENTER;
     auto ret = coordinationListener_.insert({ COORDINATION,
-        std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>()});
+        std::vector<sptr<JsUtilCooperate::CallbackInfo>>()});
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
     }
@@ -59,7 +59,7 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork, uv_qos_default);
     } else {
@@ -87,7 +87,7 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallStartPromiseWork, uv_qos_default);
     } else {
@@ -115,7 +115,7 @@ void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallStopPromiseWork, uv_qos_default);
     } else {
@@ -141,7 +141,7 @@ void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallGetStatePromiseWork, uv_qos_default);
     } else {
@@ -174,7 +174,8 @@ void JsEventCooperateTarget::AddListener(napi_env env, const std::string &type, 
     }
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_unique<JsUtilCooperate::CallbackInfo>();
+    sptr<JsUtilCooperate::CallbackInfo> monitor = new (std::nothrow) JsUtilCooperate::CallbackInfo();
+    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -253,11 +254,13 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &deviceId, 
         CHKPV(work);
         item->data.msg = msg;
         item->data.deviceDescriptor = deviceId;
-        work->data = static_cast<void*>(&item);
+        item->IncStrongRef(nullptr);
+        work->data = item.GetRefPtr();
         int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
             EmitCoordinationMessageEvent, uv_qos_default);
         if (result != 0) {
             FI_HILOGE("uv_queue_work_with_qos failed");
+            item->DecStrongRef(nullptr);
             JsUtilCooperate::DeletePtr<uv_work_t*>(work);
         }
     }
@@ -578,9 +581,9 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         return;
     }
 
-    auto temp = static_cast<std::unique_ptr<JsUtilCooperate::CallbackInfo>*>(work->data);
+    sptr<JsUtilCooperate::CallbackInfo> temp(static_cast<JsUtilCooperate::CallbackInfo*>(work->data));
     JsUtilCooperate::DeletePtr<uv_work_t*>(work);
-
+    temp->DecStrongRef(nullptr);
     auto messageEvent = coordinationListener_.find(COORDINATION);
     if (messageEvent == coordinationListener_.end()) {
         FI_HILOGE("Find messageEvent failed");
@@ -590,7 +593,7 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         CHKPC(item->env);
-        if (item->ref != (*temp)->ref) {
+        if (item->ref != temp->ref) {
             continue;
         }
         napi_value deviceDescriptor = nullptr;

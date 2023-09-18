@@ -18,6 +18,7 @@
 use std::ffi::NulError;
 
 /// Error codes.
+#[derive(Debug)]
 #[repr(i32)]
 pub enum FusionErrorCode {
     /// Operation failed.

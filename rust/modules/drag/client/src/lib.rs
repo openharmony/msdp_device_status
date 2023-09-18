@@ -18,16 +18,12 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate ipc_rust;
-
-use fusion_data_rust::{ Intention, DefaultReply, DragData};
+use std::ffi::{ c_char, CString };
+use std::rc::Rc;
+use fusion_data_rust::{ Intention, DefaultReply, DragData };
 use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ MsgParcel, Deserialize };
-use std::ffi::{ c_char, CString };
-use std::rc::Rc;
 use hilog_rust::{ debug, error, hilog, HiLogLabel, LogType };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {

@@ -240,43 +240,31 @@ void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
         return;
     }
     do {
-        switch (opt) {
-            case 'd': {
-                ReadDownAction(argc, argv);
-                break;
+        {
+            auto action = regularActions_.find(opt);
+            if (action != regularActions_.end()) {
+                action->second();
+                continue;
             }
-            case 'u': {
-                ReadUpAction();
-                break;
+        }
+        {
+            auto action = readActions_.find(opt);
+            if (action != readActions_.end()) {
+                action->second(optarg);
+                continue;
             }
-            case 'm': {
-                ReadMoveAction(argc, argv);
-                break;
+        }
+        {
+            auto action = moveActions_.find(opt);
+            if (action != moveActions_.end()) {
+                action->second(argc, argv);
+                continue;
             }
-            case 'M': {
-                ReadMoveToAction(argc, argv);
-                break;
-            }
-            case 'D': {
-                ReadDragToAction(argc, argv);
-                break;
-            }
-            case 'f': {
-                ReadActions(optarg);
-                break;
-            }
-            case 'r': {
-                ReadRawInput(optarg);
-                break;
-            }
-            case 'w': {
-                VirtualDeviceBuilder::WaitFor(optarg, "touchscreen");
-                break;
-            }
-            default: {
-                ShowUsage();
-                break;
-            }
+        }
+        if (opt == 'w') {
+            VirtualDeviceBuilder::WaitFor(optarg, "touchscreen");
+        } else {
+            ShowUsage();
         }
     } while ((opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:")) >= 0);
 }

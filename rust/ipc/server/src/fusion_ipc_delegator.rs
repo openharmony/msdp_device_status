@@ -13,19 +13,23 @@
  * limitations under the License.
  */
 
-//! Fusion IPC delegator
+//! Delegator of IPC service.
+//!
+//! This is part of implementation of IPC service as required by IPC framework.
+//! As IPC request will first be delegated to this [`delegator`]. [`delegator`]
+//! will check user token, and then redirect request to business module.
 
 #![allow(unused_variables)]
 
 use std::cell::Cell;
 use std::sync::Mutex;
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Deserialize, InterfaceToken, IRemoteBroker, IRemoteStub };
-use crate::fusion_data_rust::{ Intention, IPlugin, CallingContext };
-use crate::fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
-use crate::fusion_ipc_service_rust::{ IDeviceStatus, FusionIpcStub };
-use crate::fusion_plugin_manager_rust::PluginManager;
+use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Deserialize, InterfaceToken, IRemoteBroker, IRemoteStub };
+use fusion_data_rust::{ Intention, IPlugin, CallingContext };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
+use fusion_ipc_service_rust::{ IDeviceStatus, FusionIpcStub };
+use fusion_plugin_manager_rust::PluginManager;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,

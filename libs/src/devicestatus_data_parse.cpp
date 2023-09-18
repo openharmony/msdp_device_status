@@ -57,7 +57,7 @@ int32_t DeviceStatusDataParse::CreateJsonFile()
         return DEVICESTATUS_FAILED;
     }
     if (chown(MSDP_DATA_PATH.c_str(), buf.st_uid, buf.st_gid) != 0) {
-        FI_HILOGE("Chown failed, errno is %{public}d", errno);
+        FI_HILOGE("Chown failed, errno:%{public}d", errno);
         return DEVICESTATUS_FAILED;
     }
 
@@ -68,7 +68,7 @@ bool DeviceStatusDataParse::ParseDeviceStatusData(Type type, Data& data)
 {
     std::string jsonBuf = ReadJsonFile(MSDP_DATA_PATH.c_str());
     if (jsonBuf.empty()) {
-        FI_HILOGE("Read json failed, errno is %{public}d", errno);
+        FI_HILOGE("Read json failed, errno:%{public}d", errno);
         data.type = type;
         data.value = OnChangedValue::VALUE_INVALID;
         return false;

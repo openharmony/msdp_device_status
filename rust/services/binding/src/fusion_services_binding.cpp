@@ -25,7 +25,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOM
 } // namespace
 
 struct NativeService {
-    int32_t refCnt;
+    int32_t refCnt { 0 };
 };
 
 struct NativeService* NativeService_New()

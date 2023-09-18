@@ -43,69 +43,78 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 /// SA ID for "ohos.msdp.Idevicestatus"
 pub const MSDP_DEVICESTATUS_SERVICE_ID: i32 = 2902;
 
-/// trait IDeviceStatus
+/// Abstration of services.
+///
+/// By design, for ease of extention, all service implementations are required to
+/// map its functions to this collection of interface, with services identified
+/// by Intentions.
 pub trait IDeviceStatus: IRemoteBroker {
-    /// TODO:
+    /// Enable the service identified by [`intention`].
     fn enable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Disable the service identified by [`intention`].
     fn disable(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Start the service identified by [`intention`].
     fn start(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Stop the service identified by [`intention`].
     fn stop(&self, intention: Intention, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Add a watch of state of service, with the service identified by [`intention`],
+    /// the state to watch identified by [`id`], parameters packed in [`data`] parcel.
     fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Remove a watch of state of service.
     fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Set a parameter of service, with the service identified by [`intention`],
+    /// the parameter identified by [`id`], and values packed in [`data`] parcel.
     fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Get a parameter of service, with the service identified by [`intention`],
+    /// the parameter identified by [`id`].
     fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
-    /// TODO:
+    /// Interact with service identified by [`intention`] for general purpose. This interface
+    /// supplements functions of previous intefaces. Functionalities of this interface is
+    /// service spicific.
     fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel<'_>, reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()>;
 }
 
 fn on_remote_request(stub: &dyn IDeviceStatus, code: u32, data: &BorrowedMsgParcel<'_>,
-    reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
+                     reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
     call_debug_enter!("FusionIpcService::on_remote_request");
     let intention = split_intention(code)?;
     let id = split_param(code);
 
     match split_action(code)? {
         CommonAction::Enable => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.enable()");
+            info!(LOG_LABEL, "call stub.enable()");
             stub.enable(intention, data, reply)
         }
         CommonAction::Disable => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.disable()");
+            info!(LOG_LABEL, "call stub.disable()");
             stub.disable(intention, data, reply)
         }
         CommonAction::Start => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.start()");
+            info!(LOG_LABEL, "call stub.start()");
             stub.start(intention, data, reply)
         }
         CommonAction::Stop => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.stop()");
+            info!(LOG_LABEL, "call stub.stop()");
             stub.stop(intention, data, reply)
         }
         CommonAction::AddWatch => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.add_watch()");
+            info!(LOG_LABEL, "call stub.add_watch()");
             stub.add_watch(intention, id, data, reply)
         }
         CommonAction::RemoveWatch => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.remove_watch()");
+            info!(LOG_LABEL, "call stub.remove_watch()");
             stub.remove_watch(intention, id, data, reply)
         }
         CommonAction::SetParam => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.set_param()");
+            info!(LOG_LABEL, "call stub.set_param()");
             stub.set_param(intention, id, data, reply)
         }
         CommonAction::GetParam => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.get_param()");
+            info!(LOG_LABEL, "call stub.get_param()");
             stub.get_param(intention, id, data, reply)
         }
         CommonAction::Control => {
-            info!(LOG_LABEL, "in FusionIpcService::on_remote_request(): call stub.control()");
+            info!(LOG_LABEL, "call stub.control()");
             stub.control(intention, id, data, reply)
         }
     }

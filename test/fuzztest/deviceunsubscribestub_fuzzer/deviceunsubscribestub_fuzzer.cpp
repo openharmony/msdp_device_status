@@ -25,7 +25,7 @@ using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
 
-void DoSomethingWithMyAPI(const uint8_t* data, size_t size)
+void DeviceStatusUnsubscribeFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
@@ -47,7 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-    OHOS::DoSomethingWithMyAPI(data, size);
+    OHOS::DeviceStatusUnsubscribeFuzzTest(data, size);
     return 0;
 }
 

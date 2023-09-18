@@ -56,6 +56,8 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
 const std::string UD_KEY { "Unified data key" };
+const std::string FILTER_INFO { "Undefined filter info" };
+const std::string EXTRA_INFO { "Undefined extra info" };
 } // namespace
 
 class InteractionDragDrawingTest : public testing::Test {
@@ -125,6 +127,8 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     dragData.shadowInfo.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.udKey = UD_KEY;
+    dragData.extraInfo = FILTER_INFO;
+    dragData.extraInfo = EXTRA_INFO;
     dragData.sourceType = sourceType;
     dragData.pointerId = pointerId;
     dragData.dragNum = dragNum;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! fusion IPC client.
+//! Implementation of client side of IPC.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -41,28 +41,28 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionIpcClient"
 };
 
-/// struct FusionIpcClient
+/// Representation of client side of IPC.
 pub struct FusionIpcClient(RemoteObjRef<dyn IDeviceStatus>);
 
 impl FusionIpcClient {
-    /// TODO: add documentation.
+    /// Connect device status service.
     pub fn connect() -> FusionResult<Self> {
         call_debug_enter!("FusionIpcClient::connect");
         match get_service(MSDP_DEVICESTATUS_SERVICE_ID) {
             Ok(obj) => {
                 match <dyn IDeviceStatus as FromRemoteObj>::try_from(obj) {
                     Ok(obj_ref) => {
-                        info!(LOG_LABEL, "in FusionIpcClient::connect(): Connect to service successfully");
+                        info!(LOG_LABEL, "Connect to service successfully");
                         Ok(FusionIpcClient(obj_ref))
                     }
                     Err(err) => {
-                        error!(LOG_LABEL, "in FusionIpcClient::connect(): Can not dereference remote object");
+                        error!(LOG_LABEL, "Can not dereference remote object");
                         Err(FusionErrorCode::Fail)
                     }
                 }
             }
             Err(err) => {
-                error!(LOG_LABEL, "in FusionIpcClient::connect(): Can not connect to service");
+                error!(LOG_LABEL, "Can not connect to service");
                 Err(FusionErrorCode::Fail)
             }
         }
@@ -82,7 +82,7 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to enable the service identified by [`intention`].
     pub fn enable(&self, intention: Intention, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::enable");
@@ -105,7 +105,7 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to disable the service identified by [`intention`].
     pub fn disable(&self, intention: Intention, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::disable");
@@ -128,7 +128,7 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to start the service identified by [`intention`].
     pub fn start(&self, intention: Intention, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::start");
@@ -151,7 +151,7 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to stop the service identified by [`intention`].
     pub fn stop(&self, intention: Intention, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::stop");
@@ -174,7 +174,9 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to add a watch of state of service, with the service identified by
+    /// [`intention`], the state to watch identified by [`id`], parameters packed in
+    /// [`data`] parcel.
     pub fn add_watch(&self, intention: Intention, id: u32, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::add_watch");
@@ -197,7 +199,7 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to remove a watch of state of service.
     pub fn remove_watch(&self, intention: Intention, id: u32, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::remove_watch");
@@ -220,7 +222,9 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to set a parameter of service, with the service identified by
+    /// [`intention`], the parameter identified by [`id`], and values packed in
+    /// [`data`] parcel.
     pub fn set_param(&self, intention: Intention, id: u32, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::set_param");
@@ -243,7 +247,8 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to get a parameter of service, with the service identified by
+    /// [`intention`], the parameter identified by [`id`].
     pub fn get_param(&self, intention: Intention, id: u32, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::get_param");
@@ -266,7 +271,9 @@ impl FusionIpcClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to interact with service identified by [`intention`] for general purpose.
+    /// This interface supplements functions of previous intefaces. Functionalities of
+    /// this interface is service spicific.
     pub fn control(&self, intention: Intention, id: u32, data: &dyn Serialize,
         reply: &mut BorrowedMsgParcel<'_>) -> FusionResult<()> {
         call_debug_enter!("FusionIpcClient::control");

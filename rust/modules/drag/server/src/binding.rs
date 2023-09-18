@@ -15,7 +15,7 @@
 
 //! Fusion drag-IPC binding
 
-use crate::fusion_data_rust::{ CDragData };
+use fusion_data_rust::CDragData;
 
 /// type alias OnStartDrag
 pub type OnStartDrag = unsafe extern "C" fn (
