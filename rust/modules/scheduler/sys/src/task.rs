@@ -15,7 +15,7 @@
 
 //! Implementation of task handle.
 
-use fusion_data_rust::{ FusionErrorCode, FusionInteractionResult };
+use fusion_utils_rust::{ FusionErrorCode, FusionResult };
 use ylong_runtime::task::JoinHandle;
 
 /// Representation of task handle.
@@ -42,7 +42,7 @@ impl<R> TaskHandle<R> {
     }
 
     /// Get result of this task.
-    pub fn result(&mut self) -> FusionInteractionResult<R>
+    pub fn result(&mut self) -> FusionResult<R>
     {
         if let Some(join_handle) = self.join_handle.take() {
             if let Ok(ret) = ylong_runtime::block_on(join_handle) {

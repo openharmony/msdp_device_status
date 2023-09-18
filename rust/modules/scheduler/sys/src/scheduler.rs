@@ -27,8 +27,7 @@ use std::pin::Pin;
 use std::sync::{ Arc, Mutex };
 use std::sync::atomic::{ AtomicBool, Ordering };
 use std::task::{ Context, Poll, Waker };
-use fusion_data_rust::{ FusionErrorCode, FusionInteractionResult };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
 use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
 
 /// Indicating data other than high-priority data can be read.
@@ -175,7 +174,7 @@ impl Epoll {
         self.epoll_fd
     }
 
-    fn epoll_add(&self, fd: RawFd) -> FusionInteractionResult<()>
+    fn epoll_add(&self, fd: RawFd) -> FusionResult<()>
     {
         call_debug_enter!("Epoll::epoll_add");
         let mut ev = libc::epoll_event {
@@ -197,7 +196,7 @@ impl Epoll {
         }
     }
 
-    fn epoll_del(&self, fd: RawFd) -> FusionInteractionResult<()>
+    fn epoll_del(&self, fd: RawFd) -> FusionResult<()>
     {
         call_debug_enter!("Epoll::epoll_del");
         // SAFETY:
@@ -247,7 +246,7 @@ impl Epoll {
         Some(epoll_events)
     }
 
-    fn epoll_reset(&self, fd: RawFd) -> FusionInteractionResult<()>
+    fn epoll_reset(&self, fd: RawFd) -> FusionResult<()>
     {
         call_debug_enter!("Epoll::epoll_reset");
         let mut ev = libc::epoll_event {
@@ -270,7 +269,7 @@ impl Epoll {
     }
 
     fn add_epoll_handler(&self, fd: RawFd, epoll_handler: EpollHandler)
-        -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+        -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Epoll::add_epoll_handler");
         let mut guard = self.handlers.lock().unwrap();
@@ -285,7 +284,7 @@ impl Epoll {
         Ok(raw)
     }
 
-    fn remove_epoll_handler(&self, fd: RawFd) -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+    fn remove_epoll_handler(&self, fd: RawFd) -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Epoll::remove_epoll_handler");
         let mut guard = self.handlers.lock().unwrap();
@@ -504,7 +503,7 @@ impl Scheduler {
     }
 
     pub(crate) fn add_epoll_handler(&self, handler: Arc<dyn IEpollHandler>)
-        -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+        -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Scheduler::add_epoll_handler");
         let fd: RawFd = handler.fd();
@@ -515,7 +514,7 @@ impl Scheduler {
     }
 
     pub(crate) fn remove_epoll_handler(&self, handler: Arc<dyn IEpollHandler>)
-        -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+        -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Scheduler::remove_epoll_handler");
         self.epoll.remove_epoll_handler(handler.fd())

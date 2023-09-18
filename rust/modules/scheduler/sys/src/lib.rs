@@ -44,8 +44,7 @@ use std::ffi::{ c_char, CString };
 use std::sync::Arc;
 use std::sync::atomic::{ AtomicUsize, Ordering };
 use std::time::Duration;
-use fusion_data_rust::FusionInteractionResult;
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{call_debug_enter, FusionResult };
 use hilog_rust::{ hilog, HiLogLabel, LogType };
 use scheduler::Scheduler;
 
@@ -208,7 +207,7 @@ impl Handler {
     /// handler.add_epoll_handler(epoll_handler)
     /// ```
     pub fn add_epoll_handler(&self, handler: Arc<dyn IEpollHandler>)
-        -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+        -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Handler::add_epoll_handler");
         self.scheduler.add_epoll_handler(handler)
@@ -216,7 +215,7 @@ impl Handler {
 
     /// Remove an epoll handler from epoll event loop.
     pub fn remove_epoll_handler(&self, handler: Arc<dyn IEpollHandler>)
-        -> FusionInteractionResult<Arc<dyn IEpollHandler>>
+        -> FusionResult<Arc<dyn IEpollHandler>>
     {
         call_debug_enter!("Handler::remove_epoll_handler");
         self.scheduler.remove_epoll_handler(handler)
