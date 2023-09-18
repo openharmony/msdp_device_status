@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! Coordination client implementation.
+//! Proxy for multi-device cooperation.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -39,14 +39,14 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionCoordinationClient"
 };
 
-/// struct FusionCoordinationClient
+/// Definition of proxy for multi-device cooperation.
 #[derive(Default)]
 pub struct FusionCoordinationClient {
     dummy: i32
 }
 
 impl FusionCoordinationClient {
-    /// TODO: add documentation.
+    /// Request to enable multi-device cooperation.
     pub fn enable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
         call_debug_enter!("FusionCoordinationClient::enable_coordination");
@@ -66,7 +66,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to disable multi-device cooperation.
     pub fn disable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
         call_debug_enter!("FusionCoordinationClient::disable_coordination");
@@ -86,7 +86,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to start multi-device cooperation.
     pub fn start_coordination(&self, user_data: i32, remote_network_id: String,
         start_device_id: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
@@ -109,7 +109,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to stop multi-device cooperation.
     pub fn stop_coordination(&self, user_data: i32, is_unchained: i32,
         ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
@@ -131,7 +131,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request for current state of multi-device cooperation.
     pub fn get_coordination_state(&self, user_data: i32, device_id: String,
         ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
@@ -163,7 +163,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to listen for events of multi-device cooperation.
     pub fn register_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
         call_debug_enter!("FusionCoordinationClient::register_coordination_listener");
@@ -181,7 +181,7 @@ impl FusionCoordinationClient {
         }
     }
 
-    /// TODO: add documentation.
+    /// Request to stop listening for events of multi-device cooperation.
     pub fn unregister_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
         call_debug_enter!("FusionCoordinationClient::unregister_coordination_listener");

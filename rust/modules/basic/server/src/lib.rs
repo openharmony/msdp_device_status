@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! Basic funtionality implementation.
+//! General functionalities.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -33,14 +33,13 @@ use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingCont
 use fusion_services_rust::{ FusionService };
 use fusion_utils_rust::{ call_debug_enter };
 
-
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
     tag: "FusionBasicServer"
 };
 
-/// struct FusionBasicServer
+/// Module-level interface of general functionalities.
 #[derive(Default)]
 pub struct FusionBasicServer {
     dummy: i32
@@ -49,32 +48,21 @@ pub struct FusionBasicServer {
 impl FusionBasicServer {
     fn alloc_socket_pair(&self, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>
     {
-        if let Ok(call_param) = AllocSocketPairParam::deserialize(data) {
-            if let Some(proxy) = FusionService::get_instance() {
-                let mut client_fd: RawFd = 0;
-                let mut token_type: i32 = 0;
+        let call_param = AllocSocketPairParam::deserialize(data).map_err(|_err| { -1 })?;
 
-                proxy.alloc_socket_fd(call_param.program_name.as_str(),
-                    call_param.module_type, &mut client_fd, &mut token_type)?;
+        if let Some(proxy) = FusionService::get_instance() {
+            let mut client_fd: RawFd = 0;
+            let mut token_type: i32 = 0;
 
-                let f = unsafe {
-                    File::from_raw_fd(client_fd)
-                };
-                let fdesc = FileDesc::new(f);
+            proxy.alloc_socket_fd(call_param.program_name.as_str(),
+                call_param.module_type, &mut client_fd, &mut token_type)?;
 
-                if fdesc.serialize(reply).is_err() {
-                    return Err(-1);
-                }
-                if token_type.serialize(reply).is_err() {
-                    return Err(-1);
-                }
-                Ok(0)
-            } else {
-                error!(LOG_LABEL, "No proxy");
-                Err(-1)
-            }
+            let f = unsafe { File::from_raw_fd(client_fd) };
+            FileDesc::new(f).serialize(reply).map_err(|_err| { -1 })?;
+            token_type.serialize(reply).map_err(|_err| { -1 })?;
+            Ok(0)
         } else {
-            info!(LOG_LABEL, "Can not deserialize AllocSocketPairParam");
+            error!(LOG_LABEL, "No proxy");
             Err(-1)
         }
     }

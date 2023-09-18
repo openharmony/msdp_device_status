@@ -65,7 +65,7 @@ pub struct FusionService {
 }
 
 impl FusionService {
-    /// TODO: add documentation.
+    /// Get the single instance of [`FusionService`].
     pub fn get_instance() -> Option<&'static Self> {
         static mut FUSION_SERVICE_PROXY: Option<FusionService> = None;
         static INIT_ONCE: Once = Once::new();

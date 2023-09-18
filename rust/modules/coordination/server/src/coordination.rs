@@ -13,15 +13,17 @@
  * limitations under the License.
  */
 
-//! Coordination implementation.
+//! Implementation of multi-device cooperation.
 
 #![allow(dead_code)]
 
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ hilog, HiLogLabel, LogType };
-use crate::fusion_data_rust::{ GeneralCoordinationParam, StartCoordinationParam, CallingContext,
+
+use hilog_rust::{ hilog, HiLogLabel, LogType };
+
+use fusion_data_rust::{ GeneralCoordinationParam, StartCoordinationParam, CallingContext,
     StopCoordinationParam, GetCoordinationStateParam, FusionResult };
-use crate::fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -29,14 +31,12 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "Coordination"
 };
 
-/// struct Coordination
 #[derive(Default)]
 pub struct Coordination {
     dummy: i32
 }
 
 impl Coordination {
-    /// TODO: add documentation.
     pub fn enable(&self, context: &CallingContext,
         param: &GeneralCoordinationParam) -> FusionResult<i32>
     {
@@ -44,7 +44,6 @@ impl Coordination {
         Err(-1)
     }
 
-    /// TODO: add documentation.
     pub fn disable(&self, context: &CallingContext,
         param: &GeneralCoordinationParam) -> FusionResult<i32>
     {
@@ -52,7 +51,6 @@ impl Coordination {
         Err(-1)
     }
 
-    /// TODO: add documentation.
     pub fn start(&self, context: &CallingContext,
         param: &StartCoordinationParam) -> FusionResult<i32>
     {
@@ -60,7 +58,6 @@ impl Coordination {
         Err(-1)
     }
 
-    /// TODO: add documentation.
     pub fn stop(&self, context: &CallingContext,
         param: &StopCoordinationParam) -> FusionResult<i32>
     {
@@ -68,7 +65,6 @@ impl Coordination {
         Err(-1)
     }
 
-    /// TODO: add documentation.
     pub fn get_state(&self, context: &CallingContext,
         param: &GetCoordinationStateParam) -> FusionResult<i32>
     {

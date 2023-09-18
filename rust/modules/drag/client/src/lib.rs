@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! Drag client implementation.
+//! Proxy for `Drag` service.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -32,14 +32,14 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragClient"
 };
 
-/// struct DragClient
+/// Definition of proxy for `Drag` service.
 #[derive(Default)]
 pub struct DragClient {
     dummy: i32
 }
 
 impl DragClient {
-    /// TODO: add documentation.
+    /// Request service to change to [`DRAG`] mode.
     pub fn start_drag(&self, drag_data: &DragData, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
     {
         call_debug_enter!("DragClient::start_drag");
