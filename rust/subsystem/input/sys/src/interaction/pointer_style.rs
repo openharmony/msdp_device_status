@@ -33,7 +33,7 @@ impl Default for CPointerStyle {
 }
 
 impl CPointerStyle {
-    /// Create a CPointerStyle object
+    /// Create a CPointerStyle object.
     pub fn new() -> Self {
         Self {
             size: -1, 
@@ -47,7 +47,7 @@ impl CPointerStyle {
     }
 }
 
-/// struct PointerStyle
+/// Struct PointerStyle.
 pub struct PointerStyle {
     inner: CPointerStyle,
 }
@@ -59,16 +59,16 @@ impl Default for PointerStyle {
 }
 
 impl PointerStyle {
-    /// Create a PointerStyle object
+    /// Create a PointerStyle object.
     pub fn new() -> Self {
         Self {
             inner: CPointerStyle::default()
         }
     }
 
-    /// Get pointer style
+    /// Get the pointer style from the PointerStyle.
     pub fn pointer_style(&mut self) -> FusionResult<()> {
-        // SAFETY:  no `None` here, cause `CPointerStyle` is valid
+        // SAFETY:  no `None` here, cause `CPointerStyle` is valid.
         unsafe {
             if input_binding::CGetPointerStyle(&mut self.inner) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "get pointer style failed");

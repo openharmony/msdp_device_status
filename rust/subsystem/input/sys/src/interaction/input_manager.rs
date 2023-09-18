@@ -26,13 +26,13 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 const INPUT_BINDING_OK: i32 = 0;
 
-/// struct ExtraData
+/// Struct ExtraData.
 pub struct InputManager;
 
 impl InputManager {
-    /// add monitor.
+    /// Add monitor.
     pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<()> {
-        // SAFETY: no `None` here, cause `callback` is valid
+        // SAFETY: No `None` here, cause `callback` is valid.
         unsafe {
             if input_binding::CAddMonitor(callback) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to add monitor");
@@ -42,9 +42,9 @@ impl InputManager {
         }
     }
 
-    /// set pointer visible.
+    /// Set pointer visible.
     pub fn set_pointer_visible(visible: bool) -> FusionResult<()> {
-        // SAFETY: set pointer event visible
+        // SAFETY: Set pointer event visible.
         unsafe {
             if input_binding::CSetPointerVisible(visible) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to set pointer visible");
@@ -54,9 +54,9 @@ impl InputManager {
         }
     }
 
-    /// enable input device.
+    /// Enable input device.
     pub fn enable_input_device(enable: bool) -> FusionResult<()> {
-        // SAFETY: enable input device
+        // SAFETY: Enable input device.
         unsafe {
             if input_binding::CEnableInputDevice(enable) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to enable input device");
@@ -66,9 +66,9 @@ impl InputManager {
         }
     }
 
-    /// remove input event filter.
+    /// Remove input event filter.
     pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<()> {
-        // SAFETY: remove input event filter
+        // SAFETY: Remove input event filter.
         unsafe {
             if input_binding::CRemoveInputEventFilter(filter_id) != INPUT_BINDING_OK {
                 error!(LOG_LABEL, "failed to remove input event filter");
@@ -78,25 +78,25 @@ impl InputManager {
         }
     }
 
-    /// remove monitor.
+    /// Remove monitor.
     pub fn remove_monitor(monitor_id: i32) {
-        // SAFETY: remove monitor
+        // SAFETY: Remove monitor.
         unsafe {
             input_binding::CRemoveMonitor(monitor_id);
         }
     }
 
-    /// remove interceptor.
+    /// Remove interceptor.
     pub fn remove_interceptor(interceptor_id: i32) {
-        // SAFETY: remove interceptor
+        // SAFETY: Remove interceptor.
         unsafe {
             input_binding::CRemoveInterceptor(interceptor_id);
         }
     }
 
-    /// set pointer location.
+    /// Set pointer location.
     pub fn set_pointer_location(physical_x: i32, physical_y: i32) {
-        // SAFETY: remove monitor
+        // SAFETY: Remove monitor.
         unsafe {
             input_binding::CSetPointerLocation(physical_x, physical_y);
         }
