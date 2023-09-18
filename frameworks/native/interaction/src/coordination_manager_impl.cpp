@@ -17,7 +17,7 @@
 
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

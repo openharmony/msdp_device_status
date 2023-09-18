@@ -26,7 +26,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

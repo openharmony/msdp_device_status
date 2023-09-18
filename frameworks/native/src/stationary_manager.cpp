@@ -15,7 +15,7 @@
 
 #include "stationary_manager.h"
 
-#include "util.h"
+#include "include/util.h"
 
 #include "devicestatus_client.h"
 #include "devicestatus_common.h"

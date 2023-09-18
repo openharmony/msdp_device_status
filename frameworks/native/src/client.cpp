@@ -22,7 +22,7 @@
 #include "fi_log.h"
 #include "proto.h"
 #include "time_cost_chk.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -19,7 +19,7 @@
 #include <cstdio>
 
 #include "devicestatus_define.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

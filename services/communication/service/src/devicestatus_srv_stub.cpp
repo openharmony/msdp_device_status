@@ -26,7 +26,7 @@
 #include "fi_log.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
