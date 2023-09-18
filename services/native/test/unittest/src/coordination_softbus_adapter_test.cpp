@@ -36,26 +36,17 @@ constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 
 int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
-    if (!g_sendable) {
-        return RET_ERR;
-    }
-    return RET_OK;
+    return g_sendable == true ? RET_OK : RET_ERR;
 }
 
 int32_t CoordinationSoftbusAdapter::Init()
 {
-    if (!g_init) {
-        return RET_ERR;
-    }
-    return RET_OK;
+    return g_init == true ? RET_OK : RET_ERR;
 }
 
 int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId)
 {
-    if (!g_cond) {
-        return RET_ERR;
-    }
-    return RET_OK;
+    return g_cond == true ? RET_OK : RET_ERR;
 }
 
 void CoordinationSoftbusAdapterTest::SetUpTestCase() {}
