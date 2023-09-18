@@ -22,11 +22,11 @@ mod coordination;
 
 use std::ffi::{ c_char, CString };
 
-use hilog_rust::{ error, hilog, HiLogLabel, LogType };
+use hilog_rust::{ hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize };
 
 use fusion_data_rust::{ IPlugin, CallingContext, GeneralCoordinationParam, StartCoordinationParam,
-    StopCoordinationParam, GetCoordinationStateParam, FusionResult };
+    StopCoordinationParam, GetCoordinationStateParam };
 use fusion_plugin_manager_rust::export_plugin;
 use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 

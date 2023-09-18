@@ -17,21 +17,19 @@
 
 #![allow(unused_variables)]
 
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-
 mod identity;
 
 use std::ffi::{ c_char, CString };
+
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{
+use ipc_rust::{
     BorrowedMsgParcel, IRemoteBroker, IRemoteObj, MsgParcel, IMsgParcel,
     RemoteObj, RemoteStub, define_remote_object
 };
-use crate::fusion_data_rust::Intention;
-use crate::fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
+
+use fusion_data_rust::Intention;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
+
 use crate::identity::{ CommonAction, compose_param_id, split_action, split_intention, split_param };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {

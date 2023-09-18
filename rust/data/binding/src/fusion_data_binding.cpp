@@ -20,6 +20,7 @@
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_data_binding" };
+} // namespace
 
 struct CDragData* CDragDataFree(struct CDragData *cdrag)
 {
@@ -45,4 +46,3 @@ int32_t CDragDataFrom(const ::OHOS::Msdp::DeviceStatus::DragData *drag, CDragDat
     cdrag->hasCanceledAnimation = drag->hasCanceledAnimation;
     return RET_OK;
 }
-} // namespace

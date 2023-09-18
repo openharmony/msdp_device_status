@@ -13,9 +13,7 @@
  * limitations under the License.
  */
 
-use crate::{
-    input_binding, input_binding::CKeyEvent
-};
+use crate::{ input_binding, input_binding::CKeyEvent };
 
 /// KeyEvent packed the native CKeyEvent.
 #[repr(C)]

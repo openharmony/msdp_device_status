@@ -13,10 +13,7 @@
  * limitations under the License.
  */
 
-//! TODO: add documentation.
-
-#![feature(rustc_private)]
-extern crate libc;
+//! Tests of asynchronous scheduling.
 
 use std::ffi::{ c_void, c_char, c_int, CString };
 use std::io::Error;
@@ -24,9 +21,11 @@ use std::os::fd::RawFd;
 use std::sync::{ Arc, Condvar, Mutex };
 use std::sync::atomic::{ AtomicI32, Ordering };
 use std::time::Duration;
+
 use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
+
 use fusion_scheduler_rust::{ Handler, IEpollHandler, LIBC_EPOLLIN };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,

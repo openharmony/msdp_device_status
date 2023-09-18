@@ -60,9 +60,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 /// fail and return error.
 ///
 #[derive(Default)]
-pub struct FusionDragServer {
-    dummy: i32
-}
+pub struct FusionDragServer(i32);
 
 impl IPlugin for FusionDragServer {
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
