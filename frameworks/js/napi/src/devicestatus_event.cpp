@@ -53,7 +53,7 @@ bool DeviceStatusEvent::On(int32_t eventType, napi_value handler, bool isOnce)
         return false;
     }
     if (eventMap_[eventType].size() > EVENT_LIST_MAX || eventOnceMap_[eventType].size() > EVENT_LIST_MAX) {
-        FI_HILOGE("list size over");
+        FI_HILOGE("List size is out of range");
         return false;
     }
     if (isOnce) {
@@ -86,7 +86,7 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
         eventMap_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
     }
     if (eventMap_[eventType].empty()) {
-        FI_HILOGE("eventMap_ save callback");
+        FI_HILOGI("eventMap_ save callback");
         SaveCallback(eventType, onHandlerRef, isOnce);
         return true;
     }

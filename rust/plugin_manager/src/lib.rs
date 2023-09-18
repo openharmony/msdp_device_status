@@ -103,7 +103,7 @@ impl PluginManager {
                         creator()
                     };
                     if plugin_ptr.is_null() {
-                        error!(LOG_LABEL, "Fail to create plugin instance");
+                        error!(LOG_LABEL, "Failed to create plugin instance");
                         None
                     } else {
                         Some(unsafe {

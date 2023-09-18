@@ -289,7 +289,7 @@ pub unsafe extern "C" fn fusion_stop_coordination(user_data: i32, is_unchained: 
                     0
                 }
                 Err(err) => {
-                    error!(LOG_LABEL, "Fail to stop coordination");
+                    error!(LOG_LABEL, "Failed to stop coordination");
                     err
                 }
             }

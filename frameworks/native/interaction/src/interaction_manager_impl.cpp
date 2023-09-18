@@ -44,7 +44,7 @@ bool InteractionManagerImpl::InitClient()
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
-        FI_HILOGE("The client fails to start");
+        FI_HILOGE("The client failed to start");
         return false;
     }
     return true;
