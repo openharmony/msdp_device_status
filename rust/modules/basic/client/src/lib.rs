@@ -22,8 +22,8 @@ extern crate fusion_data_rust;
 extern crate fusion_utils_rust;
 extern crate ipc_rust;
 
-use fusion_data_rust::{ Intention, AllocSocketPairParam, BasicParamID, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_data_rust::{ Intention, AllocSocketPairParam, BasicParamID};
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ FileDesc, MsgParcel, Deserialize };
 use std::ffi::{ c_char, CString };
@@ -62,11 +62,11 @@ impl FusionBasicClient {
                     }
                 }
                 error!(LOG_LABEL, "Failed to deserialize reply");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

@@ -21,8 +21,7 @@
 use std::ffi::{ c_char, c_int, CString };
 use std::os::fd::RawFd;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_data_rust::FusionResult;
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -78,7 +77,7 @@ impl FusionNativeService {
     }
 
     pub fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionNativeService:alloc_socket_fd");
         let mut fd: c_int = 0;
@@ -89,10 +88,10 @@ impl FusionNativeService {
         };
         if ret == 0 {
             *client_fd = fd as RawFd;
-            Ok(0)
+            Ok(())
         } else {
             error!(LOG_LABEL, "Failed to allocate socket pair");
-            Err(ret)
+            Err(FusionErrorCode::Fail)
         }
     }
 }

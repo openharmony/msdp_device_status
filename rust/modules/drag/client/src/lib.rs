@@ -20,8 +20,8 @@
 
 use std::ffi::{ c_char, CString };
 use std::rc::Rc;
-use fusion_data_rust::{ Intention, DefaultReply, DragData, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_data_rust::{ Intention, DefaultReply, DragData };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ MsgParcel, Deserialize };
 use hilog_rust::{ debug, error, hilog, HiLogLabel, LogType };
@@ -55,13 +55,13 @@ impl DragClient {
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Failed to deserialize DefaultReply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

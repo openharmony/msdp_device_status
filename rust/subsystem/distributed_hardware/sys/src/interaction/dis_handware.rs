@@ -16,8 +16,7 @@
 #![allow(dead_code)]
 
 use std::ffi::{ c_char, CString };
-use crate::fusion_utils_rust::{ call_info_trace };
-use fusion_data_rust::{FusionInteractionResult, FusionErrorCode};
+use crate::fusion_utils_rust::{ call_info_trace, FusionResult, FusionErrorCode };
 use crate::dm_binding;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -27,26 +26,26 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 static FI_PKG_NAME: &str = "ohos.msdp.fusioninteraction";
 
-/// struct DisHandware
+/// Call the DisHandware interface.
 pub struct DisHandware;
 
 impl DisHandware {
-    /// Init device manager.
-    pub fn init_device_manager() -> FusionInteractionResult<i32> {
+    /// Call the InitDeviceManager interface of the dishandware subsystem to init device manager.
+    pub fn init_device_manager() -> FusionResult<()> {
         call_info_trace!("DisHandware::init_device_manager");
         let pkg_name = CString::new(FI_PKG_NAME)?;
-        // SAFETY: no `None` here, cause `callback` and  `pkg_name` is valid.
+        // SAFETY: No `None` here, cause `callback` and  `pkg_name` is valid.
         unsafe {
             if !dm_binding::CInitDeviceManager(pkg_name.as_ptr(), dm_binding::on_remote_died) {
                 error!(LOG_LABEL, "Init device manager failed");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// Register device state
-    pub fn register_device_state() -> FusionInteractionResult<i32> {
+    /// Call the InitDeviceManager interface of the dishandware subsystem to register device state.
+    pub fn register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;
@@ -56,28 +55,28 @@ impl DisHandware {
             on_device_ready: dm_binding::on_device_ready,
             on_device_offline: dm_binding::on_device_offline,
         };
-        // SAFETY: no `None` here, cause `callback` and `pkg_name` and `extra` is valid.
+        // SAFETY: No `None` here, cause `callback` and `pkg_name` and `extra` is valid.
         unsafe {
             if !dm_binding::CRegisterDevState(pkg_name.as_ptr(), extra.as_ptr(), callbacks) {
                 error!(LOG_LABEL, "Register devStateCallback failed");
                 return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// UnRegister device state
-    pub fn un_register_device_state() -> FusionInteractionResult<i32> {
+    /// Call the InitDeviceManager interface of the dishandware subsystem to unregister device state.
+    pub fn un_register_device_state() -> FusionResult<()> {
         call_info_trace!("DisHandware::un_register_device_state");
         let pkg_name = CString::new(FI_PKG_NAME)?;
         let extra = CString::new("")?;
-        // SAFETY: no `None` here, cause `pkg_name` and `extra` is valid.
+        // SAFETY: No `None` here, cause `pkg_name` and `extra` is valid.
         unsafe {
             if !dm_binding::CUnRegisterDevState(pkg_name.as_ptr(), extra.as_ptr()) {
                 error!(LOG_LABEL, "UnRegister devStateCallback failed");
                 return Err(FusionErrorCode::Fail);
             }
         }
-        Ok(0)
+        Ok(())
     }
 }

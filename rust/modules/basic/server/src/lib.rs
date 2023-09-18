@@ -29,9 +29,9 @@ use std::fs::File;
 use std::os::fd::{ FromRawFd, RawFd };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize, FileDesc, Serialize };
-use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext, FusionResult };
+use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext};
 use fusion_services_rust::{ FusionService };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -46,7 +46,7 @@ pub struct FusionBasicServer {
 }
 
 impl FusionBasicServer {
-    fn alloc_socket_pair(&self, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>
+    fn alloc_socket_pair(&self, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>
     {
         let call_param = AllocSocketPairParam::deserialize(data).map_err(|_err| { -1 })?;
 
@@ -58,68 +58,68 @@ impl FusionBasicServer {
                 call_param.module_type, &mut client_fd, &mut token_type)?;
 
             let f = unsafe { File::from_raw_fd(client_fd) };
-            FileDesc::new(f).serialize(reply).map_err(|_err| { -1 })?;
-            token_type.serialize(reply).map_err(|_err| { -1 })?;
-            Ok(0)
+            FileDesc::new(f).serialize(reply).map_err(|_err| { FusionErrorCode::Fail })?;
+            token_type.serialize(reply).map_err(|_err| { FusionErrorCode::Fail })?;
+            Ok(())
         } else {
             error!(LOG_LABEL, "No proxy");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         }
     }
 }
 
 impl IPlugin for FusionBasicServer {
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::enable");
-        Ok(0)
+        Ok(())
     }
 
     fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::disable");
-        Ok(0)
+        Ok(())
     }
 
     fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::start");
         error!(LOG_LABEL, "FusionBasicServer::start");
-        Err(-1)
+        Err(FusionErrorCode::Fail)
     }
 
     fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::stop");
-        Ok(0)
+        Ok(())
     }
 
     fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::add_watch");
-        Ok(0)
+        Ok(())
     }
 
     fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::remove_watch");
-        Ok(0)
+        Ok(())
     }
 
     fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::set_param");
-        Ok(0)
+        Ok(())
     }
 
     fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::get_param");
-        Ok(0)
+        Ok(())
     }
 
     fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionBasicServer::control");
         match BasicParamID::try_from(id) {
             Ok(param) => {
@@ -132,7 +132,7 @@ impl IPlugin for FusionBasicServer {
             }
             Err(_) => {
                 error!(LOG_LABEL, "Invalid param id: {}", id);
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

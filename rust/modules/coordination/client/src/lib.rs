@@ -24,9 +24,9 @@ extern crate ipc_rust;
 
 use fusion_data_rust::{
     Intention, DefaultReply, GeneralCoordinationParam, StartCoordinationParam,
-    StopCoordinationParam, GetCoordinationStateParam, FusionResult
+    StopCoordinationParam, GetCoordinationStateParam
 };
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ MsgParcel, Deserialize };
 use std::ffi::{ c_char, CString };
@@ -47,7 +47,7 @@ pub struct FusionCoordinationClient {
 
 impl FusionCoordinationClient {
     /// Request to enable multi-device cooperation.
-    pub fn enable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn enable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::enable_coordination");
         match MsgParcel::new() {
@@ -61,13 +61,13 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// Request to disable multi-device cooperation.
-    pub fn disable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn disable_coordination(&self, user_data: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::disable_coordination");
         match MsgParcel::new() {
@@ -81,14 +81,14 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// Request to start multi-device cooperation.
     pub fn start_coordination(&self, user_data: i32, remote_network_id: String,
-        start_device_id: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+        start_device_id: i32, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::start_coordination");
         match MsgParcel::new() {
@@ -104,14 +104,14 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// Request to stop multi-device cooperation.
     pub fn stop_coordination(&self, user_data: i32, is_unchained: i32,
-        ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+        ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::stop_coordination");
         match MsgParcel::new() {
@@ -126,7 +126,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -152,19 +152,19 @@ impl FusionCoordinationClient {
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Fail to deserialize DefaultReply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// Request to listen for events of multi-device cooperation.
-    pub fn register_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn register_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::register_coordination_listener");
         match MsgParcel::new() {
@@ -176,13 +176,13 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// Request to stop listening for events of multi-device cooperation.
-    pub fn unregister_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn unregister_coordination_listener(&self, ipc_client: Rc<FusionIpcClient>) -> FusionResult<()>
     {
         call_debug_enter!("FusionCoordinationClient::unregister_coordination_listener");
         match MsgParcel::new() {
@@ -194,7 +194,7 @@ impl FusionCoordinationClient {
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
