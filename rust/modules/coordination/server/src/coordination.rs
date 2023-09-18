@@ -13,15 +13,17 @@
  * limitations under the License.
  */
 
-//! Coordination implementation.
+//! Implementation of multi-device cooperation.
 
 #![allow(dead_code)]
 
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ hilog, HiLogLabel, LogType };
-use crate::fusion_data_rust::{ GeneralCoordinationParam, StartCoordinationParam, CallingContext,
-    StopCoordinationParam, GetCoordinationStateParam };
-use crate::fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
+
+use hilog_rust::{ hilog, HiLogLabel, LogType };
+
+use fusion_data_rust::{ GeneralCoordinationParam, StartCoordinationParam, CallingContext,
+    StopCoordinationParam, GetCoordinationStateParam, FusionResult };
+use fusion_utils_rust::{ call_debug_enter FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -29,14 +31,12 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "Coordination"
 };
 
-/// struct Coordination
 #[derive(Default)]
 pub struct Coordination {
     dummy: i32
 }
 
 impl Coordination {
-    /// TODO: add documentation.
     pub fn enable(&self, context: &CallingContext,
         param: &GeneralCoordinationParam) -> FusionResult<()>
     {
@@ -44,7 +44,6 @@ impl Coordination {
         Err(FusionErrorCode::Fail)
     }
 
-    /// TODO: add documentation.
     pub fn disable(&self, context: &CallingContext,
         param: &GeneralCoordinationParam) -> FusionResult<()>
     {
@@ -52,7 +51,6 @@ impl Coordination {
         Err(FusionErrorCode::Fail)
     }
 
-    /// TODO: add documentation.
     pub fn start(&self, context: &CallingContext,
         param: &StartCoordinationParam) -> FusionResult<()>
     {
@@ -60,7 +58,6 @@ impl Coordination {
         Err(FusionErrorCode::Fail)
     }
 
-    /// TODO: add documentation.
     pub fn stop(&self, context: &CallingContext,
         param: &StopCoordinationParam) -> FusionResult<()>
     {
@@ -68,7 +65,6 @@ impl Coordination {
         Err(FusionErrorCode::Fail)
     }
 
-    /// TODO: add documentation.
     pub fn get_state(&self, context: &CallingContext,
         param: &GetCoordinationStateParam) -> FusionResult<()>
     {
