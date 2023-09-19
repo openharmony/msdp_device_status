@@ -26,8 +26,8 @@ use std::sync::Mutex;
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize, InterfaceToken, IRemoteBroker, IRemoteStub };
-use fusion_data_rust::{ Intention, IPlugin, CallingContext, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_data_rust::{ Intention, IPlugin, CallingContext };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_service_rust::{ IDeviceStatus, FusionIpcStub };
 use fusion_plugin_manager_rust::PluginManager;
 
@@ -48,21 +48,21 @@ impl FusionIpcDelegator {
         }
     }
 
-    fn check_interface_token(&self, data: &BorrowedMsgParcel) -> FusionResult<i32> {
+    fn check_interface_token(&self, data: &BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::check_interface_token");
         match InterfaceToken::deserialize(data) {
             Ok(token) => {
                 debug!(LOG_LABEL, "check interface token");
                 if token.get_token() != FusionIpcStub::get_descriptor() {
                     error!(LOG_LABEL, "unexpected token");
-                    Err(-1)
+                    Err(FusionErrorCode::Fail)
                 } else {
-                    Ok(0)
+                    Ok(())
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "Deserialization of interface token failed");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -79,13 +79,13 @@ impl FusionIpcDelegator {
                     }
                     None => {
                         error!(LOG_LABEL, "Failed to load intention module");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "error locking");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -93,7 +93,7 @@ impl FusionIpcDelegator {
 
 impl IDeviceStatus for FusionIpcDelegator {
     fn enable(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::enable");
         self.check_interface_token(data)?;
 
@@ -104,7 +104,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn disable(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::disable");
         self.check_interface_token(data)?;
 
@@ -115,7 +115,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn start(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::start");
         self.check_interface_token(data)?;
 
@@ -126,7 +126,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn stop(&self, intention: Intention, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::stop");
         self.check_interface_token(data)?;
 
@@ -137,7 +137,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn add_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::add_watch");
         self.check_interface_token(data)?;
 
@@ -148,7 +148,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn remove_watch(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::remove_watch");
         self.check_interface_token(data)?;
 
@@ -159,7 +159,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn set_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::set_param");
         self.check_interface_token(data)?;
 
@@ -170,7 +170,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn get_param(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::get_param");
         self.check_interface_token(data)?;
 
@@ -181,7 +181,7 @@ impl IDeviceStatus for FusionIpcDelegator {
     }
 
     fn control(&self, intention: Intention, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionIpcDelegator::control");
         self.check_interface_token(data)?;
 

@@ -15,11 +15,17 @@ import("//build/ohos.gni")
 import("../../device_status.gni")
 
 config("devicestatus_util_private_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }
 
 config("devicestatus_util_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }
 
 ohos_shared_library("devicestatus_util") {
@@ -47,5 +53,8 @@ ohos_shared_library("devicestatus_util") {
 }
 
 config("devicestatus_utils_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    ".",
+    "include",
+  ]
 }

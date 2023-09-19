@@ -23,8 +23,8 @@
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize };
-use fusion_data_rust::{ IPlugin, CallingContext, DragData, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_data_rust::{ IPlugin, CallingContext, DragData };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_plugin_manager_rust::export_plugin;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -66,19 +66,19 @@ pub struct FusionDragServer {
 
 impl IPlugin for FusionDragServer {
     fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::enable");
-        Ok(0)
+        Ok(())
     }
 
     fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::disable");
-        Ok(0)
+        Ok(())
     }
 
     fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::start");
         match DragData::deserialize(data) {
             Ok(drag_data) => {
@@ -86,61 +86,56 @@ impl IPlugin for FusionDragServer {
                 info!(LOG_LABEL, "{}", drag_data);
                 match 0u32.serialize(reply) {
                     Ok(_) => {
-                        Ok(0)
+                        Ok(())
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Failed to serialize reply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             Err(_) => {
                 error!(LOG_LABEL, "in FusionDragServer::start(): DragData::deserialize() failed");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::stop");
-        Ok(0)
+        Ok(())
     }
 
     fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::add_watch");
-        Ok(0)
+        Ok(())
     }
 
     fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::remove_watch");
-        Ok(0)
+        Ok(())
     }
 
     fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::set_param");
-        Ok(0)
+        Ok(())
     }
 
     fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::get_param");
-        Ok(0)
+        Ok(())
     }
 
     fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel,
-        reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
+        reply: &mut BorrowedMsgParcel) -> FusionResult<()> {
         call_debug_enter!("FusionDragServer::control");
-        Ok(0)
+        Ok(())
     }
-}
-
-fn start(context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32> {
-    info!(LOG_LABEL, "in start()");
-    Ok(0)
 }
 
 export_plugin!(FusionDragServer);

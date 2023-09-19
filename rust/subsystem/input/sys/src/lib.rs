@@ -17,6 +17,7 @@
 
 extern crate hilog_rust;
 extern crate fusion_data_rust;
+extern crate fusion_utils_rust;
 
 mod input_binding;
 mod interaction;

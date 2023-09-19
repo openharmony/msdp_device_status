@@ -16,10 +16,6 @@
 #define private public
 #include "coordination_softbus_adapter_test.h"
 
-#include <gtest/gtest.h>
-
-#include "coordination_sm.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -27,18 +23,30 @@ using namespace testing::ext;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapterTest" };
 auto g_adapter = CoordinationSoftbusAdapter::GetInstance();
-bool g_sendable = false;
+bool g_sendable { false };
+bool g_init { false };
+bool g_cond { false };
 const std::string LOCAL_NETWORKID { "testLocalNetworkId" };
 const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
-const std::string ORIGIN_NETWORKID { "testRemoteNetworkId" };
+const std::string ORIGIN_NETWORKID { "testOriginNetworkId" };
+const std::string DEVICE_ID { "testDeviceId" };
+constexpr int32_t SESSION_ID { 1 };
+constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 } // namespace
 
 int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
-    if (!g_sendable) {
-        return RET_ERR;
-    }
-    return RET_OK;
+    return g_sendable == true ? RET_OK : RET_ERR;
+}
+
+int32_t CoordinationSoftbusAdapter::Init()
+{
+    return g_init == true ? RET_OK : RET_ERR;
+}
+
+int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId)
+{
+    return g_cond == true ? RET_OK : RET_ERR;
 }
 
 void CoordinationSoftbusAdapterTest::SetUpTestCase() {}
@@ -239,6 +247,113 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
     ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_OK);
     g_adapter->sessionDevMap_.clear();  
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest013
+ * @tc.desc: test normal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_adapter->sessionDevMap_[REMOTE_NETWORKID] = SESSION_ID;
+    int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
+    EXPECT_EQ(ret, RET_OK);
+    g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
+    g_adapter->sessionDevMap_.clear();
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest014
+ * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_init = false;
+    int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
+    EXPECT_EQ(ret, RET_ERR);
+    g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest015
+ * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_init = true;
+    int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
+    EXPECT_EQ(ret, RET_ERR);
+    g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest016
+ * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest016, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_init = true;
+    g_cond = false;
+    int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
+    EXPECT_EQ(ret, RET_ERR);
+    g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest017
+ * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest017, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
+    g_adapter->OnSessionClosed(SESSION_ID);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest018
+ * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest018, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
+    g_adapter->OnSessionClosed(SESSION_ID);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest019
+ * @tc.desc: test abnormal func named SendData in devicestatus
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest019, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    std::string data = "TestSendData";
+    g_adapter->sessionDevMap_[DEVICE_ID] = SESSION_ID;
+    int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
+        INTERCEPT_STRING_LENGTH);
+    EXPECT_EQ(ret, RET_ERR);
+    g_adapter->sessionDevMap_.clear();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

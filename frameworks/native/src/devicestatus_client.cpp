@@ -22,7 +22,7 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 
-#include "util.h"
+#include "include/util.h"
 
 #include "coordination_manager_impl.h"
 #include "devicestatus_common.h"

@@ -37,7 +37,7 @@ macro_rules! define_enum {
         }
 
         impl TryFrom<u32> for $name {
-            type Error = i32;
+            type Error = FusionErrorCode;
             fn try_from(code: u32) -> std::result::Result<Self, Self::Error> {
                 match code {
                     $(
@@ -46,7 +46,7 @@ macro_rules! define_enum {
                         }
                     )*
                     _ => {
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
@@ -86,14 +86,14 @@ macro_rules! define_enum {
     };
 }
 
-/// struct InnerFunctionTracer
+/// Helper to log the enter and leave of function calls.
 pub struct InnerFunctionTracer<'a> {
     log: Box<dyn Fn(&str, &str)>,
     func_name: &'a str
 }
 
 impl<'a> InnerFunctionTracer<'a> {
-    /// TODO: add documentation.
+    /// Construct a new instance of [`InnerFunctionTracer`].
     pub fn new(log: Box<dyn Fn(&str, &str)>, func_name: &'a str) -> Self {
         log(func_name, "enter");
         Self {
@@ -108,7 +108,7 @@ impl<'a> Drop for InnerFunctionTracer<'a> {
     }
 }
 
-/// call_debug_enter
+/// Log in `DEBUG` level the enter and leave of function calls.
 #[macro_export]
 macro_rules! call_debug_enter {
     (
@@ -123,7 +123,7 @@ macro_rules! call_debug_enter {
     };
 }
 
-/// call_info_trace
+/// Log in `INFO` level the enter and leave of function calls.
 #[macro_export]
 macro_rules! call_info_trace {
     (

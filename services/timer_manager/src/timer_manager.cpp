@@ -21,7 +21,7 @@
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

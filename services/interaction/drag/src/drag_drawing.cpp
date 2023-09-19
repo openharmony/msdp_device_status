@@ -38,7 +38,7 @@
 #include "ui/rs_ui_director.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {

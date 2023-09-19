@@ -42,7 +42,8 @@
         "dsoftbus",
         "common",
         "motion",
-        "build_framework"
+        "build_framework",
+        "ylong_runtime"
       ],
       "third_party": [
         "cJSON",
