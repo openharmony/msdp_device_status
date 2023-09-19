@@ -428,13 +428,13 @@ void VirtualTouchScreenBuilder::ReadAction(const nlohmann::json &model)
 }
 
 int32_t VirtualTouchScreenBuilder::GetModelValue(const nlohmann::json &model, const std::string &targetName,
-    int32_t DefaultValue)
+    int32_t defaultValue)
 {
     auto it = model.find(targetName);
     if (it != model.cend() && it->is_number_integer()) {
         return it.value();
     }
-    return DefaultValue;
+    return defaultValue;
 }
 
 void VirtualTouchScreenBuilder::HandleDown(const nlohmann::json &model)

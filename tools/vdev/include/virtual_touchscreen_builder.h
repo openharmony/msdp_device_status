@@ -56,7 +56,7 @@ private:
     static void ReadRawInput(const char *path);
     static void ReadRawModel(const nlohmann::json &model, int32_t level);
     static void ReadRawData(const nlohmann::json &model);
-    static int32_t GetModelValue(const nlohmann::json &model, const std::string &targetName, int32_t DefaultValue);
+    static int32_t GetModelValue(const nlohmann::json &model, const std::string &targetName, int32_t defaultValue);
     using InterfaceParameterLess = void(*)();
     using InterfaceParameterOne = void(*)(const char*);
     using InterfaceParameterTwo = void(*)(int32_t, char**);
