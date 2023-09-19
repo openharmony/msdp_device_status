@@ -427,76 +427,56 @@ void VirtualTouchScreenBuilder::ReadAction(const nlohmann::json &model)
     }
 }
 
+int32_t VirtualTouchScreenBuilder::GetModelValue(const nlohmann::json &model, const std::string &targetName,
+    int32_t DefaultValue)
+{
+    auto it = model.find(targetName);
+    if (it != model.cend() && it->is_number_integer()) {
+        return it.value();
+    }
+    return DefaultValue;
+}
+
 void VirtualTouchScreenBuilder::HandleDown(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t x = -1;
-    it = model.find("x");
-    if (it != model.cend() && it->is_number_integer()) {
-        x = it.value();
-    }
-    int32_t y = -1;
-    it = model.find("y");
-    if (it != model.cend() && it->is_number_integer()) {
-        y = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", -1);
+
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", -1);
+
     std::cout << "[touchscreen] down: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->DownButton(slot, x, y);
 }
 
 void VirtualTouchScreenBuilder::HandleMove(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t dx = 0;
-    it = model.find("dx");
-    if (it != model.cend() && it->is_number_integer()) {
-        dx = it.value();
-    }
-    int32_t dy = 0;
-    it = model.find("dy");
-    if (it != model.cend() && it->is_number_integer()) {
-        dy = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+
+    int32_t dx = VirtualTouchScreenBuilder::GetModelValue(model, "dx", 0);
+
+    int32_t dy = VirtualTouchScreenBuilder::GetModelValue(model, "dy", 0);
+
     std::cout << "[touchscreen] move: [" << slot << ", (" << dx << "," << dy << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->Move(slot, dx, dy);
 }
 
 void VirtualTouchScreenBuilder::HandleUp(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+
     std::cout << "[touchscreen] release: [" << slot << "]" << std::endl;
     VirtualTouchScreen::GetDevice()->UpButton(slot);
 }
 
 void VirtualTouchScreenBuilder::HandleMoveTo(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t x = -1;
-    it = model.find("x");
-    if (it != model.cend() && it->is_number_integer()) {
-        x = it.value();
-    }
-    int32_t y = -1;
-    it = model.find("y");
-    if (it != model.cend() && it->is_number_integer()) {
-        y = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", -1);
+
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", -1);
+
     std::cout << "[touchscreen] move-to: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->MoveTo(slot, x, y);
 }
