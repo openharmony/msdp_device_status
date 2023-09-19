@@ -73,7 +73,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
     }
     ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(networkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop coordination fail");
+        FI_HILOGE("Stop coordination failed");
         return ret;
     }
 

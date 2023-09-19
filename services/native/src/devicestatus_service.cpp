@@ -76,7 +76,7 @@ void DeviceStatusService::OnStart()
     delegateTasks_.SetWorkerThreadId(tid);
 
     if (!Init()) {
-        FI_HILOGE("On start call init fail");
+        FI_HILOGE("On start call init failed");
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
@@ -167,7 +167,7 @@ bool DeviceStatusService::Init()
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
-        FI_HILOGE("OnStart init fail");
+        FI_HILOGE("OnStart init failed");
         return false;
     }
     if (EpollCreate() != RET_OK) {
@@ -405,7 +405,7 @@ int32_t DeviceStatusService::InitTimerMgr()
     }
     ret = AddEpoll(EPOLL_EVENT_TIMER, timerMgr_.GetTimerFd());
     if (ret != RET_OK) {
-        FI_HILOGE("AddEpoll for timer fail");
+        FI_HILOGE("AddEpoll for timer failed");
     }
     return ret;
 }
