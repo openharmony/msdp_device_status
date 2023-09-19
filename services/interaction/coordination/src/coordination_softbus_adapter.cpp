@@ -41,9 +41,9 @@ const SessionAttribute g_sessionAttr = {
     .dataType = SessionType::TYPE_BYTES,
     .linkTypeNum = DINPUT_LINK_TYPE_MAX,
     .linkType = {
+        LINK_TYPE_WIFI_P2P,
         LINK_TYPE_WIFI_WLAN_2G,
-        LINK_TYPE_WIFI_WLAN_5G,
-        LINK_TYPE_WIFI_P2P
+        LINK_TYPE_WIFI_WLAN_5G
     }
 };
 
@@ -290,7 +290,7 @@ std::shared_ptr<CoordinationSoftbusAdapter> CoordinationSoftbusAdapter::GetInsta
 }
 
 int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &localNetworkId,
-    const std::string &remoteNetworkId)
+    const std::string &remoteNetworkId, bool checkButtonDown)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
@@ -301,7 +301,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     int32_t sessionId = sessionDevMap_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     bool isPointerButtonPressed = false;
-    if (pointerEvent != nullptr) {
+    if (pointerEvent != nullptr && checkButtonDown) {
         for (const auto &item : pointerEvent->GetPressedButtons()) {
             if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
                 isPointerButtonPressed = true;
@@ -616,7 +616,7 @@ void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::func
 {
     CALL_DEBUG_ENTER;
     if (messageId <= MIN_ID || messageId >= MAX_ID) {
-        FI_HILOGE("Message id is invalid:%{public}d", messageId);
+        FI_HILOGE("Message id is invalid, messageId:%{public}d", messageId);
         return;
     }
     CHKPV(callback);

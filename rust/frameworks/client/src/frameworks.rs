@@ -23,9 +23,9 @@ use std::sync::Once;
 use std::ffi::{ c_char, CString };
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
 use ipc_rust::FileDesc;
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
-use fusion_data_rust::{ AllocSocketPairParam, DragData, FusionResult };
+use fusion_data_rust::{ AllocSocketPairParam, DragData};
 use fusion_basic_client_rust::FusionBasicClient;
 use fusion_drag_client_rust::DragClient;
 use fusion_coordination_client_rust::FusionCoordinationClient;
@@ -105,7 +105,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -119,13 +119,13 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
-    pub fn register_coordination_listener(&self) -> FusionResult<i32> {
+    pub fn register_coordination_listener(&self) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::register_coordination_listener");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -133,13 +133,13 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
-    pub fn unregister_coordination_listener(&self) -> FusionResult<i32> {
+    pub fn unregister_coordination_listener(&self) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::unregister_coordination_listener");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -147,13 +147,13 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
-    pub fn enable_coordination(&self, user_data: i32) -> FusionResult<i32> {
+    pub fn enable_coordination(&self, user_data: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::enable_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -161,13 +161,13 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
-    pub fn disable_coordination(&self, user_data: i32) -> FusionResult<i32> {
+    pub fn disable_coordination(&self, user_data: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::disable_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -175,14 +175,14 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
     pub fn start_coordination(&self, user_data: i32, remote_network_id: String,
-        start_device_id: i32) -> FusionResult<i32> {
+        start_device_id: i32) -> FusionResult<()> {
         call_debug_enter!("FusionFrameworks::start_coordination");
         match self.ipc_client.as_ref() {
             Some(ipc_client_ref) => {
@@ -192,13 +192,13 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
 
     /// TODO: add documentation.
-    pub fn stop_coordination(&self, user_data: i32, is_unchained: i32) -> FusionResult<i32>
+    pub fn stop_coordination(&self, user_data: i32, is_unchained: i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionFrameworks::stop_coordination");
         match self.ipc_client.as_ref() {
@@ -207,7 +207,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -222,7 +222,7 @@ impl<'a> FusionFrameworks {
             }
             None => {
                 error!(LOG_LABEL, "ipc_client is none");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

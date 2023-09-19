@@ -115,7 +115,7 @@ void Device::Dispatch(const struct epoll_event &ev)
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         FI_HILOGD("Input data received");
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
-        FI_HILOGE("Epoll hangup:%{public}s", strerror(errno));
+        FI_HILOGE("Epoll hangup, errno:%{public}s", strerror(errno));
     }
 }
 
@@ -125,7 +125,7 @@ void Device::QueryDeviceInfo()
     char buffer[PATH_MAX] = { 0 };
     int32_t rc = ioctl(fd_, EVIOCGNAME(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get device name:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get device name, errno:%{public}s", strerror(errno));
     } else {
         name_.assign(buffer);
     }
@@ -133,7 +133,7 @@ void Device::QueryDeviceInfo()
     struct input_id inputId;
     rc = ioctl(fd_, EVIOCGID, &inputId);
     if (rc < 0) {
-        FI_HILOGE("Could not get device input id:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get device input id, errno:%{public}s", strerror(errno));
     } else {
         bus_ = inputId.bustype;
         product_ = inputId.product;
@@ -159,7 +159,7 @@ void Device::QueryDeviceInfo()
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get uniq:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get uniq, errno:%{public}s", strerror(errno));
     } else {
         uniq_.assign(buffer);
     }
@@ -170,23 +170,23 @@ void Device::QuerySupportedEvents()
     CALL_DEBUG_ENTER;
     int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get key events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get key events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get abs events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get rel events mask, errno:%{public}s", strerror(errno));
     }
     rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
     if (rc < 0) {
-        FI_HILOGE("Could not get properties mask:%{public}s", strerror(errno));
+        FI_HILOGE("Could not get properties mask, errno:%{public}s", strerror(errno));
     }
 }
 
@@ -235,21 +235,36 @@ bool Device::HasJoystickAxesOrButtons() const
     return false;
 }
 
+bool Device::HasAbsCoord() const
+{
+    return (HasAbs(ABS_X) && HasAbs(ABS_Y));
+}
+
+bool Device::HasMtCoord() const
+{
+    return (HasAbs(ABS_MT_POSITION_X) && HasAbs(ABS_MT_POSITION_Y));
+}
+
+bool Device::HasRelCoord() const
+{
+    return (HasRel(REL_X) && HasRel(REL_Y));
+}
+
 void Device::PrintCapsDevice() const
 {
-    std::map<int32_t, std::string> deviceComparisonTable {
-        {DEVICE_CAP_KEYBOARD, "keyboard"},
-        {DEVICE_CAP_TOUCH, "touch device"},
-        {DEVICE_CAP_POINTER, "pointer"},
-        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
-        {DEVICE_CAP_TABLET_PAD, "pad"},
-        {DEVICE_CAP_GESTURE, "gesture"},
-        {DEVICE_CAP_SWITCH, "switch"},
-        {DEVICE_CAP_JOYSTICK, "joystick"}};
-    size_t size = deviceComparisonTable.size();
-    for (size_t i = 0; i < size; ++i) {
-        if (caps_.test(i)) {
-            FI_HILOGD("This is %{public}s", deviceComparisonTable[i].c_str());
+    const std::map<std::size_t, std::string> deviceComparisonTable {
+        { DEVICE_CAP_KEYBOARD, "keyboard" },
+        { DEVICE_CAP_TOUCH, "touch device" },
+        { DEVICE_CAP_POINTER, "pointer" },
+        { DEVICE_CAP_TABLET_TOOL, "tablet tool" },
+        { DEVICE_CAP_TABLET_PAD, "pad" },
+        { DEVICE_CAP_GESTURE, "gesture" },
+        { DEVICE_CAP_SWITCH, "switch" },
+        { DEVICE_CAP_JOYSTICK, "joystick" }
+    };
+    for (const auto &[cap, name]: deviceComparisonTable) {
+        if (caps_.test(cap)) {
+            FI_HILOGD("This is %{public}s", name.c_str());
         }
     }
 }
@@ -257,45 +272,64 @@ void Device::PrintCapsDevice() const
 void Device::CheckPointers()
 {
     CALL_DEBUG_ENTER;
-    bool hasAbsCoords { TestBit(ABS_X, absBitmask_) && TestBit(ABS_Y, absBitmask_) };
-    bool hasMtCoords { TestBit(ABS_MT_POSITION_X, absBitmask_) && TestBit(ABS_MT_POSITION_Y, absBitmask_) };
-    bool isDirect { TestBit(INPUT_PROP_DIRECT, propBitmask_) };
-    bool hasTouch { TestBit(BTN_TOUCH, keyBitmask_) };
-    bool hasRelCoords { TestBit(REL_X, relBitmask_) && TestBit(REL_Y, relBitmask_) };
-    bool stylusOrPen { TestBit(BTN_STYLUS, keyBitmask_) || TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool fingerButNoPen { TestBit(BTN_TOOL_FINGER, keyBitmask_) && !TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool hasMouseBtn { HasMouseButton() };
-    bool hasJoystickFeature { HasJoystickAxesOrButtons() };
+    if (HasAbsCoord()) {
+        CheckAbs();
+    } else {
+        CheckJoystick();
+    }
+    if (HasMtCoord()) {
+        CheckMt();
+    }
+    CheckAdditional();
+    PrintCapsDevice();
+}
 
-    if (hasAbsCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasMouseBtn) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-        } else if (hasJoystickFeature) {
-            caps_.set(DEVICE_CAP_JOYSTICK);
-        }
-    } else if (hasJoystickFeature) {
+void Device::CheckAbs()
+{
+    CALL_DEBUG_ENTER;
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasMouseButton()) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    } else if (HasJoystickAxesOrButtons()) {
         caps_.set(DEVICE_CAP_JOYSTICK);
     }
-    if (hasMtCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-        }
+}
+
+void Device::CheckJoystick()
+{
+    CALL_DEBUG_ENTER;
+    if (HasJoystickAxesOrButtons()) {
+        caps_.set(DEVICE_CAP_JOYSTICK);
     }
-    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) && !caps_.test(DEVICE_CAP_POINTER) &&
-        !caps_.test(DEVICE_CAP_JOYSTICK) && hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
+}
+
+void Device::CheckMt()
+{
+    CALL_DEBUG_ENTER;
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    }
+}
+
+void Device::CheckAdditional()
+{
+    CALL_DEBUG_ENTER;
+    if (!HasCapability(DEVICE_CAP_TABLET_TOOL) &&
+        !HasCapability(DEVICE_CAP_POINTER) &&
+        !HasCapability(DEVICE_CAP_JOYSTICK) &&
+        HasMouseButton() &&
+        (HasRelCoord() || !HasAbsCoord())) {
         caps_.set(DEVICE_CAP_POINTER);
     }
-    PrintCapsDevice();
 }
 
 void Device::CheckPencilMouse()

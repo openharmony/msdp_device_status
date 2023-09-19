@@ -30,9 +30,11 @@ device_status_part_name = "device_status"
 device_status_subsystem_name = "msdp"
 device_status_root_path = "//base/msdp/device_status"
 device_status_interfaces_path = "${device_status_root_path}/interfaces"
+device_status_libs_path = "${device_status_root_path}/libs"
 device_status_frameworks_path = "${device_status_root_path}/frameworks"
 device_status_service_path = "${device_status_root_path}/services"
 device_status_utils_path = "${device_status_root_path}/utils/common"
+device_status_fuzz_output_path = "${device_status_part_name}/device_status"
 
 device_status_default_defines = []
 

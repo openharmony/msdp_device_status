@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import("../../../device_status.gni")
 
-module_output_path = "device_status/device_status_native"
+module_output_path = "${device_status_fuzz_output_path}"
 
 deps_ex = [
   "ability_base:base",

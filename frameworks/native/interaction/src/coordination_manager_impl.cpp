@@ -17,7 +17,7 @@
 
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -240,9 +240,9 @@ const CoordinationManagerImpl::CoordinationState *CoordinationManagerImpl::GetCo
 int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     std::string deviceId;
-    int32_t nType;
+    int32_t nType = 0;
     pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read type failed");
@@ -255,9 +255,9 @@ int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient& clie
 int32_t CoordinationManagerImpl::OnCoordinationMessage(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     std::string deviceId;
-    int32_t nType;
+    int32_t nType = 0;
     pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");
@@ -270,8 +270,9 @@ int32_t CoordinationManagerImpl::OnCoordinationMessage(const StreamClient& clien
 int32_t CoordinationManagerImpl::OnCoordinationState(const StreamClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
-    bool state;
+    int32_t userData = 0;
+    bool state = false;
+
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");

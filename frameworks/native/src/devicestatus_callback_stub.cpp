@@ -51,8 +51,8 @@ int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
 int32_t DeviceStatusCallbackStub::OnDeviceStatusChangedStub(MessageParcel &data)
 {
     CALL_DEBUG_ENTER;
-    int32_t type;
-    int32_t value;
+    int32_t type = 0;
+    int32_t value = 0;
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, value, E_DEVICESTATUS_READ_PARCEL_ERROR);
     Data devicestatusData = {

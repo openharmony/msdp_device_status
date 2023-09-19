@@ -67,7 +67,7 @@ void AlgoBase::UpdateStateAndReport(OnChangedValue value, int32_t state, Type ty
     state_ = state;
     reportInfo_.type = type;
     reportInfo_.value = value;
-    FI_HILOGI("type:%{public}d,value:%{public}d", type, value);
+    FI_HILOGI("type:%{public}d, value:%{public}d", type, value);
     callback_->OnResult(reportInfo_);
 }
 } // namespace DeviceStatus

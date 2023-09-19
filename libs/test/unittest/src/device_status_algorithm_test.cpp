@@ -80,7 +80,7 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
         return RET_ERR;
     }
     if (algoHandler->handle != nullptr) {
-        FI_HILOGE("handle has exists");
+        FI_HILOGE("handle already exists");
         return RET_OK;
     }
 
@@ -100,7 +100,7 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
     algoHandler->create = reinterpret_cast<IMsdp* (*)()>(dlsym(algoHandler->handle, "Create"));
     algoHandler->destroy = reinterpret_cast<void *(*)(IMsdp*)>(dlsym(algoHandler->handle, "Destroy"));
     if (algoHandler->create == nullptr || algoHandler->destroy == nullptr) {
-        FI_HILOGE("%{public}s dlsym Create or Destroy failed", dlName.c_str());
+        FI_HILOGE("%{public}s dlsym create or destroy failed", dlName.c_str());
         dlclose(algoHandler->handle);
         algoHandler->Clear();
         return RET_ERR;
@@ -136,7 +136,7 @@ int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpA
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest001 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest001 start");
     AlgoAbsoluteStill still;
     bool ret = still.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
@@ -155,7 +155,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest002 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest002 start");
     AlgoHorizontal horizontal;
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal.Init(TYPE_INVALID);
@@ -174,7 +174,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest003 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest003 start");
     AlgoVertical vertical;
     bool ret = vertical.Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;

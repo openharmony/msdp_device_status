@@ -57,7 +57,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return;
     }
 }
@@ -86,7 +86,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return;
     }
 }
@@ -115,7 +115,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return devicestatusData;
     }
 
@@ -296,7 +296,7 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-    int32_t pid;
+    int32_t pid = 0;
     READINT32(reply, pid, IPC_PROXY_DEAD_OBJECT_ERR);
     return pid;
 }
@@ -362,6 +362,8 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);

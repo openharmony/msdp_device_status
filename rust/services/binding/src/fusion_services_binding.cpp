@@ -24,7 +24,7 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_services_binding" };
 
 struct NativeService {
-    int32_t refCnt;
+    int32_t refCnt { 0 };
 };
 
 struct NativeService* NativeServiceNew()

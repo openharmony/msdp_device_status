@@ -44,7 +44,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop coordination fail");
+        FI_HILOGE("Stop coordination failed");
         return RET_ERR;
     }
     std::string taskName = "process_stop_task";

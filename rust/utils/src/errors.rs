@@ -18,6 +18,7 @@
 use std::ffi::NulError;
 
 /// Error codes.
+#[derive(Debug)]
 #[repr(i32)]
 pub enum FusionErrorCode {
     /// Operation failed.
@@ -54,8 +55,14 @@ impl TryFrom<i32> for FusionErrorCode {
     }
 }
 
-/// IPC specific Result, error is i32 type
-pub type FusionResult<T> = std::result::Result<T, i32>;
+impl std::fmt::Display for FusionErrorCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FusionErrorCode::Fail => write!(f, "Operation failed."),
+            FusionErrorCode::InvalidParam => write!(f, "Invalid input parameter(s).")
+        }
+    }
+}
 
 /// Fusion Interaction specific Result, error is FusionErrorCode type
-pub type FusionInteractionResult<T> = std::result::Result<T, FusionErrorCode>;
+pub type FusionResult<T> = std::result::Result<T, FusionErrorCode>;
