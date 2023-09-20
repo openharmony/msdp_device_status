@@ -184,6 +184,17 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
     return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
+int32_t DragManager::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("No drag instance running, can not get dragData");
+        return RET_ERR;
+    }
+    dragData = DRAG_DATA_MGR.GetDragData();
+    return RET_OK;
+}
+
 int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;

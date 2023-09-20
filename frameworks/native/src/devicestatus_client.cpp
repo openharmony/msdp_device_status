@@ -408,6 +408,13 @@ int32_t DeviceStatusClient::UpdateShadowPic(const ShadowInfo &shadowInfo)
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->UpdateShadowPic(shadowInfo);
 }
+
+int32_t DeviceStatusClient::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetDragData(dragData);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
