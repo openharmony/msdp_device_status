@@ -1319,22 +1319,6 @@ void DrawDynamicEffectModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(scale_);
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->SetScale(scale_->Get(), scale_->Get());
-    auto rsSurface = Rosen::RSSurfaceExtractor::ExtractRSSurface(g_drawingInfo.surfaceNode);
-    CHKPV(rsSurface);
-    auto frame = rsSurface->RequestFrame(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    CHKPV(frame);
-    FI_HILOGD("alpha_:%{public}f, scale_:%{public}f", alpha_->Get(), scale_->Get());
-#ifdef NEW_RENDER_CONTEXT
-    std::vector<Rosen::RectI> damageRects;
-    Rosen::RectI rect(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    damageRects.push_back(rect);
-    rsSurface->SetDamageRegion(damageRects);
-    rsSurface->FlushFrame();
-#else
-    frame->SetDamageRegion(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    rsSurface->FlushFrame(frame);
-#endif
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DrawDynamicEffectModifier::SetAlpha(float alpha)
