@@ -235,6 +235,34 @@ CLEANUP:
     inputMgr->RemoveMonitor(monitorId);
     return ret;
 }
+
+void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
+{
+    CALL_DEBUG_ENTER;
+    MMI::InputManager *inputMgr = MMI::InputManager::GetInstance();
+    CHKPV(inputMgr);
+    auto monitor = std::make_shared<PointerPositionMonitor>();
+    int32_t monitorId = inputMgr->AddMonitor(monitor);
+    if (monitorId < 0) {
+        FI_HILOGE("Failed to add mouse monitor");
+        return;
+    }
+    Move(MOVE_VALUE_X, MOVE_VALUE_Y);
+    Move(-MOVE_VALUE_Y, -MOVE_VALUE_X);
+    int32_t targetX = monitor->GetX() + dx;
+    int32_t targetY = monitor->GetY() + dy;
+    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)",targetX, targetY);
+    Move(dx, dy);
+    int32_t nLoops = 5;
+    while (nLoops-- > 0) {
+        if (targetX == monitor->GetX() && targetY == monitor->GetY()) {
+            break;
+        } else {
+            Move(targetX - monitor->GetX(), targetY - monitor->GetY());
+        }
+    }
+    inputMgr->RemoveMonitor(monitorId);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
