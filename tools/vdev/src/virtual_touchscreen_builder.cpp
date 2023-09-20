@@ -48,6 +48,8 @@ constexpr int32_t SY_OFFSET { 1 };
 constexpr int32_t TX_OFFSET { 2 };
 constexpr int32_t TY_OFFSET { 3 };
 constexpr uint32_t IO_FLAG_WIDTH { 6 };
+constexpr int32_t DEFAULT_VALUE_MINUS_ONE { -1 };
+constexpr int32_t DEFAULT_VALUE_ZERO { 0 };
 } // namespace
 
 class PointerEventMonitor final : public MMI::IInputEventConsumer {
@@ -439,11 +441,11 @@ int32_t VirtualTouchScreenBuilder::GetModelValue(const nlohmann::json &model, co
 
 void VirtualTouchScreenBuilder::HandleDown(const nlohmann::json &model)
 {
-    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
 
-    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", -1);
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", DEFAULT_VALUE_MINUS_ONE);
 
-    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", -1);
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", DEFAULT_VALUE_MINUS_ONE);
 
     std::cout << "[touchscreen] down: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->DownButton(slot, x, y);
@@ -451,11 +453,11 @@ void VirtualTouchScreenBuilder::HandleDown(const nlohmann::json &model)
 
 void VirtualTouchScreenBuilder::HandleMove(const nlohmann::json &model)
 {
-    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
 
-    int32_t dx = VirtualTouchScreenBuilder::GetModelValue(model, "dx", 0);
+    int32_t dx = VirtualTouchScreenBuilder::GetModelValue(model, "dx", DEFAULT_VALUE_ZERO);
 
-    int32_t dy = VirtualTouchScreenBuilder::GetModelValue(model, "dy", 0);
+    int32_t dy = VirtualTouchScreenBuilder::GetModelValue(model, "dy", DEFAULT_VALUE_ZERO);
 
     std::cout << "[touchscreen] move: [" << slot << ", (" << dx << "," << dy << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->Move(slot, dx, dy);
@@ -463,7 +465,7 @@ void VirtualTouchScreenBuilder::HandleMove(const nlohmann::json &model)
 
 void VirtualTouchScreenBuilder::HandleUp(const nlohmann::json &model)
 {
-    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
 
     std::cout << "[touchscreen] release: [" << slot << "]" << std::endl;
     VirtualTouchScreen::GetDevice()->UpButton(slot);
@@ -471,11 +473,11 @@ void VirtualTouchScreenBuilder::HandleUp(const nlohmann::json &model)
 
 void VirtualTouchScreenBuilder::HandleMoveTo(const nlohmann::json &model)
 {
-    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", -1);
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
 
-    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", -1);
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", DEFAULT_VALUE_MINUS_ONE);
 
-    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", -1);
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", DEFAULT_VALUE_MINUS_ONE);
 
     std::cout << "[touchscreen] move-to: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->MoveTo(slot, x, y);
