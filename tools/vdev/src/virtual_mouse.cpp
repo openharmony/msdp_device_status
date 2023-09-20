@@ -257,9 +257,8 @@ void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
     while (nLoops-- > 0) {
         if (targetX == monitor->GetX() && targetY == monitor->GetY()) {
             break;
-        } else {
-            Move(targetX - monitor->GetX(), targetY - monitor->GetY());
         }
+        Move(targetX - monitor->GetX(), targetY - monitor->GetY());
     }
     inputMgr->RemoveMonitor(monitorId);
 }
