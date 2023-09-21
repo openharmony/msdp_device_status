@@ -277,7 +277,7 @@ void VirtualMouseBuilder::ReadMoveAction(int32_t argc, char *argv[])
         dy = std::atoi(argv[optind++]);
     }
     std::cout << "[mouse] move: (" << dx << "," << dy << ")" << std::endl;
-    VirtualMouse::GetDevice()->Move(dx, dy);
+    VirtualMouse::GetDevice()->MoveProcess(dx, dy);
 }
 
 void VirtualMouseBuilder::ReadMoveToAction(int32_t argc, char *argv[])
