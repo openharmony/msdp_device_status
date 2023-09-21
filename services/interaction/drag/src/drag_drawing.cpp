@@ -1319,6 +1319,7 @@ void DrawDynamicEffectModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(scale_);
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->SetScale(scale_->Get(), scale_->Get());
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void DrawDynamicEffectModifier::SetAlpha(float alpha)
