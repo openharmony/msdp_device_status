@@ -158,8 +158,8 @@ private:
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
-    std::map<CallbackType, TimerInfo> watchingMap_;
-    std::map<CallbackType, DInputCallback> callbackMap_;
+    std::map<CallbackType, TimerInfo> watchings_;
+    std::map<CallbackType, DInputCallback> callbacks_;
     std::mutex adapterLock_;
 };
 

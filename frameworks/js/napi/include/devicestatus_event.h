@@ -47,7 +47,7 @@ public:
     void ClearEventMap();
     bool RemoveAllCallback(int32_t eventType);
     bool SaveCallbackByEvent(int32_t eventType, napi_value handler, bool isOnce,
-        std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_);
+        std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events_);
     bool IsNoExistCallback(std::list<std::shared_ptr<DeviceStatusEventListener>>,
         napi_value handler, int32_t eventType);
     void SaveCallback(int32_t eventType, napi_ref onHandlerRef, bool isOnce);
@@ -55,8 +55,8 @@ protected:
     napi_env env_ { nullptr };
     napi_ref thisVarRef_ { nullptr };
     std::mutex mutex_;
-    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventMap_;
-    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventOnceMap_;
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> events_;
+    std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>> eventOnces_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

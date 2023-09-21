@@ -36,7 +36,7 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListeners_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
     }
@@ -156,8 +156,8 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListener_.find(type);
-    if (iter == coordinationListener_.end()) {
+    auto iter = coordinationListeners_.find(type);
+    if (iter == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -186,8 +186,8 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListener_.find(type);
-    if (iter == coordinationListener_.end()) {
+    auto iter = coordinationListeners_.find(type);
+    if (iter == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -235,8 +235,8 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = coordinationListener_.find(COOPERATE);
-    if (changeEvent == coordinationListener_.end()) {
+    auto changeEvent = coordinationListeners_.find(COOPERATE);
+    if (changeEvent == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", std::string(COOPERATE).c_str());
         return;
     }
@@ -580,8 +580,8 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
-    auto messageEvent = coordinationListener_.find(COOPERATE);
-    if (messageEvent == coordinationListener_.end()) {
+    auto messageEvent = coordinationListeners_.find(COOPERATE);
+    if (messageEvent == coordinationListeners_.end()) {
         FI_HILOGE("Find messageEvent failed");
         return;
     }
