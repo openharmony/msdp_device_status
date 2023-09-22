@@ -13,12 +13,6 @@
  * limitations under the License.
  */
 
-// Plugin manager, On-demand load and unload dynamic library.
-// Plugin module supply one group of interfaces, bussiness implement these interfaces
-// as a plugin, this plugin can manage by plugin manager.
-// Currently there are two plugins, one is mouse and key coordination, another is drag
-// interacton. They develop base on plugin manager.
-
 #ifndef PLUGIN_MANAGER_H
 #define PLUGIN_MANAGER_H
 

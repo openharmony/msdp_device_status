@@ -22,10 +22,10 @@
 #include <string>
 
 #include "client.h"
-#include "devicestatus_client.h"
-#include "devicestatus_define.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
+#include "intention_client.h"
+#include "intention_define.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -53,7 +53,7 @@ private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
-    std::function<void(const DragNotifyMsg&)> stopCallback_ { nullptr };
+    std::function<void(const DragNotifyMsg&)> stopCallback_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

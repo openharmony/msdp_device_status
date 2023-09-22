@@ -16,7 +16,7 @@
 #include "cooperate.h"
 
 #include "cooperate_params.h"
-#include "devicestatus_define.h"
+#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {

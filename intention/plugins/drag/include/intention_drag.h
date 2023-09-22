@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// Drag Server implementation.
-
 #ifndef INTENTION_DRAG_H
 #define INTENTION_DRAG_H
 

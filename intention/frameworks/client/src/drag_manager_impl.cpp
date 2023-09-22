@@ -15,9 +15,9 @@
 
 #include "drag_manager_impl.h"
 
-#include "devicestatus_client.h"
-#include "devicestatus_define.h"
 #include "drag_data.h"
+#include "intention_client.h"
+#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -91,7 +91,7 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
     CHKPR(listener, RET_ERR);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!hasRegistered_) {
-        AddDraglistenerParam param;
+        AddDragListenerParam param;
         DefaultDragReply reply;
         int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::DRAG, DragParam::LISTENER, param, reply);
         if (ret != RET_OK) {
@@ -126,7 +126,7 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
 
     if (hasRegistered_ && dragListener_.empty()) {
         hasRegistered_ = false;
-        RemoveDraglistenerParam param;
+        RemoveDragListenerParam param;
         DefaultDragReply reply;
         return IntentionClient::GetInstance().RemoveWatch(Intention::DRAG, DragParam::LISTENER, param, reply);
     }

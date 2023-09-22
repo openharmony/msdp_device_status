@@ -18,11 +18,11 @@
 #include "message_parcel.h"
 #include "pixel_map.h"
 
-#include "devicestatus_common.h"
-#include "devicestatus_define.h"
-#include "devicestatus_service.h"
-#include "devicestatus_srv_proxy.h"
 #include "fi_log.h"
+#include "intention_common.h"
+#include "intention_define.h"
+#include "intention_proxy.h"
+#include "intention_service.h"
 #include "include/util.h"
 
 namespace OHOS {

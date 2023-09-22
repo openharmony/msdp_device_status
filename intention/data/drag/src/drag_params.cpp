@@ -117,22 +117,22 @@ bool GetUdKeyParam::Unmarshalling(Parcel &data)
     return READSTRING(data, udKey);
 }
 
-bool AddDraglistenerParam::Marshalling(Parcel &data) const
+bool AddDragListenerParam::Marshalling(Parcel &data) const
 {
     return true;
 }
 
-bool AddDraglistenerParam::Unmarshalling(Parcel &data)
+bool AddDragListenerParam::Unmarshalling(Parcel &data)
 {
     return true;
 }
 
-bool RemoveDraglistenerParam::Marshalling(Parcel &data) const
+bool RemoveDragListenerParam::Marshalling(Parcel &data) const
 {
     return true;
 }
 
-bool RemoveDraglistenerParam::Unmarshalling(Parcel &data)
+bool RemoveDragListenerParam::Unmarshalling(Parcel &data)
 {
     return true;
 }

@@ -22,12 +22,11 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 
-#include "include/util.h"
-
 #include "cooperate_manager_impl.h"
-#include "devicestatus_common.h"
-#include "devicestatus_define.h"
 #include "drag_manager_impl.h"
+#include "intention_common.h"
+#include "intention_define.h"
+#include "include/util.h"
 
 // Implementation of client side of IPC.
 

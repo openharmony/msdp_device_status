@@ -15,7 +15,7 @@
 
 #include "state_machine.h"
 
-#include "devicestatus_define.h"
+#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {

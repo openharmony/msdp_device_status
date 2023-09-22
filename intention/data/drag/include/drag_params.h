@@ -77,12 +77,12 @@ struct GetUdKeyParam final : public ParamBase {
     std::string udKey;
 };
 
-struct AddDraglistenerParam : public ParamBase {
+struct AddDragListenerParam : public ParamBase {
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data);
 };
 
-struct RemoveDraglistenerParam : public ParamBase {
+struct RemoveDragListenerParam : public ParamBase {
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data);
 };

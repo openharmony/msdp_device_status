@@ -16,7 +16,7 @@
 #include "cooperate_manager_impl.h"
 
 #include "intention_client.h"
-#include "devicestatus_define.h"
+#include "intention_define.h"
 #include "include/util.h"
 
 namespace OHOS {

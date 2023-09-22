@@ -15,11 +15,11 @@
 
 #include "task_scheduler.h"
 
-#include <sys/syscall.h>
 #include <fcntl.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
-#include "devicestatus_define.h"
+#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {

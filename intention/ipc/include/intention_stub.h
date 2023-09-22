@@ -19,11 +19,11 @@
 #include <map>
 
 #include <iremote_stub.h>
+#include "message_option.h"
+#include "message_parcel.h"
 #include <nocopyable.h>
 
 #include "i_intention.h"
-#include "message_option.h"
-#include "message_parcel.h"
 
 namespace OHOS {
 namespace Msdp {

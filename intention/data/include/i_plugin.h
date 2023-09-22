@@ -80,9 +80,9 @@ public:
 };
 
 struct CallingContext {
-    uint32_t tokenId {};
-    int32_t pid;
-    int32_t tid;
+    uint32_t tokenId { 0 };
+    int32_t pid { -1 };
+    int32_t tid { -1 };
     SessionPtr session { nullptr };
 };
 

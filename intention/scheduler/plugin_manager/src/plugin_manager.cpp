@@ -29,7 +29,7 @@ PluginManager::Plugin::Plugin(IContext *context, void *handle)
 PluginManager::Plugin::~Plugin()
 {
     if (instance_ != nullptr) {
-        auto destroy = (DestroyInstance)dlsym(handle_, "DestroyInstance");
+        auto destroy = static_cast<DestroyInstance>(dlsym(handle_, "DestroyInstance"));
         if (destroy != nullptr) {
             destroy(instance_);
         }
@@ -44,7 +44,7 @@ IPlugin* PluginManager::Plugin::GetInstance()
     }
     auto func = static_cast<CreateInstance*>(dlsym(iter.second, "CreateInstance"));
     if (func == nullptr) {
-        FI_HILOGE("Dlsym msg:%{public}s", dlerror());
+        FI_HILOGE("dlsym msg:%{public}s", dlerror());
         return RET_ERR;
     }
     instance_ = func(context_);

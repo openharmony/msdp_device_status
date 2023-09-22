@@ -18,9 +18,9 @@
 
 #include "pixel_map.h"
 
-#include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
+#include "intention_define.h"
 #include "stream_session.h"
 
 namespace OHOS {
@@ -42,6 +42,16 @@ public:
     int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t SetDragWindowVisible(bool visible);
+
+private:
+    int32_t InitDataManager(const DragData &dragData) const;
+    int32_t OnStartDrag();
+    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
+    void StateChangedNotify(DragState state);
+
+private:
+    StateChangeNotify stateNotify_;
+    DragState dragState_ { DragState::STOP };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

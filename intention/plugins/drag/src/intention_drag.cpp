@@ -15,8 +15,8 @@
 
 #include "intention_drag.h"
 
-#include "fi_log.h"
 #include "drag_params.h"
+#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -25,7 +25,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionDrag" };
 } // namespace
 
-IntentionDrag(IContext *context)
+IntentionDrag::IntentionDrag(IContext *context)
     : context_(context)
 {}
 

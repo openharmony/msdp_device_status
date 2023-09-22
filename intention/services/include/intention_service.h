@@ -19,8 +19,8 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
-#include "intention_stub.h"
 #include "i_context.h"
+#include "intention_stub.h"
 #include "plugin_manager.h"
 #include "task_scheduler.h"
 #include "timer_manager.h"

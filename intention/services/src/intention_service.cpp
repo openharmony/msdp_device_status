@@ -18,18 +18,17 @@
 #include <unistd.h>
 #include <vector>
 
-#include <ipc_skeleton.h>
-
 #include "hitrace_meter.h"
 #include "hisysevent.h"
-#include "i_plugin.h"
 #include "if_system_ability_manager.h"
+#include <ipc_skeleton.h>
 #include "iservice_registry.h"
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
-#include "devicestatus_common.h"
-#include "devicestatus_hisysevent.h"
+#include "i_plugin.h"
+#include "intention_common.h"
+#include "intention_hisysevent.h"
 
 namespace OHOS {
 namespace Msdp {

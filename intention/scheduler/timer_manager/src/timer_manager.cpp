@@ -19,8 +19,8 @@
 
 #include <sys/timerfd.h>
 
-#include "devicestatus_define.h"
 #include "fi_log.h"
+#include "intention_define.h"
 #include "include/util.h"
 
 namespace OHOS {
