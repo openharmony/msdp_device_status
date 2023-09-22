@@ -76,7 +76,7 @@ private:
     void CheckDefineOutput(int32_t fd, const char* fmt, Ts... args);
 
 private:
-    std::map<Type, std::set<std::shared_ptr<AppInfo>>> appInfoMap_;
+    std::map<Type, std::set<std::shared_ptr<AppInfo>>> appInfos_;
     std::queue<std::shared_ptr<DeviceStatusRecord>> deviceStatusQueue_;
     std::mutex mutex_;
     IContext *context_ { nullptr };

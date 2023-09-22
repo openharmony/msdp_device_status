@@ -142,9 +142,9 @@ ErrCode AlgoMgr::Enable(Type type)
                 FI_HILOGE("still_ is nullptr");
                 still_ = std::make_shared<AlgoAbsoluteStill>();
                 still_->Init(type);
-                callAlgoNum_[type] = 0;
+                callAlgoNums_[type] = 0;
             }
-            callAlgoNum_[type]++;
+            callAlgoNums_[type]++;
             break;
         }
         case Type::TYPE_HORIZONTAL_POSITION: {
@@ -152,9 +152,9 @@ ErrCode AlgoMgr::Enable(Type type)
                 FI_HILOGE("horizontalPosition_ is nullptr");
                 horizontalPosition_ = std::make_shared<AlgoHorizontal>();
                 horizontalPosition_->Init(type);
-                callAlgoNum_[type] = 0;
+                callAlgoNums_[type] = 0;
             }
-            callAlgoNum_[type]++;
+            callAlgoNums_[type]++;
             break;
         }
         case Type::TYPE_VERTICAL_POSITION: {
@@ -162,9 +162,9 @@ ErrCode AlgoMgr::Enable(Type type)
                 FI_HILOGE("verticalPosition_ is nullptr");
                 verticalPosition_ = std::make_shared<AlgoVertical>();
                 verticalPosition_->Init(type);
-                callAlgoNum_[type] = 0;
+                callAlgoNums_[type] = 0;
             }
-            callAlgoNum_[type]++;
+            callAlgoNums_[type]++;
             break;
         }
         default: {
@@ -179,10 +179,10 @@ ErrCode AlgoMgr::Enable(Type type)
 ErrCode AlgoMgr::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
-    callAlgoNum_[type]--;
-    FI_HILOGI("callAlgoNum_:%{public}d", callAlgoNum_[type]);
-    if (callAlgoNum_[type] != 0) {
-        FI_HILOGE("callAlgoNum_[type] is not zero");
+    callAlgoNums_[type]--;
+    FI_HILOGI("callAlgoNums_:%{public}d", callAlgoNums_[type]);
+    if (callAlgoNums_[type] != 0) {
+        FI_HILOGE("callAlgoNums_[type] is not zero");
         return RET_ERR;
     }
     switch (type) {
@@ -215,7 +215,7 @@ ErrCode AlgoMgr::Disable(Type type)
             break;
         }
     }
-    callAlgoNum_.erase(type);
+    callAlgoNums_.erase(type);
     UnregisterSensor(type);
     return RET_OK;
 }

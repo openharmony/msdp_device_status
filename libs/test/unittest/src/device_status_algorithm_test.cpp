@@ -561,7 +561,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest024, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest025, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusAlgorithmTest025 start");
-    g_manager->callAlgoNum_[Type::TYPE_ABSOLUTE_STILL] = 2;
+    g_manager->callAlgoNums_[Type::TYPE_ABSOLUTE_STILL] = 2;
     int32_t ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -576,7 +576,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest026, TestSize.Level
     FI_HILOGI("DeviceStatusAlgorithmTest026 start");
     int32_t ret = g_manager->Enable(Type::TYPE_MAX);
     ASSERT_TRUE(ret);
-    g_manager->callAlgoNum_[Type::TYPE_MAX] = 1;
+    g_manager->callAlgoNums_[Type::TYPE_MAX] = 1;
     ret = g_manager->Disable(Type::TYPE_MAX);
     EXPECT_TRUE(ret == RET_OK);
 }

@@ -41,7 +41,7 @@ const std::vector<std::string> vecDeviceStatusValue {
 };
 thread_local DeviceStatusNapi *g_obj = nullptr;
 } // namespace
-std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
+std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
@@ -89,7 +89,7 @@ DeviceStatusNapi::DeviceStatusNapi(napi_env env) : DeviceStatusEvent(env)
     devicestatusValueRef_ = nullptr;
     DeviceStatusClient::GetInstance().RegisterDeathListener([this] {
         FI_HILOGI("Receive death notification");
-        callbackMap_.clear();
+        callbacks_.clear();
         ClearEventMap();
     });
 }
@@ -351,8 +351,8 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
     }
-    auto callbackIter = callbackMap_.find(type);
-    if (callbackIter != callbackMap_.end()) {
+    auto callbackIter = callbacks_.find(type);
+    if (callbackIter != callbacks_.end()) {
         FI_HILOGD("Callback exists");
         return nullptr;
     }
@@ -364,7 +364,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         ThrowErr(env, SERVICE_EXCEPTION, "On:Failed to SubscribeCallback");
         return nullptr;
     }
-    auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
+    auto ret = callbacks_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         FI_HILOGE("Failed to insert");
     }
@@ -417,8 +417,8 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
 napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int32_t event)
 {
     CALL_DEBUG_ENTER;
-    auto callbackIter = callbackMap_.find(type);
-    if (callbackIter == callbackMap_.end()) {
+    auto callbackIter = callbacks_.find(type);
+    if (callbackIter == callbacks_.end()) {
         NAPI_ASSERT(env, false, "No existed callback");
         return nullptr;
     }
@@ -427,7 +427,7 @@ napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int
     if (unsubscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
     }
-    callbackMap_.erase(type);
+    callbacks_.erase(type);
     return nullptr;
 }
 

@@ -77,6 +77,11 @@ constexpr float PIVOT_X { 0.5f };
 constexpr float PIVOT_Y { 0.5f };
 constexpr float SVG_ORIGINAL_SIZE { 40.0f };
 constexpr float DEFAULT_POSITION_X { 0.0f };
+constexpr float BLUR_SIGMA_SCALE { 0.57735f };
+constexpr float RADIUS_VP { 23.0f };
+constexpr float DEFAULT_SATURATION { 1.05f };
+constexpr float DEFAULT_BRIGHTNESS { 1.05f };
+constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "AnimationEventRunner" };
@@ -380,6 +385,8 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.isPreviousDefaultStyle = false;
     g_drawingInfo.isCurrentDefaultStyle = false;
     g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
+    g_drawingInfo.filterInfo.clear();
+    g_drawingInfo.extraInfo.clear();
     RemoveModifier();
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
@@ -1164,8 +1171,9 @@ void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
     CHKPV(g_drawingInfo.pixelMap);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     if (FilterInfo filterInfo; ParserFilterInfo(filterInfo) && filterInfo.componentType == BIG_FOLDER_LABEL) {
-        std::shared_ptr<Rosen::RSFilter> backFilter =
-            Rosen::RSFilter::CreateMaterialFilter(filterInfo.blurStyle, filterInfo.dipScale);
+        std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+            DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
         if (backFilter == nullptr) {
             FI_HILOGE("Create backgroundFilter failed");
             return;
@@ -1178,6 +1186,12 @@ void DragDrawing::ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode)
         filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         FI_HILOGD("Add filter successfully");
     }
+}
+
+float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
+{
+    float radiusPx = radiusVp * dipScale;
+    return radiusPx > 0.0f ? BLUR_SIGMA_SCALE * radiusPx + 0.5f : 0.0f;
 }
 
 DragDrawing::~DragDrawing() 
@@ -1305,21 +1319,6 @@ void DrawDynamicEffectModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(scale_);
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->SetScale(scale_->Get(), scale_->Get());
-    auto rsSurface = Rosen::RSSurfaceExtractor::ExtractRSSurface(g_drawingInfo.surfaceNode);
-    CHKPV(rsSurface);
-    auto frame = rsSurface->RequestFrame(g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    CHKPV(frame);
-    FI_HILOGD("alpha_:%{public}f, scale_:%{public}f", alpha_->Get(), scale_->Get());
-#ifdef NEW_RENDER_CONTEXT
-    std::vector<Rosen::RectI> damageRects;
-    Rosen::RectI rect(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    damageRects.push_back(rect);
-    rsSurface->SetDamageRegion(damageRects);
-    rsSurface->FlushFrame();
-#else
-    frame->SetDamageRegion(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
-    rsSurface->FlushFrame(frame);
-#endif
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
