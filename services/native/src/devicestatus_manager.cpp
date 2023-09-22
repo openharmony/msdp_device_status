@@ -284,7 +284,7 @@ int32_t DeviceStatusManager::GetPackageName(AccessTokenID tokenId, std::string &
         case ATokenTypeEnum::TOKEN_HAP: {
             HapTokenInfo hapInfo;
             if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                FI_HILOGE("Get hap token info fail");
+                FI_HILOGE("Get hap token info failed");
                 return RET_ERR;
             }
             packageName = hapInfo.bundleName;
@@ -294,7 +294,7 @@ int32_t DeviceStatusManager::GetPackageName(AccessTokenID tokenId, std::string &
         case ATokenTypeEnum::TOKEN_SHELL: {
             NativeTokenInfo tokenInfo;
             if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                FI_HILOGE("Get native token info fail");
+                FI_HILOGE("Get native token info failed");
                 return RET_ERR;
             }
             packageName = tokenInfo.processName;

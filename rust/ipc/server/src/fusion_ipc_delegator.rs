@@ -61,7 +61,7 @@ impl FusionIpcDelegator {
                 }
             }
             Err(_) => {
-                error!(LOG_LABEL, "Deserialization of interface token fail");
+                error!(LOG_LABEL, "Deserialization of interface token failed");
                 Err(FusionErrorCode::Fail)
             }
         }
@@ -78,7 +78,7 @@ impl FusionIpcDelegator {
                         Ok(plugin)
                     }
                     None => {
-                        error!(LOG_LABEL, "Fail to load intention module");
+                        error!(LOG_LABEL, "Failed to load intention module");
                         Err(FusionErrorCode::Fail)
                     }
                 }

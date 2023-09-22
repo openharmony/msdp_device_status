@@ -69,7 +69,7 @@ define_system_ability!(
 static A: extern fn() = {
     extern fn init() {
         let sa = SystemAbility::new_system_ability(MSDP_DEVICESTATUS_SERVICE_ID, true).expect(
-            "fail to create sa instance"
+            "Failed to create sa instance"
         );
         sa.register();
     }

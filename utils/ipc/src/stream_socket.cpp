@@ -36,7 +36,7 @@ int32_t StreamSocket::EpollCreate()
 {
     epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     if (epollFd_ < 0) {
-        FI_HILOGE("epoll_create1 fail: %{public}s", ::strerror(errno));
+        FI_HILOGE("epoll_create1 failed: %{public}s", ::strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
@@ -53,7 +53,7 @@ int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event
         return RET_ERR;
     }
     if (::epoll_ctl(epollFd_, op, fd, &event) != 0) {
-        FI_HILOGE("epoll_ctl(%{public}d,%{public}d,%{public}d) fail:%{public}s", epollFd_, op, fd, ::strerror(errno));
+        FI_HILOGE("epoll_ctl(%{public}d,%{public}d,%{public}d) failed:%{public}s", epollFd_, op, fd, ::strerror(errno));
         return RET_ERR;
     }
     return RET_OK;

@@ -162,7 +162,7 @@ impl FusionIpcProxy {
                             tr
                         }
                         Err(_) => {
-                            error!(LOG_LABEL, "Fail to send request");
+                            error!(LOG_LABEL, "Failed to send request");
                             return Err(FusionErrorCode::Fail);
                         }
                     }
