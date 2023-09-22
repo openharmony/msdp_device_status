@@ -167,7 +167,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     } else if (intervalMs > MAX_INTERVAL_MS) {
         intervalMs = MAX_INTERVAL_MS;
     }
-    if (!callback) {
+    if (callback == nullptr) {
         return NONEXISTENT_ID;
     }
     int32_t timerId = TakeNextTimerId();

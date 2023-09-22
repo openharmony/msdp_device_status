@@ -28,8 +28,8 @@ public:
     ITimerManager() = default;
     virtual ~ITimerManager() = default;
 
-    virtual int32_t AddTimer(int32_t, int32_t, std::function<void()>) = 0;
-    virtual int32_t RemoveTimer(int32_t) = 0;
+    virtual int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) = 0;
+    virtual int32_t RemoveTimer(int32_t timerId) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

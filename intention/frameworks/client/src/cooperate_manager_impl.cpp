@@ -15,7 +15,7 @@
 
 #include "cooperate_manager_impl.h"
 
-#include "devicestatus_client.h"
+#include "intention_client.h"
 #include "devicestatus_define.h"
 #include "include/util.h"
 
@@ -32,7 +32,7 @@ int32_t CooperateManagerImpl::RegisterCooperateListener(CooperateListenerPtr lis
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         if (item == listener) {
-            FI_HILOGW("The listener already exists");
+            FI_HILOGE("The listener already exists");
             return RET_ERR;
         }
     }
@@ -84,8 +84,8 @@ int32_t CooperateManagerImpl::PrepareCooperate(FuncCooperateMessage callback)
     CooperateEvent event;
     event.msg = callback;
     if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
+        FI_HILOGD("userData exceeds the maximum");
+        userData_ = 0;
     }
     DefaultCooperateParam param { userData_ };
     DefaultCooperateReply reply;
@@ -107,7 +107,7 @@ int32_t CooperateManagerImpl::UnprepareCooperate(FuncCooperateMessage callback)
     std::lock_guard<std::mutex> guard(mtx_);
     if (userData_ == std::numeric_limits<int32_t>::max()) {
         FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
+        userData_ = 0;
     }
     DefaultCooperateParam param { userData_ };
     DefaultCooperateReply reply;
@@ -130,7 +130,7 @@ int32_t CooperateManagerImpl::ActivateCooperate(const std::string &remoteNetwork
     event.msg = callback;
     if (userData_ == std::numeric_limits<int32_t>::max()) {
         FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
+        userData_ = 0;
     }
     StartCooperateParam param { userData_, remoteNetworkId, startDeviceId };
     DefaultCooperateReply reply;
@@ -152,7 +152,7 @@ int32_t CooperateManagerImpl::DeactivateCooperate(bool isUnchained, FuncCooperat
     event.msg = callback;
     if (userData_ == std::numeric_limits<int32_t>::max()) {
         FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
+        userData_ = 0;
     }
     StartCooperateParam param { userData_, isUnchained };
     DefaultCooperateReply reply;
@@ -166,8 +166,7 @@ int32_t CooperateManagerImpl::DeactivateCooperate(bool isUnchained, FuncCooperat
     return RET_OK;
 }
 
-int32_t CooperateManagerImpl::GetCooperateState(
-    const std::string &deviceId, FuncCooperateState callback)
+int32_t CooperateManagerImpl::GetCooperateState(const std::string &deviceId, FuncCooperateState callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -175,7 +174,7 @@ int32_t CooperateManagerImpl::GetCooperateState(
     event.state = callback;
     if (userData_ == std::numeric_limits<int32_t>::max()) {
         FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
+        userData_ = 0;
     }
     GetCooperateStateParam param { deviceId, userData_ };
     DefaultCooperateReply reply;
@@ -187,112 +186,6 @@ int32_t CooperateManagerImpl::GetCooperateState(
     devCooperateEvent_[userData_] = event;
     userData_++;
     return RET_OK;
-}
-
-void CooperateManagerImpl::OnDevCooperateListener(const std::string deviceId, CooperateMessage msg)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    for (const auto &item : devCooperateListener_) {
-        item->OnCooperateMessage(deviceId, msg);
-    }
-}
-
-void CooperateManagerImpl::OnCooperateMessageEvent(int32_t userData,
-    const std::string deviceId, CooperateMessage msg)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devCooperateEvent_.find(userData);
-    if (iter == devCooperateEvent_.end()) {
-        return;
-    }
-    CooperateMsg event = iter->second.msg;
-    CHKPV(event);
-    event(deviceId, msg);
-    devCooperateEvent_.erase(iter);
-}
-
-void CooperateManagerImpl::OnCooperateStateEvent(int32_t userData, bool state)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devCooperateEvent_.find(userData);
-    if (iter == devCooperateEvent_.end()) {
-        return;
-    }
-    CooperateState event = iter->second.state;
-    CHKPV(event);
-    event(state);
-    devCooperateEvent_.erase(iter);
-    FI_HILOGD("cooperate state event callback, userData:%{public}d, state:(%{public}d)", userData, state);
-}
-
-int32_t CooperateManagerImpl::GetUserData() const
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    return userData_;
-}
-
-int32_t CooperateManagerImpl::OnCooperateListener(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    std::string deviceId;
-    int32_t nType = 0;
-    pkt >> userData >> deviceId >> nType;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read type failed");
-        return RET_ERR;
-    }
-    OnDevCooperateListener(deviceId, CooperateMessage(nType));
-    return RET_OK;
-}
-
-int32_t CooperateManagerImpl::OnCooperateMessage(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    std::string deviceId;
-    int32_t nType = 0;
-    pkt >> userData >> deviceId >> nType;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
-    }
-    OnCooperateMessageEvent(userData, deviceId, CooperateMessage(nType));
-    return RET_OK;
-}
-
-int32_t CooperateManagerImpl::OnCooperateState(const StreamClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    bool state = false;
-
-    pkt >> userData >> state;
-    if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
-    }
-    OnCooperateStateEvent(userData, state);
-    return RET_OK;
-}
-
-const CooperateManagerImpl::CooperateMsg *CooperateManagerImpl::GetCooperateMessageEvent(
-    int32_t userData) const
-{
-    auto iter = devCooperateEvent_.find(userData);
-    return iter == devCooperateEvent_.end() ? nullptr : &iter->second.msg;
-}
-
-const CooperateManagerImpl::CooperateState *CooperateManagerImpl::GetCooperateStateEvent(
-    int32_t userData) const
-{
-    auto iter = devCooperateEvent_.find(userData);
-    return iter == devCooperateEvent_.end() ? nullptr : &iter->second.state;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

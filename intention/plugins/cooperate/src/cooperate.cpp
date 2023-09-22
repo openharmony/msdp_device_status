@@ -66,6 +66,7 @@ int32_t Cooperate::Stop(CallingContext &context, Parcel &data, Parcel &reply)
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed, ret:%{public}d", ret);
     }
+    return ret;
 }
 
 int32_t Cooperate::AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
@@ -94,6 +95,7 @@ int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, Parcel &data, 
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
     }
+    return ret;
 }
 
 int32_t Cooperate::Control(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)

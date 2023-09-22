@@ -28,7 +28,6 @@ public:
     IContext() = default;
     virtual ~IContext() = default;
 
-    virtual IDeviceManager& GetDeviceManager() = 0;
     virtual ITaskScheduler& GetTaskScheduler() = 0;
     virtual ITimerManager& GetTimerManager() = 0;
     virtual IPluginManager& GetPluginManager() = 0;

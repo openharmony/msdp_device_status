@@ -54,15 +54,14 @@ int32_t IntentionClient::Enable(uint32_t intention, ParamBase &data, ParamBase &
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Enable(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -74,15 +73,14 @@ int32_t IntentionClient::Disable(uint32_t intention, ParamBase &data, ParamBase 
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -94,15 +92,14 @@ int32_t IntentionClient::Start(uint32_t intention, ParamBase &data, ParamBase &r
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(InentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -114,15 +111,14 @@ int32_t IntentionClient::Stop(uint32_t intention, ParamBase &data, ParamBase &re
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Stop(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -134,15 +130,14 @@ int32_t IntentionClient::AddWatch(uint32_t intention, uint32_t id, ParamBase &da
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->AddWatch(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -154,15 +149,14 @@ int32_t IntentionClient::RemoveWatch(uint32_t intention, uint32_t id, ParamBase 
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->RemoveWatch(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -174,15 +168,14 @@ int32_t IntentionClient::SetParam(uint32_t intention, uint32_t id, ParamBase &da
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->SetParam(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -194,15 +187,14 @@ int32_t IntentionClient::GetParam(uint32_t intention, uint32_t id, ParamBase &da
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->GetParam(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -214,15 +206,14 @@ int32_t IntentionClient::Control(uint32_t intention, uint32_t id, ParamBase &dat
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    MessageParcel replyParcel;
-
-    if (!dataParcel.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Control(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
         reply.Unmarshalling(replyParcel);
@@ -232,6 +223,7 @@ int32_t IntentionClient::Control(uint32_t intention, uint32_t id, ParamBase &dat
 
 ErrCode IntentionClient::Connect()
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     if (devicestatusProxy_ != nullptr) {
         return RET_OK;
@@ -260,6 +252,7 @@ ErrCode IntentionClient::Connect()
 
 void IntentionClient::ResetProxy(const wptr<IRemoteObject>& remote)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(devicestatusProxy_);
     auto serviceRemote = devicestatusProxy_->AsObject();
@@ -275,6 +268,7 @@ void IntentionClient::ResetProxy(const wptr<IRemoteObject>& remote)
 
 void IntentionClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(remote);
     IntentionClient::GetInstance().ResetProxy(remote);
     FI_HILOGD("Recv death notice");

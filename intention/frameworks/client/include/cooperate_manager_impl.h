@@ -52,17 +52,6 @@ public:
         FuncCooperateMessage callback);
     int32_t DeactivateCooperate(bool isUnchained, FuncCooperateMessage callback);
     int32_t GetCooperateState(const std::string &deviceId, FuncCooperateState callback);
-    void OnDevCooperateListener(const std::string deviceId, CooperateMessage msg);
-    void OnCooperateMessageEvent(int32_t userData, const std::string deviceId, CooperateMessage msg);
-    void OnCooperateStateEvent(int32_t userData, bool state);
-    int32_t GetUserData() const;
-    int32_t OnCooperateListener(const StreamClient& client, NetPacket& pkt);
-    int32_t OnCooperateMessage(const StreamClient& client, NetPacket& pkt);
-    int32_t OnCooperateState(const StreamClient& client, NetPacket& pkt);
-
-private:
-    const CooperateMsg *GetCooperateMessageEvent(int32_t userData) const;
-    const CooperateState *GetCooperateStateEvent(int32_t userData) const;
 
 private:
     std::list<CooperateListenerPtr> devCooperateListener_;

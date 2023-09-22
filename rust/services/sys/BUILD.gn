@@ -19,7 +19,6 @@ ohos_rust_shared_library("fusion_services_rust") {
 
   deps = [
     "${device_status_root_path}/rust/data/sys:fusion_data_rust",
-    "${device_status_root_path}/rust/modules/scheduler/sys:fusion_scheduler_rust",
     "${device_status_root_path}/rust/services/binding:fusion_services_binding",
     "${device_status_root_path}/rust/utils:fusion_utils_rust",
   ]

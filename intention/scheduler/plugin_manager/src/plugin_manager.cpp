@@ -42,7 +42,7 @@ IPlugin* PluginManager::Plugin::GetInstance()
     if (instance_ != nullptr) {
         return instance_;
     }
-    auto func = (CreateInstance*)dlsym(iter.second, "CreateInstance");
+    auto func = static_cast<CreateInstance*>(dlsym(iter.second, "CreateInstance"));
     if (func == nullptr) {
         FI_HILOGE("Dlsym msg:%{public}s", dlerror());
         return RET_ERR;
@@ -63,6 +63,10 @@ IPlugin* PluginManager::LoadPlugin(Intention intention)
         case Intention::COOPERATE: {
             return DoLoadPlugin(intention);
         }
+        default: {
+            FI_HILOGW("Intention is invalid");
+            break;
+        }
     }
     return nullptr;
 }
@@ -79,6 +83,7 @@ int32_t PluginManager::LoadLibrary(Intention intention)
             libPath = "/system/lib/libintention_cooperate.z.so";
         }
         default: {
+            FI_HILOGW("Intention is invalid");
             return RET_ERR;
         }
     }

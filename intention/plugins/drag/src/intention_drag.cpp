@@ -70,19 +70,24 @@ int32_t IntentionDrag::RemoveWatch(CallingContext &context, uint32_t id, Parcel 
 int32_t IntentionDrag::SetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
 {
     switch (id) {
-    case DragParam::WINDOW_VISIBLE: {
-        SetDragWindowVisibleParam param;
-        if (param.Unmarshalling(data)) {
-            return dragMgr_.SetDragWindowVisible(param.visible);
+        case DragParam::WINDOW_VISIBLE: {
+            SetDragWindowVisibleParam param;
+            if (param.Unmarshalling(data)) {
+                return dragMgr_.SetDragWindowVisible(param.visible);
+            }
+            break;
         }
-        break;
-    }
-    case DragParam::SHADOW_PIC: {
-        UpdateShadowPicParam param;
-        if (param.Unmarshalling(data)) {
-            return dragMgr_.UpdateShadowPic(param.shadowInfo);
+        case DragParam::SHADOW_PIC: {
+            UpdateShadowPicParam param;
+            if (param.Unmarshalling(data)) {
+                return dragMgr_.UpdateShadowPic(param.shadowInfo);
+            }
+            break;
         }
-        break;
+        default: {
+            FI_HILOGE("The \'DragParam\' parameter is invalid");
+            break;
+        }
     }
     return RET_ERR;
 }

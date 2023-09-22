@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// Drag Server implementation.
-
 #ifndef DRAG_MANAGER_H
 #define DRAG_MANAGER_H
 

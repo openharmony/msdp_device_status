@@ -41,7 +41,7 @@ int32_t IntentionProxy::Enable(uint32_t intention, MessageParcel &data, MessageP
         PARAMID(CommonAction::ENABLE, intention, 0u),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -57,7 +57,7 @@ int32_t IntentionProxy::Disable(uint32_t intention, MessageParcel &data, Message
         PARAMID(CommonAction::DISABLE, intention, 0u),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -73,7 +73,7 @@ int32_t IntentionProxy::Start(uint32_t intention, MessageParcel &data, MessagePa
         PARAMID(CommonAction::START, intention, 0u),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -89,7 +89,7 @@ int32_t IntentionProxy::Stop(uint32_t intention, MessageParcel &data, MessagePar
         PARAMID(CommonAction::STOP, intention, 0u),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -105,7 +105,7 @@ int32_t IntentionProxy::AddWatch(uint32_t intention, uint32_t id, MessageParcel 
         PARAMID(CommonAction::ADD_WATCH, intention, id),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -121,7 +121,7 @@ int32_t IntentionProxy::RemoveWatch(uint32_t intention, uint32_t id, MessageParc
         PARAMID(CommonAction::REMOVE_WATCH, intention, id),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -137,7 +137,7 @@ int32_t IntentionProxy::SetParam(uint32_t intention, uint32_t id, MessageParcel 
         PARAMID(CommonAction::SET_PARAM, intention, id),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -153,7 +153,7 @@ int32_t IntentionProxy::GetParam(uint32_t intention, uint32_t id, MessageParcel 
         PARAMID(CommonAction::GET_PARAM, intention, id),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -169,7 +169,7 @@ int32_t IntentionProxy::Control(uint32_t intention, uint32_t id, MessageParcel &
         PARAMID(CommonAction::CONTROL, intention, id),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
     }
     return ret;
 }

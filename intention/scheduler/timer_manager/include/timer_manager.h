@@ -16,8 +16,8 @@
 #ifndef TIMER_MANAGER_H
 #define TIMER_MANAGER_H
 
-#include <future>
 #include <functional>
+#include <future>
 #include <list>
 #include <memory>
 

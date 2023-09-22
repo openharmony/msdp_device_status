@@ -115,8 +115,8 @@ int32_t TaskScheduler::PostAsyncTask(DTaskCallback callback)
 
 void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
-    std::lock_guard<std::mutex> guard(mux_);
     static constexpr int32_t onceProcessTaskLimit = 10;
+    std::lock_guard<std::mutex> guard(mux_);
     for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
         if (tasks_.empty()) {
             break;
@@ -131,16 +131,16 @@ void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 
 TaskScheduler::TaskPtr TaskScheduler::PostTask(DTaskCallback callback, Promise *promise)
 {
-    std::lock_guard<std::mutex> guard(mux_);
     FI_HILOGD("tasks_ size:%{public}zu", tasks_.size());
     static constexpr int32_t maxTasksLimit = 1000;
+    std::lock_guard<std::mutex> guard(mux_);
     size_t tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
         FI_HILOGE("The task queue is full, size:%{public}zu/%{public}d", tsize, maxTasksLimit);
         return nullptr;
     }
     int32_t id = GenerateId();
-    TaskData data = {GetThisThreadId(), id};
+    TaskData data = { GetThisThreadId(), id };
     ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);

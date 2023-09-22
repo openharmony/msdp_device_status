@@ -38,9 +38,9 @@ public:
     virtual void OnStart() override;
     virtual void OnStop() override;
 
-    ITaskScheduler& GetTaskScheduler() override;
-    ITimerManager& GetTimerManager() override;
-    IPluginManager& GetPluginManager() override;
+    ITaskScheduler& GetTaskScheduler() const override;
+    ITimerManager& GetTimerManager() const override;
+    IPluginManager& GetPluginManager() const override;
 
 private:
     int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
@@ -59,17 +59,17 @@ private:
     PluginManager pluginMgr_;
 };
 
-ITaskScheduler& IntentionService::GetTaskScheduler()
+ITaskScheduler& IntentionService::GetTaskScheduler() const
 {
     return taskScheduler_;
 }
 
-ITimerManager& IntentionService::GetTimerManager()
+ITimerManager& IntentionService::GetTimerManager() const
 {
     return timerMgr_;
 }
 
-IPluginManager& IntentionService::GetPluginManager()
+IPluginManager& IntentionService::GetPluginManager() const
 {
     return pluginMgr_;
 }

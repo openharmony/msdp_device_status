@@ -18,14 +18,11 @@
 #include "message_parcel.h"
 #include "pixel_map.h"
 
-#include "devicestatus_callback_proxy.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
 #include "fi_log.h"
-#include "stationary_callback.h"
-#include "stationary_data.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -38,10 +35,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Intenti
 int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    std::u16string descriptor = DeviceStatusSrvStub::GetDescriptor();
+    std::u16string descriptor = IntentionStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
+        FI_HILOGE("IntentionStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
 
