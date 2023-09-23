@@ -23,7 +23,7 @@ extern "C" {
 
 struct NativeService;
 
-struct NativeService* NativeServiceNew();
+struct NativeService* NativeServiceNew(void);
 struct NativeService* NativeServiceRef(struct NativeService *service);
 struct NativeService* NativeServiceUnref(struct NativeService *service);
 
