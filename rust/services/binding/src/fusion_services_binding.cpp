@@ -27,7 +27,7 @@ struct NativeService {
     int32_t refCnt { 0 };
 };
 
-struct NativeService* NativeServiceNew()
+struct NativeService* NativeServiceNew(void)
 {
     CALL_DEBUG_ENTER;
     struct NativeService *service = new NativeService;

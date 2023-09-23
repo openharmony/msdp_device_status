@@ -298,7 +298,7 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     const std::string programName(GetProgramName());
     int32_t ret = fusion_alloc_socket_fd(programName.c_str(), moduleType, &socketFd_, &tokenType_);
     if (ret != RET_OK) {
-        FI_HILOGE("Fail to connect to server via socket:%{public}d", ret);
+        FI_HILOGE("Failed to connect to server via socket:%{public}d", ret);
         return RET_ERR;
     }
     FI_HILOGI("Connected successfully to server via socket, "

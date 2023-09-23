@@ -30,7 +30,7 @@ static void WriteEvent(const std::string& packageName, Types ... args)
     int32_t ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MSDP, packageName,
         HiviewDFX::HiSysEvent::EventType::STATISTIC, args...);
     if (ret != 0) {
-        FI_HILOGE("Write event fail:%{public}s", packageName.c_str());
+        FI_HILOGE("Write event failed:%{public}s", packageName.c_str());
     }
 }
 

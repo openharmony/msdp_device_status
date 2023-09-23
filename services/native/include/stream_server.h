@@ -74,9 +74,9 @@ protected:
 
 protected:
     MsgServerFunCallback recvFun_ { nullptr };
-    std::map<int32_t, SessionPtr> sessionsMap_;
-    std::map<int32_t, int32_t> idxPidMap_;
-    std::map<int32_t, CircleStreamBuffer> circleBufMap_;
+    std::map<int32_t, SessionPtr> sessionss_;
+    std::map<int32_t, int32_t> idxPids_;
+    std::map<int32_t, CircleStreamBuffer> circleBufs_;
     std::map<int32_t, std::function<void(SessionPtr)>> callbacks_;
 };
 } // namespace DeviceStatus

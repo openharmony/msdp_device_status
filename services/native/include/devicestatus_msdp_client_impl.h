@@ -70,9 +70,9 @@ private:
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };
     MsdpAlgoHandle mock_;
     MsdpAlgoHandle algo_;
-    std::map<Type, uint32_t> algoCallCount_;
-    std::map<Type, uint32_t> mockCallCount_;
-    std::map<Type, OnChangedValue> deviceStatusDataMap_;
+    std::map<Type, uint32_t> algoCallCounts_;
+    std::map<Type, uint32_t> mockCallCounts_;
+    std::map<Type, OnChangedValue> deviceStatusDatas_;
     DeviceStatusMsdpClientImpl::CallbackManager callBacksMgr_;
     IMsdp* iAlgo_ { nullptr };
     IMsdp* iMock_ { nullptr };

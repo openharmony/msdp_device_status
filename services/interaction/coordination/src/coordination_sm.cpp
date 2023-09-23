@@ -239,7 +239,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     }
     UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
-        FI_HILOGE("Open input softbus fail");
+        FI_HILOGE("Open input softbus failed");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     isStarting_ = true;
@@ -248,7 +248,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Start remote input fail");
+        FI_HILOGE("Start remote input failed");
         isStarting_ = false;
         return ret;
     }
@@ -283,7 +283,7 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->DeactivateCoordination(stopNetworkId, isUnchained, preparedNetworkId_);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop input device coordination fail");
+        FI_HILOGE("Stop input device coordination failed");
         isStopping_ = false;
     }
     CHKPR(notifyDragCancelCallback_, ERROR_NULL_POINTER);
@@ -440,7 +440,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
     }
 
     if (!isSuccess) {
-        FI_HILOGE("Start distributed fail, startDevice:%{public}d", startDeviceId);
+        FI_HILOGE("Start distributed failed, startDevice:%{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);

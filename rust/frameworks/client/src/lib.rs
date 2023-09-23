@@ -92,7 +92,7 @@ pub unsafe extern "C" fn fusion_alloc_socket_fd(program_name: *const c_char, mod
             }
         }
         None => {
-            error!(LOG_LABEL, "Fail dereferencing FusionFrameworks instance");
+            error!(LOG_LABEL, "Failed to dereference FusionFrameworks instance");
             -1
         }
     }
@@ -150,7 +150,7 @@ pub unsafe extern "C" fn fusion_register_coordination_listener() -> i32
                     0
                 }
                 Err(err) => {
-                    error!(LOG_LABEL, "Fail to register coordination listener: {}", @public(err));
+                    error!(LOG_LABEL, "Failed to register coordination listener: {}", @public(err));
                     i32::from(err)
                 }
             }
@@ -175,7 +175,7 @@ pub unsafe extern "C" fn fusion_unregister_coordination_listener() -> i32
                     0
                 }
                 Err(err) => {
-                    error!(LOG_LABEL, "Fail to unregister coordination listener: {}", @public(err));
+                    error!(LOG_LABEL, "Failed to unregister coordination listener: {}", @public(err));
                     i32::from(err)
                 }
             }
@@ -289,7 +289,7 @@ pub unsafe extern "C" fn fusion_stop_coordination(user_data: i32, is_unchained: 
                     0
                 }
                 Err(err) => {
-                    error!(LOG_LABEL, "Fail to stop coordination");
+                    error!(LOG_LABEL, "Failed to stop coordination");
                     i32::from(err)
                 }
             }
@@ -327,7 +327,7 @@ pub unsafe extern "C" fn fusion_get_coordination_state(user_data: i32, device_id
                     0
                 }
                 Err(err) => {
-                    error!(LOG_LABEL, "Fail to get coordination state: {}", @public(err));
+                    error!(LOG_LABEL, "Failed to get coordination state: {}", @public(err));
                     i32::from(err)
                 }
             }
