@@ -54,7 +54,6 @@ void DeviceStatusClientTest::DeviceStatusClientTestCallback::OnDeviceStatusChang
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest001 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_VERTICAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -69,7 +68,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest001 end";
 }
 
 /**
@@ -79,7 +77,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest002 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_INVALID;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -94,7 +91,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest002 end";
 }
 
 /**
@@ -104,7 +100,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest003 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_ABSOLUTE_STILL;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -119,7 +114,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest003 end";
 }
 
 /**
@@ -129,7 +123,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest004 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_HORIZONTAL_POSITION;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -144,7 +137,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest004 end";
 }
 
 /**
@@ -154,7 +146,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest005 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_LID_OPEN;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -169,7 +160,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest005 end";
 }
 
 /**
@@ -179,7 +169,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest006 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_MAX;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
@@ -194,7 +183,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
     GTEST_LOG_(INFO) << "Cancel register";
     ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest006 end";
 }
 
 /**
@@ -204,7 +192,6 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest007 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_ABSOLUTE_STILL;
     auto stationaryMgr = StationaryManager::GetInstance();
@@ -214,7 +201,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest007 end";
 }
 
 /**
@@ -224,7 +210,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest008 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_VERTICAL_POSITION;
     auto stationaryMgr = StationaryManager::GetInstance();
@@ -234,7 +219,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest008 end";
 }
 
 /**
@@ -244,7 +228,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest009 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_HORIZONTAL_POSITION;
     auto stationaryMgr = StationaryManager::GetInstance();
@@ -254,7 +237,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusData failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest009 end";
 }
 
 /**
@@ -264,7 +246,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 enter";
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_LID_OPEN;
     auto stationaryMgr = StationaryManager::GetInstance();
@@ -274,7 +255,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest004 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 end";
 }
 
 /**
@@ -284,7 +264,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 enter";
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_INVALID;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -293,7 +273,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest005 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
 }
 
 /**
@@ -303,7 +282,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 enter";
+    CALL_TEST_DEBUG;
     Type type = static_cast<Type>(10);
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -312,7 +291,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest006 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -73,12 +73,13 @@ std::shared_ptr<Media::PixelMap> DragDataManagerTest::CreatePixelMap(int32_t wid
     int32_t colorLen = width * height;
     uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
     if (colorPixels == nullptr) {
+        FI_HILOGE("ColorPixels is nullptr");
         return nullptr;
     }
     int32_t colorByteCount = colorLen * INT32_BYTE;
     auto ret = memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
     if (ret != EOK) {
-        FI_HILOGE("memset_s failed");
+        FI_HILOGE("Memset_s failed");
         delete[] colorPixels;
         return nullptr;
     }
@@ -236,6 +237,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     DragData dragData;
     dragData.shadowInfo.pixelMap = nullptr;
     dragData.shadowInfo.x = SHADOWINFO_X;
@@ -258,6 +260,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHPAD, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
@@ -281,6 +284,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHPAD, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
@@ -300,6 +304,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest009, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
@@ -320,6 +325,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest009, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest010, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_FALSE(dragData == std::nullopt);
@@ -339,6 +345,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest010, TestSize.Level0)
  */
 HWTEST_F(DragDataManagerTest, DragDataManagerTest011, TestSize.Level0)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = MMI::PointerEvent::Create();
     EXPECT_FALSE(pointerEvent == nullptr);
     MMI::PointerEvent::PointerItem pointerItem;
