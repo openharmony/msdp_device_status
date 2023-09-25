@@ -168,7 +168,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
         if ((networkId == preparedNetworkId_.first) || (networkId == preparedNetworkId_.second)) {
             if (currentState_ != CoordinationState::STATE_FREE) {
                 D_INPUT_ADAPTER->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                    COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_), [](bool isSuccess) {
+                    COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, false), [](bool isSuccess) {
                     FI_HILOGI("Failed to stop remote");
                 });
             }
