@@ -41,7 +41,8 @@ int32_t CooperateManagerImpl::RegisterCooperateListener(CooperateListenerPtr lis
         DefaultCooperateParam param;
         DefaultCooperateReply reply;
 
-        int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::COOPERATE, CooperateParam::REGISTER, param, reply);
+        int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::COOPERATE,
+            CooperateParam::REGISTER, param, reply);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register, ret:%{public}d", ret);
             return ret;
@@ -111,7 +112,8 @@ int32_t CooperateManagerImpl::UnprepareCooperate(FuncCooperateMessage callback)
     }
     DefaultCooperateParam param { userData_ };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().RemoveWatch(Intention::COOPERATE, CooperateParam::PREPARE, param, reply);
+    int32_t ret = IntentionClient::GetInstance().RemoveWatch(Intention::COOPERATE,
+        CooperateParam::PREPARE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Unprepare cooperate failed");
         return ret;

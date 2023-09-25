@@ -25,10 +25,10 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 enum CommonAction : uint32_t {
-	ENABLE,
-	DISABLE,
-	START,
-	STOP,
+    ENABLE,
+    DISABLE,
+    START,
+    STOP,
     ADD_WATCH,
     REMOVE_WATCH,
     SET_PARAM,
@@ -37,8 +37,8 @@ enum CommonAction : uint32_t {
 };
 
 enum class Intention : uint32_t {
-	DRAG,
-	COOPERATE,
+    DRAG,
+    COOPERATE,
 };
 
 inline constexpr uint32_t PARAMBITS { 20U };
@@ -52,7 +52,7 @@ inline constexpr uint32_t ACTIONMASK { (uint32_t(1U) << ACTIONBITS) - uint32_t(1
 
 constexpr uint32_t PARAMID(uint32_t action, uint32_t intention, uint32_t param)
 {
-	return (
+    return (
         ((action & ACTIONMASK) << ACTIONSHIFT) |
         ((intention & INTENTIONMASK) << INTENTIONSHIFT) |
         (param & PARAMMASK)
