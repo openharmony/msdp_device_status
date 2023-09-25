@@ -54,7 +54,7 @@ impl FusionIpcDelegator {
             Ok(token) => {
                 debug!(LOG_LABEL, "check interface token");
                 if token.get_token() != FusionIpcStub::get_descriptor() {
-                    error!(LOG_LABEL, "unexpected token");
+                    error!(LOG_LABEL, "Unexpected token");
                     Err(FusionErrorCode::Fail)
                 } else {
                     Ok(())
@@ -84,7 +84,7 @@ impl FusionIpcDelegator {
                 }
             }
             Err(_) => {
-                error!(LOG_LABEL, "error locking");
+                error!(LOG_LABEL, "Error locking");
                 Err(FusionErrorCode::Fail)
             }
         }
@@ -99,7 +99,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.enable()");
+        info!(LOG_LABEL, "Call plugin.enable()");
         plugin.enable(&context, data, reply)
     }
 
@@ -110,7 +110,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.disable()");
+        info!(LOG_LABEL, "Call plugin.disable()");
         plugin.disable(&context, data, reply)
     }
 
@@ -121,7 +121,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.start()");
+        info!(LOG_LABEL, "Call plugin.start()");
         plugin.start(&context, data, reply)
     }
 
@@ -132,7 +132,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.stop()");
+        info!(LOG_LABEL, "Call plugin.stop()");
         plugin.stop(&context, data, reply)
     }
 
@@ -143,7 +143,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.add_watch()");
+        info!(LOG_LABEL, "Call plugin.add_watch()");
         plugin.add_watch(&context, id, data, reply)
     }
 
@@ -154,7 +154,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.remove_watch()");
+        info!(LOG_LABEL, "Call plugin.remove_watch()");
         plugin.remove_watch(&context, id, data, reply)
     }
 
@@ -165,7 +165,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.set_param()");
+        info!(LOG_LABEL, "Call plugin.set_param()");
         plugin.set_param(&context, id, data, reply)
     }
 
@@ -176,7 +176,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.get_param()");
+        info!(LOG_LABEL, "Call plugin.get_param()");
         plugin.get_param(&context, id, data, reply)
     }
 
@@ -187,7 +187,7 @@ impl IDeviceStatus for FusionIpcDelegator {
 
         let plugin = self.load_plugin(intention)?;
         let context = CallingContext::current();
-        info!(LOG_LABEL, "call plugin.control()");
+        info!(LOG_LABEL, "Call plugin.control()");
         plugin.control(&context, id, data, reply)
     }
 }
