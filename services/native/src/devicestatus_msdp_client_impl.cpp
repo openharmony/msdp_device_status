@@ -153,9 +153,10 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 {
     if ((type == Type::TYPE_ABSOLUTE_STILL) || (type == Type::TYPE_HORIZONTAL_POSITION) ||
         (type == Type::TYPE_VERTICAL_POSITION)) {
+        FI_HILOGI("support ability type:%{public}d", type);
         return RET_OK;
     }
-    FI_HILOGI("Not support ability");
+    FI_HILOGE("Not support ability");
     return RET_ERR;
 }
 
@@ -334,7 +335,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
 {
     CALL_DEBUG_ENTER;
     if (mock_.handle != nullptr) {
-        FI_HILOGE("mock handle is not nullptr");
+        FI_HILOGW("mock handle is not nullptr");
         return RET_OK;
     }
     std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;

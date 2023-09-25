@@ -28,7 +28,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     CHKPV(remote);
-    FI_HILOGD("Recv death notice");
+    FI_HILOGI("Recv death notice");
 }
 
 bool DeviceStatusManager::Init()
@@ -37,7 +37,7 @@ bool DeviceStatusManager::Init()
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new (std::nothrow) DeviceStatusCallbackDeathRecipient();
         if (devicestatusCBDeathRecipient_ == nullptr) {
-            FI_HILOGE("devicestatusCBDeathRecipient_ failed");
+            FI_HILOGE("DevicestatusCBDeathRecipient_ failed");
             return false;
         }
     }
@@ -134,7 +134,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
     auto iter = listeners_.find(devicestatusData.type);
     if (iter == listeners_.end()) {
-        FI_HILOGI("type:%{public}d", devicestatusData.type);
+        FI_HILOGE("DevicestatusData not find type:%{public}d", devicestatusData.type);
         return false;
     }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
@@ -143,7 +143,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
             FI_HILOGE("Listener is nullptr");
             return false;
         }
-        FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
+        FI_HILOGI("Type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
         switch (arrs_[devicestatusData.type]) {
             case ENTER: {
                 if (devicestatusData.value == VALUE_ENTER) {

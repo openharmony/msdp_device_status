@@ -244,7 +244,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    FI_HILOGE("EnterUNevent:%{public}d", event);
+    FI_HILOGI("Enter event:%{public}d", event);
     CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = IPCSkeleton::GetCallingUid();
