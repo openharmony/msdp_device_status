@@ -255,7 +255,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest004 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 end";
 }
 
 /**
@@ -265,7 +264,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 Enter";
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_INVALID;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -274,7 +273,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest005 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
 }
 
 /**
@@ -284,7 +282,7 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 Enter";
+    CALL_TEST_DEBUG;
     Type type = static_cast<Type>(10);
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
@@ -293,7 +291,6 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
         data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
         << "GetDeviceStatusDataTest006 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
 }
 } // namespace DeviceStatus
 } // namespace Msdp
