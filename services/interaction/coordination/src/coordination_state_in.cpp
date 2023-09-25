@@ -91,7 +91,7 @@ int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNet
 int32_t CoordinationStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_);
+    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, true);
     std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_);
     int32_t ret = D_INPUT_ADAPTER->StopRemoteInput(
         originNetworkId, inputDeviceDhids, [this, originNetworkId](bool isSuccess) {

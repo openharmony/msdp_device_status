@@ -244,12 +244,12 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
     return inputDeviceDhids;
 }
 
-std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(const std::string &dhid) const
+std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(const std::string &dhid, bool isRemote) const
 {
     int32_t deviceId { -1 };
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
-        if (dev->GetDhid() == dhid) {
+        if (dev->GetDhid() == dhid && dev->IsRemote() == isRemote) {
             deviceId = id;
             break;
         }

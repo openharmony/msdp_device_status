@@ -59,7 +59,7 @@ void CoordinationStateOut::ProcessStop(const std::string& remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_);
+    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, false);
     if (inputDeviceDhids.empty()) {
         COOR_SM->OnStopFinish(false, remoteNetworkId);
     }
