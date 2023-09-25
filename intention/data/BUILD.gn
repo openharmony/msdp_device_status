@@ -17,7 +17,7 @@ import("//build/ohos.gni")
 config("cooperate_params_config") {
   include_dirs = [
     "include",
-    "${device_status_root_path}/utils/ipc/include"
+    "${device_status_root_path}/utils/ipc/include",
   ]
 }
 
