@@ -30,15 +30,15 @@ ohos_shared_library("cooperate") {
     "src/cooperate_device_manager.cpp",
     "src/cooperate_event_handler.cpp",
     "src/cooperate_event_manager.cpp",
-    "src/state_machine.cpp",
-    "src/dsoftbus_adapter.cpp",
     "src/cooperate_state_free.cpp",
     "src/cooperate_state_in.cpp",
     "src/cooperate_state_out.cpp",
     "src/cooperate_util.cpp",
     "src/device_profile_adapter.cpp",
     "src/dinput_adapter.cpp",
+    "src/dsoftbus_adapter.cpp",
     "src/i_cooperate_state.cpp",
+    "src/state_machine.cpp",
   ]
 
   public_configs = [ ":cooperate_public_config" ]
