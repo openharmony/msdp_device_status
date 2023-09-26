@@ -73,7 +73,7 @@ void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
     CHKPV(deviceStatusNapi);
     int32_t type = static_cast<int32_t>(data->type);
     int32_t value = static_cast<int32_t>(data->value);
-    FI_HILOGD("type:%{public}d, Value:%{public}d", type, value);
+    FI_HILOGD("type:%{public}d, value:%{public}d", type, value);
     deviceStatusNapi->OnDeviceStatusChangedDone(type, value, false);
 }
 
