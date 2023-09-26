@@ -76,11 +76,11 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {
-        FI_HILOGE("AlgoHandler is nullptr");
+        FI_HILOGE("algoHandler is nullptr");
         return RET_ERR;
     }
     if (algoHandler->handle != nullptr) {
-        FI_HILOGE("Handle already exists");
+        FI_HILOGE("handle already exists");
         return RET_OK;
     }
 
@@ -112,11 +112,11 @@ int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpA
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {
-        FI_HILOGE("AlgoHandler is nullptr");
+        FI_HILOGE("algoHandler is nullptr");
         return RET_ERR;
     }
     if (algoHandler->handle == nullptr) {
-        FI_HILOGE("Handle is nullptr");
+        FI_HILOGE("handle is nullptr");
         return RET_ERR;
     }
 
