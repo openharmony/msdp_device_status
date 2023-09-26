@@ -84,7 +84,7 @@ impl<'a> FusionFrameworks {
         if self.ipc_client.is_some() {
             return;
         }
-        info!(LOG_LABEL, "trying to connect server");
+        info!(LOG_LABEL, "Trying to connect server");
         match FusionIpcClient::connect() {
             Ok(client) => {
                 info!(LOG_LABEL, "Connect to server successfully");
