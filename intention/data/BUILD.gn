@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,24 +14,30 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-ohos_rust_shared_library("fusion_services_rust") {
-  sources = [ "src/lib.rs" ]
-
-  deps = [
-    "${device_status_root_path}/rust/data/sys:fusion_data_rust",
-    "${device_status_root_path}/rust/services/binding:fusion_services_binding",
-    "${device_status_root_path}/rust/utils:fusion_utils_rust",
+config("cooperate_params_config") {
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/utils/ipc/include",
   ]
+}
+
+config("cooperate_params_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_source_set("cooperate_params") {
+  sources = [ "src/cooperate_params.cpp" ]
+
+  configs = [ ":cooperate_params_config" ]
+
+  public_configs = [ ":cooperate_params_public_config" ]
 
   external_deps = [
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "hilog:hilog_rust",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 
-  crate_name = "fusion_services_rust"
-  crate_type = "dylib"
-
-  subsystem_name = "${device_status_subsystem_name}"
+  subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }
