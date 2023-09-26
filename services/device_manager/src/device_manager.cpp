@@ -250,7 +250,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
     FI_HILOGI("  is pointer:    %{public}s", dev->IsPointerDevice() ? "True" : "False");
     FI_HILOGI("  is keyboard:   %{public}s", dev->IsKeyboard() ? "True" : "False");
 
-    for (auto observer : observers_) {
+    for (const auto &observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
         CHKPC(ptr);
         ptr->OnDeviceAdded(dev);
@@ -259,7 +259,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 
 void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
-    for (auto observer : observers_) {
+    for (const auto &observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
         CHKPC(ptr);
         ptr->OnDeviceRemoved(dev);
