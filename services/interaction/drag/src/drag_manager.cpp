@@ -579,6 +579,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
+    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     return HandleDragResult(result, hasCustomAnimation);
 }
 
