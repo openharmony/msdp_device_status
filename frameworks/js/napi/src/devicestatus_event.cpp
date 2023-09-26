@@ -269,18 +269,18 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
 void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);;
+    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>>::iterator typeHandler;
     if (isOnce) {
         typeHandler = eventOnces_.find(eventType);
         if (typeHandler == eventOnces_.end()) {
-            FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
+            FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
             return;
         }
     } else {
         typeHandler = events_.find(eventType);
         if (typeHandler == events_.end()) {
-            FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
+            FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
             return;
         }
     }

@@ -189,7 +189,7 @@ void VirtualDeviceBuilder::Unmount(const char *name, const char *id)
     std::cout << "The backing process for virtual " << name << "can't be found." << std::endl;
 EXIT:
     if (closedir(procDir) != 0) {
-        FI_HILOGE("Closedir error:%{public}s", strerror(errno));
+        FI_HILOGE("closedir error:%{public}s", strerror(errno));
     }
 }
 
@@ -290,7 +290,7 @@ void VirtualDeviceBuilder::Close()
             FI_HILOGE("Ioctl error:%{public}s", strerror(errno));
         }
         if (close(fd_) != 0) {
-            FI_HILOGE("Close error:%{public}s", strerror(errno));
+            FI_HILOGE("close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }
@@ -437,7 +437,7 @@ int32_t VirtualDeviceBuilder::ScanFor(std::function<bool(std::shared_ptr<Virtual
         }
     }
     if (closedir(dir) != 0) {
-        FI_HILOGE("Closedir error:%{public}s", strerror(errno));
+        FI_HILOGE("closedir error:%{public}s", strerror(errno));
     }
     return RET_OK;
 }
