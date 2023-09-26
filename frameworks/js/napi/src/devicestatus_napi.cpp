@@ -53,7 +53,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
     CHKPV(loop);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    FI_HILOGD("DevicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
+    FI_HILOGD("devicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
         devicestatusData.type, devicestatusData.value);
     data_ = devicestatusData;
     work->data = static_cast<void *>(&data_);
@@ -73,7 +73,7 @@ void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
     CHKPV(deviceStatusNapi);
     int32_t type = static_cast<int32_t>(data->type);
     int32_t value = static_cast<int32_t>(data->value);
-    FI_HILOGD("Type:%{public}d, Value:%{public}d", type, value);
+    FI_HILOGD("type:%{public}d, value:%{public}d", type, value);
     deviceStatusNapi->OnDeviceStatusChangedDone(type, value, false);
 }
 
@@ -111,7 +111,7 @@ DeviceStatusNapi::~DeviceStatusNapi()
 void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("Value:%{public}d", value);
+    FI_HILOGD("value:%{public}d", value);
     OnEvent(type, ARG_1, value, isOnce);
 }
 
@@ -152,7 +152,7 @@ bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
             FI_HILOGE("Failed to get valueType");
             return false;
         }
-        FI_HILOGD("ValueType:%{public}d", valueType);
+        FI_HILOGD("valueType:%{public}d", valueType);
         arr[i] = valueType;
     }
     if (arr[ARG_0] != napi_string || arr[ARG_1] != napi_number || arr[ARG_2] != napi_number ||
@@ -193,7 +193,7 @@ bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
             FI_HILOGE("Failed to get valueType");
             return false;
         }
-        FI_HILOGD("ValueType:%{public}d", valueType);
+        FI_HILOGD("valueType:%{public}d", valueType);
         arr[i] = valueType;
     }
     if (arr[ARG_0] != napi_string || arr[ARG_1] != napi_function) {
@@ -380,7 +380,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
-    FI_HILOGD("Type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
+    FI_HILOGD("type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
     if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
         ThrowErr(env, PARAM_ERROR, "Type is illegal");
         return nullptr;

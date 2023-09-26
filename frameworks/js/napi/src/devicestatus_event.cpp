@@ -141,7 +141,7 @@ bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = events_.find(eventType);
     if (iter == events_.end()) {
-        FI_HILOGE("EventType %{public}d not found", eventType);
+        FI_HILOGE("eventType %{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -178,7 +178,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
     FI_HILOGD("DeviceStatusEvent OffOnce in for event:%{public}d", eventType);
     auto iter = eventOnces_.find(eventType);
     if (iter == eventOnces_.end()) {
-        FI_HILOGE("EventType %{public}d not found", eventType);
+        FI_HILOGE("eventType %{public}d not found", eventType);
         return false;
     }
     bool equal = false;
@@ -206,7 +206,7 @@ bool DeviceStatusEvent::RemoveAllCallback(int32_t eventType)
     CALL_DEBUG_ENTER;
     auto iter = events_.find(eventType);
     if (iter == events_.end()) {
-        FI_HILOGE("EvenType %{public}d not found", eventType);
+        FI_HILOGE("evenType %{public}d not found", eventType);
         return false;
     }
     events_.erase(eventType);
@@ -269,7 +269,7 @@ void DeviceStatusEvent::SendRet(int32_t eventType, int32_t value, napi_value &re
 void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);;
+    FI_HILOGD("OnEvent for %{public}d, isOnce:%{public}d", eventType, isOnce);
     std::map<int32_t, std::list<std::shared_ptr<DeviceStatusEventListener>>>::iterator typeHandler;
     if (isOnce) {
         typeHandler = eventOnces_.find(eventType);
@@ -280,7 +280,7 @@ void DeviceStatusEvent::OnEvent(int32_t eventType, size_t argc, int32_t value, b
     } else {
         typeHandler = events_.find(eventType);
         if (typeHandler == events_.end()) {
-            FI_HILOGE("OnEvent:eventType %{public}d not found", eventType);
+            FI_HILOGE("OnEvent eventType %{public}d not found", eventType);
             return;
         }
     }

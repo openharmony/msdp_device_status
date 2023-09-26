@@ -143,7 +143,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
             FI_HILOGE("Listener is nullptr");
             return false;
         }
-        FI_HILOGI("Type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
+        FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
         switch (arrs_[devicestatusData.type]) {
             case ENTER: {
                 if (devicestatusData.value == VALUE_ENTER) {

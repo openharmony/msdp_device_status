@@ -290,7 +290,7 @@ void VirtualDeviceBuilder::Close()
             FI_HILOGE("ioctl error:%{public}s", strerror(errno));
         }
         if (close(fd_) != 0) {
-            FI_HILOGE("Close error:%{public}s", strerror(errno));
+            FI_HILOGE("close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }

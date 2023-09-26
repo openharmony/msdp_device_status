@@ -695,7 +695,7 @@ void DragManager::MoveTo(int32_t x, int32_t y)
         return;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    FI_HILOGI("DisplayId: %{public}d, x: %{public}d, y: %{public}d", dragData.displayId, x, y);
+    FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
 } // namespace DeviceStatus
