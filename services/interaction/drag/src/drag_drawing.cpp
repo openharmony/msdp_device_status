@@ -290,8 +290,6 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPR(shadowInfo.pixelMap, RET_ERR);
-    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX + shadowInfo.x - g_drawingInfo.pixelMapX,
-        g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
     g_drawingInfo.pixelMap = shadowInfo.pixelMap;
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
@@ -319,6 +317,8 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         g_drawingInfo.pixelMapY = shadowInfo.y;
         DrawMouseIcon();
     }
+    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX + shadowInfo.x - g_drawingInfo.pixelMapX,
+        g_drawingInfo.displayY + shadowInfo.y - g_drawingInfo.pixelMapY);
     Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
