@@ -152,7 +152,7 @@ int32_t VirtualTouchScreen::Move(int32_t slot, int32_t dx, int32_t dy)
         slot = N_SLOTS_AVAILABLE - 1;
     }
     if (!slots_[slot].active) {
-        FI_HILOGE("Slot [%{public}d] is not active", slot);
+        FI_HILOGE("slot [%{public}d] is not active", slot);
         return RET_ERR;
     }
     Coordinate tcoord {
@@ -189,7 +189,7 @@ int32_t VirtualTouchScreen::MoveTo(int32_t slot, int32_t x, int32_t y)
         slot = N_SLOTS_AVAILABLE - 1;
     }
     if (!slots_[slot].active) {
-        FI_HILOGE("Slot [%{public}d] is not active", slot);
+        FI_HILOGE("slot [%{public}d] is not active", slot);
         return RET_ERR;
     }
     return Move(slot, x - slots_[slot].coord.x, y - slots_[slot].coord.y);

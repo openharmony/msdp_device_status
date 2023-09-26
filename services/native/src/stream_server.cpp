@@ -111,29 +111,29 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
     static constexpr size_t nativeBufferSize = 64 * 1024;
     SessionPtr sess = nullptr;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
+        FI_HILOGE("Setsockopt serverFd failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-        FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
+        FI_HILOGE("Setsockopt serverFd failed, errno:%{public}d", errno);
         goto CLOSE_SOCK;
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            FI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            FI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            FI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
+            FI_HILOGE("Setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             goto CLOSE_SOCK;
         }
     }

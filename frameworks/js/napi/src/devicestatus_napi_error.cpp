@@ -53,7 +53,7 @@ void ThrowErr(const napi_env &env, int32_t errCode, const std::string &printMsg)
     FI_HILOGE("printMsg:%{public}s, errCode:%{public}d", printMsg.c_str(), errCode);
     std::optional<std::string> msg = GetErrMsg(errCode);
     if (!msg) {
-        FI_HILOGE("ErrCode:%{public}d is invalid", errCode);
+        FI_HILOGE("errCode:%{public}d is invalid", errCode);
         return;
     }
     napi_value error = CreateNapiError(env, errCode, msg.value());
