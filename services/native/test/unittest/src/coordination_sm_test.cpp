@@ -18,12 +18,14 @@
 #include "coordination_sm_test.h"
 #include "coordination_softbus_adapter_test.h"
 
-#include <gtest/gtest.h>
-
 #include "accesstoken_kit.h"
+#include <gtest/gtest.h>
+#include "pointer_event.h"
+
 #include "coordination_device_manager.h"
 #include "coordination_event_handler.h"
 #include "coordination_message.h"
+#include "coordination_sm.h"
 #include "coordination_softbus_adapter.h"
 #include "coordination_state_in.h"
 #include "coordination_util.h"
@@ -47,6 +49,7 @@ const std::string REMOTE_NETWORKID { "Test_Remote_NetworkId" };
 const std::string ORIGIN_NETWORKID { "Test_Origin_NetworkId" };
 constexpr int32_t DEVICE_ID { 0 };
 constexpr int32_t ERR_CODE { 20900001 };
+constexpr int32_t UNKNOWN_STATE { 3 };
 } // namespace
 
 class CoordinationSMTest : public testing::Test {
@@ -160,6 +163,83 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)
     EXPECT_TRUE(ret == 0);
     ClearCoordiantionSM();
     ClearCoordinationSoftbusAdapter();
+}
+
+/**
+ * @tc.name: CoordinationSMTest004
+ * @tc.desc: Interface (GetDeviceCoordinationState) testing
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest004, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string state = COOR_SM->GetDeviceCoordinationState(CoordinationState::STATE_FREE);
+    EXPECT_TRUE(state == "free");
+    state = COOR_SM->GetDeviceCoordinationState(CoordinationState::STATE_IN);
+    EXPECT_TRUE(state == "in");
+    state = COOR_SM->GetDeviceCoordinationState(CoordinationState::STATE_OUT);
+    EXPECT_TRUE(state == "out");
+    state = COOR_SM->GetDeviceCoordinationState(static_cast<CoordinationState>(UNKNOWN_STATE));
+    EXPECT_TRUE(state == "unknown");
+}
+
+/**
+ * @tc.name: CoordinationSMTest005
+ * @tc.desc: Interface (UpdateLastPointerEventCallback) testing
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest005, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    COOR_SM->UpdateLastPointerEventCallback(pointerEvent);
+    EXPECT_TRUE(COOR_SM->lastPointerEvent_ == pointerEvent);
+}
+
+/**
+ * @tc.name: CoordinationSMTest006
+ * @tc.desc: Interface (GetLastPointerEvent) testing
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest006, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = MMI::PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
+    COOR_SM->UpdateLastPointerEventCallback(pointerEvent);
+    auto lastPointerEvent = COOR_SM->GetLastPointerEvent();
+    ASSERT_TRUE(lastPointerEvent != nullptr);
+    EXPECT_TRUE(lastPointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_CANCEL);
+}
+
+/**
+ * @tc.name: CoordinationSMTest007
+ * @tc.desc: Interface (SetSinkNetworkId) testing
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest007, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string remoteNetworkId("cde2b5b4453a5b3ec566f836ffa7a4aab52c4b9c8a0b34f3d6aaca4566db24f0");
+    COOR_SM->SetSinkNetworkId(remoteNetworkId);
+    EXPECT_TRUE(COOR_SM->sinkNetworkId_ == remoteNetworkId);
+}
+
+/**
+ * @tc.name: CoordinationSMTest008
+ * @tc.desc: Interface (Reset) testing
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest008, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    COOR_SM->isStarting_ = true;
+    std::string networkId("cde2b5b4453a5b3ec566f836ffa7a4aab52c4b9c8a0b34f3d6aaca4566db24f0");
+    COOR_SM->Reset(networkId);
+    EXPECT_TRUE(COOR_SM->isStarting_ == false);
 }
 
 /**
