@@ -13,12 +13,23 @@
  * limitations under the License.
  */
 
+#define private public
+#define protected public
+#include "coordination_sm_test.h"
+#include "coordination_softbus_adapter_test.h"
+
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "coordination_sm.h"
+#include "coordination_device_manager.h"
+#include "coordination_event_handler.h"
+#include "coordination_message.h"
+#include "coordination_softbus_adapter.h"
+#include "coordination_state_in.h"
 #include "coordination_util.h"
+#include "device.h"
 #include "fi_log.h"
+
 #include "nativetoken_kit.h"
 #include "nocopyable.h"
 #include "token_setproc.h"
@@ -32,6 +43,10 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSMTest" };
+const std::string REMOTE_NETWORKID { "Test_Remote_NetworkId" };
+const std::string ORIGIN_NETWORKID { "Test_Origin_NetworkId" };
+constexpr int32_t DEVICE_ID { 0 };
+constexpr int32_t ERR_CODE { 20900001 };
 } // namespace
 
 class CoordinationSMTest : public testing::Test {
@@ -77,6 +92,22 @@ void CoordinationSMTest::SetAceessTokenPermission(const std::string &processName
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
+int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
+{
+    CALL_DEBUG_ENTER;
+    return sessionId == 1 ? RET_OK : RET_ERR;
+}
+
+Device::Device(int32_t deviceId) {}
+
+Device::~Device() {}
+
+int32_t Device::Open() { return 0; }
+
+void Device::Close() {}
+
+void Device::Dispatch(const struct epoll_event &ev) {}
+
 /**
  * @tc.name: CoordinationSMTest
  * @tc.desc: test IsNeedFilterOut state == CoordinationState::STATE_OUT
@@ -98,6 +129,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
     keyEvent->AddKeyItem(item);
     bool ret = COOR_SM->IsNeedFilterOut(localNetworkId, keyEvent);
     EXPECT_EQ(false, ret);
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
@@ -110,6 +143,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
     CALL_TEST_DEBUG;
     int32_t ret = COOR_SM->GetCoordinationState("");
     EXPECT_TRUE(ret == static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR));
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
@@ -123,6 +158,74 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
     EXPECT_TRUE(ret == 0);
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
+}
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test normal ActivateCoordination return the correct value
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest009, TestSize.Level0){ 
+    CALL_TEST_DEBUG;
+    int32_t startDeviceId = 1;
+    COOR_SOFTBUS_ADAPTER->sessionDevs_[REMOTE_NETWORKID] = 0;
+    COOR_SM->currentState_ = CoordinationState::STATE_IN;
+    COOR_SM->coordinationStates_[CoordinationState::STATE_IN] = std::make_shared<CoordinationStateIn>();
+    int32_t ret = COOR_SM->ActivateCoordination(REMOTE_NETWORKID, startDeviceId);
+    EXPECT_EQ(ret, ERR_CODE);
+    COOR_SOFTBUS_ADAPTER->sessionDevs_[REMOTE_NETWORKID] = 1;
+    ret = COOR_SM->ActivateCoordination(REMOTE_NETWORKID, startDeviceId);
+    EXPECT_EQ(ret, RET_OK);
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
+}
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test normal DeactivateCoordination return the correct value
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0){
+    CALL_TEST_DEBUG;
+    COOR_SM->currentState_ = CoordinationState::STATE_IN;
+    COOR_SM->coordinationStates_[CoordinationState::STATE_IN] = std::make_shared<CoordinationStateIn>();
+    COOR_SM->startDeviceDhid_ = "teststartDeviceDhid";
+    std::shared_ptr<Device> curdevice= std::make_shared<Device>(DEVICE_ID);
+    curdevice->name_ = "DistributedInput ";
+    std::shared_ptr<CoordinationDeviceManager::Device> dev = std::make_shared<CoordinationDeviceManager::Device>(curdevice);
+    dev->dhid_ = COOR_SM->startDeviceDhid_;
+    dev->networkId_ = "testNetworkId";
+    std::function<void(void)> mycallback = [&](void){
+        GTEST_LOG_(INFO) << "notifyDragCancelCallback_ callback test";
+    };
+    COOR_SM->notifyDragCancelCallback_ = mycallback;
+    COOR_DEV_MGR->devices_[0] = dev;
+    COOR_SOFTBUS_ADAPTER->sessionDevs_["testNetworkId"] = 0;
+    int32_t ret = COOR_SM->DeactivateCoordination(false);
+    EXPECT_EQ(ret, RET_ERR);
+    COOR_SOFTBUS_ADAPTER->sessionDevs_["testNetworkId"] = 1;
+    ret = COOR_SM->DeactivateCoordination(false);
+    EXPECT_EQ(ret, RET_OK);
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
+}
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test normal UpdateState 
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest011, TestSize.Level0){
+    CALL_TEST_DEBUG;
+    COOR_SM->UpdateState(CoordinationState::STATE_IN);
+    auto curstate = COOR_SM->GetCurrentCoordinationState();
+    EXPECT_EQ(curstate, CoordinationState::STATE_IN);
+    std::pair<std::string, std::string> devicelist = COOR_SM->GetPreparedDevices();
+    EXPECT_TRUE(devicelist.first.empty() && devicelist.second.empty());
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -27,6 +27,7 @@ config("module_private_config") {
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/communication/service/include",
     "${device_status_service_path}/interaction/drag/src/include",
+    "${device_status_service_path}/device_manager/include",
     "${device_status_utils_path}/include",
   ]
 }
