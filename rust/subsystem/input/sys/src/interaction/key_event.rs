@@ -26,7 +26,7 @@ impl KeyEvent {
     pub fn new(key_event: *const CKeyEvent) -> Self {
         Self(key_event)
     }
-    
+
     /// Extract a raw `CKeyEvent` pointer from this wrapper.
     /// # Safety
     pub unsafe fn as_inner(&self) -> *const CKeyEvent {

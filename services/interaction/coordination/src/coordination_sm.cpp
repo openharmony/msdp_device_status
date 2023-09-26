@@ -895,7 +895,6 @@ void CoordinationSM::SetAbsolutionLocation(double xPercent, double yPercent)
     MMI::InputManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
 }
 
-
 void CoordinationSM::OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(eventHandler_);

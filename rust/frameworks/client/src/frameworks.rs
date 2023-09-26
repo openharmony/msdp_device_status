@@ -30,7 +30,6 @@ use fusion_basic_client_rust::FusionBasicClient;
 use fusion_drag_client_rust::DragClient;
 use fusion_coordination_client_rust::FusionCoordinationClient;
 
-
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,

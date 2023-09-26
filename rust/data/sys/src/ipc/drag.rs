@@ -21,7 +21,6 @@ use crate::fusion_utils_rust::{ call_debug_enter };
 use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
 use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
 
-
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
