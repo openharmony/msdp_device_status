@@ -287,7 +287,7 @@ void VirtualDeviceBuilder::Close()
 {
     if (fd_ >= 0) {
         if (ioctl(fd_, UI_DEV_DESTROY) < 0) {
-            FI_HILOGE("Ioctl error:%{public}s", strerror(errno));
+            FI_HILOGE("ioctl error:%{public}s", strerror(errno));
         }
         if (close(fd_) != 0) {
             FI_HILOGE("close error:%{public}s", strerror(errno));
