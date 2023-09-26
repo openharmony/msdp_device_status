@@ -77,7 +77,7 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
     napi_ref onHandlerRef = nullptr;
     napi_status status = napi_create_reference(env_, handler, 1, &onHandlerRef);
     if (status != napi_ok) {
-        FI_HILOGE("Failed to create reference");
+        FI_HILOGE("Failed to napi_create_reference");
         return false;
     }
     auto iter = events_.find(eventType);
@@ -107,12 +107,12 @@ bool DeviceStatusEvent::IsNoExistCallback(std::list<std::shared_ptr<DeviceStatus
     for (const auto& item : events_[eventType]) {
         napi_status status = napi_get_reference_value(env_, item->onHandlerRef, &result);
         if (status != napi_ok) {
-            FI_HILOGE("napi_get_reference_value failed");
+            FI_HILOGE("Failed to napi_get_reference_value");
             return false;
         }
         status = napi_strict_equals(env_, result, handler, &equal);
         if (status != napi_ok) {
-            FI_HILOGE("napi_strict_equals failed");
+            FI_HILOGE("Failed to napi_strict_equals");
             return false;
         }
         if (equal) {
@@ -150,19 +150,19 @@ bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
     for (auto listener : events_[eventType]) {
         napi_status status = napi_get_reference_value(env_, listener->onHandlerRef, &result);
         if (status != napi_ok) {
-            FI_HILOGE("Failed to get_reference_value");
+            FI_HILOGE("Failed to napi_get_reference_value");
             return false;
         }
         status = napi_strict_equals(env_, result, handler, &equal);
         if (status != napi_ok) {
-            FI_HILOGE("Failed to strict_equals");
+            FI_HILOGE("Failed to napi_strict_equals");
             return false;
         }
         if (equal) {
             FI_HILOGI("Delete handler from list %{public}d", eventType);
             status = napi_delete_reference(env_, listener->onHandlerRef);
             if (status != napi_ok) {
-                FI_HILOGW("Delete failed");
+                FI_HILOGW("Failed to napi_delete_reference");
             }
             events_[eventType].remove(listener);
             break;
@@ -190,7 +190,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
             FI_HILOGI("Delete once handler from list %{public}d", eventType);
             napi_status status = napi_delete_reference(env_, listener->onHandlerRef);
             if (status != napi_ok) {
-                FI_HILOGW("Delete failed");
+                FI_HILOGW("Failed to napi_delete_reference");
             }
             eventOnces_[eventType].remove(listener);
             break;
@@ -297,7 +297,7 @@ void DeviceStatusEvent::ClearEventMap()
         for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
-                FI_HILOGW("Failed to delete reference");
+                FI_HILOGW("Failed to napi_delete_reference");
             }
         }
     }
@@ -305,7 +305,7 @@ void DeviceStatusEvent::ClearEventMap()
         for (const auto &eventListener : iter.second) {
             napi_status status = napi_delete_reference(env_, eventListener->onHandlerRef);
             if (status != napi_ok) {
-                FI_HILOGW("Failed to delete reference");
+                FI_HILOGW("Failed to napi_delete_reference");
                 napi_delete_reference(env_, eventListener->onHandlerRef);
             }
         }

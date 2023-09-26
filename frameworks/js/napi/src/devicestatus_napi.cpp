@@ -59,7 +59,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
     work->data = static_cast<void *>(&data_);
     int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, EmitOnEvent, uv_qos_default);
     if (ret != 0) {
-        FI_HILOGE("uv_queue_work_with_qos failed");
+        FI_HILOGE("Failed to uv_queue_work_with_qos");
     }
 }
 
@@ -376,7 +376,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     CALL_DEBUG_ENTER;
     const auto [ret, handler, typeMode, event, latency] = CheckSubscribeParam(env, info);
     if (!ret) {
-        FI_HILOGE("On:SubscribeDeviceStatus is failed");
+        FI_HILOGE("On:Failed to SubscribeDeviceStatus");
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
@@ -436,7 +436,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
     CALL_DEBUG_ENTER;
     const auto [ret, handler, type] = CheckGetParam(env, info);
     if (!ret) {
-        FI_HILOGE("Once:GetDeviceStatus is failed");
+        FI_HILOGE("Once:Failed to GetDeviceStatus");
         return nullptr;
     }
     if (g_obj == nullptr) {
