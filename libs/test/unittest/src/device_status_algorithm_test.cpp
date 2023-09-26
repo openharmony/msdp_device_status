@@ -76,11 +76,11 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {
-        FI_HILOGE("algoHandler is nullptr");
+        FI_HILOGE("AlgoHandler is nullptr");
         return RET_ERR;
     }
     if (algoHandler->handle != nullptr) {
-        FI_HILOGE("handle already exists");
+        FI_HILOGE("Handle already exists");
         return RET_OK;
     }
 
@@ -112,11 +112,11 @@ int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpA
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {
-        FI_HILOGE("algoHandler is nullptr");
+        FI_HILOGE("AlgoHandler is nullptr");
         return RET_ERR;
     }
     if (algoHandler->handle == nullptr) {
-        FI_HILOGE("handle is nullptr");
+        FI_HILOGE("Handle is nullptr");
         return RET_ERR;
     }
 
@@ -143,8 +143,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     still.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    still.RegisterCallback(callback);
     ASSERT_TRUE(ret);
 }
 
@@ -160,8 +160,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    horizontal.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     horizontal.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -179,8 +179,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level
     bool ret = vertical.Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    vertical.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     vertical.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -236,8 +236,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoAbsoluteStill still;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    still.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
@@ -258,8 +258,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoHorizontal horizontal;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    horizontal.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
