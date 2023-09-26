@@ -227,6 +227,21 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest011, TestSize.Level0){
     ClearCoordiantionSM();
     ClearCoordinationSoftbusAdapter();
 }
+
+/**
+ * @tc.name: CoordinationSMTest
+ * @tc.desc: test normal UpdatePreparedDevices and obtain correct value 
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSMTest, CoordinationSMTest012, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    COOR_SM->UpdatePreparedDevices(REMOTE_NETWORKID, ORIGIN_NETWORKID);
+    std::pair<std::string, std::string> devicelist = COOR_SM->GetPreparedDevices();
+    EXPECT_TRUE((devicelist.first == REMOTE_NETWORKID) && (devicelist.second == ORIGIN_NETWORKID));
+    ClearCoordiantionSM();
+    ClearCoordinationSoftbusAdapter();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
