@@ -27,7 +27,6 @@
 
 #include "refbase.h"
 
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

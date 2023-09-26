@@ -183,7 +183,7 @@ int32_t CoordinationSoftbusAdapter::Init()
             FI_HILOGE("Remove session server failed, error code:%{public}d", ret);
         }
     }
-    
+
     localSessionName_ = sessionName;
     ret = CreateSessionServer(FI_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {

@@ -246,7 +246,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
     g_sendable = true;
     ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();  
+    g_adapter->sessionDevs_.clear();
 }
 
 /**
