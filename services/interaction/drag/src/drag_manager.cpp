@@ -524,7 +524,6 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 int32_t DragManager::OnStartDrag()
 {
     auto extraData = CreateExtraData(true);
-    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
@@ -536,6 +535,8 @@ int32_t DragManager::OnStartDrag()
         FI_HILOGE("Init drag drawing cancel, drag animation is running");
         return RET_ERR;
     }
+    dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     ret = AddDragEventHandler(dragData.sourceType);
     if (ret != RET_OK) {
 #ifdef OHOS_DRAG_ENABLE_MONITOR
