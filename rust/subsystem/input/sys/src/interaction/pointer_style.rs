@@ -71,10 +71,10 @@ impl PointerStyle {
         // SAFETY:  no `None` here, cause `CPointerStyle` is valid.
         unsafe {
             if input_binding::CGetPointerStyle(&mut self.inner) != INPUT_BINDING_OK {
-                error!(LOG_LABEL, "get pointer style failed");
+                error!(LOG_LABEL, "Get pointer style failed");
                 return Err(FusionErrorCode::Fail);
             }
-            debug!(LOG_LABEL, "get pointer style success");
+            debug!(LOG_LABEL, "Get pointer style success");
             Ok(())
         }
     }

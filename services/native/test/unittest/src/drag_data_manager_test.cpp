@@ -353,9 +353,11 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest011, TestSize.Level0)
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(),
         pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-    ASSERT_LT(pointerEvent->GetTargetDisplayId(), 0);
+    EXPECT_LT(pointerEvent->GetTargetDisplayId(), 0);
     DragDrawing dragDrawing;
     dragDrawing.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+    dragDrawing.DestroyDragWindow();
+    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
 }
 } // namespace
 } // namespace DeviceStatus

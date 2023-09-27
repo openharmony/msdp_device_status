@@ -46,7 +46,7 @@ impl DragClient {
         match MsgParcel::new() {
             Some(mut reply_parcel) => {
                 let mut borrowed_reply_parcel = reply_parcel.borrowed();
-                debug!(LOG_LABEL, "call ipc_client::start()");
+                debug!(LOG_LABEL, "Call ipc_client::start()");
                 ipc_client.start(Intention::Drag, drag_data, &mut borrowed_reply_parcel)?;
 
                 match DefaultReply::deserialize(&borrowed_reply_parcel) {
