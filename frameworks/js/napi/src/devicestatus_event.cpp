@@ -147,7 +147,7 @@ bool DeviceStatusEvent::Off(int32_t eventType, napi_value handler)
     bool equal = false;
     napi_value result = nullptr;
 
-    for (auto listener : events_[eventType]) {
+    for (const auto &listener : events_[eventType]) {
         napi_status status = napi_get_reference_value(env_, listener->onHandlerRef, &result);
         if (status != napi_ok) {
             FI_HILOGE("Failed to napi_get_reference_value");
@@ -183,7 +183,7 @@ bool DeviceStatusEvent::OffOnce(int32_t eventType, napi_value handler)
     }
     bool equal = false;
     napi_value result = nullptr;
-    for (auto listener : eventOnces_[eventType]) {
+    for (const auto &listener : eventOnces_[eventType]) {
         napi_get_reference_value(env_, listener->onHandlerRef, &result);
         napi_strict_equals(env_, result, handler, &equal);
         if (equal) {

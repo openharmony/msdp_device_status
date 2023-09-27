@@ -199,8 +199,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -217,8 +217,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -235,8 +235,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -253,8 +253,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest004 failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest004 failed";
 }
 
 /**
@@ -271,8 +271,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest005 failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest005 failed";
 }
 
 /**
@@ -289,8 +289,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest006 failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest006 failed";
 }
 } // namespace DeviceStatus
 } // namespace Msdp

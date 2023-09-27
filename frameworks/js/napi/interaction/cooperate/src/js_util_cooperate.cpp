@@ -92,7 +92,7 @@ napi_value JsUtilCooperate::GetStateResult(napi_env env, bool result)
     CHKRP(napi_get_boolean(env, result, &state), GET_BOOLEAN);
     napi_value object = nullptr;
     CHKRP(napi_create_object(env, &object), CREATE_OBJECT);
-    CHKRP(napi_set_named_property(env,  object, "state", state), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, object, "state", state), SET_NAMED_PROPERTY);
     return object;
 }
 

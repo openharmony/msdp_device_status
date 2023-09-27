@@ -677,7 +677,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
         InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
         ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
-        for (auto listener : dragListeners) {
+        for (const auto &listener : dragListeners) {
             ret = InteractionManager::GetInstance()->RemoveDraglistener(listener);
             EXPECT_EQ(ret, RET_OK);
         }

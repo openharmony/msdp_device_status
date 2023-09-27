@@ -156,7 +156,7 @@ void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
     GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s \n", startTime.c_str());
     for (const auto &item : appInfos_) {
-        for (auto appInfo : item.second) {
+        for (const auto &appInfo : item.second) {
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | type:%s | packageName:%s\n",
                 appInfo->startTime.c_str(), appInfo->uid, appInfo->pid, GetStatusType(appInfo->type).c_str(),
                 appInfo->packageName.c_str());

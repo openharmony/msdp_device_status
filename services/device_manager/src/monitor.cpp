@@ -91,7 +91,7 @@ int32_t Monitor::OpenConnection()
     CALL_DEBUG_ENTER;
     inotifyFd_ = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
     if (inotifyFd_ < 0) {
-        FI_HILOGE("Initializing inotify , errno:%{public}s", strerror(errno));
+        FI_HILOGE("Initializing inotify, errno:%{public}s", strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
