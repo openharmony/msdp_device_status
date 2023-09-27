@@ -226,6 +226,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest007, TestSize.Level0)
     std::string remoteNetworkId("cde2b5b4453a5b3ec566f836ffa7a4aab52c4b9c8a0b34f3d6aaca4566db24f0");
     COOR_SM->SetSinkNetworkId(remoteNetworkId);
     EXPECT_TRUE(COOR_SM->sinkNetworkId_ == remoteNetworkId);
+    COOR_SM->sinkNetworkId_.clear();
 }
 
 /**
@@ -240,6 +241,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest008, TestSize.Level0)
     std::string networkId("cde2b5b4453a5b3ec566f836ffa7a4aab52c4b9c8a0b34f3d6aaca4566db24f0");
     COOR_SM->Reset(networkId);
     EXPECT_TRUE(COOR_SM->isStarting_ == false);
+    COOR_SM->remoteNetworkId_.clear();
+    COOR_SM->sinkNetworkId_.clear();
 }
 
 /**
