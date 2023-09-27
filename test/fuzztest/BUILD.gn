@@ -25,6 +25,7 @@ group("device_status_fuzztest") {
     "devicestatusstub_fuzzer:fuzztest",
     "devicesubscribestub_fuzzer:fuzztest",
     "deviceunsubscribestub_fuzzer:fuzztest",
+    "getdragdata_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
