@@ -323,6 +323,46 @@ int32_t DeviceStatusSrvProxy::GetUdKey(std::string &udKey)
     return RET_OK;
 }
 
+int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA), data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragData failed");
+        return ret;
+    }
+
+    auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(reply);
+    CHKPR(pixelMap, RET_ERR);
+    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
+    READINT32(reply, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUINT8VECTOR(reply, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(reply, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayX, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READBOOL(reply, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    return ret;
+}
+
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;

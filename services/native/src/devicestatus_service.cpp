@@ -726,6 +726,17 @@ int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
     return ret;
 }
 
+int32_t DeviceStatusService::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragData, &dragMgr_, std::ref(dragData)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get drag data failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;

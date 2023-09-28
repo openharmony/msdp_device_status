@@ -190,6 +190,12 @@ int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
     }
     return DeviceStatusClient::GetInstance().UpdateShadowPic(shadowInfo);
 }
+
+int32_t DragManagerImpl::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().GetDragData(dragData);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

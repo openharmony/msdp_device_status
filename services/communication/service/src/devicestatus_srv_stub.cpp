@@ -79,7 +79,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
             &DeviceStatusSrvStub::GetShadowOffsetStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
-            &DeviceStatusSrvStub::UpdateShadowPicStub}
+            &DeviceStatusSrvStub::UpdateShadowPicStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
+            &DeviceStatusSrvStub::GetDragDataStub}
     };
 }
 
@@ -323,7 +325,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
+    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -449,6 +451,36 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessagePar
     if (ret != RET_OK) {
         FI_HILOGE("Call Update shadow picture failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData;
+    int32_t ret = GetDragData(dragData);
+    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
+    if (!dragData.shadowInfo.pixelMap->Marshalling(reply)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(reply, dragData.shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.shadowInfo.y, ERR_INVALID_VALUE);
+    WRITEUINT8VECTOR(reply, dragData.buffer, ERR_INVALID_VALUE);
+    WRITESTRING(reply, dragData.udKey, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.sourceType, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.dragNum, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.pointerId, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayX, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
+    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
     return ret;
 }
 } // namespace DeviceStatus

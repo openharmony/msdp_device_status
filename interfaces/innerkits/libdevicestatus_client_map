@@ -46,6 +46,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateDragStyle(OHOS::Msdp::DeviceStatus::DragCursorStyle)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateShadowPic(OHOS::Msdp::DeviceStatus::ShadowInfo const&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragData(OHOS::Msdp::DeviceStatus::DragData&)";
         };
     local:
         *;
