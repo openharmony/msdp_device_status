@@ -23,7 +23,7 @@ namespace DeviceStatus {
 
 void ClearCoordiantionSM()
 {
-    COOR_SM->preparedNetworkId_ = { "", "" } ;
+    COOR_SM->preparedNetworkId_ = { "", "" };
     COOR_SM->startDeviceDhid_ = "";
     COOR_SM->remoteNetworkId_ = "";
     COOR_SM->sinkNetworkId_ = "";
@@ -31,15 +31,15 @@ void ClearCoordiantionSM()
     COOR_SM->currentState_ = CoordinationState::STATE_FREE;
     COOR_SM->initCallback_ = nullptr;
     COOR_SM->stateCallback_ = nullptr;
-    COOR_SM->isStarting_ = false ;
-    COOR_SM->isStopping_ = false ;
+    COOR_SM->isStarting_ = false;
+    COOR_SM->isStopping_ = false;
     COOR_SM->mouseLocation_ = std::make_pair(0, 0);
     COOR_SM->lastPointerEvent_ = nullptr;
-    COOR_SM->displayX_ = -1 ;
-    COOR_SM->displayY_ = -1 ;
-    COOR_SM->interceptorId_ = -1 ;
-    COOR_SM->monitorId_ = -1 ;
-    COOR_SM->filterId_ = -1 ;
+    COOR_SM->displayX_ = -1;
+    COOR_SM->displayY_ = -1;
+    COOR_SM->interceptorId_ = -1;
+    COOR_SM->monitorId_ = -1;
+    COOR_SM->filterId_ = -1;
     COOR_SM->remoteNetworkIdCallback_ = nullptr;
     COOR_SM->mouseLocationCallback_ = nullptr;
     COOR_SM->notifyDragCancelCallback_ = nullptr;

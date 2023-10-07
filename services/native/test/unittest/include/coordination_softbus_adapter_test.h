@@ -33,7 +33,7 @@ public:
     void TearDown();
 };
 
-void  ClearCoordinationSoftbusAdapter()
+void ClearCoordinationSoftbusAdapter()
 {
     COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
     COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
