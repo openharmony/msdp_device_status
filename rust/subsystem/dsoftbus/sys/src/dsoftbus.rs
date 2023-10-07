@@ -23,8 +23,8 @@ use std::sync::{Once, Mutex, Arc, Condvar};
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
 use std::hash::{Hash, Hasher};
-use std::ptr;
 use std::vec::Vec;
+use std::ptr;
 use fusion_data_rust::{FusionResult, FusionErrorCode};
 use fusion_utils_rust::{ call_debug_enter };
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
@@ -41,6 +41,7 @@ use crate::binding::{
     NETWORK_ID_BUF_LEN,
     DEVICE_NAME_BUF_LEN,
     RET_OK,
+    C_CHAR_SIZE,
     ISessionListener,
     StreamData,
     StreamFrameInfo,
@@ -63,46 +64,44 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 
 /// Provide for C lib to call
-/// # Safety
 extern "C" fn on_session_opened(session_id: i32, result: i32) -> i32 {
-    match DSoftbus::get_instance() {
-        Some(dsoftbus) => {
-            match dsoftbus.on_session_opened(session_id, result) {
-                Ok(_) => { RET_OK },
-                Err(err) => { err },
-            }
+    if let Some(dsoftbus) = DSoftbus::get_instance() {
+        if let Err(err) = dsoftbus.on_session_opened(session_id, result) {
+            err
+        } else {
+            RET_OK
         }
-        None => {
-            error!(LOG_LABEL, "DSoftbus is none");
-            FusionErrorCode::Fail.into()
-        }
+    } else {
+        error!(LOG_LABEL, "DSoftbus is none");
+        FusionErrorCode::Fail.into()
     }
 }
 
 /// Provide for C lib to call
-/// # Safety
 extern "C" fn on_session_closed(session_id: i32) {
-    match DSoftbus::get_instance() {
-        Some(dsoftbus) => {
-            dsoftbus.on_session_closed(session_id);
-        }
-        None => {
-            error!(LOG_LABEL, "DSoftbus is none");
-        }
+    if let Some(dsoftbus) = DSoftbus::get_instance() {
+        dsoftbus.on_session_closed(session_id);
+        } else {
+        error!(LOG_LABEL, "DSoftbus is none");
     }
 }
 
 /// Provide for C lib to call
-/// # Safety
 extern "C" fn on_bytes_received(session_id: i32, data: *const c_void, data_len: u32) {
-    match DSoftbus::get_instance() {
-        Some(dsoftbus) => {
-            dsoftbus.on_bytes_received(session_id, data, data_len);
-        }
-        None => {
-            error!(LOG_LABEL, "DSoftbus is none");
-        }
+    if let Some(dsoftbus) = DSoftbus::get_instance() {
+        dsoftbus.on_bytes_received(session_id, data, data_len);
+    } else {
+        error!(LOG_LABEL, "DSoftbus is none");
     }
+}
+
+/// Provide for C lib to call
+extern "C" fn on_message_received(session_id: i32, byte_data: *const c_void, data_len: u32) {
+}
+
+/// Provide for C lib to call
+extern "C" fn on_stream_received(session_id: i32, byte_data: *const StreamData,
+    ext_data: *const StreamData, param_data: *const StreamFrameInfo) {
 }
 
 /// Callback trait used for handling events in the DSoftbus instance. 
@@ -137,7 +136,7 @@ struct Inner {
     /// The session ID.
     session_id: i32,
     /// The session listener.
-    sess_listener: ISessionListener,
+    session_listener: ISessionListener,
     /// The local session name.
     local_session_name: String,
     /// The session device map.
@@ -168,20 +167,8 @@ impl Inner {
     /// ```
     fn init(&mut self) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::init");
-        let session_name_head = String::from("ohos.msdp.device_status");
-        let local_network_id = match self.local_network_id() {
-            Ok(local_network_id) => local_network_id,
-            Err(err) => {
-                error!(LOG_LABEL, "Local networkid is empty");
-                return Err(FusionErrorCode::Fail.into());
-            }
-        };
+        let session_name = self.get_session_name()?;
 
-        let mut local_network_id_slice = String::default();
-        if local_network_id.len() > INTERCEPT_STRING_LENGTH {
-            local_network_id_slice = local_network_id[0..INTERCEPT_STRING_LENGTH].to_string();
-        }
-        let session_name = session_name_head + &local_network_id_slice;
         if self.local_session_name.eq(&session_name) {
             info!(LOG_LABEL, "Session server has already created");
             return Ok(());
@@ -191,28 +178,98 @@ impl Inner {
         if !self.local_session_name.is_empty() {
             error!(LOG_LABEL, "Remove last sesison server, sessionName:{}", @public(self.local_session_name));
             // SAFETY: no `None` here, cause `fi_pkg_name` and `local_session_name` is valid.
-            let ret = unsafe { RemoveSessionServer(fi_pkg_name.as_ptr(), self.local_session_name.as_ptr()) };
+            let ret: i32 = unsafe { RemoveSessionServer(fi_pkg_name.as_ptr(), self.local_session_name.as_ptr()) };
             if ret != RET_OK {
                 error!(LOG_LABEL, "Remove session server failed, error code:{}", @public(ret));
             }
-        } 
+        }
 
-        self.local_session_name = session_name;  
-        self.sess_listener = ISessionListener {
-            on_session_opened: Some(on_session_opened),
-            on_session_closed: Some(on_session_closed),
-            on_bytes_received: Some(on_bytes_received),
-            on_message_received: None,
-            on_stream_received: None,
-        };
-        // SAFETY: no `None` here, cause `fi_pkg_name`、`local_session_name` and `sess_listener` is valid.
+        self.local_session_name = session_name;
+        let session_listener = self.create_session_listener(
+            Some(on_session_opened),
+            Some(on_session_closed),
+            Some(on_bytes_received),
+            Some(on_message_received),
+            Some(on_stream_received),
+        ).map_err (|_| {
+            error!(LOG_LABEL, "Create session_listener failed");
+            FusionErrorCode::Fail
+        })?;
+
+        // SAFETY: no `None` here, cause `fi_pkg_name`、`local_session_name` and `session_listener` is valid.
         let ret: i32 = unsafe { CreateSessionServer(fi_pkg_name.as_ptr(), self.local_session_name.as_ptr(),
-            &self.sess_listener) };
+            &self.session_listener) };
         if ret != RET_OK {
             error!(LOG_LABEL, "Create session server failed, error code:{}", @public(ret));
             return Err(FusionErrorCode::Fail.into());
         }
         Ok(())
+    }
+    
+    /// Create a session listener object with the given callback functions.
+    ///
+    /// # Arguments
+    ///
+    /// * `on_session_opened` - Callback function for session opened event.
+    /// * `on_session_closed` - Callback function for session closed event.
+    /// * `on_bytes_received` - Callback function for bytes received event.
+    /// * `on_message_received` - Callback function for message received event.
+    /// * `on_stream_received` - Callback function for stream received event.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing the created `ISessionListener` object if successful,
+    /// or an error code if any of the callback functions are NULL.
+    fn create_session_listener(&mut self,
+        on_session_opened_ptr: Option<extern "C" fn(i32, i32) -> i32>,
+        on_session_closed_ptr: Option<extern "C" fn(i32)>,
+        on_bytes_received_ptr: Option<extern "C" fn(i32, *const c_void, u32)>,
+        on_message_received_ptr: Option<extern "C" fn(i32, *const c_void, u32)>,
+        on_stream_received_ptr: Option<extern "C" fn(i32, *const StreamData, *const StreamData, *const StreamFrameInfo)>
+    ) -> FusionResult<ISessionListener> {
+        let session_listener = ISessionListener {
+            on_session_opened: on_session_opened_ptr.ok_or(FusionErrorCode::Fail)?,
+            on_session_closed: on_session_closed_ptr.ok_or(FusionErrorCode::Fail)?,
+            on_bytes_received: on_bytes_received_ptr.ok_or(FusionErrorCode::Fail)?,
+            on_message_received: on_message_received_ptr.ok_or(FusionErrorCode::Fail)?,
+            on_stream_received: on_stream_received_ptr.ok_or(FusionErrorCode::Fail)?,
+        };
+    
+        Ok(session_listener)
+    }
+
+    /// This function is used to generate a session name by concatenating a fixed prefix `ohos.msdp.device_status` and
+    /// local network ID. The function returns the session name as a `String`.
+    ///
+    /// # Arguments
+    ///
+    /// * `&mut self` - A mutable reference to the current instance of the struct that holds this function.
+    ///
+    /// # Returns
+    ///
+    /// * `FusionResult<String>` - The generated session name, wrapped in a `FusionResult` indicating whether the
+    /// operation was successful or not.
+    ///
+    /// # Errors
+    ///
+    /// This function could fail if there is no local network ID available, in which case a `FusionErrorCode::Fail`
+    /// error code is returned.
+    ///
+    fn get_session_name(&mut self) -> FusionResult<String> {
+        let session_name_head = String::from("ohos.msdp.device_status");
+
+        let local_network_id = self.local_network_id().map_err(|_| {
+            error!(LOG_LABEL, "Local network id is empty");
+            FusionErrorCode::Fail
+        })?;
+
+        if local_network_id.len() >= INTERCEPT_STRING_LENGTH {
+            let local_network_id_slice = local_network_id[0..INTERCEPT_STRING_LENGTH].to_string();
+            Ok(session_name_head + &local_network_id_slice)
+        } else {
+            error!(LOG_LABEL, "Length of local_network_id less than 20");
+            Err(FusionErrorCode::Fail.into())
+        }
     }
 
     /// Retrieves the local network ID.
@@ -238,22 +295,46 @@ impl Inner {
 
         let fi_pkg_name: String = String::from("ohos.msdp.fusioninteraction");
         // SAFETY: no `None` here, cause `fi_pkg_name`、`local_node` is valid.
-        let ret = unsafe { GetLocalNodeDeviceInfo(fi_pkg_name.as_ptr(), &mut local_node as *mut NodeBasicInfo) };
+        let ret: i32 = unsafe { GetLocalNodeDeviceInfo(fi_pkg_name.as_ptr() as *const c_char,
+            &mut local_node as *mut NodeBasicInfo) };
         if ret != RET_OK {
             error!(LOG_LABEL, "GetLocalNodeDeviceInfo result:{}", @public(ret));
             return Err(FusionErrorCode::Fail.into());
         }
 
-        let network_id_ptr: *const c_char =  local_node.network_id.as_ptr() as *const c_char;
-        // SAFETY: no `None` here, cause `network_id_ptr` is valid.
-        let network_id_str = unsafe {CStr::from_ptr(network_id_ptr)};
-        let network_id_slice: &str = network_id_str.to_str().unwrap();
-        let network_id = network_id_slice.to_owned();
-        if network_id.is_empty() {
-            error!(LOG_LABEL, "Local networkid is empty");
-            return Err(FusionErrorCode::Fail.into());
-        }
-        Ok(network_id_slice.to_owned())
+        // let network_id_ptr: *const c_char =  local_node.network_id.as_ptr() as *const c_char;
+        // // SAFETY: no `None` here, cause `network_id_ptr` is valid.
+        // let network_id_str = unsafe {CStr::from_ptr(network_id_ptr)};
+        // let network_id_slice: &str = network_id_str.to_str().unwrap();
+        // let network_id = network_id_slice.to_owned();
+        // if network_id.is_empty() {
+        //     error!(LOG_LABEL, "Local networkid is empty");
+        //     return Err(FusionErrorCode::Fail.into());
+        // }
+        let network_id = self.convert_i8_array_to_string(&local_node.network_id);
+        Ok(network_id)
+    }
+
+    /// Converts an array of signed 8-bit integers to a String.
+    ///
+    /// # Arguments
+    ///
+    /// * `arr` - The input array containing i8 values.
+    ///
+    /// # Returns
+    ///
+    /// A new String containing the UTF-8 encoded characters from the input array.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let arr: [i8; 5] = [72, 101, 108, 108, 111];
+    /// let result = convert_i8_array_to_string(&arr);
+    /// assert_eq!(result, "Hello");
+    /// ```
+    fn convert_i8_array_to_string(&self, arr: &[i8]) -> String {
+        let u8_arr: Vec<u8> = arr.iter().map(|&x| x as u8).collect();
+        String::from_utf8_lossy(&u8_arr).to_string()
     }
 
     /// Releases all resources associated with the `DSoftbus` instance.
@@ -278,6 +359,28 @@ impl Inner {
         self.channel_status_map.clear();
     }
 
+    /// Generates a peer session name based on the provided remote network ID.
+    /// The generated session name is a concatenation of a fixed session name and the sliced remote network ID.
+    /// If the length of the remote network ID is less than INTERCEPT_STRING_LENGTH, an error is returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `remote_network_id` - A reference to a String representing the remote network ID.
+    ///
+    /// # Returns
+    ///
+    /// - `Ok(peer_session_name)` if the peer session name is successfully generated.
+    /// - `Err(FusionErrorCode::Fail)` if the length of the remote network ID is less than INTERCEPT_STRING_LENGTH.
+    fn get_peer_session_name(&mut self, remote_network_id: &String) -> FusionResult<String>{
+        if remote_network_id.len() >= INTERCEPT_STRING_LENGTH {
+            let session_name = String::from("ohos.msdp.device_status");
+            let remote_network_id_slice = remote_network_id[0..INTERCEPT_STRING_LENGTH].to_string();
+            Ok(session_name + &remote_network_id_slice)
+        } else {
+            error!(LOG_LABEL, "Length of remote_network_id less than 20");
+            Err(FusionErrorCode::Fail.into())
+        }
+    }
     /// Opens the input softbus connection for the specified remote network ID.
     ///
     /// # Arguments
@@ -297,35 +400,26 @@ impl Inner {
     /// ```
     fn open_input_softbus(&mut self, remote_network_id: &String) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::open_input_softbus");
-        let session_name = String::from("ohos.msdp.device_status");
-        let group_id = String::from("fi_softbus_group_id");
-
         if self.check_device_session_state(remote_network_id) {
             error!(LOG_LABEL, "Softbus session has already opened");
             return Ok(());
         }
 
-        if self.init().is_err() {
-            error!(LOG_LABEL, "init failed");
-            return Err(FusionErrorCode::Fail.into());
-        }
+        self.init()?;
      
         let data: u8 = 0;
         let session_attr =  SessionAttribute {
             data_type: TYPE_BYTES,
             link_type_num: DINPUT_LINK_TYPE_MAX,
             link_type: [LINK_TYPE_WIFI_WLAN_2G, LINK_TYPE_WIFI_WLAN_5G, LINK_TYPE_WIFI_P2P,
-            LINK_TYPE_BR, 0, 0, 0, 0, 0],
+                        LINK_TYPE_BR, 0, 0, 0, 0, 0],
             stream_attr: 0,
             fast_trans_data:data as *const u8,
             fast_trans_data_size: 0,
-        };  
+        };
 
-        let mut remote_network_id_slice = String::from("");
-        if remote_network_id.len() > INTERCEPT_STRING_LENGTH {
-            remote_network_id_slice = remote_network_id[0..INTERCEPT_STRING_LENGTH].to_string();
-        }
-         let peer_session_name = session_name + &remote_network_id_slice;
+        let peer_session_name = self.get_peer_session_name(remote_network_id)?;
+        let group_id = String::from("fi_softbus_group_id");
         // SAFETY: no `None` here, `local_session_name` is initialized in `init()`, `peer_session_name`,
         // `remote_network_id`, `group_id` and `session_attr` is valid.
         let session_id = unsafe { OpenSession(self.local_session_name.as_ptr() as *const c_char,
@@ -353,13 +447,13 @@ impl Inner {
     /// ```
     fn close_input_softbus(&mut self, remote_network_id: &String) {
         call_debug_enter!("DSoftbus::close_input_softbus");
-        let get_result: Option<&i32> = self.session_dev_map.get(remote_network_id);
-        if get_result.is_none() {
+        if let Some(session_id) = self.session_dev_map.get(remote_network_id) {
+            // SAFETY: no `None` here, `session_id` is valid.
+            unsafe { CloseSession(*session_id) };
+        } else {
             error!(LOG_LABEL, "SessionDevIdMap not found");
-        }
-        let session_id = get_result.copied().unwrap();
-        // SAFETY: no `None` here, `session_id` is valid.
-        unsafe { CloseSession(session_id) };
+            return;
+        } 
         self.session_dev_map.remove(remote_network_id);
         self.channel_status_map.remove(remote_network_id);
         self.session_id = -1;
@@ -383,9 +477,9 @@ impl Inner {
     /// let mut softbus = DSoftbus::default();
     /// softbus.wait_session_opend(&"network_id".to_string(), 1);
     /// ```
-    fn wait_session_opend(&mut self, remote_network_id: &String, session_id: i32) -> FusionResult<()> {
+    fn wait_session_opend(&mut self, remote_network_id: &String, session_id_: i32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::wait_session_opend");
-        self.session_dev_map.insert(remote_network_id.to_string(), session_id);
+        self.session_dev_map.insert(remote_network_id.to_string(), session_id_);
         self.wait_cond = Arc::new((Mutex::new(false), Condvar::new()));
         let pair = Arc::clone(&self.wait_cond);
         let (lock, cvar) = &*pair;
@@ -412,12 +506,6 @@ impl Inner {
     /// A `FusionResult` which can either be `Ok(())` if the operation was successful or an error wrapped in a
     /// `FusionErrorCode`.
     ///
-    /// # Safety
-    ///
-    /// This function makes use of unsafe Rust code to call external functions, such as `GetPeerDeviceId` and
-    /// `GetSessionSide`, which are assumed to be implemented safely and correctly. Additionally, it assumes that
-    /// there are no null pointers returned by these functions.
-    ///
     /// # Example
     ///
     /// ```
@@ -427,28 +515,27 @@ impl Inner {
     /// ```
     fn on_session_opened(&mut self, session_id: i32, result: i32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::on_session_opened");
-        let mut peer_dev_id: Vec<c_char> = Vec::with_capacity(65);
         self.session_id = session_id;
+        let mut peer_dev_id: Vec<c_char> = Vec::with_capacity(65);
+        peer_dev_id.extend(vec![0; 65]);
         let peer_dev_id_ptr = peer_dev_id.as_mut_ptr() as *mut c_char;
-        // SAFETY: no `None` here
-        let get_peer_device_id_result: i32 = unsafe { GetPeerDeviceId(session_id, peer_dev_id_ptr,
-            ((std::mem::size_of::<c_char>()) * DEVICE_ID_SIZE_MAX).try_into().unwrap()) };
+        let len: u32 = (C_CHAR_SIZE * DEVICE_ID_SIZE_MAX) as u32;
         
-        let peer_dev_id_str = unsafe {CStr::from_ptr(peer_dev_id_ptr)};
-        let peer_dev_id_slice: &str = peer_dev_id_str.to_str().unwrap();
-        let peer_dev_id = peer_dev_id_slice.to_owned();
+        // SAFETY: Assumes valid input arguments and that `peer_dev_id_ptr` points to a memory block of at least `len`
+        // bytes. Caller must ensure these conditions for correct behavior and to prevent memory issues or security
+        // vulnerabilities.
+        let get_peer_device_id_result: i32 = unsafe { GetPeerDeviceId(session_id, peer_dev_id_ptr, len) };
+        
+        let peer_dev_id_str = unsafe { CStr::from_ptr(peer_dev_id_ptr) };
+        let peer_dev_id: String = peer_dev_id_str.to_string_lossy().into_owned();
 
         if result != RET_OK {
-            let device_id = match self.find_device(session_id) {
-                Ok(device_id) => device_id,
-                Err(err) => {
-                    error!(LOG_LABEL, "find_device error");
-                    return Err(FusionErrorCode::Fail.into());
-                }
-            };
+            let device_id = self.find_device(session_id).map_err(|_|{
+                error!(LOG_LABEL, "find_device error");
+                FusionErrorCode::Fail
+            })?; 
 
-            let get_result: Option<&i32> = self.session_dev_map.get(&device_id);
-            if get_result.is_some() {
+            if let Some(value) = self.session_dev_map.get(&device_id) {
                 self.session_dev_map.remove(&device_id);
             }
 
@@ -458,7 +545,7 @@ impl Inner {
             self.wait_cond.1.notify_all();
             return Ok(());
         }
-        // SAFETY: no `None` here
+        // SAFETY: This function does not care about the boundary value of the input.
         let session_side: i32 = unsafe { GetSessionSide(session_id) };
         if session_side == SESSION_SIDE_SERVER {
             if get_peer_device_id_result == RET_OK {
@@ -530,11 +617,10 @@ impl Inner {
                 return;
             }
         };
-        let get_result: Option<&i32> = self.session_dev_map.get(&device_id);
-        if get_result.is_some() {
+        if let Some(value) = self.session_dev_map.get(&device_id) {
             self.session_dev_map.remove(&device_id);
         }
-        // SAFETY: no `None` here, `session_id` is valid.
+        // SAFETY: This function does not care about the boundary value of the input.
         if unsafe { GetSessionSide(session_id) } != RET_OK {
             self.channel_status_map.remove(&device_id);
         }
@@ -578,7 +664,7 @@ impl Inner {
         // SAFETY: no `None` here, cause `network_id_ptr` is valid.
         let data_str = unsafe {CStr::from_ptr(data as *const c_char)};
         let data_slice: &str = data_str.to_str().unwrap();
-        let data = data_slice.to_owned();
+        let data: String = data_slice.to_owned();
 
         for callback in &self.callback {
             callback.on_handle_msg(session_id, &data);
@@ -609,12 +695,12 @@ impl Inner {
     /// ```
     fn check_device_session_state(&self, remote_network_id: &String) -> bool {
         call_debug_enter!("DSoftbus::check_device_session_state");
-        let get_result: Option<&i32> = self.session_dev_map.get(remote_network_id);
-        if get_result.is_none() {
+        if let Some(value) = self.session_dev_map.get(remote_network_id) {
+            true
+        } else {
             error!(LOG_LABEL, "Check session state error");
-            return false;
+            false
         }
-        true
     }
 
     /// Sends a message to a specified device.
@@ -630,11 +716,6 @@ impl Inner {
     /// Returns `Ok(())` if the message was sent successfully, or an error of type `FusionResult<()>` if sending the
     /// message failed.
     ///
-    /// # Safety
-    ///
-    /// This function is marked as unsafe because it internally calls an external unsafe function `SendBytes`. The
-    /// caller needs to ensure that `device_id`, `data`, and `data_len` are valid and properly initialized.
-    ///
     /// # Example
     ///
     /// ```rust
@@ -646,14 +727,18 @@ impl Inner {
     /// ```
     fn send_msg(&self, device_id: &String, data: *const c_void, data_len: u32) -> FusionResult<()> {
         call_debug_enter!("DSoftbus::send_msg");
-        let session_id = self.session_dev_map.get(device_id).copied().unwrap_or(0);
-        // SAFETY: no `None` here, `session_id`, `data` and `data_len` is valid.
-        let result: i32 = unsafe {SendBytes(session_id, data, data_len) };
-        if result != RET_OK {
-            error!(LOG_LABEL, "Send bytes failed, result:{}", @public(result));
-            return Err(FusionErrorCode::Fail.into());
+        if let Some(session_id) = self.session_dev_map.get(device_id) {
+            // SAFETY: no `None` here, `session_id`, `data` and `data_len` is valid.
+            let result: i32 = unsafe {SendBytes(*session_id, data, data_len) };
+            if result != RET_OK {
+                error!(LOG_LABEL, "Send bytes failed, result:{}", @public(result));
+                return Err(FusionErrorCode::Fail.into());
+            }
+            Ok(())
+        } else {
+            error!(LOG_LABEL, "Check session state error");
+            Err(FusionErrorCode::Fail.into())
         }
-        Ok(())
     }
 
     /// Returns a clone of the session device map.
@@ -730,14 +815,14 @@ impl DSoftbus {
     /// }
     /// ```
     pub fn get_instance() -> Option<&'static Self> {
-        static mut DSOFTBUS: Option<DSoftbus> = None;
+        static mut G_DSOFTBUS: Option<DSoftbus> = None;
         static INIT_ONCE: Once = Once::new();
         // SAFETY: no `None` here. just Modifying the Static Variables
         unsafe {
             INIT_ONCE.call_once(|| {
-                DSOFTBUS = Some(DSoftbus::default());
+                G_DSOFTBUS = Some(DSoftbus::default());
             });
-            DSOFTBUS.as_ref()
+            G_DSOFTBUS.as_ref()
         }
     }
 

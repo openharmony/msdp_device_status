@@ -38,6 +38,7 @@ pub const TYPE_BUTT: i32 = 5;
 pub const NETWORK_ID_BUF_LEN: usize = 65;
 pub const DEVICE_NAME_BUF_LEN: usize = 128;
 pub const RET_OK: i32 = 0;
+pub const C_CHAR_SIZE: usize = std::mem::size_of::<c_char>();
 
 /// NodeBasicInfo is a structure that represents basic information about a node.
 #[repr(C)]
@@ -97,22 +98,6 @@ pub struct StreamFrameInfo {
     pub tv_list: i32,
 }
 
-/// ISessionListener is a structure that defines the callbacks for session events.
-#[repr(C)]
-#[derive(Default)]
-pub struct ISessionListener {
-    /// The callback function is used to do something after listening that a session has been opened.
-    pub on_session_opened: Option<OnSessionOpened>,
-    /// The callback function is used to do something after listening that a session has been closed.
-    pub on_session_closed: Option<OnSessionClosed>,
-    /// The callback function is used to do something when listening to receive some byte messages.
-    pub on_bytes_received: Option<OnBytesReceived>,
-    /// The callback function is used to do something when listening to receive some string messages.
-    pub on_message_received: Option<OnMessageReceived>,
-    /// The callback function is used to do something when listening to receive some stream messages.
-    pub on_stream_received: Option<OnstreamReceived>,
-}
-
 // Callback function type for OnSessionOpened() from native, this callback will be called after listening
 // that a session has been opened.
 pub type OnSessionOpened = extern "C" fn (session_id: i32, resultValue: i32) -> i32;
@@ -129,6 +114,55 @@ pub type OnMessageReceived = extern "C" fn (session_id: i32, byteData: *const c_
 // to receive some stream messages.
 pub type OnstreamReceived = extern "C" fn (session_id: i32, byteData: *const StreamData,
     extData: *const StreamData, paramData: *const StreamFrameInfo);
+
+/// ISessionListener is a structure that defines the callbacks for session events.
+#[repr(C)]
+pub struct ISessionListener {
+    /// The callback function is used to do something after listening that a session has been opened.
+    pub on_session_opened: OnSessionOpened,
+    /// The callback function is used to do something after listening that a session has been closed.
+    pub on_session_closed: OnSessionClosed,
+    /// The callback function is used to do something when listening to receive some byte messages.
+    pub on_bytes_received: OnBytesReceived,
+    /// The callback function is used to do something when listening to receive some string messages.
+    pub on_message_received: OnMessageReceived,
+    /// The callback function is used to do something when listening to receive some stream messages.
+    pub on_stream_received: OnstreamReceived,
+}
+
+/// Provide for C lib to call
+extern "C" fn on_session_opened_c(_session_id: i32, _result: i32) -> i32 {
+    0
+}
+
+/// Provide for C lib to call
+extern "C" fn on_session_closed_c(_session_id: i32) {
+}
+
+/// Provide for C lib to call
+extern "C" fn on_bytes_received_c(_session_id: i32, _data: *const c_void, _data_len: u32) {
+}
+
+/// Provide for C lib to call
+extern "C" fn on_message_received_c(_session_id: i32, _byte_data: *const c_void, _data_len: u32) {
+}
+
+/// Provide for C lib to call
+extern "C" fn on_stream_received_c(_session_id: i32, _byte_data: *const StreamData,
+    _ext_data: *const StreamData, _param_data: *const StreamFrameInfo) {
+}
+
+impl Default for ISessionListener {
+    fn default() -> Self {
+        ISessionListener {
+            on_session_opened: on_session_opened_c,
+            on_session_closed: on_session_closed_c,
+            on_bytes_received: on_bytes_received_c,
+            on_message_received: on_message_received_c,
+            on_stream_received: on_stream_received_c,
+        }
+    }
+}
 
 // These C interfaces are defined in lib: dsoftbus:softbus_client
 extern "C" {
