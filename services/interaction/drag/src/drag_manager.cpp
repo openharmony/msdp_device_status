@@ -17,9 +17,7 @@
 
 #include "extra_data.h"
 #include "hitrace_meter.h"
-#include "input_manager.h"
 #include "pixel_map.h"
-#include "pointer_style.h"
 #include "udmf_client.h"
 #include "unified_types.h"
 

@@ -57,6 +57,9 @@ public:
     DrawMouseIconModifier() = default;
     ~DrawMouseIconModifier() = default;
     void Draw(Rosen::RSDrawingContext &context) const override;
+
+private:
+    void OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const;
 };
 
 class DrawDynamicEffectModifier : public Rosen::RSContentStyleModifier {
@@ -86,6 +89,8 @@ struct DrawingInfo {
     int32_t pixelMapY { -1 };
     int32_t displayX { -1 };
     int32_t displayY { -1 };
+    int32_t mouseWidth { 0 };
+    int32_t mouseHeight { 0 };
     int32_t rootNodeWidth { -1 };
     int32_t rootNodeHeight { -1 };
     float scalingValue { 0.0 };

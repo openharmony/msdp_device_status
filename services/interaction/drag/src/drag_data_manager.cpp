@@ -16,7 +16,6 @@
 #include "drag_data_manager.h"
 
 #include "hitrace_meter.h"
-#include "pointer_style.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
