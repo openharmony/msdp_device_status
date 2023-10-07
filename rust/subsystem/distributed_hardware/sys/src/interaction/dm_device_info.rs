@@ -16,16 +16,16 @@
 use crate::{ CDmDeviceInfo, CDmAuthForm };
 use std::ffi::CStr;
 
-/// DmDeviceInfo packed the native CDmDeviceInfo
+/// DmDeviceInfo packed the native CDmDeviceInfo.
 pub struct DmDeviceInfo(*const CDmDeviceInfo);
 
 impl DmDeviceInfo {
-    /// Create a PointerEvent object
+    /// Create a PointerEvent object.
     pub fn new(device_info: *const CDmDeviceInfo) -> Self {
         Self(device_info)
     }
 
-    /// Extract a raw `CDmDeviceInfo` pointer from this wrapper
+    /// Extract a raw `CDmDeviceInfo` pointer from this wrapper.
     /// 
     /// # Safety
     /// 
@@ -44,7 +44,7 @@ impl DmDeviceInfo {
 }
 
 impl DmDeviceInfo {
-    /// Get CDmDeviceInfo device id property
+    /// Get the device id attribute of CDmDeviceInfo.
     pub fn device_id(&self) -> String {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
@@ -52,7 +52,7 @@ impl DmDeviceInfo {
         device_id.to_string_lossy().into_owned()
     }
 
-    /// Get CDmDeviceInfo device name property
+    /// Get the device name attribute of CDmDeviceInfo.
     pub fn device_name(&self) -> String {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
@@ -60,7 +60,7 @@ impl DmDeviceInfo {
         device_name.to_string_lossy().into_owned()
     }
 
-    /// Get CDmDeviceInfo device type id property
+    /// Get the device type id attribute of CDmDeviceInfo.
     pub fn device_type_id(&self) -> u16 {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
@@ -69,7 +69,7 @@ impl DmDeviceInfo {
         }
     }
 
-    /// Get CDmDeviceInfo network id property
+    /// Get the network id attribute of CDmDeviceInfo.
     pub fn network_id(&self) -> String {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
@@ -77,7 +77,7 @@ impl DmDeviceInfo {
         network_id.to_string_lossy().into_owned()
     }
 
-    /// Get CDmDeviceInfo range property
+    /// Get the range attribute of CDmDeviceInfo.
     pub fn range(&self) -> i32 {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.
@@ -86,7 +86,7 @@ impl DmDeviceInfo {
         }
     }
 
-    /// Get CDmDeviceInfo DmAuthForm property
+    /// Get the auth form attribute of CDmDeviceInfo.
     pub fn auth_form(&self) -> CDmAuthForm {
         // SAFETY:
         // Rust `DmDeviceInfo` always hold a valid native `CDmDeviceInfo`.

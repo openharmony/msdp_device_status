@@ -16,5 +16,7 @@
 //! Several utils.
 
 mod macros;
+mod errors;
 
 pub use macros::InnerFunctionTracer;
+pub use errors::{ FusionErrorCode, FusionResult };

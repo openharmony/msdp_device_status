@@ -212,47 +212,31 @@ void VirtualMouseBuilder::Act(int32_t argc, char *argv[])
         return;
     }
     do {
-        switch (opt) {
-            case 'd': {
-                ReadDownAction();
-                break;
+        {
+            auto action = regularActions_.find(opt);
+            if (action != regularActions_.end()) {
+                action->second();
+                continue;
             }
-            case 'u': {
-                ReadUpAction();
-                break;
+        }
+        {
+            auto action = readActions_.find(opt);
+            if (action != readActions_.end()) {
+                action->second(optarg);
+                continue;
             }
-            case 's': {
-                ReadScrollAction();
-                break;
+        }
+        {
+            auto action = moveActions_.find(opt);
+            if (action != moveActions_.end()) {
+                action->second(argc, argv);
+                continue;
             }
-            case 'm': {
-                ReadMoveAction(argc, argv);
-                break;
-            }
-            case 'M': {
-                ReadMoveToAction(argc, argv);
-                break;
-            }
-            case 'D': {
-                ReadDragToAction(argc, argv);
-                break;
-            }
-            case 'f': {
-                ReadActions(optarg);
-                break;
-            }
-            case 'r': {
-                ReadRawInput(optarg);
-                break;
-            }
-            case 'w': {
-                VirtualDeviceBuilder::WaitFor(optarg, "mouse");
-                break;
-            }
-            default: {
-                ShowUsage();
-                break;
-            }
+        }
+        if (opt == 'w') {
+            VirtualDeviceBuilder::WaitFor(optarg, "mouse");
+        } else {
+            ShowUsage();
         }
     } while ((opt = getopt(argc, argv, "d:u:s:m:M:f:r:w:D:")) >= 0);
 }
@@ -293,7 +277,7 @@ void VirtualMouseBuilder::ReadMoveAction(int32_t argc, char *argv[])
         dy = std::atoi(argv[optind++]);
     }
     std::cout << "[mouse] move: (" << dx << "," << dy << ")" << std::endl;
-    VirtualMouse::GetDevice()->Move(dx, dy);
+    VirtualMouse::GetDevice()->MoveProcess(dx, dy);
 }
 
 void VirtualMouseBuilder::ReadMoveToAction(int32_t argc, char *argv[])

@@ -42,7 +42,9 @@
         "device_info_manager",
         "dsoftbus",
         "common",
-        "motion"
+        "motion",
+        "build_framework",
+        "ylong_runtime"
       ],
       "third_party": [
         "cJSON",

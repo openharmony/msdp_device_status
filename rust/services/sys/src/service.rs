@@ -22,8 +22,7 @@ use std::ffi::{ c_char, CString };
 use std::os::fd::RawFd;
 use std::sync::{ Mutex, Once };
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_data_rust::{ FusionResult };
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use crate::binding::FusionNativeService;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -51,7 +50,7 @@ impl FusionServiceImpl {
     }
 
     fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         call_debug_enter!("FusionServiceImpl:alloc_socket_fd");
         self.native_service.alloc_socket_fd(program_name, module_type, client_fd, token_type)
@@ -65,7 +64,7 @@ pub struct FusionService {
 }
 
 impl FusionService {
-    /// TODO: add documentation.
+    /// Get the single instance of [`FusionService`].
     pub fn get_instance() -> Option<&'static Self> {
         static mut FUSION_SERVICE_PROXY: Option<FusionService> = None;
         static INIT_ONCE: Once = Once::new();
@@ -105,7 +104,7 @@ impl FusionService {
 
     /// Call to allocate socket pair for client/server communication.
     pub fn alloc_socket_fd(&self, program_name: &str, module_type: i32,
-        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<i32>
+        client_fd: &mut RawFd, token_type: &mut i32) -> FusionResult<()>
     {
         match self.service_impl.lock() {
             Ok(guard) => {
@@ -113,7 +112,7 @@ impl FusionService {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {}", err);
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

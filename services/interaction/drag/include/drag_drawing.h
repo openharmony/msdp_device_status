@@ -77,6 +77,7 @@ struct DrawingInfo {
     std::atomic_bool isPreviousDefaultStyle { false };
     std::atomic_bool isCurrentDefaultStyle { false };
     bool isInitUiDirector { true };
+    bool isExistScalingVallue { false };
     int32_t sourceType { -1 };
     int32_t currentDragNum { -1 };
     DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
@@ -87,11 +88,21 @@ struct DrawingInfo {
     int32_t displayY { -1 };
     int32_t rootNodeWidth { -1 };
     int32_t rootNodeHeight { -1 };
+    float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+    std::string filterInfo;
+    std::string extraInfo;
+};
+
+struct FilterInfo {
+    std::string componentType;
+    int32_t blurStyle;
+    int32_t cornerRadius;
+    float dipScale;
 };
 
 class DragDrawing : public IDragAnimation {
@@ -145,7 +156,9 @@ private:
     int32_t GetFilePath(std::string &filePath);
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
-
+    bool ParserFilterInfo(FilterInfo& filterInfo);
+    void ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode);
+    static float RadiusVp2Sigma(float radiusVp, float dipScale);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };

@@ -50,6 +50,7 @@ public:
     void SendDragData(int32_t targetTid, const std::string &udKey);
     int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t GetDragData(DragData &dragData);
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -59,6 +60,8 @@ public:
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(void)> callback) override;
+    void SetPointerEventFilterTime(int64_t filterTime) override;
+    void MoveTo(int32_t x, int32_t y) override;
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;

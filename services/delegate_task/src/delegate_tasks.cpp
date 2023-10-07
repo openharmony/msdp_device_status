@@ -62,7 +62,7 @@ bool DelegateTasks::Init()
 {
     CALL_DEBUG_ENTER;
     if (::pipe2(fds_, O_CLOEXEC | O_NONBLOCK) != 0) {
-        FI_HILOGE("pipe2 fail: %{public}s", ::strerror(errno));
+        FI_HILOGE("pipe2 failed, errno:%{public}s", ::strerror(errno));
         return false;
     }
     return true;

@@ -45,9 +45,9 @@ int32_t CoordinationStateIn::ActivateCoordination(const std::string &remoteNetwo
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
-    int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId, false);
     if (ret != RET_OK) {
-        FI_HILOGE("Start coordination fail");
+        FI_HILOGE("Start coordination failed");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_start_task";
@@ -77,7 +77,7 @@ int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNet
     CALL_DEBUG_ENTER;
     int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(remoteNetworkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop coordination fail");
+        FI_HILOGE("Stop coordination failed");
         return ret;
     }
     (void)(preparedNetworkId);
@@ -91,14 +91,14 @@ int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNet
 int32_t CoordinationStateIn::ProcessStop()
 {
     CALL_DEBUG_ENTER;
-    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_);
+    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, true);
     std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_);
     int32_t ret = D_INPUT_ADAPTER->StopRemoteInput(
         originNetworkId, inputDeviceDhids, [this, originNetworkId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, originNetworkId, -1);
         });
     if (ret != RET_OK) {
-        FI_HILOGE("Stop remote input fail");
+        FI_HILOGE("Stop remote input failed");
         COOR_SM->OnStopFinish(false, originNetworkId);
     }
     return RET_OK;

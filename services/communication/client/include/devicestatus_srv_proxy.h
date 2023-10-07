@@ -51,6 +51,7 @@ public:
     virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) override;
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
+    virtual int32_t GetDragData(DragData &dragData) override;
     virtual int32_t GetDragTargetPid() override;
     virtual int32_t GetUdKey(std::string &udKey) override;
     virtual int32_t AddDraglistener() override;

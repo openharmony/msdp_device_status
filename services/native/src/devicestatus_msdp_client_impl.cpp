@@ -42,8 +42,8 @@ using ClientValue = OnChangedValue;
 DeviceStatusMsdpClientImpl::DeviceStatusMsdpClientImpl()
 {
     for (int32_t type = 0; type < static_cast<int32_t>(Type::TYPE_MAX); ++type) {
-        algoCallCount_[static_cast<Type>(type)] = 0;
-        mockCallCount_[static_cast<Type>(type)] = 0;
+        algoCallCounts_[static_cast<Type>(type)] = 0;
+        mockCallCounts_[static_cast<Type>(type)] = 0;
     }
 }
 
@@ -73,9 +73,9 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     }
     CHKPR(iMock_, RET_ERR);
     iMock_->Enable(type);
-    auto iter = mockCallCount_.find(type);
-    if (iter == mockCallCount_.end()) {
-        auto ret = mockCallCount_.emplace(type, 0);
+    auto iter = mockCallCounts_.find(type);
+    if (iter == mockCallCounts_.end()) {
+        auto ret = mockCallCounts_.emplace(type, 0);
         if (!ret.second) {
             FI_HILOGW("type is duplicated");
             return RET_ERR;
@@ -84,7 +84,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
         iter->second++;
     }
     RegisterMock();
-    FI_HILOGI("mockCallCount_:%{public}d", mockCallCount_[type]);
+    FI_HILOGI("mockCallCounts_:%{public}d", mockCallCounts_[type]);
     return RET_OK;
 }
 
@@ -104,9 +104,9 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         return RET_ERR;
     }
 
-    auto iter = algoCallCount_.find(type);
-    if (iter == algoCallCount_.end()) {
-        auto ret =  algoCallCount_.emplace(type, 0);
+    auto iter = algoCallCounts_.find(type);
+    if (iter == algoCallCounts_.end()) {
+        auto ret =  algoCallCounts_.emplace(type, 0);
         if (!ret.second) {
             FI_HILOGW("type is duplicated");
             return RET_ERR;
@@ -115,7 +115,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
         iter->second++;
     }
     RegisterAlgo();
-    FI_HILOGI("algoCallCount_:%{public}d", algoCallCount_[type]);
+    FI_HILOGI("algoCallCounts_:%{public}d", algoCallCounts_[type]);
     return RET_OK;
 }
 
@@ -153,9 +153,10 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 {
     if ((type == Type::TYPE_ABSOLUTE_STILL) || (type == Type::TYPE_HORIZONTAL_POSITION) ||
         (type == Type::TYPE_VERTICAL_POSITION)) {
+        FI_HILOGI("support ability type:%{public}d", type);
         return RET_OK;
     }
-    FI_HILOGI("Not support ability");
+    FI_HILOGE("Not support ability");
     return RET_ERR;
 }
 
@@ -175,20 +176,20 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 {
     CALL_DEBUG_ENTER;
     CHKPR(iAlgo_, RET_ERR);
-    auto iter = algoCallCount_.find(type);
-    if (iter == algoCallCount_.end()) {
+    auto iter = algoCallCounts_.find(type);
+    if (iter == algoCallCounts_.end()) {
         FI_HILOGE("Failed to find record type");
         return RET_ERR;
     }
     if (iter->second == 0) {
-        algoCallCount_.erase(type);
+        algoCallCounts_.erase(type);
     } else {
         iAlgo_->Disable(type);
         UnregisterAlgo();
     }
     iter->second--;
-    algoCallCount_.erase(type);
-    if (algoCallCount_.empty()) {
+    algoCallCounts_.erase(type);
+    if (algoCallCounts_.empty()) {
         if (UnloadAlgoLibrary() == RET_ERR) {
             FI_HILOGE("Failed to close algorithm library");
             return RET_ERR;
@@ -197,7 +198,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
         iAlgo_ = nullptr;
         callBacksMgr_ = nullptr;
     }
-    FI_HILOGI("algoCallCount_:%{public}d", algoCallCount_[type]);
+    FI_HILOGI("algoCallCounts_:%{public}d", algoCallCounts_[type]);
     return RET_OK;
 }
 
@@ -205,20 +206,20 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 {
     CALL_DEBUG_ENTER;
     CHKPR(iMock_, RET_ERR);
-    auto iter = mockCallCount_.find(type);
-    if (iter == mockCallCount_.end()) {
+    auto iter = mockCallCounts_.find(type);
+    if (iter == mockCallCounts_.end()) {
         FI_HILOGE("Failed to find record type");
         return RET_ERR;
     }
     if (iter->second == 0) {
-        mockCallCount_.erase(type);
+        mockCallCounts_.erase(type);
     } else {
         iMock_->DisableCount(type);
         iMock_->Disable(type);
         UnregisterMock();
     }
     iter->second--;
-    if (mockCallCount_.empty()) {
+    if (mockCallCounts_.empty()) {
         if (UnloadMockLibrary() == RET_ERR) {
             FI_HILOGE("Failed to close library");
             return RET_ERR;
@@ -300,14 +301,14 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mutex_);
-    for (auto iter = deviceStatusDataMap_.begin(); iter != deviceStatusDataMap_.end(); ++iter) {
+    for (auto iter = deviceStatusDatas_.begin(); iter != deviceStatusDatas_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;
             notifyManagerFlag_ = true;
             return data;
         }
     }
-    auto ret = deviceStatusDataMap_.insert(std::make_pair(data.type, data.value));
+    auto ret = deviceStatusDatas_.insert(std::make_pair(data.type, data.value));
     if (!ret.second) {
         FI_HILOGW("type is duplicated");
         return data;
@@ -318,7 +319,7 @@ Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
 
 std::map<ClientType, ClientValue> DeviceStatusMsdpClientImpl::GetObserverData() const
 {
-    return deviceStatusDataMap_;
+    return deviceStatusDatas_;
 }
 
 void DeviceStatusMsdpClientImpl::GetDeviceStatusTimestamp()
@@ -334,7 +335,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
 {
     CALL_DEBUG_ENTER;
     if (mock_.handle != nullptr) {
-        FI_HILOGE("mock handle is not nullptr");
+        FI_HILOGW("mock handle is not nullptr");
         return RET_OK;
     }
     std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;
@@ -386,7 +387,7 @@ IMsdp* DeviceStatusMsdpClientImpl::GetMockInst(Type type)
     if (mock_.pAlgorithm == nullptr) {
         std::unique_lock lock(mutex_);
         mock_.pAlgorithm = mock_.create();
-        mockCallCount_[type] = 0;
+        mockCallCounts_[type] = 0;
     }
     return mock_.pAlgorithm;
 }

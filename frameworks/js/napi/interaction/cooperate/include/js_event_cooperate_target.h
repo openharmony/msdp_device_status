@@ -71,7 +71,6 @@ private:
     static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
-    static std::unique_ptr<JsUtilCooperate::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 
     inline static std::map<CoordinationMessage, CooperateMessage> messageTransform = {
         { CoordinationMessage::PREPARE, CooperateMessage::STATE_ON },
@@ -80,8 +79,8 @@ private:
         { CoordinationMessage::ACTIVATE_SUCCESS, CooperateMessage::INFO_SUCCESS },
         { CoordinationMessage::ACTIVATE_FAIL, CooperateMessage::INFO_FAIL }
     };
-    inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtilCooperate::CallbackInfo>>>
-        coordinationListener_ {};
+    inline static std::map<std::string_view, std::vector<sptr<JsUtilCooperate::CallbackInfo>>>
+        coordinationListeners_ {};
     std::atomic_bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus

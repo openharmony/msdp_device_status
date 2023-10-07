@@ -33,7 +33,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "drag_manager.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -148,15 +148,15 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
 void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    if (appInfoMap_.empty()) {
-        FI_HILOGE("appInfoMap_ is empty");
+    if (appInfos_.empty()) {
+        FI_HILOGE("appInfos_ is empty");
         return;
     }
     std::string startTime;
     GetTimeStamp(startTime);
     dprintf(fd, "Current time:%s \n", startTime.c_str());
-    for (const auto &item : appInfoMap_) {
-        for (auto appInfo : item.second) {
+    for (const auto &item : appInfos_) {
+        for (const auto &appInfo : item.second) {
             dprintf(fd, "startTime:%s | uid:%d | pid:%d | type:%s | packageName:%s\n",
                 appInfo->startTime.c_str(), appInfo->uid, appInfo->pid, GetStatusType(appInfo->type).c_str(),
                 appInfo->packageName.c_str());
@@ -277,16 +277,16 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CHKPV(appInfo);
     GetTimeStamp(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
-    auto iter = appInfoMap_.find(appInfo->type);
-    if (iter == appInfoMap_.end()) {
+    auto iter = appInfos_.find(appInfo->type);
+    if (iter == appInfos_.end()) {
         if (appInfos.insert(appInfo).second) {
-            auto [_, ret] = appInfoMap_.insert(std::make_pair(appInfo->type, appInfos));
+            auto [_, ret] = appInfos_.insert(std::make_pair(appInfo->type, appInfos));
             if (!ret) {
                 FI_HILOGW("type is duplicated");
             }
         }
     } else {
-        if (!appInfoMap_[iter->first].insert(appInfo).second) {
+        if (!appInfos_[iter->first].insert(appInfo).second) {
             FI_HILOGW("appInfo is duplicated");
         }
     }
@@ -297,17 +297,17 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CALL_DEBUG_ENTER;
     CHKPV(appInfo);
     CHKPV(appInfo->callback);
-    FI_HILOGI("appInfoMap size:%{public}zu", appInfoMap_.size());
+    FI_HILOGI("appInfoMap size:%{public}zu", appInfos_.size());
 
-    auto appInfoSetIter = appInfoMap_.find(appInfo->type);
-    if (appInfoSetIter == appInfoMap_.end()) {
+    auto appInfoSetIter = appInfos_.find(appInfo->type);
+    if (appInfoSetIter == appInfos_.end()) {
         FI_HILOGE("Not exist %{public}d type appInfo", appInfo->type);
         return;
     }
     FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu",
-        appInfo->type, appInfoMap_[appInfoSetIter->first].size());
-    auto iter = appInfoMap_.find(appInfo->type);
-    if (iter == appInfoMap_.end()) {
+        appInfo->type, appInfos_[appInfoSetIter->first].size());
+    auto iter = appInfos_.find(appInfo->type);
+    if (iter == appInfos_.end()) {
         FI_HILOGW("Remove app info is not exists");
         return;
     }

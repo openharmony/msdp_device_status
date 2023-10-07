@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! IPC data definitions of DRAG module.
+//! Common data definitions of IPC.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -32,7 +32,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionIpcDefaultData"
 };
 
-/// struct CallingContext
+/// User ID、user token、user process ID etc. of one IPC request.
 pub struct CallingContext {
     calling_uid: u64,
     calling_pid: u64,
@@ -40,7 +40,7 @@ pub struct CallingContext {
 }
 
 impl CallingContext {
-    /// TODO: add documentation.
+    /// Get user ID、user token、user process ID etc. of current IPC request.
     pub fn current() -> Self {
         info!(LOG_LABEL, "in CallingContext::current(): assemble current calling context");
         Self {

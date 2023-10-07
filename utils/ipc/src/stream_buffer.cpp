@@ -44,7 +44,7 @@ void StreamBuffer::Clean()
     Reset();
     errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
     if (ret != EOK) {
-        FI_HILOGE("Call memset_s fail");
+        FI_HILOGE("Call memset_s failed");
         return;
     }
 }

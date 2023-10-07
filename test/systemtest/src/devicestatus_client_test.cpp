@@ -199,8 +199,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest007, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -217,8 +217,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest008, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -235,8 +235,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest009, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusData failed";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
 /**
@@ -253,9 +253,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_LID_OPEN &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest004 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest010 end";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest004 failed";
 }
 
 /**
@@ -265,16 +264,15 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest010, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 Enter";
+    CALL_TEST_DEBUG;
     Type type = Type::TYPE_INVALID;
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest005 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest011 end";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest005 failed";
 }
 
 /**
@@ -284,16 +282,15 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest011, TestSize.Level0)
  */
 HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest012, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 Enter";
+    CALL_TEST_DEBUG;
     Type type = static_cast<Type>(10);
     auto stationaryMgr = StationaryManager::GetInstance();
     Data data = stationaryMgr->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_TRUE(data.type == Type::TYPE_INVALID &&
-        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT)
-        << "GetDeviceStatusDataTest006 failed";
-    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest012 end";
+        data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT);
+    GTEST_LOG_(INFO) << "GetDeviceStatusDataTest006 failed";
 }
 } // namespace DeviceStatus
 } // namespace Msdp

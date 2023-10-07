@@ -33,7 +33,7 @@ class DragDataManager final {
 public:
     DISALLOW_MOVE(DragDataManager);
 
-    void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
+    void Init(const DragData &dragData);
     DragData GetDragData() const;
     void SetDragStyle(DragCursorStyle style);
     void SetShadowInfo(const ShadowInfo &shadowInfo);
@@ -50,7 +50,6 @@ public:
     bool IsMotionDrag() const;
 private:
     DragData dragData_;
-    OHOS::MMI::PointerStyle pointerStyle_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::u16string dragMessage_;
     bool visible_ { false };

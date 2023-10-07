@@ -26,7 +26,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -48,6 +48,7 @@ public:
     int32_t SetDragWindowVisible(bool visible);
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t GetDragData(DragData &dragData);
 
 private:
     std::mutex mtx_;

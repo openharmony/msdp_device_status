@@ -28,7 +28,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     CHKPV(remote);
-    FI_HILOGD("Recv death notice");
+    FI_HILOGI("Recv death notice");
 }
 
 bool DeviceStatusManager::Init()
@@ -37,7 +37,7 @@ bool DeviceStatusManager::Init()
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new (std::nothrow) DeviceStatusCallbackDeathRecipient();
         if (devicestatusCBDeathRecipient_ == nullptr) {
-            FI_HILOGE("devicestatusCBDeathRecipient_ failed");
+            FI_HILOGE("DevicestatusCBDeathRecipient_ failed");
             return false;
         }
     }
@@ -132,9 +132,9 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
     CALL_DEBUG_ENTER;
     FI_HILOGI("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
-    auto iter = listenerMap_.find(devicestatusData.type);
-    if (iter == listenerMap_.end()) {
-        FI_HILOGI("type:%{public}d", devicestatusData.type);
+    auto iter = listeners_.find(devicestatusData.type);
+    if (iter == listeners_.end()) {
+        FI_HILOGE("DevicestatusData not find type:%{public}d", devicestatusData.type);
         return false;
     }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
@@ -188,27 +188,27 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
     arrs_ [type_] = event_;
     FI_HILOGI("type_:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
-    FI_HILOGI("listenerMap_.size:%{public}zu", listenerMap_.size());
+    FI_HILOGI("listeners_.size:%{public}zu", listeners_.size());
     auto object = callback->AsObject();
     CHKPV(object);
     std::lock_guard lock(mutex_);
-    auto dtTypeIter = listenerMap_.find(type);
-    if (dtTypeIter == listenerMap_.end()) {
+    auto dtTypeIter = listeners_.find(type);
+    if (dtTypeIter == listeners_.end()) {
         if (listeners.insert(callback).second) {
             FI_HILOGI("No found set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
-        auto [_, ret] = listenerMap_.insert(std::make_pair(type, listeners));
+        auto [_, ret] = listeners_.insert(std::make_pair(type, listeners));
         if (!ret) {
             FI_HILOGW("type is duplicated");
         }
     } else {
-        FI_HILOGI("callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());
-        auto iter = listenerMap_[dtTypeIter->first].find(callback);
-        if (iter != listenerMap_[dtTypeIter->first].end()) {
+        FI_HILOGI("callbacklist.size:%{public}zu", listeners_[dtTypeIter->first].size());
+        auto iter = listeners_[dtTypeIter->first].find(callback);
+        if (iter != listeners_[dtTypeIter->first].end()) {
             return;
         }
-        if (listenerMap_[dtTypeIter->first].insert(callback).second) {
+        if (listeners_[dtTypeIter->first].insert(callback).second) {
             FI_HILOGI("Find set list of type, insert success");
             object->AddDeathRecipient(devicestatusCBDeathRecipient_);
         }
@@ -233,26 +233,26 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     }
     auto object = callback->AsObject();
     CHKPV(object);
-    FI_HILOGE("listenerMap_.size:%{public}zu, arrs_:%{public}d", listenerMap_.size(), arrs_ [type_]);
+    FI_HILOGE("listeners_.size:%{public}zu, arrs_:%{public}d", listeners_.size(), arrs_ [type_]);
     FI_HILOGE("UNevent:%{public}d", event);
     std::lock_guard lock(mutex_);
-    auto dtTypeIter = listenerMap_.find(type);
-    if (dtTypeIter == listenerMap_.end()) {
+    auto dtTypeIter = listeners_.find(type);
+    if (dtTypeIter == listeners_.end()) {
         FI_HILOGE("Failed to find listener for type");
         return;
     }
-    FI_HILOGI("callbacklist.size:%{public}zu", listenerMap_[dtTypeIter->first].size());
-    auto iter = listenerMap_[dtTypeIter->first].find(callback);
-    if (iter != listenerMap_[dtTypeIter->first].end()) {
-        if (listenerMap_[dtTypeIter->first].erase(callback) != 0) {
+    FI_HILOGI("callbacklist.size:%{public}zu", listeners_[dtTypeIter->first].size());
+    auto iter = listeners_[dtTypeIter->first].find(callback);
+    if (iter != listeners_[dtTypeIter->first].end()) {
+        if (listeners_[dtTypeIter->first].erase(callback) != 0) {
             object->RemoveDeathRecipient(devicestatusCBDeathRecipient_);
-            if (listenerMap_[dtTypeIter->first].empty()) {
-                listenerMap_.erase(dtTypeIter);
+            if (listeners_[dtTypeIter->first].empty()) {
+                listeners_.erase(dtTypeIter);
             }
         }
     }
-    FI_HILOGI("listenerMap_.size:%{public}zu", listenerMap_.size());
-    if (listenerMap_.empty()) {
+    FI_HILOGI("listeners_.size:%{public}zu", listeners_.size());
+    if (listeners_.empty()) {
         Disable(type);
     } else {
         FI_HILOGI("Other subscribe exist");
@@ -284,7 +284,7 @@ int32_t DeviceStatusManager::GetPackageName(AccessTokenID tokenId, std::string &
         case ATokenTypeEnum::TOKEN_HAP: {
             HapTokenInfo hapInfo;
             if (AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
-                FI_HILOGE("Get hap token info fail");
+                FI_HILOGE("Get hap token info failed");
                 return RET_ERR;
             }
             packageName = hapInfo.bundleName;
@@ -294,7 +294,7 @@ int32_t DeviceStatusManager::GetPackageName(AccessTokenID tokenId, std::string &
         case ATokenTypeEnum::TOKEN_SHELL: {
             NativeTokenInfo tokenInfo;
             if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
-                FI_HILOGE("Get native token info fail");
+                FI_HILOGE("Get native token info failed");
                 return RET_ERR;
             }
             packageName = tokenInfo.processName;

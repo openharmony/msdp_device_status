@@ -76,7 +76,7 @@ void DeviceStatusService::OnStart()
     delegateTasks_.SetWorkerThreadId(tid);
 
     if (!Init()) {
-        FI_HILOGE("On start call init fail");
+        FI_HILOGE("On start call init failed");
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
@@ -167,7 +167,7 @@ bool DeviceStatusService::Init()
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
-        FI_HILOGE("OnStart init fail");
+        FI_HILOGE("OnStart init failed");
         return false;
     }
     if (EpollCreate() != RET_OK) {
@@ -235,6 +235,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->SaveAppInfo(appInfo);
+    StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
     devicestatusManager_->Subscribe(type, event, latency, callback);
     FinishTrace(HITRACE_TAG_MSDP);
     ReportSensorSysEvent(type, true);
@@ -243,7 +244,7 @@ void DeviceStatusService::Subscribe(Type type, ActivityEvent event, ReportLatenc
 
 void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
-    FI_HILOGE("EnterUNevent:%{public}d", event);
+    FI_HILOGI("Enter event:%{public}d", event);
     CHKPV(devicestatusManager_);
     auto appInfo = std::make_shared<AppInfo>();
     appInfo->uid = IPCSkeleton::GetCallingUid();
@@ -394,7 +395,6 @@ int32_t DeviceStatusService::InitDelegateTasks()
     return ret;
 }
 
-
 int32_t DeviceStatusService::InitTimerMgr()
 {
     CALL_INFO_TRACE;
@@ -405,7 +405,7 @@ int32_t DeviceStatusService::InitTimerMgr()
     }
     ret = AddEpoll(EPOLL_EVENT_TIMER, timerMgr_.GetTimerFd());
     if (ret != RET_OK) {
-        FI_HILOGE("AddEpoll for timer fail");
+        FI_HILOGE("AddEpoll for timer failed");
     }
     return ret;
 }
@@ -419,7 +419,7 @@ void DeviceStatusService::OnThread()
     EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        epoll_event ev[MAX_EVENT_SIZE] {};
+        struct epoll_event ev[MAX_EVENT_SIZE] {};
         int32_t count = EpollWait(MAX_EVENT_SIZE, -1, ev[0]);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto epollEvent = reinterpret_cast<device_status_epoll_event*>(ev[i].data.ptr);
@@ -440,7 +440,7 @@ void DeviceStatusService::OnThread()
     FI_HILOGD("Main worker thread stop, tid:%{public}" PRId64 "", tid);
 }
 
-void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
+void DeviceStatusService::OnDelegateTask(const struct epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
         FI_HILOGW("Not epollin");
@@ -456,7 +456,7 @@ void DeviceStatusService::OnDelegateTask(const epoll_event &ev)
     delegateTasks_.ProcessTasks();
 }
 
-void DeviceStatusService::OnTimeout(const epoll_event &ev)
+void DeviceStatusService::OnTimeout(const struct epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
@@ -471,7 +471,7 @@ void DeviceStatusService::OnTimeout(const epoll_event &ev)
     }
 }
 
-void DeviceStatusService::OnDeviceMgr(const epoll_event &ev)
+void DeviceStatusService::OnDeviceMgr(const struct epoll_event &ev)
 {
     CALL_INFO_TRACE;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
@@ -722,6 +722,17 @@ int32_t DeviceStatusService::UpdateShadowPic(const ShadowInfo &shadowInfo)
         std::bind(&DragManager::UpdateShadowPic, &dragMgr_, std::cref(shadowInfo)));
     if (ret != RET_OK) {
         FI_HILOGE("Update shadow picture failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragData, &dragMgr_, std::ref(dragData)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get drag data failed, ret:%{public}d", ret);
     }
     return ret;
 }

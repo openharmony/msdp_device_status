@@ -61,7 +61,7 @@ private:
     std::shared_ptr<AlgoAbsoluteStill> still_ { nullptr };
     std::shared_ptr<AlgoHorizontal> horizontalPosition_ { nullptr };
     std::shared_ptr<AlgoVertical> verticalPosition_ { nullptr };
-    std::map<Type, int32_t> callAlgoNum_ {};
+    std::map<Type, int32_t> callAlgoNums_ {};
     Type algoType_ { TYPE_INVALID };
 };
 } // namespace DeviceStatus

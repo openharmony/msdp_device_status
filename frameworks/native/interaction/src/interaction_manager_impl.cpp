@@ -44,7 +44,7 @@ bool InteractionManagerImpl::InitClient()
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
-        FI_HILOGE("The client fails to start");
+        FI_HILOGE("The client failed to start");
         return false;
     }
     return true;
@@ -264,6 +264,12 @@ int32_t InteractionManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.UpdateShadowPic(shadowInfo);
+}
+
+int32_t InteractionManagerImpl::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetDragData(dragData);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

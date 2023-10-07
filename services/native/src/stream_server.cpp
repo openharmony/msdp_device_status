@@ -45,16 +45,16 @@ void StreamServer::UdsStop()
         epollFd_ = -1;
     }
 
-    for (const auto &item : sessionsMap_) {
+    for (const auto &item : sessionss_) {
         item.second->Close();
     }
-    sessionsMap_.clear();
+    sessionss_.clear();
 }
 
 int32_t StreamServer::GetClientFd(int32_t pid) const
 {
-    auto it = idxPidMap_.find(pid);
-    if (it == idxPidMap_.end()) {
+    auto it = idxPids_.find(pid);
+    if (it == idxPids_.end()) {
         return INVALID_FD;
     }
     return it->second;
@@ -62,8 +62,8 @@ int32_t StreamServer::GetClientFd(int32_t pid) const
 
 int32_t StreamServer::GetClientPid(int32_t fd) const
 {
-    auto it = sessionsMap_.find(fd);
-    if (it == sessionsMap_.end()) {
+    auto it = sessionss_.find(fd);
+    if (it == sessionss_.end()) {
         return INVALID_PID;
     }
     return it->second->GetPid();
@@ -140,7 +140,7 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
     sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
     sess->SetTokenType(tokenType);
     if (!AddSession(sess)) {
-        FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        FI_HILOGE("AddSession failed, errCode:%{public}d", ADD_SESSION_FAIL);
         goto CLOSE_SOCK;
     }
     if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
@@ -178,8 +178,8 @@ void StreamServer::ReleaseSession(int32_t fd, epoll_event& ev)
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
     }
-    if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
-        circleBufMap_.erase(it);
+    if (auto it = circleBufs_.find(fd); it != circleBufs_.end()) {
+        circleBufs_.erase(it);
     }
     auto DeviceStatusService = DeviceStatus::DelayedSpSingleton<DeviceStatus::DeviceStatusService>::GetInstance();
     DeviceStatusService->DelEpoll(EPOLL_EVENT_SOCKET, fd);
@@ -201,7 +201,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
         FI_HILOGE("Invalid fd:%{public}d", fd);
         return;
     }
-    auto& buf = circleBufMap_[fd];
+    auto& buf = circleBufs_[fd];
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
@@ -249,7 +249,7 @@ void StreamServer::DumpSession(const std::string &title)
 {
     FI_HILOGD("in %s:%s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto &[key, value] : sessionsMap_) {
+    for (auto &[key, value] : sessionss_) {
         CHKPV(value);
         FI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
@@ -258,8 +258,8 @@ void StreamServer::DumpSession(const std::string &title)
 
 SessionPtr StreamServer::GetSession(int32_t fd) const
 {
-    auto it = sessionsMap_.find(fd);
-    if (it == sessionsMap_.end()) {
+    auto it = sessionss_.find(fd);
+    if (it == sessionss_.end()) {
         FI_HILOGE("Session not found, fd:%{public}d", fd);
         return nullptr;
     }
@@ -291,14 +291,14 @@ bool StreamServer::AddSession(SessionPtr ses)
         FI_HILOGE("Get process failed");
         return false;
     }
-    if (sessionsMap_.size() > MAX_SESSON_ALARM) {
+    if (sessionss_.size() > MAX_SESSON_ALARM) {
         FI_HILOGE("Too many clients, Warning Value:%{public}zu, Current Value:%{public}zu",
-            MAX_SESSON_ALARM, sessionsMap_.size());
+            MAX_SESSON_ALARM, sessionss_.size());
         return false;
     }
     DumpSession("AddSession");
-    idxPidMap_[pid] = fd;
-    sessionsMap_[fd] = ses;
+    idxPids_[pid] = fd;
+    sessionss_[fd] = ses;
     FI_HILOGI("Add session end");
     return true;
 }
@@ -313,12 +313,12 @@ void StreamServer::DelSession(int32_t fd)
     }
     int32_t pid = GetClientPid(fd);
     if (pid > 0) {
-        idxPidMap_.erase(pid);
+        idxPids_.erase(pid);
     }
-    auto it = sessionsMap_.find(fd);
-    if (it != sessionsMap_.end()) {
+    auto it = sessionss_.find(fd);
+    if (it != sessionss_.end()) {
         NotifySessionDeleted(it->second);
-        sessionsMap_.erase(it);
+        sessionss_.erase(it);
     }
     DumpSession("DelSession");
 }
