@@ -110,29 +110,30 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     return RET_OK;
 }
 
-int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
+int32_t DragManager::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGD("windowId:%{public}d", dropResult.windowId);
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
     }
-    if ((result != DragResult::DRAG_EXCEPTION) && (context_ != nullptr) && (timerId_ >= 0)) {
+    if ((dropResult.result != DragResult::DRAG_EXCEPTION) && (context_ != nullptr) && (timerId_ >= 0)) {
         context_->GetTimerManager().RemoveTimer(timerId_);
         timerId_ = -1;
     }
     int32_t ret = RET_OK;
-    if (OnStopDrag(result, hasCustomAnimation) != RET_OK) {
+    if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation) != RET_OK) {
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
     dragState_ = DragState::STOP;
     stateNotify_.StateChangedNotify(DragState::STOP);
-    if (NotifyDragResult(result) != RET_OK) {
+    if (NotifyDragResult(dropResult.result) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
     }
     DRAG_DATA_MGR.ResetDragData();
-    dragResult_ = static_cast<DragResult>(result);
+    dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
     return ret;
 }
@@ -276,7 +277,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(context_);
     int32_t repeatCount = 1;
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
-        this->StopDrag(DragResult::DRAG_EXCEPTION, false);
+        DragDropResult dropResult { DragResult::DRAG_EXCEPTION, false, -1 };
+        this->StopDrag(dropResult);
     });
     CHKPV(notifyPUllUpCallback_);
     notifyPUllUpCallback_();
