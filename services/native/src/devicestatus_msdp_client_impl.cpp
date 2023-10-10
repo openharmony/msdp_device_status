@@ -156,7 +156,7 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
         FI_HILOGI("support ability type:%{public}d", type);
         return RET_OK;
     }
-    FI_HILOGE("Not support ability");
+    FI_HILOGI("Not support ability");
     return RET_ERR;
 }
 
