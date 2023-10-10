@@ -37,7 +37,7 @@ bool DeviceStatusManager::Init()
     if (devicestatusCBDeathRecipient_ == nullptr) {
         devicestatusCBDeathRecipient_ = new (std::nothrow) DeviceStatusCallbackDeathRecipient();
         if (devicestatusCBDeathRecipient_ == nullptr) {
-            FI_HILOGE("DevicestatusCBDeathRecipient_ failed");
+            FI_HILOGE("devicestatusCBDeathRecipient_ failed");
             return false;
         }
     }
@@ -132,9 +132,10 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
     CALL_DEBUG_ENTER;
     FI_HILOGI("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
+    std::lock_guard lock(mutex_);
     auto iter = listeners_.find(devicestatusData.type);
     if (iter == listeners_.end()) {
-        FI_HILOGE("DevicestatusData not find type:%{public}d", devicestatusData.type);
+        FI_HILOGE("type:%{public}d is not exits", devicestatusData.type);
         return false;
     }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
