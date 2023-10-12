@@ -18,19 +18,14 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-extern crate ipc_rust;
-extern crate hilog_rust;
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_ipc_service_rust;
+use std::ffi::{ c_char, CString };
 
+use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{
     BorrowedMsgParcel, FromRemoteObj, InterfaceToken, MsgParcel,
     RemoteObjRef, Serialize, get_service,
 };
 
-use std::ffi::{ c_char, CString };
-use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use fusion_data_rust::Intention;
 use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_service_rust::{ IDeviceStatus, FusionIpcProxy, MSDP_DEVICESTATUS_SERVICE_ID };

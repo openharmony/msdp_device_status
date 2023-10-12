@@ -19,7 +19,6 @@
 #![allow(unused_variables)]
 
 use std::ffi::{ c_char, CString };
-use std::rc::Rc;
 use fusion_data_rust::{ Intention, DefaultReply, DragData };
 use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
@@ -34,13 +33,11 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 
 /// Definition of proxy for `Drag` service.
 #[derive(Default)]
-pub struct DragClient {
-    dummy: i32
-}
+pub struct DragClient(i32);
 
 impl DragClient {
     /// Request service to change to [`DRAG`] mode.
-    pub fn start_drag(&self, drag_data: &DragData, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    pub fn start_drag(&self, drag_data: &DragData, ipc_client: &FusionIpcClient) -> FusionResult<i32>
     {
         call_debug_enter!("DragClient::start_drag");
         match MsgParcel::new() {

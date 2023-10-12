@@ -15,10 +15,6 @@
 
 //! data definitions.
 
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate fusion_utils_rust;
-
 mod ipc;
 mod plugin_manager;
 

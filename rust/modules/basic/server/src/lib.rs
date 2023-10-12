@@ -18,19 +18,15 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-extern crate fusion_data_rust;
-extern crate fusion_services_rust;
-extern crate fusion_utils_rust;
-extern crate hilog_rust;
-extern crate ipc_rust;
-
 use std::ffi::{ c_char, CString };
 use std::fs::File;
 use std::os::fd::{ FromRawFd, RawFd };
+
 use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
 use ipc_rust::{ BorrowedMsgParcel, Deserialize, FileDesc, Serialize };
-use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext};
-use fusion_services_rust::{ FusionService };
+
+use fusion_data_rust::{ IPlugin, AllocSocketPairParam, BasicParamID, CallingContext };
+use fusion_services_rust::FusionService;
 use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -41,14 +37,12 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 
 /// Module-level interface of general functionalities.
 #[derive(Default)]
-pub struct FusionBasicServer {
-    dummy: i32
-}
+pub struct FusionBasicServer(i32);
 
 impl FusionBasicServer {
     fn alloc_socket_pair(&self, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>
     {
-        let call_param = AllocSocketPairParam::deserialize(data).map_err(|_err| { -1 })?;
+        let call_param = AllocSocketPairParam::deserialize(data).or(Err(FusionErrorCode::Fail))?;
 
         if let Some(proxy) = FusionService::get_instance() {
             let mut client_fd: RawFd = 0;
@@ -58,8 +52,8 @@ impl FusionBasicServer {
                 call_param.module_type, &mut client_fd, &mut token_type)?;
 
             let f = unsafe { File::from_raw_fd(client_fd) };
-            FileDesc::new(f).serialize(reply).map_err(|_err| { FusionErrorCode::Fail })?;
-            token_type.serialize(reply).map_err(|_err| { FusionErrorCode::Fail })?;
+            FileDesc::new(f).serialize(reply).or(Err(FusionErrorCode::Fail))?;
+            token_type.serialize(reply).or(Err(FusionErrorCode::Fail))?;
             Ok(())
         } else {
             error!(LOG_LABEL, "No proxy");

@@ -19,12 +19,14 @@
 #![allow(unused_variables)]
 
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{
+
+use hilog_rust::{ info, hilog, HiLogLabel, LogType };
+use ipc_rust::{
     BorrowedMsgParcel, Serialize, Deserialize, IpcResult,
     get_calling_token_id, get_calling_uid, get_calling_pid
 };
-use crate::fusion_utils_rust::call_debug_enter;
+
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -42,7 +44,7 @@ pub struct CallingContext {
 impl CallingContext {
     /// Get user ID、user token、user process ID etc. of current IPC request.
     pub fn current() -> Self {
-        info!(LOG_LABEL, "in CallingContext::current(): assemble current calling context");
+        info!(LOG_LABEL, "Assemble current calling context");
         Self {
             calling_uid: get_calling_uid(),
             calling_pid: get_calling_pid(),
@@ -51,9 +53,9 @@ impl CallingContext {
     }
 }
 
-/// struct DefaultReply
+/// Default reply for a request.
 pub struct DefaultReply {
-    /// TODO: add documentation.
+    /// The result of a request.
     pub reply: i32,
 }
 
