@@ -165,29 +165,31 @@ void Device::QueryDeviceInfo()
     }
 }
 
+void Device::GetEventMask(const std::string &eventName, uint32_t type,
+    std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGBIT(type, arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get %{public}s events mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
+void Device::GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGPROP(arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
 void Device::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
-    int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get key events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get properties mask, errno:%{public}s", strerror(errno));
-    }
+    GetEventMask("", 0, sizeof(evBitmask_), evBitmask_);
+    GetEventMask("key", EV_KEY, sizeof(keyBitmask_), keyBitmask_);
+    GetEventMask("abs", EV_ABS, sizeof(absBitmask_), absBitmask_);
+    GetEventMask("rel", EV_REL, sizeof(relBitmask_), relBitmask_);
+    GetPropMask("properties", sizeof(propBitmask_), propBitmask_);
 }
 
 void Device::UpdateCapability()

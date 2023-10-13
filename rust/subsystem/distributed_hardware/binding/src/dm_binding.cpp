@@ -99,33 +99,20 @@ CDmDeviceInfo* DmDeviceStateCallback::CreateCDeviceInfo(const OHOS::DistributedH
 {
     CALL_DEBUG_ENTER;
     CDmDeviceInfo* cDeviceInfo = new (std::nothrow) CDmDeviceInfo;
-    CHKPP(cDeviceInfo);
     cDeviceInfo->deviceId = new (std::nothrow) char[sizeof(deviceInfo.deviceId)];
-    CHKPP(cDeviceInfo->deviceId);
     if (strcpy_s(cDeviceInfo->deviceId, sizeof(deviceInfo.deviceId), deviceInfo.deviceId) != EOK) {
         FI_HILOGE("Invalid device id:\'%{public}s\'", deviceInfo.deviceId);
-        delete cDeviceInfo->deviceId;
-        delete cDeviceInfo;
         return nullptr;
     }
     cDeviceInfo->deviceName = new (std::nothrow) char[sizeof(deviceInfo.deviceName)];
-    CHKPP(cDeviceInfo->deviceName);
     if (strcpy_s(cDeviceInfo->deviceName, sizeof(deviceInfo.deviceName), deviceInfo.deviceName) != EOK) {
         FI_HILOGE("Invalid device name:\'%{public}s\'", deviceInfo.deviceName);
-        delete cDeviceInfo->deviceId;
-        delete cDeviceInfo->deviceName;
-        delete cDeviceInfo;
         return nullptr;
     }
     cDeviceInfo->deviceTypeId = deviceInfo.deviceTypeId;
     cDeviceInfo->networkId = new (std::nothrow) char[sizeof(deviceInfo.networkId)];
-    CHKPP(cDeviceInfo->networkId);
     if (strcpy_s(cDeviceInfo->networkId, sizeof(deviceInfo.networkId), deviceInfo.networkId) != EOK) {
         FI_HILOGE("Invalid network id:\'%{public}s\'", deviceInfo.networkId);
-        delete cDeviceInfo->deviceId;
-        delete cDeviceInfo->deviceName;
-        delete cDeviceInfo->networkId;
-        delete cDeviceInfo;
         return nullptr;
     }
     cDeviceInfo->range = deviceInfo.range;
