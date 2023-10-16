@@ -256,11 +256,6 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
 int32_t FusionDeviceProfileAdapter::UnregisterCrossStateListener(const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("device_id is :%{public}s ", deviceId.c_str());
-    for (std::map<std::string, std::shared_ptr<ProfileEventCallback>>::iterator it = callbacks_.begin();
-        it != callbacks_.end(); it++) {
-        FI_HILOGD("device_id is :%{public}s, callback is used :%{public}ld,", (it->first).c_str(), (it->second).use_count());
-    } 
     auto cbIter = callbacks_.find(deviceId);
     if (cbIter == callbacks_.end()){
         FI_HILOGW("This device has no callback");
@@ -338,9 +333,6 @@ int32_t SyncCrossSwitchState(int32_t state, CIStringVector *deviceIds)
 
     for (size_t i = 0; i < deviceIds->size(deviceIds); ++i) {
         const char *device_id = deviceIds->at(deviceIds, i);
-        FI_HILOGD("the device_id b is :%{public}s ", device_id);
-        int32_t len =  strlen(device_id);
-        FI_HILOGD("the length of device_id b is :%{public}d ", len);
         CHKPR(device_id, RET_ERR);
         deviceId.emplace_back(std::string(device_id));
     }
