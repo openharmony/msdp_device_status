@@ -28,8 +28,10 @@
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
+#include "input_manager.h"
 #include "parameters.h"
 #include "pointer_event.h"
+#include "pointer_style.h"
 #include "render/rs_filter.h"
 #include "string_ex.h"
 #include "transaction/rs_interfaces.h"
@@ -81,7 +83,13 @@ constexpr float BLUR_SIGMA_SCALE { 0.57735f };
 constexpr float RADIUS_VP { 23.0f };
 constexpr float DEFAULT_SATURATION { 1.05f };
 constexpr float DEFAULT_BRIGHTNESS { 1.05f };
+constexpr float INCREASE_RATIO { 1.22f };
+constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
+constexpr int32_t INVALID_COLOR_VALUE { -1 };
+constexpr int32_t GLOBAL_WINDOW_ID { -1 };
+constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "AnimationEventRunner" };
@@ -90,7 +98,8 @@ const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy
 const std::string DEFAULT_DRAG_PATH { "/system/etc/device_status/drag_icon/Default_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
 const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_One_Drag.svg" };
-const std::string MOUSE_DRAG_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag.svg" };
+const std::string MOUSE_DRAG_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Default.svg" };
+const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Cursor_Circle.png" };
 const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 #ifdef __aarch64__
 const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
@@ -304,8 +313,8 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         return RET_ERR;
     }
     int32_t adjustSize = (SVG_WIDTH + TWELVE_SIZE) * scalingValue;
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
-    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + g_drawingInfo.mouseWidth + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + g_drawingInfo.mouseHeight + adjustSize;
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
@@ -378,6 +387,8 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.pixelMapY = -1;
     g_drawingInfo.displayX = -1;
     g_drawingInfo.displayY = -1;
+    g_drawingInfo.mouseWidth = 0;
+    g_drawingInfo.mouseHeight = 0;
     g_drawingInfo.rootNodeWidth = -1;
     g_drawingInfo.rootNodeHeight = -1;
     g_drawingInfo.pixelMap = nullptr;
@@ -1030,8 +1041,6 @@ bool DragDrawing::NeedAdjustSvgInfo()
     }
     std::string deviceType = system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::MOVE) &&
-        ((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
-        (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
@@ -1055,11 +1064,8 @@ int32_t DragDrawing::GetFilePath(std::string &filePath)
             break;
         }
         case DragCursorStyle::MOVE: {
-            std::string deviceType = system::GetDeviceType();
-            if (((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
-                (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
-                (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-                FI_HILOGD("Device type is phone, not need draw svg style, deviceType:%{public}s", deviceType.c_str());
+            if (g_drawingInfo.currentDragNum == DRAG_NUM_ONE) {
+                FI_HILOGD("Not need draw svg style, current drag number is one");
                 filePath = DEFAULT_DRAG_PATH;
             } else {
                 filePath = MOVE_DRAG_PATH;
@@ -1194,7 +1200,7 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
     return radiusPx > 0.0f ? BLUR_SIGMA_SCALE * radiusPx + 0.5f : 0.0f;
 }
 
-DragDrawing::~DragDrawing() 
+DragDrawing::~DragDrawing()
 {
     if (dragExtHandle_ != nullptr) {
         dlclose(dragExtHandle_);
@@ -1236,8 +1242,8 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
     adjustSize = (SVG_WIDTH + TWELVE_SIZE) * scalingValue;
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + adjustSize;
-    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + g_drawingInfo.mouseWidth + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + g_drawingInfo.mouseHeight + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
@@ -1275,18 +1281,46 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     CALL_DEBUG_ENTER;
-    std::string imagePath = MOUSE_DRAG_PATH;
+    std::string imagePath;
+    MMI::PointerStyle pointerStyle;
+    int32_t ret = MMI::InputManager::GetInstance()->GetPointerStyle(GLOBAL_WINDOW_ID, pointerStyle);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
+        return;
+    }
+    int32_t pointerStyleId = pointerStyle.id;
+    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+        imagePath = MOUSE_DRAG_CURSOR_CIRCLE_PATH;
+    } else {
+        imagePath = MOUSE_DRAG_DEFAULT_PATH;
+    }
     Media::SourceOptions opts;
     opts.formatHint = "image/svg+xml";
     uint32_t errCode = 0;
     auto imageSource = Media::ImageSource::CreateImageSource(imagePath, opts, errCode);
     CHKPV(imageSource);
+    int32_t pointerSize = pointerStyle.size;
+    if (pointerSize < DEFAULT_MOUSE_SIZE) {
+        FI_HILOGD("Invalid pointerSize:%{public}d", pointerSize);
+        pointerSize = DEFAULT_MOUSE_SIZE;
+    }
     Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
-        .width = DEVICE_INDEPENDENT_PIXEL * GetScaling(),
-        .height = DEVICE_INDEPENDENT_PIXEL * GetScaling()
+        .width = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling(),
+        .height = pow(INCREASE_RATIO, pointerSize - 1) * DEVICE_INDEPENDENT_PIXEL * GetScaling()
     };
+    int32_t pointerColor = pointerStyle.color;
+    if (pointerColor != INVALID_COLOR_VALUE) {
+        decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
+    }
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
+    CHKPV(pixelMap);
+    OnDraw(pixelMap, pointerStyleId);
+}
+
+void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, int32_t pointerStyleId) const
+{
+    CALL_DEBUG_ENTER;
     CHKPV(pixelMap);
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
@@ -1295,18 +1329,36 @@ void DrawMouseIconModifier::Draw(Rosen::RSDrawingContext &context) const
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
-        pixelMap->GetWidth(), pixelMap->GetHeight());
-    mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
-        pixelMap->GetWidth(), pixelMap->GetHeight());
-    mouseIconNode->SetBgImageWidth(decodeOpts.desiredSize.width);
-    mouseIconNode->SetBgImageHeight(decodeOpts.desiredSize.height);
+    if (pointerStyleId == MOUSE_DRAG_CURSOR_CIRCLE_STYLE) {
+        int32_t positionX = -g_drawingInfo.pixelMapX - (pixelMap->GetWidth() / CURSOR_CIRCLE_MIDDLE);
+        int32_t positionY = -g_drawingInfo.pixelMapY + adjustSize - (pixelMap->GetHeight() / CURSOR_CIRCLE_MIDDLE);
+        mouseIconNode->SetBounds(positionX, positionY, pixelMap->GetWidth(), pixelMap->GetHeight());
+        mouseIconNode->SetFrame(positionX, positionY, pixelMap->GetWidth(), pixelMap->GetHeight());
+    } else {
+        mouseIconNode->SetBounds(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
+            pixelMap->GetWidth(), pixelMap->GetHeight());
+        mouseIconNode->SetFrame(-g_drawingInfo.pixelMapX, -g_drawingInfo.pixelMapY + adjustSize,
+            pixelMap->GetWidth(), pixelMap->GetHeight());
+    }
+    mouseIconNode->SetBgImageWidth(pixelMap->GetWidth());
+    mouseIconNode->SetBgImageHeight(pixelMap->GetHeight());
     mouseIconNode->SetBgImagePositionX(0);
     mouseIconNode->SetBgImagePositionY(0);
     auto rosenImage = std::make_shared<Rosen::RSImage>();
     rosenImage->SetPixelMap(pixelMap);
     rosenImage->SetImageRepeat(0);
     mouseIconNode->SetBgImage(rosenImage);
+    g_drawingInfo.mouseWidth = pixelMap->GetWidth();
+    g_drawingInfo.mouseHeight = pixelMap->GetHeight();
+    adjustSize = (SVG_WIDTH + TWELVE_SIZE) * GetScaling();
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + pixelMap->GetWidth() + adjustSize;
+    g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + pixelMap->GetHeight() + adjustSize;
+    CHKPV(g_drawingInfo.rootNode);
+    g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
+    CHKPV(g_drawingInfo.surfaceNode);
+    g_drawingInfo.surfaceNode->SetBoundsWidth(g_drawingInfo.rootNodeWidth);
+    g_drawingInfo.surfaceNode->SetBoundsHeight(g_drawingInfo.rootNodeHeight);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 

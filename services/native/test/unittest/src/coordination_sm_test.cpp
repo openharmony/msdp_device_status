@@ -16,7 +16,6 @@
 #define private public
 #define protected public
 #include "coordination_sm_test.h"
-#include "coordination_softbus_adapter_test.h"
 
 #include "accesstoken_kit.h"
 #include <gtest/gtest.h>
@@ -51,6 +50,43 @@ constexpr int32_t DEVICE_ID { 0 };
 constexpr int32_t ERR_CODE { 20900001 };
 constexpr int32_t UNKNOWN_STATE { 3 };
 } // namespace
+
+void ClearCoordiantionSM()
+{
+    COOR_SM->preparedNetworkId_ = { "", "" };
+    COOR_SM->startDeviceDhid_ = "";
+    COOR_SM->remoteNetworkId_ = "";
+    COOR_SM->sinkNetworkId_ = "";
+    COOR_SM->isUnchained_ = false;
+    COOR_SM->currentState_ = CoordinationState::STATE_FREE;
+    COOR_SM->initCallback_ = nullptr;
+    COOR_SM->stateCallback_ = nullptr;
+    COOR_SM->isStarting_ = false;
+    COOR_SM->isStopping_ = false;
+    COOR_SM->mouseLocation_ = std::make_pair(0, 0);
+    COOR_SM->lastPointerEvent_ = nullptr;
+    COOR_SM->displayX_ = -1;
+    COOR_SM->displayY_ = -1;
+    COOR_SM->interceptorId_ = -1;
+    COOR_SM->monitorId_ = -1;
+    COOR_SM->filterId_ = -1;
+    COOR_SM->remoteNetworkIdCallback_ = nullptr;
+    COOR_SM->mouseLocationCallback_ = nullptr;
+    COOR_SM->notifyDragCancelCallback_ = nullptr;
+    COOR_SM->runner_ = nullptr;
+    COOR_SM->onlineDevice_.clear();
+    COOR_SM->stateChangedCallbacks_.clear();
+    COOR_SM->coordinationStates_.clear();
+}
+
+void ClearCoordinationSoftbusAdapter()
+{
+    COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
+    COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
+    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
+    COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
+    COOR_SOFTBUS_ADAPTER->channelStatuss_.clear();
+}
 
 class CoordinationSMTest : public testing::Test {
 public:
@@ -105,7 +141,10 @@ Device::Device(int32_t deviceId) {}
 
 Device::~Device() {}
 
-int32_t Device::Open() { return 0; }
+int32_t Device::Open() 
+{
+    return 0;
+}
 
 void Device::Close() {}
 
@@ -250,7 +289,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest008, TestSize.Level0)
  * @tc.desc: test normal ActivateCoordination return the correct value
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSMTest, CoordinationSMTest009, TestSize.Level0){ 
+HWTEST_F(CoordinationSMTest, CoordinationSMTest009, TestSize.Level0)
+{
     CALL_TEST_DEBUG;
     int32_t startDeviceId = 1;
     COOR_SOFTBUS_ADAPTER->sessionDevs_[REMOTE_NETWORKID] = 0;
@@ -270,7 +310,8 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest009, TestSize.Level0){
  * @tc.desc: test normal DeactivateCoordination return the correct value
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0){
+HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0)
+{
     CALL_TEST_DEBUG;
     COOR_SM->currentState_ = CoordinationState::STATE_IN;
     COOR_SM->coordinationStates_[CoordinationState::STATE_IN] = std::make_shared<CoordinationStateIn>();
@@ -280,7 +321,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0){
     std::shared_ptr<CoordinationDeviceManager::Device> dev = std::make_shared<CoordinationDeviceManager::Device>(curdevice);
     dev->dhid_ = COOR_SM->startDeviceDhid_;
     dev->networkId_ = "testNetworkId";
-    std::function<void(void)> mycallback = [&](void){
+    std::function<void(void)> mycallback = [&](void) {
         GTEST_LOG_(INFO) << "notifyDragCancelCallback_ callback test";
     };
     COOR_SM->notifyDragCancelCallback_ = mycallback;
@@ -297,10 +338,11 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0){
 
 /**
  * @tc.name: CoordinationSMTest
- * @tc.desc: test normal UpdateState 
+ * @tc.desc: test normal UpdateState
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSMTest, CoordinationSMTest011, TestSize.Level0){
+HWTEST_F(CoordinationSMTest, CoordinationSMTest011, TestSize.Level0)
+{
     CALL_TEST_DEBUG;
     COOR_SM->UpdateState(CoordinationState::STATE_IN);
     auto curstate = COOR_SM->GetCurrentCoordinationState();
@@ -313,7 +355,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest011, TestSize.Level0){
 
 /**
  * @tc.name: CoordinationSMTest
- * @tc.desc: test normal UpdatePreparedDevices and obtain correct value 
+ * @tc.desc: test normal UpdatePreparedDevices and obtain correct value
  * @tc.type: FUNC
  */
 HWTEST_F(CoordinationSMTest, CoordinationSMTest012, TestSize.Level0)

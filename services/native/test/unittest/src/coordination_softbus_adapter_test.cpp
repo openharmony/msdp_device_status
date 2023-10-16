@@ -34,6 +34,15 @@ constexpr int32_t SESSION_ID { 1 };
 constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 } // namespace
 
+void ClearCoordinationSoftbusAdapter()
+{
+    COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
+    COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
+    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
+    COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
+    COOR_SOFTBUS_ADAPTER->channelStatuss_.clear();
+}
+
 int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
     return g_sendable == true ? RET_OK : RET_ERR;

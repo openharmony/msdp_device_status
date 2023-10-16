@@ -38,24 +38,13 @@ pub struct CAxisEvent {
     _private: [u8; 0],
 }
 
-/// C representation of [`PointerStyleColor`].
-#[repr(C)]
-pub struct CPointerStyleColor {
-    /// Pointer style color r property
-    pub r: u8,
-    /// Pointer style color g property
-    pub g: u8,
-    /// Pointer style color b property
-    pub b: u8,
-}
-
 /// C representation of [`PointerStyle`].
 #[repr(C)]
 pub struct CPointerStyle {
     /// Pointer style size property
     pub size: i32,
     /// Pointer style color property
-    pub color: CPointerStyleColor,
+    pub color: i32,
     /// Pointer style id property
     pub id: i32,
 }

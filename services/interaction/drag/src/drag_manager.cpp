@@ -17,9 +17,7 @@
 
 #include "extra_data.h"
 #include "hitrace_meter.h"
-#include "input_manager.h"
 #include "pixel_map.h"
-#include "pointer_style.h"
 #include "udmf_client.h"
 #include "unified_types.h"
 
@@ -558,8 +556,7 @@ int32_t DragManager::OnStartDrag()
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
     return RET_OK;
@@ -586,9 +583,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
-        MMI::InputManager::GetInstance()->SetPointerVisible(true);
-    }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));

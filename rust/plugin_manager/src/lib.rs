@@ -22,20 +22,15 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_basic_server_rust;
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate libloading;
-
 use std::collections::HashMap;
 use std::path::Path;
 use std::ffi::{ c_char, CString };
-use fusion_data_rust::{ Intention, IPlugin };
-use fusion_utils_rust::{ call_debug_enter };
-use fusion_basic_server_rust::FusionBasicServer;
+
 use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
+
+use fusion_data_rust::{ Intention, IPlugin };
+use fusion_utils_rust::call_debug_enter;
+use fusion_basic_server_rust::FusionBasicServer;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,

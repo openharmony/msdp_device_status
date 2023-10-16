@@ -16,9 +16,11 @@
 //! IPC data definitions of Coordination module.
 
 use std::ffi::{ c_char, CString };
-use crate::fusion_utils_rust::{ call_debug_enter };
-use crate::hilog_rust::{ hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use hilog_rust::{ hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,

@@ -18,9 +18,13 @@
 #![allow(dead_code)]
 
 use std::ffi::{ c_char, CString };
-use crate::fusion_utils_rust::{ call_info_trace };
-use crate::DmDeviceInfo;
+
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
+
+use fusion_utils_rust::call_info_trace;
+
+use crate::DmDeviceInfo;
+
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
