@@ -81,7 +81,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
             &DeviceStatusSrvStub::UpdateShadowPicStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
-            &DeviceStatusSrvStub::GetDragDataStub}
+            &DeviceStatusSrvStub::GetDragDataStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
+            &DeviceStatusSrvStub::AddHotAreaListenerStub}
     };
 }
 
@@ -481,6 +483,16 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = AddHotAreaListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus

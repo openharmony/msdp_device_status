@@ -271,6 +271,17 @@ int32_t InteractionManagerImpl::GetDragData(DragData &dragData)
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetDragData(dragData);
 }
+
+int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<ICoordinationListener> listener)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
+    return coordinationManagerImpl_.AddHotAreaListener(listener);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

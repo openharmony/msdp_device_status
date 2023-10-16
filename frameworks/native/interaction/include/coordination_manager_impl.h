@@ -59,6 +59,10 @@ public:
     int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
     int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
 
+    int32_t AddHotAreaListener(CoordinationListenerPtr listener);
+    void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
+    int32_t OnHotAreaListener(const StreamClient& client, NetPacket& pkt);
+
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
@@ -66,9 +70,11 @@ private:
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
+    std::list<CoordinationListenerPtr> devHotAreaListener_;
     mutable std::mutex mtx_;
     int32_t userData_ { 0 };
     std::atomic_bool isListeningProcess_ { false };
+    bool isHotAreaListener_ { false };
     IClientPtr client_ { nullptr };
 };
 } // namespace DeviceStatus

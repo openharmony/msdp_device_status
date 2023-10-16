@@ -30,6 +30,7 @@ ohos_shared_library("coordination") {
     "src/coordination_device_manager.cpp",
     "src/coordination_event_handler.cpp",
     "src/coordination_event_manager.cpp",
+    "src/coordination_hotarea.cpp",
     "src/coordination_sm.cpp",
     "src/coordination_softbus_adapter.cpp",
     "src/coordination_state_free.cpp",
