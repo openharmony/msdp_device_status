@@ -41,13 +41,13 @@ ohos_shared_library("fusion_device_profile_binding") {
   public_configs = [ ":fusion_device_profile_binding_public_config" ]
 
   external_deps = [
-    "c_utils:utils",
-    "device_info_manager:distributed_device_profile_client",
-    "hilog:libhilog",
-    "dsoftbus:softbus_client",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "device_info_manager:distributed_device_profile_client",
+    "dsoftbus:softbus_client",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

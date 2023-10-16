@@ -185,7 +185,6 @@ int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool state, const std::
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) {
-                      FI_HILOGD("Sync result:%{public}s", deviceId.c_str());
                       syncOptions.AddDevice(deviceId);
                       FI_HILOGD("Add device success");
                   });
@@ -215,7 +214,6 @@ bool FusionDeviceProfileAdapter::GetCrossSwitchState(const std::string &deviceId
         FI_HILOGE("State is not number type");
         return false;
     }
-    FI_HILOGD("Sync result:%{public}d", static_cast<bool>(state->valueint));
     return (static_cast<bool>(state->valueint));
 }
 
@@ -243,10 +241,7 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
     subscribeInfos.emplace_back(syncEventInfo);
 
     SaveSubscribeInfos(deviceId, callback, subscribeInfos);
-    for (std::map<std::string, std::shared_ptr<ProfileEventCallback>>::iterator it = callbacks_.begin();
-		it != callbacks_.end(); it++) {
-        FI_HILOGD("device_id is :%{public}s, callback is used :%{public}ld,", (it->first).c_str(), (it->second).use_count());
-	}    
+  
     if (subscribeInfos.empty()) {
         FI_HILOGI("Profile events have been subscribed");
         return RET_ERR;
@@ -255,13 +250,6 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
     std::list<ProfileEvent> failedEvents;
     int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, callback, failedEvents);
-
-    // RemoveFailedSubscriptions(deviceId, failedEvents);
-    FI_HILOGD("device_id is :%{public}s ", deviceId.c_str());
-    for (std::map<std::string, std::shared_ptr<ProfileEventCallback>>::iterator it = callbacks_.begin();
-        it != callbacks_.end(); it++) {
-        FI_HILOGD("device_id is :%{public}s, callback is used :%{public}ld,", (it->first).c_str(), (it->second).use_count());
-    } 
     return ret;
 }
 
@@ -283,7 +271,6 @@ int32_t FusionDeviceProfileAdapter::UnregisterCrossStateListener(const std::stri
     std::list<ProfileEvent> failedEvents;
     int32_t ret = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
         cbIter->second, failedEvents);
-    // RemoveFailedSubscriptions(deviceId, failedEvents);
     callbacks_.erase(cbIter);
     return ret;
 }
@@ -351,6 +338,9 @@ int32_t SyncCrossSwitchState(int32_t state, CIStringVector *deviceIds)
 
     for (size_t i = 0; i < deviceIds->size(deviceIds); ++i) {
         const char *device_id = deviceIds->at(deviceIds, i);
+        FI_HILOGD("the device_id b is :%{public}s ", device_id);
+        int32_t len =  strlen(device_id);
+        FI_HILOGD("the length of device_id b is :%{public}d ", len);
         CHKPR(device_id, RET_ERR);
         deviceId.emplace_back(std::string(device_id));
     }

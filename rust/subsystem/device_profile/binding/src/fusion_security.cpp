@@ -61,7 +61,7 @@ void GetAccessToken()
         "ohos.permission.CAPTURE_SCREEN",
         "ohos.permission.DISTRIBUTED_DATASYNC",
     };
-    SetAceessTokenPermission("fusion_device_profile_test", perms, 2);
+    SetAceessTokenPermission("fusion_device_profile_rust", perms, 2);
 }
 
 struct CString : public CIString {

@@ -20,12 +20,17 @@
 
 use std::ffi::{ c_char, c_int, CString };
 use std::rc::Rc;
-use hilog_rust::{ hilog, HiLogLabel, LogType };
+use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 use fusion_data_rust::{ FusionErrorCode, FusionResult };
 use fusion_utils_rust::call_debug_enter;
 use crate::binding::{
     CProfileChangeNotification,
     CIProfileEventCb,
+    CIProfileEvents,
+    CSubscribeInfo,
+    CISubscribeInfos,
+    SubscribeProfileEvents,
+    UnsubscribeProfileEvents,
 };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -172,7 +177,9 @@ impl From<Rc<dyn IProfileEventCallback>> for ProfileEventCallback {
 }
 
 /// TODO: add documentation.
-pub struct DeviceProfile;
+pub struct DeviceProfile {
+
+}
 
 impl DeviceProfile {
     /// TODO: add documentation.
@@ -191,18 +198,99 @@ impl DeviceProfile {
     /// TODO: add documentation.
     pub fn subscribe_profile_events(subscribe_infos: &[SubscribeInfo],
         event_callback: &Rc<dyn IProfileEventCallback>,
-        failed_events: &mut [ProfileEvent]) -> FusionResult<i32>
+        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<i32>
     {
         call_debug_enter!("DeviceProfile::subscribe_profile_events");
-        Err(-1)
+        let mut subscriptions = Vec::<CSubscribeInfo>::new();
+        for info in subscribe_infos.iter() {
+            subscriptions.push(CSubscribeInfo {
+                profile_event: info.profile_event as u32,
+                extra_info: info.extra_info.as_ptr() as *const c_char,
+            });
+        }
+        let subscriptions_borrowed = CISubscribeInfos {
+            clone: None,
+            destruct: None,
+            subscribe_infos: subscriptions.as_ptr(),
+            num_of_subscribe_infos: subscriptions.len(),
+        };
+
+        let mut event_cb = ProfileEventCallback::from(event_callback.clone());
+        let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
+        let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
+
+        let ret = unsafe {
+            SubscribeProfileEvents(&subscriptions_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
+        };
+        if !failed_ptr.is_null() {
+            let profile_events_slice = unsafe {
+                std::slice::from_raw_parts((*failed_ptr).profile_events, (*failed_ptr).num_of_profile_events)
+            };
+            for profile_event in profile_events_slice.iter() {
+                if let Ok(e) = ProfileEvent::try_from(*profile_event) {
+                    failed_events.push(e);
+                }
+            }
+            unsafe {
+                if let Some(destruct) = (*failed_ptr).destruct {
+                    destruct(failed_ptr);
+                }
+            }
+        }
+        if ret != 0 {
+            error!(LOG_LABEL, "SubscribeProfileEvents fail");
+            Err(-1)
+        } else {
+            Ok(0)
+        }
     }
 
     /// TODO: add documentation.
     pub fn unsubscribe_profile_events(profile_events: &[ProfileEvent],
         event_callback: &Rc<dyn IProfileEventCallback>,
-        failed_events: &mut [ProfileEvent]) -> FusionResult<i32>
+        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<i32>
     {
-        Err(-1)
+        call_debug_enter!("DeviceProfile::unsubscribe_profile_events");
+        let mut profileevents = Vec::<u32>::new();
+        for info in profile_events.iter() {
+            profileevents.push((*info).into());
+        }
+        let profile_events_borrowed = CIProfileEvents {
+            clone: None,
+            destruct: None,
+            profile_events: profileevents.as_ptr() as *mut u32,
+            num_of_profile_events: profileevents.len(),
+        };
+
+        let mut event_cb = ProfileEventCallback::from(event_callback.clone());
+        let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
+        let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
+
+        let ret = unsafe {
+            UnsubscribeProfileEvents(&profile_events_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
+        };
+        if !failed_ptr.is_null() {
+            let profile_events_slice = unsafe {
+                std::slice::from_raw_parts((*failed_ptr).profile_events, (*failed_ptr).num_of_profile_events)
+            };
+            for profile_event in profile_events_slice.iter() {
+                if let Ok(e) = ProfileEvent::try_from(*profile_event) {
+                    failed_events.push(e);
+                }
+            }
+            unsafe {
+                if let Some(destruct) = (*failed_ptr).destruct {
+                    destruct(failed_ptr);
+                }
+            }
+        }
+
+        if ret != 0 {
+            error!(LOG_LABEL, "UnsubscribeProfileEvents fail");
+            Err(-1)
+        } else {
+            Ok(0)
+        }
     }
 
     /// TODO: add documentation.

@@ -13,13 +13,82 @@
  * limitations under the License.
  */
 
+#include "cJSON.h"
 #include "fusion_device_profile.h"
+
+#include <sstream>
+
+#include <distributed_device_profile_client.h>
 
 #include "devicestatus_define.h"
 
+using namespace ::OHOS::DeviceProfile;
+
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
+const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
+
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json != nullptr) {
+            cJSON_Delete(json);
+            json = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json;
+    }
+    cJSON *json = nullptr;
+};
+
+class ProfileEventCallbackImpl final : public IProfileEventCallback {
+public:
+    ProfileEventCallbackImpl(CIProfileEventCb *eventCb);
+    ~ProfileEventCallbackImpl();
+
+    void OnSyncCompleted(const SyncResult &syncResults) override;
+    void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
+
+private:
+    CIProfileEventCb *eventCb_ { nullptr };
+};
+
+ProfileEventCallbackImpl::ProfileEventCallbackImpl(CIProfileEventCb *eventCb)
+{
+    if ((eventCb != nullptr) && (eventCb->clone != nullptr)) {
+        eventCb_ = eventCb->clone(eventCb);
+    }
+}
+
+ProfileEventCallbackImpl::~ProfileEventCallbackImpl()
+{
+    if (eventCb_ != nullptr && eventCb_->destruct != nullptr) {
+        eventCb_->destruct(eventCb_);
+    }
+}
+
+void ProfileEventCallbackImpl::OnSyncCompleted(const SyncResult &syncResults)
+{
+    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
+        FI_HILOGD("Sync result:%{public}d", syncResult.second);
+    });
+}
+
+void ProfileEventCallbackImpl::OnProfileChanged(const ProfileChangeNotification &changeNotification)
+{
+    CALL_INFO_TRACE;
+}
+
+static void Destruct(CIProfileEvents *target)
+{
+    CHKPV(target);
+    delete [] target->profileEvents;
+    delete target;
+}
 
 int32_t PutDeviceProfile(const CServiceCharacteristicProfile *profile)
 {
@@ -38,7 +107,44 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
                                CIProfileEvents **failedEvents)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    CHKPR(subscribeInfos, RET_ERR);
+    std::list<SubscribeInfo> subscriptions;
+
+    for (size_t index = 0; index < subscribeInfos->n_subscribe_infos; ++index) {
+        const CSubscribeInfo &cSub = subscribeInfos->subscribe_infos[index];
+
+        if ((cSub.profileEvent >= ProfileEvent::EVENT_UNKNOWN) &&
+            (cSub.profileEvent < ProfileEvent::EVENT_PROFILE_END)) {
+            CHKPC(cSub.extraInfo);
+            SubscribeInfo subscription;
+            subscription.profileEvent = static_cast<ProfileEvent>(cSub.profileEvent);
+            subscription.extraInfo = nlohmann::json::parse(cSub.extraInfo, nullptr, false);
+            subscriptions.push_back(subscription);
+        }
+    }
+
+    auto callback = std::make_shared<ProfileEventCallbackImpl>(eventCb);
+    std::list<ProfileEvent> fails;
+
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
+        subscriptions, callback, fails);
+
+    if (!fails.empty()) {
+        CIProfileEvents *p = new CIProfileEvents;
+        p->numOfProfileEvents = fails.size();
+        p->profileEvents = new uint32_t[fails.size()];
+        p->clone = nullptr;
+        p->destruct = &Destruct;
+
+        size_t index = 0;
+        for (const auto &profile_event: fails) {
+            p->profileEvents[index++] = profile_event;
+        }
+        *failedEvents = p;
+    } else {
+        *failedEvents = nullptr;
+    }
+    return ret;
 }
 
 int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
@@ -46,7 +152,40 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
                                  CIProfileEvents **failedEvents)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    CHKPR(profileEvents, RET_ERR);
+    std::list<ProfileEvent> profiles;
+
+    for (size_t index = 0; index < profileEvents->numOfProfileEvents; ++index) {
+        uint32_t cPro = profileEvents->profileEvents[index];
+        if ((cPro >= static_cast<uint32_t>(ProfileEvent::EVENT_UNKNOWN)) &&
+            (cPro < static_cast<uint32_t>(ProfileEvent::EVENT_PROFILE_END))) {
+            ProfileEvent profile = static_cast<ProfileEvent>(cPro);
+            profiles.push_back(profile);
+        }
+    }
+
+    auto callback = std::make_shared<ProfileEventCallbackImpl>(eventCb);
+    std::list<ProfileEvent> fails;
+
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(
+        profiles, callback, fails);
+
+    if (!fails.empty()) {
+        CIProfileEvents *p = new CIProfileEvents;
+        p->numOfProfileEvents = fails.size();
+        p->profileEvents = new uint32_t[fails.size()];
+        p->clone = nullptr;
+        p->destruct = &Destruct;
+
+        size_t index = 0;
+        for (const auto &profile_event: fails) {
+            p->profileEvents[index++] = profile_event;
+        }
+        *failedEvents = p;
+    } else {
+        *failedEvents = nullptr;
+    }
+    return ret;
 }
 
 int32_t SyncDeviceProfile(const CSyncOptions *syncOptions, CIProfileEventCb *syncCb)

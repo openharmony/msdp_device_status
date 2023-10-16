@@ -24,7 +24,7 @@ use std::ffi::{ c_char, c_int };
 pub struct CServiceCharacteristicProfile {
     pub service_id: *const c_char,
     pub service_type: *const c_char,
-    pub service_profile_json: *const c_char,
+    pub state: bool,
     pub characteristic_profile_json: *const c_char,
 }
 
