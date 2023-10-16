@@ -40,9 +40,10 @@
         "udmf",
         "device_info_manager",
         "dsoftbus",
-        "graphic_2d",
         "common",
-        "motion"
+        "motion",
+        "build_framework",
+        "ylong_runtime"
       ],
       "third_party": [
         "cJSON",

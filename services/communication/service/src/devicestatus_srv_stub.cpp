@@ -26,7 +26,7 @@
 #include "fi_log.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,7 +37,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceS
 
 DeviceStatusSrvStub::DeviceStatusSrvStub()
 {
-    mapConnFunc_ = {
+    ConnFuncs_ = {
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
             &DeviceStatusSrvStub::SubscribeStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
@@ -79,7 +79,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
             &DeviceStatusSrvStub::GetShadowOffsetStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
-            &DeviceStatusSrvStub::UpdateShadowPicStub}
+            &DeviceStatusSrvStub::UpdateShadowPicStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
+            &DeviceStatusSrvStub::GetDragDataStub}
     };
 }
 
@@ -93,8 +95,8 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
-    auto it = mapConnFunc_.find(code);
-    if (it != mapConnFunc_.end()) {
+    auto it = ConnFuncs_.find(code);
+    if (it != ConnFuncs_.end()) {
         return (this->*it->second)(data, reply);
     }
     FI_HILOGE("Unknown code:%{public}u", code);
@@ -177,7 +179,7 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
 int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
@@ -189,7 +191,7 @@ int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, Messag
 int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UnprepareCoordination(userData);
     if (ret != RET_OK) {
@@ -201,11 +203,11 @@ int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, Mess
 int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string remoteNetworkId;
     READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t startDeviceId;
+    int32_t startDeviceId = 0;
     READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = ActivateCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
@@ -217,9 +219,9 @@ int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    bool isUnchained;
+    bool isUnchained = false;
     READBOOL(data, isUnchained, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = DeactivateCoordination(userData, isUnchained);
     if (ret != RET_OK) {
@@ -231,7 +233,7 @@ int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, Mes
 int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string deviceId;
     READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -245,7 +247,7 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t style;
+    int32_t style = 0;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
@@ -282,7 +284,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
         FI_HILOGE("Service is not running, pid:%{public}d, go switch default", pid);
         return SERVICE_NOT_RUNNING;
     }
-    int32_t moduleId;
+    int32_t moduleId = 0;
     READINT32(data, moduleId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string clientName;
     READSTRING(data, clientName, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -323,11 +325,13 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
+    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
     READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(data, dragData.extraInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -360,14 +364,14 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
 int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t result;
+    int32_t result = 0;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if ((result < static_cast<int32_t>(DragResult::DRAG_SUCCESS)) ||
         (result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION))) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
-    bool hasCustomAnimation;
+    bool hasCustomAnimation = false;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
@@ -400,7 +404,7 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
 int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    bool visible;
+    bool visible = false;
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {
@@ -447,6 +451,36 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessagePar
     if (ret != RET_OK) {
         FI_HILOGE("Call Update shadow picture failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData;
+    int32_t ret = GetDragData(dragData);
+    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
+    if (!dragData.shadowInfo.pixelMap->Marshalling(reply)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(reply, dragData.shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.shadowInfo.y, ERR_INVALID_VALUE);
+    WRITEUINT8VECTOR(reply, dragData.buffer, ERR_INVALID_VALUE);
+    WRITESTRING(reply, dragData.udKey, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.sourceType, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.dragNum, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.pointerId, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayX, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
+    WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
+    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
     return ret;
 }
 } // namespace DeviceStatus

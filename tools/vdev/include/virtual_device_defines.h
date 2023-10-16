@@ -20,11 +20,11 @@
 #include <string>
 
 #ifndef REL_WHEEL_HI_RES
-#define REL_WHEEL_HI_RES    0x0b
+#define REL_WHEEL_HI_RES 0x0b
 #endif
 
 #ifndef REL_HWHEEL_HI_RES
-#define REL_HWHEEL_HI_RES   0x0c
+#define REL_HWHEEL_HI_RES 0x0c
 #endif
 
 namespace OHOS {

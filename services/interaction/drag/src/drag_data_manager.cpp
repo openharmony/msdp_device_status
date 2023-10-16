@@ -16,7 +16,6 @@
 #include "drag_data_manager.h"
 
 #include "hitrace_meter.h"
-#include "pointer_style.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -27,20 +26,20 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDataManager" };
+constexpr int32_t DEFAULT_DISPLAY_ID { 0 };
 } // namespace
 
 DragDataManager::DragDataManager() = default;
 DragDataManager::~DragDataManager() = default;
 
-void DragDataManager::Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle)
+void DragDataManager::Init(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
     dragData_ = dragData;
-    if (dragData.displayId < 0) {
-        dragData_.displayId = 0;
+    if (dragData.displayId < DEFAULT_DISPLAY_ID) {
+        dragData_.displayId = DEFAULT_DISPLAY_ID;
         FI_HILOGW("The value of displayId(%{public}d) is correcting to 0", dragData.displayId);
     }
-    pointerStyle_ = pointerStyle;
     targetTid_ = -1;
     targetPid_ = -1;
 }
@@ -58,11 +57,6 @@ void DragDataManager::SetShadowInfo(const ShadowInfo &shadowInfo)
 DragCursorStyle DragDataManager::GetDragStyle() const
 {
     return dragStyle_;
-}
-
-std::u16string DragDataManager::GetDragMessage() const
-{
-    return dragMessage_;
 }
 
 DragData DragDataManager::GetDragData() const
@@ -118,7 +112,7 @@ void DragDataManager::ResetDragData()
     CALL_DEBUG_ENTER;
     ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
-    dragData_ = { shadowInfo, buffer, "", -1, -1, -1, -1, -1, -1, false };
+    dragData_ = { shadowInfo, buffer, "", "", "", -1, -1, -1, -1, -1, -1, false };
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)

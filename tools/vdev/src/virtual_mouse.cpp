@@ -224,7 +224,7 @@ int32_t VirtualMouse::MoveTo(int32_t x, int32_t y)
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(MINIMUM_INTERVAL));
         }
-        FI_HILOGD("current position: (%{public}d, %{public}d)", monitor->GetX(), monitor->GetY());
+        FI_HILOGD("Current position: (%{public}d, %{public}d)", monitor->GetX(), monitor->GetY());
         if (x == monitor->GetX() && y == monitor->GetY()) {
             ret = RET_OK;
             goto CLEANUP;
@@ -234,6 +234,33 @@ int32_t VirtualMouse::MoveTo(int32_t x, int32_t y)
 CLEANUP:
     inputMgr->RemoveMonitor(monitorId);
     return ret;
+}
+
+void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
+{
+    CALL_DEBUG_ENTER;
+    MMI::InputManager *inputMgr = MMI::InputManager::GetInstance();
+    CHKPV(inputMgr);
+    auto monitor = std::make_shared<PointerPositionMonitor>();
+    int32_t monitorId = inputMgr->AddMonitor(monitor);
+    if (monitorId < 0) {
+        FI_HILOGE("Failed to add mouse monitor");
+        return;
+    }
+    Move(MOVE_VALUE_X, MOVE_VALUE_Y);
+    Move(-MOVE_VALUE_Y, -MOVE_VALUE_X);
+    int32_t targetX = monitor->GetX() + dx;
+    int32_t targetY = monitor->GetY() + dy;
+    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)",targetX, targetY);
+    Move(dx, dy);
+    int32_t nLoops = 5;
+    while (nLoops-- > 0) {
+        if (targetX == monitor->GetX() && targetY == monitor->GetY()) {
+            break;
+        }
+        Move(targetX - monitor->GetX(), targetY - monitor->GetY());
+    }
+    inputMgr->RemoveMonitor(monitorId);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

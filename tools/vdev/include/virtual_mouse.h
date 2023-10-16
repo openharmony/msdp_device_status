@@ -34,6 +34,7 @@ public:
     void Scroll(int32_t dy);
     void Move(int32_t dx, int32_t dy);
     int32_t MoveTo(int32_t x, int32_t y);
+    void MoveProcess(int32_t dx, int32_t dy);
 
 private:
     explicit VirtualMouse(const std::string &name);

@@ -61,24 +61,9 @@ DelegateTasks::~DelegateTasks()
 bool DelegateTasks::Init()
 {
     CALL_DEBUG_ENTER;
-    int32_t res = pipe(fds_);
-    if (res == -1) {
-        FI_HILOGE("The pipe create failed, errno:%{public}d", errno);
+    if (::pipe2(fds_, O_CLOEXEC | O_NONBLOCK) != 0) {
+        FI_HILOGE("pipe2 failed, errno:%{public}s", ::strerror(errno));
         return false;
-    }
-    if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
-        FI_HILOGE("The fcntl read failed, errno:%{public}d", errno);
-        if (close(fds_[0]) < 0) {
-            FI_HILOGE("Close fds_[0] failed, error:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
-            return false;
-        }
-    }
-    if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
-        FI_HILOGE("The fcntl write failed, errno:%{public}d", errno);
-        if (close(fds_[1]) < 0) {
-            FI_HILOGE("Close fds_[1] failed, error:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
-            return false;
-        }
     }
     return true;
 }

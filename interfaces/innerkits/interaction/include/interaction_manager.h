@@ -188,6 +188,14 @@ public:
      */
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
 
+    /**
+     * @brief 获取所有与拖拽相关的数据。
+     * @param dragData 保存拖拽相关的数据。
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetDragData(DragData &dragData);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-//! IPC server implementation.
+//! Implementation of SA of device status service.
 
 #![allow(unused_variables)]
 
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ IRemoteBroker, RemoteObj };
-use crate::system_ability_fwk_rust::{ define_system_ability, RSystemAbility, ISystemAbility, IMethod };
-use crate::fusion_ipc_service_rust::{ FusionIpcStub, MSDP_DEVICESTATUS_SERVICE_ID };
+use fusion_ipc_service_rust::{ FusionIpcStub, MSDP_DEVICESTATUS_SERVICE_ID };
+use fusion_services_rust::FusionService;
+use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
+use ipc_rust::{ IRemoteBroker, RemoteObj };
+use system_ability_fwk_rust::{ define_system_ability, RSystemAbility, ISystemAbility, IMethod };
 use crate::fusion_ipc_delegator::FusionIpcDelegator;
-use crate::fusion_services_rust::{ FusionService };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
-    tag: "FusionIpcServer"
+    tag: "DeviceStatusSA",
 };
 
 fn on_start<T: ISystemAbility + IMethod>(ability: &T) {
@@ -69,7 +69,7 @@ define_system_ability!(
 static A: extern fn() = {
     extern fn init() {
         let sa = SystemAbility::new_system_ability(MSDP_DEVICESTATUS_SERVICE_ID, true).expect(
-            "fail to create sa instance"
+            "Failed to create sa instance"
         );
         sa.register();
     }

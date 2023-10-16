@@ -22,7 +22,7 @@
 #include "iremote_broker.h"
 #include "iremote_object.h"
 
-#include "util.h"
+#include "include/util.h"
 
 #include "coordination_manager_impl.h"
 #include "devicestatus_common.h"
@@ -89,7 +89,7 @@ void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
         devicestatusProxy_ = nullptr;
     }
     if (deathListener_ != nullptr) {
-        FI_HILOGI("notify death listner");
+        FI_HILOGI("Notify death listener");
         deathListener_();
     }
 }
@@ -298,7 +298,7 @@ int32_t DeviceStatusClient::AllocSocketPair(int32_t moduleType)
     const std::string programName(GetProgramName());
     int32_t ret = fusion_alloc_socket_fd(programName.c_str(), moduleType, &socketFd_, &tokenType_);
     if (ret != RET_OK) {
-        FI_HILOGE("Fail to connect to server via socket:%{public}d", ret);
+        FI_HILOGE("Failed to connect to server via socket:%{public}d", ret);
         return RET_ERR;
     }
     FI_HILOGI("Connected successfully to server via socket, "
@@ -407,6 +407,13 @@ int32_t DeviceStatusClient::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->UpdateShadowPic(shadowInfo);
+}
+
+int32_t DeviceStatusClient::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetDragData(dragData);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

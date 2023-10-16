@@ -16,9 +16,12 @@
 //! Plugin manager related definitions.
 
 use std::any::Any;
-use ipc_rust::{ BorrowedMsgParcel };
-use crate::{ CallingContext, FusionResult };
-use crate::fusion_utils_rust::{ define_enum };
+
+use ipc_rust::BorrowedMsgParcel;
+
+use fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
+
+use crate::CallingContext;
 
 define_enum! {
     Intention {
@@ -28,25 +31,25 @@ define_enum! {
     }
 }
 
-/// trait IPlugin
-/// TOTO: add documentation.
+/// Interface between service modules and intention framework.
 pub trait IPlugin: Any + Send + Sync + std::panic::RefUnwindSafe {
-    /// TODO: add documentation
-    fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
-    /// TODO: add documentation
-    fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<i32>;
+    /// Enable this service.
+    fn enable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Disable this service.
+    fn disable(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Start work of this service.
+    fn start(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Stop work of this service.
+    fn stop(&self, context: &CallingContext, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Add a watch to a state of this service.
+    fn add_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Remove a watch to a state of this service.
+    fn remove_watch(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Set a paramenter of this service.
+    fn set_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Get a parameter of this service.
+    fn get_param(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
+    /// Interact with this service. This interface supplements functions of previous intefaces.
+    /// Functionalities of this interface is service spicific.
+    fn control(&self, context: &CallingContext, id: u32, data: &BorrowedMsgParcel, reply: &mut BorrowedMsgParcel) -> FusionResult<()>;
 }

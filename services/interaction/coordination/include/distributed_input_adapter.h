@@ -33,6 +33,7 @@
 #include "start_stop_result_call_back_stub.h"
 #include "stop_d_input_call_back_stub.h"
 #include "unprepare_d_input_call_back_stub.h"
+#include "register_session_state_callback_stub.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -62,6 +63,8 @@ public:
 
     int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
+    int32_t RegisterSessionStateCb(std::function<void(uint32_t)> callback);
+    int32_t UnregisterSessionStateCb();
 
 private:
     enum class CallbackType {
@@ -140,12 +143,23 @@ private:
         void OnResult(const std::string &devId, const int32_t &status) override;
     };
 
+    class SessionStateCallback final :
+        public DistributedHardware::DistributedInput::RegisterSessionStateCallbackStub {
+    public:
+        SessionStateCallback() = default;
+        ~SessionStateCallback() = default;
+        SessionStateCallback(std::function<void(uint32_t)> callback) : callback_(callback) {}
+        void OnResult(const std::string &devId, const uint32_t status) override;
+    private:
+        std::function<void(uint32_t)> callback_;
+    };
+
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
-    std::map<CallbackType, TimerInfo> watchingMap_;
-    std::map<CallbackType, DInputCallback> callbackMap_;
+    std::map<CallbackType, TimerInfo> watchings_;
+    std::map<CallbackType, DInputCallback> callbacks_;
     std::mutex adapterLock_;
 };
 

@@ -17,9 +17,9 @@
 
 #include "extra_data.h"
 #include "hitrace_meter.h"
-#include "input_manager.h"
 #include "pixel_map.h"
-#include "pointer_style.h"
+#include "udmf_client.h"
+#include "unified_types.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -27,17 +27,16 @@
 #include "fi_log.h"
 #include "proto.h"
 
-#include "udmf_client.h"
-#include "unified_types.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
+std::atomic<int64_t> g_startFilterTime { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
@@ -84,13 +83,14 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
         " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
         " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
-        " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d",
+        " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
-        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation);
+        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
+        dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
@@ -182,6 +182,17 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
     return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
+int32_t DragManager::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("No drag instance running, can not get dragData");
+        return RET_ERR;
+    }
+    dragData = DRAG_DATA_MGR.GetDragData();
+    return RET_OK;
+}
+
 int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;
@@ -267,6 +278,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         this->StopDrag(DragResult::DRAG_EXCEPTION, false);
     });
+    CHKPV(notifyPUllUpCallback_);
+    notifyPUllUpCallback_();
 }
 
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -279,6 +292,16 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (g_startFilterTime > 0) {
+        auto actionTime = pointerEvent->GetActionTime();
+        if (g_startFilterTime >= actionTime
+            && pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
+            FI_HILOGW("Invalid event");
+            return;
+        } else {
+            g_startFilterTime = -1;
+        }
+    }
     CHKPV(callback_);
     CHKPV(context_);
     callback_(pointerEvent);
@@ -352,11 +375,11 @@ void DragManager::Dump(int32_t fd) const
         udKey = "";
     }
     dprintf(fd, "dragData = {\n"
-            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tsourceType:%d\n\tdragNum:%d\n\tpointerId:%d\n"
-            "\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.sourceType, dragData.dragNum,
-            dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
-            dragData.hasCanceledAnimation ? "true" : "false");
+            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
+            "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
+            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.filterInfo.c_str(),
+            dragData.extraInfo.c_str(), dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX,
+            dragData.displayY, dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {
         std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
         CHKPV(pixelMap);
@@ -468,12 +491,7 @@ MMI::ExtraData DragManager::CreateExtraData(bool appended)
 int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
-    MMI::PointerStyle pointerStyle;
-    if (MMI::InputManager::GetInstance()->GetPointerStyle(MMI::GLOBAL_WINDOW_ID, pointerStyle) != RET_OK) {
-        FI_HILOGE("Get pointer style failed");
-        return RET_ERR;
-    }
-    DRAG_DATA_MGR.Init(dragData, pointerStyle);
+    DRAG_DATA_MGR.Init(dragData);
     return RET_OK;
 }
 
@@ -515,7 +533,6 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 int32_t DragManager::OnStartDrag()
 {
     auto extraData = CreateExtraData(true);
-    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
@@ -528,6 +545,7 @@ int32_t DragManager::OnStartDrag()
         return RET_ERR;
     }
     dragDrawing_.Draw(dragData.displayId, dragData.displayX, dragData.displayY);
+    MMI::InputManager::GetInstance()->AppendExtraData(extraData);
     ret = AddDragEventHandler(dragData.sourceType);
     if (ret != RET_OK) {
 #ifdef OHOS_DRAG_ENABLE_MONITOR
@@ -567,6 +585,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         dragDrawing_.EraseMouseIcon();
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
+    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     return HandleDragResult(result, hasCustomAnimation);
 }
 
@@ -575,6 +594,10 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     if (dragState_ == DragState::MOTION_DRAGGING) {
         FI_HILOGW("Currently in motion dragging");
         return RET_OK;
+    }
+    if (dragState_ == DragState::STOP) {
+        FI_HILOGW("No drag instance running, can not set drag window visible");
+        return RET_ERR;
     }
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
@@ -591,6 +614,13 @@ void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
     CALL_DEBUG_ENTER;
     CHKPV(callback);
     stateChangedCallback_ = callback;
+}
+
+void DragManager::RegisterNotifyPullUp(std::function<void(void)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    notifyPUllUpCallback_ = callback;
 }
 
 void DragManager::StateChangedNotify(DragState state)
@@ -656,6 +686,24 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         }
     }
     return RET_OK;
+}
+
+void DragManager::SetPointerEventFilterTime(int64_t filterTime)
+{
+    CALL_DEBUG_ENTER;
+    g_startFilterTime = filterTime;
+}
+
+void DragManager::MoveTo(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return;
+    }
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
+    dragDrawing_.Draw(dragData.displayId, x, y);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

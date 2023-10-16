@@ -15,15 +15,16 @@
 
 #include "v_input_device.h"
 
-#include <cstring>
-#include <fstream>
-#include <regex>
-#include <sstream>
-
 #include <fcntl.h>
 #include <securec.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include <cstring>
+#include <fstream>
+#include <map>
+#include <regex>
+#include <sstream>
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
@@ -93,7 +94,7 @@ void VInputDevice::Close()
     CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         if (close(fd_) != 0) {
-            FI_HILOGE("close error:%{public}s", strerror(errno));
+            FI_HILOGE("Close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
     }
@@ -266,59 +267,88 @@ bool VInputDevice::HasJoystickAxesOrButtons() const
     return false;
 }
 
+void VInputDevice::PrintCapsDevice() const
+{
+    std::map<std::size_t, std::string> deviceComparisonTable {
+        {DEVICE_CAP_KEYBOARD, "keyboard"},
+        {DEVICE_CAP_TOUCH, "touch device"},
+        {DEVICE_CAP_POINTER, "pointer"},
+        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
+        {DEVICE_CAP_TABLET_PAD, "pad"},
+        {DEVICE_CAP_GESTURE, "gesture"},
+        {DEVICE_CAP_SWITCH, "switch"},
+        {DEVICE_CAP_JOYSTICK, "joystick"}};
+    for (const auto& [cap, name] : deviceComparisonTable) {
+        if (caps_.test(cap)) {
+            FI_HILOGD("This is %{public}s", name.c_str());
+        }
+    }
+}
+
+bool VInputDevice::HasAbsCoord() const
+{
+    return HasAbs(ABS_X) && HasAbs(ABS_Y);
+}
+
+bool VInputDevice::HasMtCoord() const
+{
+    return HasAbs(ABS_MT_POSITION_X) && HasAbs(ABS_MT_POSITION_Y);
+}
+
+bool VInputDevice::HasRelCoord() const
+{
+    return HasRel(REL_X) && HasRel(REL_Y);
+}
+
+void VInputDevice::CheckAbs()
+{
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasMouseButton()) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    } else if (HasJoystickAxesOrButtons()) {
+        caps_.set(DEVICE_CAP_JOYSTICK);
+    }
+}
+
+void VInputDevice::CheckMt()
+{
+    if (HasKey(BTN_STYLUS) || HasKey(BTN_TOOL_PEN)) {
+        caps_.set(DEVICE_CAP_TABLET_TOOL);
+    } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_POINTER);
+    } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
+        caps_.set(DEVICE_CAP_TOUCH);
+    }
+}
+
+void VInputDevice::CheckAdditional()
+{
+    if (!HasCapability(DEVICE_CAP_TABLET_TOOL) &&
+        !HasCapability(DEVICE_CAP_POINTER) &&
+        !HasCapability(DEVICE_CAP_JOYSTICK) &&
+        HasMouseButton() && (HasRelCoord() || !HasAbsCoord())) {
+        caps_.set(DEVICE_CAP_POINTER);
+    }
+}
+
 void VInputDevice::CheckPointers()
 {
     CALL_DEBUG_ENTER;
-    bool hasAbsCoords { TestBit(ABS_X, absBitmask_) && TestBit(ABS_Y, absBitmask_) };
-    bool hasMtCoords { TestBit(ABS_MT_POSITION_X, absBitmask_) && TestBit(ABS_MT_POSITION_Y, absBitmask_) };
-    bool isDirect { TestBit(INPUT_PROP_DIRECT, propBitmask_) };
-    bool hasTouch { TestBit(BTN_TOUCH, keyBitmask_) };
-    bool hasRelCoords { TestBit(REL_X, relBitmask_) && TestBit(REL_Y, relBitmask_) };
-    bool stylusOrPen { TestBit(BTN_STYLUS, keyBitmask_) || TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool fingerButNoPen { TestBit(BTN_TOOL_FINGER, keyBitmask_) && !TestBit(BTN_TOOL_PEN, keyBitmask_) };
-    bool hasMouseBtn { HasMouseButton() };
-    bool hasJoystickFeature { HasJoystickAxesOrButtons() };
-
-    if (hasAbsCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-            FI_HILOGD("This is tablet tool");
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is touchpad");
-        } else if (hasMouseBtn) {
-            caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is mouse");
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-            FI_HILOGD("This is touch device");
-        } else if (hasJoystickFeature) {
-            caps_.set(DEVICE_CAP_JOYSTICK);
-            FI_HILOGD("This is joystick");
-        }
-    } else if (hasJoystickFeature) {
+    if (HasAbsCoord()) {
+        CheckAbs();
+    } else if (HasJoystickAxesOrButtons()) {
         caps_.set(DEVICE_CAP_JOYSTICK);
-        FI_HILOGD("This is joystick");
     }
-    if (hasMtCoords) {
-        if (stylusOrPen) {
-            caps_.set(DEVICE_CAP_TABLET_TOOL);
-            FI_HILOGD("This is tablet tool");
-        } else if (fingerButNoPen && !isDirect) {
-            caps_.set(DEVICE_CAP_POINTER);
-            FI_HILOGD("This is touchpad");
-        } else if (hasTouch || isDirect) {
-            caps_.set(DEVICE_CAP_TOUCH);
-            FI_HILOGD("This is touch device");
-        }
+    if (HasMtCoord()) {
+        CheckMt();
     }
-    if (!caps_.test(DEVICE_CAP_TABLET_TOOL) &&
-        !caps_.test(DEVICE_CAP_POINTER) &&
-        !caps_.test(DEVICE_CAP_JOYSTICK) &&
-        hasMouseBtn && (hasRelCoords || !hasAbsCoords)) {
-        caps_.set(DEVICE_CAP_POINTER);
-        FI_HILOGD("This is mouse");
-    }
+    CheckAdditional();
+    PrintCapsDevice();
 }
 
 void VInputDevice::CheckKeys()

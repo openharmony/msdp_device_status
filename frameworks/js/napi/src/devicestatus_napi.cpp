@@ -41,7 +41,7 @@ const std::vector<std::string> vecDeviceStatusValue {
 };
 thread_local DeviceStatusNapi *g_obj = nullptr;
 } // namespace
-std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbackMap_;
+std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
 void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
@@ -53,13 +53,13 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data& devicestatusData)
     CHKPV(loop);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    FI_HILOGD("DevicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
+    FI_HILOGD("devicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
         devicestatusData.type, devicestatusData.value);
     data_ = devicestatusData;
     work->data = static_cast<void *>(&data_);
-    int32_t ret = uv_queue_work(loop, work, [] (uv_work_t *work) {}, EmitOnEvent);
+    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, EmitOnEvent, uv_qos_default);
     if (ret != 0) {
-        FI_HILOGE("Failed to execute work queue");
+        FI_HILOGE("Failed to uv_queue_work_with_qos");
     }
 }
 
@@ -73,7 +73,7 @@ void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
     CHKPV(deviceStatusNapi);
     int32_t type = static_cast<int32_t>(data->type);
     int32_t value = static_cast<int32_t>(data->value);
-    FI_HILOGD("Type:%{public}d, Value:%{public}d", type, value);
+    FI_HILOGD("type:%{public}d, value:%{public}d", type, value);
     deviceStatusNapi->OnDeviceStatusChangedDone(type, value, false);
 }
 
@@ -89,7 +89,7 @@ DeviceStatusNapi::DeviceStatusNapi(napi_env env) : DeviceStatusEvent(env)
     devicestatusValueRef_ = nullptr;
     DeviceStatusClient::GetInstance().RegisterDeathListener([this] {
         FI_HILOGI("Receive death notification");
-        callbackMap_.clear();
+        callbacks_.clear();
         ClearEventMap();
     });
 }
@@ -111,7 +111,7 @@ DeviceStatusNapi::~DeviceStatusNapi()
 void DeviceStatusNapi::OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("Value:%{public}d", value);
+    FI_HILOGD("value:%{public}d", value);
     OnEvent(type, ARG_1, value, isOnce);
 }
 
@@ -152,7 +152,7 @@ bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
             FI_HILOGE("Failed to get valueType");
             return false;
         }
-        FI_HILOGD("ValueType:%{public}d", valueType);
+        FI_HILOGD("valueType:%{public}d", valueType);
         arr[i] = valueType;
     }
     if (arr[ARG_0] != napi_string || arr[ARG_1] != napi_number || arr[ARG_2] != napi_number ||
@@ -193,7 +193,7 @@ bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
             FI_HILOGE("Failed to get valueType");
             return false;
         }
-        FI_HILOGD("ValueType:%{public}d", valueType);
+        FI_HILOGD("valueType:%{public}d", valueType);
         arr[i] = valueType;
     }
     if (arr[ARG_0] != napi_string || arr[ARG_1] != napi_function) {
@@ -348,11 +348,11 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         },
         nullptr, &g_obj->callbackRef_);
     if (!g_obj->On(type, handler, false)) {
-        FI_HILOGE("Type:%{public}d already exists", type);
+        FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
     }
-    auto callbackIter = callbackMap_.find(type);
-    if (callbackIter != callbackMap_.end()) {
+    auto callbackIter = callbacks_.find(type);
+    if (callbackIter != callbacks_.end()) {
         FI_HILOGD("Callback exists");
         return nullptr;
     }
@@ -364,7 +364,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         ThrowErr(env, SERVICE_EXCEPTION, "On:Failed to SubscribeCallback");
         return nullptr;
     }
-    auto ret = callbackMap_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
+    auto ret = callbacks_.insert(std::pair<int32_t, sptr<IRemoteDevStaCallback>>(type, callback));
     if (!ret.second) {
         FI_HILOGE("Failed to insert");
     }
@@ -376,11 +376,11 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatus(napi_env env, napi_callback_i
     CALL_DEBUG_ENTER;
     const auto [ret, handler, typeMode, event, latency] = CheckSubscribeParam(env, info);
     if (!ret) {
-        FI_HILOGE("On:SubscribeDeviceStatus is failed");
+        FI_HILOGE("On:Failed to SubscribeDeviceStatus");
         return nullptr;
     }
     int32_t type = ConvertTypeToInt(typeMode);
-    FI_HILOGD("Type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
+    FI_HILOGD("type:%{public}d, event:%{public}d, latency:%{public}d", type, event, latency);
     if ((type < Type::TYPE_ABSOLUTE_STILL) || (type > Type::TYPE_LID_OPEN)) {
         ThrowErr(env, PARAM_ERROR, "Type is illegal");
         return nullptr;
@@ -417,8 +417,8 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
 napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int32_t event)
 {
     CALL_DEBUG_ENTER;
-    auto callbackIter = callbackMap_.find(type);
-    if (callbackIter == callbackMap_.end()) {
+    auto callbackIter = callbacks_.find(type);
+    if (callbackIter == callbacks_.end()) {
         NAPI_ASSERT(env, false, "No existed callback");
         return nullptr;
     }
@@ -427,7 +427,7 @@ napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int
     if (unsubscribeRet != RET_OK) {
         ThrowErr(env, SERVICE_EXCEPTION, "Off:Failed to UnsubscribeCallback");
     }
-    callbackMap_.erase(type);
+    callbacks_.erase(type);
     return nullptr;
 }
 
@@ -436,7 +436,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
     CALL_DEBUG_ENTER;
     const auto [ret, handler, type] = CheckGetParam(env, info);
     if (!ret) {
-        FI_HILOGE("Once:GetDeviceStatus is failed");
+        FI_HILOGE("Once:Failed to GetDeviceStatus");
         return nullptr;
     }
     if (g_obj == nullptr) {
@@ -452,7 +452,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
             nullptr, &g_obj->callbackRef_);
     }
     if (!g_obj->On(type, handler, true)) {
-        FI_HILOGE("Type:%{public}d already exists", type);
+        FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
     }
     Data devicestatusData = StationaryManager::GetInstance()->GetDeviceStatusData(static_cast<Type>(type));

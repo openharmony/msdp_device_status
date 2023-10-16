@@ -94,7 +94,7 @@ napi_value JsDragContext::JsConstructor(napi_env env, napi_callback_info info)
     JsDragContext *jsContext = new (std::nothrow) JsDragContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void *data, void *hin) {
-        FI_HILOGI("jsvm ends");
+        FI_HILOGI("Jsvm ends");
         JsDragContext *context = static_cast<JsDragContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -149,10 +149,10 @@ JsDragContext *JsDragContext::GetInstance(napi_env env)
 napi_value JsDragContext::On(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = TWO_PARAM;
-    napi_value argv[TWO_PARAM] = { nullptr };
+    size_t argc = 2;
+    napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < TWO_PARAM) {
+    if (argc < 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
@@ -160,60 +160,60 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
     CHKPP(jsDev);
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
-    if (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string)) {
+    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), CREATE_STRING_UTF8);
     if ((DRAG_TYPE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->RegisterListener(env, argv[ONE_PARAM]);
+    jsDragMgr->RegisterListener(env, argv[1]);
     return nullptr;
 }
 
 napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = TWO_PARAM;
-    napi_value argv[TWO_PARAM] = { nullptr };
+    size_t argc = 2;
+    napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsDragContext *jsDev = JsDragContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsDragMgr = jsDev->GetJsDragMgr();
     CHKPP(jsDragMgr);
-    if ((argc == ZERO_PARAM) || (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string))) {
+    if ((argc == 0) || (!UtilNapi::TypeOf(env, argv[0], napi_string))) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), CREATE_STRING_UTF8);
     if ((DRAG_TYPE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;
     }
-    if (argc == ONE_PARAM) {
+    if (argc == 1) {
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
-    if (UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_undefined) || UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_null)) {
+    if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
         jsDragMgr->UnregisterListener(env);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
+    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsDragMgr->UnregisterListener(env, argv[ONE_PARAM]);
+    jsDragMgr->UnregisterListener(env, argv[1]);
     return nullptr;
 }
 

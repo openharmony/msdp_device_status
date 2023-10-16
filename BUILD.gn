@@ -23,6 +23,8 @@ group("devicestatus_service_group") {
       "${device_status_root_path}/rust/modules/coordination/server:fusion_coordination_server_ffi",
       "${device_status_root_path}/rust/modules/drag/server:fusion_drag_server_ffi",
       "${device_status_root_path}/rust/subsystem/device_profile/sys:fusion_device_profile_rust",
+      "${device_status_root_path}/rust/subsystem/distributed_hardware/sys:dm_ffi",
+      "${device_status_root_path}/rust/subsystem/input/sys:input_ffi",
     ]
   }
 }

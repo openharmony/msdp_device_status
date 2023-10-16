@@ -15,57 +15,41 @@
 
 #include "setdragwindowvisible_fuzzer.h"
 
-#include "securec.h"
+#include "singleton.h"
 
-#include "devicestatus_define.h"
+#define private public
+#include "devicestatus_service.h"
 #include "fi_log.h"
-#include "interaction_manager.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SetDragWindowVisibleFuzzTest" };
-constexpr int32_t NUM_TWO { 2 };
-} // namespace
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "SetDragWindowVisibleFuzzTest" };
 
-template<class T>
-void GetObject(const uint8_t *data, size_t size, T &object)
+bool SetDragWindowVisibleFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return;
+    const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failure");
+        return false;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return;
-    }
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE), datas, reply, option);
+    return true;
 }
-
-void SetDragWindowVisibleFuzzTest(const uint8_t* data, size_t size)
-{
-    CALL_DEBUG_ENTER;
-    bool bWindowVisible = false;
-    int32_t num = 0;
-    GetObject<int32_t>(data, size, num);
-    if ((num % NUM_TWO) == 1) {
-        bWindowVisible = true;
-    }
-    int32_t ret = InteractionManager::GetInstance()->SetDragWindowVisible(bWindowVisible);
-    FI_HILOGD("ret:%{public}d", ret);
-}
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
-extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-    if (size < sizeof(int32_t)) {
-        return 0;
-    }
-    OHOS::Msdp::DeviceStatus::SetDragWindowVisibleFuzzTest(data, size);
+
+    OHOS::SetDragWindowVisibleFuzzTest(data, size);
     return 0;
 }

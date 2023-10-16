@@ -16,9 +16,11 @@
 //! IPC data definitions of Coordination module.
 
 use std::ffi::{ c_char, CString };
-use crate::fusion_utils_rust::{ call_debug_enter };
-use crate::hilog_rust::{ hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use hilog_rust::{ hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -26,10 +28,10 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionCoordinationData"
 };
 
-/// TODO: add documentation.
+/// General parameters of request of multi-device cooperation.
 #[derive(Default)]
 pub struct GeneralCoordinationParam {
-    /// TODO: add documentation.
+    /// ID of one request.
     pub user_data: i32,
 }
 
@@ -52,13 +54,13 @@ impl Deserialize for GeneralCoordinationParam {
     }
 }
 
-/// TODO: add documentation.
+/// Parameters of request to start multi-device cooperation.
 pub struct StartCoordinationParam {
-    /// TODO: add documentation.
+    /// ID of one request.
     pub user_data: i32,
-    /// TODO: add documentation.
+    /// The input device that trigger multi-device cooperation.
     pub start_device_id: i32,
-    /// TODO: add documentation.
+    /// The remote device we want to cooperate with.
     pub remote_network_id: String,
 }
 
@@ -85,11 +87,11 @@ impl Deserialize for StartCoordinationParam {
     }
 }
 
-/// TODO: add documentation.
+/// Parameters of request to stop multi-device cooperation.
 pub struct StopCoordinationParam {
-    /// TODO: add documentation.
+    /// ID of one request.
     pub user_data: i32,
-    /// TODO: add documentation.
+    /// Indicate whether to stop remote input.
     pub is_unchained: i32,
 }
 
@@ -114,11 +116,12 @@ impl Deserialize for StopCoordinationParam {
     }
 }
 
-/// TODO: add documentation.
+/// Parameters of request to check switch status of multi-device cooperation
+/// of the remote device.
 pub struct GetCoordinationStateParam {
-    /// TODO: add documentation.
+    /// ID of one request.
     pub user_data: i32,
-    /// TODO: add documentation.
+    /// The remote device.
     pub device_id: String,
 }
 

@@ -106,6 +106,70 @@ void VirtualDeviceBuilder::Daemonize()
     }
 }
 
+void VirtualDeviceBuilder::ConcatenationName(std::string &sLine)
+{
+    auto s = sLine.begin();
+    while (s != sLine.end() && (isspace(*s) || (*s == '\0'))) {
+        s = sLine.erase(s);
+    }
+    while (s != sLine.end()) {
+        while (s != sLine.end() && !isspace(*s) && *s != '\0') {
+            ++s;
+        }
+        auto t = s;
+        while (t != sLine.end() && (isspace(*t) || (*t == '\0'))) {
+            ++t;
+        }
+        if (t != sLine.end()) {
+            *s++ = '_';
+        }
+        while (s != sLine.end() && (isspace(*s) || (*s == '\0'))) {
+            s = sLine.erase(s);
+        }
+    }
+}
+
+bool VirtualDeviceBuilder::ExecuteUnmount(const char *id, const char *name, const std::string &direntName)
+{
+    std::ostringstream sPattern;
+    sPattern << "^vdevadm_(mount|clone)_-t_?" << id;
+    std::regex pattern { sPattern.str() };
+    if (!Utility::IsInteger(direntName)) {
+        return false;
+    }
+
+    std::ostringstream spath;
+    spath << "/proc/" << direntName;
+    struct stat statBuf;
+    if (stat(spath.str().c_str(), &statBuf) != 0) {
+        std::cout << "stat \'" << spath.str() << "\' failed: " << strerror(errno) << std::endl;
+        return false;
+    }
+    if (!S_ISDIR(statBuf.st_mode)) {
+        return false;
+    }
+    spath << "/cmdline";
+    std::ifstream stream(spath.str(), std::ios::in);
+    if (!stream.is_open()) {
+        return false;
+    }
+    std::string sLine;
+    while (std::getline(stream, sLine)) {
+        ConcatenationName(sLine);
+        if (std::regex_search(sLine, pattern)) {
+            std::cout << "\tfound: \'" << direntName << "\'" << std::endl;
+            int32_t pid = std::atoi(direntName.c_str());
+            if (kill(static_cast<pid_t>(pid), SIGTERM) != 0) {
+                std::cout << "Failed to stop backing process [" << pid << "]: " << strerror(errno) << std::endl;
+            } else {
+                std::cout << "Unmount virtual " << name << " successfully." << std::endl;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
 void VirtualDeviceBuilder::Unmount(const char *name, const char *id)
 {
     std::cout << "Start to unmount virtual " << name << " ..." << std::endl;
@@ -115,69 +179,14 @@ void VirtualDeviceBuilder::Unmount(const char *name, const char *id)
         return;
     }
 
-    std::ostringstream sPattern;
-    sPattern << "^vdevadm_(mount|clone)_-t_?" << id;
-    std::regex pattern { sPattern.str() };
     struct dirent *dent;
-
     while ((dent = readdir(procDir)) != nullptr) {
-        if (!Utility::IsInteger(std::string(dent->d_name))) {
-            continue;
-        }
-
-        std::ostringstream spath;
-        spath << "/proc/" << dent->d_name;
-
-        struct stat statBuf;
-        if (stat(spath.str().c_str(), &statBuf) != 0) {
-            std::cout << "stat \'" << spath.str() << "\' failed: " << strerror(errno) << std::endl;
-            continue;
-        }
-        if (!S_ISDIR(statBuf.st_mode)) {
-            continue;
-        }
-        spath << "/cmdline";
-
-        std::ifstream stream(spath.str(), std::ios::in);
-        if (!stream.is_open()) {
-            continue;
-        }
-        std::string sLine;
-
-        while (std::getline(stream, sLine)) {
-            auto s = sLine.begin();
-            while (s != sLine.end() && (isspace(*s) || (*s == '\0'))) {
-                s = sLine.erase(s);
-            }
-            while (s != sLine.end()) {
-                while (s != sLine.end() && !isspace(*s) && *s != '\0') {
-                    ++s;
-                }
-                auto t = s;
-                while (t != sLine.end() && (isspace(*t) || (*t == '\0'))) {
-                    ++t;
-                }
-                if (t != sLine.end()) {
-                    *s++ = '_';
-                }
-                while (s != sLine.end() && (isspace(*s) || (*s == '\0'))) {
-                    s = sLine.erase(s);
-                }
-            }
-
-            if (std::regex_search(sLine, pattern)) {
-                std::cout << "\tfound: \'" << dent->d_name << "\'" << std::endl;
-                int32_t pid = std::atoi(dent->d_name);
-                if (kill(static_cast<pid_t>(pid), SIGTERM) != 0) {
-                    std::cout << "Failed to stop backing process [" << pid << "]: " << strerror(errno) << std::endl;
-                } else {
-                    std::cout << "Unmount virtual " << name << " successfully." << std::endl;
-                }
-                goto EXIT;
-            }
+        std::string direntName { dent->d_name };
+        if (ExecuteUnmount(id, name, direntName)) {
+            goto EXIT;
         }
     }
-    std::cout << "Mo backing process for virtual " << name << " was found." << std::endl;
+    std::cout << "The backing process for virtual " << name << "can't be found." << std::endl;
 EXIT:
     if (closedir(procDir) != 0) {
         FI_HILOGE("closedir error:%{public}s", strerror(errno));
@@ -266,7 +275,7 @@ bool VirtualDeviceBuilder::SetUp()
     if (ioctl(fd_, UI_DEV_CREATE) < 0) {
         FI_HILOGE("Failed to setup uinput device");
         if (close(fd_) != 0) {
-            FI_HILOGE("close error:%{public}s", strerror(errno));
+            FI_HILOGE("Close error:%{public}s", strerror(errno));
         }
         fd_ = -1;
         return false;
@@ -380,11 +389,11 @@ int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
     char realPath[PATH_MAX] {};
 
     if (realpath(path, realPath) == nullptr) {
-        std::cout << "invalid path: " << path << std::endl;
+        std::cout << "Invalid path: " << path << std::endl;
         return RET_ERR;
     }
     if (Utility::GetFileSize(realPath) > MAXIMUM_FILESIZE_ALLOWED) {
-        std::cout << "file is too large" << std::endl;
+        std::cout << "File is too large" << std::endl;
         return RET_ERR;
     }
     std::cout << "Read input data from \'" << realPath << "\'" << std::endl;

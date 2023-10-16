@@ -15,11 +15,7 @@ import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
 ohos_rust_shared_ffi("fusion_ipc_server_ffi") {
-  sources = [
-    "src/fusion_ipc_delegator.rs",
-    "src/fusion_ipc_server.rs",
-    "src/lib.rs",
-  ]
+  sources = [ "src/lib.rs" ]
 
   deps = [
     "${device_status_root_path}/rust/data/sys:fusion_data_rust",
@@ -30,8 +26,6 @@ ohos_rust_shared_ffi("fusion_ipc_server_ffi") {
   ]
 
   external_deps = [
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
     "hilog:hilog_rust",
     "ipc:ipc_rust",
     "safwk:system_ability_fwk_rust",

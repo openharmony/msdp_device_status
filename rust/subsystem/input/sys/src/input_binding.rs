@@ -17,50 +17,39 @@
 
 #![allow(dead_code)]
 
-/// struct CPointerEvent
+/// C representation of [`PointerEvent`].
 #[repr(C)]
 pub struct CPointerEvent {
     /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
-/// struct CKeyEvent
+/// C representation of [`KeyEvent`].
 #[repr(C)]
 pub struct CKeyEvent {
     /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
-/// struct CAxisEvent
+/// C representation of [`AxisEvent`].
 #[repr(C)]
 pub struct CAxisEvent {
     /// Corresponding to the C-side 'void' type, one way to avoid using 'unsafe'
     _private: [u8; 0],
 }
 
-/// struct CPointerStyleColor
-#[repr(C)]
-pub struct CPointerStyleColor {
-    /// Pointer style color r property
-    pub r: u8,
-    /// Pointer style color g property
-    pub g: u8,
-    /// Pointer style color b property
-    pub b: u8,
-}
-
-/// struct CPointerStyle
+/// C representation of [`PointerStyle`].
 #[repr(C)]
 pub struct CPointerStyle {
     /// Pointer style size property
     pub size: i32,
     /// Pointer style color property
-    pub color: CPointerStyleColor,
+    pub color: i32,
     /// Pointer style id property
     pub id: i32,
 }
 
-/// struct CExtraData
+/// C representation of [`ExtraData`].
 #[repr(C)]
 pub struct CExtraData {
     /// Extra data appended property

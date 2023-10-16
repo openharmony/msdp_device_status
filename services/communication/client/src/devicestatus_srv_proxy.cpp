@@ -57,7 +57,7 @@ void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLaten
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return;
     }
 }
@@ -86,7 +86,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return;
     }
 }
@@ -115,7 +115,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("SendRequest is failed, error code:%{public}d", ret);
+        FI_HILOGE("SendRequest is failed, errCode:%{public}d", ret);
         return devicestatusData;
     }
 
@@ -144,7 +144,7 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -164,7 +164,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -185,7 +185,7 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -206,7 +206,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COORDINATION),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -230,7 +230,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COORDINATION),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -252,7 +252,7 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUn
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COORDINATION),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -273,7 +273,7 @@ int32_t DeviceStatusSrvProxy::UpdateDragStyle(DragCursorStyle style)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -293,10 +293,10 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    int32_t pid;
+    int32_t pid = 0;
     READINT32(reply, pid, IPC_PROXY_DEAD_OBJECT_ERR);
     return pid;
 }
@@ -316,11 +316,51 @@ int32_t DeviceStatusSrvProxy::GetUdKey(std::string &udKey)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     READSTRING(reply, udKey, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
+}
+
+int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA), data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragData failed");
+        return ret;
+    }
+
+    auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(reply);
+    CHKPR(pixelMap, RET_ERR);
+    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap> (pixelMap);
+    READINT32(reply, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READUINT8VECTOR(reply, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(reply, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayX, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(reply, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READBOOL(reply, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
@@ -340,7 +380,7 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -362,6 +402,8 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
@@ -376,7 +418,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
@@ -403,7 +445,7 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
@@ -549,7 +591,7 @@ int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }

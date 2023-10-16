@@ -39,9 +39,9 @@ int32_t CoordinationStateFree::ActivateCoordination(
         FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
-    int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId);
+    int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId, true);
     if (ret != RET_OK) {
-        FI_HILOGE("Start input device coordination fail");
+        FI_HILOGE("Start input device coordination failed");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     std::string taskName = "process_start_task";
@@ -73,7 +73,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
     }
     ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(networkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop coordination fail");
+        FI_HILOGE("Stop coordination failed");
         return ret;
     }
 

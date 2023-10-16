@@ -59,7 +59,7 @@ public:
     void OnDeviceStatusChangedDone(int32_t type, int32_t value, bool isOnce);
     static DeviceStatusNapi* GetDeviceStatusNapi();
 
-    static std::map<int32_t, sptr<IRemoteDevStaCallback>> callbackMap_;
+    static std::map<int32_t, sptr<IRemoteDevStaCallback>> callbacks_;
 
 private:
     static bool CheckArguments(napi_env env, napi_callback_info info);

@@ -175,7 +175,7 @@ void DeviceStatusMsdpMock::CloseTimer()
 
 void DeviceStatusMsdpMock::TimerCallback()
 {
-    uint64_t timers;
+    uint64_t timers {};
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
         FI_HILOGE("Read timer fd failed");
         return;
@@ -208,7 +208,7 @@ int32_t DeviceStatusMsdpMock::RegisterTimerCallback(int32_t fd, const EventType 
     ev.data.ptr = reinterpret_cast<void*>(this);
     ev.data.fd = fd;
     if (epoll_ctl(epFd_, EPOLL_CTL_ADD, fd, &ev) == -1) {
-        FI_HILOGE("epoll_ctl failed, error num:%{public}d", errno);
+        FI_HILOGE("epoll_ctl failed, errno:%{public}d", errno);
         return RET_ERR;
     }
 

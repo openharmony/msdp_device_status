@@ -56,6 +56,8 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
 const std::string UD_KEY { "Unified data key" };
+const std::string FILTER_INFO { "Undefined filter info" };
+const std::string EXTRA_INFO { "Undefined extra info" };
 } // namespace
 
 class InteractionDragDrawingTest : public testing::Test {
@@ -101,7 +103,11 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
-    CHKPL(pixelMap);
+    if (pixelMap == nullptr) {
+        FI_HILOGE("Create pixelMap failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
     delete[] colorPixels;
     return pixelMap;
 }
@@ -121,6 +127,8 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     dragData.shadowInfo.y = 0;
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.udKey = UD_KEY;
+    dragData.extraInfo = FILTER_INFO;
+    dragData.extraInfo = EXTRA_INFO;
     dragData.sourceType = sourceType;
     dragData.pointerId = pointerId;
     dragData.dragNum = dragNum;
@@ -352,7 +360,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_Animation,
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, NOT_HAS_CUSTOM_ANIMATION);
+    ret = InteractionManager::GetInstance()->StopDrag(DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));

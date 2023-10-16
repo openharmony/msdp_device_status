@@ -37,7 +37,7 @@ DistributedInputAdapter::~DistributedInputAdapter()
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
-    callbackMap_.clear();
+    callbacks_.clear();
 }
 
 bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
@@ -114,11 +114,25 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }
 
+int32_t DistributedInputAdapter::RegisterSessionStateCb(std::function<void(uint32_t)> callback)
+{
+    CALL_INFO_TRACE;
+    sptr<SessionStateCallback> cb = new (std::nothrow) SessionStateCallback(callback);
+    CHKPR(callback, ERROR_NULL_POINTER);
+    return DistributedInputKit::RegisterSessionStateCb(cb);
+}
+
+int32_t DistributedInputAdapter::UnregisterSessionStateCb()
+{
+    CALL_INFO_TRACE;
+    return DistributedInputKit::UnregisterSessionStateCb();
+}
+
 void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPV(callback);
-    callbackMap_[type] = callback;
+    callbacks_[type] = callback;
     AddTimer(type);
 }
 
@@ -128,34 +142,34 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
     auto context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     int32_t timerId = context->GetTimerManager().AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
-        if ((callbackMap_.find(type) == callbackMap_.end()) || (watchingMap_.find(type) == watchingMap_.end())) {
+        if ((callbacks_.find(type) == callbacks_.end()) || (watchings_.find(type) == watchings_.end())) {
             FI_HILOGE("Callback or watching is not exist");
             return;
         }
-        if (watchingMap_[type].times == 0) {
+        if (watchings_[type].times == 0) {
             FI_HILOGI("It will be retry to call callback next time");
-            watchingMap_[type].times++;
+            watchings_[type].times++;
             return;
         }
-        callbackMap_[type](false);
-        callbackMap_.erase(type);
+        callbacks_[type](false);
+        callbacks_.erase(type);
     });
     if (timerId < 0) {
-        FI_HILOGE("Add timer failed timeId:%{public}d", timerId);
+        FI_HILOGE("Add timer failed, timeId:%{public}d", timerId);
         return;
     }
-    watchingMap_[type].timerId = timerId;
-    watchingMap_[type].times = 0;
+    watchings_[type].timerId = timerId;
+    watchings_[type].times = 0;
 }
 
 void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
     FI_HILOGD("Remove timer type:%{public}d", type);
-    if (watchingMap_.find(type) != watchingMap_.end()) {
+    if (watchings_.find(type) != watchings_.end()) {
         auto context = COOR_EVENT_MGR->GetIContext();
         CHKPV(context);
-        context->GetTimerManager().RemoveTimer(watchingMap_[type].timerId);
-        watchingMap_.erase(type);
+        context->GetTimerManager().RemoveTimer(watchings_[type].timerId);
+        watchings_.erase(type);
     }
 }
 
@@ -164,13 +178,13 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
     RemoveTimer(type);
-    auto it = callbackMap_.find(type);
-    if (it == callbackMap_.end()) {
+    auto it = callbacks_.find(type);
+    if (it == callbacks_.end()) {
         FI_HILOGI("Dinput callback not exist");
         return;
     }
     it->second(status == RET_OK);
-    callbackMap_.erase(it);
+    callbacks_.erase(it);
 }
 
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
@@ -223,6 +237,12 @@ void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std
 void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
+}
+
+void DistributedInputAdapter::SessionStateCallback::OnResult(const std::string &devId, const uint32_t status)
+{
+    CHKPV(callback_);
+    callback_(status);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

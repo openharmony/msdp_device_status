@@ -80,14 +80,14 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
         return RET_ERR;
     }
     if (algoHandler->handle != nullptr) {
-        FI_HILOGE("handle has exists");
+        FI_HILOGE("handle already exists");
         return RET_OK;
     }
 
     std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName.c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
+        FI_HILOGE("Get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -100,7 +100,7 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
     algoHandler->create = reinterpret_cast<IMsdp* (*)()>(dlsym(algoHandler->handle, "Create"));
     algoHandler->destroy = reinterpret_cast<void *(*)(IMsdp*)>(dlsym(algoHandler->handle, "Destroy"));
     if (algoHandler->create == nullptr || algoHandler->destroy == nullptr) {
-        FI_HILOGE("%{public}s dlsym Create or Destroy failed", dlName.c_str());
+        FI_HILOGE("%{public}s dlsym create or destroy failed", dlName.c_str());
         dlclose(algoHandler->handle);
         algoHandler->Clear();
         return RET_ERR;
@@ -136,15 +136,15 @@ int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpA
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest001 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest001 start");
     AlgoAbsoluteStill still;
     bool ret = still.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     still.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    still.RegisterCallback(callback);
     ASSERT_TRUE(ret);
 }
 
@@ -155,13 +155,13 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest001, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest002 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest002 start");
     AlgoHorizontal horizontal;
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     bool ret = horizontal.Init(TYPE_INVALID);
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    horizontal.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     horizontal.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -174,13 +174,13 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest002, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level1)
 {
-    FI_HILOGI("AbsolutstillTest003 start");
+    FI_HILOGI("DeviceStatusAlgorithmTest003 start");
     AlgoVertical vertical;
     bool ret = vertical.Init(TYPE_INVALID);
     int32_t sensorTypeId = SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;
     ASSERT_TRUE(ret);
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    vertical.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     vertical.Unsubscribe(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -236,8 +236,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoAbsoluteStill still;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    still.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    still.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     ret += 1;
@@ -258,8 +258,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoHorizontal horizontal;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    horizontal.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    horizontal.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;
@@ -561,7 +561,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest024, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest025, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusAlgorithmTest025 start");
-    g_manager->callAlgoNum_[Type::TYPE_ABSOLUTE_STILL] = 2;
+    g_manager->callAlgoNums_[Type::TYPE_ABSOLUTE_STILL] = 2;
     int32_t ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -576,7 +576,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest026, TestSize.Level
     FI_HILOGI("DeviceStatusAlgorithmTest026 start");
     int32_t ret = g_manager->Enable(Type::TYPE_MAX);
     ASSERT_TRUE(ret);
-    g_manager->callAlgoNum_[Type::TYPE_MAX] = 1;
+    g_manager->callAlgoNums_[Type::TYPE_MAX] = 1;
     ret = g_manager->Disable(Type::TYPE_MAX);
     EXPECT_TRUE(ret == RET_OK);
 }

@@ -38,11 +38,11 @@ inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
 #endif
 
 #ifndef FI_FILE_NAME
-#define FI_FILE_NAME   (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
+#define FI_FILE_NAME (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
 #endif
 
 #ifndef FI_LINE_INFO
-#define FI_LINE_INFO   FI_FILE_NAME, __LINE__
+#define FI_LINE_INFO FI_FILE_NAME, __LINE__
 #endif
 
 #define FI_HILOGD(fmt, ...) do { \
@@ -95,13 +95,13 @@ private:
 } // namespace Msdp
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER        OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Debug___    \
+#define CALL_DEBUG_ENTER OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Debug___ \
     { std::bind(&OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
 
-#define CALL_INFO_TRACE         OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
+#define CALL_INFO_TRACE OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___ \
     { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
 
-#define CALL_TEST_DEBUG         OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___     \
+#define CALL_TEST_DEBUG OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___ \
     { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
     (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
 #endif // FI_LOG_H

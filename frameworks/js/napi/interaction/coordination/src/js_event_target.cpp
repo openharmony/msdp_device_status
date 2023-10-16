@@ -36,7 +36,7 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListener_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListeners_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
     }
@@ -55,15 +55,15 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPreparePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallPrepareAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -82,15 +82,15 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallActivateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -110,15 +110,15 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallDeactivatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDeactivateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, CallDeactivateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -136,15 +136,17 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStatePromiseWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            CallGetCrossingSwitchStatePromiseWork, uv_qos_default);
     } else {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetCrossingSwitchStateAsyncWork);
+        result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            CallGetCrossingSwitchStateAsyncWork, uv_qos_default);
     }
 
     if (result != 0) {
-        FI_HILOGE("uv_queue_work failed");
+        FI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         cb->DecStrongRef(nullptr);
     }
@@ -154,8 +156,8 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListener_.find(type);
-    if (iter == coordinationListener_.end()) {
+    auto iter = coordinationListeners_.find(type);
+    if (iter == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -184,8 +186,8 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListener_.find(type);
-    if (iter == coordinationListener_.end()) {
+    auto iter = coordinationListeners_.find(type);
+    if (iter == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
@@ -233,8 +235,8 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = coordinationListener_.find(COOPERATE);
-    if (changeEvent == coordinationListener_.end()) {
+    auto changeEvent = coordinationListeners_.find(COOPERATE);
+    if (changeEvent == coordinationListeners_.end()) {
         FI_HILOGE("Find %{public}s failed", std::string(COOPERATE).c_str());
         return;
     }
@@ -250,9 +252,10 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         item->data.deviceDescriptor = deviceId;
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
-        int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCoordinationMessageEvent);
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            EmitCoordinationMessageEvent, uv_qos_default);
         if (result != 0) {
-            FI_HILOGE("uv_queue_work failed");
+            FI_HILOGE("uv_queue_work_with_qos failed");
             item->DecStrongRef(nullptr);
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
@@ -577,8 +580,8 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
-    auto messageEvent = coordinationListener_.find(COOPERATE);
-    if (messageEvent == coordinationListener_.end()) {
+    auto messageEvent = coordinationListeners_.find(COOPERATE);
+    if (messageEvent == coordinationListeners_.end()) {
         FI_HILOGE("Find messageEvent failed");
         return;
     }

@@ -15,55 +15,37 @@
 
 #include "preparecoordination_fuzzer.h"
 
-#include "securec.h"
+#include "singleton.h"
 
-#include "coordination_message.h"
-#include "devicestatus_define.h"
-#include "interaction_manager.h"
+#define private public
+#include "devicestatus_service.h"
+#include "message_parcel.h"
 
+using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PrepareCoordinationFuzzTest" };
-} // namespace
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = ::memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::PREPARE_COORDINATION), datas, reply, option);
+    return true;
 }
-
-void PrepareCoordinationFuzzTest(const uint8_t* data, size_t size)
-{
-    CALL_DEBUG_ENTER;
-    int32_t random = 0;
-    (void)GetObject<int32_t>(data, 0, random);
-    bool enabled = ((random % 2) == 0);
-    auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
-        FI_HILOGD("Prepare coordination fuzz test");
-    };
-    if (enabled) {
-        InteractionManager::GetInstance()->PrepareCoordination(fun);
-    } else {
-        InteractionManager::GetInstance()->UnprepareCoordination(fun);
-    }
-}
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Msdp::DeviceStatus::PrepareCoordinationFuzzTest(data, size);
+    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
 

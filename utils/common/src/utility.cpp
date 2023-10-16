@@ -21,6 +21,7 @@
 
 #include <cerrno>
 #include <limits>
+#include <map>
 #include <regex>
 #include <sstream>
 
@@ -146,33 +147,15 @@ void Utility::ShowFileAttributes(const char *path)
     }
 
     std::ostringstream ss;
-    if (buf.st_mode & S_IRUSR) {
-        ss << "U+R ";
+    std::map<mode_t, std::string> modes {{S_IRUSR, "U+R "}, {S_IWUSR, "U+W "}, {S_IXUSR, "U+X "}, {S_IRGRP, "G+R "},
+        {S_IWGRP, "G+W "}, {S_IXGRP, "G+X "}, {S_IROTH, "O+R "}, {S_IWOTH, "O+W "}, {S_IXOTH, "O+X "}};
+    for (const auto &element : modes) {
+        if (buf.st_mode & element.first) {
+            ss << element.second;
+            break;
+        }
     }
-    if (buf.st_mode & S_IWUSR) {
-        ss << "U+W ";
-    }
-    if (buf.st_mode & S_IXUSR) {
-        ss << "U+X ";
-    }
-    if (buf.st_mode & S_IRGRP) {
-        ss << "G+R ";
-    }
-    if (buf.st_mode & S_IWGRP) {
-        ss << "G+W ";
-    }
-    if (buf.st_mode & S_IXGRP) {
-        ss << "G+X ";
-    }
-    if (buf.st_mode & S_IROTH) {
-        ss << "O+R ";
-    }
-    if (buf.st_mode & S_IWOTH) {
-        ss << "O+W ";
-    }
-    if (buf.st_mode & S_IXOTH) {
-        ss << "O+X ";
-    }
+
     FI_HILOGD("%{public}20s:%{public}s", "PERMISSIONS", ss.str().c_str());
 }
 

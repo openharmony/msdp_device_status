@@ -13,25 +13,24 @@
  * limitations under the License.
  */
 
-//! Plugin manager.
+//! Plugin manager, On-demand load and unload dynamic library.
+//! Plugin module supply one group of interfaces, bussiness implement these interfaces
+//! as a plugin, this plugin can manage by plugin manager.
+//! Currently there are two plugins, one is mouse and key coordination, another is drag
+//! interacton. They develop base on plugin manager.
 
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_basic_server_rust;
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate libloading;
-
 use std::collections::HashMap;
 use std::path::Path;
 use std::ffi::{ c_char, CString };
-use fusion_data_rust::{ Intention, IPlugin };
-use fusion_utils_rust::{ call_debug_enter };
-use fusion_basic_server_rust::FusionBasicServer;
+
 use hilog_rust::{ debug, info, error, hilog, HiLogLabel, LogType };
+
+use fusion_data_rust::{ Intention, IPlugin };
+use fusion_utils_rust::call_debug_enter;
+use fusion_basic_server_rust::FusionBasicServer;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -39,11 +38,13 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionPluginManager"
 };
 
-/// TODO: add documentation
+/// Helper to define intefaces of library that will be used by [`PluginManager`]
+/// to interact with it.
 #[macro_export]
 macro_rules! export_plugin {
     ($plugin_type:ty) => {
-        /// TODO: add documentation.
+        /// Create a new instance of [`IPlugin`] through which functionalities
+        /// of this module can be accessed.
         /// # Safety
         #[no_mangle]
         pub unsafe extern "C" fn _create_plugin() -> *mut dyn IPlugin {
@@ -53,7 +54,7 @@ macro_rules! export_plugin {
     };
 }
 
-/// struct PluginManager
+/// Loading、unloading and bookkeeping of modules.
 #[derive(Default)]
 pub struct PluginManager {
     loaders: HashMap<Intention, libloading::Library>
@@ -103,7 +104,7 @@ impl PluginManager {
                         creator()
                     };
                     if plugin_ptr.is_null() {
-                        error!(LOG_LABEL, "Fail to create plugin instance");
+                        error!(LOG_LABEL, "Failed to create plugin instance");
                         None
                     } else {
                         Some(unsafe {
@@ -123,7 +124,7 @@ impl PluginManager {
         }
     }
 
-    /// TODO: add documentation
+    /// Load module identified by [`intention`].
     pub fn load_plugin(&mut self, intention: Intention) -> Option<Box<dyn IPlugin>>
     {
         call_debug_enter!("PluginManager::load_plugin");
@@ -137,7 +138,7 @@ impl PluginManager {
         }
     }
 
-    /// TODO: add documentation
+    /// Unload module identified by [`intention`].
     pub fn unload_plugin(&mut self, intention: Intention) {
         call_debug_enter!("PluginManager::unload_plugin");
         if let Some(loader) = self.loaders.remove(&intention) {

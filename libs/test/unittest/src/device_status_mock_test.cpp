@@ -82,7 +82,7 @@ int32_t DeviceStatusMsdpMocKTest::LoadMockLibrary(const std::shared_ptr<MsdpAlgo
     std::string dlName = DEVICESTATUS_MOCK_LIB_PATH;
     char libRealPath[PATH_MAX] = {};
     if (realpath(dlName.c_str(), libRealPath) == nullptr) {
-        FI_HILOGE("get absolute algoPath is error, errno:%{public}d", errno);
+        FI_HILOGE("Get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -95,7 +95,7 @@ int32_t DeviceStatusMsdpMocKTest::LoadMockLibrary(const std::shared_ptr<MsdpAlgo
     mockHandler->create = reinterpret_cast<IMsdp* (*)()>(dlsym(mockHandler->handle, "Create"));
     mockHandler->destroy = reinterpret_cast<void *(*)(IMsdp*)>(dlsym(mockHandler->handle, "Destroy"));
     if (mockHandler->create == nullptr || mockHandler->destroy == nullptr) {
-        FI_HILOGE("%{public}s dlsym Create or Destroy failed", dlName.c_str());
+        FI_HILOGE("%{public}s dlsym create or destroy failed", dlName.c_str());
         dlclose(mockHandler->handle);
         mockHandler->Clear();
         return RET_ERR;

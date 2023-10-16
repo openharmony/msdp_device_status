@@ -23,15 +23,15 @@ extern "C" {
 
 struct NativeService;
 
-struct NativeService* NativeService_New();
-struct NativeService* NativeService_Ref(struct NativeService *service);
-struct NativeService* NativeService_Unref(struct NativeService *service);
+struct NativeService* NativeServiceNew(void);
+struct NativeService* NativeServiceRef(struct NativeService *service);
+struct NativeService* NativeServiceUnref(struct NativeService *service);
 
-void NativeService_OnDump(struct NativeService *service);
-void NativeService_OnStart(struct NativeService *service);
-void NativeService_OnStop(struct NativeService *service);
+void NativeServiceOnDump(struct NativeService *service);
+void NativeServiceOnStart(struct NativeService *service);
+void NativeServiceOnStop(struct NativeService *service);
 
-int32_t NativeService_AllocSocketFd(struct NativeService *service, const char *programName,
+int32_t NativeServiceAllocSocketFd(struct NativeService *service, const char *programName,
     int32_t moduleType, int32_t *toReturnClientFd, int32_t *tokenType);
 
 #ifdef __cplusplus

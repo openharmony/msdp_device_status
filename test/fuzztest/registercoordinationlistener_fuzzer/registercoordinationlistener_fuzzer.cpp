@@ -15,42 +15,36 @@
 
 #include "registercoordinationlistener_fuzzer.h"
 
-#include "coordination_message.h"
-#include "fi_log.h"
-#include "interaction_manager.h"
-#include "i_coordination_listener.h"
+#include "singleton.h"
 
+#define private public
+#include "devicestatus_service.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "RegisterCoordinationListenerFuzzTest" };
-} // namespace
+const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-class CoordinationListenerTest : public ICoordinationListener {
-public:
-    CoordinationListenerTest() : ICoordinationListener() {}
-    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
-    {
-        FI_HILOGD("Register coordination listener fuzz test");
-    };
-};
-
-void RegisterCoordinationListenerFuzzTest()
+bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<CoordinationListenerTest> consumer = std::make_shared<CoordinationListenerTest>();
-    InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
-    InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(0);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR), datas, reply, option);
+    return true;
 }
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
-    (void)data;
-    (void)size;
-    OHOS::Msdp::DeviceStatus::RegisterCoordinationListenerFuzzTest();
+    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }

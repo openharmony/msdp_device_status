@@ -63,7 +63,7 @@ int32_t CGetPointerAction(const CPointerEvent* cPointerEvent)
     CHKPR(cPointerEvent, RET_ERR);
     CHKPR(cPointerEvent->event, RET_ERR);
     auto ret = cPointerEvent->event->GetPointerAction();
-    FI_HILOGD("action: %{public}d", ret);
+    FI_HILOGD("action:%{public}d", ret);
     return ret;
 }
 
@@ -175,9 +175,7 @@ int32_t CGetPointerStyle(CPointerStyle* cPointerStyle)
     }
 
     cPointerStyle->size = pointerStyle.size;
-    cPointerStyle->color.r = pointerStyle.color.r;
-    cPointerStyle->color.g = pointerStyle.color.g;
-    cPointerStyle->color.b = pointerStyle.color.b;
+    cPointerStyle->color = pointerStyle.color;
     cPointerStyle->id = pointerStyle.id;
     return RET_OK;
 }

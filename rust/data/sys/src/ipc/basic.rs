@@ -17,10 +17,11 @@
 
 use std::ffi::{ c_char, CStr, CString };
 use std::fmt::{ Display, Formatter, Error };
-use crate::fusion_utils_rust::{ call_debug_enter, define_enum };
-use crate::hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
-use crate::FusionResult;
+
+use hilog_rust::{ info, error, hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use fusion_utils_rust::{ call_debug_enter, define_enum, FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -72,7 +73,7 @@ impl AllocSocketPairParam {
             }
             Err(_) => {
                 error!(LOG_LABEL, "Can not convert \'program_name\' from CStr to String");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

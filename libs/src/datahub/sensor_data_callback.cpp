@@ -19,7 +19,7 @@
 #include <cstdio>
 
 #include "devicestatus_define.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -37,7 +37,7 @@ SensorDataCallback::~SensorDataCallback()
     alive_ = false;
     CHKPV(algorithmThread_);
     if (!algorithmThread_->joinable()) {
-        FI_HILOGE("thread join fail");
+        FI_HILOGE("Thread join failed");
         return;
     }
     sem_post(&sem_);
@@ -60,13 +60,13 @@ bool SensorDataCallback::Unregister()
     CALL_DEBUG_ENTER;
     bool ret = UnregisterCallbackSensor(SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER);
     if (!ret) {
-        FI_HILOGE("ret failed");
+        FI_HILOGE("UnregisterCallbackSensor failed");
         return false;
     }
     alive_ = false;
     CHKPF(algorithmThread_);
     if (!algorithmThread_->joinable()) {
-        FI_HILOGE("Thread join fail");
+        FI_HILOGE("Thread join failed");
         return false;
     }
     sem_post(&sem_);

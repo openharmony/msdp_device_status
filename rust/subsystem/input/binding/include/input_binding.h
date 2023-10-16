@@ -24,7 +24,6 @@ struct CPointerEvent;
 struct CKeyEvent;
 struct CAxisEvent;
 struct CPointerStyle;
-struct CPointerStyleColor;
 struct CExtraData;
 
 int CGetPointerId(const CPointerEvent* cPointerEvent);

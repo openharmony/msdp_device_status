@@ -13,21 +13,19 @@
  * limitations under the License.
  */
 
-use crate::{
-    input_binding, input_binding::CKeyEvent
-};
+use crate::{ input_binding, input_binding::CKeyEvent };
 
-/// KeyEvent packed the native CKeyEvent
+/// KeyEvent packed the native CKeyEvent.
 #[repr(C)]
 pub struct KeyEvent(*const CKeyEvent);
 
 impl KeyEvent {
-    /// Create a KeyEvent object
+    /// Create a KeyEvent object.
     pub fn new(key_event: *const CKeyEvent) -> Self {
         Self(key_event)
     }
-    
-    /// Extract a raw `CKeyEvent` pointer from this wrapper
+
+    /// Extract a raw `CKeyEvent` pointer from this wrapper.
     /// # Safety
     pub unsafe fn as_inner(&self) -> *const CKeyEvent {
         self.0
@@ -43,7 +41,7 @@ impl KeyEvent {
 }
 
 impl KeyEvent {
-    /// key add flag.
+    /// Add flag to KeyEvent.
     pub fn add_flag(&self) {
         // SAFETY:
         // Rust KeyEvent always hold a valid native CKeyEvent.
@@ -52,7 +50,7 @@ impl KeyEvent {
         }
     }
 
-    /// get key code.
+    /// Get the key code from the KeyEvent.
     pub fn key_code(&self) -> i32 {
         // SAFETY:
         // Rust KeyEvent always hold a valid native CKeyEvent.

@@ -19,15 +19,21 @@ group("device_status_fuzztest") {
 
   deps += [
     "adddraglistener_fuzzer:fuzztest",
+    "devicegetcachestub_fuzzer:fuzztest",
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
-    "devicestatusstub_fuzzer:fuzztest",
+    "devicesubscribestub_fuzzer:fuzztest",
+    "deviceunsubscribestub_fuzzer:fuzztest",
+    "getdragdata_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
+    "handleallocsocketfd_fuzzer:fuzztest",
+    "removedraglistener_fuzzer:fuzztest",
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
+    "unregistercoordinationlistener_fuzzer:fuzztest",
     "updatedragstyle_fuzzer:fuzztest",
     "updateshadowpic_fuzzer:fuzztest",
   ]
@@ -38,6 +44,7 @@ group("device_status_fuzztest") {
       "getcoordinationstate_fuzzer:fuzztest",
       "preparecoordination_fuzzer:fuzztest",
       "registercoordinationlistener_fuzzer:fuzztest",
+      "unpreparecoordination_fuzzer:fuzztest",
     ]
   }
 }

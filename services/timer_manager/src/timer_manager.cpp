@@ -21,7 +21,7 @@
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
-#include "util.h"
+#include "include/util.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -49,7 +49,7 @@ int32_t TimerManager::OnInit(IContext *context)
 
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
     if (timerFd_ < 0) {
-        FI_HILOGE("timer: timerfd_create failed");
+        FI_HILOGE("Timer: timerfd_create failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -285,7 +285,7 @@ int32_t TimerManager::ArmTimer()
     }
     struct itimerspec tspec {};
     int64_t expire = CalcNextDelayInternal();
-    FI_HILOGI("next expire %{public}" PRId64, expire);
+    FI_HILOGI("Next expire %{public}" PRId64, expire);
 
     if (expire == 0) {
         expire = 1;
@@ -296,7 +296,7 @@ int32_t TimerManager::ArmTimer()
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {
-        FI_HILOGE("timer: timerfd_settime error");
+        FI_HILOGE("Timer: timerfd_settime error");
         return RET_ERR;
     }
     return RET_OK;

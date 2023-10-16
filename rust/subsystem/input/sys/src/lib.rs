@@ -15,9 +15,6 @@
 
 //! rust input sys.
 
-extern crate hilog_rust;
-extern crate fusion_data_rust;
-
 mod input_binding;
 mod interaction;
 

@@ -15,15 +15,12 @@
 
 //! ExtraData data definitions of DRAG module.
 
-use crate::{
-    input_binding, input_binding::CExtraData
-};
-use fusion_data_rust::{
-    DragData, FusionResult
-};
+use crate::{ input_binding, input_binding::CExtraData };
+use fusion_data_rust::DragData;
+use fusion_utils_rust::{ FusionResult, FusionErrorCode };
 
 impl CExtraData {
-    /// Create a CExtraData object
+    /// Create a CExtraData object.
     pub fn new(appended: bool) -> Self {
         CExtraData {
             appended,
@@ -34,13 +31,13 @@ impl CExtraData {
         }
     }
 
-    /// Set CExtraData appended property
+    /// Set the appended property for CExtraData.
     pub fn set_appended(&mut self, appended: bool) -> &mut Self {
         self.appended = appended;
         self
     }
 
-    /// Set CExtraData buffer property
+    /// Set the buffer property for CExtraData.
     pub fn set_buffer(&mut self, vec: &Vec<u8>) -> &mut Self {
         let vec_ptr = vec.as_ptr();
         self.buffer = vec_ptr;
@@ -48,47 +45,47 @@ impl CExtraData {
         self
     }
 
-    /// Set CExtraData source type property
+    /// Set the source type property for CExtraData.
     pub fn set_source_type(&mut self, source_type: i32) -> &mut Self {
         self.source_type = source_type;
         self
     }
 
-    /// Set CExtraData pointer id property
+    /// Set the pointer id property for CExtraData.
     pub fn set_pointer_id(&mut self, pointer_id: i32) -> &mut Self {
         self.pointer_id = pointer_id;
         self
     }
 }
 
-/// struct ExtraData
+/// Struct extra data.
 pub struct ExtraData {
     inner: CExtraData,
 }
 
 impl ExtraData {
-    /// Create a ExtraData object
+    /// Create a ExtraData object.
     pub fn new(appended: bool) -> Self {
         Self {
             inner: CExtraData::new(appended)
         }
     }
 
-    /// The extra data information is sent to the external subsystem
-    pub fn appended_extra_data(&mut self, allow_appended: bool, drag_data: DragData) -> FusionResult<i32> {
+    /// The extra data information is sent to the external subsystem.
+    pub fn appended_extra_data(&mut self, allow_appended: bool, drag_data: DragData) -> FusionResult<()> {
         let buffer: &Vec<u8>= &drag_data.buffer;
         if buffer.is_empty() {
-            return Err(-1)
+            return Err(FusionErrorCode::Fail);
         }
         self.inner.set_appended(allow_appended)
                   .set_buffer(buffer)
                   .set_source_type(drag_data.source_type)
                   .set_pointer_id(drag_data.pointer_id);
 
-        // SAFETY:  no `None` here, cause `cextra_data` is valid
+        // SAFETY:  No `None` here, cause `cextra_data` is valid.
         unsafe {
             input_binding::CAppendExtraData(&self.inner);
         }
-        Ok(0)
+        Ok(())
     }
 }

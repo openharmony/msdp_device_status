@@ -19,12 +19,12 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <uv.h>
 #include <vector>
 
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "refbase.h"
-#include <uv.h>
 
 #include "i_drag_listener.h"
 
@@ -64,7 +64,7 @@ private:
 
     std::atomic_bool hasRegistered_ { false };
     inline static std::mutex mutex_;
-    inline static std::vector<std::unique_ptr<CallbackInfo>> listeners_ {};
+    inline static std::vector<sptr<CallbackInfo>> listeners_ {};
 };
 } // namespace DeviceStatus
 } // namespace Msdp

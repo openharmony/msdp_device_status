@@ -52,7 +52,7 @@ inline constexpr size_t NBYTES(size_t nbits)
 class VInputDevice final {
 public:
     enum Capability {
-        DEVICE_CAP_KEYBOARD,
+        DEVICE_CAP_KEYBOARD = 0,
         DEVICE_CAP_TOUCH,
         DEVICE_CAP_POINTER,
         DEVICE_CAP_TABLET_TOOL,
@@ -93,17 +93,30 @@ public:
     bool IsKeyboard() const;
     bool IsTouchscreen() const;
 
+    bool HasAbs(size_t abs) const;
+    bool HasRel(size_t rel) const;
+    bool HasKey(size_t key) const;
+    bool HasProperty(size_t property) const;
+    bool HasCapability(Capability capability) const;
+
 private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
     bool HasMouseButton() const;
     bool HasJoystickAxesOrButtons() const;
+    bool HasAbsCoord() const;
+    bool HasMtCoord() const;
+    bool HasRelCoord() const;
     void CheckPointers();
     void CheckKeys();
+    void CheckAbs();
+    void CheckMt();
+    void CheckAdditional();
     void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
         uint8_t *whichBitMask) const;
     void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
+    void PrintCapsDevice() const;
 
 private:
     int32_t fd_ { -1 };
@@ -219,6 +232,31 @@ inline bool VInputDevice::IsKeyboard() const
 inline bool VInputDevice::IsTouchscreen() const
 {
     return caps_.test(DEVICE_CAP_TOUCH);
+}
+
+inline bool VInputDevice::HasAbs(size_t abs) const
+{
+    return TestBit(abs, absBitmask_);
+}
+
+inline bool VInputDevice::HasRel(size_t rel) const
+{
+    return TestBit(rel, relBitmask_);
+}
+
+inline bool VInputDevice::HasKey(size_t key) const
+{
+    return TestBit(key, keyBitmask_);
+}
+
+inline bool VInputDevice::HasProperty(size_t property) const
+{
+    return TestBit(property, propBitmask_);
+}
+
+inline bool VInputDevice::HasCapability(Capability capability) const
+{
+    return caps_.test(capability);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

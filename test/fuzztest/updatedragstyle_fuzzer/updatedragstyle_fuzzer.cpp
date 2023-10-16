@@ -15,53 +15,47 @@
 
 #include "updatedragstyle_fuzzer.h"
 
-#include "securec.h"
-
-#include "devicestatus_define.h"
+#include "singleton.h"
 #include "fi_log.h"
-#include "interaction_manager.h"
 
+#define private public
+#include "devicestatus_service.h"
+#include "message_parcel.h"
+
+using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UpdateDragStyleFuzzTest" };
-constexpr int32_t DRAGCURSORSTYLE_MAX { 4 };
-} // namespace
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "UpdateDragStyleFuzzTest" };
+const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
-template<class T>
-void GetObject(const uint8_t *data, size_t size, T &object)
+bool UpdateDragStyleFuzzTest(const uint8_t* data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return;
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        FI_HILOGE("Write failed");
+        return false;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return;
+    if (!datas.WriteBuffer(data, size)) {
+        FI_HILOGE("Write data failed");
+        return false;
     }
+    if (!datas.RewindRead(0)) {
+        FI_HILOGE("Read failed");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(Msdp::DeviceInterfaceCode::UPDATED_DRAG_STYLE), datas, reply, option);
+    return true;
 }
-
-void UpdateDragStyleFuzzTest(const uint8_t* data, size_t size)
-{
-    CALL_DEBUG_ENTER;
-    int32_t num = 0;
-    GetObject<int32_t>(data, size, num);
-    InteractionManager::GetInstance()->UpdateDragStyle(static_cast<DragCursorStyle>(num % DRAGCURSORSTYLE_MAX));
-}
-} // namespace DeviceStatus
-} // namespace Msdp
 } // namespace OHOS
 
-extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t size)
 {
+    /* Run your code on data */
     if (data == nullptr) {
         return 0;
     }
-    if (size < sizeof(int32_t)) {
-        return 0;
-    }
-    OHOS::Msdp::DeviceStatus::UpdateDragStyleFuzzTest(data, size);
+    OHOS::UpdateDragStyleFuzzTest(data, size);
     return 0;
 }
-

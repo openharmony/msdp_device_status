@@ -13,21 +13,16 @@
  * limitations under the License.
  */
 
-//! Drag client implementation.
+//! Proxy for `Drag` service.
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate ipc_rust;
-
-use fusion_data_rust::{ Intention, DefaultReply, DragData, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use std::ffi::{ c_char, CString };
+use fusion_data_rust::{ Intention, DefaultReply, DragData };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 use fusion_ipc_client_rust::FusionIpcClient;
 use ipc_rust::{ MsgParcel, Deserialize };
-use std::ffi::{ c_char, CString };
-use std::rc::Rc;
 use hilog_rust::{ debug, error, hilog, HiLogLabel, LogType };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -36,21 +31,19 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragClient"
 };
 
-/// struct DragClient
+/// Definition of proxy for `Drag` service.
 #[derive(Default)]
-pub struct DragClient {
-    dummy: i32
-}
+pub struct DragClient(i32);
 
 impl DragClient {
-    /// TODO: add documentation.
-    pub fn start_drag(&self, drag_data: &DragData, ipc_client: Rc<FusionIpcClient>) -> FusionResult<i32>
+    /// Request service to change to [`DRAG`] mode.
+    pub fn start_drag(&self, drag_data: &DragData, ipc_client: &FusionIpcClient) -> FusionResult<i32>
     {
         call_debug_enter!("DragClient::start_drag");
         match MsgParcel::new() {
             Some(mut reply_parcel) => {
                 let mut borrowed_reply_parcel = reply_parcel.borrowed();
-                debug!(LOG_LABEL, "call ipc_client::start()");
+                debug!(LOG_LABEL, "Call ipc_client::start()");
                 ipc_client.start(Intention::Drag, drag_data, &mut borrowed_reply_parcel)?;
 
                 match DefaultReply::deserialize(&borrowed_reply_parcel) {
@@ -59,13 +52,13 @@ impl DragClient {
                     }
                     Err(_) => {
                         error!(LOG_LABEL, "Failed to deserialize DefaultReply");
-                        Err(-1)
+                        Err(FusionErrorCode::Fail)
                     }
                 }
             }
             None => {
                 error!(LOG_LABEL, "Can not instantiate MsgParcel");
-                Err(-1)
+                Err(FusionErrorCode::Fail)
             }
         }
     }

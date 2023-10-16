@@ -17,10 +17,11 @@
 
 use std::ffi::{ c_char, CString };
 use std::fmt::{ Display, Formatter, Error };
-use crate::fusion_utils_rust::{ call_debug_enter };
-use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
 
+use hilog_rust::{ info, hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -28,14 +29,14 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragData"
 };
 
-/// Struct CShadowInfo
+/// C representation of [`ShadowInfo`].
 #[repr(C)]
 pub struct CShadowInfo {
     x: i32,
     y: i32,
 }
 
-/// Struct CDragData
+/// C representation of [`DragData`].
 #[repr(C)]
 pub struct CDragData {
     shadow_info: CShadowInfo,
@@ -50,7 +51,7 @@ pub struct CDragData {
     has_canceled_animation: bool,
 }
 
-/// Struct ShadowInfo
+/// Data of shadow.
 pub struct ShadowInfo {
     x: i32,
     y: i32,
@@ -90,13 +91,13 @@ impl Deserialize for ShadowInfo {
     }
 }
 
-/// Struct DragData
+/// Bookkeeping of drag operation.
 pub struct DragData {
-    /// Represents `ShadowInfo` information in the `DragData` struct
+    /// Meta data of shadow.
     pub shadow_info: ShadowInfo,
-    /// Represents `buffer` information in the `DragData` struct
+    /// Buffer for meta data of drag.
     pub buffer: Vec<u8>,
-    /// Represents `source_type` information in the `DragData` struct
+    /// The device type of input event that trigger this drag.
     pub source_type: i32,
     /// Represents `drag_num` information in the `DragData` struct
     pub drag_num: i32,

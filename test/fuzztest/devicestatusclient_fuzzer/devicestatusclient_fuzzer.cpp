@@ -28,6 +28,15 @@ using namespace OHOS::Msdp::DeviceStatus;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientFuzzTest" };
 constexpr int32_t WAIT_TIME { 1000 };
+
+bool DeviceStatusClientFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t idSize = 8;
+    if (static_cast<int32_t>(size) > idSize) {
+        DeviceStatusClientFuzzer::TestSubscribeCallback(data);
+    }
+    return true;
+}
 } // namespace
 
 auto stationaryMgr = StationaryManager::GetInstance();
@@ -73,19 +82,10 @@ void DeviceStatusClientFuzzer::TestUnSubscribeCallback(Type type)
     stationaryMgr->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-{
-    int32_t idSize = 8;
-    if (static_cast<int32_t>(size) > idSize) {
-        DeviceStatusClientFuzzer::TestSubscribeCallback(data);
-    }
-    return true;
-}
-
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    DoSomethingInterestingWithMyAPI(data, size);
+    DeviceStatusClientFuzzTest(data, size);
     return 0;
 }

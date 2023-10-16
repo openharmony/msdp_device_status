@@ -38,6 +38,8 @@ public:
         MIN_ID = 0,
         DRAGGING_DATA = 1,
         STOPDRAG_DATA = 2,
+        IS_PULL_UP = 3,
+        DRAG_CANCEL = 4,
         MAX_ID = 50
     };
     struct DataPacket {
@@ -46,7 +48,8 @@ public:
         uint8_t data[0];
     };
 
-    int32_t StartRemoteCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    int32_t StartRemoteCoordination(const std::string &localNetworkId,
+        const std::string &remoteNetworkId, bool checkButtonDown);
     int32_t StartRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess,
         const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained);
@@ -65,6 +68,7 @@ public:
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
     int32_t NotifyFilterAdded(const std::string &remoteNetworkId);
+    void ConfigTcpAlive();
 
 private:
     CoordinationSoftbusAdapter() = default;
@@ -77,13 +81,14 @@ private:
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();
 
-    std::map<std::string, int32_t> sessionDevMap_;
-    std::map<std::string, bool> channelStatusMap_;
+    std::map<std::string, int32_t> sessionDevs_;
+    std::map<std::string, bool> channelStatuss_;
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
-    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvMap_;
+    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvs_;
+    int32_t sessionId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

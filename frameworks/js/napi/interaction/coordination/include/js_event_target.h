@@ -61,7 +61,7 @@ private:
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
 
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
-        coordinationListener_ {};
+        coordinationListeners_ {};
     std::atomic_bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus

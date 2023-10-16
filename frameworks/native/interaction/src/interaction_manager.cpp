@@ -117,6 +117,11 @@ int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     return INTER_MGR_IMPL.UpdateShadowPic(shadowInfo);
 }
+
+int32_t InteractionManager::GetDragData(DragData &dragData)
+{
+    return INTER_MGR_IMPL.GetDragData(dragData);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

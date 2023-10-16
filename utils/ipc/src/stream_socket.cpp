@@ -32,49 +32,40 @@ StreamSocket::~StreamSocket()
     EpollClose();
 }
 
-int32_t StreamSocket::EpollCreate(int32_t size)
+int32_t StreamSocket::EpollCreate()
 {
-    epollFd_ = epoll_create(size);
+    epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
     if (epollFd_ < 0) {
-        FI_HILOGE("epoll_create, return:%{public}d", epollFd_);
-    } else {
-        FI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
-    }
-    return epollFd_;
-}
-
-int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
-{
-    if (fd < 0) {
-        FI_HILOGE("Invalid fd:%{public}d", fd);
-        return RET_ERR;
-    }
-    if (epollFd < 0) {
-        epollFd = epollFd_;
-    }
-    if (epollFd < 0) {
-        FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
-        return RET_ERR;
-    }
-    int32_t ret = (op == EPOLL_CTL_DEL ? epoll_ctl(epollFd, op, fd, NULL) : epoll_ctl(epollFd, op, fd, &event));
-    if (ret < 0) {
-        FI_HILOGE("epoll_ctl, return:%{public}d, epollFd_:%{public}d, op:%{public}d, fd:%{public}d, errno:%{public}d",
-            ret, epollFd, op, fd, errno);
+        FI_HILOGE("epoll_create1 failed: %{public}s", ::strerror(errno));
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events, int32_t epollFd)
+int32_t StreamSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event)
 {
-    if (epollFd < 0) {
-        epollFd = epollFd_;
-    }
-    if (epollFd < 0) {
-        FI_HILOGE("Invalid epollFd:%{public}d", epollFd);
+    if (fd < 0) {
+        FI_HILOGE("Invalid fd:%{public}d", fd);
         return RET_ERR;
     }
-    return epoll_wait(epollFd, &events, maxevents, timeout);
+    if (epollFd_ < 0) {
+        FI_HILOGE("Invalid epollFd:%{public}d", epollFd_);
+        return RET_ERR;
+    }
+    if (::epoll_ctl(epollFd_, op, fd, &event) != 0) {
+        FI_HILOGE("epoll_ctl(%{public}d,%{public}d,%{public}d) failed:%{public}s", epollFd_, op, fd, ::strerror(errno));
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t StreamSocket::EpollWait(int32_t maxevents, int32_t timeout, struct epoll_event &events)
+{
+    if (epollFd_ < 0) {
+        FI_HILOGE("Invalid epollFd:%{public}d", epollFd_);
+        return RET_ERR;
+    }
+    return epoll_wait(epollFd_, &events, maxevents, timeout);
 }
 
 void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::PacketCallBackFun callbackFun)
@@ -90,7 +81,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (static_cast<int32_t>(head->size) < 0 || static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE) {
+        if ((static_cast<int32_t>(head->size) < 0) || (static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE)) {
             FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
                 "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();

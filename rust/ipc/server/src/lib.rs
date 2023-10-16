@@ -13,16 +13,7 @@
  * limitations under the License.
  */
 
-//! IPC server definition.
-
-extern crate hilog_rust;
-extern crate ipc_rust;
-extern crate system_ability_fwk_rust;
-extern crate fusion_data_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_ipc_service_rust;
-extern crate fusion_services_rust;
-extern crate fusion_plugin_manager_rust;
+//! Implementation of server side of IPC.
 
 mod fusion_ipc_delegator;
 mod fusion_ipc_server;

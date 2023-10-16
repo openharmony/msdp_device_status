@@ -48,6 +48,8 @@ constexpr int32_t SY_OFFSET { 1 };
 constexpr int32_t TX_OFFSET { 2 };
 constexpr int32_t TY_OFFSET { 3 };
 constexpr uint32_t IO_FLAG_WIDTH { 6 };
+constexpr int32_t DEFAULT_VALUE_MINUS_ONE { -1 };
+constexpr int32_t DEFAULT_VALUE_ZERO { 0 };
 } // namespace
 
 class PointerEventMonitor final : public MMI::IInputEventConsumer {
@@ -240,43 +242,31 @@ void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
         return;
     }
     do {
-        switch (opt) {
-            case 'd': {
-                ReadDownAction(argc, argv);
-                break;
+        {
+            auto action = regularActions_.find(opt);
+            if (action != regularActions_.end()) {
+                action->second();
+                continue;
             }
-            case 'u': {
-                ReadUpAction();
-                break;
+        }
+        {
+            auto action = readActions_.find(opt);
+            if (action != readActions_.end()) {
+                action->second(optarg);
+                continue;
             }
-            case 'm': {
-                ReadMoveAction(argc, argv);
-                break;
+        }
+        {
+            auto action = moveActions_.find(opt);
+            if (action != moveActions_.end()) {
+                action->second(argc, argv);
+                continue;
             }
-            case 'M': {
-                ReadMoveToAction(argc, argv);
-                break;
-            }
-            case 'D': {
-                ReadDragToAction(argc, argv);
-                break;
-            }
-            case 'f': {
-                ReadActions(optarg);
-                break;
-            }
-            case 'r': {
-                ReadRawInput(optarg);
-                break;
-            }
-            case 'w': {
-                VirtualDeviceBuilder::WaitFor(optarg, "touchscreen");
-                break;
-            }
-            default: {
-                ShowUsage();
-                break;
-            }
+        }
+        if (opt == 'w') {
+            VirtualDeviceBuilder::WaitFor(optarg, "touchscreen");
+        } else {
+            ShowUsage();
         }
     } while ((opt = getopt(argc, argv, "d:u:m:M:f:r:w:D:")) >= 0);
 }
@@ -286,8 +276,8 @@ void VirtualTouchScreenBuilder::ReadDownAction(int32_t argc, char *argv[])
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
 
-    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) || !Utility::IsInteger(argv[optind]) ||
-        !Utility::IsInteger(argv[optind + 1])) {
+    if (!Utility::IsInteger(optarg) || (optind < 0) || (optind + 1 >= argc) ||
+        !Utility::IsInteger(argv[optind]) || !Utility::IsInteger(argv[optind + 1])) {
         std::cout << "Require arguments for Option \'-d\'." << std::endl;
         ShowUsage();
         return;
@@ -439,76 +429,56 @@ void VirtualTouchScreenBuilder::ReadAction(const nlohmann::json &model)
     }
 }
 
+int32_t VirtualTouchScreenBuilder::GetModelValue(const nlohmann::json &model, const std::string &targetName,
+    int32_t defaultValue)
+{
+    auto it = model.find(targetName);
+    if (it != model.cend() && it->is_number_integer()) {
+        return it.value();
+    }
+    return defaultValue;
+}
+
 void VirtualTouchScreenBuilder::HandleDown(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t x = -1;
-    it = model.find("x");
-    if (it != model.cend() && it->is_number_integer()) {
-        x = it.value();
-    }
-    int32_t y = -1;
-    it = model.find("y");
-    if (it != model.cend() && it->is_number_integer()) {
-        y = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
+
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", DEFAULT_VALUE_MINUS_ONE);
+
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", DEFAULT_VALUE_MINUS_ONE);
+
     std::cout << "[touchscreen] down: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->DownButton(slot, x, y);
 }
 
 void VirtualTouchScreenBuilder::HandleMove(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t dx = 0;
-    it = model.find("dx");
-    if (it != model.cend() && it->is_number_integer()) {
-        dx = it.value();
-    }
-    int32_t dy = 0;
-    it = model.find("dy");
-    if (it != model.cend() && it->is_number_integer()) {
-        dy = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
+
+    int32_t dx = VirtualTouchScreenBuilder::GetModelValue(model, "dx", DEFAULT_VALUE_ZERO);
+
+    int32_t dy = VirtualTouchScreenBuilder::GetModelValue(model, "dy", DEFAULT_VALUE_ZERO);
+
     std::cout << "[touchscreen] move: [" << slot << ", (" << dx << "," << dy << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->Move(slot, dx, dy);
 }
 
 void VirtualTouchScreenBuilder::HandleUp(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
+
     std::cout << "[touchscreen] release: [" << slot << "]" << std::endl;
     VirtualTouchScreen::GetDevice()->UpButton(slot);
 }
 
 void VirtualTouchScreenBuilder::HandleMoveTo(const nlohmann::json &model)
 {
-    int32_t slot = -1;
-    auto it = model.find("slot");
-    if (it != model.cend() && it->is_number_integer()) {
-        slot = it.value();
-    }
-    int32_t x = -1;
-    it = model.find("x");
-    if (it != model.cend() && it->is_number_integer()) {
-        x = it.value();
-    }
-    int32_t y = -1;
-    it = model.find("y");
-    if (it != model.cend() && it->is_number_integer()) {
-        y = it.value();
-    }
+    int32_t slot = VirtualTouchScreenBuilder::GetModelValue(model, "slot", DEFAULT_VALUE_MINUS_ONE);
+
+    int32_t x = VirtualTouchScreenBuilder::GetModelValue(model, "x", DEFAULT_VALUE_MINUS_ONE);
+
+    int32_t y = VirtualTouchScreenBuilder::GetModelValue(model, "y", DEFAULT_VALUE_MINUS_ONE);
+
     std::cout << "[touchscreen] move-to: [" << slot << ", (" << x << "," << y << ")]" << std::endl;
     VirtualTouchScreen::GetDevice()->MoveTo(slot, x, y);
 }

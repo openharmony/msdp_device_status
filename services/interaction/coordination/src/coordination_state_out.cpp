@@ -44,7 +44,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(tempRemoteNetworkId, isUnchained);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop coordination fail");
+        FI_HILOGE("Stop coordination failed");
         return RET_ERR;
     }
     std::string taskName = "process_stop_task";
@@ -59,7 +59,7 @@ void CoordinationStateOut::ProcessStop(const std::string& remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_);
+    std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, false);
     if (inputDeviceDhids.empty()) {
         COOR_SM->OnStopFinish(false, remoteNetworkId);
     }

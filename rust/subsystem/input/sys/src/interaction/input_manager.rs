@@ -15,10 +15,14 @@
 
 #![allow(dead_code)]
 
-use crate::{input_binding, input_binding::OnPointerEventCallback};
-use fusion_data_rust::FusionResult;
 use std::ffi::{ c_char, CString };
+
 use hilog_rust::{error, hilog, HiLogLabel, LogType};
+
+use fusion_utils_rust::{ FusionResult, FusionErrorCode };
+
+use crate::{ input_binding, input_binding::OnPointerEventCallback };
+
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
@@ -26,77 +30,77 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 const INPUT_BINDING_OK: i32 = 0;
 
-/// struct ExtraData
+/// Call the input manager interface.
 pub struct InputManager;
 
 impl InputManager {
-    /// add monitor.
-    pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<i32> {
-        // SAFETY: no `None` here, cause `callback` is valid
+    /// Call the AddMonitor interface of the input subsystem to add monitor.
+    pub fn add_monitor(callback: OnPointerEventCallback) -> FusionResult<()> {
+        // SAFETY: No `None` here, cause `callback` is valid.
         unsafe {
             if input_binding::CAddMonitor(callback) != INPUT_BINDING_OK {
-                error!(LOG_LABEL, "failed to add monitor");
-                return Err(-1);
+                error!(LOG_LABEL, "Failed to add monitor");
+                return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// set pointer visible.
-    pub fn set_pointer_visible(visible: bool) -> FusionResult<i32> {
-        // SAFETY: set pointer event visible
+    /// Call the SetPointerVisible interface of the input subsystem to set pointer visible.
+    pub fn set_pointer_visible(visible: bool) -> FusionResult<()> {
+        // SAFETY: Set pointer event visible.
         unsafe {
             if input_binding::CSetPointerVisible(visible) != INPUT_BINDING_OK {
-                error!(LOG_LABEL, "failed to set pointer visible");
-                return Err(-1);
+                error!(LOG_LABEL, "Failed to set pointer visible");
+                return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// enable input device.
-    pub fn enable_input_device(enable: bool) -> FusionResult<i32> {
-        // SAFETY: enable input device
+    /// Call the EnableInputDevice interface of the input subsystem to enable input device.
+    pub fn enable_input_device(enable: bool) -> FusionResult<()> {
+        // SAFETY: Enable input device.
         unsafe {
             if input_binding::CEnableInputDevice(enable) != INPUT_BINDING_OK {
-                error!(LOG_LABEL, "failed to enable input device");
-                return Err(-1);
+                error!(LOG_LABEL, "Failed to enable input device");
+                return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// remove input event filter.
-    pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<i32> {
-        // SAFETY: remove input event filter
+    /// Call the RemoveInputEventFilter interface of the input subsystem to remove filter.
+    pub fn remove_input_event_filter(filter_id: i32) -> FusionResult<()> {
+        // SAFETY: Remove input event filter.
         unsafe {
             if input_binding::CRemoveInputEventFilter(filter_id) != INPUT_BINDING_OK {
-                error!(LOG_LABEL, "failed to remove input event filter");
-                return Err(-1);
+                error!(LOG_LABEL, "Failed to remove input event filter");
+                return Err(FusionErrorCode::Fail);
             }
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// remove monitor.
+    /// Call the RemoveMonitor interface of the input subsystem to remove monitor.
     pub fn remove_monitor(monitor_id: i32) {
-        // SAFETY: remove monitor
+        // SAFETY: Remove monitor.
         unsafe {
             input_binding::CRemoveMonitor(monitor_id);
         }
     }
 
-    /// remove interceptor.
+    /// Call the RemoveInterceptor interface of the input subsystem to remove Interceptor.
     pub fn remove_interceptor(interceptor_id: i32) {
-        // SAFETY: remove interceptor
+        // SAFETY: Remove interceptor.
         unsafe {
             input_binding::CRemoveInterceptor(interceptor_id);
         }
     }
 
-    /// set pointer location.
+    /// Call the SetPointerLocation interface of the input subsystem to set pointer location.
     pub fn set_pointer_location(physical_x: i32, physical_y: i32) {
-        // SAFETY: remove monitor
+        // SAFETY: Remove monitor.
         unsafe {
             input_binding::CSetPointerLocation(physical_x, physical_y);
         }

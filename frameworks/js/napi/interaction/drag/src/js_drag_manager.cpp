@@ -61,7 +61,8 @@ void JsDragManager::RegisterListener(napi_env env, napi_value handle)
     }
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
-    auto monitor = std::make_unique<CallbackInfo>();
+    sptr<CallbackInfo> monitor = new (std::nothrow) CallbackInfo();
+    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     listeners_.push_back(std::move(monitor));
@@ -115,10 +116,12 @@ void JsDragManager::OnDragMessage(DragState state)
         uv_work_t* work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->state = state;
-        work->data = static_cast<void*>(&item);
-        int32_t result = uv_queue_work(loop, work, [](uv_work_t* work) {}, CallDragMsg);
+        item->IncStrongRef(nullptr);
+        work->data = item.GetRefPtr();
+        int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t* work) {}, CallDragMsg, uv_qos_default);
         if (result != 0) {
-            FI_HILOGE("uv_queue_work failed");
+            FI_HILOGE("uv_queue_work_with_qos failed");
+            item->DecStrongRef(nullptr);
             DeletePtr<uv_work_t*>(work);
         }
     }
@@ -133,8 +136,9 @@ void JsDragManager::CallDragMsg(uv_work_t *work, int32_t status)
         FI_HILOGE("Check data is nullptr");
         return;
     }
-    auto temp = static_cast<std::unique_ptr<CallbackInfo>*>(work->data);
+    sptr<CallbackInfo> temp(static_cast<CallbackInfo*>(work->data));
     DeletePtr<uv_work_t*>(work);
+    temp->DecStrongRef(nullptr);
     std::lock_guard<std::mutex> guard(mutex_);
     if (listeners_.empty()) {
         FI_HILOGE("The listener list is empty");
@@ -142,7 +146,7 @@ void JsDragManager::CallDragMsg(uv_work_t *work, int32_t status)
     }
     for (const auto &item : listeners_) {
         CHKPC(item->env);
-        if (item->ref != (*temp)->ref) {
+        if (item->ref != temp->ref) {
             continue;
         }
         napi_handle_scope scope = nullptr;

@@ -1,0 +1,72 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("../../../device_status.gni")
+
+config("cooperate_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("cooperate") {
+  include_dirs = [
+    "include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/context/include",
+    "//third_party/cJSON",
+  ]
+
+  sources = [
+    "src/cooperate.cpp",
+    "src/cooperate_device_manager.cpp",
+    "src/cooperate_event_handler.cpp",
+    "src/cooperate_event_manager.cpp",
+    "src/cooperate_state_free.cpp",
+    "src/cooperate_state_in.cpp",
+    "src/cooperate_state_out.cpp",
+    "src/cooperate_util.cpp",
+    "src/device_profile_adapter.cpp",
+    "src/dinput_adapter.cpp",
+    "src/dsoftbus_adapter.cpp",
+    "src/i_cooperate_state.cpp",
+    "src/state_machine.cpp",
+  ]
+
+  public_configs = [ ":cooperate_public_config" ]
+
+  defines = device_status_default_defines
+
+  deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_info_manager:distributed_device_profile_client",
+    "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
+    "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "ipc:ipc_single",
+    "window_manager:libdm",
+  ]
+
+  subsystem_name = "${device_status_subsystem_name}"
+  part_name = "${device_status_part_name}"
+}

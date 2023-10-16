@@ -33,12 +33,11 @@ class DragDataManager final {
 public:
     DISALLOW_MOVE(DragDataManager);
 
-    void Init(const DragData &dragData, const MMI::PointerStyle &pointerStyle);
+    void Init(const DragData &dragData);
     DragData GetDragData() const;
     void SetDragStyle(DragCursorStyle style);
     void SetShadowInfo(const ShadowInfo &shadowInfo);
     DragCursorStyle GetDragStyle() const;
-    std::u16string GetDragMessage() const;
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const;
@@ -51,7 +50,6 @@ public:
     bool IsMotionDrag() const;
 private:
     DragData dragData_;
-    OHOS::MMI::PointerStyle pointerStyle_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::u16string dragMessage_;
     bool visible_ { false };

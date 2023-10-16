@@ -25,10 +25,10 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOM
 } // namespace
 
 struct NativeService {
-    int32_t refCnt;
+    int32_t refCnt { 0 };
 };
 
-struct NativeService* NativeService_New()
+struct NativeService* NativeServiceNew(void)
 {
     CALL_DEBUG_ENTER;
     struct NativeService *service = new NativeService;
@@ -36,14 +36,14 @@ struct NativeService* NativeService_New()
     return service;
 }
 
-struct NativeService* NativeService_Ref(struct NativeService *service)
+struct NativeService* NativeServiceRef(struct NativeService *service)
 {
     CHKPP(service);
     service->refCnt++;
     return service;
 }
 
-struct NativeService* NativeService_Unref(struct NativeService *service)
+struct NativeService* NativeServiceUnref(struct NativeService *service)
 {
     CHKPP(service);
     if (service->refCnt > 0) {
@@ -57,25 +57,25 @@ struct NativeService* NativeService_Unref(struct NativeService *service)
     return nullptr;
 }
 
-void NativeService_OnDump(struct NativeService *service)
+void NativeServiceOnDump(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-void NativeService_OnStart(struct NativeService *service)
+void NativeServiceOnStart(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-void NativeService_OnStop(struct NativeService *service)
+void NativeServiceOnStop(struct NativeService *service)
 {
     CALL_INFO_TRACE;
     CHKPV(service);
 }
 
-int32_t NativeService_AllocSocketFd(struct NativeService *service, const char *programName,
+int32_t NativeServiceAllocSocketFd(struct NativeService *service, const char *programName,
     int32_t moduleType, int32_t *toReturnClientFd, int32_t *tokenType)
 {
     CALL_DEBUG_ENTER;

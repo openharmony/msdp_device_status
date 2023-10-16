@@ -238,7 +238,7 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    FI_HILOGI("add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGI("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
@@ -250,7 +250,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
     FI_HILOGI("  is pointer:    %{public}s", dev->IsPointerDevice() ? "True" : "False");
     FI_HILOGI("  is keyboard:   %{public}s", dev->IsKeyboard() ? "True" : "False");
 
-    for (auto observer : observers_) {
+    for (const auto &observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
         CHKPC(ptr);
         ptr->OnDeviceAdded(dev);
@@ -259,7 +259,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 
 void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> dev)
 {
-    for (auto observer : observers_) {
+    for (const auto &observer : observers_) {
         std::shared_ptr<IDeviceObserver> ptr = observer.lock();
         CHKPC(ptr);
         ptr->OnDeviceRemoved(dev);

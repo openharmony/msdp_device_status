@@ -13,21 +13,19 @@
  * limitations under the License.
  */
 
-use crate::{
-    input_binding, input_binding::CPointerEvent
-};
+use crate::{ input_binding, input_binding::CPointerEvent };
 
-/// PointerEvent packed the native CPointerEvent
+/// PointerEvent packed the native CPointerEvent.
 #[repr(C)]
 pub struct PointerEvent(*const CPointerEvent);
 
 impl PointerEvent {
-    /// Create a PointerEvent object
+    /// Create a PointerEvent object.
     pub fn new(pointer_event: *const CPointerEvent) -> Self {
         Self(pointer_event)
     }
 
-    /// Extract a raw `CPointerEvent` pointer from this wrapper
+    /// Extract a raw `CPointerEvent` pointer from this wrapper.
     /// # Safety
     pub unsafe fn as_inner(&self) -> *const CPointerEvent {
         self.0
@@ -43,7 +41,7 @@ impl PointerEvent {
 }
 
 impl PointerEvent {
-    /// get pointer id
+    /// Get the pointer id from the PointerEvent.
     pub fn pointer_id(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -52,8 +50,8 @@ impl PointerEvent {
         }
     }
 
-    /// get pointer action
-    pub fn pointer_acttion(&self) -> i32 {
+    /// Get the pointer action from the PointerEvent.
+    pub fn pointer_action(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
         unsafe {
@@ -61,7 +59,7 @@ impl PointerEvent {
         }
     }
 
-    /// get target window id
+    /// Get the target window id from the PointerEvent.
     pub fn target_window_id(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -70,7 +68,7 @@ impl PointerEvent {
         }
     }
 
-    /// get source type
+    /// Get the source type from the PointerEvent.
     pub fn source_type(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -79,7 +77,7 @@ impl PointerEvent {
         }
     }
 
-    /// get taget display id
+    /// Get the target display y from the PointerEvent.
     pub fn taget_display_id(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -88,7 +86,7 @@ impl PointerEvent {
         }
     }
 
-    /// get display x
+    /// Get the display x from the PointerEvent.
     pub fn display_x(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -97,7 +95,7 @@ impl PointerEvent {
         }
     }
 
-    /// get display y
+    /// Get the display y from the PointerEvent.
     pub fn display_y(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -106,7 +104,7 @@ impl PointerEvent {
         }
     }
 
-    /// get device id
+    /// Get the device id from the PointerEvent.
     pub fn device_id(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -115,7 +113,7 @@ impl PointerEvent {
         }
     }
 
-    /// get window pid
+    /// Get the window id from the PointerEvent.
     pub fn window_pid(&self) -> i32 {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.
@@ -124,7 +122,7 @@ impl PointerEvent {
         }
     }
 
-    /// pointer add flag
+    /// Add flag to the PointerEvent.
     pub fn add_flag(&self) {
         // SAFETY:
         // Rust PointerEvent always hold a valid native CPointerEvent.

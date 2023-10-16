@@ -167,20 +167,20 @@ napi_value JsCooperateContext::GetState(napi_env env, napi_callback_info info)
     size_t length = ZERO_PARAM;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], deviceDescriptor,
         sizeof(deviceDescriptor), &length), GET_VALUE_STRING_UTF8);
-    std::string deviceDescriptor_ = deviceDescriptor;
+    std::string deviceDescriptorTmp = deviceDescriptor;
 
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCooperateManager);
     if (argc == ONE_PARAM) {
-        return jsCooperateManager->GetState(env, deviceDescriptor_);
+        return jsCooperateManager->GetState(env, deviceDescriptorTmp);
     }
     if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCooperateManager->GetState(env, deviceDescriptor_, argv[ONE_PARAM]);
+    return jsCooperateManager->GetState(env, deviceDescriptorTmp, argv[ONE_PARAM]);
 }
 
 napi_value JsCooperateContext::On(napi_env env, napi_callback_info info)
@@ -235,21 +235,21 @@ napi_value JsCooperateContext::Off(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = {};
     size_t length = ZERO_PARAM;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    std::string type_ = type;
+    std::string typeTmp = type;
 
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsCooperateManager = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCooperateManager);
     if (argc == ONE_PARAM) {
-        jsCooperateManager->UnregisterListener(env, type_);
+        jsCooperateManager->UnregisterListener(env, typeTmp);
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[ONE_PARAM], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsCooperateManager->UnregisterListener(env, type_, argv[ONE_PARAM]);
+    jsCooperateManager->UnregisterListener(env, typeTmp, argv[ONE_PARAM]);
     return nullptr;
 }
 
@@ -305,7 +305,7 @@ napi_value JsCooperateContext::JsConstructor(napi_env env, napi_callback_info in
     JsCooperateContext *jsContext = new (std::nothrow) JsCooperateContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void *data, void *hin) {
-        FI_HILOGI("jsvm ends");
+        FI_HILOGI("Jsvm ends");
         JsCooperateContext *context = static_cast<JsCooperateContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -385,7 +385,6 @@ void JsCooperateContext::DeclareDeviceCoordinationInterface(napi_env env, napi_v
         sizeof(msg) / sizeof(*msg), msg, &eventMsg), DEFINE_CLASS);
     CHKRV(napi_set_named_property(env, exports, "EventMsg", eventMsg), SET_NAMED_PROPERTY);
 }
-
 
 void JsCooperateContext::DeclareDeviceCoordinationData(napi_env env, napi_value exports)
 {

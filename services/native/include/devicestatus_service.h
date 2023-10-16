@@ -83,6 +83,7 @@ public:
     int32_t SetDragWindowVisible(bool visible) override;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
+    int32_t GetDragData(DragData &dragData) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
@@ -101,8 +102,6 @@ private:
     void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
-    int32_t OnStartDrag(const DragData &dragData, int32_t pid);
-    int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);

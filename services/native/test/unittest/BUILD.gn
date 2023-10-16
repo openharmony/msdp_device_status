@@ -22,9 +22,13 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "${device_status_root_path}/libs/interface",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
     "${device_status_service_path}/delegate_task/include",
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/communication/service/include",
+    "${device_status_service_path}/interaction/drag/src/include",
+    "${device_status_service_path}/device_manager/include",
+    "${device_status_utils_path}/include",
   ]
 }
 
@@ -88,12 +92,112 @@ ohos_unittest("DeviceStatusAgentTest") {
   ]
 }
 
+ohos_unittest("DragDataManagerTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
+
+  sources = [ "src/drag_data_manager_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_service_path}/interaction/drag:interaction_drag",
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "ipc:ipc_single",
+  ]
+}
+
+ohos_unittest("CoordinationSMTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/context/include",
+  ]
+  sources = [ "src/coordination_sm_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/coordination:coordination_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gtest_main",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "device_info_manager:distributed_device_profile_client",
+    "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+  ]
+}
+
+ohos_unittest("CoordinationSoftbusAdapterTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "${device_status_interfaces_path}/innerkits/include" ]
+
+  sources = [ "src/coordination_softbus_adapter_test.cpp" ]
+
+  configs = [
+    "${device_status_service_path}/interaction/drag:interaction_drag_public_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_service_path}/interaction/coordination:coordination",
+    "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "device_info_manager:distributed_device_profile_client",
+    "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+  ]
+}
+
 group("unittest") {
   testonly = true
   deps = []
 
   deps += [
     ":DeviceStatusAgentTest",
+    ":DragDataManagerTest",
     ":test_devicestatus_service",
   ]
+
+  if (fusion_interaction_coordination) {
+    deps += [
+      ":CoordinationSMTest",
+      ":CoordinationSoftbusAdapterTest",
+    ]
+  }
 }
