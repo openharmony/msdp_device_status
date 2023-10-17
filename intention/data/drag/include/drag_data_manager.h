@@ -35,6 +35,7 @@ public:
     void Init(const DragData &dragData);
     void ResetDragData();
     DragData GetDragData() const;
+    bool IsMotionDrag() const;
 
 private:
     DragData dragData_;
