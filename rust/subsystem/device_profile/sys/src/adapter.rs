@@ -21,8 +21,7 @@
 use std::ffi::{ c_char, CStr, CString };
 use std::rc::Rc;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_data_rust::{ FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
 use crate::binding::{
     CICrossStateListener,
     CIStringVector,
@@ -184,7 +183,7 @@ impl DeviceProfileAdapter {
         let ret = unsafe { UpdateCrossSwitchState(state as i32) };
         if ret != 0 {
             error!(LOG_LABEL, "UpdateCrossSwitchState fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -201,7 +200,7 @@ impl DeviceProfileAdapter {
         };
         if ret != 0 {
             error!(LOG_LABEL, "SyncCrossSwitchState fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -214,7 +213,7 @@ impl DeviceProfileAdapter {
         let ret = unsafe { GetCrossSwitchState(device_id.as_ptr()) };
         if ret == 0 {
             error!(LOG_LABEL, "GetCrossSwitchState failed");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -233,7 +232,7 @@ impl DeviceProfileAdapter {
         };
         if ret != 0 {
             error!(LOG_LABEL, "RegisterCrossStateListener fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -246,7 +245,7 @@ impl DeviceProfileAdapter {
         let ret = unsafe { UnregisterCrossStateListener(device_id.as_ptr()) };
         if ret != 0 {
             error!(LOG_LABEL, "UnregisterCrossStateListener fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }

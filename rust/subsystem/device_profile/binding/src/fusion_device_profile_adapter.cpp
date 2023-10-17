@@ -49,7 +49,7 @@ struct JsonParser {
 
 class ProfileEventCallback final : public IProfileEventCallback {
 public:
-    ProfileEventCallback(CICrossStateListener *listener);
+    explicit ProfileEventCallback(CICrossStateListener *listener);
     ~ProfileEventCallback();
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
@@ -114,10 +114,10 @@ void ProfileEventCallback::OnSyncCompleted(const SyncResult &syncResults)
 void ProfileEventCallback::OnProfileChanged(const ProfileChangeNotification &changeNotification)
 {
     CALL_INFO_TRACE;
-    if ((listener_ != nullptr) && (listener_->on_update != nullptr)) {
+    if ((listener_ != nullptr) && (listener_->onUpdate != nullptr)) {
         std::string deviceId = changeNotification.GetDeviceId();
         auto state = DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(deviceId);
-        listener_->on_update(listener_, deviceId.c_str(), state);
+        listener_->onUpdate(listener_, deviceId.c_str(), state);
     }
 }
 
@@ -257,7 +257,7 @@ int32_t FusionDeviceProfileAdapter::UnregisterCrossStateListener(const std::stri
 {
     CALL_DEBUG_ENTER;
     auto cbIter = callbacks_.find(deviceId);
-    if (cbIter == callbacks_.end()){
+    if (cbIter == callbacks_.end()) {
         FI_HILOGW("This device has no callback");
         return RET_OK;
     }
@@ -344,7 +344,7 @@ int32_t GetCrossSwitchState(const char *deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceId, RET_ERR);
-    auto state = 
+    auto state =
         DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(std::string(deviceId));
     return (static_cast<int32_t>(state));
 }

@@ -47,7 +47,7 @@ struct JsonParser {
 
 class ProfileEventCallbackImpl final : public IProfileEventCallback {
 public:
-    ProfileEventCallbackImpl(CIProfileEventCb *eventCb);
+    explicit ProfileEventCallbackImpl(CIProfileEventCb *eventCb);
     ~ProfileEventCallbackImpl();
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
@@ -110,8 +110,8 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
     CHKPR(subscribeInfos, RET_ERR);
     std::list<SubscribeInfo> subscriptions;
 
-    for (size_t index = 0; index < subscribeInfos->n_subscribe_infos; ++index) {
-        const CSubscribeInfo &cSub = subscribeInfos->subscribe_infos[index];
+    for (size_t index = 0; index < subscribeInfos->nSubscribeInfos; ++index) {
+        const CSubscribeInfo &cSub = subscribeInfos->subscribeInfos[index];
 
         if ((cSub.profileEvent >= ProfileEvent::EVENT_UNKNOWN) &&
             (cSub.profileEvent < ProfileEvent::EVENT_PROFILE_END)) {

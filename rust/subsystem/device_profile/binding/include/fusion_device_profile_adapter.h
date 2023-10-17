@@ -28,7 +28,7 @@ struct CIStringVector {
 struct CICrossStateListener {
     CICrossStateListener* (*clone)(CICrossStateListener *listener);
     void (*destruct)(CICrossStateListener *listener);
-    void (*on_update)(CICrossStateListener *listener, const char *device_id, int32_t state);
+    void (*onUpdate)(CICrossStateListener *listener, const char *device_id, int32_t state);
 };
 
 using DeviceProfileCallback = void (*)(const char *, bool, void *);

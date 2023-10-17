@@ -61,13 +61,14 @@ void GetAccessToken()
         "ohos.permission.CAPTURE_SCREEN",
         "ohos.permission.DISTRIBUTED_DATASYNC",
     };
-    SetAceessTokenPermission("fusion_device_profile_rust", perms, 2);
+    size_t permCount = 2;
+    SetAceessTokenPermission("fusion_device_profile_rust", perms, permCount);
 }
 
 struct CString : public CIString {
     std::string str;
 
-    CString(const char *s);
+    explicit CString(const char *s);
     DISALLOW_MOVE(CString);
     CString(const CString &other);
     ~CString() = default;

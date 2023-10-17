@@ -21,8 +21,7 @@
 use std::ffi::{ c_char, c_int, CString };
 use std::rc::Rc;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_data_rust::{ FusionErrorCode, FusionResult };
-use fusion_utils_rust::call_debug_enter;
+use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
 use crate::binding::{
     CProfileChangeNotification,
     CIProfileEventCb,
@@ -185,14 +184,14 @@ impl DeviceProfile {
     /// TODO: add documentation.
     pub fn put_device_profile(profile: &ServiceCharacteristicProfile) -> FusionResult<i32>
     {
-        Err(-1)
+        Err(FusionErrorCode::Fail)
     }
 
     /// TODO: add documentation.
     pub fn get_device_profile(udid: &str, service_id: &str,
         profile: &ServiceCharacteristicProfile) -> FusionResult<i32>
     {
-        Err(-1)
+        Err(FusionErrorCode::Fail)
     }
 
     /// TODO: add documentation.
@@ -239,7 +238,7 @@ impl DeviceProfile {
         }
         if ret != 0 {
             error!(LOG_LABEL, "SubscribeProfileEvents fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -287,7 +286,7 @@ impl DeviceProfile {
 
         if ret != 0 {
             error!(LOG_LABEL, "UnsubscribeProfileEvents fail");
-            Err(-1)
+            Err(FusionErrorCode::Fail)
         } else {
             Ok(0)
         }
@@ -297,6 +296,6 @@ impl DeviceProfile {
     pub fn sync_device_profile(sync_options: &SyncOptions,
                                sync_callback: &Rc<dyn IProfileEventCallback>) -> FusionResult<i32>
     {
-        Err(-1)
+        Err(FusionErrorCode::Fail)
     }
 }

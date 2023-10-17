@@ -38,8 +38,8 @@ struct CSubscribeInfo {
 };
 
 struct CSubscribeInfos {
-    const CSubscribeInfo *subscribe_infos;
-    size_t n_subscribe_infos;
+    const CSubscribeInfo *subscribeInfos;
+    size_t nSubscribeInfos;
 };
 
 enum CProfileChangeType: int32_t {
@@ -66,20 +66,20 @@ struct CProfileChangeNotification {
 struct CIProfileEventCb {
     CIProfileEventCb* (*clone)(CIProfileEventCb *cb);
     void (*destruct)(CIProfileEventCb *cb);
-    void (*onSyncCompleted)(CIProfileEventCb *cb, const char *device_id, int32_t sync_result);
+    void (*onSyncCompleted)(CIProfileEventCb *cb, const char *deviceId, int32_t sync_result);
     void (*onProfileChanged)(CIProfileEventCb *cb, const CProfileChangeNotification *notification);
 };
 
 enum CSyncMode : int32_t {
-    Pull,
-    Push,
-    PushPull,
+    PULL,
+    PUSH,
+    PUSH_PULL,
 };
 
 struct CSyncOptions {
-    CSyncMode sync_mode;
-    const char * const* device_ids;
-    size_t n_device_ids;
+    CSyncMode syncMode;
+    const char *const* deviceIds;
+    size_t nDeviceIds;
 };
 
 #ifdef __cplusplus
