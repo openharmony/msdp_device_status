@@ -24,7 +24,7 @@
 #include "plugin_manager.h"
 #include "task_scheduler.h"
 #include "timer_manager.h"
-#include "intention_delayed_sp_singleton.h"
+#include "devicestatus_delayed_sp_singleton.h"
 
 namespace OHOS {
 namespace Msdp {
