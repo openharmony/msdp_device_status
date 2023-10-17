@@ -44,7 +44,7 @@ public:
     int32_t AddListener(SessionPtr session);
     int32_t RemoveListener(SessionPtr session);
     int32_t StartDrag(const DragData &dragData, SessionPtr sess) override;
-    int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
+    int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey) const;
     void SendDragData(int32_t targetTid, const std::string &udKey);
