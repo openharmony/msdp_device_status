@@ -23,7 +23,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
-// constexpr int32_t TIMEOUT_MS { 2000 };
 constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 } // namespace
 
@@ -131,16 +130,16 @@ int32_t DragManager::SetDragWindowVisible(bool visible)
 int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
-    // DRAG_DATA_MGR.Init(dragData);
+    DRAG_DATA_MGR.Init(dragData);
     return RET_OK;
 }
 
 void DragManager::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
-    // if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
-    //     stateChangedCallback_(state);
-    // }
+    if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
+        stateChangedCallback_(state);
+    }
 }
 
 int32_t DragManager::OnStartDrag()

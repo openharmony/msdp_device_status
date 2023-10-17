@@ -16,8 +16,6 @@
 #include "drag_manager_impl.h"
 
 #include "drag_data.h"
-// #include "intention_client.h"
-// #include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {

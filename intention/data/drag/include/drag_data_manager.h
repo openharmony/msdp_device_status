@@ -19,7 +19,6 @@
 #include <string>
 
 #include "pixel_map.h"
-// #include "pointer_style.h"
 #include "singleton.h"
 
 #include "drag_data.h"

@@ -22,8 +22,6 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "i_plugin.h"
-// #include "intention_proxy.h"
-// #include "intention_service.h"
 #include "include/util.h"
 
 namespace OHOS {

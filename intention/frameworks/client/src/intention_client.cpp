@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// #include "ipc_client.h"
-
 #include <if_system_ability_manager.h>
 #include <iservice_registry.h>
 #include <system_ability_definition.h>
@@ -24,11 +22,8 @@
 
 #include "cooperate_manager_impl.h"
 #include "drag_manager_impl.h"
-// #include "intention_common.h"
 #include "devicestatus_define.h"
 #include "include/util.h"
-
-// Implementation of client side of IPC.
 
 namespace OHOS {
 namespace Msdp {

@@ -22,7 +22,6 @@
 #include <mutex>
 #include <optional>
 
-// #include "client.h"
 #include "cooperate_message.h"
 #include "i_cooperate_listener.h"
 #include "cooperate_params.h"

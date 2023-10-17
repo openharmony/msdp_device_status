@@ -21,7 +21,6 @@
 #include <mutex>
 #include <string>
 
-// #include "client.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
 #include "intention_client.h"
