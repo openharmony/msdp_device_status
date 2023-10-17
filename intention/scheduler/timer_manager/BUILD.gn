@@ -27,8 +27,8 @@ ohos_source_set("timer_manager") {
   configs = [ ":timer_manager_config" ]
 
   deps = [
-    "${device_status_utils_path}:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
   ]
 
   external_deps = [

@@ -22,7 +22,7 @@ ohos_shared_library("intention_cooperate") {
     "include",
     "${intention_root_path}/data/cooperate/include",
     "${device_status_root_path}/utils/ipc/include",
-    "${intention_root_path}/data/include"
+    "${intention_root_path}/data/include",
   ]
 
   sources = [
@@ -43,8 +43,8 @@ ohos_shared_library("intention_cooperate") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "input:libmmi-client",
     "hitrace:hitrace_meter",
+    "input:libmmi-client",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

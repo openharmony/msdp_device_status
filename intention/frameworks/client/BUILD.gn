@@ -23,23 +23,23 @@ config("intention_public_config") {
     "${device_status_root_path}/utils/ipc/include",
     "${intention_root_path}/data/cooperate/include",
     "${intention_root_path}/data/cooperate",
-    "${intention_root_path}/ipc/include"
+    "${intention_root_path}/ipc/include",
   ]
 }
 
 ohos_shared_library("intention_client") {
   sources = [
-    "${intention_root_path}/frameworks/client/src/drag_manager_impl.cpp",
     "${intention_root_path}/frameworks/client/src/cooperate_manager_impl.cpp",
+    "${intention_root_path}/frameworks/client/src/drag_manager_impl.cpp",
     "${intention_root_path}/frameworks/client/src/intention_client.cpp",
   ]
 
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/ipc:intention_ipc",
     "${intention_root_path}/data:cooperate_params",
     "${intention_root_path}/data:drag_params",
+    "${intention_root_path}/ipc:intention_ipc",
   ]
 
   public_configs = [ ":intention_public_config" ]

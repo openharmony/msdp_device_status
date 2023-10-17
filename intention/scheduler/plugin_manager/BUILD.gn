@@ -17,7 +17,7 @@ import("//build/ohos.gni")
 config("plugin_manager_config") {
   include_dirs = [
     "include",
-    "${intention_root_path}/data/include"
+    "${intention_root_path}/data/include",
   ]
 }
 
@@ -27,8 +27,8 @@ ohos_source_set("plugin_manager") {
   configs = [ ":plugin_manager_config" ]
 
   deps = [
-    "${device_status_utils_path}:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
   ]
 
   external_deps = [

@@ -23,7 +23,7 @@ ohos_shared_library("intention_service") {
     "${intention_root_path}/scheduler/plugin_manager/include",
     "${intention_root_path}/scheduler/task_scheduler/include",
     "${intention_root_path}/scheduler/timer_manager/include",
-    "${intention_root_path}/utils/common/include"
+    "${intention_root_path}/utils/common/include",
   ]
 
   sources = [ "src/intention_service.cpp" ]
