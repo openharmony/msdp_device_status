@@ -38,6 +38,7 @@ pub const TYPE_BUTT: i32 = 5;
 pub const NETWORK_ID_BUF_LEN: usize = 65;
 pub const DEVICE_NAME_BUF_LEN: usize = 128;
 pub const RET_OK: i32 = 0;
+pub const RET_ERROR: i32 = -1;
 pub const C_CHAR_SIZE: usize = std::mem::size_of::<c_char>();
 
 /// NodeBasicInfo is a structure that represents basic information about a node.

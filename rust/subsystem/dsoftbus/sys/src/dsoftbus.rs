@@ -25,8 +25,7 @@ use std::time::Duration;
 use std::hash::{Hash, Hasher};
 use std::vec::Vec;
 use std::ptr;
-use fusion_data_rust::{FusionResult, FusionErrorCode};
-use fusion_utils_rust::{ call_debug_enter };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode};
 use hilog_rust::{ error, info, hilog, HiLogLabel, LogType };
 use crate::binding::{
     INTERCEPT_STRING_LENGTH,
@@ -41,6 +40,7 @@ use crate::binding::{
     NETWORK_ID_BUF_LEN,
     DEVICE_NAME_BUF_LEN,
     RET_OK,
+    RET_ERROR,
     C_CHAR_SIZE,
     ISessionListener,
     StreamData,
@@ -67,7 +67,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 extern "C" fn on_session_opened(session_id: i32, result: i32) -> i32 {
     if let Some(dsoftbus) = DSoftbus::get_instance() {
         if let Err(err) = dsoftbus.on_session_opened(session_id, result) {
-            err
+            RET_ERROR
         } else {
             RET_OK
         }
@@ -201,7 +201,7 @@ impl Inner {
             &self.session_listener) };
         if ret != RET_OK {
             error!(LOG_LABEL, "Create session server failed, error code:{}", @public(ret));
-            return Err(FusionErrorCode::Fail.into());
+            return Err(FusionErrorCode::Fail);
         }
         Ok(())
     }
@@ -262,13 +262,13 @@ impl Inner {
             error!(LOG_LABEL, "Local network id is empty");
             FusionErrorCode::Fail
         })?;
-
+        println!("local_network_id= {}", local_network_id);
         if local_network_id.len() >= INTERCEPT_STRING_LENGTH {
             let local_network_id_slice = local_network_id[0..INTERCEPT_STRING_LENGTH].to_string();
             Ok(session_name_head + &local_network_id_slice)
         } else {
             error!(LOG_LABEL, "Length of local_network_id less than 20");
-            Err(FusionErrorCode::Fail.into())
+            Err(FusionErrorCode::Fail)
         }
     }
 
@@ -299,7 +299,7 @@ impl Inner {
             &mut local_node as *mut NodeBasicInfo) };
         if ret != RET_OK {
             error!(LOG_LABEL, "GetLocalNodeDeviceInfo result:{}", @public(ret));
-            return Err(FusionErrorCode::Fail.into());
+            return Err(FusionErrorCode::Fail);
         }
 
         // let network_id_ptr: *const c_char =  local_node.network_id.as_ptr() as *const c_char;
@@ -378,7 +378,7 @@ impl Inner {
             Ok(session_name + &remote_network_id_slice)
         } else {
             error!(LOG_LABEL, "Length of remote_network_id less than 20");
-            Err(FusionErrorCode::Fail.into())
+            Err(FusionErrorCode::Fail)
         }
     }
     /// Opens the input softbus connection for the specified remote network ID.
@@ -427,7 +427,7 @@ impl Inner {
             group_id.as_ptr() as *const c_char, &session_attr as *const SessionAttribute) };
         if session_id < 0 {
             error!(LOG_LABEL, "OpenSession failed, session_id:{}", @public(session_id));
-            return Err(FusionErrorCode::Fail.into());
+            return Err(FusionErrorCode::Fail);
         }
 
         self.wait_session_opend(remote_network_id, session_id)
@@ -488,7 +488,7 @@ impl Inner {
         let get_result = self.channel_status_map.get(remote_network_id);
         if get_result.is_some() && !get_result.copied().unwrap() {
             error!(LOG_LABEL, "OpenSession timeout");
-            return Err(FusionErrorCode::Fail.into());
+            return Err(FusionErrorCode::Fail);
         }
         self.channel_status_map.insert(remote_network_id.to_string(), false);
         Ok(())
@@ -592,7 +592,7 @@ impl Inner {
             }
         }
         error!(LOG_LABEL, "find_device error");
-        Err(FusionErrorCode::Fail.into())
+        Err(FusionErrorCode::Fail)
     }
 
     /// Handles the event when a session is closed.
@@ -732,12 +732,12 @@ impl Inner {
             let result: i32 = unsafe {SendBytes(*session_id, data, data_len) };
             if result != RET_OK {
                 error!(LOG_LABEL, "Send bytes failed, result:{}", @public(result));
-                return Err(FusionErrorCode::Fail.into());
+                return Err(FusionErrorCode::Fail);
             }
             Ok(())
         } else {
             error!(LOG_LABEL, "Check session state error");
-            Err(FusionErrorCode::Fail.into())
+            Err(FusionErrorCode::Fail)
         }
     }
 
@@ -857,7 +857,7 @@ impl DSoftbus {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -922,7 +922,7 @@ impl DSoftbus {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -994,7 +994,7 @@ impl DSoftbus {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -1102,7 +1102,7 @@ impl DSoftbus {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
+                Err(FusionErrorCode::Fail)
             }
         }
     }
@@ -1194,7 +1194,7 @@ impl DSoftbus {
             }
             Err(err) => {
                 error!(LOG_LABEL, "lock error: {:?}", err);
-                Err(FusionErrorCode::Fail.into())
+                Err(FusionErrorCode::Fail)
             }
         }
     }
