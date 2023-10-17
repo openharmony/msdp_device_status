@@ -48,7 +48,7 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
     int32_t colorLen = width * height;
-    uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
+    uint32_t* colorPixels = new (std::nothrow) uint32_t[colorLen];
     if (colorPixels == nullptr) {
         FI_HILOGE("ColorPixels is nullptr");
         return nullptr;
@@ -79,7 +79,7 @@ bool UpdateShadowPicFuzzTest(const uint8_t* data, size_t size)
         return false;
     }
     auto pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
-    if (pixelMap->Marshalling(datas)) {
+    if (!pixelMap->Marshalling(datas)) {
         FI_HILOGE("Failed to marshalling pixelMap");
         return false;
     }
