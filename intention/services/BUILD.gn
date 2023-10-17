@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,40 +11,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../device_status.gni")
+import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
 
-config("cooperate_public_config") {
-  include_dirs = [ "include" ]
-}
-
-ohos_shared_library("intention_cooperate") {
+ohos_shared_library("intention_service") {
+  shlib_type = "sa"
   include_dirs = [
     "include",
-    "${intention_root_path}/data/cooperate/include",
-    "${device_status_root_path}/utils/ipc/include",
-    "${intention_root_path}/data/include"
+    "${intention_root_path}/data/include",
+    "${intention_root_path}/ipc/include",
+    "${intention_root_path}/scheduler/plugin_manager/include",
+    "${intention_root_path}/scheduler/task_scheduler/include",
+    "${intention_root_path}/scheduler/timer_manager/include",
+    "${intention_root_path}/utils/common/include"
   ]
 
-  sources = [
-    "src/cooperate.cpp",
-    "src/state_machine.cpp",
-  ]
-
-  public_configs = [ ":cooperate_public_config" ]
-
-  defines = device_status_default_defines
+  sources = [ "src/intention_service.cpp" ]
 
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/data:cooperate_params",
+    "${intention_root_path}/ipc:intention_ipc",
+    "${intention_root_path}/scheduler/plugin_manager:plugin_manager",
+    "${intention_root_path}/scheduler/task_scheduler:task_scheduler",
+    "${intention_root_path}/scheduler/timer_manager:timer_manager",
   ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "input:libmmi-client",
-    "hitrace:hitrace_meter",
+    "safwk:system_ability_fwk",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

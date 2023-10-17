@@ -11,31 +11,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../device_status.gni")
+import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
 
-config("plugin_manager_public_config") {
+config("plugin_manager_config") {
   include_dirs = [
     "include",
-    "${device_status_root_path}/intention/data/ipc",
+    "${intention_root_path}/data/include"
   ]
 }
 
 ohos_source_set("plugin_manager") {
-  include_dirs = [
-    "include",
-    "${device_status_root_path}/intention/data/ipc",
-  ]
-
   sources = [ "src/plugin_manager.cpp" ]
 
-  public_configs = [ ":plugin_manager_public_config" ]
+  configs = [ ":plugin_manager_config" ]
 
-  defines = device_status_default_defines
+  deps = [
+    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
 
-  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 
-  external_deps = [ "c_utils:utils" ]
-
-  subsystem_name = "${device_status_subsystem_name}"
+  subsystem_name = "msdp"
   part_name = "${device_status_part_name}"
 }

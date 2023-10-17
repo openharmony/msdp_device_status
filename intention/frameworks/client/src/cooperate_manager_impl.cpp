@@ -16,7 +16,7 @@
 #include "cooperate_manager_impl.h"
 
 #include "intention_client.h"
-#include "intention_define.h"
+#include "devicestatus_define.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -41,7 +41,7 @@ int32_t CooperateManagerImpl::RegisterCooperateListener(CooperateListenerPtr lis
         DefaultCooperateParam param;
         DefaultCooperateReply reply;
 
-        int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::COOPERATE,
+        int32_t ret = IntentionClient::GetInstance().AddWatch(static_cast<uint32_t>(Intention::COOPERATE),
             CooperateParam::REGISTER, param, reply);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register, ret:%{public}d", ret);
@@ -73,7 +73,8 @@ listenerLabel:
         isListeningProcess_ = false;
         DefaultCooperateParam param;
         DefaultCooperateReply reply;
-        return IntentionClient::GetInstance().RemoveWatch(Intention::COOPERATE, CooperateParam::REGISTER, param, reply);
+        return IntentionClient::GetInstance().RemoveWatch(static_cast<uint32_t>(Intention::COOPERATE),
+            CooperateParam::REGISTER, param, reply);
     }
     return RET_OK;
 }
@@ -90,7 +91,8 @@ int32_t CooperateManagerImpl::PrepareCooperate(FuncCooperateMessage callback)
     }
     DefaultCooperateParam param { userData_ };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::COOPERATE, CooperateParam::PREPARE, param, reply);
+    int32_t ret = IntentionClient::GetInstance().AddWatch(static_cast<uint32_t>(Intention::COOPERATE),
+        CooperateParam::PREPARE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Prepare cooperate failed");
         return ret;
@@ -112,7 +114,7 @@ int32_t CooperateManagerImpl::UnprepareCooperate(FuncCooperateMessage callback)
     }
     DefaultCooperateParam param { userData_ };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().RemoveWatch(Intention::COOPERATE,
+    int32_t ret = IntentionClient::GetInstance().RemoveWatch(static_cast<uint32_t>(Intention::COOPERATE),
         CooperateParam::PREPARE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Unprepare cooperate failed");
@@ -136,7 +138,7 @@ int32_t CooperateManagerImpl::ActivateCooperate(const std::string &remoteNetwork
     }
     StartCooperateParam param { userData_, remoteNetworkId, startDeviceId };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().Start(Intention::COOPERATE, param, reply);
+    int32_t ret = IntentionClient::GetInstance().Start(static_cast<uint32_t>(Intention::COOPERATE), param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Activate cooperate failed");
         return ret;
@@ -156,9 +158,9 @@ int32_t CooperateManagerImpl::DeactivateCooperate(bool isUnchained, FuncCooperat
         FI_HILOGE("userData exceeds the maximum");
         userData_ = 0;
     }
-    StartCooperateParam param { userData_, isUnchained };
+    StopCooperateParam param { userData_, isUnchained };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().Start(Intention::COOPERATE, param, reply);
+    int32_t ret = IntentionClient::GetInstance().Start(static_cast<uint32_t>(Intention::COOPERATE), param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate cooperate failed");
         return ret;
@@ -180,7 +182,8 @@ int32_t CooperateManagerImpl::GetCooperateState(const std::string &deviceId, Fun
     }
     GetCooperateStateParam param { deviceId, userData_ };
     DefaultCooperateReply reply;
-    int32_t ret = IntentionClient::GetInstance().GetParam(Intention::COOPERATE, CooperateParam::STATE, param, reply);
+    int32_t ret = IntentionClient::GetInstance().GetParam(static_cast<uint32_t>(Intention::COOPERATE),
+        CooperateParam::STATE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Get cooperate state failed");
         return ret;

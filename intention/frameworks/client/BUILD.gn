@@ -11,40 +11,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../device_status.gni")
+import("//base/msdp/device_status/device_status.gni")
+import("//build/ohos.gni")
 
-config("cooperate_public_config") {
-  include_dirs = [ "include" ]
-}
-
-ohos_shared_library("intention_cooperate") {
+config("intention_public_config") {
   include_dirs = [
     "include",
-    "${intention_root_path}/data/cooperate/include",
+    "${intention_root_path}/data/drag/include",
+    "${intention_root_path}/data/include",
+    "${intention_root_path}/interfaces/include",
     "${device_status_root_path}/utils/ipc/include",
-    "${intention_root_path}/data/include"
+    "${intention_root_path}/data/cooperate/include",
+    "${intention_root_path}/data/cooperate",
+    "${intention_root_path}/ipc/include"
   ]
+}
 
+ohos_shared_library("intention_client") {
   sources = [
-    "src/cooperate.cpp",
-    "src/state_machine.cpp",
+    "${intention_root_path}/frameworks/client/src/drag_manager_impl.cpp",
+    "${intention_root_path}/frameworks/client/src/cooperate_manager_impl.cpp",
+    "${intention_root_path}/frameworks/client/src/intention_client.cpp",
   ]
-
-  public_configs = [ ":cooperate_public_config" ]
-
-  defines = device_status_default_defines
 
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
+    "${intention_root_path}/ipc:intention_ipc",
     "${intention_root_path}/data:cooperate_params",
+    "${intention_root_path}/data:drag_params",
   ]
+
+  public_configs = [ ":intention_public_config" ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "input:libmmi-client",
-    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

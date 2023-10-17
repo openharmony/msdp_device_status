@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ipc_client.h"
+// #include "ipc_client.h"
 
 #include <if_system_ability_manager.h>
 #include <iservice_registry.h>
@@ -24,8 +24,8 @@
 
 #include "cooperate_manager_impl.h"
 #include "drag_manager_impl.h"
-#include "intention_common.h"
-#include "intention_define.h"
+// #include "intention_common.h"
+#include "devicestatus_define.h"
 #include "include/util.h"
 
 // Implementation of client side of IPC.
@@ -59,7 +59,9 @@ int32_t IntentionClient::Enable(uint32_t intention, ParamBase &data, ParamBase &
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Enable(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -78,7 +80,9 @@ int32_t IntentionClient::Disable(uint32_t intention, ParamBase &data, ParamBase 
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Disable(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -91,13 +95,15 @@ int32_t IntentionClient::Start(uint32_t intention, ParamBase &data, ParamBase &r
 {
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(InentionProxy::GetDescriptor())) {
+    if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
         FI_HILOGE("Write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -116,7 +122,9 @@ int32_t IntentionClient::Stop(uint32_t intention, ParamBase &data, ParamBase &re
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Stop(intention, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -135,7 +143,9 @@ int32_t IntentionClient::AddWatch(uint32_t intention, uint32_t id, ParamBase &da
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->AddWatch(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -154,7 +164,9 @@ int32_t IntentionClient::RemoveWatch(uint32_t intention, uint32_t id, ParamBase 
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->RemoveWatch(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -173,7 +185,9 @@ int32_t IntentionClient::SetParam(uint32_t intention, uint32_t id, ParamBase &da
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->SetParam(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -192,7 +206,9 @@ int32_t IntentionClient::GetParam(uint32_t intention, uint32_t id, ParamBase &da
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->GetParam(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -211,7 +227,9 @@ int32_t IntentionClient::Control(uint32_t intention, uint32_t id, ParamBase &dat
     }
     data.Marshalling(dataParcel);
 
-    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    if (Connect() != RET_OK) {
+        return RET_ERR;
+    }
     MessageParcel replyParcel;
     int32_t ret = devicestatusProxy_->Control(intention, id, dataParcel, replyParcel);
     if (ret == RET_OK) {
@@ -234,7 +252,7 @@ ErrCode IntentionClient::Connect()
     sptr<IRemoteObject> remoteObject = sa->CheckSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID);
     CHKPR(remoteObject, E_DEVICESTATUS_GET_SERVICE_FAILED);
 
-    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) DeviceStatusDeathRecipient());
+    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) IntentionDeathRecipient());
     CHKPR(deathRecipient_, ERR_NO_MEMORY);
 
     if (remoteObject->IsProxyObject()) {
@@ -265,7 +283,7 @@ void IntentionClient::ResetProxy(const wptr<IRemoteObject>& remote)
     }
 }
 
-void IntentionClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void IntentionClient::IntentionDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     CALL_DEBUG_ENTER;
     CHKPV(remote);

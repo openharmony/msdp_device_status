@@ -17,13 +17,14 @@
 
 #include "drag_params.h"
 #include "fi_log.h"
-#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
+// constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 } // namespace
 
 int32_t DragManager::AddListener(SessionPtr session)
@@ -95,7 +96,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(result);
     StateChangedNotify(DragState::STOP);
-    return ret;
+    return RET_OK;
 }
 
 int32_t DragManager::GetDragTargetPid() const
@@ -130,16 +131,16 @@ int32_t DragManager::SetDragWindowVisible(bool visible)
 int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     CALL_DEBUG_ENTER;
-    DRAG_DATA_MGR.Init(dragData);
+    // DRAG_DATA_MGR.Init(dragData);
     return RET_OK;
 }
 
 void DragManager::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
-    if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
-        stateChangedCallback_(state);
-    }
+    // if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
+    //     stateChangedCallback_(state);
+    // }
 }
 
 int32_t DragManager::OnStartDrag()
@@ -152,6 +153,29 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
     CALL_DEBUG_ENTER;
     return RET_ERR;
+}
+
+int32_t DragManager::NotifyDragResult(DragResult result)
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    int32_t targetPid = GetDragTargetPid();
+    NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
+    if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
+        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+        return RET_ERR;
+    }
+    pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    CHKPR(dragOutSession_, RET_ERR);
+    if (!dragOutSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

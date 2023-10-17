@@ -41,11 +41,14 @@ int32_t IntentionDrag::Disable(CallingContext &context, Parcel &data, Parcel &re
 
 int32_t IntentionDrag::Start(CallingContext &context, Parcel &data, Parcel &reply)
 {
+    if (context_ == nullptr) {
+        return RET_ERR;
+    }
     StartDragParam param;
     if (!param.Unmarshalling(data)) {
         return RET_ERR;
     }
-    return dragMgr_.StartDrag(param, context.session);
+    return dragMgr_.StartDrag(param.dragData, context.session);
 }
 
 int32_t IntentionDrag::Stop(CallingContext &context, Parcel &data, Parcel &reply)
@@ -54,7 +57,7 @@ int32_t IntentionDrag::Stop(CallingContext &context, Parcel &data, Parcel &reply
     if (!param.Unmarshalling(data)) {
         return RET_ERR;
     }
-    return dragMgr_.StopDrag(param.result, param.hasCustomAnimation);
+    return dragMgr_.StopDrag(static_cast<DragResult>(param.result), param.hasCustomAnimation);
 }
 
 int32_t IntentionDrag::AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)

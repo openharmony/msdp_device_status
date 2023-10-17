@@ -20,6 +20,10 @@
 
 #include <singleton.h>
 
+#include "i_plugin.h"
+#include "i_intention.h"
+#include "intention_proxy.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -56,12 +60,23 @@ public:
     int32_t Control(uint32_t intention, uint32_t id, ParamBase &data, ParamBase &reply);
 
 private:
+    class IntentionDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        IntentionDeathRecipient() = default;
+        ~IntentionDeathRecipient() = default;
+        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+
+    private:
+        DISALLOW_COPY_AND_MOVE(IntentionDeathRecipient);
+    };
     ErrCode Connect();
     void ResetProxy(const wptr<IRemoteObject>& remote);
 
 private:
+    std::mutex mutex_;
     sptr<IIntention> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
+    std::function<void()> deathListener_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

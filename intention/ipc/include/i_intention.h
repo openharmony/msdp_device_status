@@ -32,28 +32,28 @@ namespace DeviceStatus {
 class IIntention : public IRemoteBroker {
 public:
     // Enable the service identified by [`intention`].
-    int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
     // Disable the service identified by [`intention`].
-    int32_t Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
     // Start the service identified by [`intention`].
-    int32_t Start(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t Start(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
     // Stop the service identified by [`intention`].
-    int32_t Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply) = 0;
     // Add a watch of state of service, with the service identified by [`intention`],
     // the state to watch identified by [`id`], parameters packed in [`data`] parcel.
-    int32_t AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
     // Remove a watch of state of service.
-    int32_t RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
     // Set a parameter of service, with the service identified by [`intention`],
     // the parameter identified by [`id`], and values packed in [`data`] parcel.
-    int32_t SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
     // Get a parameter of service, with the service identified by [`intention`],
     // the parameter identified by [`id`].
-    int32_t GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
     // Interact with service identified by [`intention`] for general purpose. This interface
     // supplements functions of previous intefaces. Functionalities of this interface is
     // service spicific.
-    int32_t Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
+    virtual int32_t Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };

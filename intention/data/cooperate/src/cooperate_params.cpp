@@ -25,12 +25,12 @@ DefaultCooperateParam::DefaultCooperateParam(int32_t userData)
 
 bool DefaultCooperateParam::Marshalling(Parcel &data) const
 {
-    return WRITEINT32(data, userData);
+    return data.WriteInt32(userData);
 }
 
 bool DefaultCooperateParam::Unmarshalling(Parcel &data)
 {
-    return READINT32(data, userData);
+    return data.ReadInt32(userData);
 }
 
 bool DefaultCooperateReply::Marshalling(Parcel &data) const
@@ -43,28 +43,36 @@ bool DefaultCooperateReply::Unmarshalling(Parcel &data)
     return true;
 }
 
+StartCooperateParam::StartCooperateParam()
+{
+}
+
 StartCooperateParam::StartCooperateParam(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
-    : userData(userData),
-      remoteNetworkId(remoteNetworkId),
-      startDeviceId(startDeviceId)
+    : remoteNetworkId(remoteNetworkId),
+      startDeviceId(startDeviceId),
+      userData(userData)
 {}
 
 bool StartCooperateParam::Marshalling(Parcel &data) const
 {
     return (
-        WRITEINT32(data, userData) &&
-        WRITESTRING(data, remoteNetworkId) &&
-        WRITEINT32(data, startDeviceId)
+        data.WriteInt32(userData) &&
+        data.WriteString(remoteNetworkId) &&
+        data.WriteInt32(startDeviceId)
     );
 }
 
 bool StartCooperateParam::Unmarshalling(Parcel &data)
 {
     return (
-        READINT32(data, userData) &&
-        READSTRING(data, remoteNetworkId) &&
-        READINT32(data, startDeviceId)
+        data.ReadInt32(userData) &&
+        data.ReadString(remoteNetworkId) &&
+        data.ReadInt32(startDeviceId)
     );
+}
+
+GetCooperateStateParam::GetCooperateStateParam()
+{
 }
 
 GetCooperateStateParam::GetCooperateStateParam(std::string deviceId, int32_t userData)
@@ -74,18 +82,22 @@ GetCooperateStateParam::GetCooperateStateParam(std::string deviceId, int32_t use
 
 bool GetCooperateStateParam::Marshalling(Parcel &data) const
 {
-    return {
-        WRITEINT32(data, userData) &&
-        WRITESTRING(data, deviceId)
-    };
+    return (
+        data.WriteInt32(userData) &&
+        data.WriteString(deviceId)
+    );
 }
 
 bool GetCooperateStateParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, userData) &&
-        READSTRING(data, deviceId)
-    }
+    return (
+        data.ReadInt32(userData) &&
+        data.ReadString(deviceId)
+    );
+}
+
+StopCooperateParam::StopCooperateParam()
+{
 }
 
 StopCooperateParam::StopCooperateParam(int32_t userData, bool isUnchained)
@@ -94,18 +106,18 @@ StopCooperateParam::StopCooperateParam(int32_t userData, bool isUnchained)
 
 bool StopCooperateParam::Marshalling(Parcel &data) const
 {
-    return {
-        WRITEINT32(data, userData) &&
-        WRITEBOOL(data, isUnchained)
-    };
+    return (
+        data.WriteInt32(userData) &&
+        data.WriteBool(isUnchained)
+    );
 }
 
 bool StopCooperateParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, userData) &&
-        READBOOL(data, isUnchained)
-    };
+    return (
+        data.ReadInt32(userData) &&
+        data.ReadBool(isUnchained)
+    );
 }
 } // namespace DeviceStatus
 } // namespace Msdp

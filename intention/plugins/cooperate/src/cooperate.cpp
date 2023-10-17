@@ -16,7 +16,7 @@
 #include "cooperate.h"
 
 #include "cooperate_params.h"
-#include "intention_define.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -43,6 +43,9 @@ int32_t Cooperate::Disable(CallingContext &context, Parcel &data, Parcel &reply)
 
 int32_t Cooperate::Start(CallingContext &context, Parcel &data, Parcel &reply)
 {
+    if (context_ == nullptr) {
+        return RET_ERR;
+    }
     StartCooperateParam param;
     if (!param.Unmarshalling(data)) {
         return RET_ERR;

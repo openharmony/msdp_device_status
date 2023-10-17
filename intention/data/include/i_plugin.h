@@ -18,12 +18,12 @@
 
 #include "parcel.h"
 
-#include "i_context.h"
 #include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+class IContext;
 enum CommonAction : uint32_t {
     ENABLE,
     DISABLE,
@@ -88,6 +88,8 @@ struct CallingContext {
 
 class IPlugin {
 public:
+    virtual ~IPlugin() = default;
+
     virtual int32_t Enable(CallingContext &context, Parcel &data, Parcel &reply) = 0;
     virtual int32_t Disable(CallingContext &context, Parcel &data, Parcel &reply) = 0;
     virtual int32_t Start(CallingContext &context, Parcel &data, Parcel &reply) = 0;
@@ -99,8 +101,8 @@ public:
     virtual int32_t Control(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply) = 0;
 };
 
-using CreateInstance = IPlugin* (*)(IContext *context);
-using DestroyInstance = void (*)(IPlugin *);
+using IntentionCreateInstance = IPlugin* (*)(IContext *context);
+using IntentionDestroyInstance = void (*)(IPlugin *);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

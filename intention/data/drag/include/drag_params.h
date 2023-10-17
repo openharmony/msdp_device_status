@@ -17,6 +17,7 @@
 #define DRAG_PARAMS_H
 #include <memory>
 
+#include "drag_data.h"
 #include "i_plugin.h"
 
 namespace OHOS {
@@ -39,17 +40,19 @@ struct DefaultDragReply final : public ParamBase {
 };
 
 struct StartDragParam final : public ParamBase {
+    StartDragParam();
     StartDragParam(const DragData &dragData);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     DragData dragData;
 };
 
 struct StopDragParam final : public ParamBase {
+    StopDragParam();
     StopDragParam(int32_t result, bool hasCustomAnimation);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     int32_t result;
     bool hasCustomAnimation { false };
@@ -58,39 +61,41 @@ struct StopDragParam final : public ParamBase {
 struct DragStyleParam final : public ParamBase {
     DragStyleParam(int32_t style);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     int32_t mouseStyle {};
 };
 
 struct DragTargetPidParam : public ParamBase {
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     int32_t pid;
 };
 
 struct GetUdKeyParam final : public ParamBase {
+    GetUdKeyParam(std::string &udKey);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     std::string udKey;
 };
 
 struct AddDragListenerParam : public ParamBase {
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 };
 
 struct RemoveDragListenerParam : public ParamBase {
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 };
 
 struct SetDragWindowVisibleParam final : public ParamBase {
+    SetDragWindowVisibleParam();
     SetDragWindowVisibleParam(bool visible);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     bool visible;
 };
@@ -98,7 +103,7 @@ struct SetDragWindowVisibleParam final : public ParamBase {
 struct GetShadowOffsetParam final : public ParamBase {
     GetShadowOffsetParam(int32_t offsetX, int32_t offsetY, int32_t width, int32_t height);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     int32_t offsetX { -1 };
     int32_t offsetY { -1 };
@@ -107,9 +112,10 @@ struct GetShadowOffsetParam final : public ParamBase {
 };
 
 struct UpdateShadowPicParam final : public ParamBase {
+    UpdateShadowPicParam();
     UpdateShadowPicParam(ShadowInfo shadowInfo);
     bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data);
+    bool Unmarshalling(Parcel &data) override;
 
     ShadowInfo shadowInfo;
 };

@@ -22,9 +22,10 @@
 #include <mutex>
 #include <optional>
 
-#include "client.h"
+// #include "client.h"
 #include "cooperate_message.h"
 #include "i_cooperate_listener.h"
+#include "cooperate_params.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -59,7 +60,6 @@ private:
     mutable std::mutex mtx_;
     int32_t userData_ { 0 };
     std::atomic_bool isListeningProcess_ { false };
-    IClientPtr client_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

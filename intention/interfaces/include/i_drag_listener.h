@@ -13,44 +13,24 @@
  * limitations under the License.
  */
 
-#include "state_machine.h"
+#ifndef I_DRAG_LISTENER_H
+#define I_DRAG_LISTENER_H
 
-#include "devicestatus_define.h"
+#include <memory>
+
+#include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateMachine" };
-} // namespace
-
-void StateMachine::EnableCooperate()
-{
-    CALL_INFO_TRACE;
-}
-
-void StateMachine::DisableCooperate()
-{
-    CALL_INFO_TRACE;
-}
-
-int32_t StateMachine::StartCooperate(const std::string &remoteNetworkId, int32_t startDeviceId)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
-
-int32_t StateMachine::StopCooperate(bool isUnchained)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
-
-int32_t StateMachine::GetCooperateState(const std::string &deviceId)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
+class IDragListener {
+public:
+    IDragListener() = default;
+    virtual ~IDragListener() = default;
+    virtual void OnDragMessage(DragState state) = 0;
+};
+using DragListenerPtr = std::shared_ptr<IDragListener>;
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // I_DRAG_LISTENER_H
