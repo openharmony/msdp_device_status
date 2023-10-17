@@ -25,6 +25,7 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
+#include "i_hotarea_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -202,7 +203,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
-    int32_t AddHotAreaListener(std::shared_ptr<ICoordinationListener> listener);
+    int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
 private:
     InteractionManager() = default;

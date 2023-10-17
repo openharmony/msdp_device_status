@@ -30,9 +30,9 @@
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
+#include "coordination_hotarea.h"
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-#include "coordination_hotarea.h"
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
 
@@ -920,7 +920,6 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     }
     return ret;
 }
-#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 int32_t DeviceStatusService::OnAddHotAreaListener(int32_t pid)
 {
@@ -934,10 +933,12 @@ int32_t DeviceStatusService::OnAddHotAreaListener(int32_t pid)
     HOT_AREA->AddHotAreaListener(event);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 
 int32_t DeviceStatusService::AddHotAreaListener()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnAddHotAreaListener, this, pid));
@@ -945,9 +946,9 @@ int32_t DeviceStatusService::AddHotAreaListener()
         FI_HILOGE("Failed to add hot area listener, ret:%{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -633,16 +633,6 @@ void JsEventCooperateTarget::HandleExecuteResult(napi_env env, int32_t errCode)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, napiError.msg.c_str());
     }
 }
-
-void JsEventCooperateTarget::OnHotAreaMessage(int32_t displayX, int32_t displayY, HotAreaType msg, bool isEdge)
-{
-    CALL_INFO_TRACE;
-    (void)(displayX);
-    (void)(displayY);
-    (void)(msg);
-    (void)(isEdge);
-    FI_HILOGD("HotAreaType:%{public}d, isEdge:%{public}d", msg, isEdge);
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -282,7 +282,7 @@ int32_t CoordinationManagerImpl::OnCoordinationState(const StreamClient& client,
     return RET_OK;
 }
 
-int32_t CoordinationManagerImpl::AddHotAreaListener(CoordinationListenerPtr listener)
+int32_t CoordinationManagerImpl::AddHotAreaListener(HotAreaListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);

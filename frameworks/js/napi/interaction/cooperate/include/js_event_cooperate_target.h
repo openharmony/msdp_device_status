@@ -60,7 +60,6 @@ public:
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
     void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
-    void OnHotAreaMessage(int32_t displayX, int32_t displayY, HotAreaType msg, bool isEdge) override;
 
 private:
     static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
