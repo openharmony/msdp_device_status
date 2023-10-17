@@ -26,13 +26,65 @@ using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "StartDragFuzzTest" };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
+constexpr int32_t PIXEL_MAP_WIDTH { 40 };
+constexpr int32_t PIXEL_MAP_HEIGHT { 40 };
+constexpr int32_t INT32_BYTE { 4 };
+constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+
+std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
+{
+    CALL_DEBUG_ENTER;
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
+        return nullptr;
+    }
+    Media::InitializationOptions opts;
+    opts.size.width = width;
+    opts.size.height = height;
+    opts.pixelFormat = Media::PixelFormat::BGRA_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
+
+    int32_t colorLen = width * height;
+    uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
+    if (colorPixels == nullptr) {
+        FI_HILOGE("ColorPixels is nullptr");
+        return nullptr;
+    }
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    auto ret = memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    if (ret != EOK) {
+        FI_HILOGE("Memset_s failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
+    if (pixelMap == nullptr) {
+        FI_HILOGE("Create pixelMap failed");
+        delete[] colorPixels;
+        return nullptr;
+    }
+    delete[] colorPixels;
+    return pixelMap;
+}
 
 bool StartDragFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
-        FI_HILOGE("Write failure");
+    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN)) {
+        FI_HILOGE("Write failed");
+        return false;
+    }
+    auto pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
+    if (pixelMap->Marshalling(datas)) {
+        FI_HILOGE("Failed to marshalling pixelMap");
+        return false;
+    }
+    if (!datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failed");
         return false;
     }
     MessageParcel reply;
