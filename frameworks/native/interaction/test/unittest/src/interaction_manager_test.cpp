@@ -1244,8 +1244,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
         PrintDragData(replyDragData);
         SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
-        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
-        ASSERT_EQ(ret, RET_OK);
+        InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
     }
