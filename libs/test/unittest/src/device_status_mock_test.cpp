@@ -133,7 +133,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest001, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest001 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->UnregisterCallback() == ERR_OK);
 }
@@ -147,7 +147,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest002, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest002 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_INVALID) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_INVALID) == ERR_OK);
@@ -163,7 +163,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest003, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest003 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_ABSOLUTE_STILL) == ERR_OK);
@@ -179,7 +179,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest004, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest004 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
@@ -195,7 +195,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest005, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest005 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_VERTICAL_POSITION) == ERR_OK);
@@ -211,7 +211,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest006, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest006 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_LID_OPEN) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_LID_OPEN) == ERR_OK);
@@ -227,7 +227,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest007, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest007 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_MAX) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_MAX) == ERR_OK);
@@ -243,7 +243,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest008, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest008 start");
     EXPECT_TRUE(g_testMock->Init());
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_TRUE(g_testMock->Enable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
     EXPECT_TRUE(g_testMock->Disable(Type::TYPE_HORIZONTAL_POSITION) == ERR_OK);
@@ -353,7 +353,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest014, TestSize.Level1)
 HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest015, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusMsdpMocKTest015 start");
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    auto callback = std::make_shared<DeviceStatusMsdpClientImpl>();
     EXPECT_TRUE(g_testMock->RegisterCallback(callback) == ERR_OK);
     EXPECT_FALSE(g_testMock->NotifyMsdpImpl({TYPE_INVALID, VALUE_INVALID}) == ERR_OK);
 }
