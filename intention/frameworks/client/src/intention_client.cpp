@@ -21,8 +21,8 @@
 #include "iremote_object.h"
 
 #include "cooperate_manager_impl.h"
-#include "drag_manager_impl.h"
 #include "devicestatus_define.h"
+#include "drag_manager_impl.h"
 #include "include/util.h"
 
 namespace OHOS {

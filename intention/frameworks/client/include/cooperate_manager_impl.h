@@ -23,8 +23,8 @@
 #include <optional>
 
 #include "cooperate_message.h"
-#include "i_cooperate_listener.h"
 #include "cooperate_params.h"
+#include "i_cooperate_listener.h"
 
 namespace OHOS {
 namespace Msdp {

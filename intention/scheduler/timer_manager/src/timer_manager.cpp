@@ -19,7 +19,6 @@
 
 #include <sys/timerfd.h>
 
-#include "fi_log.h"
 #include "devicestatus_define.h"
 #include "include/util.h"
 

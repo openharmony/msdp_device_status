@@ -18,7 +18,6 @@
 #include "message_parcel.h"
 #include "pixel_map.h"
 
-#include "fi_log.h"
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "i_plugin.h"

@@ -20,7 +20,6 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
-#include "fi_log.h"
 
 namespace OHOS {
 namespace Msdp {

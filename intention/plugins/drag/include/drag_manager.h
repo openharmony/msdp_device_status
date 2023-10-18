@@ -18,9 +18,9 @@
 
 #include "pixel_map.h"
 
-#include "i_context.h"
-#include "drag_data_manager.h"
 #include "devicestatus_define.h"
+#include "drag_data_manager.h"
+#include "i_context.h"
 #include "state_change_notify.h"
 
 namespace OHOS {

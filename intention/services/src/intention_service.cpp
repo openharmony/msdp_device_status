@@ -22,8 +22,8 @@
 #include <ipc_skeleton.h>
 #include "system_ability_definition.h"
 
-#include "i_plugin.h"
 #include "devicestatus_common.h"
+#include "i_plugin.h"
 
 namespace OHOS {
 namespace Msdp {

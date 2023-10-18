@@ -21,12 +21,12 @@
 #include <mutex>
 #include <string>
 
+#include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_params.h"
 #include "i_drag_listener.h"
 #include "intention_client.h"
-#include "devicestatus_define.h"
 #include "include/util.h"
-#include "drag_params.h"
 
 namespace OHOS {
 namespace Msdp {

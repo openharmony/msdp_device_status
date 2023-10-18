@@ -20,8 +20,8 @@
 
 #include <singleton.h>
 
-#include "i_plugin.h"
 #include "i_intention.h"
+#include "i_plugin.h"
 #include "intention_proxy.h"
 
 namespace OHOS {
