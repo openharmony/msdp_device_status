@@ -22,8 +22,8 @@ use std::ffi::{ c_char, CString };
 use hilog_rust::{ hilog, HiLogLabel, LogType };
 
 use fusion_data_rust::{ GeneralCoordinationParam, StartCoordinationParam, CallingContext,
-    StopCoordinationParam, GetCoordinationStateParam, FusionResult };
-use fusion_utils_rust::{ call_debug_enter FusionResult, FusionErrorCode };
+    StopCoordinationParam, GetCoordinationStateParam };
+use fusion_utils_rust::{ call_debug_enter, FusionResult, FusionErrorCode };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -32,9 +32,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 };
 
 #[derive(Default)]
-pub struct Coordination {
-    dummy: i32
-}
+pub struct Coordination(i32);
 
 impl Coordination {
     pub fn enable(&self, context: &CallingContext,

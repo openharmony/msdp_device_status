@@ -17,9 +17,11 @@
 
 use std::ffi::{ c_char, CString };
 use std::fmt::{ Display, Formatter, Error };
-use crate::fusion_utils_rust::{ call_debug_enter };
-use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
-use crate::ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use hilog_rust::{ info, hilog, HiLogLabel, LogType };
+use ipc_rust::{ BorrowedMsgParcel, Serialize, Deserialize, IpcResult };
+
+use fusion_utils_rust::call_debug_enter;
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
@@ -27,7 +29,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "FusionDragData"
 };
 
-/// Struct CShadowInfo
+/// C representation of [`ShadowInfo`].
 #[repr(C)]
 pub struct CShadowInfo {
     x: i32,
@@ -49,7 +51,7 @@ pub struct CDragData {
     has_canceled_animation: bool,
 }
 
-/// Struct ShadowInfo
+/// Data of shadow.
 pub struct ShadowInfo {
     x: i32,
     y: i32,

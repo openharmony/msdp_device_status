@@ -1039,7 +1039,6 @@ bool DragDrawing::NeedAdjustSvgInfo()
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
-    std::string deviceType = system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::MOVE) &&
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;

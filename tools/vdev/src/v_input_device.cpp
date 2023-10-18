@@ -250,10 +250,7 @@ bool VInputDevice::HasJoystickAxesOrButtons() const
             return true;
         }
     }
-    if (HasAxesOrButton(ABS_RX, ABS_PRESSURE, absBitmask_)) {
-        return true;
-    }
-    return false;
+    return HasAxesOrButton(ABS_RX, ABS_PRESSURE, absBitmask_);
 }
 
 void VInputDevice::PrintCapsDevice() const

@@ -40,15 +40,9 @@ struct CAxisEvent {
     std::shared_ptr<OHOS::MMI::AxisEvent> event;
 };
 
-struct CPointerStyleColor {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
 struct CPointerStyle {
     int32_t size { -1 };
-    CPointerStyleColor color { 0 };
+    int32_t color { 0 };
     int32_t id { 0 };
 };
 

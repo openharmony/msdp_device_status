@@ -15,10 +15,14 @@
 
 #![allow(dead_code)]
 
-use crate::{ input_binding, input_binding::OnPointerEventCallback };
-use crate::fusion_utils_rust::{ FusionResult, FusionErrorCode };
 use std::ffi::{ c_char, CString };
-use hilog_rust::{ error, hilog, HiLogLabel, LogType };
+
+use hilog_rust::{error, hilog, HiLogLabel, LogType};
+
+use fusion_utils_rust::{ FusionResult, FusionErrorCode };
+
+use crate::{ input_binding, input_binding::OnPointerEventCallback };
+
 const LOG_LABEL: HiLogLabel = HiLogLabel {
     log_type: LogType::LogCore,
     domain: 0xD002220,
