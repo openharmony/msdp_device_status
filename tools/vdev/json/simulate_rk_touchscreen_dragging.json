@@ -1,0 +1,19 @@
+{
+    "device": "touchscreen",
+    "type": "elegant",
+    "actions": [
+        { "action": "down", "slot": 1, "x": 200, "y": 200 },
+        { "action": "wait", "duration": 100 },
+        { "action": "up", "slot": 1 },
+        { "action": "wait", "duration": 1000 },
+        { "action": "down", "slot": 1, "x": 218, "y": 1265 },
+        { "action": "wait", "duration": 50 },
+        { "action": "up", "slot": 1 },
+        { "action": "wait", "duration": 1000 },
+        { "action": "down", "slot": 1, "x": 200, "y": 200 },
+        { "action": "wait", "duration": 1000 },
+        { "action": "move-to", "slot": 1, "x": 500, "y": 500 },
+        { "action": "wait", "duration": 500 },
+        { "action": "up", "slot": 1 }
+    ]
+}
