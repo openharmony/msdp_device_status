@@ -198,10 +198,10 @@ void Device::UpdateCapability()
     CheckKeys();
 }
 
-bool Device::HasMouseButton() const
+bool Device::HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const
 {
-    for (size_t button = BTN_MOUSE; button < BTN_JOYSTICK; ++button) {
-        if (TestBit(button, keyBitmask_)) {
+    for (size_t type = start; type < end; ++type) {
+        if (TestBit(type, whichBitMask)) {
             return true;
         }
     }
@@ -211,28 +211,14 @@ bool Device::HasMouseButton() const
 bool Device::HasJoystickAxesOrButtons() const
 {
     if (!TestBit(BTN_JOYSTICK - 1, keyBitmask_)) {
-        for (size_t button = BTN_JOYSTICK; button < BTN_DIGI; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-        for (size_t button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-        for (size_t button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-    }
-    for (size_t axis = ABS_RX; axis < ABS_PRESSURE; ++axis) {
-        if (TestBit(axis, absBitmask_)) {
+        if (HasAxesOrButton(BTN_JOYSTICK, BTN_DIGI, keyBitmask_) ||
+            // BTN_TRIGGER_HAPPY40 + 1 : loop boundary
+            HasAxesOrButton(BTN_TRIGGER_HAPPY1, BTN_TRIGGER_HAPPY40 + 1, keyBitmask_) ||
+            HasAxesOrButton(BTN_DPAD_UP, BTN_DPAD_RIGHT + 1, keyBitmask_)) { // BTN_DPAD_RIGHT + 1 : loop boundary
             return true;
         }
     }
-    return false;
+    return HasAxesOrButton(ABS_RX, ABS_PRESSURE, absBitmask_);
 }
 
 bool Device::HasAbsCoord() const
@@ -291,7 +277,7 @@ void Device::CheckAbs()
         caps_.set(DEVICE_CAP_TABLET_TOOL);
     } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
         caps_.set(DEVICE_CAP_POINTER);
-    } else if (HasMouseButton()) {
+    } else if (HasAxesOrButton(BTN_MOUSE, BTN_JOYSTICK, keyBitmask_)) {
         caps_.set(DEVICE_CAP_POINTER);
     } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
         caps_.set(DEVICE_CAP_TOUCH);
@@ -326,7 +312,7 @@ void Device::CheckAdditional()
     if (!HasCapability(DEVICE_CAP_TABLET_TOOL) &&
         !HasCapability(DEVICE_CAP_POINTER) &&
         !HasCapability(DEVICE_CAP_JOYSTICK) &&
-        HasMouseButton() &&
+        HasAxesOrButton(BTN_MOUSE, BTN_JOYSTICK, keyBitmask_) &&
         (HasRelCoord() || !HasAbsCoord())) {
         caps_.set(DEVICE_CAP_POINTER);
     }

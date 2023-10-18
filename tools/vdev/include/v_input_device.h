@@ -103,7 +103,7 @@ private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
-    bool HasMouseButton() const;
+    bool HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const;
     bool HasJoystickAxesOrButtons() const;
     bool HasAbsCoord() const;
     bool HasMtCoord() const;
