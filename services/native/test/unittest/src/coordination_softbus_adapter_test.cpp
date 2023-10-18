@@ -364,6 +364,38 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest019, Test
     EXPECT_EQ(ret, RET_ERR);
     g_adapter->sessionDevs_.clear();
 }
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest020
+ * @tc.desc: Test func named NotifyUnchainedResult, sessionDevs_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest020, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    int32_t ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest021
+ * @tc.desc: Test func named NotifyUnchainedResult, sessionDevs_ is not null, sendMsg is err or ok
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest021, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(g_adapter != nullptr);
+    g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
+    g_sendable = false;
+    int32_t ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
+    g_sendable = true;
+    ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_OK);
+    g_adapter->sessionDevs_.clear();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
