@@ -19,6 +19,7 @@
 
 #include <linux/input.h>
 
+#include "display_manager.h"
 #include "input_manager.h"
 
 #include "devicestatus_define.h"
@@ -39,6 +40,8 @@ constexpr double FAST_STEP { 5.0 };
 constexpr double TWICE_FAST_STEP { 2.0 * FAST_STEP };
 constexpr double MAXIMUM_STEP_LENGTH { 5000.0 };
 constexpr double STEP_UNIT { 1.0 };
+int32_t g_screenWidth { 720 };
+int32_t g_screenHeight { 1280 };
 } // namespace
 
 class PointerPositionMonitor final : public MMI::IInputEventConsumer {
@@ -239,6 +242,10 @@ CLEANUP:
 void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
 {
     CALL_DEBUG_ENTER;
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    CHKPV(display);
+    g_screenWidth = display->GetWidth();
+    g_screenHeight = display->GetHeight();
     MMI::InputManager *inputMgr = MMI::InputManager::GetInstance();
     CHKPV(inputMgr);
     auto monitor = std::make_shared<PointerPositionMonitor>();
@@ -249,16 +256,23 @@ void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
     }
     Move(MOVE_VALUE_X, MOVE_VALUE_Y);
     Move(-MOVE_VALUE_Y, -MOVE_VALUE_X);
-    int32_t targetX = monitor->GetX() + dx;
-    int32_t targetY = monitor->GetY() + dy;
+    int32_t currentX = monitor->GetX();
+    int32_t currentY = monitor->GetY();
+    int32_t targetX = currentX + dx;
+    int32_t targetY = currentY + dy;
     FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)",targetX, targetY);
     Move(dx, dy);
-    int32_t nLoops = 5;
-    while (nLoops-- > 0) {
-        if (targetX == monitor->GetX() && targetY == monitor->GetY()) {
-            break;
+    if ((targetX <= g_screenWidth && targetX >= 0) && (targetY <= g_screenHeight && targetY >= 0) &&
+        (currentX < g_screenWidth && currentX > 0) && (currentY < g_screenHeight && currentY > 0)) {
+        int32_t nLoops = 5;
+        while (nLoops-- > 0) {
+            currentX = monitor->GetX();
+            currentY = monitor->GetY();
+            if (targetX == currentX && targetY == currentY) {
+                break;
+            }
+            Move(targetX - currentX, targetY - currentY);
         }
-        Move(targetX - monitor->GetX(), targetY - monitor->GetY());
     }
     inputMgr->RemoveMonitor(monitorId);
 }
