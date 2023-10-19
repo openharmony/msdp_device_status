@@ -110,6 +110,11 @@ bool Utility::DoesFileExist(const char *path)
     return (access(path, F_OK) == 0);
 }
 
+ssize_t Utility::GetFileSize(const std::string &filePath)
+{
+    return GetFileSize(filePath.c_str());
+}
+
 ssize_t Utility::GetFileSize(const char *path)
 {
     struct stat buf {};

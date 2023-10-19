@@ -30,10 +30,12 @@
             "OHOS::Msdp::DeviceStatus::Utility::IsInteger(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::Utility::DoesFileExist(char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::GetFileSize(char const*)";
+            "OHOS::Msdp::DeviceStatus::Utility::GetFileSize(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::Utility::RemoveSpace(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
             "OHOS::Msdp::DeviceStatus::GetTimeStamp(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
             "OHOS::Msdp::DeviceStatus::StringSplit(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
             "OHOS::Msdp::DeviceStatus::StringPrintf(char const*, ...)";
+            "OHOS::Msdp::DeviceStatus::GetAnonyString(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         };
     local:
         *;

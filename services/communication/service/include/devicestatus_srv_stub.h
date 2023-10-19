@@ -63,7 +63,7 @@ private:
     int32_t GetDragDataStub(MessageParcel& data, MessageParcel& reply);
 
 private:
-    std::map<uint32_t, ConnFunc> ConnFuncs_;
+    std::map<uint32_t, ConnFunc> connFuncs_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

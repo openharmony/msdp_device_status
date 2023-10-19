@@ -32,7 +32,6 @@ namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDataParse" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
 constexpr int32_t READ_DATA_BUFF_SIZE { 256 };
-constexpr int32_t INVALID_FILE_SIZE { -1 };
 const std::string MSDP_DATA_PATH { "/data/msdp/device_status_data.json" };
 const std::string MSDP_DATA_DIR { "/data/msdp" };
 } // namespace
@@ -150,16 +149,6 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
     return ReadFile(realPath);
 }
 
-int32_t DeviceStatusDataParse::GetFileSize(const std::string& filePath)
-{
-    struct stat statbuf = { 0 };
-    if (stat(filePath.c_str(), &statbuf) != 0) {
-        FI_HILOGE("Get file size error");
-        return INVALID_FILE_SIZE;
-    }
-    return statbuf.st_size;
-}
-
 bool DeviceStatusDataParse::CheckFileDir(const std::string& filePath, const std::string& dir)
 {
     if (filePath.compare(0, MSDP_DATA_DIR.size(), MSDP_DATA_DIR) != 0) {
@@ -171,7 +160,7 @@ bool DeviceStatusDataParse::CheckFileDir(const std::string& filePath, const std:
 
 bool DeviceStatusDataParse::CheckFileSize(const std::string& filePath)
 {
-    int32_t fileSize = GetFileSize(filePath);
+    int32_t fileSize = Utility::GetFileSize(filePath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         FI_HILOGE("File size out of read range");
         return false;

@@ -39,6 +39,8 @@ constexpr uint32_t BASE_YEAR { 1900 };
 constexpr uint32_t BASE_MON { 1 };
 constexpr uint32_t MS_NS { 1000000 };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+constexpr size_t SHORT_KEY_LENGTH { 20 };
+constexpr size_t PLAINTEXT_LENGTH { 4 };
 const std::string SVG_PATH { "/system/etc/device_status/drag_icon/" };
 } // namespace
 
@@ -154,6 +156,26 @@ std::string StringPrintf(const char *format, ...)
     return result;
 }
 
+std::string GetAnonyString(const std::string &value)
+{
+    if (value.empty()) {
+        return "empty";
+    }
+    std::string str;
+    std::string anonyStr = "******";
+    size_t strLen = value.length();
+    if (strLen <= SHORT_KEY_LENGTH) {
+        str += value[0];
+        str += anonyStr;
+        str += value[strLen - 1];
+    } else {
+        str.append(value, 0, PLAINTEXT_LENGTH);
+        str += anonyStr;
+        str.append(value, strLen - PLAINTEXT_LENGTH, PLAINTEXT_LENGTH);
+    }
+    return str;
+}
+
 static std::string GetFileName(const std::string &strPath)
 {
     size_t nPos = strPath.find_last_of('/');
@@ -231,16 +253,6 @@ bool CheckFileExtendName(const std::string &filePath, const std::string &checkEx
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
-int32_t GetFileSize(const std::string &filePath)
-{
-    struct stat statbuf = { 0 };
-    if (stat(filePath.c_str(), &statbuf) != 0) {
-        FI_HILOGE("Get file size error, errno:%{public}d", errno);
-        return RET_ERR;
-    }
-    return statbuf.st_size;
-}
-
 bool IsValidPath(const std::string &rootDir, const std::string &filePath)
 {
     return (filePath.compare(0, rootDir.size(), rootDir) == 0);
@@ -275,7 +287,7 @@ bool IsValidSvgFile(const std::string &filePath)
         FI_HILOGE("Unable to parse files other than svg format");
         return false;
     }
-    int32_t fileSize = GetFileSize(realPath);
+    int32_t fileSize = Utility::GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         FI_HILOGE("File size out of read range");
         return false;
