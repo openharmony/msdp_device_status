@@ -22,8 +22,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr std::string_view COOPERATE { "cooperate" };
-constexpr std::string_view DRAG_TYPE { "drag" };
+inline constexpr std::string_view COOPERATE { "cooperate" };
+inline constexpr std::string_view DRAG_TYPE { "drag" };
 inline const std::string DEV_INPUT_PATH { "/dev/input/" };
 inline constexpr std::string_view CALL_FUNCTION { "napi_call_function" };
 inline constexpr std::string_view CREATE_OBJECT { "napi_create_object" };
@@ -44,10 +44,10 @@ inline constexpr std::string_view TYPEOF { "napi_typeof" };
 inline constexpr std::string_view UNWRAP { "napi_unwrap" };
 inline constexpr std::string_view WRAP { "napi_wrap" };
 inline constexpr std::string_view CREATE_STRING_UTF8 { "napi_create_string_utf8" };
-constexpr int32_t ZERO_PARAM { 0 };
-constexpr int32_t ONE_PARAM { 1 };
-constexpr int32_t TWO_PARAM { 2 };
-constexpr int32_t THREE_PARAM { 3 };
+inline constexpr int32_t ZERO_PARAM { 0 };
+inline constexpr int32_t ONE_PARAM { 1 };
+inline constexpr int32_t TWO_PARAM { 2 };
+inline constexpr int32_t THREE_PARAM { 3 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
