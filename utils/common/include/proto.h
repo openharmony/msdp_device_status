@@ -15,28 +15,29 @@
 #ifndef PROTO_H
 #define PROTO_H
 #include <sys/types.h>
-#define MAX_EVENT_SIZE 100
-static constexpr int32_t STREAM_BUF_READ_FAIL { 1 };
-static constexpr int32_t STREAM_BUF_WRITE_FAIL { 2 };
-static constexpr int32_t MAX_VECTOR_SIZE { 10 };
-static constexpr int32_t MEM_OUT_OF_BOUNDS { 3 };
-static constexpr int32_t MEMCPY_SEC_FUN_FAIL { 4 };
-static constexpr int32_t PARAM_INPUT_INVALID { 5 };
-static constexpr int32_t MAX_STREAM_BUF_SIZE { 256 };
-static constexpr size_t MAX_PACKET_BUF_SIZE { 256 };
-static constexpr int32_t ONCE_PROCESS_NETPACKET_LIMIT { 100 };
-static constexpr int32_t INVALID_FD { 6 };
-static constexpr int32_t INVALID_PID { 7 };
-static constexpr int32_t SESSION_NOT_FOUND { 8 };
-static constexpr int32_t EPOLL_MODIFY_FAIL { 9 };
-static constexpr int32_t ADD_SESSION_FAIL { 11 };
-static constexpr size_t MAX_SESSON_ALARM { 100 };
-static constexpr int32_t MAX_RECV_LIMIT { 13 };
-static constexpr int32_t SERVICE_NOT_RUNNING { 14 };
-#define CONNECT_MODULE_TYPE_FI_CLIENT 0
-#define CLIENT_RECONNECT_COOLING_TIME 800
-#define SEND_RETRY_LIMIT 32
-#define SEND_RETRY_SLEEP_TIME 10000
+
+inline constexpr int32_t MAX_EVENT_SIZE { 100 };
+inline constexpr int32_t STREAM_BUF_READ_FAIL { 1 };
+inline constexpr int32_t STREAM_BUF_WRITE_FAIL { 2 };
+inline constexpr int32_t MAX_VECTOR_SIZE { 10 };
+inline constexpr int32_t MEM_OUT_OF_BOUNDS { 3 };
+inline constexpr int32_t MEMCPY_SEC_FUN_FAIL { 4 };
+inline constexpr int32_t PARAM_INPUT_INVALID { 5 };
+inline constexpr int32_t MAX_STREAM_BUF_SIZE { 256 };
+inline constexpr size_t MAX_PACKET_BUF_SIZE { 256 };
+inline constexpr int32_t ONCE_PROCESS_NETPACKET_LIMIT { 100 };
+inline constexpr int32_t INVALID_FD { 6 };
+inline constexpr int32_t INVALID_PID { 7 };
+inline constexpr int32_t SESSION_NOT_FOUND { 8 };
+inline constexpr int32_t EPOLL_MODIFY_FAIL { 9 };
+inline constexpr int32_t ADD_SESSION_FAIL { 11 };
+inline constexpr size_t MAX_SESSON_ALARM { 100 };
+inline constexpr int32_t MAX_RECV_LIMIT { 13 };
+inline constexpr int32_t SERVICE_NOT_RUNNING { 14 };
+inline constexpr int32_t CONNECT_MODULE_TYPE_FI_CLIENT { 0 };
+inline constexpr int64_t CLIENT_RECONNECT_COOLING_TIME { 800 };
+inline constexpr int32_t SEND_RETRY_LIMIT { 32 };
+inline constexpr useconds_t SEND_RETRY_SLEEP_TIME { 10000 };
 
 enum class MessageId : int32_t {
     INVALID,
