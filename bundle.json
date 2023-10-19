@@ -25,6 +25,7 @@
         "c_utils",
         "napi",
         "image_framework",
+        "build_framework",
         "eventhandler",
         "distributed_input",
         "device_manager",

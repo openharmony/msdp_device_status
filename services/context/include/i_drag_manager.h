@@ -35,7 +35,7 @@ public:
     virtual void Dump(int32_t fd) const = 0;
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
     virtual int32_t StartDrag(const DragData &dragData, SessionPtr sess) = 0;
-    virtual int32_t StopDrag(DragResult result, bool hasCustomAnimation) = 0;
+    virtual int32_t StopDrag(const DragDropResult &dropResult) = 0;
     virtual DragState GetDragState() const = 0;
     virtual void SetDragState(DragState state) = 0;
     virtual DragResult GetDragResult() const = 0;

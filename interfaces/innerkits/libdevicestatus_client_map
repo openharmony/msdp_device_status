@@ -41,7 +41,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::DeactivateCoordination(bool, std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetCoordinationState(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::function<void (bool)>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::function<void (OHOS::Msdp::DeviceStatus::DragNotifyMsg const&)>)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragResult, bool)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragDropResult const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateDragStyle(OHOS::Msdp::DeviceStatus::DragCursorStyle)";

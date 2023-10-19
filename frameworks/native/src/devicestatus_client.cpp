@@ -366,12 +366,12 @@ int32_t DeviceStatusClient::StartDrag(const DragData &dragData)
 
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
-int32_t DeviceStatusClient::StopDrag(DragResult result, bool hasCustomAnimation)
+int32_t DeviceStatusClient::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     CHKPR(devicestatusProxy_, RET_ERR);
-    return devicestatusProxy_->StopDrag(result, hasCustomAnimation);
+    return devicestatusProxy_->StopDrag(dropResult);
 }
 
 int32_t DeviceStatusClient::AddDraglistener()

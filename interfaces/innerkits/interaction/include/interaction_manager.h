@@ -117,7 +117,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t StopDrag(DragResult result, bool hasCustomAnimation);
+    int32_t StopDrag(const DragDropResult &dropResult);
 
     /**
      * @brief Updates the mouse pointer style used for dragging.
