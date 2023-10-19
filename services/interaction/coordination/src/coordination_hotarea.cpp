@@ -41,7 +41,6 @@ void CoordinationHotArea::AddHotAreaListener(sptr<HotAreaInfo> event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
-    std::lock_guard<std::mutex> guard(lock_);
     auto it = std::find_if(hotAreaCallbacks_.begin(), hotAreaCallbacks_.end(),
         [event](auto info) {
             return (*info).sess == event->sess;
@@ -71,7 +70,6 @@ void CoordinationHotArea::RemoveHotAreaListener(sptr<HotAreaInfo> event)
 int32_t CoordinationHotArea::OnHotAreaMessage(HotAreaType msg, bool isEdge)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     if (hotAreaCallbacks_.empty()) {
         FI_HILOGW("Failed to invoke the listening interface, hotAreaCallbacks_ is empty");
         return RET_ERR;

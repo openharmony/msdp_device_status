@@ -60,7 +60,6 @@ private:
     int32_t displayY_ { 0 };
     int32_t deltaX_ { 0 };
     int32_t deltaY_ { 0 };
-    std::mutex lock_;
     bool isEdge_ { false };
     HotAreaType type_ { HotAreaType::AREA_NONE };
     std::list<sptr<HotAreaInfo>> hotAreaCallbacks_;

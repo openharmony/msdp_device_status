@@ -201,7 +201,7 @@ public:
      * @brief Registers a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 9
+     * @since 11
      */
     int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
