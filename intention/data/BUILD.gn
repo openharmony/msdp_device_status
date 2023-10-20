@@ -14,27 +14,64 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
+config("params_public_config") {
+  include_dirs = [ "include" ]
+}
+
 config("cooperate_params_config") {
   include_dirs = [
     "include",
+    "cooperate/include",
     "${device_status_root_path}/utils/ipc/include",
   ]
 }
 
-config("cooperate_params_public_config") {
-  include_dirs = [ "include" ]
-}
-
 ohos_source_set("cooperate_params") {
-  sources = [ "src/cooperate_params.cpp" ]
+  sources = [ "cooperate/src/cooperate_params.cpp" ]
 
   configs = [ ":cooperate_params_config" ]
 
-  public_configs = [ ":cooperate_params_public_config" ]
+  public_configs = [ ":params_public_config" ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+  ]
+
+  subsystem_name = "msdp"
+  part_name = "${device_status_part_name}"
+}
+
+config("drag_params_config") {
+  include_dirs = [
+    "include",
+    "drag/include",
+    "${device_status_root_path}/utils/ipc/include",
+  ]
+}
+
+ohos_source_set("drag_params") {
+  sources = [
+    "drag/src/drag_data_manager.cpp",
+    "drag/src/drag_params.cpp",
+  ]
+
+  configs = [ ":drag_params_config" ]
+
+  public_configs = [ ":params_public_config" ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "input:libmmi-client",
     "ipc:ipc_core",
   ]
 

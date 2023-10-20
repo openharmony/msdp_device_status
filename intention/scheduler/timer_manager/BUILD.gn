@@ -14,17 +14,17 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-config("plugin_manager_config") {
+config("timer_manager_config") {
   include_dirs = [
     "include",
     "${intention_root_path}/data/include",
   ]
 }
 
-ohos_source_set("plugin_manager") {
-  sources = [ "src/plugin_manager.cpp" ]
+ohos_source_set("timer_manager") {
+  sources = [ "src/timer_manager.cpp" ]
 
-  configs = [ ":plugin_manager_config" ]
+  configs = [ ":timer_manager_config" ]
 
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",

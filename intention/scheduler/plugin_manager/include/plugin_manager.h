@@ -27,7 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 
 // Loading、unloading and bookkeeping of modules.
-class PluginManager {
+class PluginManager : public IPluginManager {
 public:
     class Plugin {
     public:
@@ -62,6 +62,8 @@ private:
     IContext *context_ { nullptr };
     std::map<Intention, Plugin> libs_;
 };
+using DestroyInstance = void (*)(IPlugin *);
+using CreateInstance = IPlugin* (*)(IContext *);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

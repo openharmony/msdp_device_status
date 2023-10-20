@@ -18,10 +18,10 @@
 
 #include "pixel_map.h"
 
-#include "drag_data.h"
-#include "drag_drawing.h"
-#include "intention_define.h"
-#include "stream_session.h"
+#include "devicestatus_define.h"
+#include "drag_data_manager.h"
+#include "i_context.h"
+#include "state_change_notify.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -45,14 +45,21 @@ public:
 
 private:
     int32_t InitDataManager(const DragData &dragData) const;
+    int32_t NotifyDragResult(DragResult result);
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);
     void StateChangedNotify(DragState state);
 
 private:
+    int32_t timerId_ { -1 };
+    DragResult dragResult_ { DragResult::DRAG_FAIL };
     StateChangeNotify stateNotify_;
+    IContext* context_ { nullptr };
+    SessionPtr dragOutSession_ { nullptr };
     DragState dragState_ { DragState::STOP };
+    std::function<void(DragState)> stateChangedCallback_;
 };
+#define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

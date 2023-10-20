@@ -19,8 +19,7 @@
 
 #include <sys/timerfd.h>
 
-#include "fi_log.h"
-#include "intention_define.h"
+#include "devicestatus_define.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -167,9 +166,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     } else if (intervalMs > MAX_INTERVAL_MS) {
         intervalMs = MAX_INTERVAL_MS;
     }
-    if (callback == nullptr) {
-        return NONEXISTENT_ID;
-    }
+    CHKPR(callback, NONEXISTENT_ID);
     int32_t timerId = TakeNextTimerId();
     if (timerId < 0) {
         return NONEXISTENT_ID;

@@ -21,11 +21,11 @@
 #include <mutex>
 #include <string>
 
-#include "client.h"
+#include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_params.h"
 #include "i_drag_listener.h"
 #include "intention_client.h"
-#include "intention_define.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -41,8 +41,6 @@ public:
     int32_t GetUdKey(std::string &udKey);
     int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
     int32_t StopDrag(DragResult result, bool hasCustomAnimation);
-    int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
-    int32_t OnStateChangedMessage(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);

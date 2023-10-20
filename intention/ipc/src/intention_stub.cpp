@@ -18,11 +18,9 @@
 #include "message_parcel.h"
 #include "pixel_map.h"
 
-#include "fi_log.h"
-#include "intention_common.h"
-#include "intention_define.h"
-#include "intention_proxy.h"
-#include "intention_service.h"
+#include "devicestatus_common.h"
+#include "devicestatus_define.h"
+#include "i_plugin.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -43,16 +41,16 @@ int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
     }
 
     switch (GACTION(code)) {
-        case CommonAction::enable: {
+        case CommonAction::ENABLE: {
             return Enable(GINTENTION(code), data, reply);
         }
-        case CommonAction::Disable: {
+        case CommonAction::DISABLE: {
             return Disable(GINTENTION(code), data, reply);
         }
-        case CommonAction::start: {
+        case CommonAction::START: {
             return Start(GINTENTION(code), data, reply);
         }
-        case CommonAction::stop: {
+        case CommonAction::STOP: {
             return Stop(GINTENTION(code), data, reply);
         }
         case CommonAction::ADD_WATCH: {
