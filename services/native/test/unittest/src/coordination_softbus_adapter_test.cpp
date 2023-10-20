@@ -34,6 +34,15 @@ constexpr int32_t SESSION_ID { 1 };
 constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 } // namespace
 
+void ClearCoordinationSoftbusAdapter()
+{
+    COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
+    COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
+    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
+    COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
+    COOR_SOFTBUS_ADAPTER->channelStatuss_.clear();
+}
+
 int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
     return g_sendable == true ? RET_OK : RET_ERR;
@@ -104,7 +113,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest003, Test
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(g_adapter != nullptr);
-    int32_t ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    int32_t ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
     EXPECT_TRUE(ret == RET_ERR);
     ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
     EXPECT_TRUE(ret == RET_ERR);
@@ -121,12 +130,12 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest004, Test
     ASSERT_TRUE(g_adapter != nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
-    int32_t ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    int32_t ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
     EXPECT_TRUE(ret == RET_ERR);
     ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
     EXPECT_TRUE(ret == RET_ERR);
     g_sendable = true;
-    ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
     EXPECT_TRUE(ret == RET_OK);
     ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
     EXPECT_TRUE(ret == RET_OK);

@@ -33,14 +33,7 @@ public:
     void TearDown();
 };
 
-void ClearCoordinationSoftbusAdapter()
-{
-    COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
-    COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
-    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
-    COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
-    COOR_SOFTBUS_ADAPTER->channelStatuss_.clear();
-}
+void ClearCoordinationSoftbusAdapter();
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
