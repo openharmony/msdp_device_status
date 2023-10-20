@@ -77,6 +77,8 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest001, Test
     ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_ERR);
+    ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
 }
 
 /**
@@ -92,10 +94,14 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest002, Test
     g_sendable = false;
     int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_ERR);
+    ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
     g_sendable = true;
     ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
+    ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_OK);
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
@@ -122,84 +128,24 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest004, Test
     ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
-    int32_t ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    int32_t ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    EXPECT_TRUE(ret == RET_ERR);
+    ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
     EXPECT_TRUE(ret == RET_ERR);
     g_sendable = true;
-    ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
+    ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
     EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
+    ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_OK);
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
  * @tc.name: CoordinationSoftbusAdapterTest005
- * @tc.desc: Test func named StopRemoteCoordination, sessionDevs_ is null
- * @tc.type: FUNC
- */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest005, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NE(g_adapter, nullptr);
-    int32_t ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_ERR);
-}
-
-/**
- * @tc.name: CoordinationSoftbusAdapterTest006
- * @tc.desc: Test func named StopRemoteCoordination, sessionDevs_ is not null, sendMsg is err or ok
- * @tc.type: FUNC
- */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest006, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NE(g_adapter, nullptr);
-    g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
-    g_sendable = false;
-    int32_t ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_ERR);
-    g_sendable = true;
-    ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
-}
-
-/**
- * @tc.name: CoordinationSoftbusAdapterTest007
- * @tc.desc: Test func named StopRemoteCoordinationResult, sessionDevs_ is null
- * @tc.type: FUNC
- */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest007, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NE(g_adapter, nullptr);
-    int32_t ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_ERR);
-}
-
-/**
- * @tc.name: CoordinationSoftbusAdapterTest008
- * @tc.desc: Test func named StopRemoteCoordinationResult, sessionDevs_ is not null, sendMsg is err or ok
- * @tc.type: FUNC
- */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest008, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NE(g_adapter, nullptr);
-    g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
-    g_sendable = false;
-    int32_t ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_ERR);
-    g_sendable = true;
-    ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
-    EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
-}
-
-/**
- * @tc.name: CoordinationSoftbusAdapterTest009
  * @tc.desc: Test func named StartCoordinationOtherResult, sessionDevs_ is null
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest009, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -208,11 +154,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest009, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest010
+ * @tc.name: CoordinationSoftbusAdapterTest06
  * @tc.desc: Test func named StartCoordinationOtherResult, sessionDevs_ is not null, sendMsg is err or ok
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest06, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -223,15 +169,15 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, Test
     g_sendable = true;
     ret = g_adapter->StartCoordinationOtherResult(ORIGIN_NETWORKID, REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest011
+ * @tc.name: CoordinationSoftbusAdapterTest07
  * @tc.desc: Test func named NotifyFilterAdded, sessionDevs_ is null
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest07, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -240,11 +186,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest012
+ * @tc.name: CoordinationSoftbusAdapterTest08
  * @tc.desc: Test func named NotifyFilterAdded, sessionDevs_ is not null, sendMsg is err or ok
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest08, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -255,15 +201,15 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
     g_sendable = true;
     ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_OK);
-    g_adapter->sessionDevs_.clear();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest013
+ * @tc.name: CoordinationSoftbusAdapterTest09
  * @tc.desc: test normal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest09, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -271,15 +217,15 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, Test
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
-    g_adapter->sessionDevs_.clear();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest014
+ * @tc.name: CoordinationSoftbusAdapterTest010
  * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -290,11 +236,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest015
+ * @tc.name: CoordinationSoftbusAdapterTest011
  * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -305,11 +251,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest016
+ * @tc.name: CoordinationSoftbusAdapterTest012
  * @tc.desc: test abnormal func named OpenInputSoftbus and CloseInputSoftbus in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest016, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -321,11 +267,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest016, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest017
+ * @tc.name: CoordinationSoftbusAdapterTest013
  * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest017, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -335,11 +281,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest017, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest018
+ * @tc.name: CoordinationSoftbusAdapterTest014
  * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest018, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -349,11 +295,11 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest018, Test
 }
 
 /**
- * @tc.name: CoordinationSoftbusAdapterTest019
+ * @tc.name: CoordinationSoftbusAdapterTest015
  * @tc.desc: test abnormal func named SendData in devicestatus
  * @tc.type: FUNC
  */
-HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest019, TestSize.Level0)
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
@@ -362,7 +308,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest019, Test
     int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
         INTERCEPT_STRING_LENGTH);
     EXPECT_EQ(ret, RET_ERR);
-    g_adapter->sessionDevs_.clear();
+    ClearCoordinationSoftbusAdapter();
 }
 
 /**
