@@ -83,7 +83,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
             &DeviceStatusSrvStub::GetDragDataStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
-            &DeviceStatusSrvStub::AddHotAreaListenerStub}
+            &DeviceStatusSrvStub::AddHotAreaListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
+            &DeviceStatusSrvStub::RemoveHotAreaListenerStub}
     };
 }
 
@@ -498,6 +500,16 @@ int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, Message
     int32_t ret = AddHotAreaListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RemoveHotAreaListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
 }

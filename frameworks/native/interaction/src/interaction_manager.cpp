@@ -127,6 +127,11 @@ int32_t InteractionManager::AddHotAreaListener(std::shared_ptr<IHotAreaListener>
 {
     return INTER_MGR_IMPL.AddHotAreaListener(listener);
 }
+
+int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

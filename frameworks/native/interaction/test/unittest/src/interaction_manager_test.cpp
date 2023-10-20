@@ -56,6 +56,10 @@ constexpr int32_t DRAG_NUM { 1 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 constexpr int32_t WINDOW_ID { -1 };
+constexpr int32_t HOT_AREA_COOR { 300 };
+constexpr int32_t HOT_AREA_MAX_X { 2200 };
+constexpr int32_t HOT_AREA_MAX_Y { 1300 };
+constexpr int32_t HOT_AREA_STEP { 400 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
@@ -309,9 +313,15 @@ void InteractionManagerTest::SimulateMoveEvent(const std::pair<int32_t, int32_t>
         for (int32_t y = srcY; y <= dstY; y += MOVE_STEP) {
             coordinates.push_back({srcX, y});
         }
+        for (int32_t y = srcY; y > dstY; y -= MOVE_STEP) {
+            coordinates.push_back({srcX, y});
+        }
     } else {
         double ratio = (dstY - srcY) * 1.0 / (dstX - srcX);
         for (int32_t x = srcX; x < dstX; x += MOVE_STEP) {
+            coordinates.push_back({x, srcY + static_cast<int32_t>(ratio * (x - srcX))});
+        }
+        for (int32_t x = srcX; x >= dstX; x -= MOVE_STEP) {
             coordinates.push_back({x, srcY + static_cast<int32_t>(ratio * (x - srcX))});
         }
         coordinates.push_back({dstX, dstY});
@@ -1269,6 +1279,98 @@ HWTEST_F(InteractionManagerTest, GetDragData_Failed, TestSize.Level1)
         SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
         ASSERT_EQ(ret, RET_ERR);
     }
+}
+
+class HotAreaListenerTest : public IHotAreaListener {
+public:
+    HotAreaListenerTest() {}
+    explicit HotAreaListenerTest(std::string name) : testName_(name) {}
+    void OnHotAreaMessage(int32_t displayX, int32_t displayY, HotAreaType msg, bool isEdge) override
+    {
+        if (testName_.empty()) {
+            testName_ = std::string("HOT_AREA");
+        }
+        FI_HILOGD("%{public}s, type:%{public}s, isEdge:%{public}d, displayX:%{public}d, displayY:%{public}d",
+            testName_.c_str(), ShowMessage(msg).c_str(), isEdge, displayX, displayY);
+    };
+
+private:
+    std::string ShowMessage(HotAreaType msg)
+    {
+        switch (msg) {
+            case HotAreaType::AREA_LEFT: {
+                return std::string("left-area");
+            }
+            case HotAreaType::AREA_RIGHT: {
+                return std::string("right-area");
+            }
+            case HotAreaType::AREA_TOP: {
+                return std::string("top-area");
+            }
+            case HotAreaType::AREA_BOTTOM: {
+                return std::string("bottom-area");
+            }
+            default: {
+                return std::string("none-area");
+            }
+        }
+    }
+
+private:
+    std::string testName_;
+};
+
+/**
+ * @tc.name: AddHotAreaListener_001
+ * @tc.desc: Add hot area listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
+    int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: AddHotAreaListener_002
+ * @tc.desc: Add hot area listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
+    int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+    ASSERT_EQ(ret, RET_OK);
+    SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_COOR }, { HOT_AREA_COOR - HOT_AREA_STEP, HOT_AREA_COOR },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_COOR }, { HOT_AREA_COOR, HOT_AREA_COOR - HOT_AREA_STEP },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ HOT_AREA_MAX_X, HOT_AREA_MAX_Y }, { HOT_AREA_MAX_X + HOT_AREA_STEP, HOT_AREA_MAX_Y },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ HOT_AREA_MAX_X, HOT_AREA_MAX_Y }, { HOT_AREA_MAX_X, HOT_AREA_MAX_Y + HOT_AREA_STEP },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_TOUCH_DOWN_MS));
+    ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: RemoveHotAreaListener
+ * @tc.desc: Remove hot area listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, RemoveHotAreaListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
+    int32_t ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

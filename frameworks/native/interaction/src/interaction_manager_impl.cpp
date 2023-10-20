@@ -290,6 +290,19 @@ int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListe
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
+
+int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    return coordinationManagerImpl_.RemoveHotAreaListener(listener);
+#else
+    FI_HILOGW("Coordination does not support");
+    (void)(listener);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

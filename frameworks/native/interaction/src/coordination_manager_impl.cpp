@@ -331,6 +331,33 @@ int32_t CoordinationManagerImpl::OnHotAreaListener(const StreamClient& client, N
     OnDevHotAreaListener(positionX, positionY, HotAreaType(type), isEdge);
     return RET_OK;
 }
+
+int32_t CoordinationManagerImpl::ResetListener()
+{
+    CALL_DEBUG_ENTER;
+    if (isHotAreaListener_ && devHotAreaListener_.empty()) {
+        isHotAreaListener_ = false;
+        return DeviceStatusClient::GetInstance().RemoveHotAreaListener();
+    }
+    return RET_OK;
+}
+
+int32_t CoordinationManagerImpl::RemoveHotAreaListener(HotAreaListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (listener == nullptr) {
+        devHotAreaListener_.clear();
+        return ResetListener();
+    }
+    for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
+        if (*it == listener) {
+            devHotAreaListener_.erase(it);
+            return ResetListener();
+        }
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

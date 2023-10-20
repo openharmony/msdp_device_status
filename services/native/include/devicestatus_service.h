@@ -92,6 +92,7 @@ public:
     int32_t DelEpoll(EpollEventType type, int32_t fd);
     bool IsRunning() const override;
     int32_t AddHotAreaListener() override;
+    int32_t RemoveHotAreaListener() override;
 
 private:
     bool Init();
@@ -104,6 +105,7 @@ private:
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
     int32_t OnAddHotAreaListener(int32_t pid);
+    int32_t OnRemoveHotAreaListener(int32_t pid);
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);

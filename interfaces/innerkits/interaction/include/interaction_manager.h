@@ -205,6 +205,14 @@ public:
      */
     int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
+    /**
+     * @brief Unregisters a listener for screen hot area of the mouse pointer.
+     * @param listener Indicates the listener for screen hot area of the mouse pointer.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 9
+     */
+    int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);
