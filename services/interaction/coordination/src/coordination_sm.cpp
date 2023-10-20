@@ -816,8 +816,13 @@ void CoordinationSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::Pointer
 {
     lastPointerEvent_ = pointerEvent;
     CHKPV(pointerEvent);
-    HOT_AREA->ProcessData(pointerEvent);
-    HOT_AREA->NotifyMessage();
+    auto *context = COOR_EVENT_MGR->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CoordinationHotArea::ProcessData, HOT_AREA, pointerEvent));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
 }
 
 std::shared_ptr<MMI::PointerEvent> CoordinationSM::GetLastPointerEvent() const

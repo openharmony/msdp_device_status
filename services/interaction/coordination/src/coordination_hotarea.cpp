@@ -82,10 +82,14 @@ int32_t CoordinationHotArea::OnHotAreaMessage(HotAreaType msg, bool isEdge)
     return RET_OK;
 }
 
-void CoordinationHotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+int32_t CoordinationHotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent);
+    if (hotAreaCallbacks_.empty()) {
+        FI_HILOGW("No listener, hotAreaCallbacks_ is empty");
+        return RET_ERR;
+    }
+    CHKPR(pointerEvent, RET_ERR);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     displayX_ = pointerItem.GetDisplayX();
@@ -94,6 +98,8 @@ void CoordinationHotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> pointer
     deltaY_ = pointerItem.GetRawDy();
     CheckInHotArea();
     CheckPointerToEdge(type_);
+    NotifyMessage();
+    return RET_OK;
 }
 
 void CoordinationHotArea::CheckInHotArea()

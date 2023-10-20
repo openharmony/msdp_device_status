@@ -43,7 +43,7 @@ public:
     void AddHotAreaListener(sptr<HotAreaInfo> event);
     void RemoveHotAreaListener(sptr<HotAreaInfo> event);
     int32_t OnHotAreaMessage(HotAreaType msg, bool isEdge);
-    void ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    int32_t ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void SetWidth(int32_t deviceWidth);
     void SetHeight(int32_t deviceHight);
     void NotifyMessage();
