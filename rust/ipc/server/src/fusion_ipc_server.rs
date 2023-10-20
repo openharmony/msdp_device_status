@@ -52,7 +52,7 @@ fn on_start<T: ISystemAbility + IMethod>(ability: &T) {
 }
 
 fn on_stop<T: ISystemAbility + IMethod>(ability: &T) {
-    info!(LOG_LABEL, "in on_stop(): enter");
+    info!(LOG_LABEL, "In on_stop(): enter");
     if let Some(proxy) = FusionService::get_instance() {
         proxy.on_stop();
     } else {

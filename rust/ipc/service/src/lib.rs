@@ -104,7 +104,7 @@ fn on_remote_request(stub: &dyn IDeviceStatus, code: u32, data: &BorrowedMsgParc
             stub.remove_watch(intention, id, data, reply)
         }
         CommonAction::SetParam => {
-            info!(LOG_LABEL, "call stub.set_param()");
+            info!(LOG_LABEL, "Call stub.set_param()");
             stub.set_param(intention, id, data, reply)
         }
         CommonAction::GetParam => {

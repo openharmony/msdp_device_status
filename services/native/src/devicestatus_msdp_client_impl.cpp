@@ -153,7 +153,7 @@ ErrCode DeviceStatusMsdpClientImpl::GetAlgoAbility(Type type)
 {
     if ((type == Type::TYPE_ABSOLUTE_STILL) || (type == Type::TYPE_HORIZONTAL_POSITION) ||
         (type == Type::TYPE_VERTICAL_POSITION)) {
-        FI_HILOGI("support ability type:%{public}d", type);
+        FI_HILOGI("Support ability type:%{public}d", type);
         return RET_OK;
     }
     FI_HILOGI("Not support ability");
@@ -396,7 +396,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
 {
     CALL_DEBUG_ENTER;
     if (algo_.handle != nullptr) {
-        FI_HILOGE("algo handle has exists");
+        FI_HILOGE("Algo handle has exists");
         return RET_OK;
     }
     std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
