@@ -29,11 +29,10 @@ void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
     CALL_DEBUG_ENTER;
     CHKPV(info);
     auto it = std::find_if(msgInfos_.begin(), msgInfos_.end(),
-        [info] (auto msgInfo) {
+        [info] (std::shared_ptr<MessageInfo> msgInfo) {
             return *msgInfo == info;
         });
     if (it != msgInfos_.end()) {
-        *it = info;
         return;
     }
     msgInfos_.emplace_back(info);
@@ -47,7 +46,7 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
         return;
     }
     auto it = std::find_if(msgInfos_.begin(), msgInfos_.end(),
-        [info] (auto msgInfo) {
+        [info] (std::shared_ptr<MessageInfo> msgInfo) {
             return *msgInfo == info;
         });
     if (it != msgInfos_.end()) {
@@ -82,7 +81,6 @@ void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId
     }
     if (!session->SendMsg(pkt)) {
         FI_HILOGE("Sending failed");
-        return;
     }
 }
 } // namespace DeviceStatus

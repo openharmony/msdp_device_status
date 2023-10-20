@@ -40,7 +40,7 @@ struct DefaultDragReply final : public ParamBase {
 };
 
 struct StartDragParam final : public ParamBase {
-    StartDragParam();
+    StartDragParam() = default;
     StartDragParam(const DragData &dragData);
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data) override;
@@ -49,7 +49,7 @@ struct StartDragParam final : public ParamBase {
 };
 
 struct StopDragParam final : public ParamBase {
-    StopDragParam();
+    StopDragParam() = default;
     StopDragParam(int32_t result, bool hasCustomAnimation);
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data) override;
@@ -92,7 +92,7 @@ struct RemoveDragListenerParam : public ParamBase {
 };
 
 struct SetDragWindowVisibleParam final : public ParamBase {
-    SetDragWindowVisibleParam();
+    SetDragWindowVisibleParam() = default;
     SetDragWindowVisibleParam(bool visible);
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data) override;
@@ -112,7 +112,7 @@ struct GetShadowOffsetParam final : public ParamBase {
 };
 
 struct UpdateShadowPicParam final : public ParamBase {
-    UpdateShadowPicParam();
+    UpdateShadowPicParam() = default;
     UpdateShadowPicParam(ShadowInfo shadowInfo);
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data) override;

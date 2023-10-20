@@ -55,6 +55,7 @@ int32_t IntentionClient::Enable(uint32_t intention, ParamBase &data, ParamBase &
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -76,6 +77,7 @@ int32_t IntentionClient::Disable(uint32_t intention, ParamBase &data, ParamBase 
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -97,6 +99,7 @@ int32_t IntentionClient::Start(uint32_t intention, ParamBase &data, ParamBase &r
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -118,6 +121,7 @@ int32_t IntentionClient::Stop(uint32_t intention, ParamBase &data, ParamBase &re
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -139,6 +143,7 @@ int32_t IntentionClient::AddWatch(uint32_t intention, uint32_t id, ParamBase &da
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -160,6 +165,7 @@ int32_t IntentionClient::RemoveWatch(uint32_t intention, uint32_t id, ParamBase 
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -181,6 +187,7 @@ int32_t IntentionClient::SetParam(uint32_t intention, uint32_t id, ParamBase &da
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -202,6 +209,7 @@ int32_t IntentionClient::GetParam(uint32_t intention, uint32_t id, ParamBase &da
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -223,6 +231,7 @@ int32_t IntentionClient::Control(uint32_t intention, uint32_t id, ParamBase &dat
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
+        FI_HILOGE("Failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -258,7 +267,7 @@ ErrCode IntentionClient::Connect()
     }
 
     devicestatusProxy_ = iface_cast<IIntention>(remoteObject);
-    FI_HILOGD("Connecting DeviceStatusService success");
+    FI_HILOGD("Connecting IntentionService success");
     return RET_OK;
 }
 

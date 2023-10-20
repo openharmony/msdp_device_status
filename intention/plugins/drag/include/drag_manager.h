@@ -57,7 +57,7 @@ private:
     IContext* context_ { nullptr };
     SessionPtr dragOutSession_ { nullptr };
     DragState dragState_ { DragState::STOP };
-    std::function<void(DragState)> stateChangedCallback_ { nullptr };
+    std::function<void(DragState)> stateChangedCallback_;
 };
 #define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()
 } // namespace DeviceStatus

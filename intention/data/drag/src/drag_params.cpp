@@ -21,8 +21,6 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragParams" };
 } // namespace
-StartDragParam::StartDragParam()
-{}
 
 StartDragParam::StartDragParam(const DragData &dragData) : dragData(dragData)
 {}
@@ -67,9 +65,6 @@ bool StartDragParam::Unmarshalling(Parcel &data)
 
 StopDragParam::StopDragParam(int32_t result, bool hasCustomAnimation)
     : result(result), hasCustomAnimation(hasCustomAnimation)
-{}
-
-StopDragParam::StopDragParam()
 {}
 
 bool StopDragParam::Marshalling(Parcel &data) const
@@ -151,10 +146,6 @@ bool RemoveDragListenerParam::Unmarshalling(Parcel &data)
     return true;
 }
 
-SetDragWindowVisibleParam::SetDragWindowVisibleParam()
-{
-}
-
 SetDragWindowVisibleParam::SetDragWindowVisibleParam(bool visible) : visible(visible)
 {}
 
@@ -188,10 +179,6 @@ bool GetShadowOffsetParam::Unmarshalling(Parcel &data)
         data.ReadInt32(width) &&
         data.ReadInt32(height)
     );
-}
-
-UpdateShadowPicParam::UpdateShadowPicParam()
-{
 }
 
 UpdateShadowPicParam::UpdateShadowPicParam(ShadowInfo shadowInfo) : shadowInfo(shadowInfo)

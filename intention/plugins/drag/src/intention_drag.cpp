@@ -41,11 +41,10 @@ int32_t IntentionDrag::Disable(CallingContext &context, Parcel &data, Parcel &re
 
 int32_t IntentionDrag::Start(CallingContext &context, Parcel &data, Parcel &reply)
 {
-    if (context_ == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(context_, RET_ERR);
     StartDragParam param;
     if (!param.Unmarshalling(data)) {
+        FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
     return dragMgr_.StartDrag(param.dragData, context.session);
@@ -55,6 +54,7 @@ int32_t IntentionDrag::Stop(CallingContext &context, Parcel &data, Parcel &reply
 {
     StopDragParam param;
     if (!param.Unmarshalling(data)) {
+        FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
     return dragMgr_.StopDrag(static_cast<DragResult>(param.result), param.hasCustomAnimation);

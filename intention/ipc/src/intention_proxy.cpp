@@ -34,9 +34,7 @@ int32_t IntentionProxy::Enable(uint32_t intention, MessageParcel &data, MessageP
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -52,9 +50,7 @@ int32_t IntentionProxy::Disable(uint32_t intention, MessageParcel &data, Message
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -70,9 +66,7 @@ int32_t IntentionProxy::Start(uint32_t intention, MessageParcel &data, MessagePa
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -88,9 +82,7 @@ int32_t IntentionProxy::Stop(uint32_t intention, MessageParcel &data, MessagePar
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -106,9 +98,7 @@ int32_t IntentionProxy::AddWatch(uint32_t intention, uint32_t id, MessageParcel 
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -124,9 +114,7 @@ int32_t IntentionProxy::RemoveWatch(uint32_t intention, uint32_t id, MessageParc
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -142,9 +130,7 @@ int32_t IntentionProxy::SetParam(uint32_t intention, uint32_t id, MessageParcel 
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -160,9 +146,7 @@ int32_t IntentionProxy::GetParam(uint32_t intention, uint32_t id, MessageParcel 
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
@@ -178,9 +162,7 @@ int32_t IntentionProxy::Control(uint32_t intention, uint32_t id, MessageParcel &
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
-    if (remote == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(remote, RET_ERR);
     MessageOption option;
 
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(

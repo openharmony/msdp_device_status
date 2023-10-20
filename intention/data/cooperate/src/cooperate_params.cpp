@@ -43,10 +43,6 @@ bool DefaultCooperateReply::Unmarshalling(Parcel &data)
     return true;
 }
 
-StartCooperateParam::StartCooperateParam()
-{
-}
-
 StartCooperateParam::StartCooperateParam(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
     : remoteNetworkId(remoteNetworkId),
       startDeviceId(startDeviceId),
@@ -71,10 +67,6 @@ bool StartCooperateParam::Unmarshalling(Parcel &data)
     );
 }
 
-GetCooperateStateParam::GetCooperateStateParam()
-{
-}
-
 GetCooperateStateParam::GetCooperateStateParam(std::string deviceId, int32_t userData)
     : deviceId(deviceId),
       userData(userData)
@@ -94,10 +86,6 @@ bool GetCooperateStateParam::Unmarshalling(Parcel &data)
         data.ReadInt32(userData) &&
         data.ReadString(deviceId)
     );
-}
-
-StopCooperateParam::StopCooperateParam()
-{
 }
 
 StopCooperateParam::StopCooperateParam(int32_t userData, bool isUnchained)

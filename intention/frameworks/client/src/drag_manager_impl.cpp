@@ -27,6 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragMan
 int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+        FI_HILOGE("Style is invalid");
         return RET_ERR;
     }
 

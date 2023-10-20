@@ -43,11 +43,10 @@ int32_t Cooperate::Disable(CallingContext &context, Parcel &data, Parcel &reply)
 
 int32_t Cooperate::Start(CallingContext &context, Parcel &data, Parcel &reply)
 {
-    if (context_ == nullptr) {
-        return RET_ERR;
-    }
+    CHKPR(context_, RET_ERR);
     StartCooperateParam param;
     if (!param.Unmarshalling(data)) {
+        FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
 
@@ -62,6 +61,7 @@ int32_t Cooperate::Stop(CallingContext &context, Parcel &data, Parcel &reply)
 {
     StopCooperateParam param;
     if (!param.Unmarshalling(data)) {
+        FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
 
@@ -91,6 +91,7 @@ int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, Parcel &data, 
 {
     GetCooperateStateParam param;
     if (!param.Unmarshalling(data)) {
+        FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
 
