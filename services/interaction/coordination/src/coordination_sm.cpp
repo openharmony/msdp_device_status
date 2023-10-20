@@ -26,6 +26,7 @@
 
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
+#include "coordination_hotarea.h"
 #include "coordination_message.h"
 #include "coordination_softbus_adapter.h"
 #include "coordination_state_free.h"
@@ -206,6 +207,10 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &deviceId)
 void CoordinationSM::PrepareCoordination()
 {
     CALL_INFO_TRACE;
+    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    CHKPV(display);
+    HOT_AREA->SetWidth(display->GetWidth());
+    HOT_AREA->SetHeight(display->GetHeight());
     if (monitorId_ <= 0) {
         auto monitor = std::make_shared<MonitorConsumer>(
             std::bind(&CoordinationSM::UpdateLastPointerEventCallback, this, std::placeholders::_1));
@@ -810,6 +815,14 @@ void CoordinationSM::Dump(int32_t fd)
 void CoordinationSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     lastPointerEvent_ = pointerEvent;
+    CHKPV(pointerEvent);
+    auto *context = COOR_EVENT_MGR->GetIContext();
+    CHKPV(context);
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
+        std::bind(&CoordinationHotArea::ProcessData, HOT_AREA, pointerEvent));
+    if (ret != RET_OK) {
+        FI_HILOGE("Posting async task failed");
+    }
 }
 
 std::shared_ptr<MMI::PointerEvent> CoordinationSM::GetLastPointerEvent() const

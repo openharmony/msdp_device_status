@@ -25,6 +25,7 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
+#include "i_hotarea_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -195,6 +196,14 @@ public:
      * @since 10
      */
     int32_t GetDragData(DragData &dragData);
+
+    /**
+     * @brief Registers a listener for screen hot area of the mouse pointer.
+     * @param listener Indicates the listener for screen hot area of the mouse pointer.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 11
+     */
+    int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
 private:
     InteractionManager() = default;

@@ -24,6 +24,7 @@
 
 #include "client.h"
 #include "i_coordination_listener.h"
+#include "i_hotarea_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -35,6 +36,7 @@ public:
     using CoordinationMsg = FuncCoordinationMessage;
     using CoordinationState = FuncCoordinationState;
     using CoordinationListenerPtr = std::shared_ptr<ICoordinationListener>;
+    using HotAreaListenerPtr = std::shared_ptr<IHotAreaListener>;
     struct CoordinationEvent {
         CoordinationMsg msg;
         CoordinationState state;
@@ -59,6 +61,10 @@ public:
     int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
     int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
 
+    int32_t AddHotAreaListener(HotAreaListenerPtr listener);
+    void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
+    int32_t OnHotAreaListener(const StreamClient& client, NetPacket& pkt);
+
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
@@ -66,9 +72,11 @@ private:
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
+    std::list<HotAreaListenerPtr> devHotAreaListener_;
     mutable std::mutex mtx_;
     int32_t userData_ { 0 };
     std::atomic_bool isListeningProcess_ { false };
+    bool isHotAreaListener_ { false };
     IClientPtr client_ { nullptr };
 };
 } // namespace DeviceStatus

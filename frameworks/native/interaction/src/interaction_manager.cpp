@@ -122,6 +122,11 @@ int32_t InteractionManager::GetDragData(DragData &dragData)
 {
     return INTER_MGR_IMPL.GetDragData(dragData);
 }
+
+int32_t InteractionManager::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    return INTER_MGR_IMPL.AddHotAreaListener(listener);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

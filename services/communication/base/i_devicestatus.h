@@ -62,6 +62,8 @@ public:
     {
         return true;
     }
+
+    virtual int32_t AddHotAreaListener() = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };
 } // namespace DeviceStatus

@@ -41,7 +41,8 @@ enum class DeviceInterfaceCode {
     GET_SHADOW_OFFSET,
     UPDATE_SHADOW_PIC,
     GET_DRAG_DATA,
-    ALLOC_SOCKET_FD = 40
+    ALLOC_SOCKET_FD = 40,
+    ADD_HOT_AREA_MONITOR = 50
 };
 } // namespace Msdp
 } // namespace OHOS
