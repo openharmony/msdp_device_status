@@ -101,7 +101,7 @@ private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
-    bool HasMouseButton() const;
+    bool HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const;
     bool HasJoystickAxesOrButtons() const;
     bool HasAbsCoord() const;
     bool HasMtCoord() const;
@@ -120,6 +120,9 @@ private:
     void JudgeKeyboardType();
     void LoadDeviceConfig();
     void PrintCapsDevice() const;
+    void GetEventMask(const std::string &eventName, uint32_t type, std::size_t arrayLength,
+        uint8_t *whichBitMask) const;
+    void GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const;
 
     int32_t fd_ { -1 };
     int32_t deviceId_ { -1 };

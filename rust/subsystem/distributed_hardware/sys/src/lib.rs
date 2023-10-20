@@ -15,10 +15,6 @@
 
 //! rust distributed hardware sys.
 
-extern crate hilog_rust;
-extern crate fusion_utils_rust;
-extern crate fusion_data_rust;
-
 mod dm_binding;
 mod interaction;
 

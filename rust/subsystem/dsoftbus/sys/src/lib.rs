@@ -13,14 +13,7 @@
  * limitations under the License.
  */
 
-//! data definitions.
+//! mods for dsoftbus
 
-mod ipc;
-mod plugin_manager;
-
-pub use ipc::basic::{ BasicParamID, AllocSocketPairParam };
-pub use ipc::coordination::{ GeneralCoordinationParam, StartCoordinationParam,
-    StopCoordinationParam, GetCoordinationStateParam };
-pub use ipc::default::{ CallingContext, DefaultReply };
-pub use ipc::drag::{ CDragData, DragData };
-pub use plugin_manager::{ Intention, IPlugin };
+pub mod binding;
+pub mod dsoftbus;

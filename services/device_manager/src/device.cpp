@@ -165,29 +165,31 @@ void Device::QueryDeviceInfo()
     }
 }
 
+void Device::GetEventMask(const std::string &eventName, uint32_t type,
+    std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGBIT(type, arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get %{public}s events mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
+void Device::GetPropMask(const std::string &eventName, std::size_t arrayLength, uint8_t *whichBitMask) const
+{
+    int32_t rc = ioctl(fd_, EVIOCGPROP(arrayLength), whichBitMask);
+    if (rc < 0) {
+        FI_HILOGE("Could not get %{public}s mask:%{public}s", eventName.c_str(), strerror(errno));
+    }
+}
+
 void Device::QuerySupportedEvents()
 {
     CALL_DEBUG_ENTER;
-    int32_t rc = ioctl(fd_, EVIOCGBIT(0, sizeof(evBitmask_)), evBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_KEY, sizeof(keyBitmask_)), keyBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get key events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_ABS, sizeof(absBitmask_)), absBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get abs events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGBIT(EV_REL, sizeof(relBitmask_)), relBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get rel events mask, errno:%{public}s", strerror(errno));
-    }
-    rc = ioctl(fd_, EVIOCGPROP(sizeof(propBitmask_)), propBitmask_);
-    if (rc < 0) {
-        FI_HILOGE("Could not get properties mask, errno:%{public}s", strerror(errno));
-    }
+    GetEventMask("", 0, sizeof(evBitmask_), evBitmask_);
+    GetEventMask("key", EV_KEY, sizeof(keyBitmask_), keyBitmask_);
+    GetEventMask("abs", EV_ABS, sizeof(absBitmask_), absBitmask_);
+    GetEventMask("rel", EV_REL, sizeof(relBitmask_), relBitmask_);
+    GetPropMask("properties", sizeof(propBitmask_), propBitmask_);
 }
 
 void Device::UpdateCapability()
@@ -198,10 +200,10 @@ void Device::UpdateCapability()
     CheckKeys();
 }
 
-bool Device::HasMouseButton() const
+bool Device::HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const
 {
-    for (size_t button = BTN_MOUSE; button < BTN_JOYSTICK; ++button) {
-        if (TestBit(button, keyBitmask_)) {
+    for (size_t type = start; type < end; ++type) {
+        if (TestBit(type, whichBitMask)) {
             return true;
         }
     }
@@ -211,28 +213,14 @@ bool Device::HasMouseButton() const
 bool Device::HasJoystickAxesOrButtons() const
 {
     if (!TestBit(BTN_JOYSTICK - 1, keyBitmask_)) {
-        for (size_t button = BTN_JOYSTICK; button < BTN_DIGI; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-        for (size_t button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-        for (size_t button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT; ++button) {
-            if (TestBit(button, keyBitmask_)) {
-                return true;
-            }
-        }
-    }
-    for (size_t axis = ABS_RX; axis < ABS_PRESSURE; ++axis) {
-        if (TestBit(axis, absBitmask_)) {
+        if (HasAxesOrButton(BTN_JOYSTICK, BTN_DIGI, keyBitmask_) ||
+            // BTN_TRIGGER_HAPPY40 + 1 : loop boundary
+            HasAxesOrButton(BTN_TRIGGER_HAPPY1, BTN_TRIGGER_HAPPY40 + 1, keyBitmask_) ||
+            HasAxesOrButton(BTN_DPAD_UP, BTN_DPAD_RIGHT + 1, keyBitmask_)) { // BTN_DPAD_RIGHT + 1 : loop boundary
             return true;
         }
     }
-    return false;
+    return HasAxesOrButton(ABS_RX, ABS_PRESSURE, absBitmask_);
 }
 
 bool Device::HasAbsCoord() const
@@ -291,7 +279,7 @@ void Device::CheckAbs()
         caps_.set(DEVICE_CAP_TABLET_TOOL);
     } else if (HasKey(BTN_TOOL_FINGER) && !HasKey(BTN_TOOL_PEN) && !HasProperty(INPUT_PROP_DIRECT)) {
         caps_.set(DEVICE_CAP_POINTER);
-    } else if (HasMouseButton()) {
+    } else if (HasAxesOrButton(BTN_MOUSE, BTN_JOYSTICK, keyBitmask_)) {
         caps_.set(DEVICE_CAP_POINTER);
     } else if (HasKey(BTN_TOUCH) || HasProperty(INPUT_PROP_DIRECT)) {
         caps_.set(DEVICE_CAP_TOUCH);
@@ -326,7 +314,7 @@ void Device::CheckAdditional()
     if (!HasCapability(DEVICE_CAP_TABLET_TOOL) &&
         !HasCapability(DEVICE_CAP_POINTER) &&
         !HasCapability(DEVICE_CAP_JOYSTICK) &&
-        HasMouseButton() &&
+        HasAxesOrButton(BTN_MOUSE, BTN_JOYSTICK, keyBitmask_) &&
         (HasRelCoord() || !HasAbsCoord())) {
         caps_.set(DEVICE_CAP_POINTER);
     }

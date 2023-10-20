@@ -13,9 +13,7 @@
  * limitations under the License.
  */
 
-use crate::{
-    input_binding, input_binding::CPointerEvent
-};
+use crate::{ input_binding, input_binding::CPointerEvent };
 
 /// PointerEvent packed the native CPointerEvent.
 #[repr(C)]

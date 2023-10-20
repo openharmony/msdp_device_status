@@ -17,7 +17,7 @@
 
 use crate::{ input_binding, input_binding::CExtraData };
 use fusion_data_rust::DragData;
-use crate::fusion_utils_rust::{ FusionResult, FusionErrorCode };
+use fusion_utils_rust::{ FusionResult, FusionErrorCode };
 
 impl CExtraData {
     /// Create a CExtraData object.

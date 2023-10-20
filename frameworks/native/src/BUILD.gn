@@ -24,6 +24,11 @@ config("devicestatusnapi_private_config") {
 }
 
 ohos_shared_library("deviceagent") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [ "./devicestatus_agent.cpp" ]
 
   configs = [

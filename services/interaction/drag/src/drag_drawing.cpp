@@ -1039,10 +1039,7 @@ bool DragDrawing::NeedAdjustSvgInfo()
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
-    std::string deviceType = system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::MOVE) &&
-        ((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
-        (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
@@ -1066,11 +1063,8 @@ int32_t DragDrawing::GetFilePath(std::string &filePath)
             break;
         }
         case DragCursorStyle::MOVE: {
-            std::string deviceType = system::GetDeviceType();
-            if (((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
-                (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
-                (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-                FI_HILOGD("Device type is phone, not need draw svg style, deviceType:%{public}s", deviceType.c_str());
+            if (g_drawingInfo.currentDragNum == DRAG_NUM_ONE) {
+                FI_HILOGD("Not need draw svg style, current drag number is one");
                 filePath = DEFAULT_DRAG_PATH;
             } else {
                 filePath = MOVE_DRAG_PATH;

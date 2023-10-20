@@ -682,11 +682,11 @@ int32_t DeviceStatusService::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusService::StopDrag(DragResult result, bool hasCustomAnimation)
+int32_t DeviceStatusService::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::StopDrag, &dragMgr_, result, hasCustomAnimation));
+        std::bind(&DragManager::StopDrag, &dragMgr_, dropResult));
     if (ret != RET_OK) {
         FI_HILOGE("StopDrag failed, ret:%{public}d", ret);
     }

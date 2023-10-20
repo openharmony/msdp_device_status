@@ -62,6 +62,12 @@ enum class DragResult {
     DRAG_EXCEPTION = 3
 };
 
+struct DragDropResult {
+    DragResult result { DragResult::DRAG_FAIL };
+    bool hasCustomAnimation { false };
+    int32_t windowId { -1 };
+};
+
 struct DragNotifyMsg {
     int32_t displayX { -1 };
     int32_t displayY { -1 };

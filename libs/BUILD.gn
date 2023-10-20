@@ -54,6 +54,11 @@ ohos_shared_library("devicestatus_mock") {
 }
 
 ohos_shared_library("devicestatus_algo") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "src/algorithm/algo_absolute_still.cpp",
     "src/algorithm/algo_base.cpp",

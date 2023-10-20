@@ -424,7 +424,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimation)
+int32_t DeviceStatusSrvProxy::StopDrag(const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -432,12 +432,13 @@ int32_t DeviceStatusSrvProxy::StopDrag(DragResult result, bool hasCustomAnimatio
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
-        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+    if (dropResult.result < DragResult::DRAG_SUCCESS || dropResult.result > DragResult::DRAG_EXCEPTION) {
+        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(dropResult.result));
         return RET_ERR;
     }
-    WRITEINT32(data, static_cast<int32_t>(result), ERR_INVALID_VALUE);
-    WRITEBOOL(data, hasCustomAnimation, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(dropResult.result), ERR_INVALID_VALUE);
+    WRITEBOOL(data, dropResult.hasCustomAnimation, ERR_INVALID_VALUE);
+    WRITEINT32(data, dropResult.windowId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

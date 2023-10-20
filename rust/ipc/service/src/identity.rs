@@ -17,10 +17,12 @@
 
 #![allow(dead_code)]
 
-use crate::fusion_data_rust::{ Intention };
-use crate::fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
 use std::ffi::{ c_char, CString };
-use crate::hilog_rust::{ info, hilog, HiLogLabel, LogType };
+
+use hilog_rust::{ info, hilog, HiLogLabel, LogType };
+
+use fusion_data_rust::Intention;
+use fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
 
 define_enum! {
     CommonAction {

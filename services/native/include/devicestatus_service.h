@@ -74,7 +74,7 @@ public:
     int32_t DeactivateCoordination(int32_t userData, bool isUnchained) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &deviceId) override;
     int32_t StartDrag(const DragData &dragData) override;
-    int32_t StopDrag(DragResult result, bool hasCustomAnimation) override;
+    int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
     int32_t GetDragTargetPid() override;
     int32_t GetUdKey(std::string &udKey) override;

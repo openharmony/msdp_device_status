@@ -16,9 +16,12 @@
 //! Plugin manager related definitions.
 
 use std::any::Any;
-use ipc_rust::{ BorrowedMsgParcel };
+
+use ipc_rust::BorrowedMsgParcel;
+
+use fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
+
 use crate::CallingContext;
-use crate::fusion_utils_rust::{ define_enum, FusionResult, FusionErrorCode };
 
 define_enum! {
     Intention {

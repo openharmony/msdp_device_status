@@ -22,6 +22,7 @@ using namespace ::OHOS::Msdp::DeviceStatus;
 
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_services_binding" };
+} // namespace
 
 struct NativeService {
     int32_t refCnt { 0 };
@@ -80,4 +81,3 @@ int32_t NativeServiceAllocSocketFd(struct NativeService *service, const char *pr
     CALL_DEBUG_ENTER;
     return RET_ERR;
 }
-} // namespace

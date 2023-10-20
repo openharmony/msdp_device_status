@@ -74,7 +74,7 @@ void CoordinationSoftbusAdapterTest::TearDown() {}
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
     EXPECT_TRUE(ret == RET_ERR);
     ret = g_adapter->StopRemoteCoordination(REMOTE_NETWORKID, true);
@@ -89,7 +89,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest001, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
     int32_t ret = g_adapter->StartRemoteCoordination(LOCAL_NETWORKID, REMOTE_NETWORKID, false);
@@ -112,10 +112,8 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest002, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest003, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
-    int32_t ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
-    EXPECT_TRUE(ret == RET_ERR);
-    ret = g_adapter->StopRemoteCoordinationResult(REMOTE_NETWORKID, true);
+    ASSERT_NE(g_adapter, nullptr);
+    int32_t ret = g_adapter->StartRemoteCoordinationResult(REMOTE_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
     EXPECT_TRUE(ret == RET_ERR);
 }
 
@@ -127,7 +125,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest003, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest004, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
     int32_t ret = g_adapter->StartRemoteCoordinationResult(LOCAL_NETWORKID, true, REMOTE_NETWORKID, 0, 0);
@@ -150,7 +148,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest004, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->StartCoordinationOtherResult(ORIGIN_NETWORKID, REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -163,7 +161,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest005, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest06, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[ORIGIN_NETWORKID] = 1;
     g_sendable = false;
     int32_t ret = g_adapter->StartCoordinationOtherResult(ORIGIN_NETWORKID, REMOTE_NETWORKID);
@@ -182,7 +180,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest06, TestS
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest07, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -195,7 +193,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest07, TestS
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest08, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
     g_sendable = false;
     int32_t ret = g_adapter->NotifyFilterAdded(REMOTE_NETWORKID);
@@ -214,7 +212,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest08, TestS
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest09, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_adapter->sessionDevs_[REMOTE_NETWORKID] = SESSION_ID;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
     EXPECT_EQ(ret, RET_OK);
@@ -230,7 +228,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest09, TestS
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_init = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
     EXPECT_EQ(ret, RET_ERR);
@@ -245,7 +243,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_init = true;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
     EXPECT_EQ(ret, RET_ERR);
@@ -260,7 +258,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     g_init = true;
     g_cond = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
@@ -276,7 +274,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_ERR);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->OnSessionClosed(SESSION_ID);
@@ -290,7 +288,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_OK);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->OnSessionClosed(SESSION_ID);
@@ -304,13 +302,45 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, Test
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    ASSERT_TRUE(g_adapter != nullptr);
+    ASSERT_NE(g_adapter, nullptr);
     std::string data = "TestSendData";
     g_adapter->sessionDevs_[DEVICE_ID] = SESSION_ID;
     int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
         INTERCEPT_STRING_LENGTH);
     EXPECT_EQ(ret, RET_ERR);
     ClearCoordinationSoftbusAdapter();
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest020
+ * @tc.desc: Test func named NotifyUnchainedResult, sessionDevs_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest020, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(g_adapter, nullptr);
+    int32_t ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
+}
+
+/**
+ * @tc.name: CoordinationSoftbusAdapterTest021
+ * @tc.desc: Test func named NotifyUnchainedResult, sessionDevs_ is not null, sendMsg is err or ok
+ * @tc.type: FUNC
+ */
+HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest021, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NE(g_adapter, nullptr);
+    g_adapter->sessionDevs_[REMOTE_NETWORKID] = 1;
+    g_sendable = false;
+    int32_t ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_ERR);
+    g_sendable = true;
+    ret = g_adapter->NotifyUnchainedResult(LOCAL_NETWORKID, REMOTE_NETWORKID, true);
+    EXPECT_TRUE(ret == RET_OK);
+    g_adapter->sessionDevs_.clear();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
