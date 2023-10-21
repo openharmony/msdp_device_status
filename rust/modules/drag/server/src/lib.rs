@@ -80,7 +80,7 @@ impl IPlugin for FusionDragServer {
         call_debug_enter!("FusionDragServer::start");
         match DragData::deserialize(data) {
             Ok(drag_data) => {
-                info!(LOG_LABEL, "in FusionDragServer::start(): call start_drag()");
+                info!(LOG_LABEL, "In FusionDragServer::start(): call start_drag()");
                 info!(LOG_LABEL, "{}", drag_data);
                 match 0u32.serialize(reply) {
                     Ok(_) => {
@@ -93,7 +93,7 @@ impl IPlugin for FusionDragServer {
                 }
             }
             Err(_) => {
-                error!(LOG_LABEL, "in FusionDragServer::start(): DragData::deserialize() failed");
+                error!(LOG_LABEL, "In FusionDragServer::start(): DragData::deserialize() failed");
                 Err(FusionErrorCode::Fail)
             }
         }
