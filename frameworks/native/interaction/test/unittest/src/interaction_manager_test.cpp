@@ -56,10 +56,10 @@ constexpr int32_t DRAG_NUM { 1 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 constexpr int32_t WINDOW_ID { -1 };
-constexpr int32_t HOT_AREA_COOR { 300 };
-constexpr int32_t HOT_AREA_MAX_X { 2200 };
-constexpr int32_t HOT_AREA_MAX_Y { 1300 };
-constexpr int32_t HOT_AREA_STEP { 400 };
+constexpr int32_t HOT_AREA_COOR { 250 };
+constexpr int32_t HOT_AREA_MAX_X { 2300 };
+constexpr int32_t HOT_AREA_MAX_Y { 1350 };
+constexpr int32_t HOT_AREA_STEP { 200 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
@@ -1331,9 +1331,17 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
     int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 /**
@@ -1347,7 +1355,11 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
     CALL_DEBUG_ENTER;
     auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
     int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_COOR }, { HOT_AREA_COOR - HOT_AREA_STEP, HOT_AREA_COOR },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_COOR }, { HOT_AREA_COOR, HOT_AREA_COOR - HOT_AREA_STEP },
@@ -1358,7 +1370,11 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_TOUCH_DOWN_MS));
     ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 } // namespace DeviceStatus
 } // namespace Msdp
