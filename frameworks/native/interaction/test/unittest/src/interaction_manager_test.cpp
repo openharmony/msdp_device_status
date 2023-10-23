@@ -29,7 +29,6 @@
 #include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
-#include "drag_manager.h"
 #include "interaction_manager.h"
 
 namespace OHOS {
@@ -64,7 +63,6 @@ constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY { "Unified data key" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
-DragManager g_dragManager;
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
@@ -1279,83 +1277,38 @@ HWTEST_F(InteractionManagerTest, GetDragData_Failed, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, GetDragStateError, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    DragState dragState = DragState::ERROR;
-    g_dragManager.SetDragState(dragState);
-    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
-    FI_HILOGD("dragState:%{public}d", dragState);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragState, DragState::ERROR);
-}
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
 
-/**
- * @tc.name: InteractionManagerTest_GetDragState
- * @tc.desc: Get the dragState from interface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, GetDragStateStart, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragState dragState = DragState::START;
-    g_dragManager.SetDragState(dragState);
-    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    DragState dragState;
+    ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::START);
-}
 
-/**
- * @tc.name: InteractionManagerTest_GetDragState
- * @tc.desc: Get the dragState from interface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, GetDragStateStop, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragState dragState = DragState::STOP;
-    g_dragManager.SetDragState(dragState);
-    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+    ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::STOP);
-}
-
-/**
- * @tc.name: InteractionManagerTest_GetDragState
- * @tc.desc: Get the dragState from interface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, GetDragStateCancel, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragState dragState = DragState::CANCEL;
-    g_dragManager.SetDragState(dragState);
-    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
-    FI_HILOGD("dragState:%{public}d", dragState);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragState, DragState::CANCEL);
-}
-
-/**
- * @tc.name: InteractionManagerTest_GetDragState
- * @tc.desc: Get the dragState from interface
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, GetDragStateMotionDragging, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DragState dragState = DragState::MOTION_DRAGGING;
-    g_dragManager.SetDragState(dragState);
-    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
-    FI_HILOGD("dragState:%{public}d", dragState);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragState, DragState::MOTION_DRAGGING);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
