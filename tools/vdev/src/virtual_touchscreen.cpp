@@ -137,7 +137,7 @@ int32_t VirtualTouchScreen::UpButton(int32_t slot)
 
     bool lastTouchUp = std::none_of(slots_.cbegin(), slots_.cend(), [](const auto &slot) { return slot.active; });
     if (lastTouchUp) {
-        FI_HILOGD("Last touch up, send button touch up event.");
+        FI_HILOGD("Last touch up, send button touch up event");
         SendEvent(EV_KEY, BTN_TOUCH, UP_VALUE);
         SendEvent(EV_SYN, SYN_MT_REPORT, SYNC_VALUE);
         SendEvent(EV_SYN, SYN_REPORT, SYNC_VALUE);

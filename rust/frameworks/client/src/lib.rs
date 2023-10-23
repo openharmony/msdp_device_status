@@ -46,7 +46,7 @@ unsafe extern "C" fn fusion_alloc_socket_fd(program_name: *const c_char, module_
     let param = match AllocSocketPairParam::from_c(program_name, module_type) {
         Ok(param) => { param }
         Err(err) => {
-            error!(LOG_LABEL, "Fail parsing AllocSocketPairParam");
+            error!(LOG_LABEL, "Failed parsing AllocSocketPairParam");
             return i32::from(err);
         }
     };
@@ -116,7 +116,7 @@ unsafe extern "C" fn fusion_start_coordination(user_data: i32,
     let remote_network_id: String = match CStr::from_ptr(remote_network_id).to_str() {
         Ok(id) => { id.to_string() }
         Err(_) => {
-            error!(LOG_LABEL, "Invalid network id");
+            error!(LOG_LABEL, "Invalid network_id");
             return -1;
         }
     };
@@ -144,7 +144,7 @@ unsafe extern "C" fn fusion_get_coordination_state(user_data: i32, device_id: *c
     let device_id: String = match CStr::from_ptr(device_id).to_str() {
         Ok(id) => { id.to_string() }
         Err(_) => {
-            error!(LOG_LABEL, "Invalid device id");
+            error!(LOG_LABEL, "Invalid device_id");
             return -1;
         }
     };

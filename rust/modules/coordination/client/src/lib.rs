@@ -146,7 +146,7 @@ impl FusionCoordinationClient {
                         Ok(x.reply)
                     }
                     Err(_) => {
-                        error!(LOG_LABEL, "Fail to deserialize DefaultReply");
+                        error!(LOG_LABEL, "Failed to deserialize DefaultReply");
                         Err(FusionErrorCode::Fail)
                     }
                 }

@@ -1123,7 +1123,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
     CALL_DEBUG_ENTER;
     if (g_drawingInfo.filterInfo.empty()) {
-        FI_HILOGD("FilterInfo is empty.");
+        FI_HILOGD("FilterInfo is empty");
         return false;
     }
     JsonInfoParser filterParser;
@@ -1150,7 +1150,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         return false;
     }
     if (g_drawingInfo.extraInfo.empty()) {
-        FI_HILOGD("ExtraInfo is empty.");
+        FI_HILOGD("ExtraInfo is empty");
         return false;
     }
     JsonInfoParser extraInfoParser;

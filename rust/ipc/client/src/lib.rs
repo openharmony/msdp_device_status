@@ -71,7 +71,7 @@ impl FusionIpcClient {
                 Ok(())
             }
             Err(_) => {
-                error!(LOG_LABEL, "Fail to serialize interface token");
+                error!(LOG_LABEL, "Failed to serialize interface token");
                 Err(FusionErrorCode::Fail)
             }
         }
