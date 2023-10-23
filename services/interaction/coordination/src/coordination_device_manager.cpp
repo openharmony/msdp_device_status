@@ -277,7 +277,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
 {
     CALL_INFO_TRACE;
     if (dhid.empty()) {
-        FI_HILOGD("The current networkId is an empty string");
+        FI_HILOGD("The current network id is an empty string");
         return {};
     }
     for (const auto &[id, dev] : devices_) {
@@ -286,7 +286,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(const std::string &dhi
             return dev->GetNetworkId();
         }
     }
-    FI_HILOGD("The current networkId is an empty string");
+    FI_HILOGD("The current network id is an empty string");
     return {};
 }
 

@@ -196,7 +196,7 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     if (networkId.empty()) {
-        FI_HILOGE("NetworkId is empty");
+        FI_HILOGE("Transfer network id is empty");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);

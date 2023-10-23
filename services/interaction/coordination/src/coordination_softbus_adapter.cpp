@@ -167,7 +167,7 @@ int32_t CoordinationSoftbusAdapter::Init()
     };
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty()) {
-        FI_HILOGE("Local networkid is empty");
+        FI_HILOGE("Local network id is empty");
         return RET_ERR;
     }
     std::string sessionName = SESSION_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
