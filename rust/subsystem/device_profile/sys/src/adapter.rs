@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-//! TODO: add documentation.
+//! rust adapter sys
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
 use std::ffi::{ c_char, CStr, CString };
-use std::rc::Rc;
+use std::sync::Arc;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
+use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult, err_log };
+
 use crate::binding::{
     CICrossStateListener,
     CIStringVector,
@@ -41,23 +42,34 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 #[repr(C)]
 struct CrossStateListener {
     interface: CICrossStateListener,
-    callback: Rc<dyn Fn(&str, bool)>,
+    callback: Arc<dyn Fn(&str, bool)>,
 }
 
 impl CrossStateListener {
+    extern "C" fn from_interface(listener: *mut CICrossStateListener) -> *mut Self
+    {
+        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
+        // 基于C17标准
+        listener as *mut Self
+    }
+
     extern "C" fn clone(listener: *mut CICrossStateListener) -> *mut CICrossStateListener
     {
         call_debug_enter!("CrossStateListener::clone");
-        let listener_ptr = listener as *mut Self;
+        let listener_ptr = CrossStateListener::from_interface(listener);
+        if listener_ptr.is_null() {
+            error!(LOG_LABEL, "listener_ptr is null");
+        }
         debug_assert!(!listener_ptr.is_null());
-
         let listener_box = Box::new(Self {
             interface: CICrossStateListener {
                 clone: Some(Self::clone),
                 destruct: Some(Self::destruct),
                 on_update: Some(Self::on_update),
             },
-            callback: unsafe { (*listener_ptr).callback.clone() },
+            callback:
+            // SAFETY: no `None` here, cause `listener_ptr` is valid.
+            unsafe { (*listener_ptr).callback.clone() },
         });
         Box::into_raw(listener_box) as *mut CICrossStateListener
     }
@@ -65,17 +77,24 @@ impl CrossStateListener {
     extern "C" fn destruct(listener: *mut CICrossStateListener)
     {
         call_debug_enter!("CrossStateListener::destruct");
-        let listener_ptr = listener as *mut Self;
+        let listener_ptr = CrossStateListener::from_interface(listener);
+        if listener_ptr.is_null() {
+            error!(LOG_LABEL, "listener_ptr is null");
+        }
         debug_assert!(!listener_ptr.is_null());
+        // SAFETY: no `None` here, cause `listener_ptr` is valid.
         unsafe { drop(Box::from_raw(listener_ptr)) };
     }
 
     extern "C" fn on_update(listener: *mut CICrossStateListener, device_id: *const c_char, state: i32)
     {
         call_debug_enter!("CrossStateListener::destruct");
-        let listener_ptr = listener as *mut Self;
-        debug_assert!(!listener_ptr.is_null());
+        let listener_ptr = CrossStateListener::from_interface(listener);
+        if listener_ptr.is_null() {
+            error!(LOG_LABEL, "listener_ptr is null");
+        }
         debug_assert!(!device_id.is_null());
+        // SAFETY: no `None` here, cause `listener_ptr` is valid.
         unsafe {
             if let Ok(id) = CStr::from_ptr(device_id).to_str() {
                 ((*listener_ptr).callback)(id, state != 0);
@@ -86,10 +105,10 @@ impl CrossStateListener {
     }
 }
 
-impl<F> From<Rc<F>> for CrossStateListener
+impl<F> From<Arc<F>> for CrossStateListener
 where
     F: Fn(&str, bool) + 'static {
-    fn from(value: Rc<F>) -> Self
+    fn from(value: Arc<F>) -> Self
     {
         Self {
             interface: CICrossStateListener {
@@ -109,48 +128,71 @@ struct StringVector {
 }
 
 impl StringVector {
-    extern "C" fn clone(ss: *mut CIStringVector) -> *mut CIStringVector
+    extern "C" fn from_interface(strings: *mut CIStringVector) -> *mut Self
     {
-        let ss_ptr = ss as *mut Self;
-        debug_assert!(!ss_ptr.is_null());
+        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
+        // 基于C17标准
+        strings as *mut Self
+    }
 
-        let ss_box = Box::new(Self {
+    extern "C" fn clone(strings: *mut CIStringVector) -> *mut CIStringVector
+    {
+        let strings_ptr = StringVector::from_interface(strings);
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+        }
+        debug_assert!(!strings_ptr.is_null());
+        let strings_box = Box::new(Self {
             interface: CIStringVector {
                 clone: Some(Self::clone),
                 destruct: Some(Self::destruct),
                 at: Some(Self::at),
                 size: Some(Self::size),
             },
-            data: unsafe { (*ss_ptr).data.clone() },
+            data:
+                // SAFETY: no `None` here, cause `strings_ptr` is valid.
+                unsafe { (*strings_ptr).data.clone() },
         });
-        Box::into_raw(ss_box) as *mut CIStringVector
+        Box::into_raw(strings_box) as *mut CIStringVector
     }
 
-    extern "C" fn destruct(ss: *mut CIStringVector)
+    extern "C" fn destruct(strings: *mut CIStringVector)
     {
-        let ss_ptr = ss as *mut Self;
-        debug_assert!(!ss_ptr.is_null());
-        unsafe { drop(Box::from_raw(ss_ptr)) };
+        let strings_ptr = StringVector::from_interface(strings);
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+        }
+        debug_assert!(!strings_ptr.is_null());
+        // SAFETY: no `None` here, cause `strings_ptr` is valid.
+        unsafe { drop(Box::from_raw(strings_ptr)) };
     }
 
-    extern "C" fn at(ss: *mut CIStringVector, index: usize) -> *const c_char
+    extern "C" fn at(strings: *mut CIStringVector, index: usize) -> *const c_char
     {
-        let ss_ptr = ss as *mut Self;
-        debug_assert!(!ss_ptr.is_null());
+        let strings_ptr = StringVector::from_interface(strings);
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+        }
+        debug_assert!(!strings_ptr.is_null());
+        // SAFETY: no `None` here, cause `strings_ptr` is valid.
         unsafe {
-            if index < (*ss_ptr).data.len() {
-                (*ss_ptr).data[index].as_ptr() as *const c_char
+            if index < (*strings_ptr).data.len() {
+                (*strings_ptr).data[index].as_ptr() as *const c_char
             } else {
                 std::ptr::null_mut()
             }
         }
     }
 
-    extern "C" fn size(ss: *mut CIStringVector) -> usize
+    extern "C" fn size(strings: *mut CIStringVector) -> usize
     {
-        let ss_ptr = ss as *mut Self;
-        debug_assert!(!ss_ptr.is_null());
-        unsafe { (*ss_ptr).data.len() }
+        let strings_ptr = StringVector::from_interface(strings);
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+        }
+        debug_assert!(!strings_ptr.is_null());
+        // SAFETY: no `None` here, cause `strings_ptr` is valid.
+        unsafe { (*strings_ptr).data.len() }
     }
 }
 
@@ -169,85 +211,129 @@ impl From<&[String]> for StringVector {
     }
 }
 
-/// TODO: add documentation.
+/// Implementation of device profile adapter.
 #[derive(Default)]
 pub struct DeviceProfileAdapter {
-    dummy: i32,
+    dummy: i32
 }
 
 impl DeviceProfileAdapter {
-    /// TODO: add documentation.
-    pub fn update_cross_switch_state(&self, state: bool) -> FusionResult<i32>
+    fn check_return_code(&self, ret: i32) -> FusionResult<()>
     {
-        call_debug_enter!("DeviceProfileAdapter::update_cross_switch_state");
-        let ret = unsafe { UpdateCrossSwitchState(state as i32) };
         if ret != 0 {
-            error!(LOG_LABEL, "UpdateCrossSwitchState fail");
             Err(FusionErrorCode::Fail)
         } else {
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// TODO: add documentation.
-    pub fn sync_cross_switch_state(&self, state: bool, device_ids: &[String]) -> FusionResult<i32>
+    /// Update the cross switch state with a boolean value.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `state` - A boolean value indicating the new cross switch state. `true` indicates the switch is on;
+    /// `false` indicates the switch is off.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `FusionResult<()>` indicating whether the operation is successful. If the update succeeds,
+    /// it returns `Ok(())`. If the update fails, it returns the corresponding error information.
+    pub fn update_cross_switch_state(&self, state: bool) -> FusionResult<()>
+    {
+        call_debug_enter!("DeviceProfileAdapter::update_cross_switch_state");
+        // SAFETY: no `None` here, cause `state` is valid.
+        let ret = unsafe { UpdateCrossSwitchState(state as i32) };
+        Ok(err_log!(self.check_return_code(ret), "UpdateCrossSwitchState"))
+    }
+
+    /// Synchronize the cross switch state between multiple devices.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `state` - The new cross switch state. `true` for on, `false` for off.
+    /// * `device_ids` - An array of device ID strings representing the target devices to synchronize the state.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `FusionResult<()>` indicating whether the operation is successful. If the synchronization succeeds,
+    /// it returns `Ok(())`. If the synchronization fails, it returns the corresponding error information.
+    pub fn sync_cross_switch_state(&self, state: bool, device_ids: &[String]) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::sync_cross_switch_state");
         let mut device_ids = StringVector::from(device_ids);
+        // SAFETY: no `None` here, cause `state` and `device_ids_ptr` is valid.
         let ret = unsafe {
             let device_ids_ptr: *mut StringVector = &mut device_ids;
             SyncCrossSwitchState(state as i32, device_ids_ptr as *mut CIStringVector)
         };
-        if ret != 0 {
-            error!(LOG_LABEL, "SyncCrossSwitchState fail");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(0)
-        }
+        Ok(err_log!(self.check_return_code(ret), "SyncCrossSwitchState"))
     }
 
-    /// TODO: add documentation.
-    pub fn get_cross_switch_state(&self, device_id: &str) -> FusionResult<i32>
+    /// Get the cross switch state of a specific device.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `device_id` - The device ID string representing the target device to get the cross switch state from.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `FusionResult<()>` indicating whether the operation is successful. If the getting succeeds,
+    /// it returns `Ok(())`. If the getting fails, it returns the corresponding error information.
+    pub fn get_cross_switch_state(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::get_cross_switch_state");
+        // SAFETY: no `None` here, cause `device_id` is valid.
         let ret = unsafe { GetCrossSwitchState(device_id.as_ptr()) };
-        if ret == 0 {
-            error!(LOG_LABEL, "GetCrossSwitchState failed");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(0)
-        }
+        Ok(err_log!(self.check_return_code(ret), "GetCrossSwitchState"))
     }
 
-    /// TODO: add documentation.
-    pub fn register_cross_state_listener<F>(&self, device_id: &str, callback: F) -> FusionResult<i32>
+    /// Register callback for a specific device.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `device_id` - The device ID string representing the target device to register the listener for.
+    /// * `callback` - The callback function that will be invoked when the cross state changes. It takes two parameters:
+    ///                the device ID and a boolean indicating the new cross state.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `FusionResult<()>` indicating whether the operation is successful. If the registration succeeds,
+    /// it returns `Ok(())`. If the registration fails, it returns the corresponding error information.
+    /// 
+    /// # Safety
+    /// 
+    /// This function uses an `unsafe` block to invoke the underlying C/C++ function `RegisterCrossStateListener`.
+    /// Please ensure that the `device_id` parameter and the callback function are valid and do not cause 
+    /// memory access conflicts or other undefined behaviors.
+    pub fn register_cross_state_listener<F>(&self, device_id: &str, callback: F) -> FusionResult<()>
     where
         F: Fn(&str, bool) + 'static
     {
         call_debug_enter!("DeviceProfileAdapter::register_cross_state_listener");
-        let mut listener = CrossStateListener::from(Rc::new(callback));
+        let mut listener = CrossStateListener::from(Arc::new(callback));
+        // SAFETY: no `None` here, cause `device_id` and `listener_ptr` is valid.
         let ret = unsafe {
             let listener_ptr: *mut CrossStateListener = &mut listener;
             RegisterCrossStateListener(device_id.as_ptr(), listener_ptr as *mut CICrossStateListener)
         };
-        if ret != 0 {
-            error!(LOG_LABEL, "RegisterCrossStateListener fail");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(0)
-        }
+        Ok(err_log!(self.check_return_code(ret), "RegisterCrossStateListener"))
     }
 
-    /// TODO: add documentation.
-    pub fn unregister_cross_state_listener(&self, device_id: &str) -> FusionResult<i32>
+    /// Unregister callback for a specific device.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `device_id` - The device ID string representing the target device to unregister the listener from.
+    /// 
+    /// # Returns
+    /// 
+    /// Returns `FusionResult<()>` indicating whether the operation is successful. If the unregistration succeeds,
+    /// it returns `Ok(())`. If the unregistration fails, it returns the corresponding error information.
+    pub fn unregister_cross_state_listener(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::unregister_cross_state_listener");
+        // SAFETY: no `None` here, cause `device_id` is valid.
         let ret = unsafe { UnregisterCrossStateListener(device_id.as_ptr()) };
-        if ret != 0 {
-            error!(LOG_LABEL, "UnregisterCrossStateListener fail");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(0)
-        }
+        Ok(err_log!(self.check_return_code(ret), "UnregisterCrossStateListener"))
     }
 }

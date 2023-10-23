@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-//! TODO: add documentation.
+//! rust device profile sys
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
 use std::ffi::{ c_char, c_int, CString };
-use std::rc::Rc;
+use std::sync::Arc;
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
+
 use crate::binding::{
     CProfileChangeNotification,
     CIProfileEventCb,
@@ -38,10 +39,11 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
     tag: "DeviceProfile",
 };
 
-pub struct ServiceCharacteristicProfile {
+/// Represents a service characteristic profile.
+pub struct ServiceCharacteristicProfile;
 
-}
 
+/// Represents an event related to a profile.
 #[repr(u32)]
 #[derive(Copy, Clone)]
 pub enum ProfileEvent {
@@ -73,19 +75,18 @@ impl TryFrom<u32> for ProfileEvent {
     }
 }
 
+/// Represents information for subscribing to profile events.
 pub struct SubscribeInfo {
     profile_event: ProfileEvent,
     extra_info: String,
 }
 
-pub struct SyncOptions {
+/// Represents options for synchronizing a profile.
+pub struct SyncOptions;
+/// Represents the result of a profile synchronization operation.
+pub struct SyncResult;
 
-}
-
-pub struct SyncResult {
-
-}
-
+/// Represents types of changes that can occur to a profile.
 #[repr(i32)]
 #[derive(Copy, Clone)]
 pub enum ProfileChangeType {
@@ -95,18 +96,28 @@ pub enum ProfileChangeType {
     Deleted,
 }
 
+/// Represents an entry in a profile with key-value information and change type.
 pub struct ProfileEntry {
+    /// The key of the profile entry.
     pub key: String,
+    /// The value of the profile entry.
     pub value: String,
+    /// The change type of the profile entry.
     pub change_type: ProfileChangeType,
 }
 
+/// Represents a notification for profile changes, containing affected profile entries,
+/// device ID, and whether the change is local.
 pub struct ProfileChangeNotification {
+    /// The profile entries affected by the change.
     pub profile_entries: Vec<ProfileEntry>,
+    /// The ID of the device associated with the change.
     pub device_id: String,
+    /// Indicates whether the change is local to the current device.
     pub is_local: bool,
 }
 
+/// Represents a callback interface for profile events.
 pub trait IProfileEventCallback {
     fn on_sync_completed(&self, sync_results: &SyncResult);
     fn on_profile_changed(&self, change_notification: &ProfileChangeNotification);
@@ -114,14 +125,21 @@ pub trait IProfileEventCallback {
 
 struct ProfileEventCallback {
     interface: CIProfileEventCb,
-    instance: Rc<dyn IProfileEventCallback>,
+    instance: Arc<dyn IProfileEventCallback>,
 }
 
 impl ProfileEventCallback {
+    extern "C" fn from_interface(cb: *mut CIProfileEventCb) -> *mut Self
+    {
+        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
+        // 基于C17标准
+        cb as *mut Self
+    }
+
     extern "C" fn clone(cb: *mut CIProfileEventCb) -> *mut CIProfileEventCb
     {
-        let callback_ptr = cb as *mut ProfileEventCallback;
-
+        let callback_ptr = ProfileEventCallback::from_interface(cb);
+        // SAFETY:  no `None` here, cause `callback_ptr` is valid
         match unsafe { callback_ptr.as_ref() } {
             Some(callback_ref) => {
                 let callback_box = Box::new(Self {
@@ -152,17 +170,17 @@ impl ProfileEventCallback {
 
     extern "C" fn on_sync_completed(cb: *mut CIProfileEventCb, device_id: *const c_char, sync_result: c_int)
     {
-
+        todo!()
     }
 
     extern "C" fn on_profile_changed(cb: *mut CIProfileEventCb, notification: *const CProfileChangeNotification)
     {
-
+        todo!()
     }
 }
 
-impl From<Rc<dyn IProfileEventCallback>> for ProfileEventCallback {
-    fn from(value: Rc<dyn IProfileEventCallback>) -> Self {
+impl From<Arc<dyn IProfileEventCallback>> for ProfileEventCallback {
+    fn from(value: Arc<dyn IProfileEventCallback>) -> Self {
         Self {
             interface: CIProfileEventCb {
                 clone: Some(Self::clone),
@@ -175,29 +193,37 @@ impl From<Rc<dyn IProfileEventCallback>> for ProfileEventCallback {
     }
 }
 
-/// TODO: add documentation.
-pub struct DeviceProfile {
-
-}
+/// Represents a device profile.
+pub struct DeviceProfile;
 
 impl DeviceProfile {
-    /// TODO: add documentation.
-    pub fn put_device_profile(profile: &ServiceCharacteristicProfile) -> FusionResult<i32>
+    /// Updates the device profile with the specified `ServiceCharacteristicProfile`.
+    pub fn put_device_profile(profile: &ServiceCharacteristicProfile) -> FusionResult<()>
     {
-        Err(FusionErrorCode::Fail)
+        todo!()
     }
 
-    /// TODO: add documentation.
+    /// Retrieves the device profile for the specified UDID and service ID.
     pub fn get_device_profile(udid: &str, service_id: &str,
-        profile: &ServiceCharacteristicProfile) -> FusionResult<i32>
+        profile: &ServiceCharacteristicProfile) -> FusionResult<()>
     {
-        Err(FusionErrorCode::Fail)
+        todo!()
     }
 
-    /// TODO: add documentation.
+    /// Subscribes to the specified profile events.
+    /// 
+    /// # Arguments
+    ///
+    /// * `subscribe_infos` - A slice of `SubscribeInfo` structures representing the events to subscribe to.
+    /// * `event_callback` - A reference to the `IProfileEventCallback` trait object for handling profile events.
+    /// * `failed_events` - A mutable vector to store any events that failed to subscribe.
+    ///
+    /// # Returns
+    ///
+    /// An empty `FusionResult` indicating success or an error if subscribing to events fails.
     pub fn subscribe_profile_events(subscribe_infos: &[SubscribeInfo],
-        event_callback: &Rc<dyn IProfileEventCallback>,
-        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<i32>
+        event_callback: &Arc<dyn IProfileEventCallback>,
+        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfile::subscribe_profile_events");
         let mut subscriptions = Vec::<CSubscribeInfo>::new();
@@ -218,6 +244,7 @@ impl DeviceProfile {
         let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
         let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
 
+        // SAFETY: no `None` here, cause `subscriptions_borrowed`, `event_cb_ptr` and `failed_ptr` is valid.
         let ret = unsafe {
             SubscribeProfileEvents(&subscriptions_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
@@ -230,6 +257,7 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
+            // SAFETY: no `None` here, cause `failed_ptr` is valid
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);
@@ -240,14 +268,24 @@ impl DeviceProfile {
             error!(LOG_LABEL, "SubscribeProfileEvents fail");
             Err(FusionErrorCode::Fail)
         } else {
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// TODO: add documentation.
+    /// Unsubscribes from the specified profile events.
+    /// 
+    /// # Arguments
+    ///
+    /// * `profile_events` - A slice of `ProfileEvent` enumerations representing the events to unsubscribe from.
+    /// * `event_callback` - A reference to the `IProfileEventCallback` trait object for handling profile events.
+    /// * `failed_events` - A mutable vector to store any events that failed to unsubscribe.
+    ///
+    /// # Returns
+    ///
+    /// An empty `FusionResult` indicating success or an error if unsubscribing from events fails.
     pub fn unsubscribe_profile_events(profile_events: &[ProfileEvent],
-        event_callback: &Rc<dyn IProfileEventCallback>,
-        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<i32>
+        event_callback: &Arc<dyn IProfileEventCallback>,
+        failed_events: &mut Vec<ProfileEvent>) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfile::unsubscribe_profile_events");
         let mut profileevents = Vec::<u32>::new();
@@ -265,6 +303,7 @@ impl DeviceProfile {
         let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
         let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
 
+        // SAFETY:  no `None` here, cause `profile_events_borrowed`, `event_cb_ptr` and `failed_ptr` is valid
         let ret = unsafe {
             UnsubscribeProfileEvents(&profile_events_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
@@ -277,6 +316,7 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
+            // SAFETY:  no `None` here, cause `failed_ptr`is valid
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);
@@ -288,14 +328,14 @@ impl DeviceProfile {
             error!(LOG_LABEL, "UnsubscribeProfileEvents fail");
             Err(FusionErrorCode::Fail)
         } else {
-            Ok(0)
+            Ok(())
         }
     }
 
-    /// TODO: add documentation.
+    /// Synchronizes the device profile with the specified options.
     pub fn sync_device_profile(sync_options: &SyncOptions,
-                               sync_callback: &Rc<dyn IProfileEventCallback>) -> FusionResult<i32>
+                               sync_callback: &Arc<dyn IProfileEventCallback>) -> FusionResult<()>
     {
-        Err(FusionErrorCode::Fail)
+        todo!()
     }
 }

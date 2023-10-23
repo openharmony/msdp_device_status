@@ -137,3 +137,17 @@ macro_rules! call_info_trace {
         );
     };
 }
+
+/// Output the "C++ function failed" log when the called C++ function returns an error.
+#[macro_export]
+macro_rules! err_log {
+    ($expr:expr, $log:expr) => {
+        match $expr {
+            Ok(val) => val,
+            Err(err) => {
+                error!(LOG_LABEL, "{} failed", $log);
+                return Err(err);
+            }
+        }
+    };
+}
