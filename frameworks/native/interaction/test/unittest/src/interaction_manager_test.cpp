@@ -1332,6 +1332,8 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
     auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
     int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
     ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -1356,20 +1358,6 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_TOUCH_DOWN_MS));
     ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
-    ASSERT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: RemoveHotAreaListener
- * @tc.desc: Remove hot area listener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionManagerTest, RemoveHotAreaListener, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
-    int32_t ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
     ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
