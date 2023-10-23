@@ -67,6 +67,7 @@ public:
     int32_t GetDragState(DragState &dragState);
     int32_t AllocSocketPair(int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
+    int32_t AddHotAreaListener();
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

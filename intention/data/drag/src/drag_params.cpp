@@ -18,45 +18,49 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragParams" };
+} // namespace
+
 StartDragParam::StartDragParam(const DragData &dragData) : dragData(dragData)
 {}
 
 bool StartDragParam::Marshalling(Parcel &data) const
 {
-    return {
-        WRITEINT32(data, dragData.shadowInfo.x) &&
-        WRITEINT32(data, dragData.shadowInfo.y) &&
-        WRITEUINT8VECTOR(data, dragData.buffer) &&
-        WRITESTRING(data, dragData.udKey) &&
-        WRITESTRING(data, dragData.filterInfo) &&
-        WRITESTRING(data, dragData.extraInfo) &&
-        WRITEINT32(data, dragData.sourceType) &&
-        WRITEINT32(data, dragData.dragNum) &&
-        WRITEINT32(data, dragData.pointerId) &&
-        WRITEINT32(data, dragData.displayX) &&
-        WRITEINT32(data, dragData.displayY) &&
-        WRITEINT32(data, dragData.displayId) &&
-        WRITEBOOL(data, dragData.hasCanceledAnimation)
-    };
+    return (
+        data.WriteInt32(dragData.shadowInfo.x) &&
+        data.WriteInt32(dragData.shadowInfo.y) &&
+        data.WriteUInt8Vector(dragData.buffer) &&
+        data.WriteString(dragData.udKey) &&
+        data.WriteString(dragData.filterInfo) &&
+        data.WriteString(dragData.extraInfo) &&
+        data.WriteInt32(dragData.sourceType) &&
+        data.WriteInt32(dragData.dragNum) &&
+        data.WriteInt32(dragData.pointerId) &&
+        data.WriteInt32(dragData.displayX) &&
+        data.WriteInt32(dragData.displayY) &&
+        data.WriteInt32(dragData.displayId) &&
+        data.WriteBool(dragData.hasCanceledAnimation)
+    );
 }
 
 bool StartDragParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, dragData.shadowInfo.x) &&
-        READINT32(data, dragData.shadowInfo.y) &&
-        READUINT8VECTOR(data, dragData.buffer) &&
-        READSTRING(data, dragData.udKey) &&
-        READSTRING(data, dragData.filterInfo) &&
-        READSTRING(data, dragData.extraInfo) &&
-        READINT32(data, dragData.sourceType) &&
-        READINT32(data, dragData.dragNum) &&
-        READINT32(data, dragData.pointerId) &&
-        READINT32(data, dragData.displayX) &&
-        READINT32(data, dragData.displayY) &&
-        READINT32(data, dragData.displayId) &&
-        READBOOL(data, dragData.hasCanceledAnimation)
-    };
+    return (
+        data.ReadInt32(dragData.shadowInfo.x) &&
+        data.ReadInt32(dragData.shadowInfo.y) &&
+        data.ReadUInt8Vector(&dragData.buffer) &&
+        data.ReadString(dragData.udKey) &&
+        data.ReadString(dragData.filterInfo) &&
+        data.ReadString(dragData.extraInfo) &&
+        data.ReadInt32(dragData.sourceType) &&
+        data.ReadInt32(dragData.dragNum) &&
+        data.ReadInt32(dragData.pointerId) &&
+        data.ReadInt32(dragData.displayX) &&
+        data.ReadInt32(dragData.displayY) &&
+        data.ReadInt32(dragData.displayId) &&
+        data.ReadBool(dragData.hasCanceledAnimation)
+    );
 }
 
 StopDragParam::StopDragParam(int32_t result, bool hasCustomAnimation)
@@ -65,22 +69,23 @@ StopDragParam::StopDragParam(int32_t result, bool hasCustomAnimation)
 
 bool StopDragParam::Marshalling(Parcel &data) const
 {
-    if (result < DragResult::DRAG_SUCCESS || result > DragResult::DRAG_EXCEPTION) {
+    if (static_cast<DragResult>(result) < DragResult::DRAG_SUCCESS ||
+        static_cast<DragResult>(result) > DragResult::DRAG_EXCEPTION) {
         FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
         return false;
     }
-    return {
-        WRITEINT32(data, static_cast<int32_t>(result));
-        WRITEBOOL(data, hasCustomAnimation);
-    };
+    return (
+        data.WriteInt32(static_cast<int32_t>(result)) &&
+        data.WriteBool(hasCustomAnimation)
+    );
 }
 
 bool StopDragParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, result) &&
-        READBOOL(data, hasCustomAnimation)
-    };
+    return (
+        data.ReadInt32(result) &&
+        data.ReadBool(hasCustomAnimation)
+    );
 }
 
 DragStyleParam::DragStyleParam(int32_t style) : mouseStyle(style)
@@ -89,12 +94,12 @@ DragStyleParam::DragStyleParam(int32_t style) : mouseStyle(style)
 
 bool DragStyleParam::Marshalling(Parcel &data) const
 {
-    return WRITEINT32(data, static_cast<int32_t>(mouseStyle));
+    return data.WriteInt32(static_cast<int32_t>(mouseStyle));
 }
 
 bool DragStyleParam::Unmarshalling(Parcel &data)
 {
-    return READINT32(data, mouseStyle);
+    return data.ReadInt32(mouseStyle);
 }
 
 bool DragTargetPidParam::Marshalling(Parcel &data) const
@@ -104,7 +109,11 @@ bool DragTargetPidParam::Marshalling(Parcel &data) const
 
 bool DragTargetPidParam::Unmarshalling(Parcel &data)
 {
-    return READINT32(data, pid);
+    return data.ReadInt32(pid);
+}
+
+GetUdKeyParam::GetUdKeyParam(std::string &udKey) : udKey(udKey)
+{
 }
 
 bool GetUdKeyParam::Marshalling(Parcel &data) const
@@ -114,7 +123,7 @@ bool GetUdKeyParam::Marshalling(Parcel &data) const
 
 bool GetUdKeyParam::Unmarshalling(Parcel &data)
 {
-    return READSTRING(data, udKey);
+    return data.ReadString(udKey);
 }
 
 bool AddDragListenerParam::Marshalling(Parcel &data) const
@@ -142,12 +151,12 @@ SetDragWindowVisibleParam::SetDragWindowVisibleParam(bool visible) : visible(vis
 
 bool SetDragWindowVisibleParam::Marshalling(Parcel &data) const
 {
-    return WRITEBOOL(data, visible);
+    return data.WriteBool(visible);
 }
 
 bool SetDragWindowVisibleParam::Unmarshalling(Parcel &data)
 {
-    return READBOOL(data, visible);
+    return data.ReadBool(visible);
 }
 
 GetShadowOffsetParam::GetShadowOffsetParam(int32_t offsetX, int32_t offsetY, int32_t width, int32_t height)
@@ -164,12 +173,12 @@ bool GetShadowOffsetParam::Marshalling(Parcel &data) const
 
 bool GetShadowOffsetParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, offsetX) &&
-        READINT32(data, offsetY) &&
-        READINT32(data, width) &&
-        READINT32(data, height)
-    };
+    return (
+        data.ReadInt32(offsetX) &&
+        data.ReadInt32(offsetY) &&
+        data.ReadInt32(width) &&
+        data.ReadInt32(height)
+    );
 }
 
 UpdateShadowPicParam::UpdateShadowPicParam(ShadowInfo shadowInfo) : shadowInfo(shadowInfo)
@@ -181,18 +190,18 @@ bool UpdateShadowPicParam::Marshalling(Parcel &data) const
         FI_HILOGE("Failed to marshalling pixelMap");
         return false;
     }
-    return {
-        WRITEINT32(data, shadowInfo.x);
-        WRITEINT32(data, shadowInfo.y);
-    };
+    return (
+        data.WriteInt32(shadowInfo.x) &&
+        data.WriteInt32(shadowInfo.y)
+    );
 }
 
 bool UpdateShadowPicParam::Unmarshalling(Parcel &data)
 {
-    return {
-        READINT32(data, shadowInfo.x) &&
-        READINT32(data, shadowInfo.y)
-    };
+    return (
+        data.ReadInt32(shadowInfo.x) &&
+        data.ReadInt32(shadowInfo.y)
+    );
 }
 
 bool DefaultDragReply::Marshalling(Parcel &data) const

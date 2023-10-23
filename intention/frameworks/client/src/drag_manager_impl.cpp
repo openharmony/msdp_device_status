@@ -16,8 +16,6 @@
 #include "drag_manager_impl.h"
 
 #include "drag_data.h"
-#include "intention_client.h"
-#include "intention_define.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -29,12 +27,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragMan
 int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 {
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+        FI_HILOGE("Style is invalid");
         return RET_ERR;
     }
 
     DragStyleParam param { static_cast<int32_t>(style) };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().SetParam(Intention::DRAG, DragParam::DRAG_STYLE, param, reply);
+    return IntentionClient::GetInstance().SetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::DRAG_STYLE, param, reply);
 }
 
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
@@ -62,28 +62,30 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
 
     StartDragParam param { dragData };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().Start(Intention::DRAG, param, reply);
+    return IntentionClient::GetInstance().Start(static_cast<uint32_t>(Intention::DRAG), param, reply);
 }
 
 int32_t DragManagerImpl::StopDrag(DragResult result, bool hasCustomAnimation)
 {
     StopDragParam param { static_cast<int32_t>(result), hasCustomAnimation };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().Stop(Intention::DRAG, param, reply);
+    return IntentionClient::GetInstance().Stop(static_cast<uint32_t>(Intention::DRAG), param, reply);
 }
 
 int32_t DragManagerImpl::GetDragTargetPid()
 {
     DragTargetPidParam param;
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().GetParam(Intention::DRAG, DragParam::PID, data, reply);
+    return IntentionClient::GetInstance().GetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::PID, param, reply);
 }
 
 int32_t DragManagerImpl::GetUdKey(std::string &udKey)
 {
     GetUdKeyParam param { udKey };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().GetParam(Intention::DRAG, DragParam::UDKEY, param, reply);
+    return IntentionClient::GetInstance().GetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::UDKEY, param, reply);
 }
 
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
@@ -93,7 +95,8 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
     if (!hasRegistered_) {
         AddDragListenerParam param;
         DefaultDragReply reply;
-        int32_t ret = IntentionClient::GetInstance().AddWatch(Intention::DRAG, DragParam::LISTENER, param, reply);
+        int32_t ret = IntentionClient::GetInstance().AddWatch(static_cast<uint32_t>(Intention::DRAG),
+            DragParam::LISTENER, param, reply);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register");
             return ret;
@@ -128,7 +131,8 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         hasRegistered_ = false;
         RemoveDragListenerParam param;
         DefaultDragReply reply;
-        return IntentionClient::GetInstance().RemoveWatch(Intention::DRAG, DragParam::LISTENER, param, reply);
+        return IntentionClient::GetInstance().RemoveWatch(static_cast<uint32_t>(Intention::DRAG),
+            DragParam::LISTENER, param, reply);
     }
     return RET_OK;
 }
@@ -137,14 +141,16 @@ int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
 {
     SetDragWindowVisibleParam param { visible };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().SetParam(Intention::DRAG, DragParam::WINDOW_VISIBLE, param, reply);
+    return IntentionClient::GetInstance().SetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::WINDOW_VISIBLE, param, reply);
 }
 
 int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     GetShadowOffsetParam param { offsetX, offsetY, width, height };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().GetParam(Intention::DRAG, DragParam::SHADOW_OFFSET, param, reply);
+    return IntentionClient::GetInstance().GetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::SHADOW_OFFSET, param, reply);
 }
 
 int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -160,7 +166,8 @@ int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
 
     UpdateShadowPicParam param { shadowInfo };
     DefaultDragReply reply;
-    return IntentionClient::GetInstance().SetParam(Intention::DRAG, DragParam::SHADOW_PIC, param, reply);
+    return IntentionClient::GetInstance().SetParam(static_cast<uint32_t>(Intention::DRAG),
+        DragParam::SHADOW_PIC, param, reply);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

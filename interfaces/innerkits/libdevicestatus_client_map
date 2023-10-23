@@ -48,6 +48,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateShadowPic(OHOS::Msdp::DeviceStatus::ShadowInfo const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragData(OHOS::Msdp::DeviceStatus::DragData&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragState(OHOS::Msdp::DeviceStatus::DragState&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::AddHotAreaListener(std::__h::shared_ptr<OHOS::Msdp::IHotAreaListener>)";
         };
     local:
         *;

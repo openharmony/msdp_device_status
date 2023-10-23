@@ -14,17 +14,17 @@
 import("//base/msdp/device_status/device_status.gni")
 import("//build/ohos.gni")
 
-config("plugin_manager_config") {
+config("task_scheduler_config") {
   include_dirs = [
     "include",
     "${intention_root_path}/data/include",
   ]
 }
 
-ohos_source_set("plugin_manager") {
-  sources = [ "src/plugin_manager.cpp" ]
+ohos_source_set("task_scheduler") {
+  sources = [ "src/task_scheduler.cpp" ]
 
-  configs = [ ":plugin_manager_config" ]
+  configs = [ ":task_scheduler_config" ]
 
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",

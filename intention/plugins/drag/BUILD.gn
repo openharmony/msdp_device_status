@@ -14,61 +14,40 @@
 import("//build/ohos.gni")
 import("../../../device_status.gni")
 
-config("interaction_drag_public_config") {
+config("intention_drag_public_config") {
   include_dirs = [
     "include",
-    "${intention_service_path}/context/include",
+    "${intention_root_path}/data/drag/include",
+    "${device_status_root_path}/utils/ipc/include",
   ]
 }
 
-ohos_shared_library("interaction_drag") {
-  include_dirs = [
-    "include",
-    "${intention_interfaces_path}/innerkits/interaction/include",
-    "${intention_utils_path}/include",
-    "${intention_service_path}/context/include",
-    "${intention_service_path}/native/include",
-    "//third_party/cJSON",
-  ]
+ohos_shared_library("intention_drag") {
+  include_dirs = [ "include" ]
+
+  public_configs = [ ":intention_drag_public_config" ]
 
   sources = [
-    "src/drag_data_manager.cpp",
-    "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
+    "src/intention_drag.cpp",
     "src/state_change_notify.cpp",
   ]
-
-  defines = device_status_default_defines
-
-  public_configs = [ ":interaction_drag_public_config" ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
-    "${intention_root_path}/etc/drag_icon:device_status_drag_icon",
-    "${intention_root_path}/utils/ipc:devicestatus_ipc",
-    "${intention_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
-    "//third_party/libxml2:xml2",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_utils_path}:devicestatus_util",
+    "${intention_root_path}/data:drag_params",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "eventhandler:libeventhandler",
-    "graphic_2d:libcomposer",
-    "graphic_2d:librender_service_base",
-    "graphic_2d:window_animation",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
-    "init:libbegetutil",
-    "input:libmmi-client",
-    "ipc:ipc_single",
-    "udmf:udmf_client",
-    "window_manager:libdm",
-    "window_manager:libwm",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

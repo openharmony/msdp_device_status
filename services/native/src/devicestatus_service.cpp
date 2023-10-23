@@ -30,6 +30,7 @@
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
+#include "coordination_hotarea.h"
 #include "coordination_sm.h"
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
@@ -342,7 +343,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    FI_HILOGD("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    FI_HILOGD("eventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev {};
     ev.events = EPOLLIN;
@@ -931,8 +932,35 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     }
     return ret;
 }
+
+int32_t DeviceStatusService::OnAddHotAreaListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CoordinationHotArea::HotAreaInfo> event = new (std::nothrow) CoordinationHotArea::HotAreaInfo();
+    CHKPR(event, RET_ERR);
+    event->sess = sess;
+    event->msgId = MessageId::HOT_AREA_ADD_LISTENER;
+    HOT_AREA->AddHotAreaListener(event);
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
+int32_t DeviceStatusService::AddHotAreaListener()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnAddHotAreaListener, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add hot area listener, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

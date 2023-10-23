@@ -19,7 +19,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#include "intention_define.h"
+#include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {

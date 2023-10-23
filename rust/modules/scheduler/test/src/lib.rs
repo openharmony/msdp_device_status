@@ -102,9 +102,9 @@ impl EpollHandler {
 
         let ret = unsafe { libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC | libc::O_NONBLOCK) };
         if ret != 0 {
-            error!(LOG_LABEL, "in EpollHandler::new, libc::pipe2 fail:{:?}", @public(Error::last_os_error()));
+            error!(LOG_LABEL, "In EpollHandler::new, libc::pipe2 fail:{:?}", @public(Error::last_os_error()));
         }
-        debug!(LOG_LABEL, "in EpollHandler::new, fds:({},{})", @public(fds[0]), @public(fds[1]));
+        debug!(LOG_LABEL, "In EpollHandler::new, fds:({},{})", @public(fds[0]), @public(fds[1]));
         Self {
             inner: Mutex::new(EpollHandlerImpl {
                 fds,
@@ -132,7 +132,7 @@ impl EpollHandler {
         let guard = self.inner.lock().unwrap();
         let (_, ret) = self.var.wait_timeout(guard, dur).unwrap();
         if ret.timed_out() {
-            info!(LOG_LABEL, "in EpollHandler::wait, timeout");
+            info!(LOG_LABEL, "In EpollHandler::wait, timeout");
             false
         } else {
             true
@@ -166,7 +166,7 @@ fn test_add_epoll_handler()
     let data: i32 = 13574;
     epoll.signal(data);
     assert!(epoll.wait(Duration::from_millis(100)));
-    info!(LOG_LABEL, "in test_add_epoll_handler, data:{}", @public(epoll.data()));
+    info!(LOG_LABEL, "In test_add_epoll_handler, data:{}", @public(epoll.data()));
     assert_eq!(epoll.data(), data);
     assert!(handler.remove_epoll_handler(epoll).is_ok());
 }
@@ -218,7 +218,7 @@ fn test_post_perioric_task()
     }, None, Duration::from_millis(100), Some(10));
 
     std::thread::sleep(Duration::from_secs(1));
-    info!(LOG_LABEL, "in test_post_perioric_task, data:{}", @public(epoll.data()));
+    info!(LOG_LABEL, "In test_post_perioric_task, data:{}", @public(epoll.data()));
     assert!(epoll.data() >= 10);
     assert!(handler.remove_epoll_handler(epoll).is_ok());
 }
@@ -237,7 +237,7 @@ fn test_post_delayed_task()
     }, Duration::from_millis(10));
 
     assert!(epoll.wait(Duration::from_millis(100)));
-    info!(LOG_LABEL, "in test_post_delayed_task, data:{}", @public(epoll.data()));
+    info!(LOG_LABEL, "In test_post_delayed_task, data:{}", @public(epoll.data()));
     assert_eq!(epoll.data(), data);
     assert!(handler.remove_epoll_handler(epoll).is_ok());
 }

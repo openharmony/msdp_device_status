@@ -19,6 +19,7 @@
 #include <iremote_object.h>
 #include <system_ability.h>
 
+#include "devicestatus_delayed_sp_singleton.h"
 #include "i_context.h"
 #include "intention_stub.h"
 #include "plugin_manager.h"
@@ -32,15 +33,16 @@ class IntentionService final : public IContext,
                                public SystemAbility,
                                public IntentionStub {
     DECLARE_SYSTEM_ABILITY(IntentionService);
+    DECLARE_DELAYED_SP_SINGLETON(IntentionService);
 
 public:
     virtual void OnDump() override;
     virtual void OnStart() override;
     virtual void OnStop() override;
 
-    ITaskScheduler& GetTaskScheduler() const override;
-    ITimerManager& GetTimerManager() const override;
-    IPluginManager& GetPluginManager() const override;
+    ITaskScheduler& GetTaskScheduler() override;
+    ITimerManager& GetTimerManager() override;
+    IPluginManager& GetPluginManager() override;
 
 private:
     int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
@@ -59,17 +61,17 @@ private:
     PluginManager pluginMgr_;
 };
 
-ITaskScheduler& IntentionService::GetTaskScheduler() const
+ITaskScheduler& IntentionService::GetTaskScheduler()
 {
     return taskScheduler_;
 }
 
-ITimerManager& IntentionService::GetTimerManager() const
+ITimerManager& IntentionService::GetTimerManager()
 {
     return timerMgr_;
 }
 
-IPluginManager& IntentionService::GetPluginManager() const
+IPluginManager& IntentionService::GetPluginManager()
 {
     return pluginMgr_;
 }

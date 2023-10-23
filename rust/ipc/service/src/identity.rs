@@ -55,7 +55,7 @@ const ACTIONMASK: u32 = (1u32 << ACTIONBITS) - 1u32;
 
 pub fn compose_param_id(action: CommonAction, intention: Intention, param: u32) -> u32
 {
-    info!(LOG_LABEL, "in FusionIpcServiceIdentity::compose_param_id(): enter");
+    info!(LOG_LABEL, "In FusionIpcServiceIdentity::compose_param_id(): enter");
     ((action as u32 & ACTIONMASK) << ACTIONSHIFT) |
     ((intention as u32 & INTENTIONMASK) << INTENTIONSHIFT) |
     (param & PARAMMASK)
@@ -63,18 +63,18 @@ pub fn compose_param_id(action: CommonAction, intention: Intention, param: u32) 
 
 pub fn split_action(code: u32) -> FusionResult<CommonAction>
 {
-    info!(LOG_LABEL, "in FusionIpcServiceIdentity::split_action(): enter");
+    info!(LOG_LABEL, "In FusionIpcServiceIdentity::split_action(): enter");
     CommonAction::try_from((code >> ACTIONSHIFT) & ACTIONMASK)
 }
 
 pub fn split_intention(code: u32) -> FusionResult<Intention>
 {
-    info!(LOG_LABEL, "in FusionIpcServiceIdentity::split_intention(): enter");
+    info!(LOG_LABEL, "In FusionIpcServiceIdentity::split_intention(): enter");
     Intention::try_from((code >> INTENTIONSHIFT) & INTENTIONMASK)
 }
 
 pub fn split_param(code: u32) -> u32
 {
-    info!(LOG_LABEL, "in FusionIpcServiceIdentity::split_param(): enter");
+    info!(LOG_LABEL, "In FusionIpcServiceIdentity::split_param(): enter");
     code & PARAMMASK
 }

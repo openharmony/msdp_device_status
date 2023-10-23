@@ -53,6 +53,7 @@ public:
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t GetDragData(DragData &dragData);
     int32_t GetDragState(DragState &dragState);
+    int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
 private:
     void InitMsgHandler();

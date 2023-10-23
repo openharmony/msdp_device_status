@@ -15,6 +15,8 @@
 
 #include "plugin_manager.h"
 
+#include <dlfcn.h>
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -29,7 +31,7 @@ PluginManager::Plugin::Plugin(IContext *context, void *handle)
 PluginManager::Plugin::~Plugin()
 {
     if (instance_ != nullptr) {
-        auto destroy = static_cast<DestroyInstance>(dlsym(handle_, "DestroyInstance"));
+        auto destroy = reinterpret_cast<DestroyInstance>(dlsym(handle_, "DestroyInstance"));
         if (destroy != nullptr) {
             destroy(instance_);
         }
@@ -42,10 +44,10 @@ IPlugin* PluginManager::Plugin::GetInstance()
     if (instance_ != nullptr) {
         return instance_;
     }
-    auto func = static_cast<CreateInstance*>(dlsym(iter.second, "CreateInstance"));
+    auto func = reinterpret_cast<CreateInstance>(dlsym(handle_, "CreateInstance"));
     if (func == nullptr) {
         FI_HILOGE("dlsym msg:%{public}s", dlerror());
-        return RET_ERR;
+        return nullptr;
     }
     instance_ = func(context_);
     return instance_;
@@ -75,11 +77,11 @@ int32_t PluginManager::LoadLibrary(Intention intention)
 {
     std::string libPath;
 
-    switch intention {
-        case Intention::Drag: {
+    switch (intention) {
+        case Intention::DRAG: {
             libPath = "/system/lib/libintention_drag.z.so";
         }
-        case Intention::Cooperate: {
+        case Intention::COOPERATE: {
             libPath = "/system/lib/libintention_cooperate.z.so";
         }
         default: {

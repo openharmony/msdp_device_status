@@ -30,6 +30,14 @@ enum class CoordinationMessage {
     PARAMETER_ERROR = 401,
     COORDINATION_FAIL = 20900001
 };
+
+enum class HotAreaType {
+    AREA_LEFT = 0,
+    AREA_RIGHT = 1,
+    AREA_TOP = 2,
+    AREA_BOTTOM = 3,
+    AREA_NONE = 4
+};
 } // namespace Msdp
 } // namespace OHOS
 #endif // COORDINATION_MESSAGE_H

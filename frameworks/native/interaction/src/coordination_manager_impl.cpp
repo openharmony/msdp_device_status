@@ -281,6 +281,56 @@ int32_t CoordinationManagerImpl::OnCoordinationState(const StreamClient& client,
     OnCoordinationStateEvent(userData, state);
     return RET_OK;
 }
+
+int32_t CoordinationManagerImpl::AddHotAreaListener(HotAreaListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(listener, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &item : devHotAreaListener_) {
+        if (item == listener) {
+            FI_HILOGW("The listener already exists");
+            return RET_ERR;
+        }
+    }
+    if (!isHotAreaListener_) {
+        FI_HILOGI("Start monitoring");
+        int32_t ret = DeviceStatusClient::GetInstance().AddHotAreaListener();
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to add hot area listener, ret:%{public}d", ret);
+            return ret;
+        }
+        isHotAreaListener_ = true;
+    }
+    devHotAreaListener_.push_back(listener);
+    return RET_OK;
+}
+
+void CoordinationManagerImpl::OnDevHotAreaListener(int32_t displayX,
+    int32_t displayY, HotAreaType type, bool isEdge)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &item : devHotAreaListener_) {
+        item->OnHotAreaMessage(displayX, displayY, type, isEdge);
+    }
+}
+
+int32_t CoordinationManagerImpl::OnHotAreaListener(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t positionX = 0;
+    int32_t positionY = 0;
+    int32_t type = 0;
+    bool isEdge = false;
+    pkt >> positionX >> positionY >> type >> isEdge;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    OnDevHotAreaListener(positionX, positionY, HotAreaType(type), isEdge);
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

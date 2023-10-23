@@ -61,6 +61,8 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationMessage, &coordinationManagerImpl_)},
         {MessageId::COORDINATION_GET_STATE,
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
+        {MessageId::HOT_AREA_ADD_LISTENER,
+            MsgCallbackBind2(&CoordinationManagerImpl::OnHotAreaListener, &coordinationManagerImpl_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
@@ -276,6 +278,23 @@ int32_t InteractionManagerImpl::GetDragState(DragState &dragState)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetDragState(dragState);
+}
+
+int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
+    return coordinationManagerImpl_.AddHotAreaListener(listener);
+#else
+    FI_HILOGW("Coordination does not support");
+    (void)(listener);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 } // namespace DeviceStatus
 } // namespace Msdp
