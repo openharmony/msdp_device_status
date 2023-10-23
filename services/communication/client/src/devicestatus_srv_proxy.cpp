@@ -363,6 +363,34 @@ int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
     return ret;
 }
 
+int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE), data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragState failed");
+        return ret;
+    }
+
+    int32_t dragStateInt32 = static_cast<int32_t>(dragState);
+    READINT32(reply, dragStateInt32, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    return ret;
+}
+
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;

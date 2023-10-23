@@ -196,6 +196,14 @@ public:
      */
     int32_t GetDragData(DragData &dragData);
 
+    /**
+     * @brief 获取所有与拖拽相关的状态。
+     * @param dragState 保存拖拽相关的状态。
+     * @return 拖拽状态包含：ERROR(0)、START(1)、STOP(2)、CANCEL(3)、MOTION_DRAGGING(4)
+     * @since 10
+     */
+    int32_t GetDragState(DragState &dragState);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

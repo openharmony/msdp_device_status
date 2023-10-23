@@ -81,7 +81,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
             &DeviceStatusSrvStub::UpdateShadowPicStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
-            &DeviceStatusSrvStub::GetDragDataStub}
+            &DeviceStatusSrvStub::GetDragDataStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
+            &DeviceStatusSrvStub::GetDragStateStub}
     };
 }
 
@@ -487,6 +489,23 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    DragState dragState;
+    int32_t ret = GetDragState(dragState);
+    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragState failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+
+    int32_t dragStateInt32 = static_cast<int32_t>(dragState);
+    WRITEINT32(reply, dragStateInt32, ERR_INVALID_VALUE);
     return ret;
 }
 } // namespace DeviceStatus

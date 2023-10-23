@@ -29,11 +29,18 @@ ohos_unittest("InteractionManagerTest") {
 
   sources = [ "src/interaction_manager_test.cpp" ]
 
-  configs = []
+  configs = [ "${device_status_service_path}/interaction/drag:interaction_drag_public_config" ]
 
-  deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
+  deps = [
+    "${device_status_interfaces_path}/innerkits:devicestatus_client",
+    "${device_status_service_path}/interaction/drag:interaction_drag",
+  ]
+
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",

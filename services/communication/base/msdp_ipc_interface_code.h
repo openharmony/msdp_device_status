@@ -41,6 +41,7 @@ enum class DeviceInterfaceCode {
     GET_SHADOW_OFFSET,
     UPDATE_SHADOW_PIC,
     GET_DRAG_DATA,
+    GET_DRAG_STATE,
     ALLOC_SOCKET_FD = 40
 };
 } // namespace Msdp

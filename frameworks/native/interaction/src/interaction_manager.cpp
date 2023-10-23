@@ -122,6 +122,11 @@ int32_t InteractionManager::GetDragData(DragData &dragData)
 {
     return INTER_MGR_IMPL.GetDragData(dragData);
 }
+
+int32_t InteractionManager::GetDragState(DragState &dragState)
+{
+    return INTER_MGR_IMPL.GetDragState(dragState);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
