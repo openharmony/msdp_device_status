@@ -15,6 +15,7 @@
 
 #ifndef FUSION_SECURITY_H
 #define FUSION_SECURITY_H
+
 #include <cstddef>
 #include <cstdint>
 

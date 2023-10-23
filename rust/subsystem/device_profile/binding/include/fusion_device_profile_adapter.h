@@ -15,6 +15,7 @@
 
 #ifndef FUSION_DEVICE_PROFILE_ADAPTER_H
 #define FUSION_DEVICE_PROFILE_ADAPTER_H
+
 #include <cstddef>
 #include <cstdint>
 

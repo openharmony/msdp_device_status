@@ -37,6 +37,7 @@ constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionS
 static void SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount)
 {
     if (perms == nullptr || permCount == 0) {
+        FI_HILOGE("perms is nullptr");
         return;
     }
     uint64_t tokenId;
@@ -122,6 +123,7 @@ CIString* GetLocalNetworkId()
     NodeBasicInfo node;
     int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, &node);
     if (ret != RET_OK) {
+        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
         return nullptr;
     }
     return new CString(node.networkId);

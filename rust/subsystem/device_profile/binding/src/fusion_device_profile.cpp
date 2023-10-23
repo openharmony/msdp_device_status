@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 
-#include "cJSON.h"
 #include "fusion_device_profile.h"
 
 #include <sstream>
 
-#include <distributed_device_profile_client.h>
-
+#include "cJSON.h"
+#include "distributed_device_profile_client.h"
 #include "devicestatus_define.h"
 
 using namespace ::OHOS::DeviceProfile;

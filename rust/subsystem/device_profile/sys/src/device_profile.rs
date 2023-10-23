@@ -16,10 +16,8 @@
 //! rust device profile sys
 
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
-use std::ffi::{ c_char, c_int, CString };
-use std::sync::Arc;
+use std::{ ffi::{ c_char, c_int, CString }, sync::Arc };
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
 
@@ -41,7 +39,6 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 
 /// Represents a service characteristic profile.
 pub struct ServiceCharacteristicProfile;
-
 
 /// Represents an event related to a profile.
 #[repr(u32)]
@@ -117,9 +114,11 @@ pub struct ProfileChangeNotification {
     pub is_local: bool,
 }
 
-/// Represents a callback interface for profile events.
+/// Trait defining the callback methods for profile events.
 pub trait IProfileEventCallback {
+    /// This method is called when a sync operation has completed.
     fn on_sync_completed(&self, sync_results: &SyncResult);
+    /// This method is called when a profile change notification is received.
     fn on_profile_changed(&self, change_notification: &ProfileChangeNotification);
 }
 
@@ -131,11 +130,10 @@ struct ProfileEventCallback {
 impl ProfileEventCallback {
     extern "C" fn from_interface(cb: *mut CIProfileEventCb) -> *mut Self
     {
-        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
-        // 基于C17标准
         cb as *mut Self
     }
 
+    /// Create a copy of a `CIProfileEventCb` instance.
     extern "C" fn clone(cb: *mut CIProfileEventCb) -> *mut CIProfileEventCb
     {
         let callback_ptr = ProfileEventCallback::from_interface(cb);
@@ -159,6 +157,7 @@ impl ProfileEventCallback {
         }
     }
 
+    /// Deallocate the memory used by a `CIProfileEventCb` instance.
     extern "C" fn destruct(cb: *mut CIProfileEventCb)
     {
         if !cb.is_null() {
@@ -168,12 +167,14 @@ impl ProfileEventCallback {
         }
     }
 
-    extern "C" fn on_sync_completed(cb: *mut CIProfileEventCb, device_id: *const c_char, sync_result: c_int)
+    /// This callback function is invoked when a sync operation is completed.
+    extern "C" fn on_sync_completed(_cb: *mut CIProfileEventCb, _device_id: *const c_char, _sync_result: c_int)
     {
         todo!()
     }
 
-    extern "C" fn on_profile_changed(cb: *mut CIProfileEventCb, notification: *const CProfileChangeNotification)
+    /// This callback function is invoked when a profile change notification occurs.
+    extern "C" fn on_profile_changed(_cb: *mut CIProfileEventCb, _notification: *const CProfileChangeNotification)
     {
         todo!()
     }
@@ -198,14 +199,14 @@ pub struct DeviceProfile;
 
 impl DeviceProfile {
     /// Updates the device profile with the specified `ServiceCharacteristicProfile`.
-    pub fn put_device_profile(profile: &ServiceCharacteristicProfile) -> FusionResult<()>
+    pub fn put_device_profile(_profile: &ServiceCharacteristicProfile) -> FusionResult<()>
     {
         todo!()
     }
 
     /// Retrieves the device profile for the specified UDID and service ID.
-    pub fn get_device_profile(udid: &str, service_id: &str,
-        profile: &ServiceCharacteristicProfile) -> FusionResult<()>
+    pub fn get_device_profile(_udid: &str, _service_id: &str,
+        _profile: &ServiceCharacteristicProfile) -> FusionResult<()>
     {
         todo!()
     }
@@ -265,7 +266,7 @@ impl DeviceProfile {
             }
         }
         if ret != 0 {
-            error!(LOG_LABEL, "SubscribeProfileEvents fail");
+            error!(LOG_LABEL, "SubscribeProfileEvents failed");
             Err(FusionErrorCode::Fail)
         } else {
             Ok(())
@@ -325,7 +326,7 @@ impl DeviceProfile {
         }
 
         if ret != 0 {
-            error!(LOG_LABEL, "UnsubscribeProfileEvents fail");
+            error!(LOG_LABEL, "UnsubscribeProfileEvents failed");
             Err(FusionErrorCode::Fail)
         } else {
             Ok(())
@@ -333,8 +334,8 @@ impl DeviceProfile {
     }
 
     /// Synchronizes the device profile with the specified options.
-    pub fn sync_device_profile(sync_options: &SyncOptions,
-                               sync_callback: &Arc<dyn IProfileEventCallback>) -> FusionResult<()>
+    pub fn sync_device_profile(_sync_options: &SyncOptions,
+                               _sync_callback: &Arc<dyn IProfileEventCallback>) -> FusionResult<()>
     {
         todo!()
     }

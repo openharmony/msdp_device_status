@@ -16,7 +16,6 @@
 //! rust device profile binding sys
 
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
 use std::ffi::{ c_char, c_int };
 
@@ -38,7 +37,7 @@ pub type CIProfileEventsClone = extern "C" fn (profile_events: *mut CIProfileEve
 /// Type definition for the destruct function of the `CIProfileEvents` struct.
 pub type CIProfileEventsDestruct = extern "C" fn (profile_events: *mut CIProfileEvents);
 
-/// C representation of [`IProfileEvents`].
+/// Represents a CIProfileEvents object that contains profile events information.
 #[repr(C)]
 pub struct CIProfileEvents {
     /// An optional clone function pointer for creating a clone of the `CIProfileEvents` object.
@@ -105,7 +104,7 @@ pub struct CProfileEntry {
     pub next: *const CProfileEntry,
 }
 
-/// Struct representing a profile change notification.
+/// C representation of [`ProfileChangeNotification`].
 #[repr(C)]
 pub struct CProfileChangeNotification {
     /// A pointer to an array of profile entries.
@@ -145,8 +144,12 @@ pub struct CIProfileEventCb {
 #[repr(i32)]
 #[derive(Copy, Clone)]
 pub enum CSyncMode {
+    /// The pull synchronization mode, where the local device pulls data from the remote device.
     Pull,
+    /// The push synchronization mode, where the local device pushes data to the remote device.
     Push,
+    /// The push-pull synchronization mode, where the local and remote devices can push and pull data 
+    /// in either direction.
     PushPull,
 }
 
@@ -220,7 +223,7 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `state: i32` - The new state to set for the cross switch.
+    /// * `state` - An integer value that represents the cross switch state.
     ///
     /// # Returns
     ///
@@ -230,8 +233,8 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `state: i32` - The state to synchronize the cross switch to.
-    /// * `device_ids: *mut CIStringVector` - A mutable pointer to a CIStringVector containing the device IDs to synchronize.
+    /// * `state` - The state to synchronize the cross switch to.
+    /// * `device_ids` - A mutable pointer that contains the device IDs to synchronize.
     ///
     /// # Returns
     ///
@@ -241,7 +244,7 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `device_id: *const c_char` - The ID of the device to retrieve the cross switch state for.
+    /// * `device_id` - The ID of the device to retrieve the cross switch state for.
     ///
     /// # Returns
     ///
@@ -251,8 +254,8 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `device_id: *const c_char` - The ID of the device to register the listener for.
-    /// * `listener: *mut CICrossStateListener` - A mutable pointer to the cross state listener to register.
+    /// * `device_id` - The ID of the device to register the listener for.
+    /// * `listener` - A mutable pointer to the cross state listener to register.
     ///
     /// # Returns
     ///

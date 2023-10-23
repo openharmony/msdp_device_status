@@ -15,13 +15,14 @@
 
 #ifndef FUSION_DEVICE_PROFILE_H
 #define FUSION_DEVICE_PROFILE_H
+
 #include <cstddef>
 #include <cstdint>
 
 struct CServiceCharacteristicProfile {
     const char *serviceId;
     const char *serviceType;
-    const char *serviceProfileJson;
+    bool state;
     const char *characteristicProfileJson;
 };
 

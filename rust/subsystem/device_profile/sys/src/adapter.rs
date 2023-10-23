@@ -16,10 +16,8 @@
 //! rust adapter sys
 
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
-use std::ffi::{ c_char, CStr, CString };
-use std::sync::Arc;
+use std::{ ffi::{ c_char, CStr, CString }, sync::Arc };
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
 use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult, err_log };
 
@@ -46,10 +44,10 @@ struct CrossStateListener {
 }
 
 impl CrossStateListener {
+    // Structures with C-compatible layouts that safely interconvert the first structure field and structure object.
+    // Based on the C17 standard
     extern "C" fn from_interface(listener: *mut CICrossStateListener) -> *mut Self
     {
-        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
-        // 基于C17标准
         listener as *mut Self
     }
 
@@ -67,9 +65,8 @@ impl CrossStateListener {
                 destruct: Some(Self::destruct),
                 on_update: Some(Self::on_update),
             },
-            callback:
             // SAFETY: no `None` here, cause `listener_ptr` is valid.
-            unsafe { (*listener_ptr).callback.clone() },
+            callback: unsafe { (*listener_ptr).callback.clone() },
         });
         Box::into_raw(listener_box) as *mut CICrossStateListener
     }
@@ -130,11 +127,9 @@ struct StringVector {
 impl StringVector {
     extern "C" fn from_interface(strings: *mut CIStringVector) -> *mut Self
     {
-        // 与C兼容布局的结构体，可以安全地将第一个结构体字段和结构体对象互转
-        // 基于C17标准
         strings as *mut Self
     }
-
+    
     extern "C" fn clone(strings: *mut CIStringVector) -> *mut CIStringVector
     {
         let strings_ptr = StringVector::from_interface(strings);
@@ -149,9 +144,8 @@ impl StringVector {
                 at: Some(Self::at),
                 size: Some(Self::size),
             },
-            data:
-                // SAFETY: no `None` here, cause `strings_ptr` is valid.
-                unsafe { (*strings_ptr).data.clone() },
+            // SAFETY: no `None` here, cause `strings_ptr` is valid.
+            data: unsafe { (*strings_ptr).data.clone() },
         });
         Box::into_raw(strings_box) as *mut CIStringVector
     }
@@ -231,8 +225,7 @@ impl DeviceProfileAdapter {
     /// 
     /// # Arguments
     /// 
-    /// * `state` - A boolean value indicating the new cross switch state. `true` indicates the switch is on;
-    /// `false` indicates the switch is off.
+    /// * `state` - A boolean value that represents the cross switch state. `true` for on, `false` for off.
     /// 
     /// # Returns
     /// 
@@ -250,7 +243,7 @@ impl DeviceProfileAdapter {
     /// 
     /// # Arguments
     /// 
-    /// * `state` - The new cross switch state. `true` for on, `false` for off.
+    /// * `state` - A boolean value that represents the cross switch state. `true` for on, `false` for off.
     /// * `device_ids` - An array of device ID strings representing the target devices to synchronize the state.
     /// 
     /// # Returns
@@ -299,12 +292,6 @@ impl DeviceProfileAdapter {
     /// 
     /// Returns `FusionResult<()>` indicating whether the operation is successful. If the registration succeeds,
     /// it returns `Ok(())`. If the registration fails, it returns the corresponding error information.
-    /// 
-    /// # Safety
-    /// 
-    /// This function uses an `unsafe` block to invoke the underlying C/C++ function `RegisterCrossStateListener`.
-    /// Please ensure that the `device_id` parameter and the callback function are valid and do not cause 
-    /// memory access conflicts or other undefined behaviors.
     pub fn register_cross_state_listener<F>(&self, device_id: &str, callback: F) -> FusionResult<()>
     where
         F: Fn(&str, bool) + 'static
