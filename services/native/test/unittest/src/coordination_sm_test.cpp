@@ -177,7 +177,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest001, TestSize.Level0)
 
 /**
  * @tc.name: CoordinationSMTest
- * @tc.desc: test abnormal GetCoordinationState when local NetworkId is empty
+ * @tc.desc: test abnormal GetCoordinationState when local networkId is empty
  * @tc.type: FUNC
  */
 HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
@@ -191,7 +191,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
 
 /**
  * @tc.name: CoordinationSMTest
- * @tc.desc: test normal GetCoordinationState when local NetworkId is correct
+ * @tc.desc: test normal GetCoordinationState when local networkId is correct
  * @tc.type: FUNC
  */
 HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)

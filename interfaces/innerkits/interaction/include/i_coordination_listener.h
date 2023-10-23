@@ -26,7 +26,7 @@ class ICoordinationListener {
 public:
     ICoordinationListener() = default;
     virtual ~ICoordinationListener() = default;
-    virtual void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) = 0;
+    virtual void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) = 0;
 };
 } // namespace Msdp
 } // namespace OHOS

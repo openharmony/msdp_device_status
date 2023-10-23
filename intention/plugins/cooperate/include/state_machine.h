@@ -27,7 +27,7 @@ public:
     void DisableCooperate();
     int32_t StartCooperate(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t StopCooperate(bool isUnchained);
-    int32_t GetCooperateState(const std::string &deviceId);
+    int32_t GetCooperateState(const std::string &networkId);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

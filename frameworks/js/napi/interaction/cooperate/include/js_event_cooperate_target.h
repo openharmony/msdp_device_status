@@ -48,18 +48,18 @@ public:
     virtual ~JsEventCooperateTarget() = default;
 
     static void EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
+        const std::string &networkId, CoordinationMessage msg);
     static void EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
+        const std::string &remoteNetworkId, CoordinationMessage msg);
     static void EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
-        const std::string &deviceId, CoordinationMessage msg);
+        const std::string &networkId, CoordinationMessage msg);
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb);
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
-    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
+    void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;
 
 private:
     static void CallEnablePromiseWork(uv_work_t *work, int32_t status);

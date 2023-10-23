@@ -40,7 +40,7 @@ int32_t fusion_start_coordination(int32_t userData, const char *remoteNetworkId,
 
 int32_t fusion_stop_coordination(int32_t userData, int32_t isUnchained);
 
-int32_t fusion_get_coordination_state(int32_t userData, const char *deviceId);
+int32_t fusion_get_coordination_state(int32_t userData, const char *networkId);
 
 #ifdef __cplusplus
 }

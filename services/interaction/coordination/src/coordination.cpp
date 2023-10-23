@@ -73,7 +73,7 @@ int32_t Coordination::DeactivateCoordination(SessionPtr sess, int32_t userData, 
     return ret;
 }
 
-int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &deviceId)
+int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, const std::string &networkId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -82,7 +82,7 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     COOR_EVENT_MGR->AddCoordinationEvent(event);
-    int32_t ret = COOR_SM->GetCoordinationState(deviceId);
+    int32_t ret = COOR_SM->GetCoordinationState(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
     }

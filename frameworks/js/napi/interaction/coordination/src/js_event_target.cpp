@@ -42,7 +42,7 @@ JsEventTarget::JsEventTarget()
     }
 }
 
-void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -69,7 +69,7 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     }
 }
 
-void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg)
+void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& remoteNetworkId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -96,7 +96,7 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     }
 }
 
-void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId,
+void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId,
     CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
@@ -231,7 +231,7 @@ void JsEventTarget::ResetEnv()
     INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
 }
 
-void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg)
+void JsEventTarget::OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -249,7 +249,7 @@ void JsEventTarget::OnCoordinationMessage(const std::string &deviceId, Coordinat
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.msg = msg;
-        item->data.deviceDescriptor = deviceId;
+        item->data.deviceDescriptor = networkId;
         item->IncStrongRef(nullptr);
         work->data = item.GetRefPtr();
         int32_t result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},

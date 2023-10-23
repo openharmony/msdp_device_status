@@ -618,20 +618,20 @@ int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnc
     return RET_OK;
 }
 
-int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, deviceId));
+        std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, networkId));
     if (ret != RET_OK) {
         FI_HILOGE("On get coordination state failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
-    (void)(deviceId);
+    (void)(networkId);
     FI_HILOGW("Get coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
@@ -804,10 +804,10 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
 {
     CALL_DEBUG_ENTER;
     COOR_SM->PrepareCoordination();
-    std::string deviceId;
+    std::string networkId;
     CoordinationMessage msg = CoordinationMessage::PREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
-    pkt << userData << deviceId << static_cast<int32_t>(msg);
+    pkt << userData << networkId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
@@ -828,10 +828,10 @@ int32_t DeviceStatusService::OnUnprepareCoordination(int32_t pid, int32_t userDa
 {
     CALL_DEBUG_ENTER;
     COOR_SM->UnprepareCoordination();
-    std::string deviceId;
+    std::string networkId;
     CoordinationMessage msg = CoordinationMessage::UNPREPARE;
     NetPacket pkt(MessageId::COORDINATION_MESSAGE);
-    pkt << userData << deviceId << static_cast<int32_t>(msg);
+    pkt << userData << networkId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;
@@ -902,7 +902,7 @@ int32_t DeviceStatusService::OnDeactivateCoordination(int32_t pid, int32_t userD
 }
 
 int32_t DeviceStatusService::OnGetCoordinationState(
-    int32_t pid, int32_t userData, const std::string &deviceId)
+    int32_t pid, int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     SessionPtr sess = GetSession(GetClientFd(pid));
@@ -914,7 +914,7 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     COOR_EVENT_MGR->AddCoordinationEvent(event);
-    int32_t ret = COOR_SM->GetCoordinationState(deviceId);
+    int32_t ret = COOR_SM->GetCoordinationState(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
     }

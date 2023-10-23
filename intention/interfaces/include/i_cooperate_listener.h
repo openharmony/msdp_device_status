@@ -26,7 +26,7 @@ class ICooperateListener {
 public:
     ICooperateListener() = default;
     virtual ~ICooperateListener() = default;
-    virtual void OnCooperateMessage(const std::string &deviceId, CooperateMessage msg) = 0;
+    virtual void OnCooperateMessage(const std::string &networkId, CooperateMessage msg) = 0;
 };
 } // namespace Msdp
 } // namespace OHOS

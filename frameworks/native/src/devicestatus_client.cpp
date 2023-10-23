@@ -210,10 +210,10 @@ int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnch
     return fusion_stop_coordination(userData, isUnchained);
 }
 
-int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    return fusion_get_coordination_state(userData, deviceId.c_str());
+    return fusion_get_coordination_state(userData, networkId.c_str());
 }
 
 #else // OHOS_BUILD_ENABLE_RUST_IMPL
@@ -261,11 +261,11 @@ int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnch
     return devicestatusProxy_->DeactivateCoordination(userData, isUnchained);
 }
 
-int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &deviceId)
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetCoordinationState(userData, deviceId);
+    return devicestatusProxy_->GetCoordinationState(userData, networkId);
 }
 
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
