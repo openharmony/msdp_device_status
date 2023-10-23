@@ -509,7 +509,6 @@ int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel
     CALL_DEBUG_ENTER;
     DragState dragState;
     int32_t ret = GetDragState(dragState);
-    WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
 
     if (ret != RET_OK) {
         FI_HILOGE("Get DragState failed, ret:%{public}d", ret);

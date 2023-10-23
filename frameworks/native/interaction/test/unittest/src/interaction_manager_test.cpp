@@ -1279,7 +1279,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Failed, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, GetDragStateError, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DragState dragState = DragState::ERROR;
@@ -1288,31 +1288,71 @@ HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::ERROR);
+}
 
-    dragState = DragState::START;
+/**
+ * @tc.name: InteractionManagerTest_GetDragState
+ * @tc.desc: Get the dragState from interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragStateStart, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState = DragState::START;
     g_dragManager.SetDragState(dragState);
-    ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::START);
+}
 
-    dragState = DragState::STOP;
+/**
+ * @tc.name: InteractionManagerTest_GetDragState
+ * @tc.desc: Get the dragState from interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragStateStop, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState = DragState::STOP;
     g_dragManager.SetDragState(dragState);
-    ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::STOP);
+}
 
-    dragState = DragState::CANCEL;
+/**
+ * @tc.name: InteractionManagerTest_GetDragState
+ * @tc.desc: Get the dragState from interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragStateCancel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState = DragState::CANCEL;
     g_dragManager.SetDragState(dragState);
-    ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::CANCEL);
+}
 
-    dragState = DragState::MOTION_DRAGGING;
+/**
+ * @tc.name: InteractionManagerTest_GetDragState
+ * @tc.desc: Get the dragState from interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragStateMotionDragging, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState = DragState::MOTION_DRAGGING;
     g_dragManager.SetDragState(dragState);
-    ret = InteractionManager::GetInstance()->GetDragState(dragState);
+    int32_t ret = InteractionManager::GetInstance()->GetDragState(dragState);
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::MOTION_DRAGGING);

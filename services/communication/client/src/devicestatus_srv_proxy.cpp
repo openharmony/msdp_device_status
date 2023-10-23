@@ -380,14 +380,11 @@ int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    READINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get DragState failed");
-        return ret;
-    }
 
-    int32_t dragStateInt32 = static_cast<int32_t>(dragState);
+    int32_t dragStateInt32 = 0;
     READINT32(reply, dragStateInt32, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    dragState = static_cast<DragState>(dragStateInt32);
+
     return ret;
 }
 
