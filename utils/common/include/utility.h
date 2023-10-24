@@ -55,6 +55,7 @@ public:
     static bool IsInteger(const std::string &target);
     static bool DoesFileExist(const char *path);
     static ssize_t GetFileSize(const char *path);
+    static ssize_t GetFileSize(const std::string &filePath);
 
     static void ShowFileAttributes(const char *path);
     static void ShowUserAndGroup();

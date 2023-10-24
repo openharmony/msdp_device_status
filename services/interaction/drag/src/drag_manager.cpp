@@ -33,7 +33,6 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
-constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
 std::atomic<int64_t> g_startFilterTime { -1 };
@@ -90,7 +89,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
         dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
+        GetAnonyString(dragData.udKey).c_str());
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
@@ -392,87 +391,48 @@ void DragManager::Dump(int32_t fd) const
 
 std::string DragManager::GetDragState(DragState value) const
 {
-    std::string state;
-    switch (value) {
-        case DragState::START: {
-            state = "start";
-            break;
-        }
-        case DragState::STOP: {
-            state = "stop";
-            break;
-        }
-        case DragState::CANCEL: {
-            state = "cancel";
-            break;
-        }
-        case DragState::ERROR: {
-            state = "error";
-            break;
-        }
-        default: {
-            state = "unknown";
-            FI_HILOGW("Drag status unknown");
-            break;
-        }
+    std::string state = "unknown";
+    const std::map<DragState, std::string> dragStates = {
+        { DragState::START, "start" },
+        { DragState::STOP, "stop" },
+        { DragState::CANCEL, "cancel" },
+        { DragState::ERROR, "error" }
+    };
+    auto iter = dragStates.find(value);
+    if (iter != dragStates.end()) {
+        state = iter->second;
     }
     return state;
 }
 
 std::string DragManager::GetDragResult(DragResult value) const
 {
-    std::string result;
-    switch (value) {
-        case DragResult::DRAG_SUCCESS: {
-            result = "success";
-            break;
-        }
-        case DragResult::DRAG_FAIL: {
-            result = "fail";
-            break;
-        }
-        case DragResult::DRAG_CANCEL: {
-            result = "cancel";
-            break;
-        }
-        case DragResult::DRAG_EXCEPTION: {
-            result = "abnormal";
-            break;
-        }
-        default: {
-            result = "unknown";
-            FI_HILOGW("Drag result unknown");
-            break;
-        }
+    std::string result = "unknown";
+    const std::map<DragResult, std::string> dragResults = {
+        { DragResult::DRAG_SUCCESS, "success" },
+        { DragResult::DRAG_FAIL, "fail" },
+        { DragResult::DRAG_CANCEL, "cancel" },
+        { DragResult::DRAG_EXCEPTION, "abnormal" }
+    };
+    auto iter = dragResults.find(value);
+    if (iter != dragResults.end()) {
+        result = iter->second;
     }
     return result;
 }
 
 std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
 {
-    std::string style;
-    switch (value) {
-        case DragCursorStyle::COPY: {
-            style = "copy";
-            break;
-        }
-        case DragCursorStyle::DEFAULT: {
-            style = "default";
-            break;
-        }
-        case DragCursorStyle::FORBIDDEN: {
-            style = "forbidden";
-            break;
-        }
-        case DragCursorStyle::MOVE: {
-            style = "move";
-            break;
-        }
-        default: {
-            style = "unknown";
-            FI_HILOGW("Drag cursor style unknown");
-            break;
-        }
+    std::string style = "unknown";
+    const std::map<DragCursorStyle, std::string> cursorStyles = {
+        { DragCursorStyle::COPY, "copy" },
+        { DragCursorStyle::DEFAULT, "default" },
+        { DragCursorStyle::FORBIDDEN, "forbidden" },
+        { DragCursorStyle::MOVE, "move" }
+    };
+    auto iter = cursorStyles.find(value);
+    if (iter != cursorStyles.end()) {
+        style = iter->second;
     }
     return style;
 }

@@ -98,17 +98,15 @@ public:
     void SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount);
 };
 
-void CoordinationSMTest::SetUp() {
+void CoordinationSMTest::SetUp()
+{
     AddPermission();
 }
 
 void CoordinationSMTest::AddPermission()
 {
-    const char** perms = new (std::nothrow) const char* [1];
-    CHKPV(perms);
-    perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
-    SetAceessTokenPermission("CoordinationSMTest", perms, 1);
-    delete []perms;
+    const char *perms[] = { "ohos.permission.DISTRIBUTED_DATASYNC" };
+    SetAceessTokenPermission("CoordinationSMTest", perms, sizeof(perms) / sizeof(perms[0]));
 }
 
 void CoordinationSMTest::SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount)
