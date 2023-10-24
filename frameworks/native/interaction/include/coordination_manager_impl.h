@@ -64,10 +64,12 @@ public:
     int32_t AddHotAreaListener(HotAreaListenerPtr listener);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
     int32_t OnHotAreaListener(const StreamClient& client, NetPacket& pkt);
+    int32_t RemoveHotAreaListener(HotAreaListenerPtr listener = nullptr);
 
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
+    int32_t ResetListener();
 
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;

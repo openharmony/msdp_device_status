@@ -616,6 +616,26 @@ int32_t DeviceStatusSrvProxy::AddHotAreaListener()
     }
     return ret;
 }
+
+int32_t DeviceStatusSrvProxy::RemoveHotAreaListener()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

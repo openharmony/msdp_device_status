@@ -15,6 +15,8 @@
 
 #include "devicestatus_srv_stub.h"
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #include "message_parcel.h"
 #include "pixel_map.h"
 
@@ -83,8 +85,20 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
             &DeviceStatusSrvStub::GetDragDataStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
-            &DeviceStatusSrvStub::AddHotAreaListenerStub}
+            &DeviceStatusSrvStub::AddHotAreaListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
+            &DeviceStatusSrvStub::RemoveHotAreaListenerStub}
     };
+}
+
+bool DeviceStatusSrvStub::CheckCooperatePermission()
+{
+    CALL_DEBUG_ENTER;
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    const std::string permissionName = "ohos.permission.COOPERATE_MANAGER";
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        permissionName);
+    return result == Security::AccessToken::PERMISSION_GRANTED;
 }
 
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -495,9 +509,27 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
 int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return RET_ERR;
+    }
     int32_t ret = AddHotAreaListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return RET_ERR;
+    }
+    int32_t ret = RemoveHotAreaListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
 }

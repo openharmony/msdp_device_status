@@ -933,6 +933,18 @@ int32_t DeviceStatusService::OnAddHotAreaListener(int32_t pid)
     HOT_AREA->AddHotAreaListener(event);
     return RET_OK;
 }
+
+int32_t DeviceStatusService::OnRemoveHotAreaListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CoordinationHotArea::HotAreaInfo> event = new (std::nothrow) CoordinationHotArea::HotAreaInfo();
+    CHKPR(event, RET_ERR);
+    event->sess = sess;
+    HOT_AREA->RemoveHotAreaListener(event);
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 int32_t DeviceStatusService::AddHotAreaListener()
@@ -944,6 +956,21 @@ int32_t DeviceStatusService::AddHotAreaListener()
         std::bind(&DeviceStatusService::OnAddHotAreaListener, this, pid));
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add hot area listener, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::RemoveHotAreaListener()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnRemoveHotAreaListener, this, pid));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to remove hot area listener, ret:%{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION

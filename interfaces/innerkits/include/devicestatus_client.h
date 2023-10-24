@@ -67,6 +67,7 @@ public:
     int32_t AllocSocketPair(int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddHotAreaListener();
+    int32_t RemoveHotAreaListener();
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

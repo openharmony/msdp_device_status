@@ -62,6 +62,8 @@ private:
     int32_t UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDragDataStub(MessageParcel& data, MessageParcel& reply);
     int32_t AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
+    bool CheckCooperatePermission();
 
 private:
     std::map<uint32_t, ConnFunc> connFuncs_;

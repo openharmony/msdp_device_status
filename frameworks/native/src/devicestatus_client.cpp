@@ -422,6 +422,13 @@ int32_t DeviceStatusClient::AddHotAreaListener()
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->AddHotAreaListener();
 }
+
+int32_t DeviceStatusClient::RemoveHotAreaListener()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->RemoveHotAreaListener();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
