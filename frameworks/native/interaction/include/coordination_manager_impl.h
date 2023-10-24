@@ -52,9 +52,9 @@ public:
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
         FuncCoordinationMessage callback);
     int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback);
-    int32_t GetCoordinationState(const std::string &deviceId, FuncCoordinationState callback);
-    void OnDevCoordinationListener(const std::string deviceId, CoordinationMessage msg);
-    void OnCoordinationMessageEvent(int32_t userData, const std::string deviceId, CoordinationMessage msg);
+    int32_t GetCoordinationState(const std::string &networkId, FuncCoordinationState callback);
+    void OnDevCoordinationListener(const std::string networkId, CoordinationMessage msg);
+    void OnCoordinationMessageEvent(int32_t userData, const std::string networkId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);
     int32_t GetUserData() const;
     int32_t OnCoordinationListener(const StreamClient& client, NetPacket& pkt);

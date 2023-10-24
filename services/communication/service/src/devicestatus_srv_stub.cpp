@@ -251,9 +251,9 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    std::string deviceId;
-    READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = GetCoordinationState(userData, deviceId);
+    std::string networkId;
+    READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = GetCoordinationState(userData, networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }

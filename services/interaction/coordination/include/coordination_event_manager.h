@@ -41,7 +41,7 @@ public:
         SessionPtr sess { nullptr };
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
-        std::string deviceId;
+        std::string networkId;
         CoordinationMessage msg { CoordinationMessage::PREPARE };
         bool state { false };
     };
@@ -50,10 +50,10 @@ public:
 
     void AddCoordinationEvent(sptr<EventInfo> event);
     void RemoveCoordinationEvent(sptr<EventInfo> event);
-    int32_t OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId = "");
-    void OnEnable(CoordinationMessage msg, const std::string &deviceId = "");
-    void OnStart(CoordinationMessage msg, const std::string &deviceId = "");
-    void OnStop(CoordinationMessage msg, const std::string &deviceId = "");
+    int32_t OnCoordinationMessage(CoordinationMessage msg, const std::string &networkId = "");
+    void OnEnable(CoordinationMessage msg, const std::string &networkId = "");
+    void OnStart(CoordinationMessage msg, const std::string &networkId = "");
+    void OnStop(CoordinationMessage msg, const std::string &networkId = "");
     void OnGetCrossingSwitchState(bool state);
     void OnErrorMessage(EventType type, CoordinationMessage msg);
     void SetIContext(IContext *context);
@@ -61,7 +61,7 @@ public:
 
 private:
     void NotifyCoordinationMessage(SessionPtr sess, MessageId msgId, int32_t userData,
-        const std::string &deviceId, CoordinationMessage msg);
+        const std::string &networkId, CoordinationMessage msg);
     void NotifyCoordinationState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
 
 private:

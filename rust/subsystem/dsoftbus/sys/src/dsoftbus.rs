@@ -308,7 +308,7 @@ impl Inner {
         // let network_id_slice: &str = network_id_str.to_str().unwrap();
         // let network_id = network_id_slice.to_owned();
         // if network_id.is_empty() {
-        //     error!(LOG_LABEL, "Local networkid is empty");
+        //     error!(LOG_LABEL, "Local network id is empty");
         //     return Err(FusionErrorCode::Fail.into());
         // }
         let network_id = self.convert_i8_array_to_string(&local_node.network_id);

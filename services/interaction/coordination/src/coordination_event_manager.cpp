@@ -61,7 +61,7 @@ void CoordinationEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
     }
 }
 
-int32_t CoordinationEventManager::OnCoordinationMessage(CoordinationMessage msg, const std::string &deviceId)
+int32_t CoordinationEventManager::OnCoordinationMessage(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -72,38 +72,38 @@ int32_t CoordinationEventManager::OnCoordinationMessage(CoordinationMessage msg,
     for (auto it = remoteCoordinationCallbacks_.begin(); it != remoteCoordinationCallbacks_.end(); ++it) {
         sptr<EventInfo> info = *it;
         CHKPC(info);
-        NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+        NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
     }
     return RET_OK;
 }
 
-void CoordinationEventManager::OnEnable(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnEnable(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = coordinationCallbacks_[EventType::ENABLE];
     CHKPV(info);
-    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
     coordinationCallbacks_[EventType::ENABLE] =  nullptr;
 }
 
-void CoordinationEventManager::OnStart(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnStart(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = coordinationCallbacks_[EventType::START];
     CHKPV(info);
-    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
     coordinationCallbacks_[EventType::START] =  nullptr;
 }
 
-void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string &deviceId)
+void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = coordinationCallbacks_[EventType::STOP];
     CHKPV(info);
-    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
     coordinationCallbacks_[EventType::STOP] =  nullptr;
 }
 
@@ -137,12 +137,12 @@ IContext* CoordinationEventManager::GetIContext() const
 }
 
 void CoordinationEventManager::NotifyCoordinationMessage(
-    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CoordinationMessage msg)
+    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
     NetPacket pkt(msgId);
-    pkt << userData << deviceId << static_cast<int32_t>(msg);
+    pkt << userData << networkId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

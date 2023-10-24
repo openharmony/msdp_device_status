@@ -63,9 +63,9 @@ int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
 }
 
 int32_t InteractionManager::GetCoordinationState(
-    const std::string &deviceId, std::function<void(bool)> callback)
+    const std::string &networkId, std::function<void(bool)> callback)
 {
-    return INTER_MGR_IMPL.GetCoordinationState(deviceId, callback);
+    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)

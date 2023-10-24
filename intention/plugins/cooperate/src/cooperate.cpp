@@ -95,7 +95,7 @@ int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, Parcel &data, 
         return RET_ERR;
     }
 
-    int32_t ret = sm_.GetCooperateState(param.deviceId);
+    int32_t ret = sm_.GetCooperateState(param.networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
     }

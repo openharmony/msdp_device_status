@@ -64,11 +64,11 @@ struct StopCooperateParam final : public ParamBase {
 
 struct GetCooperateStateParam final : public ParamBase {
     GetCooperateStateParam() = default;
-    GetCooperateStateParam(std::string deviceId, int32_t userData);
+    GetCooperateStateParam(std::string networkId, int32_t userData);
     bool Marshalling(Parcel &data) const override;
     bool Unmarshalling(Parcel &data) override;
 
-    std::string deviceId;
+    std::string networkId;
     int32_t userData { -1 };
 };
 } // namespace DeviceStatus
