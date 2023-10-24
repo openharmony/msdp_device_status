@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -260,7 +260,7 @@ void VirtualMouse::MoveProcess(int32_t dx, int32_t dy)
     int32_t currentY = monitor->GetY();
     int32_t targetX = currentX + dx;
     int32_t targetY = currentY + dy;
-    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)",targetX, targetY);
+    FI_HILOGD("Expected coordinates, (targetX, targetY):(%{public}d, %{public}d)", targetX, targetY);
     Move(dx, dy);
     if ((targetX <= g_screenWidth && targetX >= 0) && (targetY <= g_screenHeight && targetY >= 0) &&
         (currentX < g_screenWidth && currentX > 0) && (currentY < g_screenHeight && currentY > 0)) {

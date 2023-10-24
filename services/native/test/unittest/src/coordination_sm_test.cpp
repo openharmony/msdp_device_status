@@ -139,7 +139,7 @@ Device::Device(int32_t deviceId) {}
 
 Device::~Device() {}
 
-int32_t Device::Open() 
+int32_t Device::Open()
 {
     return 0;
 }
@@ -316,7 +316,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0)
     COOR_SM->startDeviceDhid_ = "teststartDeviceDhid";
     std::shared_ptr<Device> curdevice= std::make_shared<Device>(DEVICE_ID);
     curdevice->name_ = "DistributedInput ";
-    std::shared_ptr<CoordinationDeviceManager::Device> dev = std::make_shared<CoordinationDeviceManager::Device>(curdevice);
+    auto dev = std::make_shared<CoordinationDeviceManager::Device>(curdevice);
     dev->dhid_ = COOR_SM->startDeviceDhid_;
     dev->networkId_ = "testNetworkId";
     std::function<void(void)> mycallback = [&](void) {
