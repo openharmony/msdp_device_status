@@ -208,7 +208,7 @@ public:
     /**
      * @brief 获取拖拽状态。
      * @param dragState 返回拖拽状态。
-     * @return 拖拽状态包含：ERROR(0)、START(1)、STOP(2)、CANCEL(3)、MOTION_DRAGGING(4)
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
     int32_t GetDragState(DragState &dragState);
