@@ -273,7 +273,7 @@ impl DeviceProfile {
         let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
         let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
 
-        // SAFETY: no `None` here, `subscriptions_borrowed`, `event_cb_ptr` and `failed_ptr` are valid.
+        // SAFETY: no `None` here, cause `subscriptions_borrowed`, `event_cb_ptr` and `failed_ptr` are valid.
         let ret = unsafe {
             SubscribeProfileEvents(&subscriptions_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };

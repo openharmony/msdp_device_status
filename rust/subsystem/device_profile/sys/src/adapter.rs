@@ -117,7 +117,7 @@ impl CrossStateListener {
             error!(LOG_LABEL, "listener_ptr is null");
         } else {
             // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
-            // `device_id` and `state` is valid, which is the ensured by the caller.
+            // `device_id` and `state` are valid, which are ensured by the caller.
             unsafe {
                 if let Ok(id) = CStr::from_ptr(device_id).to_str() {
                     ((*listener_ptr).callback)(id, state != 0);
@@ -300,7 +300,7 @@ impl DeviceProfileAdapter {
     pub fn update_cross_switch_state(&self, state: bool) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::update_cross_switch_state");
-        // SAFETY: `state` is valid, which is the ensured by the caller.
+        // SAFETY: `state` is valid, which is ensured by the caller.
         let ret = unsafe { UpdateCrossSwitchState(state as u32) };
         Ok(err_log!(self.check_return_code(ret), "UpdateCrossSwitchState"))
     }
@@ -347,7 +347,7 @@ impl DeviceProfileAdapter {
     pub fn get_cross_switch_state(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::get_cross_switch_state");
-        // SAFETY: `device_id` are valid, which is the ensured by the caller.
+        // SAFETY: `device_id` is valid, which is ensured by the caller.
         let ret = unsafe { GetCrossSwitchState(device_id.as_ptr()) };
         Ok(err_log!(self.check_return_code(ret), "GetCrossSwitchState"))
     }
@@ -370,7 +370,7 @@ impl DeviceProfileAdapter {
     {
         call_debug_enter!("DeviceProfileAdapter::register_cross_state_listener");
         let mut listener = CrossStateListener::from(Arc::new(callback));
-        // SAFETY: `device_id` and `listener_ptr` are valid, which are the ensured by the caller.
+        // SAFETY: `device_id` and `listener_ptr` are valid, which are ensured by the caller.
         let ret = unsafe {
             let listener_ptr: *mut CrossStateListener = &mut listener;
             RegisterCrossStateListener(device_id.as_ptr(), listener_ptr as *mut CICrossStateListener)
@@ -391,7 +391,7 @@ impl DeviceProfileAdapter {
     pub fn unregister_cross_state_listener(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::unregister_cross_state_listener");
-        // SAFETY: `device_id` is valid, which is the ensured by the caller.
+        // SAFETY: `device_id` is valid, which is ensured by the caller.
         let ret = unsafe { UnregisterCrossStateListener(device_id.as_ptr()) };
         Ok(err_log!(self.check_return_code(ret), "UnregisterCrossStateListener"))
     }
