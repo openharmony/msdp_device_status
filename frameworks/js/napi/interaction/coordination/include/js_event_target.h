@@ -38,16 +38,16 @@ public:
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     virtual ~JsEventTarget() = default;
 
-    static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
-    static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& deviceId, CoordinationMessage msg);
+    static void EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId, CoordinationMessage msg);
+    static void EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& remoteNetworkId, CoordinationMessage msg);
+    static void EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId, CoordinationMessage msg);
     static void EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
-    void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override;
+    void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;
 
 private:
     static void CallPreparePromiseWork(uv_work_t *work, int32_t status);

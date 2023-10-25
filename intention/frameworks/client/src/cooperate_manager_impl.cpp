@@ -170,7 +170,7 @@ int32_t CooperateManagerImpl::DeactivateCooperate(bool isUnchained, FuncCooperat
     return RET_OK;
 }
 
-int32_t CooperateManagerImpl::GetCooperateState(const std::string &deviceId, FuncCooperateState callback)
+int32_t CooperateManagerImpl::GetCooperateState(const std::string &networkId, FuncCooperateState callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -180,7 +180,7 @@ int32_t CooperateManagerImpl::GetCooperateState(const std::string &deviceId, Fun
         FI_HILOGE("userData exceeds the maximum");
         userData_ = 0;
     }
-    GetCooperateStateParam param { deviceId, userData_ };
+    GetCooperateStateParam param { networkId, userData_ };
     DefaultCooperateReply reply;
     int32_t ret = IntentionClient::GetInstance().GetParam(static_cast<uint32_t>(Intention::COOPERATE),
         CooperateParam::STATE, param, reply);

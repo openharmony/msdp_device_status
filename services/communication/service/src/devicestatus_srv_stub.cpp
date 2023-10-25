@@ -15,6 +15,8 @@
 
 #include "devicestatus_srv_stub.h"
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 #include "message_parcel.h"
 #include "pixel_map.h"
 
@@ -37,7 +39,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceS
 
 DeviceStatusSrvStub::DeviceStatusSrvStub()
 {
-    ConnFuncs_ = {
+    connFuncs_ = {
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
             &DeviceStatusSrvStub::SubscribeStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
@@ -85,8 +87,20 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             &DeviceStatusSrvStub::AddHotAreaListenerStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
-            &DeviceStatusSrvStub::GetDragStateStub}
+            &DeviceStatusSrvStub::GetDragStateStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
+            &DeviceStatusSrvStub::RemoveHotAreaListenerStub}
     };
+}
+
+bool DeviceStatusSrvStub::CheckCooperatePermission()
+{
+    CALL_DEBUG_ENTER;
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    const std::string permissionName = "ohos.permission.COOPERATE_MANAGER";
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
+        permissionName);
+    return result == Security::AccessToken::PERMISSION_GRANTED;
 }
 
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -99,8 +113,8 @@ int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         FI_HILOGE("DeviceStatusSrvStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
-    auto it = ConnFuncs_.find(code);
-    if (it != ConnFuncs_.end()) {
+    auto it = connFuncs_.find(code);
+    if (it != connFuncs_.end()) {
         return (this->*it->second)(data, reply);
     }
     FI_HILOGE("Unknown code:%{public}u", code);
@@ -239,9 +253,9 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    std::string deviceId;
-    READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = GetCoordinationState(userData, deviceId);
+    std::string networkId;
+    READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = GetCoordinationState(userData, networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
     }
@@ -497,6 +511,10 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
 int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return RET_ERR;
+    }
     int32_t ret = AddHotAreaListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
@@ -515,6 +533,20 @@ int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel
     }
     int32_t dragStateInt32 = static_cast<int32_t>(dragState);
     WRITEINT32(reply, dragStateInt32, ERR_INVALID_VALUE);
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return RET_ERR;
+    }
+    int32_t ret = RemoveHotAreaListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
+    }
     return ret;
 }
 } // namespace DeviceStatus

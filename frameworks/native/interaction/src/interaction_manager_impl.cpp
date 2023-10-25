@@ -180,7 +180,7 @@ int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
 }
 
 int32_t InteractionManagerImpl::GetCoordinationState(
-    const std::string &deviceId, std::function<void(bool)> callback)
+    const std::string &networkId, std::function<void(bool)> callback)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -189,9 +189,9 @@ int32_t InteractionManagerImpl::GetCoordinationState(
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.GetCoordinationState(deviceId, callback);
+    return coordinationManagerImpl_.GetCoordinationState(networkId, callback);
 #else
-    (void)(deviceId);
+    (void)(networkId);
     (void)(callback);
     FI_HILOGW("Coordination does not support");
     return ERROR_UNSUPPORT;
@@ -290,6 +290,19 @@ int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListe
         return RET_ERR;
     }
     return coordinationManagerImpl_.AddHotAreaListener(listener);
+#else
+    FI_HILOGW("Coordination does not support");
+    (void)(listener);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    return coordinationManagerImpl_.RemoveHotAreaListener(listener);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);

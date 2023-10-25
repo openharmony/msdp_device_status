@@ -46,7 +46,7 @@ int32_t StateMachine::StopCooperate(bool isUnchained)
     return RET_ERR;
 }
 
-int32_t StateMachine::GetCooperateState(const std::string &deviceId)
+int32_t StateMachine::GetCooperateState(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     return RET_ERR;

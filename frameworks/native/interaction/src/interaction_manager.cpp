@@ -63,9 +63,9 @@ int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
 }
 
 int32_t InteractionManager::GetCoordinationState(
-    const std::string &deviceId, std::function<void(bool)> callback)
+    const std::string &networkId, std::function<void(bool)> callback)
 {
-    return INTER_MGR_IMPL.GetCoordinationState(deviceId, callback);
+    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
@@ -131,6 +131,11 @@ int32_t InteractionManager::GetDragState(DragState &dragState)
 int32_t InteractionManager::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
 {
     return INTER_MGR_IMPL.AddHotAreaListener(listener);
+}
+
+int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
+{
+    return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

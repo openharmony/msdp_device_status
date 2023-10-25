@@ -410,10 +410,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
     class CoordinationListenerTest : public ICoordinationListener {
     public:
         CoordinationListenerTest() : ICoordinationListener() {}
-        void OnCoordinationMessage(const std::string &deviceId, CoordinationMessage msg) override
+        void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override
         {
             FI_HILOGD("Register coordination listener test");
-            (void) deviceId;
+            (void) networkId;
         };
     };
     std::shared_ptr<CoordinationListenerTest> consumer =
@@ -553,11 +553,11 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abnormal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    const std::string deviceId("");
+    const std::string networkId("");
     auto fun = [](bool state) {
         FI_HILOGD("Get coordination state failed, state:%{public}d", state);
     };
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -576,12 +576,12 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Nor
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    const std::string deviceId("deviceId");
+    const std::string networkId("networkId");
     auto fun = [&promiseFlag](bool state) {
         FI_HILOGD("Get coordination state success, state:%{public}d", state);
         promiseFlag.set_value(true);
     };
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(deviceId, fun);
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);

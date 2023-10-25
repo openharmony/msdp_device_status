@@ -38,8 +38,6 @@ Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();
 } // namespace
 
-sptr<IRemoteDevStaCallback> DeviceStatusServiceTest::devCallback_ = nullptr;
-
 void DeviceStatusServiceTest::SetUpTestCase()
 {
     devCallback_ = new (std::nothrow) DeviceStatusServiceTestCallback();

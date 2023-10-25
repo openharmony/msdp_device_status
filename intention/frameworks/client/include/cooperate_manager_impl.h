@@ -51,7 +51,7 @@ public:
     int32_t ActivateCooperate(const std::string &remoteNetworkId, int32_t startDeviceId,
         FuncCooperateMessage callback);
     int32_t DeactivateCooperate(bool isUnchained, FuncCooperateMessage callback);
-    int32_t GetCooperateState(const std::string &deviceId, FuncCooperateState callback);
+    int32_t GetCooperateState(const std::string &networkId, FuncCooperateState callback);
 
 private:
     std::list<CooperateListenerPtr> devCooperateListener_;

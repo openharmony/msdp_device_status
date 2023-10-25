@@ -67,8 +67,8 @@ bool StartCooperateParam::Unmarshalling(Parcel &data)
     );
 }
 
-GetCooperateStateParam::GetCooperateStateParam(std::string deviceId, int32_t userData)
-    : deviceId(deviceId),
+GetCooperateStateParam::GetCooperateStateParam(std::string networkId, int32_t userData)
+    : networkId(networkId),
       userData(userData)
 {}
 
@@ -76,7 +76,7 @@ bool GetCooperateStateParam::Marshalling(Parcel &data) const
 {
     return (
         data.WriteInt32(userData) &&
-        data.WriteString(deviceId)
+        data.WriteString(networkId)
     );
 }
 
@@ -84,7 +84,7 @@ bool GetCooperateStateParam::Unmarshalling(Parcel &data)
 {
     return (
         data.ReadInt32(userData) &&
-        data.ReadString(deviceId)
+        data.ReadString(networkId)
     );
 }
 

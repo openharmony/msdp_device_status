@@ -41,13 +41,13 @@ public:
 
     int32_t UpdateCrossingSwitchState(bool state);
     int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
-    bool GetCrossingSwitchState(const std::string &deviceId);
-    int32_t RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback);
-    int32_t UnregisterCrossingStateListener(const std::string &deviceId);
+    bool GetCrossingSwitchState(const std::string &networkId);
+    int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
+    int32_t UnregisterCrossingStateListener(const std::string &networkId);
 
 private:
-    int32_t RegisterProfileListener(const std::string &deviceId);
-    void OnProfileChanged(const std::string &deviceId);
+    int32_t RegisterProfileListener(const std::string &networkId);
+    void OnProfileChanged(const std::string &networkId);
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
     std::mutex adapterLock_;
     std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
