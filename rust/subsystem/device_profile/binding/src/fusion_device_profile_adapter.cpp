@@ -316,14 +316,14 @@ void FusionDeviceProfileAdapter::RemoveFailedSubscriptions(const std::string &de
     }
 }
 
-int32_t UpdateCrossSwitchState(int32_t state)
+int32_t UpdateCrossSwitchState(size_t state)
 {
     CALL_DEBUG_ENTER;
     return DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().UpdateCrossSwitchState(
         static_cast<bool>(state));
 }
 
-int32_t SyncCrossSwitchState(int32_t state, CIStringVector *deviceIds)
+int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceIds, RET_ERR);

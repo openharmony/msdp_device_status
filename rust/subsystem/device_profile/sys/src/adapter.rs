@@ -44,59 +44,86 @@ struct CrossStateListener {
 }
 
 impl CrossStateListener {
-    // Structures with C-compatible layouts that safely interconvert the first structure field and structure object.
-    // Based on the C17 standard
-    extern "C" fn from_interface(listener: *mut CICrossStateListener) -> *mut Self
+    /// Structures with C-compatible layouts that safely interconvert the first structure field and structure instance.
+    /// Based on the C17 standard
+    /// 
+    /// # Note
+    ///
+    /// This function performs a conversion of the pointer type to `*mut Self` and returns it.
+    /// Please note that the pointer `listener` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure that the returned pointer is not null before dereferencing it.
+    fn from_interface(listener: *mut CICrossStateListener) -> *mut Self
     {
         listener as *mut Self
     }
-
+    /// Clone a `CICrossStateListener` instance.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `listener` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn clone(listener: *mut CICrossStateListener) -> *mut CICrossStateListener
     {
         call_debug_enter!("CrossStateListener::clone");
         let listener_ptr = CrossStateListener::from_interface(listener);
         if listener_ptr.is_null() {
             error!(LOG_LABEL, "listener_ptr is null");
+            std::ptr::null_mut()
+        } else {
+            let listener_box = Box::new(Self {
+                interface: CICrossStateListener {
+                    clone: Some(Self::clone),
+                    destruct: Some(Self::destruct),
+                    on_update: Some(Self::on_update),
+                },
+                // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
+                callback: unsafe { (*listener_ptr).callback.clone() },
+            });
+            Box::into_raw(listener_box) as *mut CICrossStateListener
         }
-        debug_assert!(!listener_ptr.is_null());
-        let listener_box = Box::new(Self {
-            interface: CICrossStateListener {
-                clone: Some(Self::clone),
-                destruct: Some(Self::destruct),
-                on_update: Some(Self::on_update),
-            },
-            // SAFETY: no `None` here, cause `listener_ptr` is valid.
-            callback: unsafe { (*listener_ptr).callback.clone() },
-        });
-        Box::into_raw(listener_box) as *mut CICrossStateListener
     }
-
+    /// Destruct a `CICrossStateListener` instance.
+    /// 
+    /// # Note
+    ///
+    /// Please note that the pointer `listener` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(listener: *mut CICrossStateListener)
     {
         call_debug_enter!("CrossStateListener::destruct");
         let listener_ptr = CrossStateListener::from_interface(listener);
         if listener_ptr.is_null() {
             error!(LOG_LABEL, "listener_ptr is null");
+        } else {
+            // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
+            unsafe { drop(Box::from_raw(listener_ptr)) };
         }
-        debug_assert!(!listener_ptr.is_null());
-        // SAFETY: no `None` here, cause `listener_ptr` is valid.
-        unsafe { drop(Box::from_raw(listener_ptr)) };
     }
-
-    extern "C" fn on_update(listener: *mut CICrossStateListener, device_id: *const c_char, state: i32)
+    /// Handle a state update event from a device.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `listener` and `device_id` are raw pointers that need to be handled carefully 
+    /// to avoid memory safety issues and undefined behavior and ensure `state` is valid(0 for off, 1 for on).
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    extern "C" fn on_update(listener: *mut CICrossStateListener, device_id: *const c_char, state: u32)
     {
         call_debug_enter!("CrossStateListener::destruct");
         let listener_ptr = CrossStateListener::from_interface(listener);
         if listener_ptr.is_null() {
             error!(LOG_LABEL, "listener_ptr is null");
-        }
-        debug_assert!(!device_id.is_null());
-        // SAFETY: no `None` here, cause `listener_ptr` is valid.
-        unsafe {
-            if let Ok(id) = CStr::from_ptr(device_id).to_str() {
-                ((*listener_ptr).callback)(id, state != 0);
-            } else {
-                error!(LOG_LABEL, "Invalid device id");
+        } else {
+            // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
+            // `device_id` and `state` is valid, which is the ensured by the caller.
+            unsafe {
+                if let Ok(id) = CStr::from_ptr(device_id).to_str() {
+                    ((*listener_ptr).callback)(id, state != 0);
+                } else {
+                    error!(LOG_LABEL, "Invalid device id");
+                }
             }
         }
     }
@@ -125,68 +152,101 @@ struct StringVector {
 }
 
 impl StringVector {
-    extern "C" fn from_interface(strings: *mut CIStringVector) -> *mut Self
+    /// Structures with C-compatible layouts that safely interconvert the first structure field and structure instance.
+    /// Based on the C17 standard
+    /// 
+    /// # Note
+    ///
+    /// This function performs a conversion of the pointer type to `*mut Self` and returns it.
+    /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure that the returned pointer is not null before dereferencing it.
+    fn from_interface(strings: *mut CIStringVector) -> *mut Self
     {
         strings as *mut Self
     }
-    
+    /// Clone a `CIStringVector` instance.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn clone(strings: *mut CIStringVector) -> *mut CIStringVector
     {
         let strings_ptr = StringVector::from_interface(strings);
         if strings_ptr.is_null() {
             error!(LOG_LABEL, "strings_ptr is null");
+            std::ptr::null_mut()
+        } else {
+            let strings_box = Box::new(Self {
+                interface: CIStringVector {
+                    clone: Some(Self::clone),
+                    destruct: Some(Self::destruct),
+                    at: Some(Self::at),
+                    size: Some(Self::size),
+                },
+                // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
+                data: unsafe { (*strings_ptr).data.clone() },
+            });
+            Box::into_raw(strings_box) as *mut CIStringVector
         }
-        debug_assert!(!strings_ptr.is_null());
-        let strings_box = Box::new(Self {
-            interface: CIStringVector {
-                clone: Some(Self::clone),
-                destruct: Some(Self::destruct),
-                at: Some(Self::at),
-                size: Some(Self::size),
-            },
-            // SAFETY: no `None` here, cause `strings_ptr` is valid.
-            data: unsafe { (*strings_ptr).data.clone() },
-        });
-        Box::into_raw(strings_box) as *mut CIStringVector
     }
-
+    /// Destruct a `CIStringVector` instance.
+    /// 
+    /// # Note
+    ///
+    /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(strings: *mut CIStringVector)
     {
         let strings_ptr = StringVector::from_interface(strings);
         if strings_ptr.is_null() {
             error!(LOG_LABEL, "strings_ptr is null");
+        } else {
+            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
+            unsafe { drop(Box::from_raw(strings_ptr)) };
         }
-        debug_assert!(!strings_ptr.is_null());
-        // SAFETY: no `None` here, cause `strings_ptr` is valid.
-        unsafe { drop(Box::from_raw(strings_ptr)) };
     }
-
+    /// Accesse an element at a specific index in a `CIStringVector` instance.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn at(strings: *mut CIStringVector, index: usize) -> *const c_char
     {
         let strings_ptr = StringVector::from_interface(strings);
         if strings_ptr.is_null() {
             error!(LOG_LABEL, "strings_ptr is null");
-        }
-        debug_assert!(!strings_ptr.is_null());
-        // SAFETY: no `None` here, cause `strings_ptr` is valid.
-        unsafe {
-            if index < (*strings_ptr).data.len() {
-                (*strings_ptr).data[index].as_ptr() as *const c_char
-            } else {
-                std::ptr::null_mut()
+            std::ptr::null_mut()
+        } else {
+            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
+            unsafe {
+                if index < (*strings_ptr).data.len() {
+                    (*strings_ptr).data[index].as_ptr() as *const c_char
+                } else {
+                    std::ptr::null_mut()
+                }
             }
         }
     }
-
+    /// Get the number of elements in a `CIStringVector` instance.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn size(strings: *mut CIStringVector) -> usize
     {
         let strings_ptr = StringVector::from_interface(strings);
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
+        if !strings_ptr.is_null() {
+            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
+            unsafe { (*strings_ptr).data.len() }
         }
-        debug_assert!(!strings_ptr.is_null());
-        // SAFETY: no `None` here, cause `strings_ptr` is valid.
-        unsafe { (*strings_ptr).data.len() }
     }
 }
 
@@ -226,16 +286,22 @@ impl DeviceProfileAdapter {
     /// # Arguments
     /// 
     /// * `state` - A boolean value that represents the cross switch state. `true` for on, `false` for off.
+    ///
+    /// # Note
+    ///
+    /// This function assumes `state` parameter is a valid boolean value (`true` or `false`), 
+    /// The caller needs to ensure that `state` is valid.
     /// 
     /// # Returns
     /// 
     /// Returns `FusionResult<()>` indicating whether the operation is successful. If the update succeeds,
     /// it returns `Ok(())`. If the update fails, it returns the corresponding error information.
+
     pub fn update_cross_switch_state(&self, state: bool) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::update_cross_switch_state");
-        // SAFETY: no `None` here, cause `state` is valid.
-        let ret = unsafe { UpdateCrossSwitchState(state as i32) };
+        // SAFETY: `state` is valid, which is the ensured by the caller.
+        let ret = unsafe { UpdateCrossSwitchState(state as u32) };
         Ok(err_log!(self.check_return_code(ret), "UpdateCrossSwitchState"))
     }
 
@@ -244,7 +310,13 @@ impl DeviceProfileAdapter {
     /// # Arguments
     /// 
     /// * `state` - A boolean value that represents the cross switch state. `true` for on, `false` for off.
-    /// * `device_ids` - An array of device ID strings representing the target devices to synchronize the state.
+    /// * `device_ids` - A slice of strings representing the device IDs to sync with.
+    /// 
+    /// # Note
+    ///
+    /// This function assumes the validity of `state` (`true` or `false`) and `device_ids` parameters.
+    /// The caller needs to ensure that `state` is valid and `device_ids` is a valid and properly initialized 
+    /// slice of strings.
     /// 
     /// # Returns
     /// 
@@ -254,10 +326,10 @@ impl DeviceProfileAdapter {
     {
         call_debug_enter!("DeviceProfileAdapter::sync_cross_switch_state");
         let mut device_ids = StringVector::from(device_ids);
-        // SAFETY: no `None` here, cause `state` and `device_ids_ptr` is valid.
+        // SAFETY: `state` and `device_ids` are valid, which are the ensured by the caller.
         let ret = unsafe {
             let device_ids_ptr: *mut StringVector = &mut device_ids;
-            SyncCrossSwitchState(state as i32, device_ids_ptr as *mut CIStringVector)
+            SyncCrossSwitchState(state as u32, device_ids_ptr as *mut CIStringVector)
         };
         Ok(err_log!(self.check_return_code(ret), "SyncCrossSwitchState"))
     }
@@ -275,7 +347,7 @@ impl DeviceProfileAdapter {
     pub fn get_cross_switch_state(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::get_cross_switch_state");
-        // SAFETY: no `None` here, cause `device_id` is valid.
+        // SAFETY: `device_id` are valid, which is the ensured by the caller.
         let ret = unsafe { GetCrossSwitchState(device_id.as_ptr()) };
         Ok(err_log!(self.check_return_code(ret), "GetCrossSwitchState"))
     }
@@ -298,7 +370,7 @@ impl DeviceProfileAdapter {
     {
         call_debug_enter!("DeviceProfileAdapter::register_cross_state_listener");
         let mut listener = CrossStateListener::from(Arc::new(callback));
-        // SAFETY: no `None` here, cause `device_id` and `listener_ptr` is valid.
+        // SAFETY: `device_id` and `listener_ptr` are valid, which are the ensured by the caller.
         let ret = unsafe {
             let listener_ptr: *mut CrossStateListener = &mut listener;
             RegisterCrossStateListener(device_id.as_ptr(), listener_ptr as *mut CICrossStateListener)
@@ -319,7 +391,7 @@ impl DeviceProfileAdapter {
     pub fn unregister_cross_state_listener(&self, device_id: &str) -> FusionResult<()>
     {
         call_debug_enter!("DeviceProfileAdapter::unregister_cross_state_listener");
-        // SAFETY: no `None` here, cause `device_id` is valid.
+        // SAFETY: `device_id` is valid, which is the ensured by the caller.
         let ret = unsafe { UnregisterCrossStateListener(device_id.as_ptr()) };
         Ok(err_log!(self.check_return_code(ret), "UnregisterCrossStateListener"))
     }

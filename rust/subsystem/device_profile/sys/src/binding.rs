@@ -139,7 +139,6 @@ pub struct CIProfileEventCb {
     pub on_profile_changed: Option<OnProfileChanged>,
 }
 
-
 /// C representation of [`SyncMode`].
 #[repr(i32)]
 #[derive(Copy, Clone)]
@@ -204,7 +203,7 @@ pub struct CIStringVector {
 
 type CICrossStateListenerClone = extern "C" fn (listener: *mut CICrossStateListener) -> *mut CICrossStateListener;
 type CICrossStateListenerDestruct = extern "C" fn (listener: *mut CICrossStateListener);
-type OnCrossStateUpdate = extern "C" fn (listener: *mut CICrossStateListener, device_id: *const c_char, state: i32);
+type OnCrossStateUpdate = extern "C" fn (listener: *mut CICrossStateListener, device_id: *const c_char, state: u32);
 
 /// A struct representing a cross-state listener.
 #[repr(C)]
@@ -223,12 +222,12 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `state` - An integer value that represents the cross switch state.
+    /// * `state` - An unsigned integer value that represents the cross switch state.
     ///
     /// # Returns
     ///
     /// Returns an `i32` value representing the result of the update operation.
-    pub fn UpdateCrossSwitchState(state: i32) -> i32;
+    pub fn UpdateCrossSwitchState(state: u32) -> i32;
     /// Synchronizes the state of the cross switch with multiple devices.
     ///
     /// # Arguments
@@ -239,7 +238,7 @@ extern "C" {
     /// # Returns
     ///
     /// Returns an `i32` value representing the result of the synchronization operation.
-    pub fn SyncCrossSwitchState(state: i32, device_ids: *mut CIStringVector) -> i32;
+    pub fn SyncCrossSwitchState(state: u32, device_ids: *mut CIStringVector) -> i32;
     /// Retrieves the state of the cross switch for a specific device.
     ///
     /// # Arguments
@@ -265,7 +264,7 @@ extern "C" {
     ///
     /// # Arguments
     ///
-    /// * `device_id: *const c_char` - The ID of the device to unregister the listener from.
+    /// * `device_id` - The ID of the device to unregister the listener from.
     ///
     /// # Returns
     ///

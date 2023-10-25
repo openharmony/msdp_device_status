@@ -38,8 +38,8 @@ using DeviceProfileCallback = void (*)(const char *, bool, void *);
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t UpdateCrossSwitchState(int32_t state);
-int32_t SyncCrossSwitchState(int32_t state, CIStringVector *deviceIds);
+int32_t UpdateCrossSwitchState(size_t state);
+int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds);
 int32_t GetCrossSwitchState(const char *deviceId);
 int32_t RegisterCrossStateListener(const char *deviceId, CICrossStateListener *listener);
 int32_t UnregisterCrossStateListener(const char *deviceId);

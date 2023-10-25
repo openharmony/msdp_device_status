@@ -19,7 +19,7 @@
 
 use std::{ ffi::{ c_char, c_int, CString }, sync::Arc };
 use hilog_rust::{ error, hilog, HiLogLabel, LogType };
-use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult };
+use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult, err_log };
 
 use crate::binding::{
     CProfileChangeNotification,
@@ -128,12 +128,26 @@ struct ProfileEventCallback {
 }
 
 impl ProfileEventCallback {
-    extern "C" fn from_interface(cb: *mut CIProfileEventCb) -> *mut Self
+    /// Structures with C-compatible layouts that safely interconvert the first structure field and structure instance.
+    /// Based on the C17 standard
+    /// 
+    /// # Note
+    ///
+    /// This function performs a conversion of the pointer type to `*mut Self` and returns it.
+    /// Please note that the pointer `cb` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure that the returned pointer is not null before dereferencing it.
+    fn from_interface(cb: *mut CIProfileEventCb) -> *mut Self
     {
         cb as *mut Self
     }
-
-    /// Create a copy of a `CIProfileEventCb` instance.
+    /// Clone a `CIProfileEventCb` instance.
+    ///
+    /// # Note
+    ///
+    /// Please note that the pointer `cb` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn clone(cb: *mut CIProfileEventCb) -> *mut CIProfileEventCb
     {
         let callback_ptr = ProfileEventCallback::from_interface(cb);
@@ -156,8 +170,13 @@ impl ProfileEventCallback {
             },
         }
     }
-
-    /// Deallocate the memory used by a `CIProfileEventCb` instance.
+    /// Destruct a `CIProfileEventCb` instance.
+    /// 
+    /// # Note
+    ///
+    /// Please note that the pointer `cb` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(cb: *mut CIProfileEventCb)
     {
         if !cb.is_null() {
@@ -198,6 +217,15 @@ impl From<Arc<dyn IProfileEventCallback>> for ProfileEventCallback {
 pub struct DeviceProfile;
 
 impl DeviceProfile {
+    fn check_return_code(&self, ret: i32) -> FusionResult<()>
+    {
+        if ret != 0 {
+            Err(FusionErrorCode::Fail)
+        } else {
+            Ok(())
+        }
+    }
+
     /// Updates the device profile with the specified `ServiceCharacteristicProfile`.
     pub fn put_device_profile(_profile: &ServiceCharacteristicProfile) -> FusionResult<()>
     {
@@ -222,7 +250,7 @@ impl DeviceProfile {
     /// # Returns
     ///
     /// An empty `FusionResult` indicating success or an error if subscribing to events fails.
-    pub fn subscribe_profile_events(subscribe_infos: &[SubscribeInfo],
+    pub fn subscribe_profile_events(&self, subscribe_infos: &[SubscribeInfo],
         event_callback: &Arc<dyn IProfileEventCallback>,
         failed_events: &mut Vec<ProfileEvent>) -> FusionResult<()>
     {
@@ -245,7 +273,7 @@ impl DeviceProfile {
         let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
         let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
 
-        // SAFETY: no `None` here, cause `subscriptions_borrowed`, `event_cb_ptr` and `failed_ptr` is valid.
+        // SAFETY: no `None` here, `subscriptions_borrowed`, `event_cb_ptr` and `failed_ptr` are valid.
         let ret = unsafe {
             SubscribeProfileEvents(&subscriptions_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
@@ -258,19 +286,14 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
-            // SAFETY: no `None` here, cause `failed_ptr` is valid
+            // SAFETY: `failed_ptr` is valid, cause has been performed null pointer check.
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);
                 }
             }
         }
-        if ret != 0 {
-            error!(LOG_LABEL, "SubscribeProfileEvents failed");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(())
-        }
+        Ok(err_log!(self.check_return_code(ret), "SubscribeProfileEvents"))
     }
 
     /// Unsubscribes from the specified profile events.
@@ -284,7 +307,7 @@ impl DeviceProfile {
     /// # Returns
     ///
     /// An empty `FusionResult` indicating success or an error if unsubscribing from events fails.
-    pub fn unsubscribe_profile_events(profile_events: &[ProfileEvent],
+    pub fn unsubscribe_profile_events(&self, profile_events: &[ProfileEvent],
         event_callback: &Arc<dyn IProfileEventCallback>,
         failed_events: &mut Vec<ProfileEvent>) -> FusionResult<()>
     {
@@ -304,7 +327,7 @@ impl DeviceProfile {
         let event_cb_ptr: *mut ProfileEventCallback = &mut event_cb;
         let mut failed_ptr: *mut CIProfileEvents = std::ptr::null_mut();
 
-        // SAFETY:  no `None` here, cause `profile_events_borrowed`, `event_cb_ptr` and `failed_ptr` is valid
+        // SAFETY:  no `None` here, cause `profile_events_borrowed`, `event_cb_ptr` and `failed_ptr` are valid.
         let ret = unsafe {
             UnsubscribeProfileEvents(&profile_events_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
@@ -317,20 +340,14 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
-            // SAFETY:  no `None` here, cause `failed_ptr`is valid
+            // SAFETY: `failed_ptr`is valid, cause has been performed null pointer check.
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);
                 }
             }
         }
-
-        if ret != 0 {
-            error!(LOG_LABEL, "UnsubscribeProfileEvents failed");
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(())
-        }
+        Ok(err_log!(self.check_return_code(ret), "UnsubscribeProfileEvents"))
     }
 
     /// Synchronizes the device profile with the specified options.
