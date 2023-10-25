@@ -69,7 +69,8 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     }
 }
 
-void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& remoteNetworkId, CoordinationMessage msg)
+void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& remoteNetworkId,
+    CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);

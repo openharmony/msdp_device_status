@@ -147,7 +147,7 @@ std::string StringPrintf(const char *format, ...)
     va_start(ap, format);
     std::string result;
     int32_t ret = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, ap);
-    if ((size_t)ret >= RET_OK && (size_t)ret < sizeof(space)) {
+    if (ret >= RET_OK && static_cast<size_t>(ret) < sizeof(space)) {
         result = space;
     } else {
         FI_HILOGE("The buffer is overflow");
