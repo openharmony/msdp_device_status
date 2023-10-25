@@ -164,17 +164,17 @@ void CooperateSM::OnCloseCooperate(const std::string &networkId, bool isLocal)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
-        if ((networkId == preparedNetworkId_.first) || (networkId == preparedNetworkId_.second)) {
-            if (currentState_ != CooperateState::STATE_FREE) {
-                D_INPUT_ADAPTER->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                    COOR_DEV_MGR->GetCooperateDhids(startDeviceDhid_, false), [](bool isSuccess) {
-                    FI_HILOGI("Failed to stop remote");
-                });
-            }
-            D_INPUT_ADAPTER->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                [](bool isSuccess) {});
+    if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() &&
+        ((networkId == preparedNetworkId_.first) || (networkId == preparedNetworkId_.second))) {
+        if (currentState_ != CooperateState::STATE_FREE) {
+            D_INPUT_ADAPTER->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+                COOR_DEV_MGR->GetCooperateDhids(startDeviceDhid_, false), [](bool isSuccess) {
+                FI_HILOGI("Failed to stop remote");
+            });
         }
+        D_INPUT_ADAPTER->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+            [](bool isSuccess) {});
+        
     }
     preparedNetworkId_ = std::make_pair("", "");
     if (currentState_ == CooperateState::STATE_FREE) {

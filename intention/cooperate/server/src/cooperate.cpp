@@ -50,7 +50,8 @@ int32_t Cooperate::Start(CallingContext &context, Parcel &data, Parcel &reply)
         return RET_ERR;
     }
 
-    int32_t ret = cooperateMgr_.ActivateCooperate(context.session, param.userData, param.remoteNetworkId, param.startDeviceId);
+    int32_t ret = cooperateMgr_.ActivateCooperate(context.session, param.userData, param.remoteNetworkId,
+        param.startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Activate cooperate failed, ret:%{public}d", ret);
     }
