@@ -174,7 +174,6 @@ void CooperateSM::OnCloseCooperate(const std::string &networkId, bool isLocal)
         }
         D_INPUT_ADAPTER->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
             [](bool isSuccess) {});
-        
     }
     preparedNetworkId_ = std::make_pair("", "");
     if (currentState_ == CooperateState::STATE_FREE) {
