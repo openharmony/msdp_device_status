@@ -32,6 +32,7 @@ namespace DeviceStatus {
 class ICoordinationState {
 public:
     ICoordinationState();
+    ICoordinationState(const std::shared_ptr<CoordinationEventHandler> &eventHandler);
     virtual ~ICoordinationState() = default;
     virtual int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
     {
