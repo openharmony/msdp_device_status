@@ -207,7 +207,7 @@ public:
 
     /**
      * @brief Obtains the dragging state.
-     * @param dragState dragState Dragging state.
+     * @param dragState Dragging state.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
