@@ -206,8 +206,8 @@ public:
     int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
     /**
-     * @brief 获取所有与拖拽相关的状态。
-     * @param dragState 保存拖拽相关的状态。
+     * @brief 获取拖拽状态。
+     * @param dragState 返回拖拽状态。
      * @return 拖拽状态包含：ERROR(0)、START(1)、STOP(2)、CANCEL(3)、MOTION_DRAGGING(4)
      * @since 10
      */
