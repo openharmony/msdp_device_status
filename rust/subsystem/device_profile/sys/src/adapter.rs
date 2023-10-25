@@ -29,6 +29,8 @@ use crate::binding::{
     GetCrossSwitchState,
     RegisterCrossStateListener,
     UnregisterCrossStateListener,
+    RET_OK,
+    EMPTY_LENGTH,
 };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -243,7 +245,10 @@ impl StringVector {
     extern "C" fn size(strings: *mut CIStringVector) -> usize
     {
         let strings_ptr = StringVector::from_interface(strings);
-        if !strings_ptr.is_null() {
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+            EMPTY_LENGTH
+        } else {
             // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
             unsafe { (*strings_ptr).data.len() }
         }
@@ -274,11 +279,7 @@ pub struct DeviceProfileAdapter {
 impl DeviceProfileAdapter {
     fn check_return_code(&self, ret: i32) -> FusionResult<()>
     {
-        if ret != 0 {
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(())
-        }
+        (ret == RET_OK).then_some(()).ok_or(FusionErrorCode::Fail)
     }
 
     /// Update the cross switch state with a boolean value.
@@ -326,7 +327,7 @@ impl DeviceProfileAdapter {
     {
         call_debug_enter!("DeviceProfileAdapter::sync_cross_switch_state");
         let mut device_ids = StringVector::from(device_ids);
-        // SAFETY: `state` and `device_ids` are valid, which are the ensured by the caller.
+        // SAFETY: `state` and `device_ids` are valid, which are ensured by the caller.
         let ret = unsafe {
             let device_ids_ptr: *mut StringVector = &mut device_ids;
             SyncCrossSwitchState(state as u32, device_ids_ptr as *mut CIStringVector)

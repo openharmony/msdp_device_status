@@ -29,6 +29,7 @@ use crate::binding::{
     CISubscribeInfos,
     SubscribeProfileEvents,
     UnsubscribeProfileEvents,
+    RET_OK,
 };
 
 const LOG_LABEL: HiLogLabel = HiLogLabel {
@@ -219,11 +220,7 @@ pub struct DeviceProfile;
 impl DeviceProfile {
     fn check_return_code(&self, ret: i32) -> FusionResult<()>
     {
-        if ret != 0 {
-            Err(FusionErrorCode::Fail)
-        } else {
-            Ok(())
-        }
+        (ret == RET_OK).then_some(()).ok_or(FusionErrorCode::Fail)
     }
 
     /// Updates the device profile with the specified `ServiceCharacteristicProfile`.
