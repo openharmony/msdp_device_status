@@ -168,7 +168,7 @@ std::string CooperateDeviceManager::Device::GenerateDescriptor()
 
 std::string CooperateDeviceManager::Device::Sha256(const std::string &in) const
 {
-    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = { 0 };
+    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = { 0 }; // 2:coefficient
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, in.data(), in.size());
