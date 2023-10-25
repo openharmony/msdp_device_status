@@ -32,7 +32,7 @@ bool StopDragFuzzTest(const uint8_t* data, size_t size)
     const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
-        FI_HILOGE("Write failure");
+        FI_HILOGE("Write failed");
         return false;
     }
     MessageParcel reply;
@@ -41,7 +41,7 @@ bool StopDragFuzzTest(const uint8_t* data, size_t size)
         static_cast<uint32_t>(Msdp::DeviceInterfaceCode::STOP_DRAG), datas, reply, option);
     return true;
 }
-}
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
