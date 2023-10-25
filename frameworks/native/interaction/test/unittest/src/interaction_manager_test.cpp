@@ -186,11 +186,12 @@ void InteractionManagerTest::AddPermission()
     const char** perms = new (std::nothrow) const char* [1];
     CHKPV(perms);
     perms[0] = "ohos.permission.COOPERATE_MANAGER";
-    SetCooperatePermission("InteractionManagerTest", perms, sizeof(perms) / sizeof(perms[0]);
+    SetCooperatePermission("InteractionManagerTest", perms, sizeof(perms) / sizeof(perms[0]));
     delete []perms;
 }
 
-void InteractionManagerTest::SetCooperatePermission(const std::string &processName, const char** perms, size_t permCount)
+void InteractionManagerTest::SetCooperatePermission(const std::string &processName,
+    const char** perms, size_t permCount)
 {
     if (perms == nullptr || permCount == 0) {
         FI_HILOGE("The parameter of coordination permission is incorrect");
@@ -218,7 +219,8 @@ void InteractionManagerTest::SetUpTestCase()
     g_deviceTouchId = mouseAndTouch.second;
 }
 
-void InteractionManagerTest::SetUp() {
+void InteractionManagerTest::SetUp()
+{
     AddPermission();
 }
 
@@ -1044,7 +1046,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 
 /**
  * @tc.name: InteractionManagerTest_TouchEventDispatch
- * @tc.desc: Get Drag Target Pid
+ * @tc.desc: Dispatch the touchscreen events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1070,7 +1072,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
             [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
-        SimulateMoveEvent({ DRAG_DST_X, DRAG_DST_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
@@ -1083,7 +1085,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 
 /**
  * @tc.name: InteractionManagerTest_MouseEventDispatch
- * @tc.desc: Get Drag Target Pid
+ * @tc.desc: Dispatch the mouse events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1108,7 +1110,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
             [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
-        SimulateMoveEvent({ DRAG_DST_X, DRAG_DST_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, TOUCH_POINTER_ID, true);
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
@@ -1407,9 +1409,11 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_STEP }, { HOT_AREA_COOR, HOT_AREA_STEP - HOT_AREA_SPAN },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    SimulateMoveEvent({ g_screenWidth - HOT_AREA_STEP, HOT_AREA_COOR }, { g_screenWidth - HOT_AREA_SPAN, HOT_AREA_COOR },
+    SimulateMoveEvent({ g_screenWidth - HOT_AREA_STEP, HOT_AREA_COOR },
+        { g_screenWidth - HOT_AREA_SPAN, HOT_AREA_COOR },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    SimulateMoveEvent({ HOT_AREA_COOR, g_screenHeight - HOT_AREA_STEP }, { HOT_AREA_COOR, g_screenHeight - HOT_AREA_SPAN },
+    SimulateMoveEvent({ HOT_AREA_COOR, g_screenHeight - HOT_AREA_STEP },
+        { HOT_AREA_COOR, g_screenHeight - HOT_AREA_SPAN },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_TOUCH_DOWN_MS));
     ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);

@@ -40,7 +40,7 @@ ohos_unittest("InteractionManagerTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
-    "window_manager:libdm"
+    "window_manager:libdm",
   ]
 }
 
