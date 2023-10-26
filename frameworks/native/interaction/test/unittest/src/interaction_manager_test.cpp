@@ -20,6 +20,8 @@
 
 #include <unistd.h>
 
+#include "accesstoken_kit.h"
+#include "display_manager.h"
 #include <gtest/gtest.h>
 #include "input_device.h"
 #include "input_manager.h"
@@ -30,6 +32,8 @@
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -56,6 +60,9 @@ constexpr int32_t DRAG_NUM { 1 };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr int32_t SUBSTR_UDKEY_LEN { 6 };
 constexpr int32_t WINDOW_ID { -1 };
+constexpr int32_t HOT_AREA_COOR { 220 };
+constexpr int32_t HOT_AREA_STEP { 150 };
+constexpr int32_t HOT_AREA_SPAN { 70 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
@@ -63,6 +70,8 @@ constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY { "Unified data key" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
+int32_t g_screenWidth { 720 };
+int32_t g_screenHeight { 1280 };
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
@@ -87,6 +96,8 @@ public:
     static int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
     static void TestRemoveMonitor(int32_t monitorId);
     static void PrintDragData(const DragData &dragData);
+    void AddPermission();
+    void SetCooperatePermission(const std::string &processName, const char** perms, size_t permCount);
 };
 
 class DragListenerTest : public IDragListener {
@@ -170,6 +181,37 @@ std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
     return mouseAndTouch;
 }
 
+void InteractionManagerTest::AddPermission()
+{
+    const char** perms = new (std::nothrow) const char* [1];
+    CHKPV(perms);
+    perms[0] = "ohos.permission.COOPERATE_MANAGER";
+    SetCooperatePermission("InteractionManagerTest", perms, sizeof(perms) / sizeof(perms[0]));
+    delete []perms;
+}
+
+void InteractionManagerTest::SetCooperatePermission(const std::string &processName,
+    const char** perms, size_t permCount)
+{
+    if (perms == nullptr || permCount == 0) {
+        FI_HILOGE("The parameter of coordination permission is incorrect");
+        return;
+    }
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permCount,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = processName.c_str(),
+        .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
 void InteractionManagerTest::SetUpTestCase()
 {
     auto mouseAndTouch = GetMouseAndTouch();
@@ -177,7 +219,10 @@ void InteractionManagerTest::SetUpTestCase()
     g_deviceTouchId = mouseAndTouch.second;
 }
 
-void InteractionManagerTest::SetUp() {}
+void InteractionManagerTest::SetUp()
+{
+    AddPermission();
+}
 
 void InteractionManagerTest::TearDown()
 {
@@ -309,9 +354,15 @@ void InteractionManagerTest::SimulateMoveEvent(const std::pair<int32_t, int32_t>
         for (int32_t y = srcY; y <= dstY; y += MOVE_STEP) {
             coordinates.push_back({srcX, y});
         }
+        for (int32_t y = srcY; y > dstY; y -= MOVE_STEP) {
+            coordinates.push_back({srcX, y});
+        }
     } else {
         double ratio = (dstY - srcY) * 1.0 / (dstX - srcX);
         for (int32_t x = srcX; x < dstX; x += MOVE_STEP) {
+            coordinates.push_back({x, srcY + static_cast<int32_t>(ratio * (x - srcX))});
+        }
+        for (int32_t x = srcX; x >= dstX; x -= MOVE_STEP) {
             coordinates.push_back({x, srcY + static_cast<int32_t>(ratio * (x - srcX))});
         }
         coordinates.push_back({dstX, dstY});
@@ -995,7 +1046,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 
 /**
  * @tc.name: InteractionManagerTest_TouchEventDispatch
- * @tc.desc: Get Drag Target Pid
+ * @tc.desc: Dispatch the touchscreen events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1021,7 +1072,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
             [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
-        SimulateMoveEvent({ DRAG_DST_X, DRAG_DST_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
@@ -1034,7 +1085,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 
 /**
  * @tc.name: InteractionManagerTest_MouseEventDispatch
- * @tc.desc: Get Drag Target Pid
+ * @tc.desc: Dispatch the mouse events
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1059,7 +1110,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         auto callbackPtr = std::make_shared<InputEventCallbackTest>(
             [&promiseEventFlag]{promiseEventFlag.set_value(true);});
         int32_t monitorId = TestAddMonitor(callbackPtr);
-        SimulateMoveEvent({ DRAG_DST_X, DRAG_DST_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, TOUCH_POINTER_ID, true);
         ASSERT_TRUE(futureEventFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
@@ -1310,6 +1361,108 @@ HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
     FI_HILOGD("dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::STOP);
+}
+
+class HotAreaListenerTest : public IHotAreaListener {
+public:
+    HotAreaListenerTest() {}
+    explicit HotAreaListenerTest(std::string name) : testName_(name) {}
+    void OnHotAreaMessage(int32_t displayX, int32_t displayY, HotAreaType msg, bool isEdge) override
+    {
+        if (testName_.empty()) {
+            testName_ = std::string("HOT_AREA");
+        }
+        FI_HILOGD("%{public}s, type:%{public}s, isEdge:%{public}d, displayX:%{public}d, displayY:%{public}d",
+            testName_.c_str(), ShowMessage(msg).c_str(), isEdge, displayX, displayY);
+    };
+
+private:
+    std::string ShowMessage(HotAreaType msg)
+    {
+        switch (msg) {
+            case HotAreaType::AREA_LEFT: {
+                return std::string("left-area");
+            }
+            case HotAreaType::AREA_RIGHT: {
+                return std::string("right-area");
+            }
+            case HotAreaType::AREA_TOP: {
+                return std::string("top-area");
+            }
+            case HotAreaType::AREA_BOTTOM: {
+                return std::string("bottom-area");
+            }
+            default: {
+                return std::string("none-area");
+            }
+        }
+    }
+
+private:
+    std::string testName_;
+};
+
+/**
+ * @tc.name: AddHotAreaListener_001
+ * @tc.desc: Add hot area listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
+    int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+/**
+ * @tc.name: AddHotAreaListener_002
+ * @tc.desc: Add hot area listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    CHKPV(display);
+    g_screenWidth = display->GetWidth();
+    g_screenHeight = display->GetHeight();
+    auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
+    int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    SimulateMoveEvent({ HOT_AREA_STEP, HOT_AREA_COOR }, { HOT_AREA_STEP - HOT_AREA_SPAN, HOT_AREA_COOR },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ HOT_AREA_COOR, HOT_AREA_STEP }, { HOT_AREA_COOR, HOT_AREA_STEP - HOT_AREA_SPAN },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ g_screenWidth - HOT_AREA_STEP, HOT_AREA_COOR },
+        { g_screenWidth - HOT_AREA_SPAN, HOT_AREA_COOR },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateMoveEvent({ HOT_AREA_COOR, g_screenHeight - HOT_AREA_STEP },
+        { HOT_AREA_COOR, g_screenHeight - HOT_AREA_SPAN },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_TOUCH_DOWN_MS));
+    ret = InteractionManager::GetInstance()->RemoveHotAreaListener(listener);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 } // namespace DeviceStatus
 } // namespace Msdp

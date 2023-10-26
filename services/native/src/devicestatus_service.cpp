@@ -35,6 +35,9 @@
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+#include "motion_drag.h"
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 
 namespace OHOS {
 namespace Msdp {
@@ -191,17 +194,14 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Drag manager init failed");
         goto INIT_FAIL;
     }
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    if (motionDrag_.Init(this) != RET_OK) {
+    if (InitMotionDrag() != RET_OK) {
         FI_HILOGE("Drag adapter init failed");
         goto INIT_FAIL;
     }
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     if (DS_DUMPER->Init(this) != RET_OK) {
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
-
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     COOR_EVENT_MGR->SetIContext(this);
     COOR_SM->Init();
@@ -394,6 +394,20 @@ int32_t DeviceStatusService::InitDelegateTasks()
     }
     FI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", epollFd_, delegateTasks_.GetReadFd());
     return ret;
+}
+
+int32_t DeviceStatusService::InitMotionDrag()
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+    if (motionDrag_ == nullptr) {
+        motionDrag_ = std::make_unique<MotionDrag>();
+    }
+    if (motionDrag_->Init(this) != RET_OK) {
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+    return RET_OK;
 }
 
 int32_t DeviceStatusService::InitTimerMgr()
@@ -831,7 +845,9 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         return MSG_SEND_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    motionDrag_.RegisterCallback();
+    if (motionDrag_ != nullptr) {
+        motionDrag_->RegisterCallback();
+    }
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return RET_OK;
 }

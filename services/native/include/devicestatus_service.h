@@ -30,9 +30,6 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-#include "motion_drag.h"
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -40,6 +37,7 @@
 
 namespace OHOS {
 namespace Msdp {
+class MotionDrag;
 namespace DeviceStatus {
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class DeviceStatusService final : public IContext,
@@ -99,6 +97,7 @@ private:
     bool Init();
     int32_t InitDelegateTasks();
     int32_t InitTimerMgr();
+    int32_t InitMotionDrag();
     void OnThread();
     void OnDelegateTask(const epoll_event &ev);
     void OnTimeout(const epoll_event &ev);
@@ -129,7 +128,7 @@ private:
     std::shared_ptr<DeviceStatusManager> devicestatusManager_ { nullptr };
     DragManager dragMgr_;
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    MotionDrag motionDrag_;
+    std::unique_ptr<MotionDrag> motionDrag_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 };
 } // namespace DeviceStatus
