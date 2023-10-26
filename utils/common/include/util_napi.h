@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef UTIL_NAPI_H
 #define UTIL_NAPI_H
 

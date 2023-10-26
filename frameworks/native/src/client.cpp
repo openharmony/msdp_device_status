@@ -27,12 +27,12 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+using namespace AppExecFwk;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Client" };
 const std::string THREAD_NAME { "ClientEventHandler" };
 } // namespace
 
-using namespace AppExecFwk;
 Client::~Client()
 {
     CALL_DEBUG_ENTER;

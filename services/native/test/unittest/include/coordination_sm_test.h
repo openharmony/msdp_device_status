@@ -15,6 +15,7 @@
 
 #ifndef COORDINATION_SM_TEST_H
 #define COORDINATION_SM_TEST_H
+
 #include "coordination_sm.h"
 
 namespace OHOS {

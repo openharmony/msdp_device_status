@@ -72,7 +72,7 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
     }
     NapiError napiError;
     if (!UtilNapiError::GetApiError(errCode, napiError)) {
-        FI_HILOGE("This error code could not be found");
+        FI_HILOGE("This errCode could not be found");
         return nullptr;
     }
     napi_value resultCode = nullptr;

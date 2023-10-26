@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef PROTO_H
 #define PROTO_H
+
 #include <sys/types.h>
 
 inline constexpr int32_t MAX_EVENT_SIZE { 100 };
