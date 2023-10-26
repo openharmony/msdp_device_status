@@ -35,9 +35,6 @@ ICoordinationState::ICoordinationState()
     eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
 
-ICoordinationState::ICoordinationState(const std::shared_ptr<CoordinationEventHandler> &eventHandler)
-    : eventHandler_(eventHandler) {}
-
 int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;

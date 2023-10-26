@@ -26,9 +26,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
 } // namespace
 
-CoordinationStateFree::CoordinationStateFree(const std::shared_ptr<CoordinationEventHandler> &eventHandler)
-    : ICoordinationState(eventHandler) {}
-
 int32_t CoordinationStateFree::ActivateCoordination(
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {

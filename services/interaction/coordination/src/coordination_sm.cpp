@@ -61,12 +61,9 @@ void CoordinationSM::Init()
 {
     CALL_INFO_TRACE;
     preparedNetworkId_ = std::make_pair("", "");
-    runner_ = AppExecFwk::EventRunner::Create(true);
-    CHKPL(runner_);
-    eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
-    coordinationStates_.emplace(CoordinationState::STATE_FREE, std::make_shared<CoordinationStateFree>(eventHandler_));
-    coordinationStates_.emplace(CoordinationState::STATE_IN, std::make_shared<CoordinationStateIn>(eventHandler_));
-    coordinationStates_.emplace(CoordinationState::STATE_OUT, std::make_shared<CoordinationStateOut>(eventHandler_));
+    coordinationStates_.emplace(CoordinationState::STATE_FREE, std::make_shared<CoordinationStateFree>());
+    coordinationStates_.emplace(CoordinationState::STATE_IN, std::make_shared<CoordinationStateIn>());
+    coordinationStates_.emplace(CoordinationState::STATE_OUT, std::make_shared<CoordinationStateOut>());
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     context->GetTimerManager().AddTimer(INTERVAL_MS, 1, [this]() {
@@ -74,6 +71,9 @@ void CoordinationSM::Init()
         COOR_SOFTBUS_ADAPTER->Init();
     });
     COOR_DEV_MGR->Init();
+    runner_ = AppExecFwk::EventRunner::Create(true);
+    CHKPL(runner_);
+    eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
 
 void CoordinationSM::OnSoftbusSessionClosed(const std::string &networkId)
