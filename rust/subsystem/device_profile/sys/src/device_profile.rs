@@ -138,9 +138,17 @@ impl ProfileEventCallback {
     /// Please note that the pointer `cb` is a raw pointer that needs to be handled carefully to avoid memory
     /// safety issues and undefined behavior.
     /// Make sure that the returned pointer is not null before dereferencing it.
-    fn from_interface(cb: *mut CIProfileEventCb) -> *mut Self
+    fn from_interface(cb: *mut CIProfileEventCb) -> Option<&'static mut Self>
     {
-        cb as *mut Self
+        let cb_ptr = cb as *mut Self;
+        if cb_ptr.is_null() {
+            error!(LOG_LABEL, "cb_ptr is null");
+            return None;
+        }
+        // SAFETY: `cb_ptr` is valid, because null pointer check has been performed.
+        unsafe {
+            cb_ptr.as_mut()
+        }
     }
     /// Clone a `CIProfileEventCb` instance.
     ///
@@ -151,24 +159,20 @@ impl ProfileEventCallback {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn clone(cb: *mut CIProfileEventCb) -> *mut CIProfileEventCb
     {
-        let callback_ptr = ProfileEventCallback::from_interface(cb);
-        // SAFETY:  no `None` here, cause `callback_ptr` is valid
-        match unsafe { callback_ptr.as_ref() } {
-            Some(callback_ref) => {
-                let callback_box = Box::new(Self {
-                    interface: CIProfileEventCb {
-                        clone: Some(Self::clone),
-                        destruct: Some(Self::destruct),
-                        on_sync_completed: Some(Self::on_sync_completed),
-                        on_profile_changed: Some(Self::on_profile_changed),
-                    },
-                    instance: callback_ref.instance.clone(),
-                });
-                Box::into_raw(callback_box) as *mut CIProfileEventCb
-            },
-            None => {
-                std::ptr::null_mut()
-            },
+        if let Some(callback_mut) = ProfileEventCallback::from_interface(cb) {
+            let callback_box = Box::new(Self {
+                interface: CIProfileEventCb {
+                    clone: Some(Self::clone),
+                    destruct: Some(Self::destruct),
+                    on_sync_completed: Some(Self::on_sync_completed),
+                    on_profile_changed: Some(Self::on_profile_changed),
+                },
+                instance: callback_mut.instance.clone(),
+            });
+            Box::into_raw(callback_box) as *mut CIProfileEventCb
+        } else {
+            error!(LOG_LABEL, "Failed to clone a CIProfileEventCb instance");
+            std::ptr::null_mut()
         }
     }
     /// Destruct a `CIProfileEventCb` instance.
@@ -180,10 +184,12 @@ impl ProfileEventCallback {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(cb: *mut CIProfileEventCb)
     {
-        if !cb.is_null() {
-            unsafe {
-                drop(Box::from_raw(cb as *mut Self));
-            }
+        let cb_ptr = cb as *mut Self;
+        if cb_ptr.is_null() {
+            error!(LOG_LABEL, "cb_ptr is null");
+        } else {
+            // SAFETY: `cb_ptr` is valid, because null pointer check has been performed.
+            unsafe { drop(Box::from_raw(cb_ptr)) };
         }
     }
 
@@ -275,6 +281,7 @@ impl DeviceProfile {
             SubscribeProfileEvents(&subscriptions_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
         if !failed_ptr.is_null() {
+            // SAFETY: `failed_ptr` is valid, because null pointer check has been performed.
             let profile_events_slice = unsafe {
                 std::slice::from_raw_parts((*failed_ptr).profile_events, (*failed_ptr).num_of_profile_events)
             };
@@ -283,7 +290,7 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
-            // SAFETY: `failed_ptr` is valid, cause has been performed null pointer check.
+            // SAFETY: `failed_ptr` is valid, because null pointer check has been performed.
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);
@@ -329,6 +336,7 @@ impl DeviceProfile {
             UnsubscribeProfileEvents(&profile_events_borrowed, event_cb_ptr as *mut CIProfileEventCb, &mut failed_ptr)
         };
         if !failed_ptr.is_null() {
+            // SAFETY: `failed_ptr` is valid, because null pointer check has been performed.
             let profile_events_slice = unsafe {
                 std::slice::from_raw_parts((*failed_ptr).profile_events, (*failed_ptr).num_of_profile_events)
             };
@@ -337,7 +345,7 @@ impl DeviceProfile {
                     failed_events.push(e);
                 }
             }
-            // SAFETY: `failed_ptr`is valid, cause has been performed null pointer check.
+            // SAFETY: `failed_ptr`is valid, because null pointer check has been performed.
             unsafe {
                 if let Some(destruct) = (*failed_ptr).destruct {
                     destruct(failed_ptr);

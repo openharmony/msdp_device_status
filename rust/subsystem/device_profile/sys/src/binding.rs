@@ -22,6 +22,7 @@ use std::ffi::{ c_char, c_int };
 /// Constant for device profile
 pub const RET_OK: i32 = 0;
 pub const EMPTY_LENGTH: usize = 0;
+
 /// C representation of [`ServiceCharacteristicProfile`].
 #[repr(C)]
 pub struct CServiceCharacteristicProfile {

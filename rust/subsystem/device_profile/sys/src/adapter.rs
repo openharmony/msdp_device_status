@@ -51,13 +51,21 @@ impl CrossStateListener {
     /// 
     /// # Note
     ///
-    /// This function performs a conversion of the pointer type to `*mut Self` and returns it.
+    /// This function performs a conversion of a raw pointer to a mutable reference of `Self` type.
     /// Please note that the pointer `listener` is a raw pointer that needs to be handled carefully to avoid memory
     /// safety issues and undefined behavior.
-    /// Make sure that the returned pointer is not null before dereferencing it.
-    fn from_interface(listener: *mut CICrossStateListener) -> *mut Self
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    fn from_interface(listener: *mut CICrossStateListener) -> Option<&'static mut Self>
     {
-        listener as *mut Self
+        let listener_ptr = listener as *mut Self;
+        if listener_ptr.is_null() {
+            error!(LOG_LABEL, "listener_ptr is null");
+            return None;
+        }
+        // SAFETY: `listener_ptr` is valid, because null pointer check has been performed.
+        unsafe {
+            listener_ptr.as_mut()
+        }
     }
     /// Clone a `CICrossStateListener` instance.
     ///
@@ -69,23 +77,22 @@ impl CrossStateListener {
     extern "C" fn clone(listener: *mut CICrossStateListener) -> *mut CICrossStateListener
     {
         call_debug_enter!("CrossStateListener::clone");
-        let listener_ptr = CrossStateListener::from_interface(listener);
-        if listener_ptr.is_null() {
-            error!(LOG_LABEL, "listener_ptr is null");
-            std::ptr::null_mut()
-        } else {
+        if let Some(listener_mut) = CrossStateListener::from_interface(listener) {
             let listener_box = Box::new(Self {
                 interface: CICrossStateListener {
                     clone: Some(Self::clone),
                     destruct: Some(Self::destruct),
                     on_update: Some(Self::on_update),
                 },
-                // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
-                callback: unsafe { (*listener_ptr).callback.clone() },
+                callback: listener_mut.callback.clone(),
             });
             Box::into_raw(listener_box) as *mut CICrossStateListener
+        } else {
+            error!(LOG_LABEL, "Failed to clone a CICrossStateListener instance");
+            std::ptr::null_mut()
         }
     }
+
     /// Destruct a `CICrossStateListener` instance.
     /// 
     /// # Note
@@ -96,11 +103,11 @@ impl CrossStateListener {
     extern "C" fn destruct(listener: *mut CICrossStateListener)
     {
         call_debug_enter!("CrossStateListener::destruct");
-        let listener_ptr = CrossStateListener::from_interface(listener);
+        let listener_ptr = listener as *mut Self;
         if listener_ptr.is_null() {
             error!(LOG_LABEL, "listener_ptr is null");
         } else {
-            // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
+            // SAFETY: `listener_ptr` is valid, because null pointer check has been performed.
             unsafe { drop(Box::from_raw(listener_ptr)) };
         }
     }
@@ -114,19 +121,18 @@ impl CrossStateListener {
     extern "C" fn on_update(listener: *mut CICrossStateListener, device_id: *const c_char, state: u32)
     {
         call_debug_enter!("CrossStateListener::destruct");
-        let listener_ptr = CrossStateListener::from_interface(listener);
-        if listener_ptr.is_null() {
-            error!(LOG_LABEL, "listener_ptr is null");
-        } else {
-            // SAFETY: `listener_ptr` is valid, cause has been performed null pointer check.
+        if let Some(listener_mut) = CrossStateListener::from_interface(listener) {
+            // SAFETY: `listener_mut` is valid, cause has been performed check.
             // `device_id` and `state` are valid, which are ensured by the caller.
             unsafe {
                 if let Ok(id) = CStr::from_ptr(device_id).to_str() {
-                    ((*listener_ptr).callback)(id, state != 0);
+                    (listener_mut.callback)(id, state != 0);
                 } else {
                     error!(LOG_LABEL, "Invalid device id");
                 }
             }
+        } else {
+            error!(LOG_LABEL, "Failed to handle a state update event from a device");
         }
     }
 }
@@ -159,13 +165,21 @@ impl StringVector {
     /// 
     /// # Note
     ///
-    /// This function performs a conversion of the pointer type to `*mut Self` and returns it.
+    /// This function performs a conversion of a raw pointer to a mutable reference of `Self` type.
     /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
     /// safety issues and undefined behavior.
     /// Make sure that the returned pointer is not null before dereferencing it.
-    fn from_interface(strings: *mut CIStringVector) -> *mut Self
+    fn from_interface(strings: *mut CIStringVector) -> Option<&'static mut Self>
     {
-        strings as *mut Self
+        let strings_ptr = strings as *mut Self;
+        if strings_ptr.is_null() {
+            error!(LOG_LABEL, "strings_ptr is null");
+            return None;
+        }
+        // SAFETY: `strings_ptr` is valid, because null pointer check has been performed.
+        unsafe {
+            strings_ptr.as_mut()
+        }
     }
     /// Clone a `CIStringVector` instance.
     ///
@@ -176,11 +190,7 @@ impl StringVector {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn clone(strings: *mut CIStringVector) -> *mut CIStringVector
     {
-        let strings_ptr = StringVector::from_interface(strings);
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
-            std::ptr::null_mut()
-        } else {
+        if let Some(strings_mut) = StringVector::from_interface(strings) {
             let strings_box = Box::new(Self {
                 interface: CIStringVector {
                     clone: Some(Self::clone),
@@ -188,10 +198,12 @@ impl StringVector {
                     at: Some(Self::at),
                     size: Some(Self::size),
                 },
-                // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
-                data: unsafe { (*strings_ptr).data.clone() },
+                data: strings_mut.data.clone(),
             });
             Box::into_raw(strings_box) as *mut CIStringVector
+        } else {
+            error!(LOG_LABEL, "Failed to clone a CIStringVector instance");
+            std::ptr::null_mut()
         }
     }
     /// Destruct a `CIStringVector` instance.
@@ -203,11 +215,11 @@ impl StringVector {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(strings: *mut CIStringVector)
     {
-        let strings_ptr = StringVector::from_interface(strings);
+        let strings_ptr = strings as *mut Self;
         if strings_ptr.is_null() {
             error!(LOG_LABEL, "strings_ptr is null");
         } else {
-            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
+            // SAFETY: `strings_ptr` is valid, because null pointer check has been performed.
             unsafe { drop(Box::from_raw(strings_ptr)) };
         }
     }
@@ -220,19 +232,16 @@ impl StringVector {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn at(strings: *mut CIStringVector, index: usize) -> *const c_char
     {
-        let strings_ptr = StringVector::from_interface(strings);
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
-            std::ptr::null_mut()
-        } else {
-            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
-            unsafe {
-                if index < (*strings_ptr).data.len() {
-                    (*strings_ptr).data[index].as_ptr() as *const c_char
-                } else {
-                    std::ptr::null_mut()
-                }
+        if let Some(strings_mut) = StringVector::from_interface(strings) {
+            if index < strings_mut.data.len() {
+                strings_mut.data[index].as_ptr() as *const c_char
+            } else {
+                error!(LOG_LABEL, "index is out of bounds");
+                std::ptr::null()
             }
+        } else {
+            error!(LOG_LABEL, "Failed to accesse CIStringVector instance");
+            std::ptr::null()
         }
     }
     /// Get the number of elements in a `CIStringVector` instance.
@@ -244,13 +253,11 @@ impl StringVector {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn size(strings: *mut CIStringVector) -> usize
     {
-        let strings_ptr = StringVector::from_interface(strings);
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
-            EMPTY_LENGTH
+        if let Some(strings_mut) = StringVector::from_interface(strings) {
+            strings_mut.data.len()
         } else {
-            // SAFETY: `strings_ptr` is valid, cause has been performed null pointer check.
-            unsafe { (*strings_ptr).data.len() }
+            error!(LOG_LABEL, "Failed to get the number of CIStringVector instance");
+            EMPTY_LENGTH
         }
     }
 }
