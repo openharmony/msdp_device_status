@@ -619,7 +619,7 @@ void JsEventTarget::HandleExecuteResult(napi_env env, int32_t errCode)
     if (errCode != OTHER_ERROR && errCode != RET_OK) {
         NapiError napiError;
         if (!UtilNapiError::GetApiError(errCode, napiError)) {
-            FI_HILOGE("This error code could not be found");
+            FI_HILOGE("This errCode could not be found");
             return;
         }
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, napiError.msg.c_str());
