@@ -259,7 +259,7 @@ impl Inner {
         let session_name_head = String::from("ohos.msdp.device_status");
 
         let local_network_id = self.local_network_id().map_err(|_| {
-            error!(LOG_LABEL, "Local network id is empty");
+            error!(LOG_LABEL, "Local_network_id is empty");
             FusionErrorCode::Fail
         })?;
         println!("local_network_id= {}", local_network_id);

@@ -46,7 +46,7 @@ unsafe extern "C" fn fusion_alloc_socket_fd(program_name: *const c_char, module_
     let param = match AllocSocketPairParam::from_c(program_name, module_type) {
         Ok(param) => { param }
         Err(err) => {
-            error!(LOG_LABEL, "Fail parsing AllocSocketPairParam");
+            error!(LOG_LABEL, "Failed parsing AllocSocketPairParam");
             return i32::from(err);
         }
     };
