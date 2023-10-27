@@ -129,20 +129,23 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
         subscriptions, callback, fails);
 
     if (!fails.empty()) {
-        CIProfileEvents *p = new CIProfileEvents;
-        p->numOfProfileEvents = fails.size();
-        p->profileEvents = new uint32_t[fails.size()];
-        p->clone = nullptr;
-        p->destruct = &Destruct;
+        CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
+        CHKPV(events);
+        events->numOfProfileEvents = fails.size();
+        events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
+        CHKPV(events->profileEvents);
+        events->clone = nullptr;
+        events->destruct = &Destruct;
 
         size_t index = 0;
         for (const auto &profile_event: fails) {
-            p->profileEvents[index++] = profile_event;
+            events->profileEvents[index++] = profile_event;
         }
-        *failedEvents = p;
+        *failedEvents = events;
     } else {
         *failedEvents = nullptr;
     }
+    events->destruct(events);
     return ret;
 }
 
@@ -170,20 +173,23 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
         profiles, callback, fails);
 
     if (!fails.empty()) {
-        CIProfileEvents *p = new CIProfileEvents;
-        p->numOfProfileEvents = fails.size();
-        p->profileEvents = new uint32_t[fails.size()];
-        p->clone = nullptr;
-        p->destruct = &Destruct;
+        CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
+        CHKPV(events);
+        events->numOfProfileEvents = fails.size();
+        events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
+        CHKPV(events->profileEvents);
+        events->clone = nullptr;
+        events->destruct = &Destruct;
 
         size_t index = 0;
         for (const auto &profile_event: fails) {
-            p->profileEvents[index++] = profile_event;
+            events->profileEvents[index++] = profile_event;
         }
-        *failedEvents = p;
+        *failedEvents = events;
     } else {
         *failedEvents = nullptr;
     }
+    events->destruct(events);
     return ret;
 }
 
