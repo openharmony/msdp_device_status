@@ -130,10 +130,10 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
 
     if (!fails.empty()) {
         CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
-        CHKPV(events);
+        CHKPP(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
-        CHKPV(events->profileEvents);
+        CHKPP(events->profileEvents, RET_ERR);
         events->clone = nullptr;
         events->destruct = &Destruct;
 
@@ -142,10 +142,10 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
             events->profileEvents[index++] = profile_event;
         }
         *failedEvents = events;
+        events->destruct(events);
     } else {
         *failedEvents = nullptr;
     }
-    events->destruct(events);
     return ret;
 }
 
@@ -174,10 +174,10 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
 
     if (!fails.empty()) {
         CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
-        CHKPV(events);
+        CHKPP(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
-        CHKPV(events->profileEvents);
+        CHKPP(events->profileEvents, RET_ERR);
         events->clone = nullptr;
         events->destruct = &Destruct;
 
@@ -186,10 +186,10 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
             events->profileEvents[index++] = profile_event;
         }
         *failedEvents = events;
+        events->destruct(events);
     } else {
         *failedEvents = nullptr;
     }
-    events->destruct(events);
     return ret;
 }
 
