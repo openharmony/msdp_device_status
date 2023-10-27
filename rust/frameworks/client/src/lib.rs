@@ -116,7 +116,7 @@ unsafe extern "C" fn fusion_start_coordination(user_data: i32,
     let remote_network_id: String = match CStr::from_ptr(remote_network_id).to_str() {
         Ok(id) => { id.to_string() }
         Err(_) => {
-            error!(LOG_LABEL, "Invalid network_id");
+            error!(LOG_LABEL, "Invalid network id");
             return -1;
         }
     };
@@ -144,7 +144,7 @@ unsafe extern "C" fn fusion_get_coordination_state(user_data: i32, device_id: *c
     let device_id: String = match CStr::from_ptr(device_id).to_str() {
         Ok(id) => { id.to_string() }
         Err(_) => {
-            error!(LOG_LABEL, "Invalid device_id");
+            error!(LOG_LABEL, "Invalid device id");
             return -1;
         }
     };
