@@ -162,7 +162,7 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(FilterInfo& filterInfo);
-    void ProcessFilter(std::shared_ptr<Rosen::RSCanvasNode> filterNode);
+    void ProcessFilter();
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
 private:
     int64_t startNum_ { -1 };
