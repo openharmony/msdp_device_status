@@ -381,9 +381,9 @@ int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
         return ret;
     }
 
-    int32_t dragStateVar = 0;
-    READINT32(reply, dragStateVar, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    dragState = static_cast<DragState>(dragStateVar);
+    int32_t dragStateTmp = 0;
+    READINT32(reply, dragStateTmp, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    dragState = static_cast<DragState>(dragStateTmp);
     return ret;
 }
 

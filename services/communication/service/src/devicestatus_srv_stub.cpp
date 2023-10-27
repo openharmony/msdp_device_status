@@ -531,8 +531,8 @@ int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel
         FI_HILOGE("Get DragState failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    int32_t dragStateInt32 = static_cast<int32_t>(dragState);
-    WRITEINT32(reply, dragStateInt32, ERR_INVALID_VALUE);
+    int32_t dragStateTmp = static_cast<int32_t>(dragState);
+    WRITEINT32(reply, dragStateTmp, ERR_INVALID_VALUE);
     return ret;
 }
 
