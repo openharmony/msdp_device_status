@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManagerImpl  {
+class DragManagerImpl {
 public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
@@ -49,6 +49,7 @@ public:
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t GetDragData(DragData &dragData);
+    int32_t GetDragState(DragState &dragState);
 
 private:
     std::mutex mtx_;

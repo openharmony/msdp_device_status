@@ -86,6 +86,8 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
             &DeviceStatusSrvStub::GetDragDataStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             &DeviceStatusSrvStub::AddHotAreaListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
+            &DeviceStatusSrvStub::GetDragStateStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
             &DeviceStatusSrvStub::RemoveHotAreaListenerStub}
     };
@@ -517,6 +519,20 @@ int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, Message
     if (ret != RET_OK) {
         FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    DragState dragState;
+    int32_t ret = GetDragState(dragState);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get DragState failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    int32_t dragStateTmp = static_cast<int32_t>(dragState);
+    WRITEINT32(reply, dragStateTmp, ERR_INVALID_VALUE);
     return ret;
 }
 

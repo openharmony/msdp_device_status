@@ -123,6 +123,11 @@ int32_t InteractionManager::GetDragData(DragData &dragData)
     return INTER_MGR_IMPL.GetDragData(dragData);
 }
 
+int32_t InteractionManager::GetDragState(DragState &dragState)
+{
+    return INTER_MGR_IMPL.GetDragState(dragState);
+}
+
 int32_t InteractionManager::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
 {
     return INTER_MGR_IMPL.AddHotAreaListener(listener);

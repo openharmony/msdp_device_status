@@ -193,6 +193,17 @@ int32_t DragManager::GetDragData(DragData &dragData)
     return RET_OK;
 }
 
+int32_t DragManager::GetDragState(DragState &dragState)
+{
+    CALL_DEBUG_ENTER;
+    dragState = GetDragState();
+    if (dragState == DragState::ERROR) {
+        FI_HILOGE("dragState_ is error");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t DragManager::NotifyDragResult(DragResult result)
 {
     CALL_DEBUG_ENTER;

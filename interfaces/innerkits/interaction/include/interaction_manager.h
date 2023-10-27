@@ -206,6 +206,14 @@ public:
     int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
 
     /**
+     * @brief Obtains the dragging state.
+     * @param dragState Dragging state.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetDragState(DragState &dragState);
+
+    /**
      * @brief Unregisters a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
