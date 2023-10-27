@@ -280,8 +280,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoVertical vertical;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    vertical.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_VERTICAL_POSITION);
     ret += 1;
@@ -302,8 +302,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
     ret += 1;
     ASSERT_TRUE(ret);
     AlgoVertical vertical;
-    std::shared_ptr<DeviceStatusMsdpClientImpl> callback_ = std::make_shared<DeviceStatusMsdpClientImpl>();
-    vertical.RegisterCallback(callback_);
+    std::shared_ptr<DeviceStatusMsdpClientImpl> callback = std::make_shared<DeviceStatusMsdpClientImpl>();
+    vertical.RegisterCallback(callback);
     ASSERT_TRUE(ret);
     ret = g_manager->Disable(Type::TYPE_HORIZONTAL_POSITION);
     ret += 1;

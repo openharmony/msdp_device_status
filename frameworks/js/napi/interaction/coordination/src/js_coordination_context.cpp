@@ -188,20 +188,20 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], networkId,
         sizeof(networkId), &length), GET_VALUE_STRING_UTF8);
-    std::string networkId_ = networkId;
+    std::string networkIdTmp = networkId;
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->GetCrossingSwitchState(env, networkId_);
+        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTmp);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->GetCrossingSwitchState(env, networkId_, argv[1]);
+    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTmp, argv[1]);
 }
 
 napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
@@ -256,25 +256,25 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    std::string type_ = type;
+    std::string typeTmp = type;
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        jsCoordinationMgr->UnregisterListener(env, type_);
+        jsCoordinationMgr->UnregisterListener(env, typeTmp);
         return nullptr;
     }
     if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
-        jsCoordinationMgr->UnregisterListener(env, type_);
+        jsCoordinationMgr->UnregisterListener(env, typeTmp);
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsCoordinationMgr->UnregisterListener(env, type_, argv[1]);
+    jsCoordinationMgr->UnregisterListener(env, typeTmp, argv[1]);
     return nullptr;
 }
 
