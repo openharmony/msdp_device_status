@@ -196,17 +196,17 @@ void JsEventCooperateTarget::RemoveListener(napi_env env, const std::string &typ
     }
     if (handle == nullptr) {
         iter->second.clear();
-        goto monitorLabel;
+        goto monitorTag;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtilCooperate::IsSameHandle(env, handle, (*it)->ref)) {
             FI_HILOGE("Success in removing monitor");
             iter->second.erase(it);
-            goto monitorLabel;
+            goto monitorTag;
         }
     }
 
-monitorLabel:
+monitorTag:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
         INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
@@ -214,16 +214,16 @@ monitorLabel:
 }
 
 napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
-    napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb)
+    napi_value dealt, sptr<JsUtilCooperate::CallbackInfo> cb)
 {
     CALL_INFO_TRACE;
     CHKPP(cb);
     cb->env = env;
     napi_value promise = nullptr;
-    if (handle == nullptr) {
+    if (dealt == nullptr) {
         CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, dealt, 1, &cb->ref), CREATE_REFERENCE);
     }
     return promise;
 }

@@ -42,8 +42,8 @@ public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
         using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
-        Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr)
-            : id_(id), fun_(fun), promise_(promise) {}
+        Task(int32_t id, DTaskCallback fun, Promise *promised = nullptr)
+            : id_(id), fun_(fun), promise_(promised) {}
         ~Task() = default;
         void ProcessTask();
 
@@ -85,11 +85,11 @@ public:
     }
     void SetWorkerThreadId(uint64_t tid)
     {
-        workerThreadId_ = tid;
+        workerThId_ = tid;
     }
     bool IsCallFromWorkerThread() const
     {
-        return (GetThisThreadId() == workerThreadId_);
+        return (GetThisThreadId() == workerThId_);
     }
 
 private:
@@ -97,7 +97,7 @@ private:
     TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
-    uint64_t workerThreadId_ { 0 };
+    uint64_t workerThId_ { 0 };
     int32_t fds_[2] {};
     std::mutex mux_;
     std::queue<TaskPtr> tasks_;

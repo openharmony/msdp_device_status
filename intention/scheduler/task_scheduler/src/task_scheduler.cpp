@@ -47,13 +47,13 @@ TaskScheduler::~TaskScheduler()
 {
     if (fds_[0] >= 0) {
         if (close(fds_[0]) < 0) {
-            FI_HILOGE("Close fds_[0] failed, error:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
+            FI_HILOGE("Close fds_[0] failed, err:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
         }
         fds_[0] = -1;
     }
     if (fds_[1] >= 0) {
         if (close(fds_[1]) < 0) {
-            FI_HILOGE("Close fds_[1] failed, error:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
+            FI_HILOGE("Close fds_[1] failed, err:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
         }
         fds_[1] = -1;
     }
@@ -88,13 +88,13 @@ int32_t TaskScheduler::PostSyncTask(DTaskCallback callback)
     }
     Promise promise;
     Future future = promise.get_future();
-    auto task = PostTask(callback, &promise);
-    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
+    auto tasks = PostTask(callback, &promise);
+    CHKPR(tasks, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
-    task->SetWaited();
+    tasks->SetWaited();
     if (res == std::future_status::timeout) {
         FI_HILOGE("Task timeout");
         return ETASKS_WAIT_TIMEOUT;

@@ -32,7 +32,7 @@ void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;
     if (hasWaited_) {
-        FI_HILOGE("Expired tasks will be discarded, id:%{public}d", id_);
+        FI_HILOGE("Expired task will be discarded, id:%{public}d", id_);
         return;
     }
     int32_t ret = fun_();

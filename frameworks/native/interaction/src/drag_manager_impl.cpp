@@ -45,7 +45,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
         (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
         (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+        FI_HILOGE("Ineffective parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             dragData.shadowInfo.x, dragData.shadowInfo.y);
         return RET_ERR;
     }

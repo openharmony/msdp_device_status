@@ -904,7 +904,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On activate coordination error, ret:%{public}d", ret);
     }
     return ret;
 }

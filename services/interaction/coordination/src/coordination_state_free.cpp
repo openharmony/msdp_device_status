@@ -36,7 +36,7 @@ int32_t CoordinationStateFree::ActivateCoordination(
     }
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
-        FI_HILOGE("Input Parameters error");
+        FI_HILOGE("Input Parameters err");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId, true);

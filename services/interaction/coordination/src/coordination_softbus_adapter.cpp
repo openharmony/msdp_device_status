@@ -417,7 +417,7 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Stop remote coordination result error, not found this device");
+        FI_HILOGE("Stop remote coordination result err, not found this device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
