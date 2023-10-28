@@ -26,9 +26,15 @@ public:
     IEpollEventSource() = default;
     virtual ~IEpollEventSource() = default;
 
+    virtual uint32_t GetEvents() const;
     virtual int32_t GetFd() const = 0;
     virtual void Dispatch(const struct epoll_event &ev) = 0;
 };
+
+inline uint32_t IEpollEventSource::GetEvents() const
+{
+    return (EPOLLIN | EPOLLHUP | EPOLLERR);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -27,7 +27,7 @@
 #include "enumerator.h"
 #include "i_context.h"
 #include "i_device_mgr.h"
-#include "i_epoll_event_source.h"
+#include "epoll_manager.h"
 #include "monitor.h"
 
 namespace OHOS {
@@ -67,17 +67,13 @@ private:
     int32_t OnInit(IContext *context);
     int32_t OnEnable();
     int32_t OnDisable();
-    int32_t OnEpollDispatch();
+    int32_t OnEpollDispatch(uint32_t events);
     int32_t ParseDeviceId(const std::string &devNode);
     void OnDeviceAdded(std::shared_ptr<IDevice> dev);
     void OnDeviceRemoved(std::shared_ptr<IDevice> dev);
     int32_t OnAddDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer);
     int32_t OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observer);
-    int32_t EpollCreate();
-    int32_t EpollAdd(IEpollEventSource *source);
-    void EpollDel(IEpollEventSource *source);
-    void EpollClose();
     int32_t RunGetDevice(std::packaged_task<std::shared_ptr<IDevice>(int32_t)> &task, int32_t id) const;
     std::shared_ptr<IDevice> OnGetDevice(int32_t id) const;
     std::shared_ptr<IDevice> AddDevice(const std::string &devNode);
@@ -86,17 +82,17 @@ private:
 
 private:
     IContext *context_ { nullptr };
-    int32_t epollFd_ { -1 };
     Enumerator enumerator_;
     Monitor monitor_;
     HotplugHandler hotplug_;
+    std::shared_ptr<EpollManager> epollMgr_ { nullptr };
     std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
 
 inline int32_t DeviceManager::GetFd() const
 {
-    return epollFd_;
+    return (epollMgr_ != nullptr ? epollMgr_->GetFd() : -1);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
