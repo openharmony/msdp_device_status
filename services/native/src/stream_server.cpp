@@ -251,7 +251,7 @@ void StreamServer::DumpSession(const std::string &title)
     int32_t i = 0;
     for (auto &[key, value] : sessionss_) {
         CHKPV(value);
-        FI_HILOGD("%d, %s", i, value->GetDescript().c_str());
+        FI_HILOGD("%d", i);
         i++;
     }
 }

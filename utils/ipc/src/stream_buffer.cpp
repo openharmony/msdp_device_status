@@ -24,18 +24,18 @@ StreamBuffer::StreamBuffer(const StreamBuffer &buf)
     Clone(buf);
 }
 
-StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
+StreamBuffer &StreamBuffer::operator=(const StreamBuffer &buffer)
 {
-    Clone(other);
+    Clone(buffer);
     return *this;
 }
 
 void StreamBuffer::Reset()
 {
-    rPos_ = 0;
     wPos_ = 0;
-    rCount_ = 0;
+    rPos_ = 0;
     wCount_ = 0;
+    rCount_ = 0;
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
 }
 
@@ -61,6 +61,11 @@ bool StreamBuffer::SeekReadPos(int32_t n)
     return true;
 }
 
+bool StreamBuffer::Write(const std::string &buf)
+{
+    return Write(buf.c_str(), buf.length()+1);
+}
+
 bool StreamBuffer::Read(std::string &buf)
 {
     if (rPos_ == wPos_) {
@@ -69,23 +74,18 @@ bool StreamBuffer::Read(std::string &buf)
         return false;
     }
     buf = ReadBuf();
-    rPos_ += static_cast<int32_t>(buf.length()) + 1;
+    rPos_ = rPos_ + static_cast<int32_t>(buf.length()) + 1;
     return (buf.length() > 0);
-}
-
-bool StreamBuffer::Write(const std::string &buf)
-{
-    return Write(buf.c_str(), buf.length()+1);
-}
-
-bool StreamBuffer::Read(StreamBuffer &buf)
-{
-    return buf.Write(Data(), Size());
 }
 
 bool StreamBuffer::Write(const StreamBuffer &buf)
 {
     return Write(buf.Data(), buf.Size());
+}
+
+bool StreamBuffer::Read(StreamBuffer &buf)
+{
+    return buf.Write(Data(), Size());
 }
 
 bool StreamBuffer::Read(char *buf, size_t size)
@@ -115,6 +115,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
+
     rPos_ += static_cast<int32_t>(size);
     rCount_ += 1;
     return true;
@@ -153,7 +154,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
     return true;
 }
 
-bool StreamBuffer::IsEmpty() const
+bool StreamBuffer::empty() const
 {
     return (rPos_ == wPos_);
 }
@@ -163,7 +164,7 @@ size_t StreamBuffer::Size() const
     return static_cast<size_t>(wPos_);
 }
 
-int32_t StreamBuffer::UnreadSize() const
+int32_t StreamBuffer::ResidualSize() const
 {
     return ((wPos_ <= rPos_) ? 0 : (wPos_ - rPos_));
 }

@@ -177,8 +177,8 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    MessageParcel reply;
     MessageOption option;
+    MessageParcel reply;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),

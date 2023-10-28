@@ -79,13 +79,13 @@ std::shared_ptr<Media::PixelMap> DragDataManagerTest::CreatePixelMap(int32_t wid
     int32_t colorByteCount = colorLen * INT32_BYTE;
     auto ret = memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
     if (ret != EOK) {
-        FI_HILOGE("Memset_s failed");
+        FI_HILOGE("Call memset_s was a failure");
         delete[] colorPixels;
         return nullptr;
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, options);
     if (pixelMap == nullptr) {
-        FI_HILOGE("Create pixelMap failed");
+        FI_HILOGE("Failed to create pixelMap");
         delete[] colorPixels;
         return nullptr;
     }

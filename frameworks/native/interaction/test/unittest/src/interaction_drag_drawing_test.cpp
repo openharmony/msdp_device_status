@@ -94,22 +94,22 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
     int32_t colorLen = width * height;
-    uint32_t *pixelcolors = new (std::nothrow) uint32_t[colorLen];
-    CHKPP(pixelcolors);
+    uint32_t *pixelColors = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(pixelColors);
     int32_t colorByteCount = colorLen * INT32_BYTE;
-    errno_t ret = memset_s(pixelcolors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    errno_t ret = memset_s(pixelColors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
     if (ret != EOK) {
         FI_HILOGE("memset_s failed");
-        delete[] pixelcolors;
+        delete[] pixelColors;
         return nullptr;
     }
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelcolors, colorLen, opts);
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelColors, colorLen, opts);
     if (pixelMap == nullptr) {
         FI_HILOGE("Create pixelMap failed");
-        delete[] pixelcolors;
+        delete[] pixelColors;
         return nullptr;
     }
-    delete[] pixelcolors;
+    delete[] pixelColors;
     return pixelMap;
 }
 

@@ -35,14 +35,14 @@ void SetThreadName(const std::string &name);
 void GetTimeStamp(std::string &startTime);
 
 template<typename T>
-bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
+bool AddInt(T op1, T op2, T minValue, T maxValue, T &res)
 {
     if (op1 >= 0) {
-        if (op2 > maxVal - op1) {
+        if (op2 > maxValue - op1) {
             return false;
         }
     } else {
-        if (op2 < minVal - op1) {
+        if (op2 < minValue - op1) {
             return false;
         }
     }

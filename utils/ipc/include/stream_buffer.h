@@ -33,9 +33,12 @@ public:
     StreamBuffer() = default;
     DISALLOW_MOVE(StreamBuffer);
     explicit StreamBuffer(const StreamBuffer &buf);
-    virtual StreamBuffer &operator=(const StreamBuffer &other);
+    virtual StreamBuffer &operator=(const StreamBuffer &buffer);
     virtual ~StreamBuffer() = default;
 
+    size_t Size() const;
+    int32_t UnreadSize() const;
+    int32_t GetAvailableBufSize() const;
     void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
@@ -44,19 +47,16 @@ public:
     bool Read(StreamBuffer &buf);
     bool Write(const StreamBuffer &buf);
     bool Read(char *buf, size_t size);
-    virtual bool Write(const char *buf, size_t size);
-    bool IsEmpty() const;
-    size_t Size() const;
-    int32_t UnreadSize() const;
-    int32_t GetAvailableBufSize() const;
+    bool empty() const;
     bool ChkRWError() const;
+    virtual bool Write(const char *buf, size_t size);
     const std::string &GetErrorStatusRemark() const;
     const char *Data() const;
+    const char *ReadBuf() const;
     template<typename T>
     bool Read(T &data);
     template<typename T>
     bool Write(const T &data);
-    const char *ReadBuf() const;
     template<typename T>
     StreamBuffer &operator >> (T &data);
     template<typename T>

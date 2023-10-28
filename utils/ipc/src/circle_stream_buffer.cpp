@@ -19,35 +19,35 @@ namespace OHOS {
 namespace Msdp {
 void CircleStreamBuffer::CopyDataToBegin()
 {
-    int32_t unreadSize = UnreadSize();
-    if (unreadSize > 0 && rPos_ > 0) {
+    int32_t residualSize = ResidualSize();
+    if (residualSize > 0 && rPos_ > 0) {
         int32_t pos = 0;
         for (int32_t i = rPos_; i <= wPos_;) {
             szBuff_[pos++] = szBuff_[i++];
         }
     }
-    FI_HILOGD("unreadSize:%{public}d rPos:%{public}d, wPos:%{public}d", unreadSize, rPos_, wPos_);
+    FI_HILOGD("ResidualSize:%{public}d rPos:%{public}d wPos:%{public}d", residualSize, rPos_, wPos_);
     rPos_ = 0;
-    wPos_ = unreadSize;
+    wPos_ = residualSize;
 }
 
 bool CircleStreamBuffer::CheckWrite(size_t size)
 {
     int32_t bufferSize = static_cast<int32_t>(size);
-    int32_t availSize = GetAvailableBufSize();
-    if (bufferSize > availSize && rPos_ > 0) {
+    int32_t availableSize = GetAvailableBufSize();
+    if (bufferSize > availableSize && rPos_ > 0) {
         CopyDataToBegin();
-        availSize = GetAvailableBufSize();
+        availableSize = GetAvailableBufSize();
     }
-    return (availSize >= bufferSize);
+    return (availableSize >= bufferSize);
 }
 
 bool CircleStreamBuffer::Write(const char *buf, size_t size)
 {
     if (!CheckWrite(size)) {
         FI_HILOGE("Out of buffer memory, availableSize:%{public}d, size:%{public}zu,"
-            "unreadSize:%{public}d, rPos:%{public}d, wPos:%{public}d",
-            GetAvailableBufSize(), size, UnreadSize(), rPos_, wPos_);
+            "residualSize:%{public}d, rPos:%{public}d, wPos:%{public}d",
+            GetAvailableBufSize(), size, ResidualSize(), rPos_, wPos_);
         return false;
     }
     return StreamBuffer::Write(buf, size);

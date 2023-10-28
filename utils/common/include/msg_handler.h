@@ -38,7 +38,7 @@ public:
     {
         callbacks_.clear();
     }
-    bool ChkKey(K id)
+    bool CheckKey(K id)
     {
         return (GetMsgCallback(id) != nullptr);
     }
@@ -46,8 +46,8 @@ public:
     const std::string& GetDebugInfo() const
     {
         std::string str;
-        for (auto &it : callbacks_) {
-            str += std::to_string(it.first);
+        for (auto &iter : callbacks_) {
+            str += std::to_string(iter.first);
             str += ',';
         }
         if (!str.empty()) {
@@ -71,11 +71,11 @@ protected:
     virtual ~MsgHandler() = default;
     V *GetMsgCallback(K id)
     {
-        auto it = callbacks_.find(id);
-        if (it == callbacks_.end()) {
+        auto iter = callbacks_.find(id);
+        if (iter == callbacks_.end()) {
             return nullptr;
         }
-        return &it->second;
+        return &iter->second;
     }
 
 protected:

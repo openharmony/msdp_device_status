@@ -106,7 +106,7 @@ bool Client::StartEventRunner()
 
     FI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
 
-    if (isConnected_ && fd_ >= 0) {
+    if (hasConnected_ && fd_ >= 0) {
         if (isListening_) {
             FI_HILOGI("File fd is in listening");
             return true;
@@ -185,7 +185,7 @@ void Client::OnRecvMsg(const char *buf, size_t size)
 
 int32_t Client::Reconnect()
 {
-    return ConnectTo();
+    return StartConnect();
 }
 
 void Client::OnReconnect()
@@ -219,7 +219,7 @@ void Client::OnDisconnected()
 {
     CALL_DEBUG_ENTER;
     FI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
-    isConnected_ = false;
+    hasConnected_ = false;
     isListening_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
@@ -239,7 +239,7 @@ void Client::OnConnected()
 {
     CALL_DEBUG_ENTER;
     FI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
-    isConnected_ = true;
+    hasConnected_ = true;
     if (funConnected_ != nullptr) {
         funConnected_(*this);
     }

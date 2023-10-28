@@ -165,7 +165,6 @@ void VirtualMouseBuilder::Clone()
         std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
         return;
     }
-
     int32_t nTries = 3;
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -510,12 +509,12 @@ void VirtualMouseBuilder::ReadRawData(const nlohmann::json &model)
         FI_HILOGD("Not an object");
         return;
     }
-    auto typeIter = model.find("type");
-    if (typeIter == model.cend() || !typeIter->is_number_integer()) {
-        return;
-    }
     auto codeIter = model.find("code");
     if (codeIter == model.cend() || !codeIter->is_number_integer()) {
+        return;
+    }
+    auto typeIter = model.find("type");
+    if (typeIter == model.cend() || !typeIter->is_number_integer()) {
         return;
     }
     auto valueIter = model.find("value");
