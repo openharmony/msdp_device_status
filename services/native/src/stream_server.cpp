@@ -291,9 +291,9 @@ bool StreamServer::AddSession(SessionPtr ses)
         FI_HILOGE("Get process failed");
         return false;
     }
-    if (sessionss_.size() > MAX_SESSON_ALARM) {
+    if (sessionss_.size() > MAX_SESSION_ALARM) {
         FI_HILOGE("Too many clients, Warning Value:%{public}zu, Current Value:%{public}zu",
-            MAX_SESSON_ALARM, sessionss_.size());
+            MAX_SESSION_ALARM, sessionss_.size());
         return false;
     }
     DumpSession("AddSession");

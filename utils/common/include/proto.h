@@ -33,7 +33,7 @@ inline constexpr int32_t INVALID_PID { 7 };
 inline constexpr int32_t SESSION_NOT_FOUND { 8 };
 inline constexpr int32_t EPOLL_MODIFY_FAIL { 9 };
 inline constexpr int32_t ADD_SESSION_FAIL { 11 };
-inline constexpr size_t MAX_SESSON_ALARM { 100 };
+inline constexpr size_t MAX_SESSION_ALARM { 100 };
 inline constexpr int32_t MAX_RECV_LIMIT { 13 };
 inline constexpr int32_t SERVICE_NOT_RUNNING { 14 };
 inline constexpr int32_t CONNECT_MODULE_TYPE_FI_CLIENT { 0 };
