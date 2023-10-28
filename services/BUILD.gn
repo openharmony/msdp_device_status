@@ -102,6 +102,8 @@ ohos_shared_library("devicestatus_service") {
     deps += [ "interaction/coordination:coordination" ]
   }
 
+  public_deps = [ "${device_status_root_path}/common/epoll:devicestatus_epoll" ]
+
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
     external_deps += [
@@ -139,6 +141,8 @@ ohos_static_library("devicestatus_static_service") {
   if (fusion_interaction_coordination) {
     deps += [ "interaction/coordination:coordination" ]
   }
+
+  public_deps = [ "${device_status_root_path}/common/epoll:devicestatus_epoll" ]
 
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {

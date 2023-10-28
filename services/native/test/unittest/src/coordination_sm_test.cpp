@@ -15,12 +15,15 @@
 
 #define private public
 #define protected public
+
 #include "coordination_sm_test.h"
 
 #include "accesstoken_kit.h"
 #include <gtest/gtest.h>
+#include "nativetoken_kit.h"
+#include "nocopyable.h"
+#include "token_setproc.h"
 #include "pointer_event.h"
-
 #include "coordination_device_manager.h"
 #include "coordination_event_handler.h"
 #include "coordination_message.h"
@@ -30,10 +33,6 @@
 #include "coordination_util.h"
 #include "device.h"
 #include "fi_log.h"
-
-#include "nativetoken_kit.h"
-#include "nocopyable.h"
-#include "token_setproc.h"
 
 using namespace ::OHOS;
 using namespace ::OHOS::Security::AccessToken;
@@ -135,7 +134,7 @@ int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string
     return sessionId == 1 ? RET_OK : RET_ERR;
 }
 
-Device::Device(int32_t deviceId) {}
+Device::Device(int32_t deviceId) :deviceId_(deviceId) {}
 
 Device::~Device() {}
 
@@ -229,7 +228,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = MMI::PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
     COOR_SM->UpdateLastPointerEventCallback(pointerEvent);
     EXPECT_TRUE(COOR_SM->lastPointerEvent_ == pointerEvent);
@@ -244,11 +243,11 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest006, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = MMI::PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(MMI::PointerEvent::POINTER_ACTION_CANCEL);
     COOR_SM->UpdateLastPointerEventCallback(pointerEvent);
     auto lastPointerEvent = COOR_SM->GetLastPointerEvent();
-    ASSERT_TRUE(lastPointerEvent != nullptr);
+    ASSERT_NE(lastPointerEvent, nullptr);
     EXPECT_TRUE(lastPointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_CANCEL);
 }
 
@@ -277,7 +276,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest008, TestSize.Level0)
     COOR_SM->isStarting_ = true;
     std::string networkId("cde2b5b4453a5b3ec566f836ffa7a4aab52c4b9c8a0b34f3d6aaca4566db24f0");
     COOR_SM->Reset(networkId);
-    EXPECT_TRUE(COOR_SM->isStarting_ == false);
+    EXPECT_TRUE(!COOR_SM->isStarting_);
     COOR_SM->remoteNetworkId_.clear();
     COOR_SM->sinkNetworkId_.clear();
 }
@@ -314,7 +313,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest010, TestSize.Level0)
     COOR_SM->currentState_ = CoordinationState::STATE_IN;
     COOR_SM->coordinationStates_[CoordinationState::STATE_IN] = std::make_shared<CoordinationStateIn>();
     COOR_SM->startDeviceDhid_ = "teststartDeviceDhid";
-    std::shared_ptr<Device> curdevice= std::make_shared<Device>(DEVICE_ID);
+    auto curdevice= std::make_shared<Device>(DEVICE_ID);
     curdevice->name_ = "DistributedInput ";
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(curdevice);
     dev->dhid_ = COOR_SM->startDeviceDhid_;

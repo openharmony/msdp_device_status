@@ -72,7 +72,7 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
-        const int32_t residualSize = circBuf.UnreadSize();
+        const int32_t residualSize = circBuf.ResidualSize();
         if (residualSize < headSize) {
             break;
         }

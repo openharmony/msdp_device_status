@@ -37,7 +37,7 @@ public:
     virtual ~StreamBuffer() = default;
 
     size_t Size() const;
-    int32_t UnreadSize() const;
+    int32_t ResidualSize() const;
     int32_t GetAvailableBufSize() const;
     void Reset();
     void Clean();
