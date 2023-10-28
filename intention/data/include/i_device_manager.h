@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef I_CONTEXT_H
-#define I_CONTEXT_H
+#ifndef I_DEVICE_MANAGER_H
+#define I_DEVICE_MANAGER_H
 
-#include "i_plugin_manager.h"
-#include "i_task_scheduler.h"
-#include "i_timer_manager.h"
-#include "i_device_manager.h"
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "i_device.h"
+#include "i_device_observer.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IContext {
+class IDeviceManager {
 public:
-    IContext() = default;
-    virtual ~IContext() = default;
-
-    virtual ITaskScheduler& GetTaskScheduler() = 0;
-    virtual ITimerManager& GetTimerManager() = 0;
-    virtual IPluginManager& GetPluginManager() = 0;
-    virtual IDeviceManager& GetDeviceManager() = 0;
+    IDeviceManager() = default;
+    virtual ~IDeviceManager() = default;
+    virtual std::shared_ptr<IDevice> GetDevice(int32_t id) const = 0;
+    virtual int32_t AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
+    virtual void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
+    virtual void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_CONTEXT_H
+#endif // I_DEVICE_MANAGER_H

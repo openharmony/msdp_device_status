@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-inline constexpr std::string_view COOPERATE { "cooperate" };
+inline constexpr std::string_view COOPERATE_NAME { "cooperate" };
 inline constexpr std::string_view DRAG_TYPE { "drag" };
 inline const std::string DEV_INPUT_PATH { "/dev/input/" };
 inline constexpr std::string_view CALL_FUNCTION { "napi_call_function" };

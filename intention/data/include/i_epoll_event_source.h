@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef I_CONTEXT_H
-#define I_CONTEXT_H
+#ifndef I_EPOLL_EVENT_SOURCE_H
+#define I_EPOLL_EVENT_SOURCE_H
 
-#include "i_plugin_manager.h"
-#include "i_task_scheduler.h"
-#include "i_timer_manager.h"
-#include "i_device_manager.h"
+#include <sys/epoll.h>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IContext {
+class IEpollEventSource {
 public:
-    IContext() = default;
-    virtual ~IContext() = default;
+    IEpollEventSource() = default;
+    virtual ~IEpollEventSource() = default;
 
-    virtual ITaskScheduler& GetTaskScheduler() = 0;
-    virtual ITimerManager& GetTimerManager() = 0;
-    virtual IPluginManager& GetPluginManager() = 0;
-    virtual IDeviceManager& GetDeviceManager() = 0;
+    virtual int32_t GetFd() const = 0;
+    virtual void Dispatch(const struct epoll_event &ev) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_CONTEXT_H
+#endif // I_EPOLL_EVENT_SOURCE_H
