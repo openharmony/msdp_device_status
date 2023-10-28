@@ -444,8 +444,8 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest017, TestSize.Level
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level1)
 {
     FI_HILOGI("DeviceStatusAlgorithmTest018 start");
-    bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
-    EXPECT_TRUE(result);
+    bool state = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
+    EXPECT_TRUE(state);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
     int32_t sensorTypeId = SENSOR_TYPE_ID_MAX;
     int32_t ret = g_manager->CheckSensorTypeId(sensorTypeId);

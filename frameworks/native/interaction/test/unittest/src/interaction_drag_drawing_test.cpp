@@ -94,22 +94,22 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
     int32_t colorLen = width * height;
-    uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
-    CHKPP(colorPixels);
+    uint32_t *pixelcolors = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(pixelcolors);
     int32_t colorByteCount = colorLen * INT32_BYTE;
-    errno_t ret = memset_s(colorPixels, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    errno_t ret = memset_s(pixelcolors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
     if (ret != EOK) {
         FI_HILOGE("memset_s failed");
-        delete[] colorPixels;
+        delete[] pixelcolors;
         return nullptr;
     }
-    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(colorPixels, colorLen, opts);
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelcolors, colorLen, opts);
     if (pixelMap == nullptr) {
         FI_HILOGE("Create pixelMap failed");
-        delete[] colorPixels;
+        delete[] pixelcolors;
         return nullptr;
     }
-    delete[] colorPixels;
+    delete[] pixelcolors;
     return pixelMap;
 }
 
@@ -119,7 +119,7 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
     if (pixelMap == nullptr) {
-        FI_HILOGE("Create pixelmap failed");
+        FI_HILOGE("CreatePixelMap failed");
         return std::nullopt;
     }
     DragData dragData;
@@ -149,6 +149,9 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
 HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_One, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
@@ -156,9 +159,6 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_On
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
     };
-    std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
-    ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
@@ -193,8 +193,8 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_Mu
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result);
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
@@ -234,8 +234,8 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, arget:%{public}d, result:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
@@ -272,16 +272,16 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
 HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_DragNum_Multiple, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::promise<bool> promiseFlag;
-    std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-        promiseFlag.set_value(true);
-    };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE);
     ASSERT_TRUE(dragData);
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result);
+        promiseFlag.set_value(true);
+    };
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);

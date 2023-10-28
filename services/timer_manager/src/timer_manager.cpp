@@ -29,10 +29,10 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
 constexpr int32_t MIN_DELAY { -1 };
-constexpr int32_t MIN_INTERVAL { 50 };
-constexpr int32_t MAX_INTERVAL_MS { 10000 };
 constexpr int32_t NONEXISTENT_ID { -1 };
+constexpr int32_t MIN_INTERVAL { 50 };
 constexpr int32_t TIME_CONVERSION { 1000 };
+constexpr int32_t MAX_INTERVAL_MS { 10000 };
 constexpr size_t MAX_TIMER_COUNT { 64 };
 } // namespace
 
@@ -49,18 +49,10 @@ int32_t TimerManager::OnInit(IContext *context)
 
     timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
     if (timerFd_ < 0) {
-        FI_HILOGE("Timer: timerfd_create failed");
+        FI_HILOGE("timerfd_create failed");
         return RET_ERR;
     }
     return RET_OK;
-}
-
-int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
-{
-    CALL_INFO_TRACE;
-    CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(
-        std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
 }
 
 int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
@@ -70,11 +62,12 @@ int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::f
     return timerId;
 }
 
-int32_t TimerManager::RemoveTimer(int32_t timerId)
+int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask(
+        std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
 }
 
 int32_t TimerManager::OnRemoveTimer(int32_t timerId)
@@ -86,11 +79,11 @@ int32_t TimerManager::OnRemoveTimer(int32_t timerId)
     return ret;
 }
 
-int32_t TimerManager::ResetTimer(int32_t timerId)
+int32_t TimerManager::RemoveTimer(int32_t timerId)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
 }
 
 int32_t TimerManager::OnResetTimer(int32_t timerId)
@@ -98,6 +91,23 @@ int32_t TimerManager::OnResetTimer(int32_t timerId)
     int32_t ret = ResetTimerInternal(timerId);
     ArmTimer();
     return ret;
+}
+
+int32_t TimerManager::ResetTimer(int32_t timerId)
+{
+    CALL_INFO_TRACE;
+    CHKPR(context_, RET_ERR);
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
+}
+
+bool TimerManager::OnIsExist(int32_t timerId) const
+{
+    for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
+        if ((*tIter)->id == timerId) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool TimerManager::IsExist(int32_t timerId) const
@@ -115,27 +125,17 @@ bool TimerManager::IsExist(int32_t timerId) const
     return fu.get();
 }
 
-bool TimerManager::OnIsExist(int32_t timerId) const
+void TimerManager::ProcessTimers()
 {
-    for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
-        if ((*tIter)->id == timerId) {
-            return true;
-        }
-    }
-    return false;
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
 }
 
 int32_t TimerManager::RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const
 {
     task(timerId);
     return RET_OK;
-}
-
-void TimerManager::ProcessTimers()
-{
-    CALL_INFO_TRACE;
-    CHKPV(context_);
-    context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
 }
 
 int32_t TimerManager::OnProcessTimers()

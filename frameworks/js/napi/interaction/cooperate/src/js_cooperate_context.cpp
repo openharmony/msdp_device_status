@@ -186,14 +186,14 @@ napi_value JsCooperateContext::GetState(napi_env env, napi_callback_info info)
 napi_value JsCooperateContext::On(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = TWO_PARAM;
     napi_value argv[TWO_PARAM] = {};
+    size_t argc = TWO_PARAM;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-
     if (argc == ZERO_PARAM) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
+
     if (!UtilNapi::TypeOf(env, argv[ZERO_PARAM], napi_string)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
@@ -310,8 +310,8 @@ napi_value JsCooperateContext::JsConstructor(napi_env env, napi_callback_info in
         delete context;
     }, nullptr, nullptr);
     if (status != napi_ok) {
-        delete jsContext;
         FI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
+        delete jsContext;
         auto infoTemp = std::string(__FUNCTION__) + ": " + std::string(WRAP) + " failed";
         napi_throw_error(env, nullptr, infoTemp.c_str());
         return nullptr;

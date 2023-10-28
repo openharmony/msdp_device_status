@@ -260,14 +260,14 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
         return result;
     }
     size_t modLen = 0;
-    status = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
-    if (status != napi_ok) {
+    napi_status napiStatus = napi_get_value_string_utf8(env, args[ARG_0], nullptr, 0, &modLen);
+    if (napiStatus != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
     char mode[NAPI_BUF_LENGTH] = {};
-    status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
-    if (status != napi_ok) {
+    napiStatus = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
+    if (napiStatus != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get mode");
         return result;
     }
