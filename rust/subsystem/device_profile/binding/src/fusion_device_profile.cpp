@@ -133,7 +133,11 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
         CHKPR(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
-        CHKPR(events->profileEvents, RET_ERR);
+        if (events->profileEvents == nullptr) {
+            delete events;
+            FI_HILOGE("events->profileEvents is null");
+            return RET_ERR;
+        }
         events->clone = nullptr;
         events->destruct = &Destruct;
 
@@ -177,7 +181,11 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
         CHKPR(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
-        CHKPR(events->profileEvents, RET_ERR);
+        if (events->profileEvents == nullptr) {
+            delete events;
+            FI_HILOGE("events->profileEvents is null");
+            return RET_ERR;
+        }
         events->clone = nullptr;
         events->destruct = &Destruct;
 

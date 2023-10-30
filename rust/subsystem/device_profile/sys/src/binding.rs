@@ -275,3 +275,31 @@ extern "C" {
     /// Returns an `i32` value representing the result of the unregistration operation.
     pub fn UnregisterCrossStateListener(device_id: *const c_char) -> i32;
 }
+
+type CIStringClone = extern "C" fn (*mut CIString) -> *mut CIString;
+type CIStringDestruct = extern "C" fn (*mut CIString);
+type CIStringGetData = extern "C" fn (*mut CIString) -> *const c_char;
+
+// Struct representing a CIString.
+#[repr(C)]
+pub struct CIString {
+    /// Optional function pointer for cloning the string.
+    pub clone: Option<CIStringClone>,
+    /// Optional function pointer for destructing the string.
+    pub destruct: Option<CIStringDestruct>,
+    /// Optional function pointer for retrieving the string data.
+    pub data: Option<CIStringGetData>,
+}
+
+// These C interfaces are defined in lib: device_profile:fusion_device_profile_binding.
+extern "C" {
+    /// Retrieves an access token from a C++ API.
+    pub fn GetAccessToken();
+    /// Get a mutable pointer to CIString.
+    ///
+    /// # Returns
+    ///
+    /// A mutable pointer to CIString. Please note that the pointer may be null if there is an error or no local network
+    /// ID is available.The caller should handle null pointer values appropriately.
+    pub fn GetLocalNetworkId() -> *mut CIString;
+}

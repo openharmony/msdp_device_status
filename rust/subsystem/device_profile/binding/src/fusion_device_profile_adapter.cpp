@@ -54,8 +54,8 @@ public:
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
     void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
-    bool SupportProfileEvent(ProfileEvent e) const;
-    void AddProfileEvent(ProfileEvent e);
+    bool SupportProfileEvent(ProfileEvent event) const;
+    void AddProfileEvent(ProfileEvent event);
     void RemoveProfileEvents(const std::list<ProfileEvent> &profileEvents);
 
     bool HasProfileEvent() const
@@ -121,14 +121,14 @@ void ProfileEventCallback::OnProfileChanged(const ProfileChangeNotification &cha
     }
 }
 
-bool ProfileEventCallback::SupportProfileEvent(ProfileEvent e) const
+bool ProfileEventCallback::SupportProfileEvent(ProfileEvent event) const
 {
-    return (profileEvents_.find(e) != profileEvents_.cend());
+    return (profileEvents_.find(event) != profileEvents_.cend());
 }
 
-void ProfileEventCallback::AddProfileEvent(ProfileEvent e)
+void ProfileEventCallback::AddProfileEvent(ProfileEvent event)
 {
-    auto ret = profileEvents_.insert(e);
+    auto ret = profileEvents_.insert(event);
     if (!ret.second) {
         FI_HILOGW("Profile event is duplicate");
     }
@@ -136,8 +136,8 @@ void ProfileEventCallback::AddProfileEvent(ProfileEvent e)
 
 void ProfileEventCallback::RemoveProfileEvents(const std::list<ProfileEvent> &profileEvents)
 {
-    for (const auto &e : profileEvents) {
-        profileEvents_.erase(e);
+    for (const auto &event : profileEvents) {
+        profileEvents_.erase(event);
     }
 }
 
@@ -222,12 +222,12 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
-    std::list<std::string> serviceIdList;
-    serviceIdList.emplace_back(SERVICE_ID);
+    std::list<std::string> serviceIds;
+    serviceIds.emplace_back(SERVICE_ID);
 
     ExtraInfo extraInfo;
     extraInfo["deviceId"] = deviceId;
-    extraInfo["serviceIds"] = serviceIdList;
+    extraInfo["serviceIds"] = serviceIds;
 
     SubscribeInfo changeEventInfo;
     changeEventInfo.profileEvent = ProfileEvent::EVENT_PROFILE_CHANGED;
@@ -248,9 +248,8 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
     }
 
     std::list<ProfileEvent> failedEvents;
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
+    return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
         subscribeInfos, callback, failedEvents);
-    return ret;
 }
 
 int32_t FusionDeviceProfileAdapter::UnregisterCrossStateListener(const std::string &deviceId)
@@ -303,10 +302,12 @@ void FusionDeviceProfileAdapter::RemoveFailedSubscriptions(const std::string &de
     std::shared_ptr<IProfileEventCallback> profileEventCb;
     auto cbIter = callbacks_.find(deviceId);
     if (cbIter == callbacks_.end()) {
+        FI_HILOGE("Find %{public}s failed", deviceId.c_str());
         return;
     }
     if (cbIter->second == nullptr) {
         callbacks_.erase(cbIter);
+        FI_HILOGE("This device has no callback");
         return;
     }
 

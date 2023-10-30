@@ -37,7 +37,7 @@ constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionS
 static void SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount)
 {
     if (perms == nullptr || permCount == 0) {
-        FI_HILOGE("perms is nullptr");
+        FI_HILOGE("perms is nullptr or permCount is 0");
         return;
     }
     uint64_t tokenId;

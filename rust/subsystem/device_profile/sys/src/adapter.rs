@@ -23,12 +23,14 @@ use fusion_utils_rust::{ call_debug_enter, FusionErrorCode, FusionResult, err_lo
 
 use crate::binding::{
     CICrossStateListener,
+    CIString,
     CIStringVector,
     UpdateCrossSwitchState,
     SyncCrossSwitchState,
     GetCrossSwitchState,
     RegisterCrossStateListener,
     UnregisterCrossStateListener,
+    GetLocalNetworkId,
     RET_OK,
     EMPTY_LENGTH,
 };
@@ -403,4 +405,78 @@ impl DeviceProfileAdapter {
         let ret = unsafe { UnregisterCrossStateListener(device_id.as_ptr()) };
         Ok(err_log!(self.check_return_code(ret), "UnregisterCrossStateListener"))
     }
+}
+
+struct CStringGuard {
+    data: *mut CIString,
+}
+
+impl CStringGuard {
+    /// Retrieves the string data from the CIString object.
+    /// 
+    /// Returns:
+    /// - Some(String): If the data is successfully retrieved and converted to a string, it is wrapped in `Some`.
+    /// - None: If the `data` or `get_data` pointer is null, or an error occurs during retrieval or conversion.
+    pub fn data(&self) -> Option<String>
+    {
+        if self.data.is_null() {
+            error!(LOG_LABEL, "data is null");
+            return None;
+        }
+        // SAFETY: `data` is valid, because null pointer check has been performed.
+        if let Some(get_data) = unsafe { (*self.data).data } {
+            // SAFETY: `get_data` is valid, becauce has been matched to `Some`.
+            match unsafe { CStr::from_ptr(get_data(self.data)).to_str() } {
+                Ok(id) => Some(id.to_string()),
+                Err(err) => {
+                    error!(LOG_LABEL, "error: {}", err);
+                    None
+                }
+            }
+        } else {
+            error!(LOG_LABEL, "get_data is null");
+            None
+        }
+    }
+}
+
+impl From<*mut CIString> for CStringGuard {
+    /// Constructs a `CStringGuard` object and assigns the given raw pointer `value` to the `data` field.
+    /// 
+    /// # Note
+    ///
+    /// Please note that the pointer `value` is a raw pointer that needs to be handled carefully to avoid memory
+    /// safety issues and undefined behavior.
+    /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
+    fn from(value: *mut CIString) -> Self
+    {
+        Self { data: value }
+    }
+}
+
+impl Drop for CStringGuard {
+    fn drop(&mut self)
+    {
+        if self.data.is_null() {
+            error!(LOG_LABEL, "data is null");
+            return;
+        }
+        // SAFETY: `data` is valid, because null pointer check has been performed.
+        unsafe {
+            if let Some(destruct) =  (*self.data).destruct {
+                destruct(self.data);
+            }
+        }
+    }
+}
+
+/// Retrieves the local network ID using FFI.
+//
+/// Returns:
+/// - Some(String): If the local network ID is successfully retrieved, it is wrapped in `Some`.
+/// - None: If the local network ID is not available or an error occurs during retrieval.
+pub fn get_local_network_id() -> Option<String>
+{
+    // SAFETY: The `CStringGuard::from` and `data` methods are all valid, which are ensured by the caller.
+    unsafe { CStringGuard::from(GetLocalNetworkId()).data() }
 }
