@@ -116,7 +116,7 @@ macro_rules! call_debug_enter {
     ) => {
         let __inner_function_tracer__ = $crate::InnerFunctionTracer::new(
             Box::new(|func_name: &str, action: &str| {
-                hilog_rust::debug!(LOG_LABEL, "in {}: {}", @public(func_name), @public(action));
+                hilog_rust::debug!(LOG_LABEL, "In {}: {}", @public(func_name), @public(action));
             }),
             $func_name
         );
@@ -131,7 +131,7 @@ macro_rules! call_info_trace {
     ) => {
         let __inner_function_tracer__ = $crate::InnerFunctionTracer::new(
             Box::new(|func_name: &str, action: &str| {
-                hilog_rust::info!(LOG_LABEL, "in {}: {}", @public(func_name), @public(action));
+                hilog_rust::info!(LOG_LABEL, "In {}: {}", @public(func_name), @public(action));
             }),
             $func_name
         );

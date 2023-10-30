@@ -91,7 +91,7 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
         return true;
     }
     if (!IsNoExistCallback(events_[eventType], handler, eventType)) {
-        FI_HILOGE("callback already exists");
+        FI_HILOGE("Callback already exists");
         return false;
     }
     SaveCallback(eventType, onHandlerRef, isOnce);
