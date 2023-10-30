@@ -120,9 +120,10 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
         if (seat == 0) {
             return StringToken(str, sep, token);
         }
+    } else {
+        token = str;
+        str = "";
     }
-    token = str;
-    str = "";
     return token.size();
 }
 

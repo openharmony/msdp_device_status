@@ -63,7 +63,7 @@ bool StreamBuffer::SeekReadPos(int32_t n)
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    return Write(buf.c_str(), buf.length()+1);
+    return Write(buf.c_str(), buf.length() + 1);
 }
 
 bool StreamBuffer::Read(std::string &buf)

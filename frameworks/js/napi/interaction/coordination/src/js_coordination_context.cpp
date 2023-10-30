@@ -361,7 +361,8 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
     napi_open_handle_scope(env, &handleScope);
     CHKPP(handleScope);
     napi_value object = nullptr;
-    CHKRP_SCOPE(env, napi_get_named_property(env, napiGlobal, g_coordination, &object), GET_NAMED_PROPERTY, handleScope);
+    CHKRP_SCOPE(env, napi_get_named_property(env, napiGlobal, g_coordination, &object),
+        GET_NAMED_PROPERTY, handleScope);
     if (object == nullptr) {
         napi_close_handle_scope(env, handleScope);
         FI_HILOGE("object is nullptr");
