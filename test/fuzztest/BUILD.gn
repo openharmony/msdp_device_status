@@ -19,6 +19,7 @@ group("device_status_fuzztest") {
 
   deps += [
     "adddraglistener_fuzzer:fuzztest",
+    "addhotarealistener_fuzzer:fuzztest",
     "devicegetcachestub_fuzzer:fuzztest",
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
@@ -30,6 +31,7 @@ group("device_status_fuzztest") {
     "getudkey_fuzzer:fuzztest",
     "handleallocsocketfd_fuzzer:fuzztest",
     "removedraglistener_fuzzer:fuzztest",
+    "removehotarealistener_fuzzer:fuzztest",
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
