@@ -190,12 +190,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    if (style != DRAG_DATA_MGR.GetDragStyle()) {
-        stateNotify_.StyleChangedNotify(style);
-    }
-    DRAG_DATA_MGR.SetDragStyle(style);
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
+    if (style == DRAG_DATA_MGR.GetDragStyle()) {
+        FI_HILOGD("Not need update drag style");
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetDragStyle(style);
+    stateNotify_.StyleChangedNotify(style);
     return dragDrawing_.UpdateDragStyle(style);
 }
 
