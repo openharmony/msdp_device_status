@@ -60,9 +60,9 @@ HWTEST_F(DeviceStatusModuleTest, DeviceStatusCallbackTest, TestSize.Level0)
     auto stationaryManager = StationaryManager::GetInstance();
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusModuleTestCallback();
     EXPECT_FALSE(cb == nullptr);
-    GTEST_LOG_(INFO) << "Start register";
+    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest start register";
     stationaryManager->SubscribeCallback(type, ActivityEvent::ENTER_EXIT, ReportLatencyNs::LONG, cb);
-    GTEST_LOG_(INFO) << "Cancel register";
+    GTEST_LOG_(INFO) << "DeviceStatusCallbackTest cancel register";
     stationaryManager->UnsubscribeCallback(type, ActivityEvent::ENTER_EXIT, cb);
 }
 
