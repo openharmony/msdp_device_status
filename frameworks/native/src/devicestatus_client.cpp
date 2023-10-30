@@ -388,6 +388,20 @@ int32_t DeviceStatusClient::RemoveDraglistener()
     return devicestatusProxy_->RemoveDraglistener();
 }
 
+int32_t DeviceStatusClient::AddSubscriptListener()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->AddSubscriptListener();
+}
+
+int32_t DeviceStatusClient::RemoveSubscriptListener()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->RemoveSubscriptListener();
+}
+
 int32_t DeviceStatusClient::SetDragWindowVisible(bool visible)
 {
     CALL_DEBUG_ENTER;

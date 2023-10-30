@@ -26,15 +26,21 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+enum class MessageType : int32_t {
+    NOTIFY_STATE,
+    NOTIFY_STYLE,
+    NOTIFY_NONE
+};
 class StateChangeNotify final {
 public:
     StateChangeNotify() = default;
     ~StateChangeNotify() = default;
-
     struct MessageInfo {
+        MessageType msgType { MessageType::NOTIFY_NONE };
         MessageId msgId { MessageId::INVALID };
         SessionPtr session { nullptr };
         DragState state { DragState::ERROR };
+        DragCursorStyle style { DragCursorStyle::DEFAULT };
         bool operator==(std::shared_ptr<MessageInfo> info)
         {
             if (info == nullptr || info->session == nullptr) {
@@ -43,16 +49,22 @@ public:
             return session->GetPid() == info->session->GetPid();
         }
     };
-
     void AddNotifyMsg(std::shared_ptr<MessageInfo> info);
     void RemoveNotifyMsg(std::shared_ptr<MessageInfo> info);
     int32_t StateChangedNotify(DragState state);
+    int32_t StyleChangedNotify(DragCursorStyle style);
 
 private:
-    void OnStateChangedNotify(SessionPtr session, MessageId msId, DragState state);
+    template <typename T>
+    void OnDragInfoNotify(SessionPtr session, MessageId msgId, T t);
 
 private:
-    std::list<std::shared_ptr<MessageInfo>> msgInfos_;
+    std::list<std::shared_ptr<MessageInfo>> msgStateInfos_;
+    std::list<std::shared_ptr<MessageInfo>> msgStyleInfos_;
+    std::map<MessageType, std::list<std::shared_ptr<MessageInfo>>> msgInfos_ = {
+        { MessageType::NOTIFY_STATE, msgStateInfos_ },
+        { MessageType::NOTIFY_STYLE, msgStyleInfos_ }
+    };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

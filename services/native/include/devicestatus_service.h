@@ -78,6 +78,8 @@ public:
     int32_t GetUdKey(std::string &udKey) override;
     int32_t AddDraglistener() override;
     int32_t RemoveDraglistener() override;
+    int32_t AddSubscriptListener() override;
+    int32_t RemoveSubscriptListener() override;
     int32_t SetDragWindowVisible(bool visible) override;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
