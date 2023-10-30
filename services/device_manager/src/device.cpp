@@ -79,7 +79,7 @@ int32_t Device::Open()
 
         fd_ = open(buf, O_RDWR | O_NONBLOCK | O_CLOEXEC);
         if (fd_ < 0) {
-            FI_HILOGE("Unable to open device \'%{public}s\':%{public}s", buf, strerror(errno));
+            FI_HILOGE("Open device \'%{public}s\':%{public}s failed", buf, strerror(errno));
             if (nRetries-- > 0) {
                 static constexpr int32_t DEFAULT_WAIT_TIME { 500 };
                 std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME));

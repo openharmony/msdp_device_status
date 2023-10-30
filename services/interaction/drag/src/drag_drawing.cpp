@@ -110,9 +110,9 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
 
-struct JsonInfoParser {
-    JsonInfoParser() = default;
-    ~JsonInfoParser()
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
     {
         if (json != nullptr) {
             cJSON_Delete(json);
@@ -1130,7 +1130,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGD("FilterInfo is empty");
         return false;
     }
-    JsonInfoParser filterParser;
+    JsonParser filterParser;
     filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
@@ -1157,7 +1157,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGD("ExtraInfo is empty");
         return false;
     }
-    JsonInfoParser extraInfoParser;
+    JsonParser extraInfoParser;
     extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s",
         g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());

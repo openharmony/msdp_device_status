@@ -122,7 +122,6 @@ void VirtualKeyboardBuilder::Clone()
     }
     auto vDev = VirtualDeviceBuilder::Select(vDevs, "keyboard");
     CHKPV(vDev);
-
     std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
     VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
     if (!vBuilder.SetUp()) {
@@ -224,7 +223,6 @@ void VirtualKeyboardBuilder::ReadActions(const char *path)
     CALL_DEBUG_ENTER;
     CHKPV(path);
     char realPath[PATH_MAX] {};
-
     if (realpath(path, realPath) == nullptr) {
         std::cout << "[keyboard] invalid path: " << path << std::endl;
         return;
@@ -234,7 +232,6 @@ void VirtualKeyboardBuilder::ReadActions(const char *path)
         return;
     }
     json model;
-
     int32_t ret = VirtualDeviceBuilder::ReadFile(realPath, model);
     if (ret == RET_ERR) {
         FI_HILOGE("Failed to read the file");
@@ -349,7 +346,7 @@ void VirtualKeyboardBuilder::ReadRawModel(const nlohmann::json &model, int32_t l
     if (model.is_object()) {
         auto typeIter = model.find("type");
         if (typeIter == model.cend() || !typeIter->is_string() || (std::string(typeIter.value()).compare("raw") != 0)) {
-            std::cout << "Expect raw input data." << std::endl;
+            std::cout << "Expect raw input data" << std::endl;
             return;
         }
         auto actionIter = model.find("actions");
@@ -371,16 +368,16 @@ void VirtualKeyboardBuilder::ReadRawData(const nlohmann::json &model)
         FI_HILOGE("model is not an object");
         return;
     }
-    auto typeIter = model.find("type");
-    if (typeIter == model.cend() || !typeIter->is_number_integer()) {
+    auto valueIter = model.find("value");
+    if (valueIter == model.cend() || !valueIter->is_number_integer()) {
         return;
     }
     auto codeIter = model.find("code");
     if (codeIter == model.cend() || !codeIter->is_number_integer()) {
         return;
     }
-    auto valueIter = model.find("value");
-    if (valueIter == model.cend() || !valueIter->is_number_integer()) {
+    auto typeIter = model.find("type");
+    if (typeIter == model.cend() || !typeIter->is_number_integer()) {
         return;
     }
     std::cout << "[virtual keyboard] raw input: [" << typeIter.value() << ", " << codeIter.value() << ", " <<

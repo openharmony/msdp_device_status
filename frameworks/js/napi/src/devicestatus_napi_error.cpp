@@ -29,8 +29,8 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage)
 {
     napi_value businessError = nullptr;
-    napi_value code = nullptr;
     napi_value msg = nullptr;
+    napi_value code = nullptr;
     NAPI_CALL(env, napi_create_int32(env, errCode, &code));
     NAPI_CALL(env, napi_create_string_utf8(env, errMessage.c_str(), NAPI_AUTO_LENGTH, &msg));
     napi_create_error(env, nullptr, msg, &businessError);
