@@ -221,6 +221,8 @@ public:
      */
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
+    int32_t EnterUninstallArea(bool isIn);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);
