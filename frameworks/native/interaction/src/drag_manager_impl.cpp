@@ -37,7 +37,7 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
@@ -58,7 +58,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        stopCallback_ = callback;
+        StartDragListener_ = listener;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -98,9 +98,20 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     }
     notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(notifyMsg);
+    CHKPR(StartDragListener_, RET_ERR);
+    CHKPR(StartDragListener_->OnDragEndMessage, RET_ERR);
+    StartDragListener_->OnDragEndMessage(notifyMsg);
     return RET_OK;
+}
+
+int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(StartDragListener_, RET_ERR);
+    CHKPR(StartDragListener_->OnHideIconMessage, RET_ERR);
+    StartDragListener_->OnHideIconMessage();
+    return RET_OK;  
 }
 
 int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)

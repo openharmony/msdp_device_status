@@ -42,7 +42,7 @@ public:
     int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback);
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback);
     int32_t UpdateDragStyle(DragCursorStyle style);
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);
     int32_t GetDragTargetPid();
     int32_t GetUdKey(std::string &udKey);

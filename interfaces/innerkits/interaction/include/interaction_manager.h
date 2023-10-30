@@ -106,7 +106,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 
     /**
      * @brief Stops dragging.

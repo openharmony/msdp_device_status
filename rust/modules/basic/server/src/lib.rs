@@ -119,7 +119,7 @@ impl IPlugin for FusionBasicServer {
             Ok(param) => {
                 match param {
                     BasicParamID::AllocSocketPair => {
-                        info!(LOG_LABEL, "alloc socket pair");
+                        info!(LOG_LABEL, "Alloc socket pair");
                         self.alloc_socket_pair(data, reply)
                     }
                 }

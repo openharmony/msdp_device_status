@@ -50,7 +50,8 @@ enum class MessageId : int32_t {
     HOT_AREA_ADD_LISTENER,
 
     DRAG_NOTIFY_RESULT,
-    DRAG_STATE_LISTENER
+    DRAG_STATE_LISTENER,
+    DRAG_NOTIFY_HIDE_ICON
 };
 
 enum TokenType : int32_t {

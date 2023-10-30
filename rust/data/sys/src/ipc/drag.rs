@@ -122,7 +122,7 @@ impl DragData {
         let ts = unsafe {
             std::slice::from_raw_parts(value.buffer, value.buffer_size)
         };
-        info!(LOG_LABEL, "fill buffer");
+        info!(LOG_LABEL, "Fill buffer");
         for item in ts.iter() {
             buf.push(*item);
         }
@@ -144,7 +144,7 @@ impl DragData {
 impl Serialize for DragData {
     fn serialize(&self, parcel: &mut BorrowedMsgParcel<'_>) -> IpcResult<()>
     {
-        info!(LOG_LABEL, "in DragData::serialize() enter");
+        info!(LOG_LABEL, "In DragData::serialize() enter");
         self.shadow_info.serialize(parcel)?;
         self.buffer.serialize(parcel)?;
         self.source_type.serialize(parcel)?;
@@ -161,7 +161,7 @@ impl Serialize for DragData {
 impl Deserialize for DragData {
     fn deserialize(parcel: &BorrowedMsgParcel<'_>) -> IpcResult<Self>
     {
-        info!(LOG_LABEL, "in DragData::deserialize() enter");
+        info!(LOG_LABEL, "In DragData::deserialize() enter");
         let drag_data = Self {
             shadow_info: ShadowInfo::deserialize(parcel)?,
             buffer: Vec::<u8>::deserialize(parcel)?,

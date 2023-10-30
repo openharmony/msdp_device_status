@@ -73,9 +73,9 @@ int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
     return INTER_MGR_IMPL.UpdateDragStyle(style);
 }
 
-int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t InteractionManager::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
-    return INTER_MGR_IMPL.StartDrag(dragData, callback);
+    return INTER_MGR_IMPL.StartDrag(dragData, listener);
 }
 
 int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)

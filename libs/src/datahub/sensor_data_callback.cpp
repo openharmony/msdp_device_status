@@ -27,13 +27,13 @@ namespace DeviceStatus {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SensorDataCallback" };
 constexpr int32_t RATE_MILLISEC { 100100100 };
-std::map<int32_t, SensorCallback> algoMap_;
+std::map<int32_t, SensorCallback> g_algoMap;
 } // namespace
 
 SensorDataCallback::SensorDataCallback() {}
 SensorDataCallback::~SensorDataCallback()
 {
-    algoMap_.clear();
+    g_algoMap.clear();
     alive_ = false;
     CHKPV(algorithmThread_);
     if (!algorithmThread_->joinable()) {
@@ -78,7 +78,7 @@ bool SensorDataCallback::SubscribeSensorEvent(int32_t sensorTypeId, SensorCallba
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(callbackMutex_);
-    auto ret = algoMap_.insert(std::pair(sensorTypeId, callback));
+    auto ret = g_algoMap.insert(std::pair(sensorTypeId, callback));
     if (ret.second) {
         return true;
     }
@@ -90,10 +90,10 @@ bool SensorDataCallback::UnsubscribeSensorEvent(int32_t sensorTypeId, SensorCall
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(callbackMutex_);
-    auto callbackIter = algoMap_.find(sensorTypeId);
-    if (callbackIter != algoMap_.end()) {
+    auto callbackIter = g_algoMap.find(sensorTypeId);
+    if (callbackIter != g_algoMap.end()) {
         FI_HILOGE("Erase sensorTypeId:%{public}d", sensorTypeId);
-        algoMap_.erase(sensorTypeId);
+        g_algoMap.erase(sensorTypeId);
     }
     return true;
 }
@@ -102,7 +102,7 @@ bool SensorDataCallback::NotifyCallback(int32_t sensorTypeId, AccelData* data)
 {
     CHKPF(data);
     std::lock_guard lock(callbackMutex_);
-    for (auto iter = algoMap_.begin(); iter != algoMap_.end(); ++iter) {
+    for (auto iter = g_algoMap.begin(); iter != g_algoMap.end(); ++iter) {
         (iter->second)(sensorTypeId, data);
     }
     return true;

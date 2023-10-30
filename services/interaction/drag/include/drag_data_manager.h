@@ -36,7 +36,7 @@ public:
     void Init(const DragData &dragData);
     DragData GetDragData() const;
     void SetDragStyle(DragCursorStyle style);
-    void SetShadowInfo(const ShadowInfo &shadowInfo);
+    void SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos);
     DragCursorStyle GetDragStyle() const;
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;
