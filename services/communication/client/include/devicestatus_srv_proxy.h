@@ -61,7 +61,8 @@ public:
     virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
-
+private:
+    static int32_t MarshallingShadowInfos(const std::vector<ShadowInfo> &shadowInfos, MessageParcel &data);
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
 };

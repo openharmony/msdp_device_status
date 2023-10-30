@@ -33,7 +33,7 @@ struct ShadowInfo {
 };
 
 struct DragData {
-    ShadowInfo shadowInfo;
+    std::vector<ShadowInfo> shadowInfos;
     std::vector<uint8_t> buffer;
     std::string udKey;
     std::string filterInfo;

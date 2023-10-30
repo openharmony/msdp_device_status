@@ -340,12 +340,11 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
 int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-    CHKPR(pixelMap, RET_ERR);
     DragData dragData;
-    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
-    READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (UnMarshallingShadowInfos(data, dragData.shadowInfos) != RET_OK) {
+        FI_HILOGE("UnMarshallingShadowInfos failed");
+        return E_DEVICESTATUS_READ_PARCEL_ERROR;
+    }
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -357,12 +356,12 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
-        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
-        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            dragData.shadowInfo.x, dragData.shadowInfo.y);
-        return RET_ERR;
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d", shadowInfo.x, shadowInfo.y);
+            return RET_ERR;
+        }
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
@@ -548,6 +547,27 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvStub::UnMarshallingShadowInfos(const MessageParcel &data, std::vector<ShadowInfo> &shadowInfos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t shadowNum { 0 };
+    READINT32(data, shadowNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (shadowNum <= 0) {
+        FI_HILOGE("Invalid shadowNum:%{public}d", shadowNum);
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < shadowNum; i++) {
+        ShadowInfo shadowInfo;
+        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+        CHKPR(pixelMap, RET_ERR);
+        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
+        READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+        READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+        shadowInfos.push_back(shadowInfo);
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

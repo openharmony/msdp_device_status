@@ -417,13 +417,10 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if (!dragData.shadowInfo.pixelMap->Marshalling(data)) {
-        FI_HILOGE("Failed to marshalling pixelMap");
+    if (MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
+        FI_HILOGE("Failed to marshalling shadowInfos");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, dragData.shadowInfo.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
@@ -659,6 +656,26 @@ int32_t DeviceStatusSrvProxy::RemoveHotAreaListener()
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvProxy::MarshallingShadowInfos(const std::vector<ShadowInfo> &shadowInfos, MessageParcel &data)
+{
+    CALL_DEBUG_ENTER;
+    if (shadowInfos.empty()) {
+        FI_HILOGE("Invalid parameter shadowInfos");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, shadowInfos.size(), ERR_INVALID_VALUE);
+    for (const auto &shadowInfo : shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if (!shadowInfo.pixelMap->Marshalling(data)) {
+            FI_HILOGE("Failed to marshalling pixelMap");
+            return ERR_INVALID_VALUE;
+        }
+        WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
