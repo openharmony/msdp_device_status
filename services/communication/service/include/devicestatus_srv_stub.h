@@ -57,6 +57,8 @@ private:
     int32_t GetUdKeyStub(MessageParcel& data, MessageParcel& reply);
     int32_t AddDraglistenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t AddSubscriptListenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t RemoveSubscriptListenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply);
     int32_t UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply);

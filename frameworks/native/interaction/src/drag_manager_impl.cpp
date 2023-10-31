@@ -119,6 +119,22 @@ int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPa
     return RET_OK;
 }
 
+int32_t DragManagerImpl::OnDragStyleChangedMessage(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t style = 0;
+    pkt >> style;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read drag msg failed");
+        return RET_ERR;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &listener : subscriptListener_) {
+        listener->OnMessage(static_cast<DragCursorStyle>(style));
+    }
+    return RET_OK;
+}
+
 int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
 {
     CALL_INFO_TRACE;
@@ -161,6 +177,52 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
     if (hasRegistered_ && dragListener_.empty()) {
         hasRegistered_ = false;
         return DeviceStatusClient::GetInstance().RemoveDraglistener();
+    }
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::AddSubscriptListener(SubscriptListenerPtr listener)
+{
+    CALL_INFO_TRACE;
+    CHKPR(listener, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!hasSubscriptRegistered_) {
+        FI_HILOGI("Start monitoring");
+        int32_t ret = DeviceStatusClient::GetInstance().AddSubscriptListener();
+        if (ret != RET_OK) {
+            FI_HILOGE("Failed to register");
+            return ret;
+        }
+        hasSubscriptRegistered_ = true;
+    }
+    if (std::all_of(subscriptListener_.cbegin(), subscriptListener_.cend(),
+                    [listener](SubscriptListenerPtr tListener) {
+                        return (tListener != listener);
+                    })) {
+        subscriptListener_.push_back(listener);
+    } else {
+        FI_HILOGW("The listener already exists");
+    }
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::RemoveSubscriptListener(SubscriptListenerPtr listener)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (listener == nullptr) {
+        subscriptListener_.clear();
+    } else {
+        subscriptListener_.erase(std::remove_if(subscriptListener_.begin(), subscriptListener_.end(),
+            [listener] (auto iter) {
+                return iter == listener;
+            })
+        );
+    }
+
+    if (hasSubscriptRegistered_ && subscriptListener_.empty()) {
+        hasSubscriptRegistered_ = false;
+        return DeviceStatusClient::GetInstance().RemoveSubscriptListener();
     }
     return RET_OK;
 }

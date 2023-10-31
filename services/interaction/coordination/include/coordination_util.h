@@ -32,10 +32,7 @@ struct JsonParser {
             json = nullptr;
         }
     }
-    operator cJSON *()
-    {
-        return json;
-    }
+    operator cJSON *() { return json; }
     cJSON *json { nullptr };
 };
 namespace COORDINATION {

@@ -36,9 +36,7 @@ const std::string FOUNDATION { "foundation" };
 
 StreamSession::StreamSession(const std::string &programName, int32_t moduleType, int32_t fd, int32_t uid, int32_t pid)
     : fd_(fd), pid_(pid)
-{
-    UpdateDescript();
-}
+{}
 
 bool StreamSession::SendMsg(const char *buf, size_t size) const
 {
@@ -91,19 +89,7 @@ void StreamSession::Close()
             FI_HILOGE("Close fd failed, error:%{public}s, fd_:%{public}d", strerror(errno), fd_);
         }
         fd_ = -1;
-        UpdateDescript();
     }
-}
-
-void StreamSession::UpdateDescript()
-{
-    std::ostringstream oss;
-    oss << "fd = " << fd_
-        << ((fd_ < 0) ? ", closed" : ", opened")
-        << ", pid = " << pid_
-        << ", tokenType = " << tokenType_
-        << std::endl;
-    descript_ = oss.str().c_str();
 }
 
 bool StreamSession::SendMsg(NetPacket &pkt) const

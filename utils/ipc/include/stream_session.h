@@ -58,19 +58,12 @@ public:
         return fd_;
     }
 
-    const std::string& GetDescript() const
-    {
-        return descript_;
-    }
-
     void SetTokenType(int32_t type)
     {
         tokenType_ = type;
     }
 
-    void UpdateDescript();
 protected:
-    std::string descript_;
     int32_t fd_ { -1 };
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };

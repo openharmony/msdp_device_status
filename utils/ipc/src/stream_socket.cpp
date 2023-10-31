@@ -72,18 +72,18 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
-        const int32_t unreadSize = circBuf.UnreadSize();
-        if (unreadSize < headSize) {
+        const int32_t residualSize = circBuf.ResidualSize();
+        if (residualSize < headSize) {
             break;
         }
-        int32_t dataSize = unreadSize - headSize;
+        int32_t dataSize = residualSize - headSize;
         char *buf = const_cast<char *>(circBuf.ReadBuf());
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
         if ((static_cast<int32_t>(head->size) < 0) || (static_cast<size_t>(head->size) > MAX_PACKET_BUF_SIZE)) {
             FI_HILOGE("Packet header parsing error, and this error cannot be recovered, the buffer will be reset, "
-                "head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
+                "head->size:%{public}d, residualSize:%{public}d", head->size, residualSize);
             circBuf.Reset();
             break;
         }
@@ -98,12 +98,12 @@ void StreamSocket::OnReadPackets(CircleStreamBuffer &circBuf, StreamSocket::Pack
         }
         if (!circBuf.SeekReadPos(pkt.GetPacketLength())) {
             FI_HILOGW("Set read position error, and this error cannot be recovered, and the buffer will be reset, "
-                "packetSize:%{public}d, unreadSize:%{public}d", pkt.GetPacketLength(), unreadSize);
+                "packetSize:%{public}d, residualSize:%{public}d", pkt.GetPacketLength(), residualSize);
             circBuf.Reset();
             break;
         }
         callbackFun(pkt);
-        if (circBuf.IsEmpty()) {
+        if (circBuf.empty()) {
             circBuf.Reset();
             break;
         }

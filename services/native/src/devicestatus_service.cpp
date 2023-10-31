@@ -323,7 +323,7 @@ void DeviceStatusService::OnConnected(SessionPtr s)
 void DeviceStatusService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
+    FI_HILOGW("Enter, session, fd:%{public}d", s->GetFd());
 }
 
 int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
@@ -678,6 +678,34 @@ int32_t DeviceStatusService::RemoveDraglistener()
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
         FI_HILOGE("Remove listener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::AddSubscriptListener()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    SessionPtr session = GetSession(GetClientFd(pid));
+    CHKPR(session, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::AddSubscriptListener, &dragMgr_, session));
+    if (ret != RET_OK) {
+        FI_HILOGE("AddListener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::RemoveSubscriptListener()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    SessionPtr session = GetSession(GetClientFd(pid));
+    CHKPR(session, RET_ERR);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::RemoveSubscriptListener, &dragMgr_, session));
+    if (ret != RET_OK) {
+        FI_HILOGE("AddListener failed, ret:%{public}d", ret);
     }
     return ret;
 }

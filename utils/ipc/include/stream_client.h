@@ -37,12 +37,12 @@ public:
 
     virtual int32_t Socket() = 0;
     virtual void Stop();
-    int32_t ConnectTo();
+    int32_t StartConnect();
     bool SendMsg(const char *buf, size_t size) const;
     bool SendMsg(const NetPacket &pkt) const;
     bool GetConnectedStatus() const
     {
-        return isConnected_;
+        return hasConnected_;
     }
 
 protected:
@@ -53,7 +53,7 @@ protected:
 protected:
     bool hasClient_ { false };
     bool isRunning_ { false };
-    bool isConnected_ { false };
+    bool hasConnected_ { false };
     MsgClientFunCallback recvFun_ { nullptr };
 };
 } // namespace DeviceStatus

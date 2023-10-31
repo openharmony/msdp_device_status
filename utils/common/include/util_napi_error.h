@@ -50,8 +50,8 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
 #define THROWERR_CUSTOM(env, code, msg) \
     do { \
         napi_value businessError = nullptr; \
-        napi_value errorCode = nullptr; \
         napi_value errorMsg = nullptr; \
+        napi_value errorCode = nullptr; \
         napi_create_int32(env, code, &errorCode); \
         napi_create_string_utf8(env, std::string(msg).c_str(), NAPI_AUTO_LENGTH, &errorMsg); \
         napi_create_error(env, nullptr, errorMsg, &businessError); \

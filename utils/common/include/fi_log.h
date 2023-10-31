@@ -72,24 +72,24 @@ public:
 
 public:
     InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
-        : logfn_ { logfn }, tag_ { tag }, level_ { level }
+        : logfunc_ { logfn }, tag_ { tag }, level_ { level }
     {
         if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, tag_, level_)) {
-            if (logfn_ != nullptr) {
-                logfn_("in %{public}s, enter");
+            if (logfunc_ != nullptr) {
+                logfunc_("in %{public}s, enter");
             }
         }
     }
     ~InnerFunctionTracer()
     {
         if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, tag_, level_)) {
-            if (logfn_ != nullptr) {
-                logfn_("in %{public}s, leave");
+            if (logfunc_ != nullptr) {
+                logfunc_("in %{public}s, leave");
             }
         }
     }
 private:
-    HilogFunc logfn_ { nullptr };
+    HilogFunc logfunc_ { nullptr };
     const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
 };

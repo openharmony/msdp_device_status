@@ -55,11 +55,11 @@ napi_value JsUtil::GetCrossingSwitchStateInfo(sptr<CallbackInfo> cb)
     CHKPP(cb);
     CHKPP(cb->env);
     napi_value ret = nullptr;
-    napi_value state = nullptr;
+    napi_value stateInfo = nullptr;
     CHKRP(napi_create_int32(cb->env, cb->data.coordinationOpened ? 1 : 0, &ret),
         CREATE_INT32);
-    CHKRP(napi_coerce_to_bool(cb->env, ret, &state), COERCE_TO_BOOL);
-    return state;
+    CHKRP(napi_coerce_to_bool(cb->env, ret, &stateInfo), COERCE_TO_BOOL);
+    return stateInfo;
 }
 
 napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)

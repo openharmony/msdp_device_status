@@ -67,7 +67,9 @@ void InteractionManagerImpl::InitMsgHandler()
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
         {MessageId::DRAG_STATE_LISTENER,
-            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)}
+            MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)},
+        {MessageId::DRAG_STYLE_LISTENER,
+            MsgCallbackBind2(&DragManagerImpl::OnDragStyleChangedMessage, &dragManagerImpl_)}
     };
     CHKPV(client_);
     for (auto &it : funs) {
@@ -248,6 +250,23 @@ int32_t InteractionManagerImpl::RemoveDraglistener(DragListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.RemoveDraglistener(listener);
+}
+
+int32_t InteractionManagerImpl::AddSubscriptListener(SubscriptListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (!InitClient()) {
+        FI_HILOGE("Get client is nullptr");
+        return RET_ERR;
+    }
+    return dragManagerImpl_.AddSubscriptListener(listener);
+}
+
+int32_t InteractionManagerImpl::RemoveSubscriptListener(SubscriptListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.RemoveSubscriptListener(listener);
 }
 
 int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
