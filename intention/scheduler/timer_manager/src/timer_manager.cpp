@@ -229,17 +229,17 @@ void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 
 int64_t TimerManager::CalcNextDelayInternal()
 {
-    int64_t  latency = MIN_DELAY;
+    int64_t latency = MIN_DELAY;
     if (!timers_.empty()) {
         int64_t nowTime = GetMillisTime();
         const auto& item = *timers_.begin();
         if (nowTime >= item->nextCallTime) {
-             latency = 0;
+            latency = 0;
         } else {
-             latency = item->nextCallTime - nowTime;
+            latency = item->nextCallTime - nowTime;
         }
     }
-    return  latency;
+    return latency;
 }
 
 void TimerManager::ProcessTimersInternal()
