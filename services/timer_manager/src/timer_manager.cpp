@@ -202,10 +202,10 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 
 int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 {
-    for (auto tIters = timers_.begin(); tIters != timers_.end(); ++tIters) {
-        if ((*tIters)->id == timerId) {
-            auto timer = std::move(*tIters);
-            timers_.erase(tIters);
+    for (auto iter = timers_.begin(); iter!= timers_.end(); ++iter) {
+        if ((*iter)->id == timerId) {
+            auto timer = std::move(*iter);
+            timers_.erase(iter);
             int64_t nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
                 FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
@@ -221,9 +221,9 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 
 void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
-    for (auto tIters = timers_.begin(); tIters != timers_.end(); ++tIters) {
-        if ((*tIters)->nextCallTime > timer->nextCallTime) {
-            timers_.insert(tIters, std::move(timer));
+    for (auto iter = timers_.begin(); iter != timers_.end(); ++iter) {
+        if ((*iter)->nextCallTime > timer->nextCallTime) {
+            timers_.insert(iter, std::move(timer));
             return;
         }
     }
@@ -232,17 +232,17 @@ void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 
 int64_t TimerManager::CalcNextDelayInternal()
 {
-    int64_t delayed = MIN_DELAY;
+    int64_t delayTime = MIN_DELAY;
     if (!timers_.empty()) {
         int64_t nowTime = GetMillisTime();
         const auto& item = *timers_.begin();
         if (nowTime >= item->nextCallTime) {
-            delayed = 0;
+            delayTime = 0;
         } else {
-            delayed = item->nextCallTime - nowTime;
+            delayTime = item->nextCallTime - nowTime;
         }
     }
-    return delayed;
+    return delayTime;
 }
 
 void TimerManager::ProcessTimersInternal()
