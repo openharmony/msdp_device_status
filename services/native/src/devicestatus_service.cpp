@@ -323,7 +323,7 @@ void DeviceStatusService::OnConnected(SessionPtr s)
 void DeviceStatusService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    FI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
+    FI_HILOGW("Enter, session, fd:%{public}d", s->GetFd());
 }
 
 int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)

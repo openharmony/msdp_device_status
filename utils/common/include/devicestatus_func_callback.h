@@ -22,15 +22,15 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 template<class MemberFunType, class ClassType>
-auto MsgCallbackBind1(MemberFunType func, ClassType* obj)
-{
-    return std::bind(func, obj, std::placeholders::_1);
-}
-
-template<class MemberFunType, class ClassType>
 auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
 {
     return std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
+}
+
+template<class MemberFunType, class ClassType>
+auto MsgCallbackBind1(MemberFunType func, ClassType* obj)
+{
+    return std::bind(func, obj, std::placeholders::_1);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

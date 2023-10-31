@@ -34,8 +34,8 @@ class DelegateTasks final : public IDelegateTasks,
                             public IdFactory<int32_t> {
 public:
     struct TaskData {
-        uint64_t tid { 0 };
         int32_t taskId { 0 };
+        uint64_t tid { 0 };
     };
     class Task : public std::enable_shared_from_this<Task> {
     public:
@@ -47,6 +47,10 @@ public:
         ~Task() = default;
         void ProcessTask();
 
+        void SetWaited()
+        {
+            hasWaited_ = true;
+        }
         int32_t GetId() const
         {
             return id_;
@@ -54,10 +58,6 @@ public:
         TaskPtr GetSharedPtr()
         {
             return shared_from_this();
-        }
-        void SetWaited()
-        {
-            hasWaited_ = true;
         }
 
     private:
@@ -75,9 +75,9 @@ public:
     ~DelegateTasks();
 
     bool Init();
-    void ProcessTasks();
     int32_t PostSyncTask(DTaskCallback callback) override;
     int32_t PostAsyncTask(DTaskCallback callback) override;
+    void ProcessTasks();
 
     int32_t GetReadFd() const
     {

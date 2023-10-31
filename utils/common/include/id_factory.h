@@ -39,9 +39,9 @@ public:
             }
             return seed_++;
         }
-        T id = *ids_.begin();
+        T firstId = *ids_.begin();
         ids_.erase(ids_.begin());
-        return id;
+        return firstId;
     }
     void RecoveryId(T id)
     {
