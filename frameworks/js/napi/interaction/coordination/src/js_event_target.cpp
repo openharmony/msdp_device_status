@@ -211,16 +211,16 @@ monitorLabel:
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value treat, sptr<JsUtil::CallbackInfo> cb)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> callback)
 {
     CALL_INFO_TRACE;
-    CHKPP(cb);
-    cb->env = env;
+    CHKPP(callback);
+    callback->env = env;
     napi_value napiPromise = nullptr;
     if (handle == nullptr) {
-        CHKRP(napi_create_promise(env, &cb->deferred, &napiPromise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &callback->deferred, &napiPromise), CREATE_PROMISE);
     } else {
-        CHKRP(napi_create_reference(env, treat, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     return napiPromise;
 }
