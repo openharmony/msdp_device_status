@@ -85,11 +85,11 @@ public:
     }
     void SetWorkerThreadId(uint64_t tid)
     {
-        workerThId_ = tid;
+        workerTid_ = tid;
     }
     bool IsCallFromWorkerThread() const
     {
-        return (GetThisThreadId() == workerThId_);
+        return (GetThisThreadId() == workerTid_);
     }
 
 private:
@@ -97,7 +97,7 @@ private:
     TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
-    uint64_t workerThId_ { 0 };
+    uint64_t workerTid_ { 0 };
     int32_t fds_[2] {};
     std::mutex mux_;
     std::queue<TaskPtr> tasks_;
