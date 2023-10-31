@@ -13,23 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef I_EPOLL_EVENT_SOURCE_H
-#define I_EPOLL_EVENT_SOURCE_H
+#ifndef ADDHOTAREALISTENER_FUZZER_H
+#define ADDHOTAREALISTENER_FUZZER_H
 
-#include <sys/epoll.h>
+#define FUZZ_PROJECT_NAME "addhotarealistener_fuzzer"
 
-namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-class IEpollEventSource {
-public:
-    IEpollEventSource() = default;
-    virtual ~IEpollEventSource() = default;
-
-    virtual int32_t GetFd() const = 0;
-    virtual void Dispatch(const struct epoll_event &ev) = 0;
-};
-} // namespace DeviceStatus
-} // namespace Msdp
-} // namespace OHOS
-#endif // I_EPOLL_EVENT_SOURCE_H
+#endif // ADDHOTAREALISTENER_FUZZER_H

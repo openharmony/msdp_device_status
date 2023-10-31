@@ -101,8 +101,8 @@ napi_value JsDragContext::JsConstructor(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         delete jsContext;
         FI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
-        auto infoTemp = std::string(__FUNCTION__) + ": " + std::string(WRAP) + " failed";
-        napi_throw_error(env, nullptr, infoTemp.c_str());
+        auto errInfoTemp = std::string(__FUNCTION__) + ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, errInfoTemp.c_str());
         return nullptr;
     }
     return thisVar;
@@ -165,8 +165,8 @@ napi_value JsDragContext::On(napi_env env, napi_callback_info info)
         return nullptr;
     }
     char type[MAX_STRING_LEN] = { 0 };
-    size_t length = 0;
-    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), CREATE_STRING_UTF8);
+    size_t strLength = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &strLength), CREATE_STRING_UTF8);
     if ((DRAG_TYPE.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be drag");
         return nullptr;

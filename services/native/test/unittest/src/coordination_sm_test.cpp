@@ -66,8 +66,8 @@ void ClearCoordiantionSM()
     COOR_SM->lastPointerEvent_ = nullptr;
     COOR_SM->displayX_ = -1;
     COOR_SM->displayY_ = -1;
-    COOR_SM->interceptorId_ = -1;
     COOR_SM->monitorId_ = -1;
+    COOR_SM->interceptorId_ = -1;
     COOR_SM->filterId_ = -1;
     COOR_SM->remoteNetworkIdCallback_ = nullptr;
     COOR_SM->mouseLocationCallback_ = nullptr;

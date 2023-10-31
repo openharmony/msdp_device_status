@@ -35,12 +35,12 @@ private: \
 template<typename T>
 class DelayedSpSingleton : public NoCopyable {
 public:
-    static sptr<T> GetInstance();
     static void DestroyInstance();
+    static sptr<T> GetInstance();
 
 private:
-    static sptr<T> instance_;
     static std::mutex mutex_;
+    static sptr<T> instance_;
 };
 
 template<typename T>
@@ -58,7 +58,6 @@ sptr<T> DelayedSpSingleton<T>::GetInstance()
             instance_ = new T();
         }
     }
-
     return instance_;
 }
 

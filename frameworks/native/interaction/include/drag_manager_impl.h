@@ -37,9 +37,6 @@ public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
 
-    int32_t UpdateDragStyle(DragCursorStyle style);
-    int32_t GetDragTargetPid();
-    int32_t GetUdKey(std::string &udKey);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
@@ -48,8 +45,11 @@ public:
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
+    int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t GetDragTargetPid();
+    int32_t GetUdKey(std::string &udKey);
+    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     int32_t GetDragData(DragData &dragData);
     int32_t GetDragState(DragState &dragState);
 

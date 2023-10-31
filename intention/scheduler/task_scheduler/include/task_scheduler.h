@@ -45,24 +45,24 @@ public:
         Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr)
             : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
-        void ProcessTask();
 
-        int32_t GetId() const
-        {
-            return id_;
-        }
         TaskPtr GetSharedPtr()
         {
             return shared_from_this();
+        }
+        int32_t GetId() const
+        {
+            return id_;
         }
         void SetWaited()
         {
             hasWaited_ = true;
         }
+        void ProcessTask();
 
     private:
-        std::atomic_bool hasWaited_ { false };
         int32_t id_ { 0 };
+        std::atomic_bool hasWaited_ { false };
         DTaskCallback fun_ { nullptr };
         Promise* promise_ { nullptr };
     };

@@ -31,7 +31,7 @@ const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
 const std::string ORIGIN_NETWORKID { "testOriginNetworkId" };
 const std::string DEVICE_ID { "testDeviceId" };
 constexpr int32_t SESSION_ID { 1 };
-constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
+constexpr uint32_t TRUNCATE_STRING_LENGTH { 20 };
 } // namespace
 
 void ClearCoordinationSoftbusAdapter()
@@ -309,7 +309,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, Test
     std::string data = "TestSendData";
     g_adapter->sessionDevs_[DEVICE_ID] = SESSION_ID;
     int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
-        INTERCEPT_STRING_LENGTH);
+        TRUNCATE_STRING_LENGTH);
     EXPECT_EQ(ret, RET_ERR);
     ClearCoordinationSoftbusAdapter();
 }

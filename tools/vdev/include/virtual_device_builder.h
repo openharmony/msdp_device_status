@@ -63,15 +63,15 @@ protected:
 
 protected:
     std::vector<uinput_abs_setup> absInit_;
+    std::vector<uint32_t> abs_;
+    std::vector<uint32_t> relBits_;
+    std::vector<uint32_t> switches_;
+    std::vector<uint32_t> repeats_;
     std::vector<uint32_t> eventTypes_;
     std::vector<uint32_t> keys_;
     std::vector<uint32_t> properties_;
-    std::vector<uint32_t> abs_;
-    std::vector<uint32_t> relBits_;
     std::vector<uint32_t> leds_;
     std::vector<uint32_t> miscellaneous_;
-    std::vector<uint32_t> switches_;
-    std::vector<uint32_t> repeats_;
 
 private:
     void SetPhys();

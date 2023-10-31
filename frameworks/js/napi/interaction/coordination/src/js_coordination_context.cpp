@@ -347,35 +347,36 @@ napi_value JsCoordinationContext::JsConstructor(napi_env env, napi_callback_info
 JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
 {
     CALL_INFO_TRACE;
-    napi_value global = nullptr;
-    CHKRP(napi_get_global(env, &global), GET_GLOBAL);
+    napi_value napiGlobal = nullptr;
+    CHKRP(napi_get_global(env, &napiGlobal), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, g_coordination, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, napiGlobal, g_coordination, &result), HAS_NAMED_PROPERTY);
     if (!result) {
         FI_HILOGE("Coordination was not found");
         return nullptr;
     }
 
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    CHKPP(scope);
+    napi_handle_scope handleScope = nullptr;
+    napi_open_handle_scope(env, &handleScope);
+    CHKPP(handleScope);
     napi_value object = nullptr;
-    CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
+    CHKRP_SCOPE(env, napi_get_named_property(env, napiGlobal, g_coordination, &object),
+        GET_NAMED_PROPERTY, handleScope);
     if (object == nullptr) {
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, handleScope);
         FI_HILOGE("object is nullptr");
         return nullptr;
     }
 
     JsCoordinationContext *instance = nullptr;
-    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, scope);
+    CHKRP_SCOPE(env, napi_unwrap(env, object, reinterpret_cast<void**>(&instance)), UNWRAP, handleScope);
     if (instance == nullptr) {
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, handleScope);
         FI_HILOGE("instance is nullptr");
         return nullptr;
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, handleScope);
     return instance;
 }
 

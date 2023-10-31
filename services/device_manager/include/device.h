@@ -92,8 +92,8 @@ public:
     bool IsKeyboard() const override;
 
     bool HasAbs(size_t abs) const;
-    bool HasRel(size_t rel) const;
     bool HasKey(size_t key) const;
+    bool HasRel(size_t rel) const;
     bool HasProperty(size_t property) const;
     bool HasCapability(Capability capability) const;
 
@@ -101,11 +101,11 @@ private:
     void QueryDeviceInfo();
     void QuerySupportedEvents();
     void UpdateCapability();
-    bool HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const;
-    bool HasJoystickAxesOrButtons() const;
     bool HasAbsCoord() const;
     bool HasMtCoord() const;
     bool HasRelCoord() const;
+    bool HasAxesOrButton(size_t start, size_t end, const uint8_t* whichBitMask) const;
+    bool HasJoystickAxesOrButtons() const;
     void CheckPointers();
     void CheckAbs();
     void CheckJoystick();
@@ -132,10 +132,10 @@ private:
     int32_t vendor_ { 0 };
     std::string devPath_;
     std::string sysPath_;
+    std::string dhid_;
     std::string name_;
     std::string phys_;
     std::string uniq_;
-    std::string dhid_;
     std::string networkId_;
     std::bitset<DEVICE_CAP_MAX> caps_;
     uint8_t evBitmask_[NBYTES(EV_MAX)] {};
