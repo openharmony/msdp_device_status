@@ -191,9 +191,9 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
 
 int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 {
-    for (auto tIters = timers_.begin(); tIters != timers_.end(); ++tIters) {
-        if ((*tIters)->id == timerId) {
-            timers_.erase(tIters);
+    for (auto iter = timers_.begin(); iter != timers_.end(); ++iter) {
+        if ((*iter)->id == timerId) {
+            timers_.erase(iter);
             return RET_OK;
         }
     }
