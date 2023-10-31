@@ -38,7 +38,6 @@ public:
     virtual bool SendMessage(const NetPacket& pkt) const = 0;
     virtual void RegisterConnectedFunction(ConnectCallback function) = 0;
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
-    virtual void RegisterConnectedFunction(ConnectCallback fun) = 0;
     virtual void OnRecvMsg(const char *buf, size_t size) = 0;
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
