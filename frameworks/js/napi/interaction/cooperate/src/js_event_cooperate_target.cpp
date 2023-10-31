@@ -214,16 +214,16 @@ monitorTag:
 }
 
 napi_value JsEventCooperateTarget::CreateCallbackInfo(napi_env env,
-    napi_value dealt, sptr<JsUtilCooperate::CallbackInfo> cb)
+    napi_value handle, sptr<JsUtilCooperate::CallbackInfo> callback)
 {
     CALL_INFO_TRACE;
-    CHKPP(cb);
-    cb->env = env;
+    CHKPP(callback);
+    callback->env = env;
     napi_value promise = nullptr;
-    if (dealt == nullptr) {
-        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+    if (handle == nullptr) {
+        CHKRP(napi_create_promise(env, &callback->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP(napi_create_reference(env, dealt, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, 1, &callback->ref), CREATE_REFERENCE);
     }
     return promise;
 }
