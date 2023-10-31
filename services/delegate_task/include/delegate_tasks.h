@@ -42,8 +42,8 @@ public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
         using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
-        Task(int32_t id, DTaskCallback fun, Promise *promised = nullptr)
-            : id_(id), fun_(fun), promise_(promised) {}
+        Task(int32_t taskid, DTaskCallback fun, Promise *promise = nullptr)
+            : taskid_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
         void ProcessTask();
 
