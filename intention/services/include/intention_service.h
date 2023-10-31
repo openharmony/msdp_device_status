@@ -49,11 +49,11 @@ private:
     int32_t Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
     int32_t Start(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
     int32_t Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
     int32_t GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
 
 private:
     TaskScheduler taskScheduler_;

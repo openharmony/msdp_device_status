@@ -49,13 +49,13 @@ int32_t IntentionClient::Enable(uint32_t intention, ParamBase &data, ParamBase &
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Enable, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Enable, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -71,13 +71,13 @@ int32_t IntentionClient::Disable(uint32_t intention, ParamBase &data, ParamBase 
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Disable, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Disable, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -93,13 +93,13 @@ int32_t IntentionClient::Start(uint32_t intention, ParamBase &data, ParamBase &r
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Start, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Start, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -115,13 +115,13 @@ int32_t IntentionClient::Stop(uint32_t intention, ParamBase &data, ParamBase &re
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Stop, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Stop, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -137,13 +137,13 @@ int32_t IntentionClient::AddWatch(uint32_t intention, uint32_t id, ParamBase &da
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Add watch, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Add watch, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -159,13 +159,13 @@ int32_t IntentionClient::RemoveWatch(uint32_t intention, uint32_t id, ParamBase 
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Remove watch, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Remove watch, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -181,13 +181,13 @@ int32_t IntentionClient::SetParam(uint32_t intention, uint32_t id, ParamBase &da
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Set param, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Set param, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -203,13 +203,13 @@ int32_t IntentionClient::GetParam(uint32_t intention, uint32_t id, ParamBase &da
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Get param, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Get param, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;
@@ -225,13 +225,13 @@ int32_t IntentionClient::Control(uint32_t intention, uint32_t id, ParamBase &dat
     CALL_DEBUG_ENTER;
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(IntentionProxy::GetDescriptor())) {
-        FI_HILOGE("Write descriptor failed");
+        FI_HILOGE("Control, write descriptor failed");
         return RET_ERR;
     }
     data.Marshalling(dataParcel);
 
     if (Connect() != RET_OK) {
-        FI_HILOGE("Failed to connect IntentionService");
+        FI_HILOGE("Control, failed to connect IntentionService");
         return RET_ERR;
     }
     MessageParcel replyParcel;

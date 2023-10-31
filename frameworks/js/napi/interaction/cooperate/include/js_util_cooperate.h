@@ -50,8 +50,8 @@ public:
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;
         ~CallbackInfo() = default;
-        napi_env env { nullptr };
         napi_ref ref { nullptr };
+        napi_env env { nullptr };
         napi_deferred deferred { nullptr };
         int32_t errCode { 0 };
         CallbackData data;

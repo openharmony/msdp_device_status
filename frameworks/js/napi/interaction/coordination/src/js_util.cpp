@@ -101,10 +101,10 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     CHKPF(scope);
-    napi_value handlerTemp = nullptr;
-    CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
+    napi_value tempHandler = nullptr;
+    CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &tempHandler), GET_REFERENCE_VALUE, scope);
     bool isEqual = false;
-    CHKRF_SCOPE(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS, scope);
+    CHKRF_SCOPE(env, napi_strict_equals(env, handle, tempHandler, &isEqual), STRICT_EQUALS, scope);
     napi_close_handle_scope(env, scope);
     return isEqual;
 }

@@ -151,9 +151,9 @@ int32_t TimerManager::TakeNextTimerId()
         [] (uint64_t s, const auto &timer) {
             return (s |= (uint64_t(1U) << timer->id));
         });
-    for (size_t i = 0; i < MAX_TIMER_COUNT; ++i) {
-        if ((timerSlot & (uint64_t(1U) << i)) == 0) {
-            return i;
+    for (size_t count = 0; count < MAX_TIMER_COUNT; ++count) {
+        if ((timerSlot & (uint64_t(1U) << count)) == 0) {
+            return count;
         }
     }
     return NONEXISTENT_ID;
@@ -176,12 +176,12 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     }
     auto timer = std::make_unique<TimerItem>();
     timer->id = nextTimerId;
-    timer->intervalMs = intervalMs;
     timer->repeatCount = repeatCount;
+    timer->intervalMs = intervalMs;
     timer->callbackCount = 0;
     int64_t nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-        FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+        FI_HILOGE("Timer internal, the addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
@@ -208,7 +208,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             timers_.erase(iter);
             int64_t nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-                FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+                FI_HILOGE("Reset timer internal, the addition of nextCallTime in TimerItem overflows");
                 return RET_ERR;
             }
             timer->callbackCount = 0;
@@ -250,28 +250,28 @@ void TimerManager::ProcessTimersInternal()
     if (timers_.empty()) {
         return;
     }
-    int64_t nowTime = GetMillisTime();
+    int64_t presentTime = GetMillisTime();
     for (;;) {
         auto tIter = timers_.begin();
         if (tIter == timers_.end()) {
             break;
         }
-        if ((*tIter)->nextCallTime > nowTime) {
+        if ((*tIter)->nextCallTime > presentTime) {
             break;
         }
-        auto curTimer = std::move(*tIter);
+        auto currentTimer = std::move(*tIter);
         timers_.erase(tIter);
-        ++curTimer->callbackCount;
-        if ((curTimer->repeatCount >= 1) && (curTimer->callbackCount >= curTimer->repeatCount)) {
-            curTimer->callback();
+        ++currentTimer->callbackCount;
+        if ((currentTimer->repeatCount >= 1) && (currentTimer->callbackCount >= currentTimer->repeatCount)) {
+            currentTimer->callback();
             continue;
         }
-        if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
+        if (!AddInt64(currentTimer->nextCallTime, currentTimer->intervalMs, currentTimer->nextCallTime)) {
             FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }
-        auto callback = curTimer->callback;
-        InsertTimerInternal(curTimer);
+        auto callback = currentTimer->callback;
+        InsertTimerInternal(currentTimer);
         callback();
     }
 }

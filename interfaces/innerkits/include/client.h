@@ -34,7 +34,7 @@ public:
     void SetEventHandler(EventHandlerPtr eventHandler) override;
     void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
     bool Start() override;
-    void RegisterConnectedFunction(ConnectCallback fun) override;
+    void RegisterConnectedFunction(ConnectCallback function) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void Stop() override;
     bool SendMessage(const NetPacket& pkt) const override;

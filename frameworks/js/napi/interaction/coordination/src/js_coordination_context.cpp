@@ -79,8 +79,8 @@ napi_value JsCoordinationContext::Prepare(napi_env env, napi_callback_info info)
 napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 1;
     napi_value argv[1] = { nullptr };
+    size_t argc = 1;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
@@ -177,7 +177,7 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Incorrect parameter count");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -188,20 +188,20 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], networkId,
         sizeof(networkId), &length), GET_VALUE_STRING_UTF8);
-    std::string networkIdTmp = networkId;
+    std::string networkIdTemp = networkId;
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTmp);
+        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTmp, argv[1]);
+    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, argv[1]);
 }
 
 napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
@@ -212,7 +212,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter mismatch error");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
@@ -241,8 +241,8 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
 napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    size_t argc = 2;
     napi_value argv[2] = { nullptr };
+    size_t argc = 2;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
@@ -253,8 +253,8 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
-    char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
+    char type[MAX_STRING_LEN] = { 0 };
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     std::string typeTmp = type;
 
@@ -313,7 +313,7 @@ napi_value JsCoordinationContext::CreateInstance(napi_env env)
     uint32_t refCount = 0;
     status = napi_reference_ref(env, jsContext->contextRef_, &refCount);
     if (status != napi_ok) {
-        FI_HILOGE("ref is nullptr");
+        FI_HILOGE("reference to nullptr");
         napi_delete_reference(env, jsContext->contextRef_);
         return nullptr;
     }

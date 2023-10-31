@@ -172,8 +172,8 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
         return NONEXISTENT_ID;
     }
     auto timer = std::make_unique<TimerItem>();
-    timer->id = timerId;
     timer->intervalMs = intervalMs;
+    timer->id = timerId;
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
     int64_t nowTime = GetMillisTime();

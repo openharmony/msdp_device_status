@@ -117,7 +117,7 @@ void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     static constexpr int32_t onceProcessTaskLimit = 10;
     std::lock_guard<std::mutex> guard(mux_);
-    for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+    for (int32_t i = 0; i < onceProcessTaskLimit; i++) {
         if (tasks_.empty()) {
             break;
         }
@@ -144,7 +144,7 @@ TaskScheduler::TaskPtr TaskScheduler::PostTask(DTaskCallback callback, Promise *
     ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        FI_HILOGE("Pipe write failed, errno:%{public}d", errno);
+        FI_HILOGE("Pipeline writes failed, errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
