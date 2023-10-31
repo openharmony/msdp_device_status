@@ -230,14 +230,14 @@ std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(int32_t devic
     const std::string localNetworkId { COOPERATE::GetLocalNetworkId() };
     const std::string pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
-    for (const auto &[id, dev] : devices_) {
-        CHKPC(dev);
-        const std::string networkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
+    for (const auto &[id, device] : devices_) {
+        CHKPC(device);
+        const std::string networkId { device->IsRemote() ? device->GetNetworkId() : localNetworkId };
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            inputDeviceDhids.push_back(dev->GetDhid());
+        if (device->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+            inputDeviceDhids.push_back(device->GetDhid());
             FI_HILOGD("unq:%{public}s, type:%{public}s", inputDeviceDhids.back().c_str(), "supportkey");
         }
     }
