@@ -180,7 +180,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
     int64_t nowTime = GetMillisTime();
-    if (!AddInt64(nowTime, time->intervalMs, time->nextCallTime)) {
+    if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
         FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
