@@ -41,11 +41,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceS
 DeviceStatusSrvStub::DeviceStatusSrvStub()
 {
     connFuncs_ = {
-        {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE),
-            &DeviceStatusSrvStub::SubscribeStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE),
-            &DeviceStatusSrvStub::UnsubscribeStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
+        { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_SUBSCRIBE), &DeviceStatusSrvStub::SubscribeStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_UNSUBSCRIBE), &DeviceStatusSrvStub::UnsubscribeStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::DEVICESTATUS_GETCACHE),
             &DeviceStatusSrvStub::GetLatestDeviceStatusDataStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
             &DeviceStatusSrvStub::RegisterCoordinationMonitorStub},
@@ -61,36 +59,31 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
             &DeviceStatusSrvStub::DeactivateCoordinationStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
             &DeviceStatusSrvStub::GetCoordinationStateStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
-            &DeviceStatusSrvStub::HandleAllocSocketFdStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
-            &DeviceStatusSrvStub::StartDragStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG),
-            &DeviceStatusSrvStub::StopDragStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE),
-            &DeviceStatusSrvStub::UpdateDragStyleStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID),
-            &DeviceStatusSrvStub::GetDragTargetPidStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY),
-            &DeviceStatusSrvStub::GetUdKeyStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
+        { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD), &DeviceStatusSrvStub::HandleAllocSocketFdStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG), &DeviceStatusSrvStub::StartDragStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::STOP_DRAG), &DeviceStatusSrvStub::StopDragStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::UPDATED_DRAG_STYLE), &DeviceStatusSrvStub::UpdateDragStyleStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_PID), &DeviceStatusSrvStub::GetDragTargetPidStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_TARGET_UDKEY), &DeviceStatusSrvStub::GetUdKeyStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
             &DeviceStatusSrvStub::AddDraglistenerStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR),
             &DeviceStatusSrvStub::RemoveDraglistenerStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::SET_DRAG_WINDOW_VISIBLE),
             &DeviceStatusSrvStub::SetDragWindowVisibleStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET),
-            &DeviceStatusSrvStub::GetShadowOffsetStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC),
-            &DeviceStatusSrvStub::UpdateShadowPicStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA),
-            &DeviceStatusSrvStub::GetDragDataStub},
-        {static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_SHADOW_OFFSET), &DeviceStatusSrvStub::GetShadowOffsetStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_SHADOW_PIC), &DeviceStatusSrvStub::UpdateShadowPicStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_DATA), &DeviceStatusSrvStub::GetDragDataStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             &DeviceStatusSrvStub::AddHotAreaListenerStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
-            &DeviceStatusSrvStub::RemoveHotAreaListenerStub}
+            &DeviceStatusSrvStub::RemoveHotAreaListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
+            &DeviceStatusSrvStub::AddSubscriptListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
+            &DeviceStatusSrvStub::RemoveSubscriptListenerStub}
     };
 }
 
@@ -421,6 +414,26 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
         FI_HILOGE("Call RemoveDraglistener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::AddSubscriptListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = AddSubscriptListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call AddSubscriptListener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::RemoveSubscriptListenerStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RemoveSubscriptListener();
+    if (ret != RET_OK) {
+        FI_HILOGE("Call RemoveSubscriptListener failed, ret:%{public}d", ret);
     }
     return ret;
 }

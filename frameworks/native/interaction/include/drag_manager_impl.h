@@ -27,6 +27,7 @@
 #include "drag_data.h"
 #include "i_drag_listener.h"
 #include "i_startdrag_listener.h"
+#include "i_subscript_listener.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -42,8 +43,11 @@ public:
     int32_t OnNotifyResult(const StreamClient& client, NetPacket& pkt);
     int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient& client, NetPacket& pkt);
+    int32_t OnDragStyleChangedMessage(const StreamClient& client, NetPacket& pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
     int32_t RemoveDraglistener(DragListenerPtr listener);
+    int32_t AddSubscriptListener(SubscriptListenerPtr listener);
+    int32_t RemoveSubscriptListener(SubscriptListenerPtr listener);
     int32_t SetDragWindowVisible(bool visible);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
@@ -56,8 +60,10 @@ public:
 private:
     std::mutex mtx_;
     std::atomic_bool hasRegistered_ { false };
+    std::atomic_bool hasSubscriptRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
     std::shared_ptr<IStartDragListener> StartDragListener_;
+    std::list<SubscriptListenerPtr> subscriptListener_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -27,6 +27,7 @@
 #include "i_drag_listener.h"
 #include "i_startdrag_listener.h"
 #include "i_hotarea_listener.h"
+#include "i_subscript_listener.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -160,6 +161,23 @@ public:
      * @since 10
      */
     int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
+
+    /**
+     * @brief 注册一个用于拖拽角标样式更改的监听器.
+     * @param listener 用于拖拽角标样式更改的侦听器.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t AddSubscriptListener(std::shared_ptr<ISubscriptListener> listener);
+
+    /**
+     * @brief 取消注册一个用于拖拽角标样式更改的监听器.
+     * @param listener 用于拖拽角标样式更改的侦听器.
+     * If no value is passed, all listeners are canceled.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t RemoveSubscriptListener(std::shared_ptr<ISubscriptListener> listener);
 
     /**
      * @brief Displays or hides the dragging window.

@@ -43,6 +43,8 @@ public:
     void OnSessionLost(SessionPtr session);
     int32_t AddListener(SessionPtr session);
     int32_t RemoveListener(SessionPtr session);
+    int32_t AddSubscriptListener(SessionPtr session);
+    int32_t RemoveSubscriptListener(SessionPtr session);
     int32_t StartDrag(const DragData &dragData, SessionPtr sess) override;
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t GetDragTargetPid() const;

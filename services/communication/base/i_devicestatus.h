@@ -52,6 +52,8 @@ public:
     virtual int32_t GetUdKey(std::string &udKey) = 0;
     virtual int32_t AddDraglistener() = 0;
     virtual int32_t RemoveDraglistener() = 0;
+    virtual int32_t AddSubscriptListener() = 0;
+    virtual int32_t RemoveSubscriptListener() = 0;
     virtual int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
