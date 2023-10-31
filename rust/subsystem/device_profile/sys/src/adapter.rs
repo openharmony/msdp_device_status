@@ -209,7 +209,7 @@ impl StringVector {
     extern "C" fn destruct(strings: *mut CIStringVector)
     {
         if let Some(strings_mut) = StringVector::from_interface(strings) {
-            // SAFETY: `strings_ptr` is valid, because null pointer check has been performed.
+            // SAFETY: `strings_mut` is valid, becauce has been matched to `Some`.
             unsafe { drop(Box::from_raw(strings_mut as *mut StringVector)) };
         } else {
             error!(LOG_LABEL, "Failed to destruct a CIStringVector instance");

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-//! TODO: add documentation.
+//! rust device profile sys
 
 #![feature(rustc_private)]
 
