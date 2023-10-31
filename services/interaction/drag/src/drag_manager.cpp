@@ -709,6 +709,12 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
+
+int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    dragDrawing_.UpdateDragItemStyle(dragItemStyle);
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

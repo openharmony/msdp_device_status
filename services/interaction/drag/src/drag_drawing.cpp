@@ -62,6 +62,7 @@ constexpr int32_t SVG_WIDTH { 40 };
 constexpr int32_t SVG_HEIGHT { 40 };
 constexpr int32_t SIXTEEN { 16 };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
+constexpr int32_t GRADIENT_COLOR_DURATION { 1000 };
 constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
@@ -241,6 +242,11 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     }
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
+    }
+    if (displayY == 500) {
+        FI_HILOGI("Here in GradientForegroundColor");
+        UpdateDragItemStyle(DragItemStyle());//Just use to test animation interface usage
+        FI_HILOGI("Here out GradientForegroundColor");
     }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
@@ -1205,6 +1211,30 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
     return radiusPx > 0.0f ? BLUR_SIGMA_SCALE * radiusPx + 0.5f : 0.0f;
 }
 
+int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    /*
+    TODO
+    Use dragItemStyle to update drag item style，with animation.
+    */
+    (void) dragItemStyle;
+    std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
+    if (pixelMapNode == nullptr) {
+        FI_HILOGD("PixelMapNode is nullptr");
+        return RET_ERR;
+    }
+    pixelMapNode->SetForegroundColor(Rosen::RSColor(124, 252, 0).AsArgbInt());
+    Rosen::RSAnimationTimingProtocol protocol;
+    protocol.SetDuration(GRADIENT_COLOR_DURATION);
+    Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+        if (pixelMapNode != nullptr) {
+            pixelMapNode->SetForegroundColor(Rosen::RSColor(208, 38, 38).AsArgbInt());
+        }
+    });
+    return RET_OK;
+}
+
 DragDrawing::~DragDrawing()
 {
     if (dragExtHandle_ != nullptr) {
@@ -1400,6 +1430,7 @@ void DrawDynamicEffectModifier::SetScale(float scale)
     }
     scale_->Set(scale);
 }
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

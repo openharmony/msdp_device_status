@@ -239,7 +239,13 @@ public:
      */
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
-    int32_t EnterUninstallArea(bool isIn);
+    /**
+     * @brief Update item style when dragging.
+     * @param dragItemStyle Indicates the style param for dragged item.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
 
 private:
     InteractionManager() = default;

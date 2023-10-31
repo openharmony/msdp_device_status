@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "pixel_map.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -81,6 +80,28 @@ struct DragAnimationData {
     int32_t offsetX { -1 };
     int32_t offsetY { -1 };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+};
+
+struct Animation {
+    int32_t duration; // 时长
+    int32_t tempo; // 节奏
+//     ICurve curve; // 动效时间曲线, 这个参数貌似没有IPC序列化反序列化的能力
+    int32_t delay; // 延迟
+    int32_t iterations; // 迭代重复次数
+    int32_t playMode; // 不确定类型
+};
+
+struct ItemStyle {
+    uint32_t foregroundColor;
+    int32_t width;
+    int32_t height;
+    int32_t radius;
+    int32_t border;
+};
+
+struct DragItemStyle {
+    Animation animation;
+    ItemStyle itemStyle;
 };
 
 enum class DragCursorStyle {

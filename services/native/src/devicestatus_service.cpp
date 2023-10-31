@@ -1032,6 +1032,17 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
+
+int32_t DeviceStatusService::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateDragItemStyle, &dragMgr_, dragItemStyle));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -46,7 +46,8 @@ enum class DeviceInterfaceCode {
     GET_DRAG_STATE,
     ALLOC_SOCKET_FD = 40,
     ADD_HOT_AREA_MONITOR = 50,
-    REMOVE_HOT_AREA_MONITOR
+    REMOVE_HOT_AREA_MONITOR,
+    UPDATE_DRAG_ITEM_STYLE
 };
 } // namespace Msdp
 } // namespace OHOS

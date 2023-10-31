@@ -25,6 +25,7 @@
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
+#include "drag_item_style_packer.h"
 #include "fi_log.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
@@ -82,7 +83,9 @@ DeviceStatusSrvStub::DeviceStatusSrvStub()
         {static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
             &DeviceStatusSrvStub::AddSubscriptListenerStub},
         {static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
-            &DeviceStatusSrvStub::RemoveSubscriptListenerStub}
+            &DeviceStatusSrvStub::RemoveSubscriptListenerStub},
+        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_DRAG_ITEM_STYLE),
+            &DeviceStatusSrvStub::UpdateDragItemStyleStub}
     };
 }
 
@@ -559,6 +562,21 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
     int32_t ret = RemoveHotAreaListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::UpdateDragItemStyleStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    DragItemStyle dragItemStyle;
+    if (DragItemStylePacker::UnMarshallingDragItemStyle(data, dragItemStyle) != RET_OK) {
+        FI_HILOGE("UnMarshallingDragItemStyle failed");
+        return RET_ERR;
+    }
+    int32_t ret = UpdateDragItemStyle(dragItemStyle);
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
     }
     return ret;
 }

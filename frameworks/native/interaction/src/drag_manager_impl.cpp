@@ -264,6 +264,12 @@ int32_t DragManagerImpl::GetDragState(DragState &dragState)
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragState(dragState);
 }
+
+int32_t DragManagerImpl::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().UpdateDragItemStyle(dragItemStyle);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

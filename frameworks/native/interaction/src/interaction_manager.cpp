@@ -147,6 +147,13 @@ int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListen
 {
     return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
+
+int32_t InteractionManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    return INTER_MGR_IMPL.UpdateDragItemStyle(dragItemStyle);
+
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

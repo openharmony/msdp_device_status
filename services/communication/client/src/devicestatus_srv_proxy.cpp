@@ -22,6 +22,7 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
+#include "drag_item_style_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 
@@ -698,6 +699,31 @@ int32_t DeviceStatusSrvProxy::RemoveHotAreaListener()
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvProxy::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    if (DragItemStylePacker::MarshallingDragItemStyle(dragItemStyle, data) != RET_OK) {
+        FI_HILOGE("MarshallingDragItemStyle failed");
+        return ERR_INVALID_VALUE;
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_DRAG_ITEM_STYLE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+
 }
 } // namespace DeviceStatus
 } // namespace Msdp
