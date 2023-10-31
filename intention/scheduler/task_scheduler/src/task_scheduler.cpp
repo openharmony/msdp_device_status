@@ -79,22 +79,22 @@ void TaskScheduler::ProcessTasks()
     }
 }
 
-int32_t TaskScheduler::PostSyncTask(DTaskCallback callback)
+int32_t TaskScheduler::PostSyncTask(DTaskCallback cb)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(cb, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
-        return callback();
+        return cb();
     }
     Promise promise;
     Future future = promise.get_future();
-    auto tasks = PostTask(callback, &promise);
-    CHKPR(tasks, ETASKS_POST_SYNCTASK_FAIL);
+    auto task = PostTask(cb, &promise);
+    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
     auto res = future.wait_for(span);
-    tasks->SetWaited();
+    task->SetWaited();
     if (res == std::future_status::timeout) {
         FI_HILOGE("Task timeout");
         return ETASKS_WAIT_TIMEOUT;
