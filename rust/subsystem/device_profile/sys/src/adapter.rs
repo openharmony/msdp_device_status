@@ -60,11 +60,7 @@ impl CrossStateListener {
     fn from_interface(listener: *mut CICrossStateListener) -> Option<&'static mut Self>
     {
         let listener_ptr = listener as *mut Self;
-        if listener_ptr.is_null() {
-            error!(LOG_LABEL, "listener_ptr is null");
-            return None;
-        }
-        // SAFETY: `listener_ptr` is valid, because null pointer check has been performed.
+        // SAFETY: `listener_ptr` is valid, because `as_mut` has null pointer checking.
         unsafe {
             listener_ptr.as_mut()
         }
@@ -105,12 +101,11 @@ impl CrossStateListener {
     extern "C" fn destruct(listener: *mut CICrossStateListener)
     {
         call_debug_enter!("CrossStateListener::destruct");
-        let listener_ptr = listener as *mut Self;
-        if listener_ptr.is_null() {
-            error!(LOG_LABEL, "listener_ptr is null");
+        if let Some(listener_mut) = CrossStateListener::from_interface(listener) {
+            // SAFETY: `listener_mut` is valid, becauce has been matched to `Some`.
+            unsafe { drop(Box::from_raw(listener_mut as *mut CrossStateListener)) };
         } else {
-            // SAFETY: `listener_ptr` is valid, because null pointer check has been performed.
-            unsafe { drop(Box::from_raw(listener_ptr)) };
+            error!(LOG_LABEL, "Failed to destruct a CICrossStateListener instance");
         }
     }
     /// Handle a state update event from a device.
@@ -174,11 +169,7 @@ impl StringVector {
     fn from_interface(strings: *mut CIStringVector) -> Option<&'static mut Self>
     {
         let strings_ptr = strings as *mut Self;
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
-            return None;
-        }
-        // SAFETY: `strings_ptr` is valid, because null pointer check has been performed.
+        // SAFETY: `strings_ptr` is valid, because `as_mut` has null pointer checking.
         unsafe {
             strings_ptr.as_mut()
         }
@@ -217,12 +208,11 @@ impl StringVector {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(strings: *mut CIStringVector)
     {
-        let strings_ptr = strings as *mut Self;
-        if strings_ptr.is_null() {
-            error!(LOG_LABEL, "strings_ptr is null");
-        } else {
+        if let Some(strings_mut) = StringVector::from_interface(strings) {
             // SAFETY: `strings_ptr` is valid, because null pointer check has been performed.
-            unsafe { drop(Box::from_raw(strings_ptr)) };
+            unsafe { drop(Box::from_raw(strings_mut as *mut StringVector)) };
+        } else {
+            error!(LOG_LABEL, "Failed to destruct a CIStringVector instance");
         }
     }
     /// Accesse an element at a specific index in a `CIStringVector` instance.
@@ -424,17 +414,16 @@ impl CStringGuard {
             return None;
         }
         // SAFETY: `data` is valid, because null pointer check has been performed.
-        if let Some(get_data) = unsafe { (*self.data).data } {
-            // SAFETY: `get_data` is valid, becauce has been matched to `Some`.
-            match unsafe { CStr::from_ptr(get_data(self.data)).to_str() } {
-                Ok(id) => Some(id.to_string()),
-                Err(err) => {
-                    error!(LOG_LABEL, "error: {}", err);
-                    None
-                }
-            }
+        let data = unsafe { (*self.data).data };
+        if let Some(data) = data {
+            // SAFETY: `data` is valid, becauce has been matched to `Some`.
+            let res = unsafe { CStr::from_ptr(data(self.data)).to_str() };
+            res.ok().map(|id| id.to_string()).or_else(|| {
+                error!(LOG_LABEL, "Failed to convert CStr to str");
+                None
+            })
         } else {
-            error!(LOG_LABEL, "get_data is null");
+            error!(LOG_LABEL, "data is null");
             None
         }
     }

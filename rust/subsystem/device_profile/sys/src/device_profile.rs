@@ -141,11 +141,7 @@ impl ProfileEventCallback {
     fn from_interface(cb: *mut CIProfileEventCb) -> Option<&'static mut Self>
     {
         let cb_ptr = cb as *mut Self;
-        if cb_ptr.is_null() {
-            error!(LOG_LABEL, "cb_ptr is null");
-            return None;
-        }
-        // SAFETY: `cb_ptr` is valid, because null pointer check has been performed.
+        // SAFETY: `cb_ptr` is valid, because `as_mut` has null pointer checking.
         unsafe {
             cb_ptr.as_mut()
         }
@@ -184,12 +180,11 @@ impl ProfileEventCallback {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn destruct(cb: *mut CIProfileEventCb)
     {
-        let cb_ptr = cb as *mut Self;
-        if cb_ptr.is_null() {
-            error!(LOG_LABEL, "cb_ptr is null");
+        if let Some(callback_mut) = ProfileEventCallback::from_interface(cb) {
+            // SAFETY: `callback_mut` is valid, becauce has been matched to `Some`.
+            unsafe { drop(Box::from_raw(callback_mut as *mut ProfileEventCallback)) };
         } else {
-            // SAFETY: `cb_ptr` is valid, because null pointer check has been performed.
-            unsafe { drop(Box::from_raw(cb_ptr)) };
+            error!(LOG_LABEL, "Failed to destruct a CIProfileEventCb instance");
         }
     }
 
