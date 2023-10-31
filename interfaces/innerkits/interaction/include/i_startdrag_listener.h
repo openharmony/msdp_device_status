@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 class IStartDragListener {
 public:
     IStartDragListener() = default;
@@ -27,6 +28,7 @@ public:
     virtual void OnDragEndMessage(const DragNotifyMsg &msg) = 0;
     virtual void OnHideIconMessage() = 0;
 };
+}
 } // namespace Msdp
 } // namespace OHOS
 #endif // I_START_DRAG_LISTENER_H

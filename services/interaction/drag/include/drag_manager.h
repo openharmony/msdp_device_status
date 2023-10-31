@@ -94,6 +94,7 @@ public:
 private:
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t NotifyDragResult(DragResult result);
+    int32_t NotifyHideIcon();
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
     int32_t OnStopDrag(DragResult result, bool hasCustomAnimation);

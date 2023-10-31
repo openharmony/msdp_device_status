@@ -62,8 +62,6 @@ public:
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
 private:
-    static int32_t MarshallingShadowInfos(const std::vector<ShadowInfo> &shadowInfos, MessageParcel &data);
-private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
 };
 } // namespace DeviceStatus

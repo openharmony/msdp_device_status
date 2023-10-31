@@ -66,8 +66,6 @@ private:
     int32_t RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
     bool CheckCooperatePermission();
 private:
-    static int32_t UnMarshallingShadowInfos(const MessageParcel &data, std::vector<ShadowInfo> &shadowInfos);
-private:
     std::map<uint32_t, ConnFunc> connFuncs_;
 };
 } // namespace DeviceStatus

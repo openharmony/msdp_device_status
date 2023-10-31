@@ -101,7 +101,6 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(StartDragListener_, RET_ERR);
-    CHKPR(StartDragListener_->OnDragEndMessage, RET_ERR);
     StartDragListener_->OnDragEndMessage(notifyMsg);
     return RET_OK;
 }
@@ -111,7 +110,6 @@ int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket&
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(StartDragListener_, RET_ERR);
-    CHKPR(StartDragListener_->OnHideIconMessage, RET_ERR);
     StartDragListener_->OnHideIconMessage();
     return RET_OK;  
 }

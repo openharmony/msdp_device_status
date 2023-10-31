@@ -79,7 +79,6 @@ int32_t DragManager::RemoveListener(SessionPtr session)
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-<<<<<<< HEAD
     for (const auto& shadowInfo : dragData.shadowInfos) {
         FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
         " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
@@ -91,18 +90,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
         " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
         dragData.sourceType, dragData.pointerId,
-=======
-    FI_HILOGD("dragData value Contains PixelFormat:%{public}d, PixelAlphaType:%{public}d,"
-        " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
-        " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
-        " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s",
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
-        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
-        dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
->>>>>>> 552863c94b0d4e264d9c59a2502d536fe7144b6f
         dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
         GetAnonyString(dragData.udKey).c_str());
     if (dragState_ == DragState::START) {
@@ -230,6 +217,22 @@ int32_t DragManager::NotifyDragResult(DragResult result)
         return RET_ERR;
     }
     pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    CHKPR(dragOutSession_, RET_ERR);
+    if (!dragOutSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t DragManager::NotifyHideIcon()
+{
+    CALL_DEBUG_ENTER;
+    NetPacket pkt(MessageId::DRAG_NOTIFY_HIDE_ICON);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return RET_ERR;

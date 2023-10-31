@@ -26,6 +26,7 @@
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
 #include "fi_log.h"
+#include "shadow_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "include/util.h"
@@ -341,7 +342,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
 {
     CALL_DEBUG_ENTER;
     DragData dragData;
-    if (UnMarshallingShadowInfos(data, dragData.shadowInfos) != RET_OK) {
+    if (ShadowPacker::UnMarshallingShadowInfos(data, dragData.shadowInfos) != RET_OK) {
         FI_HILOGE("UnMarshallingShadowInfos failed");
         return E_DEVICESTATUS_READ_PARCEL_ERROR;
     }
@@ -488,7 +489,7 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
         FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    if (MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
+    if (ShadowPacker::MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
         FI_HILOGE("MarshallingShadowInfos failed");
         return RET_ERR;
     }

@@ -22,6 +22,7 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
+#include "shadow_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 
@@ -344,7 +345,7 @@ int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
         FI_HILOGE("Get DragData failed");
         return ret;
     }
-    if (UnMarshallingShadowInfos(reply, dragData.shadowInfos) != RET_OK) {
+    if (ShadowPacker::UnMarshallingShadowInfos(reply, dragData.shadowInfos) != RET_OK) {
         FI_HILOGE("UnMarshallingShadowInfos failed");
         return RET_ERR;
     }
@@ -414,7 +415,7 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
+    if (ShadowPacker::MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
         FI_HILOGE("Failed to marshalling shadowInfos");
         return ERR_INVALID_VALUE;
     }

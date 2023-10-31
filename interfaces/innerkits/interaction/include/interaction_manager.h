@@ -25,6 +25,7 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
+#include "i_startdrag_listener.h"
 #include "i_hotarea_listener.h"
 
 namespace OHOS {
