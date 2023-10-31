@@ -356,7 +356,6 @@ int32_t RegisterCrossStateListener(const char *deviceId, CICrossStateListener *l
     CHKPR(deviceId, RET_ERR);
     CHKPR(listener, RET_ERR);
     auto profileCallback = std::make_shared<ProfileEventCallback>(listener);
-    FI_HILOGD("Call RegisterCrossStateListener");
     return DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().RegisterCrossStateListener(
         std::string(deviceId), profileCallback);
 }
