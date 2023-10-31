@@ -27,6 +27,8 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetInstance()";
             "OHOS::Msdp::DeviceStatus::InteractionManager::AddDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveDraglistener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IDragListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::AddSubscriptListener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::ISubscriptListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveSubscriptListener(std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::ISubscriptListener>)";
             "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackProxy";
             "vtable for OHOS::Msdp::DeviceStatus::DeviceStatusCallbackProxy";
             "VTT for OHOS::Msdp::DeviceStatus::DeviceStatusSrvProxy";

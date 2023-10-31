@@ -103,6 +103,16 @@ int32_t InteractionManager::RemoveDraglistener(DragListenerPtr listener)
     return INTER_MGR_IMPL.RemoveDraglistener(listener);
 }
 
+int32_t InteractionManager::AddSubscriptListener(SubscriptListenerPtr listener)
+{
+    return INTER_MGR_IMPL.AddSubscriptListener(listener);
+}
+
+int32_t InteractionManager::RemoveSubscriptListener(SubscriptListenerPtr listener)
+{
+    return INTER_MGR_IMPL.RemoveSubscriptListener(listener);
+}
+
 int32_t InteractionManager::SetDragWindowVisible(bool visible)
 {
     return INTER_MGR_IMPL.SetDragWindowVisible(visible);

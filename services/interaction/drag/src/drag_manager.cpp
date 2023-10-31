@@ -62,6 +62,7 @@ int32_t DragManager::AddListener(SessionPtr session)
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgId = MessageId::DRAG_STATE_LISTENER;
+    info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.AddNotifyMsg(info);
     return RET_OK;
 }
@@ -72,7 +73,31 @@ int32_t DragManager::RemoveListener(SessionPtr session)
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
+    info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.RemoveNotifyMsg(info);
+    return RET_OK;
+}
+
+int32_t DragManager::AddSubscriptListener(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(session, RET_ERR);
+    auto info = std::make_shared<StateChangeNotify::MessageInfo>();
+    info->session = session;
+    info->msgId = MessageId::DRAG_STYLE_LISTENER;
+    info->msgType = MessageType::NOTIFY_STYLE;
+    stateNotify_.AddNotifyMsg(info);
+    return RET_OK;
+}
+
+int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
+{
+    CHKPR(session, RET_ERR);
+    auto info = std::make_shared<StateChangeNotify::MessageInfo>();
+    info->msgType = MessageType::NOTIFY_STYLE;
+    info->session = session;
+    stateNotify_.RemoveNotifyMsg(info);
+
     return RET_OK;
 }
 
@@ -166,9 +191,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    DRAG_DATA_MGR.SetDragStyle(style);
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
+    if (style == DRAG_DATA_MGR.GetDragStyle()) {
+        FI_HILOGD("Not need update drag style");
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetDragStyle(style);
+    stateNotify_.StyleChangedNotify(style);
     return dragDrawing_.UpdateDragStyle(style);
 }
 
