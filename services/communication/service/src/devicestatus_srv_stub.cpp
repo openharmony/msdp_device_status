@@ -488,13 +488,10 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
         FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if (!dragData.shadowInfo.pixelMap->Marshalling(reply)) {
-        FI_HILOGE("Failed to marshalling pixelMap");
-        return ERR_INVALID_VALUE;
+    if (MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
+        FI_HILOGE("MarshallingShadowInfos failed");
+        return RET_ERR;
     }
-    WRITEINT32(reply, dragData.shadowInfo.x, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(reply, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(reply, dragData.udKey, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.sourceType, ERR_INVALID_VALUE);
@@ -547,27 +544,6 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
-}
-
-int32_t DeviceStatusSrvStub::UnMarshallingShadowInfos(const MessageParcel &data, std::vector<ShadowInfo> &shadowInfos)
-{
-    CALL_DEBUG_ENTER;
-    int32_t shadowNum { 0 };
-    READINT32(data, shadowNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (shadowNum <= 0) {
-        FI_HILOGE("Invalid shadowNum:%{public}d", shadowNum);
-        return RET_ERR;
-    }
-    for (int32_t i = 0; i < shadowNum; i++) {
-        ShadowInfo shadowInfo;
-        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-        CHKPR(pixelMap, RET_ERR);
-        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
-        READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-        READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-        shadowInfos.push_back(shadowInfo);
-    }
-    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

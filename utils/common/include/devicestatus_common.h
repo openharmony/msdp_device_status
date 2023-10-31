@@ -20,6 +20,7 @@
 #include <type_traits>
 
 #include "devicestatus_errors.h"
+#include "drag_data.h"
 #include "fi_log.h"
 
 namespace OHOS {
@@ -176,6 +177,48 @@ constexpr auto DeviceStatusToUnderlying(E e) noexcept
 {
     return static_cast<std::underlying_type_t<E>>(e);
 }
+
+static int32_t MarshallingShadowInfos(const std::vector<ShadowInfo> &shadowInfos, MessageParcel &data)
+{
+    CALL_DEBUG_ENTER;
+    if (shadowInfos.empty()) {
+        FI_HILOGE("Invalid parameter shadowInfos");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, shadowInfos.size(), ERR_INVALID_VALUE);
+    for (const auto &shadowInfo : shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if (!shadowInfo.pixelMap->Marshalling(data)) {
+            FI_HILOGE("Failed to marshalling pixelMap");
+            return ERR_INVALID_VALUE;
+        }
+        WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+        WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+static int32_t UnMarshallingShadowInfos(const MessageParcel &data, std::vector<ShadowInfo> &shadowInfos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t shadowNum { 0 };
+    READINT32(data, shadowNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (shadowNum <= 0) {
+        FI_HILOGE("Invalid shadowNum:%{public}d", shadowNum);
+        return RET_ERR;
+    }
+    for (int32_t i = 0; i < shadowNum; i++) {
+        ShadowInfo shadowInfo;
+        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+        CHKPR(pixelMap, RET_ERR);
+        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
+        READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+        READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+        shadowInfos.push_back(shadowInfo);
+    }
+    return RET_OK;
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

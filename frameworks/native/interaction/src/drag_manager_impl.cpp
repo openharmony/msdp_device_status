@@ -40,14 +40,16 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
 int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, RET_ERR);
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
-        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
-        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            dragData.shadowInfo.x, dragData.shadowInfo.y);
-        return RET_ERR;
+    CHKPR(listener, RET_ERR);
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
+            (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+                shadowInfo.x, shadowInfo.y);
+            return RET_ERR;
+        }
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {

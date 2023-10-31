@@ -388,16 +388,21 @@ void DragManager::Dump(int32_t fd) const
         FI_HILOGE("Target udKey is empty");
         udKey = "";
     }
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        dprintf(fd, "dragData = {\n""\tshadowInfoX:%d\n\tshadowInfoY\n", shadowInfo.x, shadowInfo.y);
+    }
     dprintf(fd, "dragData = {\n"
-            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
+            "\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
             "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.filterInfo.c_str(),
-            dragData.extraInfo.c_str(), dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX,
-            dragData.displayY, dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
+            udKey.c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(), dragData.sourceType, 
+            dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
+            dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {
-        std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
-        CHKPV(pixelMap);
-        dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
+        for (const auto& shadowInfo : dragData.shadowInfos) {
+            CHKPV(shadowInfo.pixelMap);
+            dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", shadowInfo.pixelMap->GetWidth(),
+            shadowInfo.pixelMap->GetHeight());
+        }
     }
     dprintf(fd, "}\n");
 }
