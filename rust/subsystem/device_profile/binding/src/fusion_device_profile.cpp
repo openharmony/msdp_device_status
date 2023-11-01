@@ -21,10 +21,10 @@
 #include "distributed_device_profile_client.h"
 #include "devicestatus_define.h"
 
-using namespace ::OHOS::DeviceProfile;
+using namespace OHOS::DeviceProfile;
 
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
@@ -85,6 +85,7 @@ void ProfileEventCallbackImpl::OnProfileChanged(const ProfileChangeNotification 
 static void Destruct(CIProfileEvents *target)
 {
     CHKPV(target);
+    CHKPV(target->profileEvents);
     delete [] target->profileEvents;
     delete target;
 }

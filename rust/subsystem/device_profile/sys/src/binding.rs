@@ -200,9 +200,9 @@ pub struct CIStringVector {
     /// An optional destruct function for cleaning up the CIStringVector.
     pub destruct: Option<CIStringVectorDestruct>,
     /// An optional function for accessing an element at a given index.
-    pub at: Option<CIStringVectorAt>,
+    pub get: Option<CIStringVectorAt>,
     /// An optional function for getting the size of the CIStringVector.
-    pub size: Option<CIStringVectorSize>,
+    pub get_size: Option<CIStringVectorSize>,
 }
 
 type CICrossStateListenerClone = extern "C" fn (listener: *mut CICrossStateListener) -> *mut CICrossStateListener;

@@ -23,8 +23,8 @@
 
 #include "devicestatus_define.h"
 
-using namespace ::OHOS;
-using namespace ::OHOS::DeviceProfile;
+using namespace OHOS;
+using namespace OHOS::DeviceProfile;
 
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
@@ -54,8 +54,8 @@ public:
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
     void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
-    bool SupportProfileEvent(ProfileEvent event) const;
-    void AddProfileEvent(ProfileEvent event);
+    bool SupportProfileEvent(const ProfileEvent &event) const;
+    void AddProfileEvent(const ProfileEvent &event);
     void RemoveProfileEvents(const std::list<ProfileEvent> &profileEvents);
 
     bool HasProfileEvent() const
@@ -114,19 +114,21 @@ void ProfileEventCallback::OnSyncCompleted(const SyncResult &syncResults)
 void ProfileEventCallback::OnProfileChanged(const ProfileChangeNotification &changeNotification)
 {
     CALL_INFO_TRACE;
-    if ((listener_ != nullptr) && (listener_->onUpdate != nullptr)) {
-        std::string deviceId = changeNotification.GetDeviceId();
-        auto state = DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(deviceId);
-        listener_->onUpdate(listener_, deviceId.c_str(), state);
+    if (listener_ == nullptr || listener_->onUpdate == nullptr) {
+        FI_HILOGE("listener_ is null or onUpdate is null");
+        return;
     }
+    std::string deviceId = changeNotification.GetDeviceId();
+    auto state = DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(deviceId);
+    listener_->onUpdate(listener_, deviceId.c_str(), state);
 }
 
-bool ProfileEventCallback::SupportProfileEvent(ProfileEvent event) const
+bool ProfileEventCallback::SupportProfileEvent(const ProfileEvent &event) const
 {
     return (profileEvents_.find(event) != profileEvents_.cend());
 }
 
-void ProfileEventCallback::AddProfileEvent(ProfileEvent event)
+void ProfileEventCallback::AddProfileEvent(const ProfileEvent &event)
 {
     auto ret = profileEvents_.insert(event);
     if (!ret.second) {
@@ -155,8 +157,10 @@ int32_t FusionDeviceProfileAdapter::UpdateCrossSwitchState(bool state)
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
+    CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
     cJSON_free(smsg);
@@ -171,8 +175,10 @@ int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool state, const std::
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
+    CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
     cJSON_free(smsg);
@@ -328,12 +334,12 @@ int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceIds, RET_ERR);
-    CHKPR(deviceIds->at, RET_ERR);
-    CHKPR(deviceIds->size, RET_ERR);
+    CHKPR(deviceIds->get, RET_ERR);
+    CHKPR(deviceIds->getSize, RET_ERR);
     std::vector<std::string> deviceId;
 
-    for (size_t i = 0; i < deviceIds->size(deviceIds); ++i) {
-        const char *device_id = deviceIds->at(deviceIds, i);
+    for (size_t i = 0; i < deviceIds->getSize(deviceIds); ++i) {
+        const char *device_id = deviceIds->get(deviceIds, i);
         CHKPR(device_id, RET_ERR);
         deviceId.emplace_back(std::string(device_id));
     }

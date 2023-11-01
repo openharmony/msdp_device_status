@@ -188,8 +188,8 @@ impl StringVector {
                 interface: CIStringVector {
                     clone: Some(Self::clone),
                     destruct: Some(Self::destruct),
-                    at: Some(Self::at),
-                    size: Some(Self::size),
+                    get: Some(Self::get),
+                    get_size: Some(Self::get_size),
                 },
                 data: strings_mut.data.clone(),
             });
@@ -222,7 +222,7 @@ impl StringVector {
     /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
     /// safety issues and undefined behavior.
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
-    extern "C" fn at(strings: *mut CIStringVector, index: usize) -> *const c_char
+    extern "C" fn get(strings: *mut CIStringVector, index: usize) -> *const c_char
     {
         if let Some(strings_mut) = StringVector::from_interface(strings) {
             if index < strings_mut.data.len() {
@@ -243,7 +243,7 @@ impl StringVector {
     /// Please note that the pointer `strings` is a raw pointer that needs to be handled carefully to avoid memory
     /// safety issues and undefined behavior.
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
-    extern "C" fn size(strings: *mut CIStringVector) -> usize
+    extern "C" fn get_size(strings: *mut CIStringVector) -> usize
     {
         if let Some(strings_mut) = StringVector::from_interface(strings) {
             strings_mut.data.len()
@@ -261,8 +261,8 @@ impl From<&[String]> for StringVector {
             interface: CIStringVector {
                 clone: Some(StringVector::clone),
                 destruct: None,
-                at: Some(Self::at),
-                size: Some(Self::size),
+                get: Some(Self::get),
+                get_size: Some(Self::get_size),
             },
             data: value.to_vec(),
         }

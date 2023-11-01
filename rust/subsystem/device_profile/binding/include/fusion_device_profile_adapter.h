@@ -22,8 +22,8 @@
 struct CIStringVector {
     CIStringVector* (*clone)(CIStringVector *);
     void (*destruct)(CIStringVector *);
-    const char* (*at)(CIStringVector *, size_t);
-    size_t (*size)(CIStringVector *);
+    const char* (*get)(CIStringVector *, size_t);
+    size_t (*getSize)(CIStringVector *);
 };
 
 struct CICrossStateListener {
