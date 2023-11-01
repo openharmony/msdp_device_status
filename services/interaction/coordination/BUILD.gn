@@ -18,6 +18,12 @@ config("coordination_public_config") {
 }
 
 ohos_shared_library("coordination") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
