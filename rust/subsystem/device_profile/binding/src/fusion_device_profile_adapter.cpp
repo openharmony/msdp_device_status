@@ -27,7 +27,7 @@ using namespace OHOS;
 using namespace OHOS::DeviceProfile;
 
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
@@ -44,12 +44,12 @@ struct JsonParser {
     {
         return json;
     }
-    cJSON *json = nullptr;
+    cJSON* json = nullptr;
 };
 
 class ProfileEventCallback final : public IProfileEventCallback {
 public:
-    explicit ProfileEventCallback(CICrossStateListener *listener);
+    explicit ProfileEventCallback(CICrossStateListener* listener);
     ~ProfileEventCallback();
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
@@ -64,7 +64,7 @@ public:
     }
 
 private:
-    CICrossStateListener *listener_ { nullptr };
+    CICrossStateListener* listener_ { nullptr };
     std::set<ProfileEvent> profileEvents_;
 };
 
@@ -90,7 +90,7 @@ private:
     const std::string characteristicsName_ = "currentStatus";
 };
 
-ProfileEventCallback::ProfileEventCallback(CICrossStateListener *listener)
+ProfileEventCallback::ProfileEventCallback(CICrossStateListener* listener)
 {
     if ((listener != nullptr) && (listener->clone != nullptr)) {
         listener_ = listener->clone(listener);
@@ -156,10 +156,10 @@ int32_t FusionDeviceProfileAdapter::UpdateCrossSwitchState(bool state)
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    cJSON *data = cJSON_CreateObject();
+    cJSON* data = cJSON_CreateObject();
     CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
-    char *smsg = cJSON_Print(data);
+    char* smsg = cJSON_Print(data);
     CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -174,10 +174,10 @@ int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool state, const std::
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    cJSON *data = cJSON_CreateObject();
+    cJSON* data = cJSON_CreateObject();
     CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
-    char *smsg = cJSON_Print(data);
+    char* smsg = cJSON_Print(data);
     CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
     profile.SetCharacteristicProfileJson(smsg);
@@ -284,6 +284,7 @@ void FusionDeviceProfileAdapter::SaveSubscribeInfos(const std::string &deviceId,
     if ((cbIter == callbacks_.end()) || (cbIter->second == nullptr)) {
         if (callback == nullptr) {
             subscribeInfos.clear();
+            FI_HILOGE("Find callback for device %{public}s failed, and the given callback is null", deviceId.c_str());
             return;
         }
         callbacks_.insert_or_assign(deviceId, callback);
@@ -330,7 +331,7 @@ int32_t UpdateCrossSwitchState(size_t state)
         static_cast<bool>(state));
 }
 
-int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds)
+int32_t SyncCrossSwitchState(size_t state, CIStringVector* deviceIds)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceIds, RET_ERR);
@@ -339,7 +340,7 @@ int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds)
     std::vector<std::string> deviceId;
 
     for (size_t i = 0; i < deviceIds->getSize(deviceIds); ++i) {
-        const char *device_id = deviceIds->get(deviceIds, i);
+        const char* device_id = deviceIds->get(deviceIds, i);
         CHKPR(device_id, RET_ERR);
         deviceId.emplace_back(std::string(device_id));
     }
@@ -347,7 +348,7 @@ int32_t SyncCrossSwitchState(size_t state, CIStringVector *deviceIds)
         static_cast<bool>(state), deviceId);
 }
 
-int32_t GetCrossSwitchState(const char *deviceId)
+int32_t GetCrossSwitchState(const char* deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceId, RET_ERR);
@@ -356,7 +357,7 @@ int32_t GetCrossSwitchState(const char *deviceId)
     return (static_cast<int32_t>(state));
 }
 
-int32_t RegisterCrossStateListener(const char *deviceId, CICrossStateListener *listener)
+int32_t RegisterCrossStateListener(const char* deviceId, CICrossStateListener* listener)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceId, RET_ERR);
@@ -366,7 +367,7 @@ int32_t RegisterCrossStateListener(const char *deviceId, CICrossStateListener *l
         std::string(deviceId), profileCallback);
 }
 
-int32_t UnregisterCrossStateListener(const char *deviceId)
+int32_t UnregisterCrossStateListener(const char* deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceId, RET_ERR);

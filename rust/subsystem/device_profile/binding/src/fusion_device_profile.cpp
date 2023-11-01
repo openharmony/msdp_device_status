@@ -24,7 +24,7 @@
 using namespace OHOS::DeviceProfile;
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
@@ -41,22 +41,22 @@ struct JsonParser {
     {
         return json;
     }
-    cJSON *json = nullptr;
+    cJSON* json = nullptr;
 };
 
 class ProfileEventCallbackImpl final : public IProfileEventCallback {
 public:
-    explicit ProfileEventCallbackImpl(CIProfileEventCb *eventCb);
+    explicit ProfileEventCallbackImpl(CIProfileEventCb* eventCb);
     ~ProfileEventCallbackImpl();
 
     void OnSyncCompleted(const SyncResult &syncResults) override;
     void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
 
 private:
-    CIProfileEventCb *eventCb_ { nullptr };
+    CIProfileEventCb* eventCb_ { nullptr };
 };
 
-ProfileEventCallbackImpl::ProfileEventCallbackImpl(CIProfileEventCb *eventCb)
+ProfileEventCallbackImpl::ProfileEventCallbackImpl(CIProfileEventCb* eventCb)
 {
     if ((eventCb != nullptr) && (eventCb->clone != nullptr)) {
         eventCb_ = eventCb->clone(eventCb);
@@ -82,7 +82,7 @@ void ProfileEventCallbackImpl::OnProfileChanged(const ProfileChangeNotification 
     CALL_INFO_TRACE;
 }
 
-static void Destruct(CIProfileEvents *target)
+static void Destruct(CIProfileEvents* target)
 {
     CHKPV(target);
     CHKPV(target->profileEvents);
@@ -90,21 +90,21 @@ static void Destruct(CIProfileEvents *target)
     delete target;
 }
 
-int32_t PutDeviceProfile(const CServiceCharacteristicProfile *profile)
+int32_t PutDeviceProfile(const CServiceCharacteristicProfile* profile)
 {
     CALL_DEBUG_ENTER;
     return RET_ERR;
 }
 
-int32_t GetDeviceProfile(const char *udId, const char *serviceId, CServiceCharacteristicProfile *profile)
+int32_t GetDeviceProfile(const char* udId, const char* serviceId, CServiceCharacteristicProfile* profile)
 {
     CALL_DEBUG_ENTER;
     return RET_ERR;
 }
 
-int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
-                               CIProfileEventCb *eventCb,
-                               CIProfileEvents **failedEvents)
+int32_t SubscribeProfileEvents(const CSubscribeInfos* subscribeInfos,
+                               CIProfileEventCb* eventCb,
+                               CIProfileEvents** failedEvents)
 {
     CALL_DEBUG_ENTER;
     CHKPR(subscribeInfos, RET_ERR);
@@ -130,13 +130,13 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
         subscriptions, callback, fails);
 
     if (!fails.empty()) {
-        CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
+        CIProfileEvents* events = new (std::nothrow) CIProfileEvents;
         CHKPR(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
         if (events->profileEvents == nullptr) {
             delete events;
-            FI_HILOGE("events->profileEvents is null");
+            FI_HILOGE("Failed to allocate memory for profileEvents");
             return RET_ERR;
         }
         events->clone = nullptr;
@@ -154,9 +154,9 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
     return ret;
 }
 
-int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
-                                 CIProfileEventCb *eventCb,
-                                 CIProfileEvents **failedEvents)
+int32_t UnsubscribeProfileEvents(const CIProfileEvents* profileEvents,
+                                 CIProfileEventCb* eventCb,
+                                 CIProfileEvents** failedEvents)
 {
     CALL_DEBUG_ENTER;
     CHKPR(profileEvents, RET_ERR);
@@ -178,13 +178,13 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
         profiles, callback, fails);
 
     if (!fails.empty()) {
-        CIProfileEvents *events = new (std::nothrow) CIProfileEvents;
+        CIProfileEvents* events = new (std::nothrow) CIProfileEvents;
         CHKPR(events, RET_ERR);
         events->numOfProfileEvents = fails.size();
         events->profileEvents = new (std::nothrow) uint32_t[fails.size()];
         if (events->profileEvents == nullptr) {
             delete events;
-            FI_HILOGE("events->profileEvents is null");
+            FI_HILOGE("Failed to allocate memory for profileEvents");
             return RET_ERR;
         }
         events->clone = nullptr;
@@ -202,7 +202,7 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
     return ret;
 }
 
-int32_t SyncDeviceProfile(const CSyncOptions *syncOptions, CIProfileEventCb *syncCb)
+int32_t SyncDeviceProfile(const CSyncOptions* syncOptions, CIProfileEventCb* syncCb)
 {
     CALL_DEBUG_ENTER;
     return RET_ERR;

@@ -27,8 +27,8 @@
 
 #include "devicestatus_define.h"
 
-using namespace ::OHOS;
-using namespace ::OHOS::Security::AccessToken;
+using namespace OHOS;
+using namespace OHOS::Security::AccessToken;
 
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionSecurity" };
@@ -69,18 +69,18 @@ void GetAccessToken()
 struct CString : public CIString {
     std::string str;
 
-    explicit CString(const char *s);
+    explicit CString(const char* s);
     DISALLOW_MOVE(CString);
     CString(const CString &other);
     ~CString() = default;
     CString& operator=(const CString &other) = delete;
 
-    static CIString* Clone(CIString *target);
-    static void Destruct(CIString *target);
-    static const char* GetData(CIString *target);
+    static CIString* Clone(CIString* target);
+    static void Destruct(CIString* target);
+    static const char* GetData(CIString* target);
 };
 
-CString::CString(const char *s)
+CString::CString(const char* s)
     : str(s != nullptr ? s : std::string())
 {
     clone = &CString::Clone;
@@ -96,23 +96,23 @@ CString::CString(const CString &other)
     data = &CString::GetData;
 }
 
-CIString* CString::Clone(CIString *target)
+CIString* CString::Clone(CIString* target)
 {
-    CString *t = static_cast<CString *>(target);
+    CString* t = static_cast<CString*>(target);
     CHKPP(t);
-    return new CString(*t);
+    return new (std::nothrow) CString(*t);
 }
 
-void CString::Destruct(CIString *target)
+void CString::Destruct(CIString* target)
 {
-    CString *t = static_cast<CString *>(target);
+    CString* t = static_cast<CString*>(target);
     CHKPV(t);
     delete t;
 }
 
-const char* CString::GetData(CIString *target)
+const char* CString::GetData(CIString* target)
 {
-    CString *t = static_cast<CString *>(target);
+    CString* t = static_cast<CString*>(target);
     CHKPP(t);
     return t->str.c_str();
 }
@@ -126,5 +126,5 @@ CIString* GetLocalNetworkId()
         FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
         return nullptr;
     }
-    return new CString(node.networkId);
+    return new (std::nothrow) CString(node.networkId);
 }

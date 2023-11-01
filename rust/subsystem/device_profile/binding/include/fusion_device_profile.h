@@ -20,26 +20,26 @@
 #include <cstdint>
 
 struct CServiceCharacteristicProfile {
-    const char *serviceId;
-    const char *serviceType;
+    const char* serviceId;
+    const char* serviceType;
     bool state;
-    const char *characteristicProfileJson;
+    const char* characteristicProfileJson;
 };
 
 struct CIProfileEvents {
-    CIProfileEvents* (*clone)(CIProfileEvents *cb);
-    void (*destruct)(CIProfileEvents *cb);
-    uint32_t *profileEvents;
+    CIProfileEvents* (*clone)(CIProfileEvents* cb);
+    void (*destruct)(CIProfileEvents* cb);
+    uint32_t* profileEvents;
     size_t numOfProfileEvents;
 };
 
 struct CSubscribeInfo {
     uint32_t profileEvent;
-    const char *extraInfo;
+    const char* extraInfo;
 };
 
 struct CSubscribeInfos {
-    const CSubscribeInfo *subscribeInfos;
+    const CSubscribeInfo* subscribeInfos;
     size_t nSubscribeInfos;
 };
 
@@ -51,24 +51,24 @@ enum CProfileChangeType: int32_t {
 };
 
 struct CProfileEntry {
-    const char *key;
-    const char *value;
+    const char* key;
+    const char* value;
     CProfileChangeType changeType;
-    const CProfileEntry *next;
+    const CProfileEntry* next;
 };
 
 struct CProfileChangeNotification {
-    const CProfileEntry *profileEntries;
+    const CProfileEntry* profileEntries;
     size_t nProfileEntries;
-    const char *deviceId;
+    const char* deviceId;
     int32_t isLocal;
 };
 
 struct CIProfileEventCb {
-    CIProfileEventCb* (*clone)(CIProfileEventCb *cb);
-    void (*destruct)(CIProfileEventCb *cb);
-    void (*onSyncCompleted)(CIProfileEventCb *cb, const char *deviceId, int32_t sync_result);
-    void (*onProfileChanged)(CIProfileEventCb *cb, const CProfileChangeNotification *notification);
+    CIProfileEventCb* (*clone)(CIProfileEventCb* cb);
+    void (*destruct)(CIProfileEventCb* cb);
+    void (*onSyncCompleted)(CIProfileEventCb* cb, const char* deviceId, int32_t sync_result);
+    void (*onProfileChanged)(CIProfileEventCb* cb, const CProfileChangeNotification* notification);
 };
 
 enum CSyncMode : int32_t {
@@ -87,16 +87,16 @@ struct CSyncOptions {
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t PutDeviceProfile(const CServiceCharacteristicProfile *profile);
-int32_t GetDeviceProfile(const char *udId, const char *serviceId, CServiceCharacteristicProfile *profile);
-int32_t SubscribeProfileEvents(const CSubscribeInfos *subscribeInfos,
-                               CIProfileEventCb *eventCb,
-                               CIProfileEvents **failedEvents);
-int32_t UnsubscribeProfileEvents(const CIProfileEvents *profileEvents,
-                                 CIProfileEventCb *eventCb,
-                                 CIProfileEvents **failedEvents);
-int32_t SyncDeviceProfile(const CSyncOptions *syncOptions,
-                          CIProfileEventCb *syncCb);
+int32_t PutDeviceProfile(const CServiceCharacteristicProfile* profile);
+int32_t GetDeviceProfile(const char* udId, const char* serviceId, CServiceCharacteristicProfile* profile);
+int32_t SubscribeProfileEvents(const CSubscribeInfos* subscribeInfos,
+                               CIProfileEventCb* eventCb,
+                               CIProfileEvents** failedEvents);
+int32_t UnsubscribeProfileEvents(const CIProfileEvents* profileEvents,
+                                 CIProfileEventCb* eventCb,
+                                 CIProfileEvents** failedEvents);
+int32_t SyncDeviceProfile(const CSyncOptions* syncOptions,
+                          CIProfileEventCb* syncCb);
 
 #ifdef __cplusplus
 }

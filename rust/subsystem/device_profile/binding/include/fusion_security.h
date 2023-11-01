@@ -24,9 +24,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 struct CIString {
-    CIString* (*clone)(CIString *);
-    void (*destruct)(CIString *);
-    const char *(*data)(CIString *);
+    CIString* (*clone)(CIString*);
+    void (*destruct)(CIString*);
+    const char *(*data)(CIString*);
 };
 
 void GetAccessToken();
