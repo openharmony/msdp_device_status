@@ -63,6 +63,7 @@ constexpr int32_t WINDOW_ID { -1 };
 constexpr int32_t HOT_AREA_COOR { 220 };
 constexpr int32_t HOT_AREA_STEP { 150 };
 constexpr int32_t HOT_AREA_SPAN { 70 };
+constexpr uint32_t RECIVE_LOOP_COUNT { 5 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
@@ -133,6 +134,57 @@ private:
         }
     }
 private:
+    std::string moduleName_;
+};
+
+class SubscriptListenerTest : public ISubscriptListener {
+public:
+    SubscriptListenerTest() {}
+    explicit SubscriptListenerTest(std::string name) : moduleName_(name) {}
+    void OnMessage(DragCursorStyle style) override
+    {
+        SetDragSyle(style);
+        if (moduleName_.empty()) {
+            moduleName_ = std::string("SubscriptListenerTest");
+        }
+        FI_HILOGD("Received notification event for subscriptListener, %{public}s, state:%{public}s",
+            moduleName_.c_str(), PrintStyleMessage(style).c_str());
+    }
+
+    DragCursorStyle GetDragStyle()
+    {
+        return dragStyle_;
+    }
+
+private:
+    void SetDragSyle(DragCursorStyle style)
+    {
+        dragStyle_ = style;
+    }
+
+    std::string PrintStyleMessage(DragCursorStyle style)
+    {
+        switch (style) {
+            case DragCursorStyle::DEFAULT: {
+                return std::string("default");
+            }
+            case DragCursorStyle::FORBIDDEN: {
+                return std::string("forbidden");
+            }
+            case DragCursorStyle::COPY: {
+                return std::string("copy");
+            }
+            case DragCursorStyle::MOVE: {
+                return std::string("move");
+            }
+            default: {
+                return std::string("unknow");
+            }
+        }
+    }
+
+private:
+    DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     std::string moduleName_;
 };
 
@@ -767,6 +819,105 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
             ret = InteractionManager::GetInstance()->RemoveDraglistener(listener);
             EXPECT_EQ(ret, RET_OK);
         }
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_SubscriptListener_001
+ * @tc.desc: SubscriptListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_SubscriptListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        int32_t ret = RET_ERR;
+        std::vector<std::shared_ptr<SubscriptListenerTest>> subscriptListeners;
+        for (size_t i = 0; i < RECIVE_LOOP_COUNT; ++i) {
+            std::string moduleName = "SubscriptListener_" + std::to_string(i);
+            auto listener = std::make_shared<SubscriptListenerTest>(moduleName);
+            ret = InteractionManager::GetInstance()->AddSubscriptListener(listener);
+            EXPECT_EQ(ret, RET_OK);
+            subscriptListeners.push_back(listener);
+        }
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
+        };
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        for (auto listener : subscriptListeners) {
+            ret = InteractionManager::GetInstance()->RemoveSubscriptListener(listener);
+            EXPECT_EQ(ret, RET_OK);
+        }
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_SubscriptListener_002
+ * @tc.desc: SubscriptListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_SubscriptListener_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceTouchId < 0) {
+        ASSERT_TRUE(g_deviceTouchId < 0);
+    } else {
+        int32_t ret = RET_ERR;
+        auto listener = std::make_shared<SubscriptListenerTest>("SubscriptListener");
+        ret = InteractionManager::GetInstance()->AddSubscriptListener(listener);
+        ASSERT_EQ(ret, RET_OK);
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
+        };
+        std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+        ASSERT_EQ(ret, RET_OK);
+        DragCursorStyle style = DragCursorStyle::DEFAULT;
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(style);
+        ASSERT_EQ(ret, RET_OK);
+
+        SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+            MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        DragCursorStyle recvStyle = listener->GetDragStyle();
+        FI_HILOGD("Recived style:%{public}d, expected style:%{public}d", static_cast<int32_t>(recvStyle),
+            static_cast<int32_t>(style));
+        ASSERT_EQ(recvStyle, style);
+        ret = InteractionManager::GetInstance()->RemoveSubscriptListener(listener);
+        ASSERT_EQ(ret, RET_OK);
     }
 }
 
