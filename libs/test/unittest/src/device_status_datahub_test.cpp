@@ -82,7 +82,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = 10;
@@ -171,7 +171,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
@@ -186,7 +186,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     int32_t sensorTypeIdt = SENSOR_TYPE_ID_TEMPERATURE;
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeIdt);
@@ -204,7 +204,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     int32_t SENSOR_TYPE_ID_ERROR = 300;
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
@@ -222,7 +222,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest010, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     int32_t SENSOR_TYPE_ID_ERROR = -1;
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
@@ -240,7 +240,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest011, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_TEMPERATURE;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(sensorTypeId);
     EXPECT_FALSE(ret);
@@ -255,7 +255,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest012, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t SENSOR_TYPE_ID_ERROR = 300;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
@@ -270,7 +270,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest013, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t SENSOR_TYPE_ID_ERROR = -1;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
     ret = SENSOR_DATA_CB.UnregisterCallbackSensor(static_cast<SensorTypeId>(SENSOR_TYPE_ID_ERROR));
     EXPECT_FALSE(ret);
@@ -298,7 +298,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest015, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = 10;
@@ -319,7 +319,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest016, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = -10;
@@ -340,7 +340,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest017, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = 163;
@@ -361,7 +361,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest018, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = -163;
@@ -382,7 +382,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest019, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = 10;
@@ -403,7 +403,7 @@ HWTEST_F(DeviceStatusDatahubTest, DeviceStatusDatahubTest020, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t sensorTypeId = SENSOR_TYPE_ID_ACCELEROMETER;
-    bool ret =  SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
+    bool ret = SENSOR_DATA_CB.RegisterCallbackSensor(sensorTypeId);
     ASSERT_TRUE(ret);
     AccelData data;
     data.x = -10;

@@ -106,7 +106,7 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoHandle(Type type)
 
     auto iter = algoCallCounts_.find(type);
     if (iter == algoCallCounts_.end()) {
-        auto ret =  algoCallCounts_.emplace(type, 0);
+        auto ret = algoCallCounts_.emplace(type, 0);
         if (!ret.second) {
             FI_HILOGW("type is duplicated");
             return RET_ERR;
