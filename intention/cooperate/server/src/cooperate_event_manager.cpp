@@ -104,7 +104,7 @@ void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &devi
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
-    cooperateCallbacks_[EventType::STOP]nullptr;
+    cooperateCallbacks_[EventType::STOP] = nullptr;
 }
 
 void CooperateEventManager::OnGetCrossingSwitchState(bool state)
