@@ -69,11 +69,15 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY { "Unified data key" };
+const std::string SYSTEM_CORE { "system_core" };
+const std::string SYSTEM_BASIC { "system_basic" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
 int32_t g_screenHeight { 1280 };
 uint64_t g_tokenID { 0 };
+const char *g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char *g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
@@ -98,39 +102,29 @@ public:
     static int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
     static void TestRemoveMonitor(int32_t monitorId);
     static void PrintDragData(const DragData &dragData);
-    static void SetPermission(NativeTokenInfoParams &perInfo);
+    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
     static void RemovePermission();
 };
 
-const char *basics[] = { "ohos.permission.COOPERATE_MANAGER" };
-const char *cores[] = { "ohos.permission.INPUT_MONITORING" };
-
-NativeTokenInfoParams g_basic_info = {
-    .dcapsNum = 0,
-    .permsNum = 1,
-    .aclsNum = 0,
-    .dcaps = nullptr,
-    .perms = basics,
-    .acls = nullptr,
-    .processName = "InteractionManagerTest",
-    .aplStr = "system_basic",
-};
-
-NativeTokenInfoParams g_core_info = {
-    .dcapsNum = 0,
-    .permsNum = 1,
-    .aclsNum = 0,
-    .dcaps = nullptr,
-    .perms = cores,
-    .acls = nullptr,
-    .processName = "InteractionManagerTest",
-    .aplStr = "system_core",
-};
-
-void InteractionManagerTest::SetPermission(NativeTokenInfoParams &perInfo)
+void InteractionManagerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
 {
     CALL_DEBUG_ENTER;
-    g_tokenID = GetAccessTokenId(&perInfo);
+    if (perms == nullptr || permAmount == 0) {
+        FI_HILOGE("The perms is empty");
+        return;
+    }
+
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permAmount,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "InteractionManagerTest",
+        .aplStr = level.c_str(),
+    };
+    g_tokenID = GetAccessTokenId(&infoInstance);
     SetSelfTokenID(g_tokenID);
     OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
 }
@@ -1214,7 +1208,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SetPermission(g_core_info);
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     if (g_deviceTouchId < 0) {
         ASSERT_TRUE(g_deviceTouchId < 0);
     } else {
@@ -1255,7 +1249,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SetPermission(g_core_info);
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     if (g_deviceMouseId < 0) {
         ASSERT_TRUE(g_deviceMouseId < 0);
     } else {
@@ -1576,7 +1570,7 @@ private:
 HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    SetPermission(g_basic_info);
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
     int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -1602,7 +1596,7 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    SetPermission(g_basic_info);
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
     CHKPV(display);
     g_screenWidth = display->GetWidth();
