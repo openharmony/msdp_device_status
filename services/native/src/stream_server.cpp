@@ -107,50 +107,63 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
         FI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
         return RET_ERR;
     }
+    int32_t setSockOptResult = SetSockOpt(serverFd, toReturnClientFd, tokenType);
+    if (RET_OK != setSockOptResult) {
+        return setSockOptResult;
+    }
+    SessionPtr sess = nullptr;
+    sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
+    sess->SetTokenType(tokenType);
+    if (!AddSession(sess)) {
+        FI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        return CloseFd(serverFd, toReturnClientFd);
+    }
+    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
+        FI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
+        return CloseFd(serverFd, toReturnClientFd);
+    }
+    OnConnected(sess);
+    return RET_OK;
+}
+
+int32_t StreamServer::SetSockOpt(int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+{
+    CALL_DEBUG_ENTER;
     static constexpr size_t bufferSize = 32 * 1024;
     static constexpr size_t nativeBufferSize = 64 * 1024;
-    SessionPtr sess = nullptr;
+    
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
-        goto CLOSE_SOCK;
+        return CloseFd(serverFd, toReturnClientFd);
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         FI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
-        goto CLOSE_SOCK;
+        return CloseFd(serverFd, toReturnClientFd);
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
             FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
-            goto CLOSE_SOCK;
+            return CloseFd(serverFd, toReturnClientFd);
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
             FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
-            goto CLOSE_SOCK;
+            return CloseFd(serverFd, toReturnClientFd);
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
             FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
-            goto CLOSE_SOCK;
+            return CloseFd(serverFd, toReturnClientFd);
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
             FI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
-            goto CLOSE_SOCK;
+            return CloseFd(serverFd, toReturnClientFd);
         }
     }
-    sess = std::make_shared<StreamSession>(programName, moduleType, serverFd, uid, pid);
-    sess->SetTokenType(tokenType);
-    if (!AddSession(sess)) {
-        FI_HILOGE("AddSession failed, errCode:%{public}d", ADD_SESSION_FAIL);
-        goto CLOSE_SOCK;
-    }
-    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-        FI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
-        goto CLOSE_SOCK;
-    }
-    OnConnected(sess);
     return RET_OK;
+}
 
-CLOSE_SOCK:
+int32_t StreamServer::CloseFd(int32_t& serverFd, int32_t& toReturnClientFd)
+{
     if (close(serverFd) < 0) {
         FI_HILOGE("Close server fd failed, error:%{public}s, serverFd:%{public}d", strerror(errno), serverFd);
     }
