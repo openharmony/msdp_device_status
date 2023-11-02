@@ -75,20 +75,20 @@ void CooperateSM::Init()
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
 }
 
-void CooperateSM::OnSoftbusSessionClosed(const std::string &NetworkId)
+void CooperateSM::OnSoftbusSessionClosed(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     CHKPV(eventHandler_);
     std::string taskName = "process_coordinition_reset";
     std::function<void()> handleFunc =
-        std::bind(&CooperateSM::OnReset, this, NetworkId);
+        std::bind(&CooperateSM::OnReset, this, networkId);
     eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 }
 
-void CooperateSM::OnReset(const std::string &NetworkId)
+void CooperateSM::OnReset(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    Reset(NetworkId);
+    Reset(networkId);
 }
 
 void CooperateSM::OnSessionLost(SessionPtr session)
@@ -190,14 +190,14 @@ void CooperateSM::OnCloseCooperate(const std::string &networkId, bool isLocal)
     }
 }
 
-int32_t CooperateSM::GetCooperateState(const std::string &deviceId)
+int32_t CooperateSM::GetCooperateState(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    if (deviceId.empty()) {
-        FI_HILOGE("DeviceId is empty");
+    if (networkId.empty()) {
+        FI_HILOGE("Transfer network id is empty");
         return static_cast<int32_t>(CooperateMessage::PARAMETER_ERROR);
     }
-    bool state = DP_ADAPTER->GetCrossingSwitchState(deviceId);
+    bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
     return RET_OK;
 }
@@ -832,7 +832,7 @@ void CooperateSM::RemoveInterceptor()
     }
 }
 
-bool CooperateSM::IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent)
+bool CooperateSM::IsNeedFilterOut(const std::string &networkId, const std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
@@ -850,7 +850,7 @@ bool CooperateSM::IsNeedFilterOut(const std::string &deviceId, const std::shared
     for (const auto &item : businessEvent.pressedKeys) {
         FI_HILOGI("pressedKeys:%{public}d", item);
     }
-    return D_INPUT_ADAPTER->IsNeedFilterOut(deviceId, businessEvent);
+    return D_INPUT_ADAPTER->IsNeedFilterOut(networkId, businessEvent);
 }
 
 void CooperateSM::DeviceInitCallBack::OnRemoteDied()

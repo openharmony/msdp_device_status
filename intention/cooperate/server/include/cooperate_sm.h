@@ -115,7 +115,7 @@ public:
     void UnprepareCooperate();
     int32_t ActivateCooperate(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t DeactivateCooperate(bool isUnchained);
-    int32_t GetCooperateState(const std::string &deviceId);
+    int32_t GetCooperateState(const std::string &networkId);
     void StartRemoteCooperate(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCooperateResult(bool isSuccess,
@@ -145,7 +145,7 @@ public:
     std::shared_ptr<MMI::PointerEvent> GetLastPointerEvent() const;
     void RemoveMonitor();
     void RemoveInterceptor();
-    bool IsNeedFilterOut(const std::string &deviceId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
+    bool IsNeedFilterOut(const std::string &networkId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
     void RegisterStateChange(CooStateChangeType type,
         std::function<void(CooperateState, CooperateState)> callback);
     bool UnchainCooperate(const std::string &localNetworkId, const std::string &remoteNetworkId);
@@ -159,7 +159,7 @@ public:
     void OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void OnSoftbusSessionClosed(const std::string &NetworkId);
+    void OnSoftbusSessionClosed(const std::string &networkId);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
@@ -176,7 +176,7 @@ private:
     void OnPostInterceptorKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void OnReset(const std::string &NetworkId);
+    void OnReset(const std::string &networkId);
     std::shared_ptr<ICooperateState> GetCurrentState();
     void RegisterSessionCallback();
 
