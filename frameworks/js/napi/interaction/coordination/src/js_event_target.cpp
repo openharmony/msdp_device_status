@@ -36,7 +36,7 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = coordinationListeners_.insert({ COOPERATE, std::vector<sptr<JsUtil::CallbackInfo>>() });
+    auto ret = coordinationListeners_.insert({ COOPERATE_NAME, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
     }
@@ -236,9 +236,9 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    auto changeEvent = coordinationListeners_.find(COOPERATE);
+    auto changeEvent = coordinationListeners_.find(COOPERATE_NAME);
     if (changeEvent == coordinationListeners_.end()) {
-        FI_HILOGE("Find %{public}s failed", std::string(COOPERATE).c_str());
+        FI_HILOGE("Find %{public}s failed", std::string(COOPERATE_NAME).c_str());
         return;
     }
 
@@ -581,7 +581,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     sptr<JsUtil::CallbackInfo> temp(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
-    auto messageEvent = coordinationListeners_.find(COOPERATE);
+    auto messageEvent = coordinationListeners_.find(COOPERATE_NAME);
     if (messageEvent == coordinationListeners_.end()) {
         FI_HILOGE("Not exit messageEvent");
         return;
