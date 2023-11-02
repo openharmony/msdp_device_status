@@ -61,7 +61,7 @@ struct CProfileChangeNotification {
     const CProfileEntry* profileEntries;
     size_t nProfileEntries;
     const char* deviceId;
-    int32_t isLocal;
+    int32_t localFlag;
 };
 
 struct CIProfileEventCb {

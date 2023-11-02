@@ -19,6 +19,7 @@
 
 #include "cJSON.h"
 #include "distributed_device_profile_client.h"
+
 #include "devicestatus_define.h"
 
 using namespace OHOS::DeviceProfile;
@@ -112,7 +113,7 @@ int32_t SubscribeProfileEvents(const CSubscribeInfos* subscribeInfos,
 
     for (size_t index = 0; index < subscribeInfos->nSubscribeInfos; ++index) {
         const CSubscribeInfo &cSub = subscribeInfos->subscribeInfos[index];
-
+        CHKPR(subscribeInfos->subscribeInfos[index], RET_ERR);
         if ((cSub.profileEvent >= ProfileEvent::EVENT_UNKNOWN) &&
             (cSub.profileEvent < ProfileEvent::EVENT_PROFILE_END)) {
             CHKPC(cSub.extraInfo);

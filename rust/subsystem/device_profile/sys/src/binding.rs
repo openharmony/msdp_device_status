@@ -117,8 +117,8 @@ pub struct CProfileChangeNotification {
     pub n_profile_entries: usize,
     /// A pointer to the device ID associated with the profile change.
     pub device_id: *const c_char,
-    /// An integer indicating whether the profile change is local or not.
-    pub is_local: c_int,
+    /// An integer indicating whether the profile change occurred locally.
+    pub local_flag: c_int,
 }
 
 /// Type definition for the clone function of a CIProfileEventCb.

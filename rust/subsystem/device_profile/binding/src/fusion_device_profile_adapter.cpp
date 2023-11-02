@@ -72,8 +72,8 @@ class FusionDeviceProfileAdapter {
     DECLARE_DELAYED_REF_SINGLETON(FusionDeviceProfileAdapter);
 
 public:
-    int32_t UpdateCrossSwitchState(bool state);
-    int32_t SyncCrossSwitchState(bool state, const std::vector<std::string> &deviceIds);
+    int32_t UpdateCrossSwitchState(bool switchState);
+    int32_t SyncCrossSwitchState(bool switchState, const std::vector<std::string> &deviceIds);
     bool GetCrossSwitchState(const std::string &deviceId);
     int32_t RegisterCrossStateListener(const std::string &deviceId,
         const std::shared_ptr<ProfileEventCallback> &callback);
@@ -115,12 +115,12 @@ void ProfileEventCallback::OnProfileChanged(const ProfileChangeNotification &cha
 {
     CALL_INFO_TRACE;
     if (listener_ == nullptr || listener_->onUpdate == nullptr) {
-        FI_HILOGE("listener_ is null or onUpdate is null");
+        FI_HILOGE("listener_ is nullptr or onUpdate is nullptr");
         return;
     }
     std::string deviceId = changeNotification.GetDeviceId();
-    auto state = DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(deviceId);
-    listener_->onUpdate(listener_, deviceId.c_str(), state);
+    bool switchState = DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(deviceId);
+    listener_->onUpdate(listener_, deviceId.c_str(), switchState);
 }
 
 bool ProfileEventCallback::SupportProfileEvent(const ProfileEvent &event) const
@@ -149,7 +149,7 @@ FusionDeviceProfileAdapter::FusionDeviceProfileAdapter()
 FusionDeviceProfileAdapter::~FusionDeviceProfileAdapter()
 {}
 
-int32_t FusionDeviceProfileAdapter::UpdateCrossSwitchState(bool state)
+int32_t FusionDeviceProfileAdapter::UpdateCrossSwitchState(bool switchState)
 {
     CALL_DEBUG_ENTER;
     const std::string SERVICE_TYPE = "deviceStatus";
@@ -158,16 +158,16 @@ int32_t FusionDeviceProfileAdapter::UpdateCrossSwitchState(bool state)
     profile.SetServiceType(SERVICE_TYPE);
     cJSON* data = cJSON_CreateObject();
     CHKPR(data, RET_ERR);
-    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
+    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(switchState));
     char* smsg = cJSON_Print(data);
-    CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
+    CHKPR(smsg, RET_ERR);
     profile.SetCharacteristicProfileJson(smsg);
     cJSON_free(smsg);
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }
 
-int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool state, const std::vector<std::string> &deviceIds)
+int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool switchState, const std::vector<std::string> &deviceIds)
 {
     CALL_DEBUG_ENTER;
     const std::string SERVICE_TYPE = "deviceStatus";
@@ -176,10 +176,10 @@ int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool state, const std::
     profile.SetServiceType(SERVICE_TYPE);
     cJSON* data = cJSON_CreateObject();
     CHKPR(data, RET_ERR);
-    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
+    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(switchState));
     char* smsg = cJSON_Print(data);
-    CHKPR(smsg, RET_ERR);
     cJSON_Delete(data);
+    CHKPR(smsg, RET_ERR);
     profile.SetCharacteristicProfileJson(smsg);
     cJSON_free(smsg);
 
@@ -263,7 +263,7 @@ int32_t FusionDeviceProfileAdapter::UnregisterCrossStateListener(const std::stri
     CALL_DEBUG_ENTER;
     auto cbIter = callbacks_.find(deviceId);
     if (cbIter == callbacks_.end()) {
-        FI_HILOGW("This device has no callback");
+        FI_HILOGW("This device is not exists");
         return RET_OK;
     }
     std::list<ProfileEvent> profileEvents;
@@ -284,7 +284,8 @@ void FusionDeviceProfileAdapter::SaveSubscribeInfos(const std::string &deviceId,
     if ((cbIter == callbacks_.end()) || (cbIter->second == nullptr)) {
         if (callback == nullptr) {
             subscribeInfos.clear();
-            FI_HILOGE("Find callback for device %{public}s failed, and the given callback is null", deviceId.c_str());
+            FI_HILOGE("Find callback for device %{public}s failed, and the given callback is nullptr",
+                deviceId.c_str());
             return;
         }
         callbacks_.insert_or_assign(deviceId, callback);
@@ -309,12 +310,12 @@ void FusionDeviceProfileAdapter::RemoveFailedSubscriptions(const std::string &de
     std::shared_ptr<IProfileEventCallback> profileEventCb;
     auto cbIter = callbacks_.find(deviceId);
     if (cbIter == callbacks_.end()) {
-        FI_HILOGE("Find %{public}s failed", deviceId.c_str());
+        FI_HILOGW("This device is not exists");
         return;
     }
     if (cbIter->second == nullptr) {
         callbacks_.erase(cbIter);
-        FI_HILOGE("This device has no callback");
+        FI_HILOGW("This device is not exists");
         return;
     }
 
@@ -324,14 +325,14 @@ void FusionDeviceProfileAdapter::RemoveFailedSubscriptions(const std::string &de
     }
 }
 
-int32_t UpdateCrossSwitchState(size_t state)
+int32_t UpdateCrossSwitchState(size_t switchState)
 {
     CALL_DEBUG_ENTER;
     return DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().UpdateCrossSwitchState(
-        static_cast<bool>(state));
+        static_cast<bool>(switchState));
 }
 
-int32_t SyncCrossSwitchState(size_t state, CIStringVector* deviceIds)
+int32_t SyncCrossSwitchState(size_t switchState, CIStringVector* deviceIds)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceIds, RET_ERR);
@@ -345,16 +346,16 @@ int32_t SyncCrossSwitchState(size_t state, CIStringVector* deviceIds)
         deviceId.emplace_back(std::string(device_id));
     }
     return DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().SyncCrossSwitchState(
-        static_cast<bool>(state), deviceId);
+        static_cast<bool>(switchState), deviceId);
 }
 
 int32_t GetCrossSwitchState(const char* deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceId, RET_ERR);
-    auto state =
+    bool switchState =
         DelayedRefSingleton<FusionDeviceProfileAdapter>::GetInstance().GetCrossSwitchState(std::string(deviceId));
-    return (static_cast<int32_t>(state));
+    return (static_cast<int32_t>(switchState));
 }
 
 int32_t RegisterCrossStateListener(const char* deviceId, CICrossStateListener* listener)
