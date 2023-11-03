@@ -51,7 +51,7 @@ int32_t ShadowPacker::MarshallingShadowInfos(const std::vector<ShadowInfo> &shad
     }
     WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < shadowNum; i++) {
-        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        CHKPR(shadowInfos[i].pixelMap, RET_ERR);
         if (!shadowInfos[i].pixelMap->Marshalling(data)) {
             FI_HILOGE("Failed to marshalling pixelMap");
             return ERR_INVALID_VALUE;

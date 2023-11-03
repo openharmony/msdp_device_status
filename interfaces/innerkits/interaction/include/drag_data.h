@@ -32,7 +32,6 @@ struct ShadowInfo {
     int32_t y { -1 };
 };
 
-struct DragNotifyMsg;
 struct DragData {
     std::vector<ShadowInfo> shadowInfos;
     std::vector<uint8_t> buffer;
