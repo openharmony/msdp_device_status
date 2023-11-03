@@ -22,7 +22,7 @@
 struct CServiceCharacteristicProfile {
     const char* serviceId;
     const char* serviceType;
-    bool state;
+    const char* serviceProfileJson;
     const char* characteristicProfileJson;
 };
 
@@ -38,7 +38,7 @@ struct CSubscribeInfo {
     const char* extraInfo;
 };
 
-struct CSubscribeInfos {
+struct CISubscribeInfos {
     const CSubscribeInfo* subscribeInfos;
     size_t nSubscribeInfos;
 };
@@ -89,7 +89,7 @@ extern "C" {
 
 int32_t PutDeviceProfile(const CServiceCharacteristicProfile* profile);
 int32_t GetDeviceProfile(const char* udId, const char* serviceId, CServiceCharacteristicProfile* profile);
-int32_t SubscribeProfileEvents(const CSubscribeInfos* subscribeInfos,
+int32_t SubscribeProfileEvents(const CISubscribeInfos* subscribeInfos,
                                CIProfileEventCb* eventCb,
                                CIProfileEvents** failedEvents);
 int32_t UnsubscribeProfileEvents(const CIProfileEvents* profileEvents,

@@ -103,17 +103,18 @@ int32_t GetDeviceProfile(const char* udId, const char* serviceId, CServiceCharac
     return RET_ERR;
 }
 
-int32_t SubscribeProfileEvents(const CSubscribeInfos* subscribeInfos,
+int32_t SubscribeProfileEvents(const CISubscribeInfos* subscribeInfos,
                                CIProfileEventCb* eventCb,
                                CIProfileEvents** failedEvents)
 {
     CALL_DEBUG_ENTER;
     CHKPR(subscribeInfos, RET_ERR);
+    CHKPR(subscribeInfos->subscribeInfos, RET_ERR);
     std::list<SubscribeInfo> subscriptions;
 
     for (size_t index = 0; index < subscribeInfos->nSubscribeInfos; ++index) {
         const CSubscribeInfo &cSub = subscribeInfos->subscribeInfos[index];
-        CHKPR(cSub, RET_ERR);
+        
         if ((cSub.profileEvent >= ProfileEvent::EVENT_UNKNOWN) &&
             (cSub.profileEvent < ProfileEvent::EVENT_PROFILE_END)) {
             CHKPC(cSub.extraInfo);

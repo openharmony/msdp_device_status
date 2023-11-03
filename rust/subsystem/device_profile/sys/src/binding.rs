@@ -30,8 +30,8 @@ pub struct CServiceCharacteristicProfile {
     pub service_id: *const c_char,
     // The type of the service.
     pub service_type: *const c_char,
-    // The state of the device.
-    pub state: bool,
+    // The json description of the service.
+    pub service_profile_json: *const c_char,
     // The characteristic profile of the service.
     pub characteristic_profile_json: *const c_char,
 }

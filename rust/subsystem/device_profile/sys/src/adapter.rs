@@ -117,7 +117,7 @@ impl CrossStateListener {
     /// Make sure to properly dereference and manipulate the data using appropriate safe Rust code.
     extern "C" fn on_update(listener: *mut CICrossStateListener, device_id: *const c_char, state: u32)
     {
-        call_debug_enter!("CrossStateListener::destruct");
+        call_debug_enter!("CrossStateListener::on_update");
         if let Some(listener_mut) = CrossStateListener::from_interface(listener) {
             // SAFETY: `listener_mut` is valid, cause has been performed check.
             // `device_id` and `state` are valid, which are ensured by the caller.
