@@ -84,7 +84,7 @@ void CoordinationEventManager::OnEnable(CoordinationMessage msg, const std::stri
     sptr<EventInfo> info = coordinationCallbacks_[EventType::ENABLE];
     CHKPV(info);
     NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    coordinationCallbacks_[EventType::ENABLE] =  nullptr;
+    coordinationCallbacks_[EventType::ENABLE] = nullptr;
 }
 
 void CoordinationEventManager::OnStart(CoordinationMessage msg, const std::string &networkId)
@@ -94,7 +94,7 @@ void CoordinationEventManager::OnStart(CoordinationMessage msg, const std::strin
     sptr<EventInfo> info = coordinationCallbacks_[EventType::START];
     CHKPV(info);
     NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    coordinationCallbacks_[EventType::START] =  nullptr;
+    coordinationCallbacks_[EventType::START] = nullptr;
 }
 
 void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string &networkId)
@@ -104,7 +104,7 @@ void CoordinationEventManager::OnStop(CoordinationMessage msg, const std::string
     sptr<EventInfo> info = coordinationCallbacks_[EventType::STOP];
     CHKPV(info);
     NotifyCoordinationMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    coordinationCallbacks_[EventType::STOP] =  nullptr;
+    coordinationCallbacks_[EventType::STOP] = nullptr;
 }
 
 void CoordinationEventManager::OnGetCrossingSwitchState(bool state)
@@ -114,7 +114,7 @@ void CoordinationEventManager::OnGetCrossingSwitchState(bool state)
     sptr<EventInfo> info = coordinationCallbacks_[EventType::STATE];
     CHKPV(info);
     NotifyCoordinationState(info->sess, info->msgId, info->userData, state);
-    coordinationCallbacks_[EventType::STATE] =  nullptr;
+    coordinationCallbacks_[EventType::STATE] = nullptr;
 }
 
 void CoordinationEventManager::OnErrorMessage(EventType type, CoordinationMessage msg)
@@ -123,7 +123,7 @@ void CoordinationEventManager::OnErrorMessage(EventType type, CoordinationMessag
     sptr<EventInfo> info = coordinationCallbacks_[type];
     CHKPV(info);
     NotifyCoordinationMessage(info->sess, info->msgId, info->userData, "", msg);
-    coordinationCallbacks_[type] =  nullptr;
+    coordinationCallbacks_[type] = nullptr;
 }
 
 void CoordinationEventManager::SetIContext(IContext *context)
