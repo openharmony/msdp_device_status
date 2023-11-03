@@ -21,7 +21,6 @@ ohos_shared_library("coordination") {
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_service_path}/context/include",
     "//third_party/cJSON",
   ]
 
@@ -47,6 +46,7 @@ ohos_shared_library("coordination") {
   defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
     "//third_party/cJSON:cjson",

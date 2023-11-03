@@ -11,22 +11,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../device_status.gni")
+import("../../../device_status.gni")
 
-config("devicestatus_epoll_public_config") {
+config("intention_epoll_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_source_set("devicestatus_epoll") {
+ohos_source_set("intention_epoll") {
   include_dirs = [ "include" ]
 
   sources = [ "src/epoll_manager.cpp" ]
 
-  public_configs = [ ":devicestatus_epoll_public_config" ]
+  public_configs = [ ":intention_epoll_public_config" ]
 
   deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
-  public_deps = [ "${device_status_root_path}/data:devicestatus_data" ]
+  public_deps =
+      [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
   external_deps = [ "hilog:libhilog" ]
 
