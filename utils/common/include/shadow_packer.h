@@ -23,6 +23,8 @@
 #include "devicestatus_errors.h"
 #include "drag_data.h"
 
+constexpr int32_t SHADOW_NUM_LIMIT { 3 };
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -41,15 +43,21 @@ int32_t ShadowPacker::MarshallingShadowInfos(const std::vector<ShadowInfo> &shad
         FI_HILOGE("Invalid parameter shadowInfos");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, shadowInfos.size(), ERR_INVALID_VALUE);
-    for (const auto &shadowInfo : shadowInfos) {
+    int32_t shadowNum = static_cast<int32_t>(shadowInfos.size());
+    if (shadowNum > SHADOW_NUM_LIMIT) {
+        FI_HILOGW("Only %{public}d shadowInfos are allowed to be packaged at most, now %{public}d exceeding the limit",
+            SHADOW_NUM_LIMIT, shadowNum);
+        shadowNum  = SHADOW_NUM_LIMIT;
+    }
+    WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
+    for (int32_t i = 0; i < shadowNum; i++) {
         CHKPR(shadowInfo.pixelMap, RET_ERR);
-        if (!shadowInfo.pixelMap->Marshalling(data)) {
+        if (!shadowInfos[i].pixelMap->Marshalling(data)) {
             FI_HILOGE("Failed to marshalling pixelMap");
             return ERR_INVALID_VALUE;
         }
-        WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
-        WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+        WRITEINT32(data, shadowInfos[i].x, ERR_INVALID_VALUE);
+        WRITEINT32(data, shadowInfos[i].y, ERR_INVALID_VALUE);
     }
     return RET_OK;
 }
@@ -59,7 +67,7 @@ int32_t ShadowPacker::UnMarshallingShadowInfos(MessageParcel &data, std::vector<
     CALL_DEBUG_ENTER;
     int32_t shadowNum { 0 };
     READINT32(data, shadowNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (shadowNum <= 0) {
+    if (shadowNum <= 0 || shadowNum > SHADOW_NUM_LIMIT) {
         FI_HILOGE("Invalid shadowNum:%{public}d", shadowNum);
         return RET_ERR;
     }
