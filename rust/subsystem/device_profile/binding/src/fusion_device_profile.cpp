@@ -86,9 +86,12 @@ void ProfileEventCallbackImpl::OnProfileChanged(const ProfileChangeNotification 
 static void Destruct(CIProfileEvents* target)
 {
     CHKPV(target);
-    CHKPV(target->profileEvents);
-    delete [] target->profileEvents;
-    delete target;
+    if (target->profileEvents == nullptr) {
+        delete target;
+    } else {
+        delete [] target->profileEvents;
+        delete target;
+    }
 }
 
 int32_t PutDeviceProfile(const CServiceCharacteristicProfile* profile)
