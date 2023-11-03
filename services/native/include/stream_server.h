@@ -58,6 +58,10 @@ public:
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const override;
 
+private:
+    int32_t SetSockOpt(int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType);
+    int32_t CloseFd(int32_t& serverFd, int32_t& toReturnClientFd);
+
 protected:
     virtual void OnConnected(SessionPtr s) = 0;
     virtual void OnDisconnected(SessionPtr s) = 0;
