@@ -139,6 +139,7 @@ public:
     void OnStopAnimation() override;
 
 private:
+    int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
