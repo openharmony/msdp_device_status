@@ -69,10 +69,15 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY { "Unified data key" };
+const std::string SYSTEM_CORE { "system_core" };
+const std::string SYSTEM_BASIC { "system_basic" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
 int32_t g_screenHeight { 1280 };
+uint64_t g_tokenID { 0 };
+const char *g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char *g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
 } // namespace
 
 class InteractionManagerTest : public testing::Test {
@@ -97,9 +102,42 @@ public:
     static int32_t TestAddMonitor(std::shared_ptr<MMI::IInputEventConsumer> consumer);
     static void TestRemoveMonitor(int32_t monitorId);
     static void PrintDragData(const DragData &dragData);
-    void AddPermission();
-    void SetCooperatePermission(const std::string &processName, const char** perms, size_t permCount);
+    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
+    static void RemovePermission();
 };
+
+void InteractionManagerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
+{
+    CALL_DEBUG_ENTER;
+    if (perms == nullptr || permAmount == 0) {
+        FI_HILOGE("The perms is empty");
+        return;
+    }
+
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permAmount,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "InteractionManagerTest",
+        .aplStr = level.c_str(),
+    };
+    g_tokenID = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(g_tokenID);
+    OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
+void InteractionManagerTest::RemovePermission()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(g_tokenID);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to remove permission");
+        return;
+    }
+}
 
 class DragListenerTest : public IDragListener {
 public:
@@ -233,37 +271,6 @@ std::pair<int32_t, int32_t> InteractionManagerTest::GetMouseAndTouch()
     return mouseAndTouch;
 }
 
-void InteractionManagerTest::AddPermission()
-{
-    const char** perms = new (std::nothrow) const char* [1];
-    CHKPV(perms);
-    perms[0] = "ohos.permission.COOPERATE_MANAGER";
-    SetCooperatePermission("InteractionManagerTest", perms, sizeof(perms) / sizeof(perms[0]));
-    delete []perms;
-}
-
-void InteractionManagerTest::SetCooperatePermission(const std::string &processName,
-    const char** perms, size_t permCount)
-{
-    if (perms == nullptr || permCount == 0) {
-        FI_HILOGE("The parameter of coordination permission is incorrect");
-        return;
-    }
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = permCount,
-        .aclsNum = 0,
-        .dcaps = nullptr,
-        .perms = perms,
-        .acls = nullptr,
-        .processName = processName.c_str(),
-        .aplStr = "system_basic",
-    };
-    uint64_t tokenId = GetAccessTokenId(&infoInstance);
-    SetSelfTokenID(tokenId);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-}
-
 void InteractionManagerTest::SetUpTestCase()
 {
     auto mouseAndTouch = GetMouseAndTouch();
@@ -271,10 +278,7 @@ void InteractionManagerTest::SetUpTestCase()
     g_deviceTouchId = mouseAndTouch.second;
 }
 
-void InteractionManagerTest::SetUp()
-{
-    AddPermission();
-}
+void InteractionManagerTest::SetUp() {}
 
 void InteractionManagerTest::TearDown()
 {
@@ -1204,6 +1208,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     if (g_deviceTouchId < 0) {
         ASSERT_TRUE(g_deviceTouchId < 0);
     } else {
@@ -1232,6 +1237,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         ret = InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_EQ(ret, RET_OK);
     }
+    RemovePermission();
 }
 
 /**
@@ -1243,6 +1249,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
     if (g_deviceMouseId < 0) {
         ASSERT_TRUE(g_deviceMouseId < 0);
     } else {
@@ -1270,6 +1277,7 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         ret = InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_EQ(ret, RET_OK);
     }
+    RemovePermission();
 }
 
 /**
@@ -1562,6 +1570,7 @@ private:
 HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     auto listener = std::make_shared<HotAreaListenerTest>(std::string("HOT_AREA"));
     int32_t ret = InteractionManager::GetInstance()->AddHotAreaListener(listener);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -1575,6 +1584,7 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -1586,6 +1596,7 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_001, TestSize.Level1)
 HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
     CHKPV(display);
     g_screenWidth = display->GetWidth();
@@ -1614,6 +1625,7 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
