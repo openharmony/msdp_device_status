@@ -348,7 +348,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
 
 void DragDrawing::OnDragSuccess()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -362,7 +362,7 @@ void DragDrawing::OnDragSuccess()
 
 void DragDrawing::OnDragFail()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode = g_drawingInfo.surfaceNode;
     CHKPV(surfaceNode);
     std::shared_ptr<Rosen::RSNode> rootNode = g_drawingInfo.rootNode;
@@ -372,7 +372,7 @@ void DragDrawing::OnDragFail()
 
 void DragDrawing::EraseMouseIcon()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT) {
         FI_HILOGE("Nodes size invalid, node size:%{public}zu", g_drawingInfo.nodes.size());
         return;
@@ -391,7 +391,7 @@ void DragDrawing::EraseMouseIcon()
 
 void DragDrawing::DestroyDragWindow()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     startNum_ = START_TIME;
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
@@ -443,10 +443,10 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     CHKPV(g_drawingInfo.surfaceNode);
     if (visible) {
         g_drawingInfo.surfaceNode->SetVisible(true);
-        FI_HILOGD("Drag surfaceNode show success");
+        FI_HILOGI("Drag surfaceNode show success");
     } else {
         g_drawingInfo.surfaceNode->SetVisible(false);
-        FI_HILOGD("Drag surfaceNode hide success");
+        FI_HILOGI("Drag surfaceNode hide success");
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
