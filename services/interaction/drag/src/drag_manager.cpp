@@ -712,6 +712,10 @@ void DragManager::MoveTo(int32_t x, int32_t y)
 
 int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
 {
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return;
+    }
     dragDrawing_.UpdateDragItemStyle(dragItemStyle);
     return RET_OK;
 }
