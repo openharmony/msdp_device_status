@@ -83,7 +83,7 @@ struct DragAnimationData {
 };
 
 struct Animation {
-    int32_t duration; // 时长
+    int32_t duration { 1000 }; // 时长
     int32_t tempo; // 节奏
 //     ICurve curve; // 动效时间曲线, 这个参数貌似没有IPC序列化反序列化的能力
     int32_t delay; // 延迟
