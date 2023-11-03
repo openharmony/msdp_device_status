@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DragManagerImpl  {
+class DragManagerImpl {
 public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;

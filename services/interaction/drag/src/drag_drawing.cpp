@@ -896,7 +896,7 @@ int32_t DragDrawing::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidt
         return RET_ERR;
     }
     int32_t number = std::stoi(srcSvgWidth) + extendSvgWidth;
-    std::string tgtSvgWidth  = std::to_string(number);
+    std::string tgtSvgWidth = std::to_string(number);
     tgtSvgWidth.append("px");
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
     oStrStream.str("");
