@@ -68,8 +68,8 @@ static std::string GetThisThreadIdOfString()
 
 uint64_t GetThisThreadId()
 {
-    std::string stid = GetThisThreadIdOfString();
-    uint64_t tid = std::stoull(stid);
+    std::string threadId = GetThisThreadIdOfString();
+    uint64_t tid = std::stoull(threadId);
     return tid;
 }
 
@@ -175,17 +175,16 @@ std::string GetAnonyString(const std::string &value)
     return str;
 }
 
-static std::string GetFileName(const std::string &strPath)
+static std::string GetFileName(const std::string &path)
 {
-    size_t nPos = strPath.find_last_of('/');
-    if (strPath.npos == nPos) {
-        nPos = strPath.find_last_of('\\');
+    size_t nPos = path.find_last_of('/');
+    if (path.npos == nPos) {
+        nPos = path.find_last_of('\\');
     }
-    if (strPath.npos == nPos) {
-        return strPath;
+    if (path.npos == nPos) {
+        return path;
     }
-
-    return strPath.substr(nPos + 1, strPath.npos);
+    return path.substr(nPos + 1, path.npos);
 }
 
 const char* GetProgramName()
