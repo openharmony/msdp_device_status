@@ -114,7 +114,7 @@ void CooperateEventManager::OnGetCrossingSwitchState(bool state)
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STATE];
     CHKPV(info);
     NotifyCooperateState(info->sess, info->msgId, info->userData, state);
-    cooperateCallbacks_[EventType::STATE] = nullptr;
+    cooperateCallbacks_[EventType::STATE] =  nullptr;
 }
 
 void CooperateEventManager::OnErrorMessage(EventType type, CooperateMessage msg)
