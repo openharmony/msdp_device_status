@@ -920,11 +920,11 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
         if (pkt.ChkRWError()) {
-            FI_HILOGE("Packet write data failed");
+            FI_HILOGE("Failed to write packet data");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt)) {
-            FI_HILOGE("Sending failed");
+            FI_HILOGE("Sending message failed");
             return RET_ERR;
         }
         return RET_OK;
