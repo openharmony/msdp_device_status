@@ -86,7 +86,6 @@ int32_t CoordinationHotArea::ProcessData(std::shared_ptr<MMI::PointerEvent> poin
 {
     CALL_DEBUG_ENTER;
     if (hotAreaCallbacks_.empty()) {
-        FI_HILOGW("No listener, hotAreaCallbacks_ is empty");
         return RET_ERR;
     }
     CHKPR(pointerEvent, RET_ERR);
@@ -118,8 +117,7 @@ void CoordinationHotArea::CheckInHotArea()
         displayX_ <= width_ - HOT_AREA_MARGIN) {
         type_ = HotAreaType::AREA_BOTTOM;
     } else {
-        FI_HILOGD("The mouse is not in the hot area");
-        return;
+        type_ = HotAreaType::AREA_NONE;
     }
 }
 
@@ -135,8 +133,7 @@ void CoordinationHotArea::CheckPointerToEdge(HotAreaType type)
     } else if (type == HotAreaType::AREA_BOTTOM) {
         isEdge_ = displayY_ >= (height_ - 1) && deltaY_ > 0;
     } else {
-        FI_HILOGD("Parameter is incorrect or mouse is not in hot area");
-        return;
+        isEdge_ = false;
     }
 }
 
