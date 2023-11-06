@@ -91,6 +91,7 @@ constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
 constexpr int32_t INVALID_COLOR_VALUE { -1 };
 constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t ICON_CORNER_RADIUS { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
@@ -253,7 +254,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-    if (displayY == 500) {
+    if (displayY >= 500 && displayY <= 510) {
         FI_HILOGI("Here in GradientForegroundColor");
         UpdateDragItemStyle(DragItemStyle());//Just use to test animation interface usage
         FI_HILOGI("Here out GradientForegroundColor");
@@ -1234,12 +1235,14 @@ int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
         FI_HILOGD("PixelMapNode is nullptr");
         return RET_ERR;
     }
-    pixelMapNode->SetForegroundColor(Rosen::RSColor(124, 252, 0).AsArgbInt());
+    pixelMapNode->SetForegroundColor(0x00FF0000);
+    pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(GRADIENT_COLOR_DURATION);
     Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
         if (pixelMapNode != nullptr) {
-            pixelMapNode->SetForegroundColor(Rosen::RSColor(208, 38, 38).AsArgbInt());
+            pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS); // 实际的动效参数中有这个radius
+            pixelMapNode->SetForegroundColor(0xAAFF0000);
         }
     });
     return RET_OK;
