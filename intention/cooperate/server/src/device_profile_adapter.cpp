@@ -118,7 +118,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
 {
     CHKPR(callback, RET_ERR);
     if (networkId.empty()) {
-        FI_HILOGE("NetworkId is nullptr");
+        FI_HILOGE("networkId is nullptr");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
@@ -141,7 +141,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
 {
     CALL_INFO_TRACE;
     if (networkId.empty()) {
-        FI_HILOGE("NetworkId is empty");
+        FI_HILOGE("networkId is empty");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
