@@ -56,7 +56,7 @@ public:
     static void EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> cb);
+    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtilCooperate::CallbackInfo> callback);
     void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
     void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;

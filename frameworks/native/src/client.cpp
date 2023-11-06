@@ -205,9 +205,9 @@ void Client::OnDisconnect()
     OnDisconnected();
 }
 
-void Client::RegisterConnectedFunction(ConnectCallback fun)
+void Client::RegisterConnectedFunction(ConnectCallback function)
 {
-    funConnected_ = fun;
+    funConnected_ = function;
 }
 
 void Client::RegisterDisconnectedFunction(ConnectCallback fun)

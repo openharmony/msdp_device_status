@@ -244,9 +244,9 @@ bool VInputDevice::HasJoystickAxesOrButtons() const
 {
     if (!TestBit(BTN_JOYSTICK - 1, keyBitmask_)) {
         if (HasAxesOrButton(BTN_JOYSTICK, BTN_DIGI, keyBitmask_) ||
-            // BTN_TRIGGER_HAPPY40 + 1 : loop boundary
+            // BTN_TRIGGER_HAPPY40 + 1 : Iteration limit
             HasAxesOrButton(BTN_TRIGGER_HAPPY1, BTN_TRIGGER_HAPPY40 + 1, keyBitmask_) ||
-            HasAxesOrButton(BTN_DPAD_UP, BTN_DPAD_RIGHT + 1, keyBitmask_)) { // BTN_DPAD_RIGHT + 1 : loop boundary
+            HasAxesOrButton(BTN_DPAD_UP, BTN_DPAD_RIGHT + 1, keyBitmask_)) { // BTN_DPAD_RIGHT + 1 : Iteration limit
             return true;
         }
     }
@@ -258,8 +258,8 @@ void VInputDevice::PrintCapsDevice() const
     std::map<std::size_t, std::string> deviceComparisonTable {
         {DEVICE_CAP_KEYBOARD, "keyboard"},
         {DEVICE_CAP_TOUCH, "touch device"},
-        {DEVICE_CAP_POINTER, "pointer"},
         {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
+        {DEVICE_CAP_POINTER, "pointer"},
         {DEVICE_CAP_TABLET_PAD, "pad"},
         {DEVICE_CAP_GESTURE, "gesture"},
         {DEVICE_CAP_SWITCH, "switch"},

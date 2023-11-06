@@ -103,10 +103,10 @@ bool JsUtilCooperate::IsSameHandle(napi_env env, napi_value handle, napi_ref ref
     CHKPF(scope);
     napi_value handlerTemp = nullptr;
     CHKRF_SCOPE(env, napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE, scope);
-    bool isEqual = false;
-    CHKRF_SCOPE(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS, scope);
+    bool isSame = false;
+    CHKRF_SCOPE(env, napi_strict_equals(env, handle, handlerTemp, &isSame), STRICT_EQUALS, scope);
     napi_close_handle_scope(env, scope);
-    return isEqual;
+    return isSame;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

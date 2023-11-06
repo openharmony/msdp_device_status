@@ -30,16 +30,16 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-inline constexpr size_t BITS_PER_UINT8 { 8 };
+inline constexpr size_t BIT_PER_UINT8 { 8 };
 
 inline constexpr size_t OFFSET(size_t bit)
 {
-    return (bit % BITS_PER_UINT8);
+    return (bit % BIT_PER_UINT8);
 }
 
 inline constexpr size_t BYTE(size_t bit)
 {
-    return (bit / BITS_PER_UINT8);
+    return (bit / BIT_PER_UINT8);
 }
 
 inline bool TestBit(size_t bit, const uint8_t *array)
@@ -49,7 +49,7 @@ inline bool TestBit(size_t bit, const uint8_t *array)
 
 inline constexpr size_t NBYTES(size_t nbits)
 {
-    return (nbits + BITS_PER_UINT8 - 1) / BITS_PER_UINT8;
+    return (nbits + BIT_PER_UINT8 - 1) / BIT_PER_UINT8;
 }
 
 class Device final : public IDevice,

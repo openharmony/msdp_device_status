@@ -54,15 +54,15 @@ private:
 
     int32_t OnInit(IContext *context);
     int32_t OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
-    int32_t OnRemoveTimer(int32_t timerId);
     int32_t OnResetTimer(int32_t timerId);
+    int32_t OnRemoveTimer(int32_t timerId);
     int32_t OnProcessTimers();
     bool OnIsExist(int32_t timerId) const;
     int32_t RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const;
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
-    int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
+    int32_t RemoveTimerInternal(int32_t timerId);
     void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int64_t CalcNextDelayInternal();
     void ProcessTimersInternal();
