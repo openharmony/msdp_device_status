@@ -21,6 +21,8 @@ ohos_shared_library("draginteraction") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/js_drag_context.cpp",
     "src/js_drag_manager.cpp",

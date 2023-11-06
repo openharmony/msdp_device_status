@@ -29,6 +29,8 @@ ohos_shared_library("devicestatus_ipc") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/circle_stream_buffer.cpp",
     "src/net_packet.cpp",

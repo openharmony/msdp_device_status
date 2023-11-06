@@ -40,6 +40,8 @@ ohos_shared_library("devicestatus_client") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   version_script = "libdevicestatus_client_map"
   sources = [
     "${device_status_frameworks_path}/native/interaction/src/drag_manager_impl.cpp",
