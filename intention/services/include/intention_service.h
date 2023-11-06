@@ -25,6 +25,7 @@
 #include "plugin_manager.h"
 #include "task_scheduler.h"
 #include "timer_manager.h"
+#include "device_manager.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -43,6 +44,7 @@ public:
     ITaskScheduler& GetTaskScheduler() override;
     ITimerManager& GetTimerManager() override;
     IPluginManager& GetPluginManager() override;
+    IDeviceManager& GetDeviceManager() override;
 
 private:
     int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
@@ -59,6 +61,7 @@ private:
     TaskScheduler taskScheduler_;
     TimerManager timerMgr_;
     PluginManager pluginMgr_;
+    DeviceManager deviceMgr_;
 };
 
 ITaskScheduler& IntentionService::GetTaskScheduler()
@@ -74,6 +77,11 @@ ITimerManager& IntentionService::GetTimerManager()
 IPluginManager& IntentionService::GetPluginManager()
 {
     return pluginMgr_;
+}
+
+IDeviceManager& IntentionService::GetDeviceManager()
+{
+    return deviceMgr_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
