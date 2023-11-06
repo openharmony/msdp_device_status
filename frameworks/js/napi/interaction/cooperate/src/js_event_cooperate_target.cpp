@@ -560,11 +560,11 @@ void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t stat
         FI_HILOGE("Object is nullptr");
         napi_close_handle_scope(cb->env, scope);
     }
-    napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
+    napi_value handlerInfo = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handlerInfo), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     size_t argc = TWO_PARAM;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, argc, resultObj, &result),
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handlerInfo, argc, resultObj, &result),
         CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);

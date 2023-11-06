@@ -23,59 +23,80 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateChangeNotify" };
 } // namespace
+template void StateChangeNotify::OnDragInfoNotify<DragState>(SessionPtr session, MessageId msgId, DragState state);
+template void StateChangeNotify::OnDragInfoNotify<DragCursorStyle>(SessionPtr session, MessageId msgId,
+    DragCursorStyle style);
 
 void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
     CALL_DEBUG_ENTER;
     CHKPV(info);
-    auto it = std::find_if(msgInfos_.begin(), msgInfos_.end(),
+    auto it = std::find_if(msgInfos_[info->msgType].begin(), msgInfos_[info->msgType].end(),
         [info] (auto msgInfo) {
             return *msgInfo == info;
         });
-    if (it != msgInfos_.end()) {
+    if (it != msgInfos_[info->msgType].end()) {
         *it = info;
         return;
     }
-    msgInfos_.emplace_back(info);
+    msgInfos_[info->msgType].emplace_back(info);
 }
 
 void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
     CALL_DEBUG_ENTER;
-    if (msgInfos_.empty() || info == nullptr) {
+    if (msgInfos_[info->msgType].empty() || info == nullptr) {
         FI_HILOGE("Remove listener failed");
         return;
     }
-    auto it = std::find_if(msgInfos_.begin(), msgInfos_.end(),
+    auto it = std::find_if(msgInfos_[info->msgType].begin(), msgInfos_[info->msgType].end(),
         [info] (auto msgInfo) {
             return *msgInfo == info;
         });
-    if (it != msgInfos_.end()) {
-        msgInfos_.erase(it);
+    if (it != msgInfos_[info->msgType].end()) {
+        msgInfos_[info->msgType].erase(it);
     }
+}
+
+int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
+{
+    CALL_DEBUG_ENTER;
+    if (msgInfos_[MessageType::NOTIFY_STYLE].empty()) {
+        FI_HILOGW("No listener, send message failed");
+        return RET_ERR;
+    }
+    for (auto it = msgInfos_[MessageType::NOTIFY_STYLE].begin();
+        it != msgInfos_[MessageType::NOTIFY_STYLE].end(); ++it) {
+        auto info = *it;
+        CHKPC(info);
+        OnDragInfoNotify(info->session, info->msgId, info->style);
+    }
+    return RET_OK;
 }
 
 int32_t StateChangeNotify::StateChangedNotify(DragState state)
 {
     CALL_DEBUG_ENTER;
-    if (msgInfos_.empty()) {
+    if (msgInfos_[MessageType::NOTIFY_STATE].empty()) {
         FI_HILOGW("No listener, send message failed");
         return RET_ERR;
     }
-    for (auto it = msgInfos_.begin(); it != msgInfos_.end(); ++it) {
+    for (auto it = msgInfos_[MessageType::NOTIFY_STATE].begin();
+        it != msgInfos_[MessageType::NOTIFY_STATE].end(); ++it) {
         auto info = *it;
         CHKPC(info);
-        OnStateChangedNotify(info->session, info->msgId, state);
+        OnDragInfoNotify(info->session, info->msgId, info->state);
     }
     return RET_OK;
 }
 
-void StateChangeNotify::OnStateChangedNotify(SessionPtr session, MessageId msgId, DragState state)
+template <typename T>
+void StateChangeNotify::OnDragInfoNotify(SessionPtr session, MessageId msgId, T t)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
     NetPacket pkt(msgId);
-    pkt << static_cast<int32_t>(state);
+    pkt << static_cast<int32_t>(t);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;

@@ -62,6 +62,7 @@ int32_t DragManager::AddListener(SessionPtr session)
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
     info->msgId = MessageId::DRAG_STATE_LISTENER;
+    info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.AddNotifyMsg(info);
     return RET_OK;
 }
@@ -72,17 +73,42 @@ int32_t DragManager::RemoveListener(SessionPtr session)
     CHKPR(session, RET_ERR);
     auto info = std::make_shared<StateChangeNotify::MessageInfo>();
     info->session = session;
+    info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.RemoveNotifyMsg(info);
+    return RET_OK;
+}
+
+int32_t DragManager::AddSubscriptListener(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(session, RET_ERR);
+    auto info = std::make_shared<StateChangeNotify::MessageInfo>();
+    info->session = session;
+    info->msgId = MessageId::DRAG_STYLE_LISTENER;
+    info->msgType = MessageType::NOTIFY_STYLE;
+    stateNotify_.AddNotifyMsg(info);
+    return RET_OK;
+}
+
+int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
+{
+    CHKPR(session, RET_ERR);
+    auto info = std::make_shared<StateChangeNotify::MessageInfo>();
+    info->msgType = MessageType::NOTIFY_STYLE;
+    info->session = session;
+    stateNotify_.RemoveNotifyMsg(info);
+
     return RET_OK;
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
-        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
-        " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
-        " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
+    FI_HILOGD("dragData value Contains PixelFormat:%{public}d, PixelAlphaType:%{public}d,"
+        " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
+        " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
+        " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
@@ -165,9 +191,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    DRAG_DATA_MGR.SetDragStyle(style);
     DRAG_DATA_MGR.SetTargetPid(targetPid);
     DRAG_DATA_MGR.SetTargetTid(targetTid);
+    if (style == DRAG_DATA_MGR.GetDragStyle()) {
+        FI_HILOGD("Not need update drag style");
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetDragStyle(style);
+    stateNotify_.StyleChangedNotify(style);
     return dragDrawing_.UpdateDragStyle(style);
 }
 

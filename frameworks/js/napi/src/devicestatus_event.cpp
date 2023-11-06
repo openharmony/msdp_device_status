@@ -91,7 +91,7 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
         return true;
     }
     if (!IsNoExistCallback(events_[eventType], handler, eventType)) {
-        FI_HILOGE("callback already exists");
+        FI_HILOGE("Callback already exists");
         return false;
     }
     SaveCallback(eventType, onHandlerRef, isOnce);
@@ -105,13 +105,13 @@ bool DeviceStatusEvent::IsNoExistCallback(std::list<std::shared_ptr<DeviceStatus
     napi_value result = nullptr;
     bool equal = false;
     for (const auto& item : events_[eventType]) {
-        napi_status status = napi_get_reference_value(env_, item->onHandlerRef, &result);
-        if (status != napi_ok) {
+        napi_status napiStatus = napi_get_reference_value(env_, item->onHandlerRef, &result);
+        if (napiStatus != napi_ok) {
             FI_HILOGE("Failed to napi_get_reference_value");
             return false;
         }
-        status = napi_strict_equals(env_, result, handler, &equal);
-        if (status != napi_ok) {
+        napiStatus = napi_strict_equals(env_, result, handler, &equal);
+        if (napiStatus != napi_ok) {
             FI_HILOGE("Failed to napi_strict_equals");
             return false;
         }

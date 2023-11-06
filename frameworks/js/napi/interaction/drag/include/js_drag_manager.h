@@ -27,6 +27,7 @@
 #include "refbase.h"
 
 #include "i_drag_listener.h"
+#include "i_subscript_listener.h"
 
 namespace OHOS {
 namespace Msdp {

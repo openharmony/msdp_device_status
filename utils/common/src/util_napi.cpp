@@ -24,9 +24,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UtilNap
 
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
-    napi_valuetype valueType = napi_undefined;
-    CHKRF(napi_typeof(env, value, &valueType), "napi_typeof");
-    return (valueType == type);
+    napi_valuetype valType = napi_undefined;
+    CHKRF(napi_typeof(env, value, &valType), "napi_typeof");
+    return (valType == type);
 }
 } // namespace UtilNapi
 } // namespace Msdp

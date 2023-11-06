@@ -84,7 +84,7 @@ void CooperateEventManager::OnEnable(CooperateMessage msg, const std::string &ne
     sptr<EventInfo> info = cooperateCallbacks_[EventType::ENABLE];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    cooperateCallbacks_[EventType::ENABLE] =  nullptr;
+    cooperateCallbacks_[EventType::ENABLE] = nullptr;
 }
 
 void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &networkId)
@@ -94,7 +94,7 @@ void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &net
     sptr<EventInfo> info = cooperateCallbacks_[EventType::START];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    cooperateCallbacks_[EventType::START] =  nullptr;
+    cooperateCallbacks_[EventType::START] = nullptr;
 }
 
 void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &networkId)
@@ -104,7 +104,7 @@ void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &netw
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
-    cooperateCallbacks_[EventType::STOP] =  nullptr;
+    cooperateCallbacks_[EventType::STOP] = nullptr;
 }
 
 void CooperateEventManager::OnGetCrossingSwitchState(bool state)
@@ -114,7 +114,7 @@ void CooperateEventManager::OnGetCrossingSwitchState(bool state)
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STATE];
     CHKPV(info);
     NotifyCooperateState(info->sess, info->msgId, info->userData, state);
-    cooperateCallbacks_[EventType::STATE] =  nullptr;
+    cooperateCallbacks_[EventType::STATE] = nullptr;
 }
 
 void CooperateEventManager::OnErrorMessage(EventType type, CooperateMessage msg)
@@ -123,7 +123,7 @@ void CooperateEventManager::OnErrorMessage(EventType type, CooperateMessage msg)
     sptr<EventInfo> info = cooperateCallbacks_[type];
     CHKPV(info);
     NotifyCooperateMessage(info->sess, info->msgId, info->userData, "", msg);
-    cooperateCallbacks_[type] =  nullptr;
+    cooperateCallbacks_[type] = nullptr;
 }
 
 void CooperateEventManager::SetIContext(IContext *context)

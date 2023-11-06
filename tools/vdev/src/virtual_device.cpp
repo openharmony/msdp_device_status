@@ -88,29 +88,29 @@ void VirtualDevice::GetInputDeviceNodes(std::map<std::string, std::string> &node
     const std::string kname { "Name=\"" };
     const std::string kevent { "event" };
     std::string name;
-    for (const auto &item : results) {
-        FI_HILOGD("item:%{public}s", item.c_str());
-        if (item[0] == 'N') {
-            std::string::size_type spos = item.find(kname);
+    for (const auto &res : results) {
+        FI_HILOGD("res:%{public}s", res.c_str());
+        if (res[0] == 'N') {
+            std::string::size_type spos = res.find(kname);
             if (spos != std::string::npos) {
                 spos += kname.size();
-                std::string::size_type tpos = item.find("\"", spos);
+                std::string::size_type tpos = res.find("\"", spos);
                 if (tpos != std::string::npos) {
-                    name = item.substr(spos, tpos - spos);
+                    name = res.substr(spos, tpos - spos);
                 }
             }
-        } else if (!name.empty() && (item[0] == 'H')) {
-            std::string::size_type spos = item.find(kevent);
+        } else if (!name.empty() && (res[0] == 'H')) {
+            std::string::size_type spos = res.find(kevent);
             if (spos != std::string::npos) {
                 std::map<std::string, std::string>::const_iterator cItr = nodes.find(name);
                 if (cItr != nodes.end()) {
                     nodes.erase(cItr);
                 }
                 std::string::size_type tpos = spos + kevent.size();
-                while (std::isalnum(item[tpos])) {
+                while (std::isalnum(res[tpos])) {
                     ++tpos;
                 }
-                auto [_, ret] = nodes.emplace(name, item.substr(spos, tpos - spos));
+                auto [_, ret] = nodes.emplace(name, res.substr(spos, tpos - spos));
                 if (!ret) {
                     FI_HILOGW("name is duplicated");
                 }

@@ -260,7 +260,7 @@ impl Epoll {
             libc::epoll_ctl(self.epoll_fd, libc::EPOLL_CTL_MOD, fd, &mut ev)
         };
         if ret != EPOLL_SUCCESS {
-            error!(LOG_LABEL, "in reset_fd, epoll_ctl_mod({},{}) fail: {:?}",
+            error!(LOG_LABEL, "In reset_fd, epoll_ctl_mod({},{}) fail: {:?}",
                    @public(self.epoll_fd), @public(fd), @public(Error::last_os_error()));
             Err(FusionErrorCode::Fail)
         } else {

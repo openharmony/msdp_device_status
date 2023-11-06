@@ -110,9 +110,9 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
 
-struct JsonInfoParser {
-    JsonInfoParser() = default;
-    ~JsonInfoParser()
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
     {
         if (json != nullptr) {
             cJSON_Delete(json);
@@ -174,19 +174,9 @@ float GetScaling()
 int32_t DragDrawing::Init(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    if (g_drawingInfo.isRunning) {
-        FI_HILOGE("Drag drawing is running, can not init again");
-        return INIT_CANCEL;
-    }
-    CHKPR(dragData.shadowInfo.pixelMap, INIT_FAIL);
-    if ((dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
-        FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
-        return INIT_FAIL;
-    }
-    if (dragData.dragNum < 0) {
-        FI_HILOGE("Invalid dragNum:%{public}d", dragData.dragNum);
-        return INIT_FAIL;
+    int32_t checkDragDataResult = CheckDragData(dragData);
+    if (INIT_SUCCESS != checkDragDataResult) {
+        return checkDragDataResult;
     }
     InitDrawingInfo(dragData);
     CreateWindow(dragData.displayX, dragData.displayY);
@@ -223,6 +213,26 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     rsUiDirector_->SendMessages();
+    return INIT_SUCCESS;
+}
+
+int32_t DragDrawing::CheckDragData(const DragData &dragData)
+{
+    CALL_DEBUG_ENTER;
+    if (g_drawingInfo.isRunning) {
+        FI_HILOGE("Drag drawing is running, can not init again");
+        return INIT_CANCEL;
+    }
+    CHKPR(dragData.shadowInfo.pixelMap, INIT_FAIL);
+    if ((dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
+        FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
+        return INIT_FAIL;
+    }
+    if (dragData.dragNum < 0) {
+        FI_HILOGE("Invalid dragNum:%{public}d", dragData.dragNum);
+        return INIT_FAIL;
+    }
     return INIT_SUCCESS;
 }
 
@@ -896,7 +906,7 @@ int32_t DragDrawing::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidt
         return RET_ERR;
     }
     int32_t number = std::stoi(srcSvgWidth) + extendSvgWidth;
-    std::string tgtSvgWidth  = std::to_string(number);
+    std::string tgtSvgWidth = std::to_string(number);
     tgtSvgWidth.append("px");
     xmlSetProp(curNode, BAD_CAST "width", BAD_CAST tgtSvgWidth.c_str());
     oStrStream.str("");
@@ -1130,7 +1140,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGD("FilterInfo is empty");
         return false;
     }
-    JsonInfoParser filterParser;
+    JsonParser filterParser;
     filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
@@ -1157,7 +1167,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGD("ExtraInfo is empty");
         return false;
     }
-    JsonInfoParser extraInfoParser;
+    JsonParser extraInfoParser;
     extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s",
         g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());

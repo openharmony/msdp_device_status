@@ -152,22 +152,22 @@ void VInputDevice::QueryDeviceInfo()
 
     rc = ioctl(fd_, EVIOCGID, &inputId_);
     if (rc < 0) {
-        FI_HILOGE("Could not get device input id:%{public}s", strerror(errno));
+        FI_HILOGE("Couldn't not get device input id:%{public}s", strerror(errno));
     }
     errno_t ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (ret != EOK) {
-        FI_HILOGE("Call memset_s failed");
+        FI_HILOGE("Call memset_s was a failure");
         return;
     }
     rc = ioctl(fd_, EVIOCGPHYS(sizeof(buffer) - 1), &buffer);
     if (rc < 0) {
-        FI_HILOGE("Could not get location:%{public}s", strerror(errno));
+        FI_HILOGE("Couldn't get location:%{public}s", strerror(errno));
     } else {
         phys_.assign(buffer);
     }
     ret = memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
     if (ret != EOK) {
-        FI_HILOGE("Call memset_s failed");
+        FI_HILOGE("Call memset_s was a failure");
         return;
     }
     rc = ioctl(fd_, EVIOCGUNIQ(sizeof(buffer) - 1), &buffer);

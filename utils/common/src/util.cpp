@@ -63,14 +63,13 @@ static std::string GetThisThreadIdOfString()
         buf[BUF_TID_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
-
     return threadLocalId;
 }
 
 uint64_t GetThisThreadId()
 {
-    std::string stid = GetThisThreadIdOfString();
-    uint64_t tid = std::stoull(stid);
+    std::string threadId = GetThisThreadIdOfString();
+    uint64_t tid = std::stoull(threadId);
     return tid;
 }
 
@@ -105,20 +104,20 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
     if (str.empty()) {
         return str.npos;
     }
-    size_t pos = str.npos;
-    size_t tmp = 0;
+    size_t seat = str.npos;
+    size_t temp = 0;
     for (auto &item : sep) {
-        tmp = str.find(item);
-        if (str.npos != tmp) {
-            pos = (std::min)(pos, tmp);
+        temp = str.find(item);
+        if (str.npos != temp) {
+            seat = (std::min)(seat, temp);
         }
     }
-    if (str.npos != pos) {
-        token = str.substr(0, pos);
-        if (str.npos != pos + 1) {
-            str = str.substr(pos + 1, str.npos);
+    if (str.npos != seat) {
+        token = str.substr(0, seat);
+        if (str.npos != seat + 1) {
+            str = str.substr(seat + 1, str.npos);
         }
-        if (pos == 0) {
+        if (seat == 0) {
             return StringToken(str, sep, token);
         }
     } else {
@@ -161,8 +160,8 @@ std::string GetAnonyString(const std::string &value)
     if (value.empty()) {
         return "empty";
     }
-    std::string str;
     std::string anonyStr = "******";
+    std::string str;
     size_t strLen = value.length();
     if (strLen <= SHORT_KEY_LENGTH) {
         str += value[0];
@@ -176,17 +175,16 @@ std::string GetAnonyString(const std::string &value)
     return str;
 }
 
-static std::string GetFileName(const std::string &strPath)
+static std::string GetFileName(const std::string &path)
 {
-    size_t nPos = strPath.find_last_of('/');
-    if (strPath.npos == nPos) {
-        nPos = strPath.find_last_of('\\');
+    size_t nPos = path.find_last_of('/');
+    if (path.npos == nPos) {
+        nPos = path.find_last_of('\\');
     }
-    if (strPath.npos == nPos) {
-        return strPath;
+    if (path.npos == nPos) {
+        return path;
     }
-
-    return strPath.substr(nPos + 1, strPath.npos);
+    return path.substr(nPos + 1, path.npos);
 }
 
 const char* GetProgramName()
