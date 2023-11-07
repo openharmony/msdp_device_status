@@ -27,12 +27,6 @@ config("fusion_services_binding_public_config") {
 }
 
 ohos_shared_library("fusion_services_binding") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
   sources = [ "src/fusion_services_binding.cpp" ]
 
   deps = [
