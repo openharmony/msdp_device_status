@@ -13,25 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef I_TIMER_MANAGER_H
-#define I_TIMER_MANAGER_H
+#ifndef I_DEVICE_MGR_H
+#define I_DEVICE_MGR_H
 
-#include <cstdint>
-
-#include <functional>
-
-namespace OHOS {
-namespace Msdp {
-namespace DeviceStatus {
-class ITimerManager {
+class IDeviceMgr {
 public:
-    ITimerManager() = default;
-    virtual ~ITimerManager() = default;
+    IDeviceMgr() = default;
+    virtual ~IDeviceMgr() = default;
 
-    virtual int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) = 0;
-    virtual int32_t RemoveTimer(int32_t timerId) = 0;
+    virtual void AddDevice(const std::string &devNode) = 0;
+    virtual void RemoveDevice(const std::string &devNode) = 0;
 };
-} // namespace DeviceStatus
-} // namespace Msdp
-} // namespace OHOS
-#endif // I_TIMER_MANAGER_H
+#endif // I_DEVICE_MGR_H

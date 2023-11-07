@@ -82,7 +82,7 @@ void DeviceStatusSrvStub::InitCoordination()
 void DeviceStatusSrvStub::InitDrag()
 {
     CALL_DEBUG_ENTER;
-    connFuncs_ = {
+    std::map<uint32_t, ConnFunc> dragFuncs_ = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             &DeviceStatusSrvStub::HandleAllocSocketFdStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
@@ -110,6 +110,7 @@ void DeviceStatusSrvStub::InitDrag()
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub },
     };
+    connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }
 
 bool DeviceStatusSrvStub::CheckCooperatePermission()

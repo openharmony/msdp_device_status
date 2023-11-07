@@ -74,4 +74,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif  // VIRTUAL_MOUSE_BUILDER_H
+#endif // VIRTUAL_MOUSE_BUILDER_H

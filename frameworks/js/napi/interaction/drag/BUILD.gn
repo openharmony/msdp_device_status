@@ -11,16 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("../../../../../device_status.gni")
 
 ohos_shared_library("draginteraction") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
   sources = [
     "src/js_drag_context.cpp",
     "src/js_drag_manager.cpp",

@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("../../device_status.gni")
 
 config("devicestatus_util_private_config") {
@@ -29,12 +28,6 @@ config("devicestatus_util_public_config") {
 }
 
 ohos_shared_library("devicestatus_util") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
   version_script = "libdevicestatus_util_map"
   sources = [
     "src/util.cpp",

@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
 import("../../../device_status.gni")
 
@@ -25,11 +24,7 @@ config("devicestatusnapi_private_config") {
 
 ohos_shared_library("deviceagent") {
   branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
+
   sources = [ "./devicestatus_agent.cpp" ]
 
   configs = [

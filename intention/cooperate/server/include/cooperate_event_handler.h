@@ -13,28 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef I_CONTEXT_H
-#define I_CONTEXT_H
+#ifndef COOPERATE_EVENT_HANDLER_H
+#define COOPERATE_EVENT_HANDLER_H
 
-#include "i_plugin_manager.h"
-#include "i_task_scheduler.h"
-#include "i_timer_manager.h"
-#include "i_device_manager.h"
+#include <memory>
+
+#include "event_handler.h"
+#include "event_runner.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IContext {
+class CooperateEventHandler final : public AppExecFwk::EventHandler {
 public:
-    IContext() = default;
-    virtual ~IContext() = default;
-
-    virtual ITaskScheduler& GetTaskScheduler() = 0;
-    virtual ITimerManager& GetTimerManager() = 0;
-    virtual IPluginManager& GetPluginManager() = 0;
-    virtual IDeviceManager& GetDeviceManager() = 0;
+    explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    ~CooperateEventHandler() override = default;
+    bool ProxyPostTask(const Callback &callback, int64_t delayTime);
+    bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
+    void ProxyRemoveTask(const std::string &name);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_CONTEXT_H
+#endif // COOPERATE_EVENT_HANDLER_H

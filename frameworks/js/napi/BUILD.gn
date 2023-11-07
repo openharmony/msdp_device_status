@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
 import("../../../device_status.gni")
 
@@ -29,11 +28,6 @@ config("devicestatus_callback_config") {
 
 ohos_shared_library("stationary") {
   branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "${device_status_frameworks_path}/js/napi/src/devicestatus_event.cpp",
     "${device_status_frameworks_path}/js/napi/src/devicestatus_napi.cpp",
