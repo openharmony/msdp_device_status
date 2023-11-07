@@ -48,8 +48,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     CALL_INFO_TRACE;
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
-    profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
+    profile.SetServiceId(SERVICE_ID);
     cJSON *data = cJSON_CreateObject();
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);

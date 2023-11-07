@@ -84,7 +84,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
-    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
+    if (!Publish(this)) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
@@ -167,8 +167,7 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
@@ -920,11 +919,11 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
         NetPacket pkt(event->msgId);
         pkt << userData << "" << static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS);
         if (pkt.ChkRWError()) {
-            FI_HILOGE("Packet write data failed");
+            FI_HILOGE("Failed to write packet data");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt)) {
-            FI_HILOGE("Sending failed");
+            FI_HILOGE("Sending message failed");
             return RET_ERR;
         }
         return RET_OK;
@@ -932,7 +931,7 @@ int32_t DeviceStatusService::OnActivateCoordination(int32_t pid,
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("On activate coordination failed, ret:%{public}d", ret);
+        FI_HILOGE("On activate coordination error, ret:%{public}d", ret);
     }
     return ret;
 }

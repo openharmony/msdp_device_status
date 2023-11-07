@@ -31,6 +31,12 @@ config("fusion_data_binding_public_config") {
 }
 
 ohos_shared_library("fusion_data_binding") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "src/fusion_data_binding.cpp" ]
 
   deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]

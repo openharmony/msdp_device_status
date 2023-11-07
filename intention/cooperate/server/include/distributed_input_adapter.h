@@ -45,7 +45,7 @@ public:
     using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
     DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
 
-    bool IsNeedFilterOut(const std::string &deviceId,
+    bool IsNeedFilterOut(const std::string &networkId,
                          const DistributedHardware::DistributedInput::BusinessEvent &event);
 
     int32_t StartRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
@@ -61,8 +61,8 @@ public:
     int32_t UnPrepareRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
                                  DInputCallback callback);
 
-    int32_t PrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback);
+    int32_t PrepareRemoteInput(const std::string &networkId, DInputCallback callback);
+    int32_t UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback);
     int32_t RegisterSessionStateCb(std::function<void(uint32_t)> callback);
     int32_t UnregisterSessionStateCb();
 

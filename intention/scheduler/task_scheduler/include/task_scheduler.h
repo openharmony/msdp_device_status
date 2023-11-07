@@ -76,7 +76,7 @@ public:
 
     bool Init();
     void ProcessTasks();
-    int32_t PostSyncTask(DTaskCallback callback) override;
+    int32_t PostSyncTask(DTaskCallback cb) override;
     int32_t PostAsyncTask(DTaskCallback callback) override;
 
     int32_t GetReadFd() const

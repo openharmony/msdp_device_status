@@ -53,7 +53,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<ISt
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+        FI_HILOGE("Start drag, invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;

@@ -69,7 +69,6 @@ public:
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
-    int32_t ResetListener();
 
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;

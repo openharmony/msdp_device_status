@@ -64,8 +64,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
-                  [&syncOptions](auto &deviceId) {
-                      syncOptions.AddDevice(deviceId);
+                  [&syncOptions](auto &networkId) {
+                      syncOptions.AddDevice(networkId);
                       FI_HILOGD("Add device success");
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
@@ -94,11 +94,11 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }
 
-bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
+bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
-    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
+    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(networkId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
@@ -114,38 +114,38 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     return (static_cast<bool>(state->valueint));
 }
 
-int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
+int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &networkId, DPCallback callback)
 {
     CHKPR(callback, RET_ERR);
-    if (deviceId.empty()) {
-        FI_HILOGE("DeviceId is nullptr");
+    if (networkId.empty()) {
+        FI_HILOGE("networkId is nullptr");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
-    auto callbackIter = callbacks_.find(deviceId);
+    auto callbackIter = callbacks_.find(networkId);
     if (callbackIter != callbacks_.end()) {
         callbackIter->second = callback;
         FI_HILOGW("Callback is updated");
         return RET_OK;
     }
-    callbacks_[deviceId] = callback;
+    callbacks_[networkId] = callback;
     FI_HILOGI("Register crossing state listener success");
-    int32_t ret = RegisterProfileListener(deviceId);
+    int32_t ret = RegisterProfileListener(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
     }
     return ret;
 }
 
-int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &deviceId)
+int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    if (deviceId.empty()) {
-        FI_HILOGE("DeviceId is empty");
+    if (networkId.empty()) {
+        FI_HILOGE("networkId is empty");
         return RET_ERR;
     }
     std::lock_guard<std::mutex> guard(adapterLock_);
-    auto it = profileEventCallbacks_.find(deviceId);
+    auto it = profileEventCallbacks_.find(networkId);
     if (it != profileEventCallbacks_.end()) {
         std::list<ProfileEvent> profileEvents;
         profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
@@ -154,7 +154,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
             it->second, failedEvents);
         profileEventCallbacks_.erase(it);
     }
-    auto callbackIter = callbacks_.find(deviceId);
+    auto callbackIter = callbacks_.find(networkId);
     if (callbackIter == callbacks_.end()) {
         FI_HILOGW("This device has no callback");
         return RET_OK;
@@ -163,13 +163,13 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
     return RET_OK;
 }
 
-int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceId)
+int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     std::list<std::string> serviceIdList;
     serviceIdList.emplace_back(SERVICE_ID);
     ExtraInfo extraInfo;
-    extraInfo["deviceId"] = deviceId;
+    extraInfo["deviceId"] = networkId;
     extraInfo["serviceIds"] = serviceIdList;
     SubscribeInfo changeEventInfo;
     changeEventInfo.profileEvent = ProfileEvent::EVENT_PROFILE_CHANGED;
@@ -180,25 +180,25 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     syncEventInfo.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
     subscribeInfos.emplace_back(syncEventInfo);
     std::list<ProfileEvent> failedEvents;
-    auto it = profileEventCallbacks_.find(deviceId);
+    auto it = profileEventCallbacks_.find(networkId);
     if (it == profileEventCallbacks_.end() || it->second == nullptr) {
-        profileEventCallbacks_[deviceId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
+        profileEventCallbacks_[networkId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     }
     return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
-        subscribeInfos, profileEventCallbacks_[deviceId], failedEvents);
+        subscribeInfos, profileEventCallbacks_[networkId], failedEvents);
 }
 
-void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
+void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    auto it = callbacks_.find(deviceId);
+    auto it = callbacks_.find(networkId);
     if (it == callbacks_.end()) {
         FI_HILOGW("The device has no callback");
         return;
     }
     if (it->second != nullptr) {
-        auto state = GetCrossingSwitchState(deviceId);
-        it->second(deviceId, state);
+        auto state = GetCrossingSwitchState(networkId);
+        it->second(networkId, state);
     } else {
         callbacks_.erase(it);
     }
@@ -208,8 +208,8 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     const ProfileChangeNotification &changeNotification)
 {
     CALL_INFO_TRACE;
-    std::string deviceId = changeNotification.GetDeviceId();
-    DP_ADAPTER->OnProfileChanged(deviceId);
+    std::string networkId = changeNotification.GetDeviceId();
+    DP_ADAPTER->OnProfileChanged(networkId);
 }
 
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)

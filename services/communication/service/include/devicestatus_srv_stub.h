@@ -67,6 +67,9 @@ private:
     int32_t AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
     bool CheckCooperatePermission();
+    void InitCoordination();
+    void InitDrag();
+
 private:
     std::map<uint32_t, ConnFunc> connFuncs_;
 };

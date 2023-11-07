@@ -85,6 +85,7 @@ constexpr float RADIUS_VP { 23.0f };
 constexpr float DEFAULT_SATURATION { 1.05f };
 constexpr float DEFAULT_BRIGHTNESS { 1.05f };
 constexpr float INCREASE_RATIO { 1.22f };
+constexpr float DRAG_WINDOW_POSITION_Z { 6999.0f };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
 constexpr int32_t INVALID_COLOR_VALUE { -1 };
@@ -856,7 +857,7 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
     g_drawingInfo.surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     CHKPV(g_drawingInfo.surfaceNode);
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
-    g_drawingInfo.surfaceNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+    g_drawingInfo.surfaceNode->SetPositionZ(DRAG_WINDOW_POSITION_Z);
     g_drawingInfo.surfaceNode->SetBounds(displayX, displayY, IMAGE_WIDTH, IMAGE_HEIGHT);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
     g_drawingInfo.surfaceNode->AttachToDisplay(g_drawingInfo.displayId);
@@ -1257,8 +1258,8 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
     adjustSize = (SVG_WIDTH + TWELVE_SIZE) * scalingValue;
-    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + g_drawingInfo.mouseWidth + adjustSize;
     g_drawingInfo.rootNodeHeight = g_drawingInfo.pixelMap->GetHeight() + g_drawingInfo.mouseHeight + adjustSize;
+    g_drawingInfo.rootNodeWidth = g_drawingInfo.pixelMap->GetWidth() + g_drawingInfo.mouseWidth + adjustSize;
     CHKPV(g_drawingInfo.rootNode);
     g_drawingInfo.rootNode->SetBounds(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);
     g_drawingInfo.rootNode->SetFrame(0, 0, g_drawingInfo.rootNodeWidth, g_drawingInfo.rootNodeHeight);

@@ -47,13 +47,13 @@ TaskScheduler::~TaskScheduler()
 {
     if (fds_[0] >= 0) {
         if (close(fds_[0]) < 0) {
-            FI_HILOGE("Close fds_[0] failed, error:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
+            FI_HILOGE("Close fds_[0] failed, err:%{public}s, fds_[0]:%{public}d", strerror(errno), fds_[0]);
         }
         fds_[0] = -1;
     }
     if (fds_[1] >= 0) {
         if (close(fds_[1]) < 0) {
-            FI_HILOGE("Close fds_[1] failed, error:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
+            FI_HILOGE("Close fds_[1] failed, err:%{public}s, fds_[1]:%{public}d", strerror(errno), fds_[1]);
         }
         fds_[1] = -1;
     }
@@ -79,16 +79,16 @@ void TaskScheduler::ProcessTasks()
     }
 }
 
-int32_t TaskScheduler::PostSyncTask(DTaskCallback callback)
+int32_t TaskScheduler::PostSyncTask(DTaskCallback cb)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(cb, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
-        return callback();
+        return cb();
     }
     Promise promise;
     Future future = promise.get_future();
-    auto task = PostTask(callback, &promise);
+    auto task = PostTask(cb, &promise);
     CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
@@ -117,7 +117,7 @@ void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     static constexpr int32_t onceProcessTaskLimit = 10;
     std::lock_guard<std::mutex> guard(mux_);
-    for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+    for (int32_t i = 0; i < onceProcessTaskLimit; i++) {
         if (tasks_.empty()) {
             break;
         }
@@ -144,7 +144,7 @@ TaskScheduler::TaskPtr TaskScheduler::PostTask(DTaskCallback callback, Promise *
     ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        FI_HILOGE("Pipe write failed, errno:%{public}d", errno);
+        FI_HILOGE("Pipeline writes failed, errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
