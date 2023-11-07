@@ -426,7 +426,7 @@ int32_t DeviceStatusService::InitTimerMgr()
 
 void DeviceStatusService::OnThread()
 {
-    SetThreadName(std::string("device_status_service"));
+    SetThreadName(std::string("os_ds_service"));
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);

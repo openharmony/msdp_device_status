@@ -196,7 +196,7 @@ bool SensorDataCallback::UnregisterCallbackSensor(int32_t sensorTypeId)
 
 void SensorDataCallback::AlgorithmLoop()
 {
-    SetThreadName(std::string("device_status_sensor"));
+    SetThreadName(std::string("os_loop_sensor"));
     CALL_DEBUG_ENTER;
     while (alive_) {
         sem_wait(&sem_);

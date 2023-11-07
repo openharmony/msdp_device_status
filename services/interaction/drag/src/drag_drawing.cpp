@@ -94,7 +94,7 @@ constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
-const std::string THREAD_NAME { "AnimationEventRunner" };
+const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string DEFAULT_DRAG_PATH { "/system/etc/device_status/drag_icon/Default_Drag.svg" };
