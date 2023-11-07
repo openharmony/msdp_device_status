@@ -1236,14 +1236,15 @@ int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
         FI_HILOGD("PixelMapNode is nullptr");
         return RET_ERR;
     }
-    pixelMapNode->SetForegroundColor(0x00FF0000);
+    pixelMapNode->SetForegroundColor(0x00000000);
     pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(GRADIENT_COLOR_DURATION);
-    Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+    Rosen::RSAnimationTimingCurve sharpCurve = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
+    Rosen::RSNode::Animate(protocol, sharpCurve, [&]() {
         if (pixelMapNode != nullptr) {
             pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS); // 实际的动效参数中有这个radius
-            pixelMapNode->SetForegroundColor(0xAAFF0000);
+            pixelMapNode->SetForegroundColor(0x99FF0000);
         }
     });
     return RET_OK;

@@ -15,12 +15,6 @@ import("//build/ohos.gni")
 import("../../../../../device_status.gni")
 
 ohos_shared_library("cooperate") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
   sources = [
     "src/js_coordination_context.cpp",
     "src/js_coordination_manager.cpp",

@@ -84,7 +84,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
-    if (!Publish(this)) {
+    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
@@ -167,7 +167,8 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
+        auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
