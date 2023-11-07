@@ -194,33 +194,33 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
     }
     if (handle == nullptr) {
         iter->second.clear();
-        goto monitorLabel;
+        goto MONITOR_LABEL;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             FI_HILOGE("Success in removing monitor");
             iter->second.erase(it);
-            goto monitorLabel;
+            goto MONITOR_LABEL;
         }
     }
 
-monitorLabel:
+MONITOR_LABEL:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
         INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> callback)
 {
     CALL_INFO_TRACE;
-    CHKPP(cb);
-    cb->env = env;
+    CHKPP(callback);
+    callback->env = env;
     napi_value napiPromise = nullptr;
     if (handle == nullptr) {
-        CHKRP(napi_create_promise(env, &cb->deferred, &napiPromise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &callback->deferred, &napiPromise), CREATE_PROMISE);
     } else {
-        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, 1, &callback->ref), CREATE_REFERENCE);
     }
     return napiPromise;
 }
@@ -269,7 +269,7 @@ void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Prepare promise, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -279,20 +279,20 @@ void JsEventTarget::CallPreparePromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope handleScope = nullptr;
     napi_open_handle_scope(cb->env, &handleScope);
     if (handleScope == nullptr) {
-        FI_HILOGE("handleScope is nullptr");
+        FI_HILOGE("Prepare promise, handleScope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetPrepareInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Prepare promise, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
     }
     napi_valuetype napiValueType = napi_undefined;
     if (napi_typeof(cb->env, object, &napiValueType) != napi_ok) {
-        FI_HILOGE("napi typeof failed");
+        FI_HILOGE("Prepare promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
@@ -312,7 +312,7 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Prepare ansy, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -322,21 +322,21 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
+        FI_HILOGE("Prepare ansy, scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetPrepareInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Prepare ansy, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;
     }
-    napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
+    napi_value processor = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &processor), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, processor, 1, &object, &result), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }
@@ -347,7 +347,7 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Activate promise, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -357,20 +357,20 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope handleScope = nullptr;
     napi_open_handle_scope(cb->env, &handleScope);
     if (handleScope == nullptr) {
-        FI_HILOGE("handleScope is nullptr");
+        FI_HILOGE("Activate promise, handleScope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetActivateInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Activate promise, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
     }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
-        FI_HILOGE("napi typeof failed");
+        FI_HILOGE("Activate promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
@@ -390,7 +390,7 @@ void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Activate async, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -400,21 +400,21 @@ void JsEventTarget::CallActivateAsyncWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
+        FI_HILOGE("Activate async, scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetActivateInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Activate async, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;
     }
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
-    napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    napi_value ret = nullptr;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }
@@ -425,7 +425,7 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Deactivate promise, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -435,13 +435,13 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope handleScope = nullptr;
     napi_open_handle_scope(cb->env, &handleScope);
     if (handleScope == nullptr) {
-        FI_HILOGE("handleScope is nullptr");
+        FI_HILOGE("Deactivate promise, handleScope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetDeactivateInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Deactivate promise, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
@@ -449,7 +449,7 @@ void JsEventTarget::CallDeactivatePromiseWork(uv_work_t *work, int32_t status)
 
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
-        FI_HILOGE("napi typeof failed");
+        FI_HILOGE("Deactivate promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
@@ -469,7 +469,7 @@ void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Deactivate async, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -479,13 +479,13 @@ void JsEventTarget::CallDeactivateAsyncWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
+        FI_HILOGE("Deactivate async, scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetDeactivateInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("object is nullptr");
+        FI_HILOGE("Deactivate async, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;

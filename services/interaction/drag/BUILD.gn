@@ -22,6 +22,12 @@ config("interaction_drag_public_config") {
 }
 
 ohos_shared_library("interaction_drag") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",

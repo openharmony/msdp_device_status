@@ -32,7 +32,7 @@ void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;
     if (hasWaited_) {
-        FI_HILOGE("Expired tasks will be discarded, id:%{public}d", id_);
+        FI_HILOGE("Expired task will be discarded, id:%{public}d", id_);
         return;
     }
     int32_t ret = fun_();
@@ -117,14 +117,14 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     std::lock_guard<std::mutex> guard(mux_);
     static constexpr int32_t onceProcessTaskLimit = 10;
-    for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+    for (int32_t i = 0; i < onceProcessTaskLimit; i++) {
         if (tasks_.empty()) {
             break;
         }
-        auto task = tasks_.front();
-        CHKPB(task);
-        RecoveryId(task->GetId());
-        tasks.push_back(task->GetSharedPtr());
+        auto duty = tasks_.front();
+        CHKPB(duty);
+        RecoveryId(duty->GetId());
+        tasks.push_back(duty->GetSharedPtr());
         tasks_.pop();
     }
 }

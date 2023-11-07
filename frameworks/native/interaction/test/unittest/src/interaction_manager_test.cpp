@@ -153,23 +153,18 @@ public:
 private:
     std::string PrintDragMessage(DragState state)
     {
-        switch (state) {
-            case DragState::ERROR: {
-                return std::string("error");
-            }
-            case DragState::START: {
-                return std::string("start");
-            }
-            case DragState::STOP: {
-                return std::string("stop");
-            }
-            case DragState::CANCEL: {
-                return std::string("cancel");
-            }
-            default: {
-                return std::string("unknow");
-            }
+        std::string type = "unknow";
+        const std::map<DragState, std::string> stateType = {
+            { DragState::ERROR, "error"},
+            { DragState::START, "start"},
+            { DragState::STOP, "stop"},
+            { DragState::CANCEL, "cancel"}
+        };
+        auto item = stateType.find(state);
+        if (item != stateType.end()) {
+            type = item->second;
         }
+        return type;
     }
 private:
     std::string moduleName_;
@@ -202,23 +197,18 @@ private:
 
     std::string PrintStyleMessage(DragCursorStyle style)
     {
-        switch (style) {
-            case DragCursorStyle::DEFAULT: {
-                return std::string("default");
-            }
-            case DragCursorStyle::FORBIDDEN: {
-                return std::string("forbidden");
-            }
-            case DragCursorStyle::COPY: {
-                return std::string("copy");
-            }
-            case DragCursorStyle::MOVE: {
-                return std::string("move");
-            }
-            default: {
-                return std::string("unknow");
-            }
+        std::string type = "unknow";
+        const std::map<DragCursorStyle, std::string> cursorStyles = {
+            { DragCursorStyle::DEFAULT, "default"},
+            { DragCursorStyle::FORBIDDEN, "forbidden"},
+            { DragCursorStyle::COPY, "copy"},
+            { DragCursorStyle::MOVE, "move"}
+        };
+        auto item = cursorStyles.find(style);
+        if (item != cursorStyles.end()) {
+            type = item->second;
         }
+        return type;
     }
 
 private:
@@ -1538,23 +1528,18 @@ public:
 private:
     std::string ShowMessage(HotAreaType msg)
     {
-        switch (msg) {
-            case HotAreaType::AREA_LEFT: {
-                return std::string("left-area");
-            }
-            case HotAreaType::AREA_RIGHT: {
-                return std::string("right-area");
-            }
-            case HotAreaType::AREA_TOP: {
-                return std::string("top-area");
-            }
-            case HotAreaType::AREA_BOTTOM: {
-                return std::string("bottom-area");
-            }
-            default: {
-                return std::string("none-area");
-            }
+        std::string type = "none-area";
+        const std::map<HotAreaType, std::string> areaType = {
+            { HotAreaType::AREA_LEFT, "left-area"},
+            { HotAreaType::AREA_RIGHT, "right-area"},
+            { HotAreaType::AREA_TOP, "top-area"},
+            { HotAreaType::AREA_BOTTOM, "bottom-area"}
+        };
+        auto item = areaType.find(msg);
+        if (item != areaType.end()) {
+            type = item->second;
         }
+        return type;
     }
 
 private:

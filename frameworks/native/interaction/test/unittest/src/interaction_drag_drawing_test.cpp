@@ -83,7 +83,7 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
 {
     CALL_DEBUG_ENTER;
     if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
-        FI_HILOGE("Invalid size, width:%{public}d, height:%{public}d", width, height);
+        FI_HILOGE("Invalid size, height:%{public}d, width:%{public}d", height, width);
         return nullptr;
     }
     Media::InitializationOptions opts;
@@ -248,13 +248,13 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
-    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::FORBIDDEN);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::MOVE);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
-    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::FORBIDDEN);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
@@ -289,13 +289,13 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::FORBIDDEN);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::MOVE);
-    ASSERT_EQ(ret, RET_OK);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
-    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };

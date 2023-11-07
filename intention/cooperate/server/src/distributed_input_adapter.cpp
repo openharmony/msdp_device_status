@@ -40,10 +40,10 @@ DistributedInputAdapter::~DistributedInputAdapter()
     callbacks_.clear();
 }
 
-bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
+bool DistributedInputAdapter::IsNeedFilterOut(const std::string &networkId, const BusinessEvent &event)
 {
     CALL_INFO_TRACE;
-    return DistributedInputKit::IsNeedFilterOut(deviceId, event);
+    return DistributedInputKit::IsNeedFilterOut(networkId, event);
 }
 
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &remoteNetworkId,
@@ -96,22 +96,22 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &remoteN
     return DistributedInputKit::UnprepareRemoteInput(remoteNetworkId, originNetworkId, cb);
 }
 
-int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &deviceId, DInputCallback callback)
+int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &networkId, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallback, callback);
-    return DistributedInputKit::PrepareRemoteInput(deviceId, cb);
+    return DistributedInputKit::PrepareRemoteInput(networkId, cb);
 }
 
-int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback)
+int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback)
 {
     CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallback, callback);
-    return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
+    return DistributedInputKit::UnprepareRemoteInput(networkId, cb);
 }
 
 int32_t DistributedInputAdapter::RegisterSessionStateCb(std::function<void(uint32_t)> callback)

@@ -41,7 +41,7 @@ public:
         SessionPtr sess { nullptr };
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
-        std::string deviceId;
+        std::string networkId;
         CooperateMessage msg { CooperateMessage::PREPARE };
         bool state { false };
     };
@@ -50,10 +50,10 @@ public:
 
     void AddCooperateEvent(sptr<EventInfo> event);
     void RemoveCooperateEvent(sptr<EventInfo> event);
-    int32_t OnCooperateMessage(CooperateMessage msg, const std::string &deviceId = "");
-    void OnEnable(CooperateMessage msg, const std::string &deviceId = "");
-    void OnStart(CooperateMessage msg, const std::string &deviceId = "");
-    void OnStop(CooperateMessage msg, const std::string &deviceId = "");
+    int32_t OnCooperateMessage(CooperateMessage msg, const std::string &networkId = "");
+    void OnEnable(CooperateMessage msg, const std::string &networkId = "");
+    void OnStart(CooperateMessage msg, const std::string &networkId = "");
+    void OnStop(CooperateMessage msg, const std::string &networkId = "");
     void OnGetCrossingSwitchState(bool state);
     void OnErrorMessage(EventType type, CooperateMessage msg);
     void SetIContext(IContext *context);
@@ -61,7 +61,7 @@ public:
 
 private:
     void NotifyCooperateMessage(SessionPtr sess, MessageId msgId, int32_t userData,
-        const std::string &deviceId, CooperateMessage msg);
+        const std::string &networkId, CooperateMessage msg);
     void NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
 
 private:

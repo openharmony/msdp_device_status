@@ -30,8 +30,8 @@ public:
 
     int32_t Enable(CallingContext &context, Parcel &data, Parcel &reply);
     int32_t Disable(CallingContext &context, Parcel &data, Parcel &reply);
-    int32_t Start(CallingContext &context, Parcel &data, Parcel &reply);
     int32_t Stop(CallingContext &context, Parcel &data, Parcel &reply);
+    int32_t Start(CallingContext &context, Parcel &data, Parcel &reply);
     int32_t AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
     int32_t RemoveWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
     int32_t SetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);

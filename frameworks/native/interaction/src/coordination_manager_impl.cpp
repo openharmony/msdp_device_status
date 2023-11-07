@@ -56,16 +56,16 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(CoordinationList
     std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         devCoordinationListener_.clear();
-        goto listenerLabel;
+        goto LISTENER_LABEL;
     }
     for (auto it = devCoordinationListener_.begin(); it != devCoordinationListener_.end(); ++it) {
         if (*it == listener) {
             devCoordinationListener_.erase(it);
-            goto listenerLabel;
+            goto LISTENER_LABEL;
         }
     }
 
-listenerLabel:
+LISTENER_LABEL:
     if (isListeningProcess_ && devCoordinationListener_.empty()) {
         isListeningProcess_ = false;
         return DeviceStatusClient::GetInstance().UnregisterCoordinationListener();
@@ -332,29 +332,23 @@ int32_t CoordinationManagerImpl::OnHotAreaListener(const StreamClient& client, N
     return RET_OK;
 }
 
-int32_t CoordinationManagerImpl::ResetListener()
-{
-    CALL_DEBUG_ENTER;
-    if (isHotAreaListener_ && devHotAreaListener_.empty()) {
-        isHotAreaListener_ = false;
-        return DeviceStatusClient::GetInstance().RemoveHotAreaListener();
-    }
-    return RET_OK;
-}
-
 int32_t CoordinationManagerImpl::RemoveHotAreaListener(HotAreaListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         devHotAreaListener_.clear();
-        return ResetListener();
+    } else {
+        devHotAreaListener_.erase(std::remove_if(devHotAreaListener_.begin(), devHotAreaListener_.end(),
+            [listener] (auto items) {
+                return items == listener;
+            })
+        );
     }
-    for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
-        if (*it == listener) {
-            devHotAreaListener_.erase(it);
-            return ResetListener();
-        }
+
+    if (isHotAreaListener_ && devHotAreaListener_.empty()) {
+        isHotAreaListener_ = false;
+        return DeviceStatusClient::GetInstance().RemoveHotAreaListener();
     }
     return RET_OK;
 }

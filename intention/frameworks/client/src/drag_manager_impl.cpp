@@ -50,7 +50,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+        FI_HILOGE("Start drag, invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
@@ -98,7 +98,7 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
         int32_t ret = IntentionClient::GetInstance().AddWatch(static_cast<uint32_t>(Intention::DRAG),
             DragParam::LISTENER, param, reply);
         if (ret != RET_OK) {
-            FI_HILOGE("Failed to register");
+            FI_HILOGE("Add drag listener, failed to register");
             return ret;
         }
         hasRegistered_ = true;
@@ -109,7 +109,7 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
                     })) {
         dragListener_.push_back(listener);
     } else {
-        FI_HILOGW("The listener already exists");
+        FI_HILOGW("Add drag listener, the listener already exists");
     }
     return RET_OK;
 }

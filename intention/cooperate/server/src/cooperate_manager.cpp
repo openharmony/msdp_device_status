@@ -73,7 +73,7 @@ int32_t CooperateManager::DeactivateCooperate(SessionPtr sess, int32_t userData,
     return ret;
 }
 
-int32_t CooperateManager::GetCooperateState(SessionPtr sess, int32_t userData, const std::string &deviceId)
+int32_t CooperateManager::GetCooperateState(SessionPtr sess, int32_t userData, const std::string &networkId)
 {
     sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
     CHKPR(event, RET_ERR);
@@ -82,7 +82,7 @@ int32_t CooperateManager::GetCooperateState(SessionPtr sess, int32_t userData, c
     event->msgId = MessageId::COORDINATION_GET_STATE;
     event->userData = userData;
     COOR_EVENT_MGR->AddCooperateEvent(event);
-    int32_t ret = COOR_SM->GetCooperateState(deviceId);
+    int32_t ret = COOR_SM->GetCooperateState(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Get cooperate manager state failed");
     }
