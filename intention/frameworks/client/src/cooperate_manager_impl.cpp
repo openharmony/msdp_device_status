@@ -59,16 +59,16 @@ int32_t CooperateManagerImpl::UnregisterCooperateListener(CooperateListenerPtr l
     std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         devCooperateListener_.clear();
-        goto listenerLabel;
+        goto LISTENER_LABEL;
     }
     for (auto it = devCooperateListener_.begin(); it != devCooperateListener_.end(); ++it) {
         if (*it == listener) {
             devCooperateListener_.erase(it);
-            goto listenerLabel;
+            goto LISTENER_LABEL;
         }
     }
 
-listenerLabel:
+LISTENER_LABEL:
     if (isListeningProcess_ && devCooperateListener_.empty()) {
         isListeningProcess_ = false;
         DefaultCooperateParam param;
