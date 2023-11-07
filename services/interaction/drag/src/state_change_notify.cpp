@@ -29,7 +29,6 @@ template void StateChangeNotify::OnDragInfoNotify<DragCursorStyle>(SessionPtr se
 
 void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
-    CALL_DEBUG_ENTER;
     CHKPV(info);
     auto it = std::find_if(msgInfos_[info->msgType].begin(), msgInfos_[info->msgType].end(),
         [info] (auto msgInfo) {
@@ -44,7 +43,6 @@ void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
 
 void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
-    CALL_DEBUG_ENTER;
     if (msgInfos_[info->msgType].empty() || info == nullptr) {
         FI_HILOGE("Remove listener failed");
         return;
@@ -60,7 +58,6 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 
 int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
 {
-    CALL_DEBUG_ENTER;
     if (msgInfos_[MessageType::NOTIFY_STYLE].empty()) {
         FI_HILOGW("No listener, send message failed");
         return RET_ERR;
