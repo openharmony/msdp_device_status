@@ -149,26 +149,6 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest003, TestSize.Level1)
 HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    g_agentTest = Type::TYPE_STILL;
-    Type type = g_agentTest;
-    std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
-        std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
-    int32_t ret = g_agent1->SubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT,
-        ReportLatencyNs::LONG, agentEvent);
-    EXPECT_TRUE(ret == RET_OK);
-    GTEST_LOG_(INFO) << "Open and close the lid, and event will report";
-    sleep(2);
-    g_agent1->UnsubscribeAgentEvent(type, ActivityEvent::ENTER_EXIT);
-}
-
-/**
- * @tc.name: DeviceStatusAgentTest005
- * @tc.desc: test subscribing lid open event
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
         std::make_shared<DeviceStatusAgentListenerMockFirstClient>();
     int32_t ret = g_agent1->SubscribeAgentEvent(Type::TYPE_INVALID, ActivityEvent::ENTER_EXIT,
@@ -181,11 +161,11 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusAgentTest006
+ * @tc.name: DeviceStatusAgentTest005
  * @tc.desc: test subscribing lid open event
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
+HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent =
@@ -200,11 +180,11 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusAgentTest007
+ * @tc.name: DeviceStatusAgentTest006
  * @tc.desc: test subscribing lid open event for 2 client
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
+HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
@@ -226,11 +206,11 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusAgentTest008
+ * @tc.name: DeviceStatusAgentTest007
  * @tc.desc: test subscribing lid open event
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
+HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<DeviceStatusAgentListenerMockFirstClient> agentEvent = nullptr;
@@ -241,11 +221,11 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusAgentTest009
+ * @tc.name: DeviceStatusAgentTest008
  * @tc.desc: test subscribing lid open event for 3 client
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
+HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_HORIZONTAL_POSITION;
@@ -273,11 +253,11 @@ HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusAgentTest0010
+ * @tc.name: DeviceStatusAgentTest009
  * @tc.desc: test subscribing lid open event
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest010, TestSize.Level1)
+HWTEST_F(DeviceStatusAgentTest, DeviceStatusAgentTest009, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     g_agentTest = Type::TYPE_STILL;
