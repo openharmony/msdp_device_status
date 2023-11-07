@@ -218,13 +218,13 @@ private:
 
 class TestStartDragListener : public IStartDragListener {
 public:
-    explicit TestStartDragListener(std::function<void()> function) : function_(function) { }
+    explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
     void OnDragEndMessage(const DragNotifyMsg &msg) override
     {
         FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
         msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
         if (function_ != nullptr) {
-            function_();
+            function_(msg);
         }
         FI_HILOGI("WLD test OnDragEndMessage");
     }
@@ -234,7 +234,7 @@ public:
         FI_HILOGI("WLD test OnHideIconMessage");
     }
 private:
-    std::function<void()> function_;
+    std::function<void(const DragNotifyMsg&)> function_;
 };
 
 std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
@@ -325,7 +325,7 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     return pixelMap;
 }
 
-std::optional<DragData> InteractionDragTest::CreateDragData(const std::pair<int32_t, int32_t> &pixelMapSize,
+std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<int32_t, int32_t> &pixelMapSize,
     int32_t sourceType, int32_t pointerId, int32_t displayId, const std::pair<int32_t, int32_t> &location)
 {
     CALL_DEBUG_ENTER;
@@ -458,17 +458,19 @@ void InteractionManagerTest::TestRemoveMonitor(int32_t monitorId)
 void InteractionManagerTest::PrintDragData(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
-        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
-        " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
+    for (const auto &shadowInfo : dragData.shadowInfos) {
+        FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
+        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
+        static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
+        static_cast<int32_t>(shadowInfo.pixelMap->GetAlphaType()),
+        static_cast<int32_t>(shadowInfo.pixelMap->GetAllocatorType()),
+        shadowInfo.pixelMap->GetWidth(), shadowInfo.pixelMap->GetHeight(), shadowInfo.x, shadowInfo.y);
+
+    }
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
         " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
-        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
-        dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
-        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
+        dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX, dragData.displayY,
+        dragData.dragNum, dragData.hasCanceledAnimation, dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
 }
 
 class InputEventCallbackTest : public MMI::IInputEventConsumer {
@@ -997,8 +999,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Failed_Mouse, 
 
         int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), nullptr);
         ASSERT_EQ(ret, RET_ERR);
-
-        dragData->shadowInfo.pixelMap = nullptr;
+        dragData->shadowInfos = {};
         ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_ERR);
     }
@@ -1448,19 +1449,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
         DragData replyDragData;
         ret = InteractionManager::GetInstance()->GetDragData(replyDragData);
         ASSERT_EQ(ret, RET_OK);
-        ASSERT_NE(replyDragData.shadowInfo.pixelMap, nullptr);
-        ASSERT_EQ(replyDragData.shadowInfo.pixelMap->GetWidth(), TEST_PIXEL_MAP_WIDTH);
-        ASSERT_EQ(replyDragData.shadowInfo.pixelMap->GetHeight(), TEST_PIXEL_MAP_HEIGHT);
-        ASSERT_EQ(dragData->udKey, replyDragData.udKey);
-        ASSERT_EQ(dragData->shadowInfo.x, replyDragData.shadowInfo.x);
-        ASSERT_EQ(dragData->shadowInfo.y, replyDragData.shadowInfo.y);
-        ASSERT_EQ(dragData->sourceType, replyDragData.sourceType);
-        ASSERT_EQ(dragData->pointerId, replyDragData.pointerId);
-        ASSERT_EQ(dragData->dragNum, replyDragData.dragNum);
-        ASSERT_EQ(dragData->displayX, replyDragData.displayX);
-        ASSERT_EQ(dragData->displayY, replyDragData.displayY);
-        ASSERT_EQ(dragData->displayId, replyDragData.displayId);
-        ASSERT_EQ(dragData->hasCanceledAnimation, replyDragData.hasCanceledAnimation);
+        ASSERT_EQ(replyDragData, *dragData);
         PrintDragData(replyDragData);
         SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };

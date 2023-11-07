@@ -125,7 +125,7 @@ int32_t DeviceStatusMsdpMocKTest::UnloadMockLibrary(const std::shared_ptr<MsdpAl
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest001
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -139,7 +139,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest001, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest002
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -155,7 +155,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest002, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest003
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -171,7 +171,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest003, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest004
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -187,7 +187,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest004, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest005
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -203,7 +203,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest005, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest006
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -219,7 +219,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest006, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest007
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -235,7 +235,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest007, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest008
  * @tc.desc: test devicestatus DisableCount
  * @tc.type: FUNC
  */
@@ -252,7 +252,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest008, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest009
  * @tc.desc: test devicestatus NotifyMsdpImpl
  * @tc.type: FUNC
  */
@@ -263,7 +263,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest009, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest010
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -280,7 +280,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest010, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest011
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -297,7 +297,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest011, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest012
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -314,7 +314,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest012, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest013
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -334,7 +334,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest013, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest014
  * @tc.desc: test devicestatus NotifyMsdpImpl
  * @tc.type: FUNC
  */
@@ -346,7 +346,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest014, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest015
  * @tc.desc: test devicestatus NotifyMsdpImpl
  * @tc.type: FUNC
  */
@@ -359,7 +359,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest015, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest016
  * @tc.desc: test devicestatus NotifyMsdpImpl
  * @tc.type: FUNC
  */
@@ -372,7 +372,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest016, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest017
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */
@@ -385,7 +385,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest017, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest018
  * @tc.desc: test devicestatus RegisterCallback
  * @tc.type: FUNC
  */
@@ -407,7 +407,7 @@ HWTEST_F(DeviceStatusMsdpMocKTest, DeviceStatusMsdpMocKTest018, TestSize.Level1)
 }
 
 /**
- * @tc.name: DeviceStatusMsdpMockTest
+ * @tc.name: DeviceStatusMsdpMocKTest019
  * @tc.desc: test devicestatus Mock in Algorithm
  * @tc.type: FUNC
  */

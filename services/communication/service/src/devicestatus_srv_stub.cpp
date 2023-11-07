@@ -528,7 +528,7 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
         FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    if (ShadowPacker::MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
+    if (ShadowPacker::MarshallingShadowInfos(dragData.shadowInfos, reply) != RET_OK) {
         FI_HILOGE("MarshallingShadowInfos failed");
         return RET_ERR;
     }

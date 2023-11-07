@@ -30,6 +30,17 @@ struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
+public:
+    bool operator==(const ShadowInfo &shadow) const
+    {
+        if (pixelMap == nullptr && shadow.pixelMap == nullptr) {
+            return x == shadow.x && y == shadow.y;
+        }
+        if (pixelMap == nullptr || shadow.pixelMap == nullptr) {
+            return false;
+        }
+        return pixelMap->IsSameImage(*(shadow.pixelMap)) && x == shadow.x && y == shadow.y;
+    }
 };
 
 struct DragData {
@@ -45,6 +56,23 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
+public:
+    bool operator==(const DragData &dragData) const
+    {
+        if (shadowInfos.size() != dragData.shadowInfos.size()) {
+            return false;
+        }
+        int32_t size = shadowInfos.size();
+        for (int32_t i = 0; i < size; i++) {
+            if (!(shadowInfos[i] == dragData.shadowInfos[i])) {
+                return false;
+            }
+        }
+        return buffer == dragData.buffer && udKey == dragData.udKey && filterInfo == dragData.filterInfo &&
+               extraInfo == dragData.extraInfo && sourceType == dragData.sourceType && dragNum == dragData.dragNum &&
+               pointerId == dragData.pointerId && displayX == dragData.displayX && displayY == dragData.displayY &&
+               displayId == dragData.displayId && hasCanceledAnimation == dragData.hasCanceledAnimation;
+    }
 };
 
 enum class DragState {
