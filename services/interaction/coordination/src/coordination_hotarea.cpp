@@ -105,16 +105,16 @@ void CoordinationHotArea::CheckInHotArea()
 {
     CALL_DEBUG_ENTER;
     if (displayX_ <= HOT_AREA_WIDTH && displayY_ >= HOT_AREA_MARGIN &&
-        displayY_ <= height_ - HOT_AREA_MARGIN) {
+        displayY_ <= (height_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_LEFT;
     } else if (displayX_ >= (width_ - HOT_AREA_WIDTH) && displayY_ >= HOT_AREA_MARGIN &&
-        displayY_ <= height_ - HOT_AREA_MARGIN) {
+        displayY_ <= (height_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_RIGHT;
     } else if (displayY_ <= HOT_AREA_WIDTH && displayX_ >= HOT_AREA_MARGIN &&
-        displayX_ <= width_ - HOT_AREA_MARGIN) {
+        displayX_ <= (width_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_TOP;
     } else if (displayY_ >= (height_ - HOT_AREA_WIDTH) && displayX_ >= HOT_AREA_MARGIN &&
-        displayX_ <= width_ - HOT_AREA_MARGIN) {
+        displayX_ <= (width_ - HOT_AREA_MARGIN)) {
         type_ = HotAreaType::AREA_BOTTOM;
     } else {
         type_ = HotAreaType::AREA_NONE;

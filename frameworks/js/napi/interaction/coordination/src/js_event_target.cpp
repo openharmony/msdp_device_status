@@ -194,17 +194,17 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
     }
     if (handle == nullptr) {
         iter->second.clear();
-        goto monitorLabel;
+        goto MONITOR_LABEL;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             FI_HILOGE("Success in removing monitor");
             iter->second.erase(it);
-            goto monitorLabel;
+            goto MONITOR_LABEL;
         }
     }
 
-monitorLabel:
+MONITOR_LABEL:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
         INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
