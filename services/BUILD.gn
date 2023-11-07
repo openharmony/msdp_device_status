@@ -15,7 +15,6 @@ import("../device_status.gni")
 
 config("devicestatus_services_private_config") {
   include_dirs = [
-    "context/include",
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
@@ -39,7 +38,6 @@ config("devicestatus_services_private_config") {
 
 config("devicestatus_services_public_config") {
   include_dirs = [
-    "context/include",
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
@@ -102,7 +100,10 @@ ohos_shared_library("devicestatus_service") {
     deps += [ "interaction/coordination:coordination" ]
   }
 
-  public_deps = [ "${device_status_root_path}/common/epoll:devicestatus_epoll" ]
+  public_deps = [
+    "${device_status_root_path}/intention/common/epoll:intention_epoll",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+  ]
 
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
@@ -142,7 +143,10 @@ ohos_static_library("devicestatus_static_service") {
     deps += [ "interaction/coordination:coordination" ]
   }
 
-  public_deps = [ "${device_status_root_path}/common/epoll:devicestatus_epoll" ]
+  public_deps = [
+    "${device_status_root_path}/intention/common/epoll:intention_epoll",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+  ]
 
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
