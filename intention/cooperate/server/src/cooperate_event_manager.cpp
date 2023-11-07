@@ -61,7 +61,7 @@ void CooperateEventManager::RemoveCooperateEvent(sptr<EventInfo> event)
     }
 }
 
-int32_t CooperateEventManager::OnCooperateMessage(CooperateMessage msg, const std::string &deviceId)
+int32_t CooperateEventManager::OnCooperateMessage(CooperateMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -72,38 +72,38 @@ int32_t CooperateEventManager::OnCooperateMessage(CooperateMessage msg, const st
     for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
         sptr<EventInfo> info = *it;
         CHKPC(info);
-        NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+        NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
     }
     return RET_OK;
 }
 
-void CooperateEventManager::OnEnable(CooperateMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnEnable(CooperateMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::ENABLE];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
     cooperateCallbacks_[EventType::ENABLE] = nullptr;
 }
 
-void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::START];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
     cooperateCallbacks_[EventType::START] = nullptr;
 }
 
-void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &deviceId)
+void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[EventType::STOP];
     CHKPV(info);
-    NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
+    NotifyCooperateMessage(info->sess, info->msgId, info->userData, networkId, msg);
     cooperateCallbacks_[EventType::STOP] = nullptr;
 }
 
@@ -137,12 +137,12 @@ IContext* CooperateEventManager::GetIContext() const
 }
 
 void CooperateEventManager::NotifyCooperateMessage(
-    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &deviceId, CooperateMessage msg)
+    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &networkId, CooperateMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
     NetPacket pkt(msgId);
-    pkt << userData << deviceId << static_cast<int32_t>(msg);
+    pkt << userData << networkId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;
