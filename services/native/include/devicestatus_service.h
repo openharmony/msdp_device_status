@@ -94,6 +94,7 @@ public:
     bool IsRunning() const override;
     int32_t AddHotAreaListener() override;
     int32_t RemoveHotAreaListener() override;
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
 
 private:
     bool Init();
