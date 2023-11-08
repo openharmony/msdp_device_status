@@ -242,7 +242,7 @@ public:
     /**
      * @brief 8dp bit movement effect for text.
      * @param enable Whether to perform 8dp displacement.
-     * The value <b>true</b> indicates the 8dp bit movement effect, 
+     * The value <b>true</b> indicates the 8dp bit movement effect,
      * and <b>false</b> indicates that there is no 8dp bit movement effect.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
