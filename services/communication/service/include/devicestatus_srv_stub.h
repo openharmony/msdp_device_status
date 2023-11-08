@@ -69,6 +69,7 @@ private:
     bool CheckCooperatePermission();
     void InitCoordination();
     void InitDrag();
+    int32_t EnterTextEditorAreaStub(MessageParcel& data, MessageParcel& reply);
 
 private:
     std::map<uint32_t, ConnFunc> connFuncs_;

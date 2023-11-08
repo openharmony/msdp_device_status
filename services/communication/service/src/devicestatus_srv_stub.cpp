@@ -74,7 +74,9 @@ void DeviceStatusSrvStub::InitCoordination()
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
             &DeviceStatusSrvStub::AddSubscriptListenerStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
-            &DeviceStatusSrvStub::RemoveSubscriptListenerStub }
+            &DeviceStatusSrvStub::RemoveSubscriptListenerStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::Enter_Text_Editor_Area),
+            &DeviceStatusSrvStub::EnterTextEditorAreaStub}
     };
 }
 
@@ -543,7 +545,7 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayX, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
-    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE); 
     return ret;
 }
 
@@ -585,6 +587,18 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
     int32_t ret = RemoveHotAreaListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool visible = false;
+    READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = EnterTextEditorArea(visible);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
 }

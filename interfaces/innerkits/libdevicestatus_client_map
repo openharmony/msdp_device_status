@@ -52,6 +52,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragState(OHOS::Msdp::DeviceStatus::DragState&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::AddHotAreaListener(std::__h::shared_ptr<OHOS::Msdp::IHotAreaListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::RemoveHotAreaListener(std::__h::shared_ptr<OHOS::Msdp::IHotAreaListener>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
         };
     local:
         *;

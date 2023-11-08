@@ -264,6 +264,11 @@ int32_t DragManagerImpl::GetDragState(DragState &dragState)
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragState(dragState);
 }
+int32_t DragManagerImpl::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

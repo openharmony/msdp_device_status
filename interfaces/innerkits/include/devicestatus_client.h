@@ -71,6 +71,7 @@ public:
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddHotAreaListener();
     int32_t RemoveHotAreaListener();
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

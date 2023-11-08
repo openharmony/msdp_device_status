@@ -54,6 +54,7 @@ public:
     int32_t GetUdKey(std::string &udKey);
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
     int32_t GetDragData(DragData &dragData);
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     std::mutex mtx_;

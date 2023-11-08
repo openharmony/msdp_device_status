@@ -747,6 +747,17 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     return ret;
 }
 
+int32_t DeviceStatusService::EnterTextEditorArea(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::EnterTextEditorArea, &dragMgr_, visible));
+    if (ret != RET_OK) {
+        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;

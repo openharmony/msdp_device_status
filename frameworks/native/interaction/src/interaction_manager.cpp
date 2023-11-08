@@ -147,6 +147,11 @@ int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListen
 {
     return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
+
+int32_t InteractionManager::EnterTextEditorArea(bool enable)
+{
+    return INTER_MGR_IMPL.EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
