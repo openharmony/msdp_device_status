@@ -753,7 +753,7 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool visible)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::EnterTextEditorArea, &dragMgr_, visible));
     if (ret != RET_OK) {
-        FI_HILOGE("StartDrag failed, ret:%{public}d", ret);
+        FI_HILOGE("Enter Text Editor Area failed, ret:%{public}d", ret);
     }
     return ret;
 }

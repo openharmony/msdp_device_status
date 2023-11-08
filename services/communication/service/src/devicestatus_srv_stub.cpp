@@ -598,7 +598,7 @@ int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel& data, Messag
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = EnterTextEditorArea(visible);
     if (ret != RET_OK) {
-        FI_HILOGE("Call hot area listener failed, ret:%{public}d", ret);
+        FI_HILOGE("Call EnterTextEditorArea failed, ret:%{public}d", ret);
     }
     return ret;
 }
