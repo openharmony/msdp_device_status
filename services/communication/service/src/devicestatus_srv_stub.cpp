@@ -545,7 +545,7 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayX, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
-    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE); 
+    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
     return ret;
 }
 

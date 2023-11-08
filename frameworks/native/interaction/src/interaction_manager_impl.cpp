@@ -329,7 +329,8 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::EnterTextEditorArea(bool enable){
+int32_t InteractionManagerImpl::EnterTextEditorArea(bool enable)
+{
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.EnterTextEditorArea(enable);
 }
