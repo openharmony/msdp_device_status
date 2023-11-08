@@ -731,7 +731,6 @@ void DragManager::MoveTo(int32_t x, int32_t y)
 int32_t DragManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("This is EnterTextEditorArea DragManager");
     return dragDrawing_.EnterTextEditorArea(enable);
 }
 } // namespace DeviceStatus
