@@ -167,8 +167,8 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        auto sm = DelayedSpSingleton<DeviceStatusService>::GetInstance();
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(sm);
+        auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
