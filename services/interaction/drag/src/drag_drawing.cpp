@@ -94,6 +94,9 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t ICON_CORNER_RADIUS { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
+constexpr int32_t GRADIENT_COLOR_BEGIN { 0x00000000 };
+constexpr int32_t GRADIENT_COLOR_END { 0x99FF0000 };
+const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
@@ -255,11 +258,11 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-    if (displayY >= 500 && displayY <= 510) {
-        FI_HILOGI("Here in GradientForegroundColor");
-        UpdateDragItemStyle(DragItemStyle());//Just use to test animation interface usage
-        FI_HILOGI("Here out GradientForegroundColor");
-    }
+    // if (displayY >= 500 && displayY <= 510) {
+    //     FI_HILOGI("Here in GradientForegroundColor");
+    //     UpdateDragItemStyle(DragItemStyle());//Just use to test animation interface usage
+    //     FI_HILOGI("Here out GradientForegroundColor");
+    // }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
@@ -1236,15 +1239,14 @@ int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
         FI_HILOGD("PixelMapNode is nullptr");
         return RET_ERR;
     }
-    pixelMapNode->SetForegroundColor(0x00000000);
+    pixelMapNode->SetForegroundColor(GRADIENT_COLOR_BEGIN);
     pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(GRADIENT_COLOR_DURATION);
-    Rosen::RSAnimationTimingCurve sharpCurve = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
-    Rosen::RSNode::Animate(protocol, sharpCurve, [&]() {
+    Rosen::RSNode::Animate(protocol, SHARP_CURVE, [&]() {
         if (pixelMapNode != nullptr) {
             pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS); // 实际的动效参数中有这个radius
-            pixelMapNode->SetForegroundColor(0x99FF0000);
+            pixelMapNode->SetForegroundColor(GRADIENT_COLOR_END);
         }
     });
     return RET_OK;
