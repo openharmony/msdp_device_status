@@ -93,6 +93,12 @@ enum class DragCursorStyle {
     COPY,
     MOVE
 };
+
+enum class DropType {
+    INVALID = -1,
+    MOVE = 0,
+    COPY = 1
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
