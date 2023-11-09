@@ -26,7 +26,7 @@ public:
     IEpollEventSource() = default;
     virtual ~IEpollEventSource() = default;
 
-    virtual uint32_t GetEvents() const;
+    virtual uint32_t GetEvents() const = 0;
     virtual int32_t GetFd() const = 0;
     virtual void Dispatch(const struct epoll_event &ev) = 0;
 };
