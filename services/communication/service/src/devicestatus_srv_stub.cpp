@@ -74,9 +74,7 @@ void DeviceStatusSrvStub::InitCoordination()
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
             &DeviceStatusSrvStub::AddSubscriptListenerStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
-            &DeviceStatusSrvStub::RemoveSubscriptListenerStub },
-        {static_cast<uint32_t>(DeviceInterfaceCode::Enter_Text_Editor_Area),
-            &DeviceStatusSrvStub::EnterTextEditorAreaStub}
+            &DeviceStatusSrvStub::RemoveSubscriptListenerStub }
     };
 }
 
@@ -110,6 +108,8 @@ void DeviceStatusSrvStub::InitDrag()
             &DeviceStatusSrvStub::GetDragDataStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
+            &DeviceStatusSrvStub::EnterTextEditorAreaStub },
     };
     connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }

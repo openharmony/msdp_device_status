@@ -240,10 +240,10 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
     /**
-     * @brief 8dp bit movement effect for text.
-     * @param enable Whether to perform 8dp displacement.
-     * The value <b>true</b> indicates the 8dp bit movement effect,
-     * and <b>false</b> indicates that there is no 8dp bit movement effect.
+     * @brief 文本编辑区8dp位移动效
+     * @param enable 用于确认是否执行8dp位移动效
+     * The value <b>true</b> 表示执行8dp位移动效,
+     * and <b>false</b> 表示不执行8dp位移动效.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */

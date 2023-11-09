@@ -716,7 +716,7 @@ int32_t DeviceStatusSrvProxy::EnterTextEditorArea(bool enable)
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::Enter_Text_Editor_Area),
         data, reply, option);
     if (ret != RET_OK) {
-        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
