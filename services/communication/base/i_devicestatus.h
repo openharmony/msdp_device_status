@@ -62,6 +62,7 @@ public:
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragState(DragState &dragState) = 0;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) = 0;
+    virtual int32_t GetDropType(DropType &dropType) = 0;
     virtual bool IsRunning() const
     {
         return true;
