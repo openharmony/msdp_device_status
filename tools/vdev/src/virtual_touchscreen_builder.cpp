@@ -243,22 +243,22 @@ void VirtualTouchScreenBuilder::Act(int32_t argc, char *argv[])
     }
     do {
         {
-            auto action = regularActions_.find(opt);
-            if (action != regularActions_.end()) {
+            auto action = ruleTscrnActions_.find(opt);
+            if (action != ruleTscrnActions_.end()) {
                 action->second();
                 continue;
             }
         }
         {
-            auto action = readActions_.find(opt);
-            if (action != readActions_.end()) {
+            auto action = readTscrnActions_.find(opt);
+            if (action != readTscrnActions_.end()) {
                 action->second(optarg);
                 continue;
             }
         }
         {
-            auto action = moveActions_.find(opt);
-            if (action != moveActions_.end()) {
+            auto action = moveTscrnActions_.find(opt);
+            if (action != moveTscrnActions_.end()) {
                 action->second(argc, argv);
                 continue;
             }
@@ -385,7 +385,7 @@ void VirtualTouchScreenBuilder::ReadActions(const char *path)
     json model;
     int32_t ret = VirtualDeviceBuilder::ReadFile(path, model);
     if (ret == RET_ERR) {
-        FI_HILOGE("Failed to read the file");
+        FI_HILOGE("Failed to read touchscreen data from the files");
         return;
     }
     ReadModel(model, MAXIMUM_LEVEL_ALLOWED);
@@ -499,7 +499,7 @@ void VirtualTouchScreenBuilder::ReadRawInput(const char *path)
     json model;
     int32_t ret = VirtualDeviceBuilder::ReadFile(path, model);
     if (ret == RET_ERR) {
-        FI_HILOGE("Failed to read raw input data");
+        FI_HILOGE("Failed to read the raw touchscreen data");
         return;
     }
     ReadRawModel(model, MAXIMUM_LEVEL_ALLOWED);

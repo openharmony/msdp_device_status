@@ -60,13 +60,13 @@ private:
     using InterfaceParameterLess = void(*)();
     using InterfaceParameterOne = void(*)(const char*);
     using InterfaceParameterTwo = void(*)(int32_t, char**);
-    inline static std::map<const char, InterfaceParameterLess> regularActions_ {
+    inline static std::map<const char, InterfaceParameterLess> ruleTscrnActions_ {
         { 'u', &ReadUpAction }
     };
-    inline static std::map<const char, InterfaceParameterOne> readActions_ {
+    inline static std::map<const char, InterfaceParameterOne> readTscrnActions_ {
         { 'f', &ReadActions }, { 'r', &ReadRawInput}
     };
-    inline static std::map<const char, InterfaceParameterTwo> moveActions_ {
+    inline static std::map<const char, InterfaceParameterTwo> moveTscrnActions_ {
         { 'd', &ReadDownAction }, { 'm', &ReadMoveAction },
         { 'D', &ReadDragToAction }, { 'M', &ReadMoveToAction }
     };
