@@ -432,7 +432,7 @@ void DeviceStatusService::OnThread()
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);
-    EnableDevMgr(MAX_N_RETRIES);
+    //EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         struct epoll_event ev[MAX_EVENT_SIZE] {};
