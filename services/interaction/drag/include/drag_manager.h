@@ -69,6 +69,7 @@ public:
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    int EnterTextEditorArea(bool enable);
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:

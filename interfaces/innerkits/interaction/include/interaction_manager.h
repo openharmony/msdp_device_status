@@ -247,6 +247,15 @@ public:
      */
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 
+    /**
+     * @brief Specifies whether to implement 8dp movement in the text editor area.
+     * @param enable Indicates whether to enable 8dp movement.
+     * The value <b>true</b> means to enable 8dp movement, and the value <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t EnterTextEditorArea(bool enable);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

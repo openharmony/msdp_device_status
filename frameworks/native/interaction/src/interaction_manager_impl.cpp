@@ -334,6 +334,12 @@ int32_t InteractionManagerImpl::GetDragSummary(std::map<std::string, int64_t> &s
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetDragSummary(summarys);
 }
+
+int32_t InteractionManagerImpl::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

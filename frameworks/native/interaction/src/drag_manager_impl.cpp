@@ -270,6 +270,12 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
 }
+
+int32_t DragManagerImpl::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

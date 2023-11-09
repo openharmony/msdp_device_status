@@ -756,6 +756,12 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
+
+int32_t DragManager::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return dragDrawing_.EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
