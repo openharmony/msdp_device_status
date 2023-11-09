@@ -57,6 +57,7 @@ void EpollManager::Close()
 int32_t EpollManager::Add(IEpollEventSource &source)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGE("Hwl>> EpollManager::Add enter");
     struct epoll_event ev {};
     ev.events = source.GetEvents();
     ev.data.ptr = &source;
