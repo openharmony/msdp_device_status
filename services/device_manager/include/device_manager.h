@@ -85,7 +85,7 @@ private:
     Enumerator enumerator_;
     Monitor monitor_;
     HotplugHandler hotplug_;
-    std::shared_ptr<IEpollEventSource> epollMgr_ { nullptr };
+    std::shared_ptr<EpollManager> epollMgr_ { nullptr };
     std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };

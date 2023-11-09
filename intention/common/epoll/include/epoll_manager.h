@@ -36,9 +36,9 @@ public:
     int32_t Open();
     void Close();
 
-    int32_t Add(IEpollEventSource &source);
-    void Remove(IEpollEventSource &source);
-    int32_t Update(IEpollEventSource &source);
+    int32_t Add(IEpollEventSource &source) override;
+    void Remove(IEpollEventSource &source) override;
+    int32_t Update(IEpollEventSource &source) override;
     int32_t Wait(struct epoll_event *events, int32_t maxevents);
     int32_t WaitTimeout(struct epoll_event *events, int32_t maxevents, int32_t timeout);
 
