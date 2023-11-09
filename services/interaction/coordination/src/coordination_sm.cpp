@@ -48,6 +48,7 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
 constexpr uint32_t P2P_SESSION_CLOSED { 1 };
+const std::string THREAD_NAME { "coordination_sm" };
 } // namespace
 
 CoordinationSM::CoordinationSM() {}
@@ -71,7 +72,7 @@ void CoordinationSM::Init()
         COOR_SOFTBUS_ADAPTER->Init();
     });
     COOR_DEV_MGR->Init();
-    runner_ = AppExecFwk::EventRunner::Create(true);
+    runner_ = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }

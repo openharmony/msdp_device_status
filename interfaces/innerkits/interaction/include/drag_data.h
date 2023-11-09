@@ -17,6 +17,7 @@
 #define DRAG_DATA_H
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -26,6 +27,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
+constexpr size_t MAX_UDKEY_SIZE { 100 };
+constexpr size_t MAX_SUMMARY_SIZE { 200 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -56,6 +59,7 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
+    std::map<std::string, int64_t> summarys;
 public:
     bool operator==(const DragData &dragData) const
     {
@@ -69,9 +73,11 @@ public:
             }
         }
         return buffer == dragData.buffer && udKey == dragData.udKey && filterInfo == dragData.filterInfo &&
+        
                extraInfo == dragData.extraInfo && sourceType == dragData.sourceType && dragNum == dragData.dragNum &&
                pointerId == dragData.pointerId && displayX == dragData.displayX && displayY == dragData.displayY &&
-               displayId == dragData.displayId && hasCanceledAnimation == dragData.hasCanceledAnimation;
+               displayId == dragData.displayId && hasCanceledAnimation == dragData.hasCanceledAnimation &&
+               summarys == dragData.summarys;
     }
 };
 
@@ -116,6 +122,12 @@ enum class DragCursorStyle {
     FORBIDDEN,
     COPY,
     MOVE
+};
+
+enum class DropType {
+    INVALID = -1,
+    MOVE = 0,
+    COPY = 1
 };
 } // namespace DeviceStatus
 } // namespace Msdp

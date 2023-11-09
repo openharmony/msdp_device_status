@@ -217,6 +217,14 @@ public:
     int32_t GetDragData(DragData &dragData);
 
     /**
+     * @brief Obtains the current droping type.
+     * @param dropType dropping type while user pressed ctrl or not.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetDropType(DropType &dropType);
+
+    /**
      * @brief Registers a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
@@ -239,6 +247,14 @@ public:
      * @since 9
      */
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
+
+    /**
+     * @brief 获取拖拽对象的数据摘要。
+     * @param summarys 保存拖拽对象的数据摘要。
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 11
+     */
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 
 private:
     InteractionManager() = default;

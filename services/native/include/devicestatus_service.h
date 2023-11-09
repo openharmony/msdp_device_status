@@ -85,6 +85,7 @@ public:
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
+    int32_t GetDropType(DropType& dropType) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
@@ -94,6 +95,7 @@ public:
     bool IsRunning() const override;
     int32_t AddHotAreaListener() override;
     int32_t RemoveHotAreaListener() override;
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
 
 private:
     bool Init();

@@ -30,6 +30,7 @@
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "include/util.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -109,6 +110,10 @@ void DeviceStatusSrvStub::InitDrag()
             &DeviceStatusSrvStub::GetDragDataStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
+            &DeviceStatusSrvStub::GetDragSummaryStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
+            &DeviceStatusSrvStub::GetDropTypeStub }
     };
     connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }
@@ -376,6 +381,10 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (!Utility::Unmarshalling(dragData.summarys, data)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return E_DEVICESTATUS_READ_PARCEL_ERROR;
+    }
     for (const auto& shadowInfo : dragData.shadowInfos) {
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
             (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
@@ -541,6 +550,10 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    if (!Utility::Marshalling(dragData.summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return ERR_INVALID_VALUE;
+    }
     return ret;
 }
 
@@ -584,6 +597,32 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParcel& reply)
+{
+    std::map<std::string, int64_t> summarys;
+    if (GetDragSummary(summarys) != RET_OK) {
+        FI_HILOGE("Get summarys failed");
+        return RET_ERR;
+    }
+    if (!Utility::Marshalling(summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return ERR_INVALID_VALUE;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    DropType dropType;
+    int32_t ret = GetDropType(dropType);
+    if (ret != RET_OK) {
+        return RET_ERR;
+    }
+    WRITEINT32(reply, static_cast<int32_t>(dropType), IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
