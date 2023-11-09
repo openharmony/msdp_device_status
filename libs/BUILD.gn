@@ -27,6 +27,12 @@ config("devicestatus_srv_public_config") {
 }
 
 ohos_shared_library("devicestatus_mock") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
+
   sources = [
     "src/devicestatus_data_parse.cpp",
     "src/devicestatus_msdp_mock.cpp",
@@ -55,6 +61,11 @@ ohos_shared_library("devicestatus_mock") {
 
 ohos_shared_library("devicestatus_algo") {
   branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
   sources = [
     "src/algorithm/algo_absolute_still.cpp",
     "src/algorithm/algo_base.cpp",

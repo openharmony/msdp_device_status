@@ -28,6 +28,12 @@ config("devicestatus_util_public_config") {
 }
 
 ohos_shared_library("devicestatus_util") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = true
+  }
+
   version_script = "libdevicestatus_util_map"
   sources = [
     "src/util.cpp",
