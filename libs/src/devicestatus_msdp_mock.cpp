@@ -224,7 +224,7 @@ void DeviceStatusMsdpMock::StartThread()
 
 void DeviceStatusMsdpMock::LoopingThreadEntry()
 {
-    SetThreadName("device_status_mock");
+    SetThreadName("os_loop_mock");
     if (callbacks_.empty()) {
         FI_HILOGD("callbacks_ is empty");
         return;

@@ -115,7 +115,7 @@ private:
     int32_t interceptorId_ { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
-    int32_t monitorId_  { -1 };
+    int32_t monitorId_ { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;

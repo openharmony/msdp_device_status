@@ -24,7 +24,6 @@ config("module_private_config") {
     "${device_status_root_path}/libs/interface",
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
     "${device_status_service_path}/delegate_task/include",
-    "${device_status_service_path}/context/include",
     "${device_status_service_path}/communication/service/include",
     "${device_status_service_path}/interaction/drag/src/include",
     "${device_status_service_path}/device_manager/include",
@@ -124,7 +123,6 @@ ohos_unittest("CoordinationSMTest") {
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
-    "${device_status_service_path}/context/include",
   ]
   sources = [ "src/coordination_sm_test.cpp" ]
 
@@ -134,6 +132,7 @@ ohos_unittest("CoordinationSMTest") {
   ]
 
   deps = [
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_utils_path}:devicestatus_util",

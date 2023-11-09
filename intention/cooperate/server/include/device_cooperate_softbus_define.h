@@ -54,4 +54,4 @@ enum {
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif  // DEVICE_COOPERATE_SOFTBUS_DEFINE_H
+#endif // DEVICE_COOPERATE_SOFTBUS_DEFINE_H

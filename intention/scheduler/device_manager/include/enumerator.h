@@ -13,23 +13,35 @@
  * limitations under the License.
  */
 
-#ifndef I_EPOLL_EVENT_SOURCE_H
-#define I_EPOLL_EVENT_SOURCE_H
+#ifndef ENUMERATOR_H
+#define ENUMERATOR_H
 
-#include <sys/epoll.h>
+#include <set>
+
+#include "nocopyable.h"
+
+#include "i_device_mgr.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IEpollEventSource {
+class Enumerator {
 public:
-    IEpollEventSource() = default;
-    virtual ~IEpollEventSource() = default;
+    Enumerator() = default;
+    ~Enumerator() = default;
+    DISALLOW_COPY_AND_MOVE(Enumerator);
 
-    virtual int32_t GetFd() const = 0;
-    virtual void Dispatch(const struct epoll_event &ev) = 0;
+    void SetDeviceMgr(IDeviceMgr *devMgr);
+    void ScanDevices();
+
+private:
+    void ScanAndAddDevices();
+    void AddDevice(const std::string &devNode) const;
+
+private:
+    IDeviceMgr *devMgr_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // I_EPOLL_EVENT_SOURCE_H
+#endif // ENUMERATOR_H

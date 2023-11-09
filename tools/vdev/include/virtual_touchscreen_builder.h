@@ -74,4 +74,4 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif  // VIRTUAL_TOUCHSCREEN_BUILDER_H
+#endif // VIRTUAL_TOUCHSCREEN_BUILDER_H
