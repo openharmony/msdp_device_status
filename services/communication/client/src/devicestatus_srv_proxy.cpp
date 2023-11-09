@@ -25,6 +25,7 @@
 #include "drag_item_style_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -360,6 +361,10 @@ int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
     READINT32(reply, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(reply, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(reply, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (!Utility::Unmarshalling(dragData.summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return E_DEVICESTATUS_READ_PARCEL_ERROR;
+    }
     return ret;
 }
 
@@ -435,6 +440,10 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(data, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    if (!Utility::Marshalling(dragData.summarys, data)) {
+        FI_HILOGE("Failed to summarys marshalling");
+        return ERR_INVALID_VALUE;
+    }
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -724,6 +733,31 @@ int32_t DeviceStatusSrvProxy::UpdateDragItemStyle(const DragItemStyle &dragItemS
     }
     return ret;
 
+}
+
+int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!Utility::Unmarshalling(summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return RET_ERR;
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

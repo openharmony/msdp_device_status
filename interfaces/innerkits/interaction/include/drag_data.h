@@ -17,6 +17,7 @@
 #define DRAG_DATA_H
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -25,6 +26,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
+constexpr size_t MAX_UDKEY_SIZE { 100 };
+constexpr size_t MAX_SUMMARY_SIZE { 200 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -44,6 +47,7 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
+    std::map<std::string, int64_t> summarys;
 };
 
 enum class DragState {
@@ -82,26 +86,10 @@ struct DragAnimationData {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
 };
 
-struct Animation {
-    int32_t duration { 1000 }; // 时长
-    int32_t tempo; // 节奏
-//     ICurve curve; // 动效时间曲线, 这个参数貌似没有IPC序列化反序列化的能力
-    int32_t delay; // 延迟
-    int32_t iterations; // 迭代重复次数
-    int32_t playMode; // 不确定类型
-};
-
-struct ItemStyle {
-    uint32_t foregroundColor;
-    int32_t width;
-    int32_t height;
-    int32_t radius;
-    int32_t border;
-};
-
 struct DragItemStyle {
-    Animation animation;
-    ItemStyle itemStyle;
+    uint32_t foregroundColor;
+    int32_t radius;
+    int32_t alpha;
 };
 
 enum class DragCursorStyle {

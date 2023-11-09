@@ -102,21 +102,31 @@ int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
     return RET_OK;
 }
 
-int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
+void DragManager::PrintDragData(const DragData &dragData)
 {
-    CALL_INFO_TRACE;
+    std::string summarys;
+    for (const auto &[udKey, recordSize] : dragData.summarys) {
+        std::string str = udKey + "-" + std::to_string(recordSize) + ";";
+        summarys += str;
+    }
     FI_HILOGI("dragData value Contains PixelFormat:%{public}d, PixelAlphaType:%{public}d,"
         " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
         " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s",
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
         dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        GetAnonyString(dragData.udKey).c_str());
+        GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
+}
+
+int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
+{
+    CALL_INFO_TRACE;
+    PrintDragData(dragData);
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance is running, can not start drag again");
         return RET_ERR;
@@ -672,6 +682,25 @@ DragResult DragManager::GetDragResult() const
 {
     CALL_DEBUG_ENTER;
     return dragResult_;
+}
+
+int32_t DragManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    if (GetDragState() != DragState::START) {
+        FI_HILOGE("No drag instance running");
+        return RET_ERR;
+    }
+    DragData dragData;
+    if (GetDragData(dragData) != RET_OK) {
+        FI_HILOGE("GetDragData failed");
+        return RET_ERR;
+    }
+    summarys = dragData.summarys;
+    if (summarys.empty()) {
+        FI_HILOGE("Summarys is empty");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation)

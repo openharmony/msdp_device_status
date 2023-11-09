@@ -94,8 +94,7 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t ICON_CORNER_RADIUS { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
-constexpr int32_t GRADIENT_COLOR_BEGIN { 0x00000000 };
-constexpr int32_t GRADIENT_COLOR_END { 0x99FF0000 };
+constexpr int32_t TRANSPARENT_COLOR { 0x00000000 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
@@ -1229,24 +1228,19 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
 int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
 {
     CALL_DEBUG_ENTER;
-    /*
-    TODO
-    Use dragItemStyle to update drag item style，with animation.
-    */
-    (void) dragItemStyle;
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     if (pixelMapNode == nullptr) {
         FI_HILOGD("PixelMapNode is nullptr");
         return RET_ERR;
     }
-    pixelMapNode->SetForegroundColor(GRADIENT_COLOR_BEGIN);
-    pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS);
+    pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR);
+    pixelMapNode->SetCornerRadius(dragItemStyle.radius);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(GRADIENT_COLOR_DURATION);
     Rosen::RSNode::Animate(protocol, SHARP_CURVE, [&]() {
         if (pixelMapNode != nullptr) {
-            pixelMapNode->SetCornerRadius(ICON_CORNER_RADIUS); // 实际的动效参数中有这个radius
-            pixelMapNode->SetForegroundColor(GRADIENT_COLOR_END);
+            pixelMapNode->SetCornerRadius(dragItemStyle.radius);
+            pixelMapNode->SetForegroundColor(dragItemStyle.foregroundColor);
         }
     });
     return RET_OK;

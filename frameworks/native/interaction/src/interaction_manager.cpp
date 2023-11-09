@@ -153,6 +153,10 @@ int32_t InteractionManager::UpdateDragItemStyle(const DragItemStyle &dragItemSty
     return INTER_MGR_IMPL.UpdateDragItemStyle(dragItemStyle);
 }
 
+int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    return INTER_MGR_IMPL.GetDragSummary(summarys);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -69,6 +69,7 @@ public:
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
     int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -95,6 +96,7 @@ public:
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
 private:
+    void PrintDragData(const DragData &dragData);
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t NotifyDragResult(DragResult result);
     int32_t InitDataManager(const DragData &dragData) const;

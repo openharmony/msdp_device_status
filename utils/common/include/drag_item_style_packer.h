@@ -32,82 +32,23 @@ private:
 public:
     static int32_t MarshallingDragItemStyle(const DragItemStyle &dragItemStyle, MessageParcel &data);
     static int32_t UnMarshallingDragItemStyle(MessageParcel &data, DragItemStyle &dragItemStyle);
-private:
-    static int32_t MarshallingAnimation(const Animation &animation, MessageParcel &data);
-    static int32_t UnMarshallingAnimation(MessageParcel &data, Animation &animation);
-    static int32_t MarshallingItemStyle(const ItemStyle &itemStyle, MessageParcel &data);
-    static int32_t UnMarshallingItemStyle(MessageParcel &data, ItemStyle &itemStyle);
 };
 
 int32_t DragItemStylePacker::MarshallingDragItemStyle(const DragItemStyle &dragItemStyle, MessageParcel &data)
 {
     CALL_DEBUG_ENTER;
-    if (MarshallingAnimation(dragItemStyle.animation, data) != RET_OK) {
-        FI_HILOGE("MarshallingAnimation failed");
-        return RET_ERR;
-    }
-    if (MarshallingItemStyle(dragItemStyle.itemStyle, data) != RET_OK) {
-        FI_HILOGE("MarshallingItemStyle failed");
-        return RET_ERR;
-    }
+    WRITEUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
+    WRITEINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
 int32_t DragItemStylePacker::UnMarshallingDragItemStyle(MessageParcel &data, DragItemStyle &dragItemStyle)
 {
     CALL_DEBUG_ENTER;
-    if (UnMarshallingAnimation(data, dragItemStyle.animation) != RET_OK) {
-        FI_HILOGE("UnMarshallingAnimation failed");
-        return RET_ERR;
-    }
-    if (UnMarshallingItemStyle(data, dragItemStyle.itemStyle) != RET_OK) {
-        FI_HILOGE("UnMarshallingItemStyle failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
-int32_t DragItemStylePacker::MarshallingAnimation(const Animation &animation, MessageParcel &data)
-{
-    CALL_DEBUG_ENTER;
-    WRITEINT32(data, animation.duration, ERR_INVALID_VALUE);
-    WRITEINT32(data, animation.tempo, ERR_INVALID_VALUE);
-    WRITEINT32(data, animation.delay, ERR_INVALID_VALUE);
-    WRITEINT32(data, animation.iterations, ERR_INVALID_VALUE);
-    WRITEINT32(data, animation.playMode, ERR_INVALID_VALUE);
-    return RET_OK;
-}
-
-int32_t DragItemStylePacker::UnMarshallingAnimation(MessageParcel &data, Animation &animation)
-{
-    CALL_DEBUG_ENTER;
-    READINT32(data, animation.duration, ERR_INVALID_VALUE);
-    READINT32(data, animation.tempo, ERR_INVALID_VALUE);
-    READINT32(data, animation.delay, ERR_INVALID_VALUE);
-    READINT32(data, animation.iterations, ERR_INVALID_VALUE);
-    READINT32(data, animation.playMode, ERR_INVALID_VALUE);
-    return RET_OK;
-}
-
-int32_t DragItemStylePacker::MarshallingItemStyle(const ItemStyle &itemStyle, MessageParcel &data)
-{
-    CALL_DEBUG_ENTER;
-    WRITEUINT32(data, itemStyle.foregroundColor, ERR_INVALID_VALUE);
-    WRITEINT32(data, itemStyle.width, ERR_INVALID_VALUE);
-    WRITEINT32(data, itemStyle.height, ERR_INVALID_VALUE);
-    WRITEINT32(data, itemStyle.radius, ERR_INVALID_VALUE);
-    WRITEINT32(data, itemStyle.border, ERR_INVALID_VALUE);
-    return RET_OK;
-}
-
-int32_t DragItemStylePacker::UnMarshallingItemStyle(MessageParcel &data, ItemStyle &itemStyle)
-{
-    CALL_DEBUG_ENTER;
-    READUINT32(data, itemStyle.foregroundColor, ERR_INVALID_VALUE);
-    READINT32(data, itemStyle.width, ERR_INVALID_VALUE);
-    READINT32(data, itemStyle.height, ERR_INVALID_VALUE);
-    READINT32(data, itemStyle.radius, ERR_INVALID_VALUE);
-    READINT32(data, itemStyle.border, ERR_INVALID_VALUE);
+    READUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
+    READINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
+    READINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
