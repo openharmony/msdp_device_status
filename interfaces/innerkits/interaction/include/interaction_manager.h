@@ -239,6 +239,14 @@ public:
      */
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
+    /**
+     * @brief 获取拖拽对象的数据摘要。
+     * @param summarys 保存拖拽对象的数据摘要。
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 11
+     */
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

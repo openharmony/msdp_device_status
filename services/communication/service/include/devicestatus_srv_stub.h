@@ -66,6 +66,7 @@ private:
     int32_t GetDragStateStub(MessageParcel &data, MessageParcel &reply);
     int32_t AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetDragSummaryStub(MessageParcel& data, MessageParcel& reply);
     bool CheckCooperatePermission();
     void InitCoordination();
     void InitDrag();

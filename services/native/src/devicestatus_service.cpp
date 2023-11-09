@@ -1032,6 +1032,17 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
 }
+
+int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragSummary, &dragMgr_, std::ref(summarys)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

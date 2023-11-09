@@ -29,6 +29,7 @@
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "include/util.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -108,6 +109,8 @@ void DeviceStatusSrvStub::InitDrag()
             &DeviceStatusSrvStub::GetDragDataStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
+            &DeviceStatusSrvStub::GetDragSummaryStub }
     };
     connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }
@@ -376,6 +379,10 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (!Utility::Unmarshalling(dragData.summarys, data)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return E_DEVICESTATUS_READ_PARCEL_ERROR;
+    }
     if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
         (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
         (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
@@ -544,6 +551,10 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel&
     WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
+    if (!Utility::Marshalling(dragData.summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return ERR_INVALID_VALUE;
+    }
     return ret;
 }
 
@@ -587,6 +598,20 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
         FI_HILOGE("Call remove hot area listener failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParcel& reply)
+{
+    std::map<std::string, int64_t> summarys;
+    if (GetDragSummary(summarys) != RET_OK) {
+        FI_HILOGE("Get summarys failed");
+        return RET_ERR;
+    }
+    if (!Utility::Marshalling(summarys, reply)) {
+        FI_HILOGE("Failed to summarys unmarshalling");
+        return ERR_INVALID_VALUE;
+    }
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

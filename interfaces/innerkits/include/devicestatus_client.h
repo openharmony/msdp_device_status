@@ -71,6 +71,7 @@ public:
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddHotAreaListener();
     int32_t RemoveHotAreaListener();
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

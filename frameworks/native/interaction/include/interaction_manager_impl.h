@@ -57,6 +57,7 @@ public:
     int32_t GetDragState(DragState &dragState);
     int32_t AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener);
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
 
 private:
     void InitMsgHandler();
