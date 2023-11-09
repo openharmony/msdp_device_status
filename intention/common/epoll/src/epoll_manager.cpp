@@ -34,7 +34,9 @@ EpollManager::~EpollManager()
 
 int32_t EpollManager::Open()
 {
+    FI_HILOGE("hwl>> EpollManager::Open() enter");
     epollFd_ = ::epoll_create1(EPOLL_CLOEXEC);
+    FI_HILOGE("hwl>> epoll_create1 leave");
     if (epollFd_ == -1) {
         FI_HILOGE("epoll_create1 failed: %{public}s", ::strerror(errno));
         return RET_ERR;

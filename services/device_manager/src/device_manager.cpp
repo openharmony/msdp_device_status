@@ -98,6 +98,10 @@ int32_t DeviceManager::OnEnable()
     FI_HILOGE("Hwl>> step 0");
     epollMgr_ = std::make_shared<EpollManager>();
     FI_HILOGE("Hwl>> step 1");
+    if(!epollMgr_)
+    {
+        FI_HILOGE("Hwl>> epollMgr_ is nullptr");
+    }
     int32_t ret = epollMgr_->Open();
     if (ret != RET_OK) {
         return ret;
