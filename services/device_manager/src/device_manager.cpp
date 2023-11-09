@@ -103,12 +103,7 @@ int32_t DeviceManager::OnEnable()
         FI_HILOGE("Hwl>> epollMgr_ is nullptr");
     }
     FI_HILOGE("Hwl>> step 1000");
-    int32_t ret = epollMgr_->Add(monitor_);
-    if (ret != RET_OK) {
-        goto DISABLE_MONITOR;
-    }
-    FI_HILOGE("Hwl>> step 4");
-    ret = epollMgr_->Open();
+    int32_t ret = epollMgr_->Open();
     if (ret != RET_OK) {
         return ret;
     }
@@ -118,7 +113,11 @@ int32_t DeviceManager::OnEnable()
         goto CLOSE_EPOLL;
     }
     FI_HILOGE("Hwl>> step 3");
-    
+    ret = epollMgr_->Add(monitor_);
+    if (ret != RET_OK) {
+        goto DISABLE_MONITOR;
+    }
+    FI_HILOGE("Hwl>> step 4");
     enumerator_.ScanDevices();
     return RET_OK;
 
