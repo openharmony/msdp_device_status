@@ -45,6 +45,7 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/src/fd_listener.cpp",
     "${device_status_frameworks_path}/native/src/stationary_manager.cpp",
     "${device_status_root_path}/services/communication/client/src/devicestatus_srv_proxy.cpp",
+    "${device_status_root_path}/services/tools/drag_data_packer.cpp"
   ]
 
   if (fusion_interaction_coordination) {

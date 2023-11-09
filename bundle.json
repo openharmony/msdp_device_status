@@ -82,6 +82,7 @@
               "include/stationary_manager.h",
               "interaction/include/coordination_message.h",
               "interaction/include/drag_data.h",
+              "interaction/include/drag_data_packer.h",
               "interaction/include/i_coordination_listener.h",
               "interaction/include/i_drag_listener.h",
               "interaction/include/i_start_drag_listener.h",

@@ -216,7 +216,7 @@ void Utility::ShowUserAndGroup()
     }
 }
 
-bool Utility::Marshalling(const summaryMap &val, Parcel &parcel)
+bool Utility::Marshalling(const SummaryMap &val, Parcel &parcel)
 {
     WRITEINT32(parcel, static_cast<int32_t>(val.size()), false);
     for (auto const &[k, v] : val) {
@@ -226,7 +226,7 @@ bool Utility::Marshalling(const summaryMap &val, Parcel &parcel)
     return true;
 }
 
-bool Utility::Unmarshalling(summaryMap &val, Parcel &parcel)
+bool Utility::Unmarshalling(SummaryMap &val, Parcel &parcel)
 {
     int32_t size = 0;
     READINT32(parcel, size, false);
