@@ -46,7 +46,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
-//constexpr int32_t MAX_N_RETRIES { 100 };
+constexpr int32_t MAX_N_RETRIES { 100 };
 
 struct device_status_epoll_event {
     int32_t fd { 0 };
@@ -432,7 +432,7 @@ void DeviceStatusService::OnThread()
     uint64_t tid = GetThisThreadId();
     delegateTasks_.SetWorkerThreadId(tid);
     FI_HILOGD("Main worker thread start, tid:%{public}" PRId64 "", tid);
-    //EnableDevMgr(MAX_N_RETRIES);
+    EnableDevMgr(MAX_N_RETRIES);
 
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         struct epoll_event ev[MAX_EVENT_SIZE] {};

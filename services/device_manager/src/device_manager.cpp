@@ -95,27 +95,35 @@ int32_t DeviceManager::Enable()
 int32_t DeviceManager::OnEnable()
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGE("Hwl>> step 0");
     epollMgr_ = std::make_shared<EpollManager>();
+    FI_HILOGE("Hwl>> step 1");
     int32_t ret = epollMgr_->Open();
     if (ret != RET_OK) {
         return ret;
     }
+    FI_HILOGE("Hwl>> step 2");
     ret = monitor_.Enable();
     if (ret != RET_OK) {
         goto CLOSE_EPOLL;
     }
+    FI_HILOGE("Hwl>> step 3");
     ret = epollMgr_->Add(monitor_);
     if (ret != RET_OK) {
         goto DISABLE_MONITOR;
     }
+    FI_HILOGE("Hwl>> step 4");
     enumerator_.ScanDevices();
     return RET_OK;
 
 DISABLE_MONITOR:
+    FI_HILOGE("Hwl>> step 5");
     monitor_.Disable();
-
+    FI_HILOGE("Hwl>> step 6");
 CLOSE_EPOLL:
+    FI_HILOGE("Hwl>> step 7");
     epollMgr_.reset();
+    FI_HILOGE("Hwl>> step 8");
     return ret;
 }
 
