@@ -713,7 +713,7 @@ int32_t DeviceStatusSrvProxy::EnterTextEditorArea(bool enable)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::Enter_Text_Editor_Area),
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
