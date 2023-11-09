@@ -46,7 +46,9 @@ void Monitor::Dispatch(const struct epoll_event &ev)
         FI_HILOGE("Epoll hangup, errno:%{public}s", strerror(errno));
     }
 }
-
+    int32_t Add(IEpollEventSource &source){return 1;}
+    void Remove(IEpollEventSource &source){}
+    int32_t Update(IEpollEventSource &source){return 1;}
 void Monitor::SetDeviceMgr(IDeviceMgr *devMgr)
 {
     CALL_DEBUG_ENTER;
