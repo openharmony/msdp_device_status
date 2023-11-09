@@ -28,6 +28,7 @@ namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
+constexpr size_t MAX_SHADOW_INFO_MEMO_SIZE { 10000000 }; // shadowInfo 的最大内存占用
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -90,6 +91,14 @@ struct DragItemStyle {
     uint32_t foregroundColor;
     int32_t radius;
     int32_t alpha;
+    bool operator==(const DragItemStyle &style) const {
+        return foregroundColor == style.foregroundColor &&
+               radius == style.radius &&
+               alpha == style.alpha;
+    }
+    bool operator!=(const DragItemStyle &style) const {
+        return !(*this == style);
+    }
 };
 
 enum class DragCursorStyle {
@@ -97,6 +106,12 @@ enum class DragCursorStyle {
     FORBIDDEN,
     COPY,
     MOVE
+};
+
+enum class DropType {
+    INVALID = -1,
+    MOVE = 0,
+    COPY = 1
 };
 } // namespace DeviceStatus
 } // namespace Msdp

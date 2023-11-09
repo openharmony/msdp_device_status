@@ -437,6 +437,13 @@ int32_t DeviceStatusClient::GetDragState(DragState &dragState)
     return devicestatusProxy_->GetDragState(dragState);
 }
 
+int32_t DeviceStatusClient::GetDropType(DropType& dropType)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetDropType(dropType);
+}
+
 int32_t DeviceStatusClient::AddHotAreaListener()
 {
     CALL_DEBUG_ENTER;
@@ -453,7 +460,6 @@ int32_t DeviceStatusClient::RemoveHotAreaListener()
 
 int32_t DeviceStatusClient::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
 {
-    CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->UpdateDragItemStyle(dragItemStyle);
 }

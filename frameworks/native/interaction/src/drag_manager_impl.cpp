@@ -267,7 +267,6 @@ int32_t DragManagerImpl::GetDragState(DragState &dragState)
 
 int32_t DragManagerImpl::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
 {
-    CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().UpdateDragItemStyle(dragItemStyle);
 }
 
@@ -275,6 +274,11 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
+}
+
+int32_t DragManagerImpl::GetDropType(DropType& dropType)
+{
+    return DeviceStatusClient::GetInstance().GetDropType(dropType);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

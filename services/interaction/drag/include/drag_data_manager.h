@@ -48,6 +48,8 @@ public:
     int32_t GetTargetPid() const;
     void SetMotionDrag(bool isMotionDrag);
     bool IsMotionDrag() const;
+    void SetDragItemStyle(const DragItemStyle &dragItemStyle);
+    DragItemStyle GetDragItemStyle();
 private:
     DragData dragData_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
@@ -56,6 +58,7 @@ private:
     int32_t targetTid_ { -1 };
     int32_t targetPid_ { -1 };
     bool isMotionDrag_ { false };
+    DragItemStyle dragItemStyle_;
 };
 
 #define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()

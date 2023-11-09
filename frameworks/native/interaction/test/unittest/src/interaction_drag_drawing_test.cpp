@@ -426,7 +426,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemSt
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle { 0x99FF0000, 41, 51};
+    DragItemStyle dragItemStyle { 0x99FF0000, 41, 51 };
     ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);

@@ -113,7 +113,9 @@ void DeviceStatusSrvStub::InitDrag()
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             &DeviceStatusSrvStub::GetDragStateStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
-            &DeviceStatusSrvStub::GetDragSummaryStub }
+            &DeviceStatusSrvStub::GetDragSummaryStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
+            &DeviceStatusSrvStub::GetDropTypeStub }
     };
     connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }
@@ -629,6 +631,18 @@ int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParc
         FI_HILOGE("Failed to summarys unmarshalling");
         return ERR_INVALID_VALUE;
     }
+    return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    DropType dropType;
+    int32_t ret = GetDropType(dropType);
+    if (ret != RET_OK) {
+        return RET_ERR;
+    }
+    WRITEINT32(reply, static_cast<int32_t>(dropType), IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 } // namespace DeviceStatus

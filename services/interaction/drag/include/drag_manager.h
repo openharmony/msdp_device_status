@@ -16,6 +16,7 @@
 #ifndef DRAG_MANAGER_H
 #define DRAG_MANAGER_H
 
+#include <atomic>
 #include <string>
 
 #include "extra_data.h"
@@ -70,34 +71,43 @@ public:
     void SetDragState(DragState state) override;
     int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
+    int32_t GetDropType(DropType& dropType) const;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,
-            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : context_(context), callback_(cb) {}
+            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb)
+            : context_(context),
+            pointerEventCallback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
         IContext* context_ { nullptr };
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> pointerEventCallback_ { nullptr };
     };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     class MonitorConsumer : public MMI::IInputEventConsumer {
     public:
-        explicit MonitorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
+        explicit MonitorConsumer(
+            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : pointerEventCallback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
+        std::function<void (std::shared_ptr<MMI::PointerEvent>)> pointerEventCallback_;
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
 private:
     void PrintDragData(const DragData &dragData);
     int32_t AddDragEventHandler(int32_t sourceType);
+    int32_t AddPointerEventHandler(uint32_t deviceTags);
+    int32_t AddKeyEventMointor();
+    int32_t RemoveKeyEventMointor();
+    int32_t RemovePointerEventHandler();
     int32_t NotifyDragResult(DragResult result);
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
@@ -113,11 +123,13 @@ private:
     StateChangeNotify stateNotify_;
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
+    int32_t keyEventMonitorId_ { -1 };
+    std::atomic<DropType> dropType_ { DropType::MOVE };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
-    int32_t interceptorId_ { -1 };
+    int32_t pointerEventInterceptorId_ { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
-    int32_t monitorId_ { -1 };
+    int32_t pointerEventMonitorId_  { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;

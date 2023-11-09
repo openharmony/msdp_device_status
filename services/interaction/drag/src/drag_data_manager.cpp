@@ -126,6 +126,16 @@ bool DragDataManager::IsMotionDrag() const
     FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
     return isMotionDrag_;
 }
+
+void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    dragItemStyle_ = dragItemStyle;
+}
+
+DragItemStyle DragDataManager::GetDragItemStyle()
+{
+    return dragItemStyle_;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

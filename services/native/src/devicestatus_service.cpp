@@ -827,6 +827,16 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return ret;
 }
 
+int32_t DeviceStatusService::GetDropType(DropType& dropType)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDropType, &dragMgr_, std::ref(dropType)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get drop type failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {

@@ -92,7 +92,6 @@ constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
 constexpr int32_t INVALID_COLOR_VALUE { -1 };
 constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
-constexpr int32_t ICON_CORNER_RADIUS { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t TRANSPARENT_COLOR { 0x00000000 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
@@ -257,11 +256,6 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
-    // if (displayY >= 500 && displayY <= 510) {
-    //     FI_HILOGI("Here in GradientForegroundColor");
-    //     UpdateDragItemStyle(DragItemStyle());//Just use to test animation interface usage
-    //     FI_HILOGI("Here out GradientForegroundColor");
-    // }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;

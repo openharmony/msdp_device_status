@@ -157,6 +157,11 @@ int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summa
 {
     return INTER_MGR_IMPL.GetDragSummary(summarys);
 }
+
+int32_t InteractionManager::GetDropType(DropType &dropType)
+{
+    return INTER_MGR_IMPL.GetDropType(dropType);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

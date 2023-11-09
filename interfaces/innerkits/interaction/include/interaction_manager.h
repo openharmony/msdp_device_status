@@ -216,6 +216,14 @@ public:
     int32_t GetDragData(DragData &dragData);
 
     /**
+     * @brief Obtains the current droping type.
+     * @param dropType dropping type while user pressed ctrl or not.
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetDropType(DropType &dropType);
+
+    /**
      * @brief Registers a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
@@ -243,7 +251,7 @@ public:
      * @brief Update item style when dragging.
      * @param dragItemStyle Indicates the style param for dragged item.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 10
+     * @since 11
      */
     int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     
