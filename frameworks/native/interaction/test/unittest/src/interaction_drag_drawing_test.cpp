@@ -426,12 +426,10 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemSt
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle;
-    int32_t ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
+    ret = InteractionManager::GetInstance()->UpdateDragItemStyle(DragItemStyle());
     ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
     ASSERT_EQ(ret, RET_OK);
     DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
