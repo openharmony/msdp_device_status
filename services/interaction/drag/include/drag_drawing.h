@@ -136,6 +136,7 @@ public:
     void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     int32_t CheckDragData(const DragData &dragData);

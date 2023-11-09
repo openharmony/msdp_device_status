@@ -59,6 +59,7 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t GetDropType(DropType &dropType);
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     void InitMsgHandler();

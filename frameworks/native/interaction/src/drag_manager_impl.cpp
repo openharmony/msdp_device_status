@@ -275,6 +275,12 @@ int32_t DragManagerImpl::GetDropType(DropType& dropType)
 {
     return DeviceStatusClient::GetInstance().GetDropType(dropType);
 }
+
+int32_t DragManagerImpl::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return DeviceStatusClient::GetInstance().EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -842,6 +842,12 @@ int32_t DragManager::GetDropType(DropType& dropType) const
     dropType = dropType_.load();
     return RET_OK;
 }
+
+int32_t DragManager::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return dragDrawing_.EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
