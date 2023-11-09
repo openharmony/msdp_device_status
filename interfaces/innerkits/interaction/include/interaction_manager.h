@@ -240,10 +240,9 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
     /**
-     * @brief 文本编辑区8dp位移动效
-     * @param enable 用于确认是否执行8dp位移动效
-     * The value <b>true</b> 表示执行8dp位移动效,
-     * and <b>false</b> 表示不执行8dp位移动效.
+     * @brief Specifies whether to implement 8dp movement in the text editor area.
+     * @param enable Indicates whether to enable 8dp movement.
+     * The value <b>true</b> means to enable 8dp movement, and the value <b>false</b> means the opposite.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
