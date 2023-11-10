@@ -504,7 +504,7 @@ void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Switch state, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -514,13 +514,13 @@ void JsEventTarget::CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        FI_HILOGE("scope is nullptr");
+        FI_HILOGE("Switch state, scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value state = JsUtil::GetCrossingSwitchStateInfo(cb);
     if (state == nullptr) {
-        FI_HILOGE("state is nullptr");
+        FI_HILOGE("Switch state, state is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;
@@ -536,35 +536,35 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Switch state asyn, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
     JsUtil::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-    napi_handle_scope handleScope = nullptr;
-    napi_open_handle_scope(cb->env, &handleScope);
-    if (handleScope == nullptr) {
-        FI_HILOGE("handleScope is nullptr");
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    if (scope == nullptr) {
+        FI_HILOGE("The scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value resultObj[2];
-    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, handleScope);
+    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, scope);
     resultObj[1] = JsUtil::GetCrossingSwitchStateInfo(cb);
     if (resultObj[1] == nullptr) {
-        FI_HILOGE("Object is nullptr");
-        napi_close_handle_scope(cb->env, handleScope);
+        FI_HILOGE("The object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
     }
     napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, handleScope);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     size_t argc = TWO_PARAM;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, argc, resultObj, &result),
-        CALL_FUNCTION, handleScope);
+        CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
-    napi_close_handle_scope(cb->env, handleScope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)

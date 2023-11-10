@@ -65,7 +65,6 @@ public:
     virtual int32_t RemoveHotAreaListener() override;
 
 private:
-    int32_t SendData(DeviceInterfaceCode interfaceCode);
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
 };
 } // namespace DeviceStatus

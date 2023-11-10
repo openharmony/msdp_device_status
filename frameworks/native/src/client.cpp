@@ -51,15 +51,15 @@ void Client::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
     CHKPV(eventHandler_);
     auto currentRunner = eventHandler_->GetEventRunner();
     CHKPV(currentRunner);
-    auto newRunner = eventHandler->GetEventRunner();
-    CHKPV(newRunner);
+    auto newEventRunner = eventHandler->GetEventRunner();
+    CHKPV(newEventRunner);
     isEventHandlerChanged_ = false;
-    if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
+    if (currentRunner->GetRunnerThreadName() != newEventRunner->GetRunnerThreadName()) {
         isEventHandlerChanged_ = true;
         FI_HILOGD("Event handler changed");
     }
     FI_HILOGD("Current handler name:%{public}s, New handler name:%{public}s",
-        currentRunner->GetRunnerThreadName().c_str(), newRunner->GetRunnerThreadName().c_str());
+        currentRunner->GetRunnerThreadName().c_str(), newEventRunner->GetRunnerThreadName().c_str());
 }
 
 bool Client::SendMessage(const NetPacket &pkt) const

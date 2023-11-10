@@ -121,10 +121,10 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
         if (tasks_.empty()) {
             break;
         }
-        auto duty = tasks_.front();
-        CHKPB(duty);
-        RecoveryId(duty->GetId());
-        tasks.push_back(duty->GetSharedPtr());
+        auto taskDuty = tasks_.front();
+        CHKPB(taskDuty);
+        RecoveryId(taskDuty->GetId());
+        tasks.push_back(taskDuty->GetSharedPtr());
         tasks_.pop();
     }
 }
@@ -144,13 +144,13 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     ssize_t res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        FI_HILOGE("Pipe write failed, errno:%{public}d", errno);
+        FI_HILOGE("Write to pipe failed, errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
-    FI_HILOGD("Post %{public}s", taskType.c_str());
+    FI_HILOGD("TaskType post %{public}s", taskType.c_str());
     return task->GetSharedPtr();
 }
 } // namespace DeviceStatus

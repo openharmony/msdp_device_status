@@ -33,11 +33,11 @@ std::string GetLocalNetworkId()
     auto localNode = std::make_unique<NodeBasicInfo>();
     int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
     if (ret != RET_OK) {
-        FI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        FI_HILOGE("Get local node device info, ret:%{public}d", ret);
         return {};
     }
     std::string networkId(localNode->networkId, sizeof(localNode->networkId));
-    FI_HILOGD("GetLocalNodeDeviceInfo networkId:%{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGD("Get local node device info, networkId:%{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     return localNode->networkId;
 }
 } // namespace COORDINATION

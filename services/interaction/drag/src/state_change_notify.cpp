@@ -69,7 +69,7 @@ int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
         it != msgInfos_[MessageType::NOTIFY_STYLE].end(); ++it) {
         auto info = *it;
         CHKPC(info);
-        OnDragInfoNotify(info->session, info->msgId, info->style);
+        OnDragInfoNotify(info->session, info->msgId, style);
     }
     return RET_OK;
 }
@@ -85,7 +85,7 @@ int32_t StateChangeNotify::StateChangedNotify(DragState state)
         it != msgInfos_[MessageType::NOTIFY_STATE].end(); ++it) {
         auto info = *it;
         CHKPC(info);
-        OnDragInfoNotify(info->session, info->msgId, info->state);
+        OnDragInfoNotify(info->session, info->msgId, state);
     }
     return RET_OK;
 }

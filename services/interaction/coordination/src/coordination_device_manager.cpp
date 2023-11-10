@@ -139,7 +139,7 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
     const std::string DH_ID_PREFIX { "Input_" };
     std::string descriptor;
     if (IsRemote() && !phys.empty()) {
-        FI_HILOGD("physicalPath:%{public}s", phys.c_str());
+        FI_HILOGD("Generate descriptor, physicalPath:%{public}s", phys.c_str());
         std::vector<std::string> idParts;
         StringSplit(phys.c_str(), SPLIT_SYMBOL, idParts);
         if (idParts.size() == NETWORK_ID_NUMS) {
@@ -148,8 +148,8 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
         return descriptor;
     }
 
-    const std::string name = GetName();
     const std::string uniq = GetUniq();
+    const std::string name = GetName();
     std::string rawDescriptor = StringPrintf(":%04x:%04x:", GetVendor(), GetProduct());
 
     if (!uniq.empty()) {
@@ -162,7 +162,7 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
         rawDescriptor += "name:" + std::regex_replace(name, std::regex(" "), "");
     }
     descriptor = DH_ID_PREFIX + Sha256(rawDescriptor);
-    FI_HILOGD("Created descriptor raw:%{public}s", rawDescriptor.c_str());
+    FI_HILOGD("Generate descriptor, created descriptor raw:%{public}s", rawDescriptor.c_str());
     return descriptor;
 }
 
@@ -307,11 +307,11 @@ bool CoordinationDeviceManager::HasLocalPointerDevice() const
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
         if (!dev->IsRemote() && dev->IsPointerDevice()) {
-            FI_HILOGD("It is currently a mouse device");
+            FI_HILOGD("Local pointer, it is currently a mouse device");
             return true;
         }
     }
-    FI_HILOGD("Not currently a mouse device");
+    FI_HILOGD("Local pointer, not currently a mouse device");
     return false;
 }
 
@@ -335,7 +335,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     CHKPV(device);
     auto iter = devices_.find(device->GetId());
     if (iter == devices_.end()) {
-        FI_HILOGE("The device corresponding to the current id:%{public}d cannot be found", device->GetId());
+        FI_HILOGE("Device removed, the device corresponding to the current id:%{public}d cannot be found", device->GetId());
         return;
     }
     std::shared_ptr<Device> dev = iter->second;
