@@ -29,9 +29,6 @@ public:
     virtual uint32_t GetEvents() const;
     virtual int32_t GetFd() const = 0;
     virtual void Dispatch(const struct epoll_event &ev) = 0;
-    virtual int32_t Add(IEpollEventSource &source) = 0;
-    virtual void Remove(IEpollEventSource &source) = 0;
-    virtual int32_t Update(IEpollEventSource &source) = 0;
 };
 
 inline uint32_t IEpollEventSource::GetEvents() const

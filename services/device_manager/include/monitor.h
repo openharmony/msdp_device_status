@@ -38,9 +38,6 @@ public:
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
-    int32_t Add(IEpollEventSource &source) override;
-    void Remove(IEpollEventSource &source) override;
-    int32_t Update(IEpollEventSource &source) override;
     void SetDeviceMgr(IDeviceMgr *devMgr);
     int32_t Enable();
     void Disable();
