@@ -34,8 +34,8 @@ struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
-public:
-    bool operator==(const ShadowInfo &shadow) const
+
+    bool operator == (const ShadowInfo &shadow) const
     {
         if (pixelMap == nullptr && shadow.pixelMap == nullptr) {
             return x == shadow.x && y == shadow.y;
@@ -44,6 +44,11 @@ public:
             return false;
         }
         return pixelMap->IsSameImage(*(shadow.pixelMap)) && x == shadow.x && y == shadow.y;
+    }
+
+    bool operator !=  (const ShadowInfo &shadow) const
+    {
+        return !(*this == shadow);
     }
 };
 
@@ -61,8 +66,8 @@ struct DragData {
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
     std::map<std::string, int64_t> summarys;
-public:
-    bool operator==(const DragData &dragData) const
+
+    bool operator == (const DragData &dragData) const
     {
         if (shadowInfos.size() != dragData.shadowInfos.size()) {
             return false;
@@ -78,6 +83,11 @@ public:
                pointerId == dragData.pointerId && displayX == dragData.displayX && displayY == dragData.displayY &&
                displayId == dragData.displayId && hasCanceledAnimation == dragData.hasCanceledAnimation &&
                summarys == dragData.summarys;
+    }
+
+    bool operator != (const DragData &dragData) const
+    {
+        return !(*this == dragData);
     }
 };
 

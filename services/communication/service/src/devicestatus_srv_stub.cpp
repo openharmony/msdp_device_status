@@ -27,7 +27,6 @@
 #include "devicestatus_srv_proxy.h"
 #include "drag_data_packer.h"
 #include "fi_log.h"
-#include "summary_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "include/util.h"

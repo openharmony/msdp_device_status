@@ -23,10 +23,24 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+
+using SummaryMap = std::map<std::string, int64_t>;
 class DragDataPacker {
 public:
     static int32_t Marshalling(const DragData &dragData, Parcel &data);
     static int32_t UnMarshalling(Parcel &data, DragData &dragData);
+};
+
+class ShadowPacker {
+public:
+    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
+    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
+};
+
+class SummaryPacker {
+public:
+    static int32_t Marshalling(const SummaryMap &val, Parcel &parcel);
+    static int32_t UnMarshalling(Parcel &parcel, SummaryMap &val);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

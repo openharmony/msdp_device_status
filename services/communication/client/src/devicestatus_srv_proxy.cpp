@@ -23,7 +23,6 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 #include "drag_data_packer.h"
-#include "summary_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "utility.h"

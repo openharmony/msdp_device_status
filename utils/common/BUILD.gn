@@ -36,8 +36,6 @@ ohos_shared_library("devicestatus_util") {
     "src/util_napi_error.cpp",
     "src/utility.cpp",
     "src/drag_data_packer.cpp",
-    "src/shadow_packer.cpp",
-    "src/summary_packer.cpp"
   ]
 
   configs = [ ":devicestatus_util_private_config" ]
