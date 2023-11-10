@@ -13,27 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef DRAG_DATA_PACKER_H
-#define DRAG_DATA_PACKER_H
+#include "drag_data_util.h"
 
 #include "parcel.h"
 
-#include "drag_data.h"
+#include "drag_data_packer.h"
 
 namespace OHOS {
 namespace Msdp {
+
 namespace DeviceStatus {
-using SummaryMap = std::map<std::string, int64_t>;
-class DragDataPacker {
-public:
-    static int32_t Marshalling(const DragData &dragData, Parcel &data);
-    static int32_t UnMarshalling(Parcel &data, DragData &dragData);
-    static int32_t MarshallingShadowInfos(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
-    static int32_t UnMarshallingShadowInfos(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
-    static int32_t MarshallingSummary(const SummaryMap &val, Parcel &parcel);
-    static int32_t UnmarshallingSummary(Parcel &parcel, SummaryMap &val);
-};
+
+int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data)
+{
+    return DragDataPacker::Marshalling(dragData, data);
+}
+
+int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData)
+{
+    return DragDataPacker::UnMarshalling(data, dragData);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DRAG_DATA_PACKER_H

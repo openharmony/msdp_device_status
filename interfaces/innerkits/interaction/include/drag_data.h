@@ -74,7 +74,6 @@ public:
             }
         }
         return buffer == dragData.buffer && udKey == dragData.udKey && filterInfo == dragData.filterInfo &&
-        
                extraInfo == dragData.extraInfo && sourceType == dragData.sourceType && dragNum == dragData.dragNum &&
                pointerId == dragData.pointerId && displayX == dragData.displayX && displayY == dragData.displayY &&
                displayId == dragData.displayId && hasCanceledAnimation == dragData.hasCanceledAnimation &&

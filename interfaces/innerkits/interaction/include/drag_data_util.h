@@ -13,23 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef SHADOW_PACKER_H
-#define SHADOW_PACKER_H
+#ifndef DRAG_DATA_UTIL_H
+#define DRAG_DATA_UTIL_H
 
-#include <message_parcel.h>
+#include "parcel.h"
 
 #include "drag_data.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class ShadowPacker {
+class DragDataUtil {
 public:
-    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
-    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
+    static int32_t Marshalling(const DragData &dragData, Parcel &data);
+    static int32_t UnMarshalling(Parcel &data, DragData &dragData);
 };
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // SHADOW_PACKER_H
+#endif // DRAG_DATA_UTIL_H

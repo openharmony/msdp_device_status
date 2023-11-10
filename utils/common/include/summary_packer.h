@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SHADOW_PACKER_H
-#define SHADOW_PACKER_H
+#ifndef SUMMARY_PACKER_H
+#define SUMMARY_PACKER_H
 
 #include <message_parcel.h>
 
@@ -23,13 +23,13 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class ShadowPacker {
+using SummaryMap = std::map<std::string, int64_t>;
+class SummaryPacker {
 public:
-    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
-    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
+    static int32_t Marshalling(const SummaryMap &val, Parcel &parcel);
+    static int32_t UnMarshalling(Parcel &parcel, SummaryMap &val);
 };
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // SHADOW_PACKER_H
+#endif // SUMMARY_PACKER_H

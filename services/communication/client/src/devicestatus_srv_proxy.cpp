@@ -22,7 +22,8 @@
 
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#include "shadow_packer.h"
+#include "drag_data_packer.h"
+#include "summary_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "utility.h"
@@ -346,22 +347,9 @@ int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
         FI_HILOGE("Get DragData failed");
         return ret;
     }
-    if (ShadowPacker::UnMarshallingShadowInfos(reply, dragData.shadowInfos) != RET_OK) {
-        FI_HILOGE("UnMarshallingShadowInfos failed");
+    if (DragDataPacker::UnMarshalling(reply, dragData) != RET_OK) {
+        FI_HILOGE("UnMarshalling dragData failed");
         return RET_ERR;
-    }
-    READUINT8VECTOR(reply, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(reply, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.displayX, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(reply, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READBOOL(reply, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (!Utility::Unmarshalling(dragData.summarys, reply)) {
-        FI_HILOGE("Failed to summarys unmarshalling");
-        return E_DEVICESTATUS_READ_PARCEL_ERROR;
     }
     return ret;
 }
@@ -420,23 +408,8 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (ShadowPacker::MarshallingShadowInfos(dragData.shadowInfos, data) != RET_OK) {
-        FI_HILOGE("Failed to marshalling shadowInfos");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayX, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayY, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayId, ERR_INVALID_VALUE);
-    WRITEBOOL(data, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
-    if (!Utility::Marshalling(dragData.summarys, data)) {
-        FI_HILOGE("Failed to summarys marshalling");
+    if (DragDataPacker::Marshalling(dragData, data) != RET_OK) {
+        FI_HILOGE("Failed to marshalling dragData");
         return ERR_INVALID_VALUE;
     }
     MessageParcel reply;
@@ -723,7 +696,7 @@ int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &sum
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    if (!Utility::Unmarshalling(summarys, reply)) {
+    if (SummaryPacker::UnMarshalling(reply, summarys) != RET_OK) {
         FI_HILOGE("Failed to summarys unmarshalling");
         return RET_ERR;
     }

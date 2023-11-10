@@ -24,6 +24,7 @@ config("devicestatus_util_public_config") {
   include_dirs = [
     ".",
     "include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
 }
 
@@ -34,6 +35,9 @@ ohos_shared_library("devicestatus_util") {
     "src/util_napi.cpp",
     "src/util_napi_error.cpp",
     "src/utility.cpp",
+    "src/drag_data_packer.cpp",
+    "src/shadow_packer.cpp",
+    "src/summary_packer.cpp"
   ]
 
   configs = [ ":devicestatus_util_private_config" ]
@@ -44,6 +48,7 @@ ohos_shared_library("devicestatus_util") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "image_framework:image_native",
   ]
 
   innerapi_tags = [ "platformsdk" ]

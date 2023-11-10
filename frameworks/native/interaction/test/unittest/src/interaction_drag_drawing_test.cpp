@@ -126,12 +126,12 @@ public:
         if (function_ != nullptr) {
             function_(msg);
         }
-        FI_HILOGI("WLD test OnDragEndMessage");
+        FI_HILOGI("Test OnDragEndMessage");
     }
 
     void OnHideIconMessage() override
     {
-        FI_HILOGI("WLD test OnHideIconMessage");
+        FI_HILOGI("Test OnHideIconMessage");
     }
 private:
     std::function<void(const DragNotifyMsg&)> function_;

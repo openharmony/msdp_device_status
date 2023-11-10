@@ -32,7 +32,7 @@
 #include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
-#include "drag_data_packer.h"
+#include "drag_data_util.h"
 #include "interaction_manager.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -228,12 +228,12 @@ public:
         if (function_ != nullptr) {
             function_(msg);
         }
-        FI_HILOGI("WLD test OnDragEndMessage");
+        FI_HILOGI("Test OnDragEndMessage");
     }
 
     void OnHideIconMessage() override
     {
-        FI_HILOGI("WLD test OnHideIconMessage");
+        FI_HILOGI("Test OnHideIconMessage");
     }
 private:
     std::function<void(const DragNotifyMsg&)> function_;
@@ -1665,22 +1665,22 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize
 }
 
 /**
- * @tc.name: TestDragDataPacker
+ * @tc.name: TestDragDataUtil_Packer
  * @tc.desc: Pack up dragData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionManagerTest, TestDragDataPacker, TestSize.Level1)
+HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     Parcel parcel;
-    int32_t ret = DragDataPacker::Marshalling(dragData.value(), parcel);
+    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel);
     ASSERT_EQ(ret, RET_OK);
     DragData dragDataFromParcel;
-    ret = DragDataPacker::UnMarshalling(parcel, dragDataFromParcel);
+    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_EQ(dragData.value(), dragDataFromParcel);
 }
