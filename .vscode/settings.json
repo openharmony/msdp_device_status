@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        ".eslintrc": "json",
+        "*.vue": "html",
+        "bitset": "cpp",
+        "memory": "cpp",
+        "random": "cpp",
+        "future": "cpp",
+        "optional": "cpp"
+    }
+}
