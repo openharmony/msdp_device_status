@@ -276,12 +276,7 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
 {
     struct epoll_event ev {};
     ev.events = events;
-    //ev.data.ptr = epollMgr_.get();
     ev.data.ptr = &epollMgr_;
-
-    //CHKPR(epollMgr_, RET_ERR);
-    //CHKPR(&epollMgr_, RET_ERR);
-    //epollMgr_->Dispatch(ev);
     epollMgr_.Dispatch(ev);
     return RET_OK;
 }
