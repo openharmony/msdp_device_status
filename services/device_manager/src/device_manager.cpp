@@ -95,42 +95,25 @@ int32_t DeviceManager::Enable()
 int32_t DeviceManager::OnEnable()
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGE("Hwl>> step 0");
-    //epollMgr_ = std::make_shared<EpollManager>();
-    FI_HILOGE("Hwl>> step 1");
-    // if(!epollMgr_)
-    // {
-    //     FI_HILOGE("Hwl>> epollMgr_ is nullptr");
-    // }
-    //int32_t ret = epollMgr_->Open();
     int32_t ret = epollMgr_.Open();
     if (ret != RET_OK) {
         return ret;
     }
-    FI_HILOGE("Hwl>> step 2");
     ret = monitor_.Enable();
     if (ret != RET_OK) {
         goto CLOSE_EPOLL;
     }
-    FI_HILOGE("Hwl>> step 3");
-    //ret = epollMgr_->Add(monitor_);
     ret = epollMgr_.Add(monitor_);
     if (ret != RET_OK) {
         goto DISABLE_MONITOR;
     }
-    FI_HILOGE("Hwl>> step 4");
     enumerator_.ScanDevices();
     return RET_OK;
 
 DISABLE_MONITOR:
-    FI_HILOGE("Hwl>> step 5");
     monitor_.Disable();
-    FI_HILOGE("Hwl>> step 6");
 CLOSE_EPOLL:
-    FI_HILOGE("Hwl>> step 7");
-    //epollMgr_.reset();
     epollMgr_.Close();
-    FI_HILOGE("Hwl>> step 8");
     return ret;
 }
 
@@ -148,12 +131,8 @@ int32_t DeviceManager::Disable()
 
 int32_t DeviceManager::OnDisable()
 {
-    //CHKPR(epollMgr_, RET_ERR);
-    //CHKPR(&epollMgr_, RET_ERR);
-    //epollMgr_->Remove(monitor_);
     epollMgr_.Remove(monitor_);
     monitor_.Disable();
-    //epollMgr_.reset();
     epollMgr_.Close();
     return RET_OK;
 }

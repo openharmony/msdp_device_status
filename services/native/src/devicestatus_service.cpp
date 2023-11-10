@@ -167,7 +167,6 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        //auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
         devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
     }
     if (!devicestatusManager_->Init()) {
