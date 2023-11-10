@@ -33,7 +33,7 @@ ohos_shared_library("fusion_data_binding") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   sources = [ "src/fusion_data_binding.cpp" ]

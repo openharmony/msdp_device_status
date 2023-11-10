@@ -21,7 +21,7 @@ declare_args() {
 }
 
 if (fusion_interaction_coordination) {
-  import("//base/msdp/motion/motion.gni")
+  #import("//base/msdp/motion/motion.gni")
 }
 
 ability_runtime_path = "//foundation/ability/ability_runtime"

@@ -31,7 +31,7 @@ ohos_shared_library("stationary") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
   sources = [
     "${device_status_frameworks_path}/js/napi/src/devicestatus_event.cpp",
