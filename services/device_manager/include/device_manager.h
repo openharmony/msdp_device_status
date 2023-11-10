@@ -94,7 +94,8 @@ private:
 inline int32_t DeviceManager::GetFd() const
 {
     //return (epollMgr_ != nullptr ? epollMgr_->GetFd() : -1);
-    return (&epollMgr_ != nullptr ? epollMgr_.GetFd() : -1);
+    //return (&epollMgr_ != nullptr ? epollMgr_.GetFd() : -1);
+    return epollMgr_.GetFd();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
