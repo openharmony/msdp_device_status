@@ -732,7 +732,6 @@ int32_t DeviceStatusSrvProxy::UpdateDragItemStyle(const DragItemStyle &dragItemS
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
-
 }
 
 int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &summarys)

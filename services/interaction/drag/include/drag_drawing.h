@@ -24,7 +24,6 @@
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
 #include "modifier/rs_modifier.h"
-#include "common/rs_color.h"
 #include "vsync_receiver.h"
 #include "drag_data.h"
 #include "i_drag_animation.h"

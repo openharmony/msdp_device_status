@@ -51,7 +51,6 @@ int32_t DragItemStylePacker::UnMarshallingDragItemStyle(MessageParcel &data, Dra
     READINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     return RET_OK;
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -1435,7 +1435,6 @@ void DrawDynamicEffectModifier::SetScale(float scale)
     }
     scale_->Set(scale);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
