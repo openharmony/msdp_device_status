@@ -129,7 +129,7 @@ DISABLE_MONITOR:
 CLOSE_EPOLL:
     FI_HILOGE("Hwl>> step 7");
     //epollMgr_.reset();
-    delete &epollMgr_;
+    epollMgr_.Close();
     FI_HILOGE("Hwl>> step 8");
     return ret;
 }
@@ -149,12 +149,12 @@ int32_t DeviceManager::Disable()
 int32_t DeviceManager::OnDisable()
 {
     //CHKPR(epollMgr_, RET_ERR);
-    CHKPR(&epollMgr_, RET_ERR);
+    //CHKPR(&epollMgr_, RET_ERR);
     //epollMgr_->Remove(monitor_);
     epollMgr_.Remove(monitor_);
     monitor_.Disable();
     //epollMgr_.reset();
-    delete &epollMgr_;
+    epollMgr_.Close();
     return RET_OK;
 }
 
@@ -301,7 +301,7 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
     ev.data.ptr = &epollMgr_;
 
     //CHKPR(epollMgr_, RET_ERR);
-    CHKPR(&epollMgr_, RET_ERR);
+    //CHKPR(&epollMgr_, RET_ERR);
     //epollMgr_->Dispatch(ev);
     epollMgr_.Dispatch(ev);
     return RET_OK;
