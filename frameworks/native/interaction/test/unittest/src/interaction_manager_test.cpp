@@ -25,12 +25,14 @@
 #include <gtest/gtest.h>
 #include "input_device.h"
 #include "input_manager.h"
+#include "parcel.h"
 #include "pointer_event.h"
 #include "securec.h"
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
+#include "drag_data_packer.h"
 #include "interaction_manager.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -1449,7 +1451,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
         DragData replyDragData;
         ret = InteractionManager::GetInstance()->GetDragData(replyDragData);
         ASSERT_EQ(ret, RET_OK);
-        ASSERT_EQ(replyDragData, *dragData);
+        ASSERT_EQ(replyDragData, dragData.value());
         PrintDragData(replyDragData);
         SimulateUpEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
@@ -1646,7 +1648,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize
     constexpr int64_t recordSize = 20;
     std::map<std::string, int64_t> summarys = { { udType, recordSize } };
     dragData.value().summarys = summarys;
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     EXPECT_EQ(ret, RET_OK);
@@ -1661,6 +1663,28 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
+
+/**
+ * @tc.name: TestDragDataPacker
+ * @tc.desc: Pack up dragData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, TestDragDataPacker, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    Parcel parcel;
+    int32_t ret = DragDataPacker::Marshalling(dragData.value(), parcel);
+    ASSERT_EQ(ret, RET_OK);
+    DragData dragDataFromParcel;
+    ret = DragDataPacker::UnMarshalling(parcel, dragDataFromParcel);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(dragData.value(), dragDataFromParcel);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
