@@ -127,7 +127,7 @@ void CoordinationStateIn::StopRemoteInput(const std::string &originNetworkId,
         [this, remoteNetworkId, startDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         });
-    if (!(ret == RET_OK)) {
+    if (ret != RET_OK) {
         COOR_SM->OnStartFinish(false, originNetworkId, startDeviceId);
     }
 }
@@ -162,7 +162,7 @@ void CoordinationStateIn::ComeBack(const std::string &remoteNetworkId, int32_t s
         [this, remoteNetworkId, startDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         });
-    if (!(ret == RET_OK)) {
+    if (ret != RET_OK) {
         COOR_SM->OnStartFinish(false, remoteNetworkId, startDeviceId);
     }
 }
