@@ -108,6 +108,8 @@ void DeviceStatusSrvStub::InitDrag()
             DeviceStatusSrvStub::GetDragDataStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
             DeviceStatusSrvStub::GetDragStateStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_STATE),
+            DeviceStatusSrvStub::GetDragStateStub }
     };
     connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
 }
