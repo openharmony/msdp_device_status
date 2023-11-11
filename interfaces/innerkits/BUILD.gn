@@ -36,7 +36,7 @@ ohos_shared_library("devicestatus_client") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   version_script = "libdevicestatus_client_map"

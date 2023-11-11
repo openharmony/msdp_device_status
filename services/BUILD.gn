@@ -82,7 +82,7 @@ ohos_shared_library("devicestatus_service") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   shlib_type = "sa"
@@ -132,7 +132,7 @@ ohos_static_library("devicestatus_static_service") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = true
+    debug = false
   }
 
   include_dirs = [ "//third_party/cJSON" ]
