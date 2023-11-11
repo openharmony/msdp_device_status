@@ -85,7 +85,7 @@ private:
     Enumerator enumerator_;
     Monitor monitor_;
     HotplugHandler hotplug_;
-    EpollManager epollMgr_;
+    __attribute__((no_sanitize("cfi"))) EpollManager epollMgr_;
     std::set<std::weak_ptr<IDeviceObserver>> observers_;
     std::unordered_map<int32_t, std::shared_ptr<IDevice>> devices_;
 };
