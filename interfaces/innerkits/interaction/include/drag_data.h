@@ -91,12 +91,15 @@ struct DragItemStyle {
     uint32_t foregroundColor;
     int32_t radius;
     int32_t alpha;
-    bool operator==(const DragItemStyle &style) const {
+
+    bool operator == (const DragItemStyle &style) const
+    {
         return foregroundColor == style.foregroundColor &&
-               radius == style.radius &&
-               alpha == style.alpha;
+               radius == style.radius && alpha == style.alpha;
     }
-    bool operator!=(const DragItemStyle &style) const {
+
+    bool operator!=(const DragItemStyle &style) const
+    {
         return !(*this == style);
     }
 };
