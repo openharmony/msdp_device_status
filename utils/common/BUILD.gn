@@ -31,11 +31,11 @@ config("devicestatus_util_public_config") {
 ohos_shared_library("devicestatus_util") {
   version_script = "libdevicestatus_util_map"
   sources = [
+    "src/drag_data_packer.cpp",
     "src/util.cpp",
     "src/util_napi.cpp",
     "src/util_napi_error.cpp",
     "src/utility.cpp",
-    "src/drag_data_packer.cpp",
   ]
 
   configs = [ ":devicestatus_util_private_config" ]
@@ -45,8 +45,8 @@ ohos_shared_library("devicestatus_util") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "napi:ace_napi",
     "image_framework:image_native",
+    "napi:ace_napi",
   ]
 
   innerapi_tags = [ "platformsdk" ]

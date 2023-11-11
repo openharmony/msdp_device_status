@@ -224,7 +224,7 @@ public:
     void OnDragEndMessage(const DragNotifyMsg &msg) override
     {
         FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
-        msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
+            msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
         if (function_ != nullptr) {
             function_(msg);
         }
@@ -462,11 +462,11 @@ void InteractionManagerTest::PrintDragData(const DragData &dragData)
     CALL_DEBUG_ENTER;
     for (const auto &shadowInfo : dragData.shadowInfos) {
         FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
-        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
-        static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
-        static_cast<int32_t>(shadowInfo.pixelMap->GetAlphaType()),
-        static_cast<int32_t>(shadowInfo.pixelMap->GetAllocatorType()),
-        shadowInfo.pixelMap->GetWidth(), shadowInfo.pixelMap->GetHeight(), shadowInfo.x, shadowInfo.y);
+            " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
+            static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAlphaType()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAllocatorType()),
+            shadowInfo.pixelMap->GetWidth(), shadowInfo.pixelMap->GetHeight(), shadowInfo.x, shadowInfo.y);
 
     }
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"

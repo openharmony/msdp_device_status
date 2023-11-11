@@ -122,7 +122,7 @@ public:
     void OnDragEndMessage(const DragNotifyMsg &msg) override
     {
         FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
-        msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
+            msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
         if (function_ != nullptr) {
             function_(msg);
         }
