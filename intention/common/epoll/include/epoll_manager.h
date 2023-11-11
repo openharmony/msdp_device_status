@@ -29,24 +29,24 @@ namespace Msdp {
 namespace DeviceStatus {
 class EpollManager final : public IEpollEventSource {
 public:
-    __attribute__((no_sanitize("cfi"))) EpollManager() = default;
-    __attribute__((no_sanitize("cfi"))) ~EpollManager();
+    EpollManager() = default;
+    ~EpollManager();
     DISALLOW_COPY_AND_MOVE(EpollManager);
 
-    __attribute__((no_sanitize("cfi"))) int32_t Open();
-    __attribute__((no_sanitize("cfi"))) void Close();
+    int32_t Open();
+    void Close();
 
-    __attribute__((no_sanitize("cfi"))) int32_t Add(IEpollEventSource &source);
-    __attribute__((no_sanitize("cfi"))) void Remove(IEpollEventSource &source);
-    __attribute__((no_sanitize("cfi"))) int32_t Update(IEpollEventSource &source);
-    __attribute__((no_sanitize("cfi"))) int32_t Wait(struct epoll_event *events, int32_t maxevents);
-    __attribute__((no_sanitize("cfi"))) int32_t WaitTimeout(struct epoll_event *events, int32_t maxevents, int32_t timeout);
+    int32_t Add(IEpollEventSource &source);
+    void Remove(IEpollEventSource &source);
+    int32_t Update(IEpollEventSource &source);
+    int32_t Wait(struct epoll_event *events, int32_t maxevents);
+    int32_t WaitTimeout(struct epoll_event *events, int32_t maxevents, int32_t timeout);
 
-    __attribute__((no_sanitize("cfi"))) int32_t GetFd() const override;
-    __attribute__((no_sanitize("cfi"))) void Dispatch(const struct epoll_event &ev) override;
+    int32_t GetFd() const override;
+    void Dispatch(const struct epoll_event &ev) override;
 
 private:
-    __attribute__((no_sanitize("cfi"))) void DispatchOne(const struct epoll_event &ev);
+    void DispatchOne(const struct epoll_event &ev);
 
 private:
     int32_t epollFd_ { -1 };
