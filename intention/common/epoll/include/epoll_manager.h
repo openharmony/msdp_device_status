@@ -29,8 +29,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class EpollManager final : public IEpollEventSource {
 public:
-    EpollManager() = default;
-    ~EpollManager();
+    __attribute__((no_sanitize("cfi"))) EpollManager() = default;
+    __attribute__((no_sanitize("cfi"))) ~EpollManager();
     DISALLOW_COPY_AND_MOVE(EpollManager);
 
     __attribute__((no_sanitize("cfi"))) int32_t Open();

@@ -95,7 +95,7 @@ int32_t DeviceManager::Enable()
 int32_t DeviceManager::OnEnable()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = epollMgr_.Open();
+    __attribute__((no_sanitize("cfi"))) int32_t ret = epollMgr_.Open();
     if (ret != RET_OK) {
         return ret;
     }
@@ -103,7 +103,7 @@ int32_t DeviceManager::OnEnable()
     if (ret != RET_OK) {
         goto CLOSE_EPOLL;
     }
-    ret = epollMgr_.Add(monitor_);
+    __attribute__((no_sanitize("cfi"))) ret = epollMgr_.Add(monitor_);
     if (ret != RET_OK) {
         goto DISABLE_MONITOR;
     }
@@ -113,7 +113,7 @@ int32_t DeviceManager::OnEnable()
 DISABLE_MONITOR:
     monitor_.Disable();
 CLOSE_EPOLL:
-    epollMgr_.Close();
+    __attribute__((no_sanitize("cfi"))) epollMgr_.Close();
     return ret;
 }
 
@@ -131,9 +131,9 @@ int32_t DeviceManager::Disable()
 
 int32_t DeviceManager::OnDisable()
 {
-    epollMgr_.Remove(monitor_);
+    __attribute__((no_sanitize("cfi"))) epollMgr_.Remove(monitor_);
     monitor_.Disable();
-    epollMgr_.Close();
+    __attribute__((no_sanitize("cfi"))) epollMgr_.Close();
     return RET_OK;
 }
 
@@ -277,7 +277,7 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
     struct epoll_event ev {};
     ev.events = events;
     ev.data.ptr = &epollMgr_;
-    epollMgr_.Dispatch(ev);
+    __attribute__((no_sanitize("cfi"))) epollMgr_.Dispatch(ev);
     return RET_OK;
 }
 

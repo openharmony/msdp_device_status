@@ -92,7 +92,7 @@ private:
 
 inline int32_t DeviceManager::GetFd() const
 {
-    return epollMgr_.GetFd();
+    return __attribute__((no_sanitize("cfi"))) epollMgr_.GetFd();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
