@@ -299,6 +299,12 @@ int32_t InteractionManagerImpl::GetDragState(DragState &dragState)
     return dragManagerImpl_.GetDragState(dragState);
 }
 
+int32_t InteractionManagerImpl::GetDropType(DropType &dropType)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetDropType(dropType);
+}
+
 int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
 {
     CALL_DEBUG_ENTER;
@@ -327,6 +333,12 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
     (void)(listener);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+int32_t InteractionManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetDragSummary(summarys);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

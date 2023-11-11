@@ -1612,6 +1612,46 @@ HWTEST_F(InteractionManagerTest, AddHotAreaListener_002, TestSize.Level1)
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     RemovePermission();
 }
+
+/**
+ * @tc.name: InteractionManagerTest_GetDragSummary
+ * @tc.desc: Get drag summarys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    const std::string udType = "general.message";
+    constexpr int64_t recordSize = 20;
+    std::map<std::string, int64_t> summarys = { { udType, recordSize } };
+    dragData.value().summarys = summarys;
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    EXPECT_EQ(ret, RET_OK);
+    summarys.clear();
+    ret = InteractionManager::GetInstance()->GetDragSummary(summarys);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(summarys[udType], recordSize);
+    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

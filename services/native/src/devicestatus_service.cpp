@@ -827,6 +827,16 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return ret;
 }
 
+int32_t DeviceStatusService::GetDropType(DropType& dropType)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDropType, &dragMgr_, std::ref(dropType)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get drop type failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {
@@ -1030,6 +1040,17 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetDragSummary, &dragMgr_, std::ref(summarys)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 } // namespace DeviceStatus

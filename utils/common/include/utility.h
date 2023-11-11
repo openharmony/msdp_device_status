@@ -17,16 +17,19 @@
 #define UTILITY_H
 
 #include <cstring>
+#include <map>
 #include <sstream>
 #include <string>
 #include <type_traits>
 
 namespace OHOS {
+class Parcel;
 namespace Msdp {
 namespace DeviceStatus {
 
 template<typename, typename = std::void_t<>>
 struct IsStreamable : public std::false_type {};
+using summaryMap = std::map<std::string, int64_t>;
 
 template<typename T>
 struct IsStreamable<T, std::void_t<decltype(operator<<(std::declval<std::ostream>(), std::declval<T>()))>>
@@ -60,6 +63,8 @@ public:
 
     static void ShowFileAttributes(const char *path);
     static void ShowUserAndGroup();
+    static bool Marshalling(const summaryMap &val, Parcel &parcel);
+    static bool Unmarshalling(summaryMap &val, Parcel &parcel);
 };
 
 inline bool Utility::IsEmpty(const char *str)

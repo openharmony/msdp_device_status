@@ -26,11 +26,12 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICoordinationState" };
+const std::string THREAD_NAME { "coordination_state" };
 } // namespace
 
 ICoordinationState::ICoordinationState()
 {
-    runner_ = AppExecFwk::EventRunner::Create(true);
+    runner_ = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CoordinationEventHandler>(runner_);
 }
