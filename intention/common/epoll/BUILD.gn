@@ -18,6 +18,12 @@ config("intention_epoll_public_config") {
 }
 
 ohos_source_set("intention_epoll") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [ "include" ]
 
   sources = [ "src/epoll_manager.cpp" ]

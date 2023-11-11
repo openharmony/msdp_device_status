@@ -27,6 +27,12 @@ config("intention_public_config") {
 }
 
 ohos_shared_library("intention_client") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [
     "${intention_root_path}/frameworks/client/src/cooperate_manager_impl.cpp",
     "${intention_root_path}/frameworks/client/src/drag_manager_impl.cpp",
