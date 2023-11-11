@@ -84,7 +84,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
-    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
+    if (!Publish(this)) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
