@@ -21,7 +21,7 @@ ohos_shared_library("coordination") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   include_dirs = [

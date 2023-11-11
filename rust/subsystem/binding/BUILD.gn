@@ -30,7 +30,7 @@ ohos_shared_library("fusion_subsystem_binding") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   sources = [ "multimedia/src/fusion_image_framework.cpp" ]

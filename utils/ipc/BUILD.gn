@@ -25,7 +25,7 @@ ohos_shared_library("devicestatus_ipc") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   sources = [

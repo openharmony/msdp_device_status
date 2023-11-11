@@ -28,7 +28,7 @@ ohos_source_set("devicestatus_vdev") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   sources = [
@@ -71,7 +71,7 @@ ohos_source_set("devicestatus_vdev_builders") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   sources = [
@@ -105,7 +105,7 @@ ohos_executable("vdevadm") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
-    debug = false
+    debug = true
   }
 
   include_dirs = [
