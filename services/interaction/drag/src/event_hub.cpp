@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,7 @@ std::shared_ptr<EventHub> EventHub::GetEventHub(IContext* context)
 void EventHub::RegisterEvent(std::shared_ptr<EventHub> eventHub)
 {
     CALL_DEBUG_ENTER;
-    auto result = EventFwk::CommonEventManager::SubscribeCommonEvent(eventHub);
+    bool result = EventFwk::CommonEventManager::SubscribeCommonEvent(eventHub);
     if (result != true) {
         FI_HILOGE("Failed to subscribe common event");
     }
@@ -59,7 +59,7 @@ void EventHub::RegisterEvent(std::shared_ptr<EventHub> eventHub)
 void EventHub::UnRegisterEvent(std::shared_ptr<EventHub> eventHub)
 {
     CALL_DEBUG_ENTER;
-    auto result = EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventHub);
+    bool result = EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventHub);
     if (result != true) {
         FI_HILOGE("Failed to unSubscribe common event");
     }
@@ -69,11 +69,15 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
 {
     const auto want = event.GetWant();
     const auto action = want.GetAction();
+    if (g_actionMap.find(action) == g_actionMap.end()) {
+        return;
+    }
     EventId eventId = g_actionMap[action];
     FI_HILOGD("Receive action:%{public}s, eventId:%{public}d", action.c_str(), static_cast<int32_t>(eventId));
     if (eventId != EventId::EVENT_SCREEN_LOCK) {
         return;
     }
+    CHKPV(context_);
     auto fun = [] (IContext* context) -> int32_t {
         if (context->GetDragManager().GetDragState() == DragState::START) {
             DragDropResult dropResult { DragResult::DRAG_CANCEL, false, -1 };
