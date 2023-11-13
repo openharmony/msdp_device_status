@@ -11,36 +11,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../device_status.gni")
+import("../../../device_status.gni")
 
-ohos_shared_library("intention_service") {
-  shlib_type = "sa"
+config("intention_device_manager_public_config") {
   include_dirs = [
     "include",
-    "${intention_root_path}/data/include",
-    "${intention_root_path}/ipc/include",
-    "${intention_root_path}/scheduler/device_manager/include",
-    "${intention_root_path}/scheduler/plugin_manager/include",
-    "${intention_root_path}/scheduler/task_scheduler/include",
-    "${intention_root_path}/scheduler/timer_manager/include",
-    "${intention_root_path}/utils/common/include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+  ]
+}
+
+ohos_source_set("intention_device_manager") {
+  include_dirs = [
+    "include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
   ]
 
-  sources = [ "src/intention_service.cpp" ]
+  sources = [
+    "src/device.cpp",
+    "src/device_manager.cpp",
+    "src/enumerator.cpp",
+    "src/monitor.cpp",
+  ]
+
+  public_configs = [ ":intention_device_manager_public_config" ]
 
   deps = [
+    "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/ipc:intention_ipc",
-    "${intention_root_path}/scheduler/plugin_manager:plugin_manager",
-    "${intention_root_path}/scheduler/task_scheduler:task_scheduler",
-    "${intention_root_path}/scheduler/timer_manager:timer_manager",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  public_deps = [
+    "${device_status_root_path}/intention/common/epoll:intention_epoll",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
   ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "safwk:system_ability_fwk",
+    "image_framework:image_native",
+    "input:libmmi-client",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

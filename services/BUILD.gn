@@ -18,7 +18,6 @@ config("devicestatus_services_private_config") {
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
-    "device_manager/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
@@ -41,7 +40,6 @@ config("devicestatus_services_public_config") {
     "delegate_task/include",
     "native/include",
     "timer_manager/include",
-    "device_manager/include",
     "interaction/drag/include",
   ]
 }
@@ -49,10 +47,6 @@ config("devicestatus_services_public_config") {
 sources_set = [
   "communication/service/src/devicestatus_srv_stub.cpp",
   "delegate_task/src/delegate_tasks.cpp",
-  "device_manager/src/device.cpp",
-  "device_manager/src/device_manager.cpp",
-  "device_manager/src/enumerator.cpp",
-  "device_manager/src/monitor.cpp",
   "native/src/devicestatus_dumper.cpp",
   "native/src/devicestatus_hisysevent.cpp",
   "native/src/devicestatus_manager.cpp",
@@ -93,7 +87,6 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
     "interaction/drag:interaction_drag",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   if (fusion_interaction_coordination) {
@@ -103,6 +96,7 @@ ohos_shared_library("devicestatus_service") {
   public_deps = [
     "${device_status_root_path}/intention/common/epoll:intention_epoll",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
   ]
 
   external_deps = external_deps_set
@@ -136,7 +130,6 @@ ohos_static_library("devicestatus_static_service") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
     "interaction/drag:interaction_drag",
-    "//third_party/openssl:libcrypto_shared",
   ]
 
   if (fusion_interaction_coordination) {
@@ -146,6 +139,7 @@ ohos_static_library("devicestatus_static_service") {
   public_deps = [
     "${device_status_root_path}/intention/common/epoll:intention_epoll",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
   ]
 
   external_deps = external_deps_set
