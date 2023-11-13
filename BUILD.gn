@@ -40,7 +40,7 @@ group("intention_group") {
     "${device_status_root_path}/intention/scheduler/plugin_manager:plugin_manager",
     "${device_status_root_path}/intention/scheduler/task_scheduler:task_scheduler",
     "${device_status_root_path}/intention/scheduler/timer_manager:timer_manager",
-    "${device_status_root_path}/intention/services:intention_service",
+    "${device_status_root_path}/intention/services/intention_service:intention_service",
   ]
 }
 
