@@ -30,7 +30,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Delegat
 
 void DelegateTasks::Task::ProcessTask()
 {
-    CALL_DEBUG_ENTER;
     if (hasWaited_) {
         FI_HILOGE("Expired task will be discarded, id:%{public}d", id_);
         return;

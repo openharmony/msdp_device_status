@@ -288,7 +288,6 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
 
 int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t style = 0;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
@@ -300,7 +299,6 @@ int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessagePar
 
 int32_t DeviceStatusSrvStub::GetDragTargetPidStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t pid = GetDragTargetPid();
     WRITEINT32(reply, pid, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
@@ -308,7 +306,6 @@ int32_t DeviceStatusSrvStub::GetDragTargetPidStub(MessageParcel& data, MessagePa
 
 int32_t DeviceStatusSrvStub::GetUdKeyStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     std::string udKey;
     int32_t ret = GetUdKey(udKey);
     if (ret != RET_OK) {
@@ -363,7 +360,6 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
 
 int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     DragData dragData;
@@ -409,7 +405,6 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
 
 int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t result = 0;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if ((result < static_cast<int32_t>(DragResult::DRAG_SUCCESS)) ||
@@ -435,7 +430,6 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& re
 
 int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t ret = AddDraglistener();
     if (ret != RET_OK) {
         FI_HILOGE("Call AddDraglistener failed, ret:%{public}d", ret);
@@ -445,7 +439,6 @@ int32_t DeviceStatusSrvStub::AddDraglistenerStub(MessageParcel& data, MessagePar
 
 int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t ret = RemoveDraglistener();
     if (ret != RET_OK) {
         FI_HILOGE("Call RemoveDraglistener failed, ret:%{public}d", ret);
@@ -455,7 +448,6 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
 
 int32_t DeviceStatusSrvStub::AddSubscriptListenerStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t ret = AddSubscriptListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call AddSubscriptListener failed, ret:%{public}d", ret);
@@ -465,7 +457,6 @@ int32_t DeviceStatusSrvStub::AddSubscriptListenerStub(MessageParcel& data, Messa
 
 int32_t DeviceStatusSrvStub::RemoveSubscriptListenerStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t ret = RemoveSubscriptListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call RemoveSubscriptListener failed, ret:%{public}d", ret);
@@ -475,7 +466,6 @@ int32_t DeviceStatusSrvStub::RemoveSubscriptListenerStub(MessageParcel& data, Me
 
 int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     bool visible = false;
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
@@ -487,7 +477,6 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, Messa
 
 int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     int32_t width = 0;
@@ -505,7 +494,6 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel& data, MessagePar
 
 int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     auto pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     ShadowInfo shadowInfo;
@@ -528,7 +516,6 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel& data, MessagePar
 
 int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel& data, MessageParcel& reply)
 {
-    CALL_DEBUG_ENTER;
     DragData dragData;
     int32_t ret = GetDragData(dragData);
     WRITEINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
@@ -576,7 +563,6 @@ int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel& data, Message
 
 int32_t DeviceStatusSrvStub::GetDragStateStub(MessageParcel &data, MessageParcel &reply)
 {
-    CALL_DEBUG_ENTER;
     DragState dragState;
     int32_t ret = GetDragState(dragState);
     if (ret != RET_OK) {
