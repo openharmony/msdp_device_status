@@ -33,16 +33,16 @@ public:
     public:
         explicit Device(std::shared_ptr<IDevice> dev);
         int32_t GetId() const;
-        std::string GetName() const;
         std::string GetDhid() const;
+        std::string GetName() const;
         std::string GetNetworkId() const;
         bool IsRemote();
         int32_t GetProduct() const;
         int32_t GetVendor() const;
         std::string GetPhys() const;
         std::string GetUniq() const;
-        bool IsPointerDevice() const;
         bool IsKeyboard() const;
+        bool IsPointerDevice() const;
         IDevice::KeyboardType GetKeyboardType() const;
 
     private:
@@ -51,8 +51,8 @@ public:
         std::string GenerateDescriptor();
         std::string Sha256(const std::string &in) const;
         std::shared_ptr<IDevice> device_ { nullptr };
-        std::string dhid_;
         std::string networkId_;
+        std::string dhid_;
     };
 
 private:

@@ -160,11 +160,11 @@ void CoordinationEventManager::NotifyCoordinationState(SessionPtr sess, MessageI
     NetPacket pkt(msgId);
     pkt << userData << state;
     if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet write data failed");
+        FI_HILOGE("Coordination state, packet write data failed");
         return;
     }
     if (!sess->SendMsg(pkt)) {
-        FI_HILOGE("Sending failed");
+        FI_HILOGE("Coordination state, sending failed");
         return;
     }
 }

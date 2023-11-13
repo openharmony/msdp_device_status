@@ -53,14 +53,14 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<ISt
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Start drag, invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+        FI_HILOGE("Start drag, invalid argument, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        StartDragListener_ = listener;
+        startDragListener_ = listener;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -100,8 +100,8 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     }
     notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(StartDragListener_, RET_ERR);
-    StartDragListener_->OnDragEndMessage(notifyMsg);
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnDragEndMessage(notifyMsg);
     return RET_OK;
 }
 
@@ -109,8 +109,8 @@ int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket&
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(StartDragListener_, RET_ERR);
-    StartDragListener_->OnHideIconMessage();
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnHideIconMessage();
     return RET_OK;  
 }
 
@@ -155,7 +155,7 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
         FI_HILOGI("Start monitoring");
         int32_t ret = DeviceStatusClient::GetInstance().AddDraglistener();
         if (ret != RET_OK) {
-            FI_HILOGE("Failed to register");
+            FI_HILOGE("Failed to register draglistener");
             return ret;
         }
         hasRegistered_ = true;
@@ -166,7 +166,7 @@ int32_t DragManagerImpl::AddDraglistener(DragListenerPtr listener)
                     })) {
         dragListener_.push_back(listener);
     } else {
-        FI_HILOGW("The listener already exists");
+        FI_HILOGW("The draglistener already exists");
     }
     return RET_OK;
 }
@@ -179,8 +179,8 @@ int32_t DragManagerImpl::RemoveDraglistener(DragListenerPtr listener)
         dragListener_.clear();
     } else {
         dragListener_.erase(std::remove_if(dragListener_.begin(), dragListener_.end(),
-            [listener] (auto iter) {
-                return iter == listener;
+            [listener] (auto lIter) {
+                return lIter == listener;
             })
         );
     }

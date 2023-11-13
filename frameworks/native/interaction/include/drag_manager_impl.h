@@ -64,7 +64,7 @@ private:
     std::atomic_bool hasRegistered_ { false };
     std::atomic_bool hasSubscriptRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
-    std::shared_ptr<IStartDragListener> StartDragListener_;
+    std::shared_ptr<IStartDragListener> startDragListener_;
     std::list<SubscriptListenerPtr> subscriptListener_;
 };
 } // namespace DeviceStatus

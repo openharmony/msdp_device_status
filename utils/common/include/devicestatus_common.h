@@ -176,7 +176,6 @@ constexpr auto DeviceStatusToUnderlying(E e) noexcept
 {
     return static_cast<std::underlying_type_t<E>>(e);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

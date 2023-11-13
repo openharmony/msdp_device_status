@@ -16,6 +16,10 @@
 #ifndef DRAG_DATA_PACKER_H
 #define DRAG_DATA_PACKER_H
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "parcel.h"
 
 #include "drag_data.h"

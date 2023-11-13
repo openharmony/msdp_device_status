@@ -94,7 +94,7 @@ public:
     void SetUp();
     void TearDown() {}
     void AddPermission();
-    void SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount);
+    void SetAceessTokenPermission(const char** perms, size_t permAmount);
 };
 
 void CoordinationSMTest::SetUp()
@@ -105,23 +105,23 @@ void CoordinationSMTest::SetUp()
 void CoordinationSMTest::AddPermission()
 {
     const char *perms[] = { "ohos.permission.DISTRIBUTED_DATASYNC" };
-    SetAceessTokenPermission("CoordinationSMTest", perms, sizeof(perms) / sizeof(perms[0]));
+    SetAceessTokenPermission(perms, sizeof(perms) / sizeof(perms[0]));
 }
 
-void CoordinationSMTest::SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount)
+void CoordinationSMTest::SetAceessTokenPermission(const char** perms, size_t permAmount)
 {
-    if (perms == nullptr || permCount == 0) {
-        FI_HILOGE("perms is nullptr or permCount is 0");
+    if (perms == nullptr || permAmount == 0) {
+        FI_HILOGE("The perms is empty");
         return;
     }
     NativeTokenInfoParams infoInstance = {
         .dcapsNum = 0,
-        .permsNum = permCount,
+        .permsNum = permAmount,
         .aclsNum = 0,
         .dcaps = nullptr,
         .perms = perms,
         .acls = nullptr,
-        .processName = processName.c_str(),
+        .processName = "CoordinationSMTest",
         .aplStr = "system_basic",
     };
     uint64_t tokenId = GetAccessTokenId(&infoInstance);
