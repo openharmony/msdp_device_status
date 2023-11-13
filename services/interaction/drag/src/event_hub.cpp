@@ -69,9 +69,9 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
 {
     const auto want = event.GetWant();
     const auto action = want.GetAction();
-    int32_t eventId = static_cast<int32_t>(g_actionMap[action]);
-    FI_HILOGD("Receive action:%{public}s, eventId:%{public}d", action.c_str(), eventId);
-    if (eventId != static_cast<int32_t>(EventId::EVENT_SCREEN_LOCK)) {
+    EventId eventId = g_actionMap[action];
+    FI_HILOGD("Receive action:%{public}s, eventId:%{public}d", action.c_str(), static_cast<int32_t>(eventId));
+    if (eventId != EventId::EVENT_SCREEN_LOCK) {
         return;
     }
     auto fun = [] (IContext* context) -> int32_t {
