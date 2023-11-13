@@ -34,7 +34,6 @@ DragDataManager::~DragDataManager() = default;
 
 void DragDataManager::Init(const DragData &dragData)
 {
-    CALL_DEBUG_ENTER;
     dragData_ = dragData;
     if (dragData.displayId < DEFAULT_DISPLAY_ID) {
         dragData_.displayId = DEFAULT_DISPLAY_ID;

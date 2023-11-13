@@ -200,7 +200,6 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
 
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
 {
-    CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
         FI_HILOGE("No drag instance running, can not update drag style");
         return RET_ERR;
@@ -295,7 +294,6 @@ int32_t DragManager::NotifyHideIcon()
 
 void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -306,13 +304,12 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragUp(pointerEvent);
         return;
     }
-    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+    FI_HILOGW("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
 void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
@@ -329,7 +326,6 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     option.key = udKey;
     UDMF::Privilege privilege;
     privilege.tokenId = static_cast<uint32_t>(targetTid);
-    FI_HILOGD("AddPrivilege enter");
     int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
@@ -340,8 +336,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;
     CHKPV(pointerEvent);
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d",
-        pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -349,7 +343,8 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("Target window drag tid:%{public}d", targetTid);
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d,Target window drag tid:%{public}d",
+        targetTid, pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
     int32_t repeatCount = 1;
@@ -365,12 +360,10 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
 {
-    CALL_DEBUG_ENTER;
 }
 
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (g_startFilterTime > 0) {
         auto actionTime = pointerEvent->GetActionTime();
@@ -402,7 +395,6 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
 
 void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const
 {
-    CALL_DEBUG_ENTER;
 }
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 
@@ -432,7 +424,6 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> 
 
 void DragManager::Dump(int32_t fd) const
 {
-    CALL_DEBUG_ENTER;
     DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
     dprintf(fd, "Drag information:\n");
@@ -525,7 +516,6 @@ std::string DragManager::GetDragCursorStyle(DragCursorStyle value) const
 
 MMI::ExtraData DragManager::CreateExtraData(bool appended)
 {
-    CALL_DEBUG_ENTER;
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     MMI::ExtraData extraData;
     extraData.buffer = dragData.buffer;
@@ -678,7 +668,6 @@ int32_t DragManager::OnStartDrag()
 
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
 {
-    CALL_INFO_TRACE;
     FI_HILOGI("Add custom animation:%{public}s", hasCustomAnimation ? "true" : "false");
     if (RemovePointerEventHandler() != RET_OK) {
         FI_HILOGE("Failed to remove pointer event handler");
@@ -759,7 +748,6 @@ void DragManager::SetDragState(DragState state)
 
 DragResult DragManager::GetDragResult() const
 {
-    CALL_DEBUG_ENTER;
     return dragResult_;
 }
 
@@ -826,7 +814,6 @@ void DragManager::SetPointerEventFilterTime(int64_t filterTime)
 
 void DragManager::MoveTo(int32_t x, int32_t y)
 {
-    CALL_INFO_TRACE;
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");
         return;

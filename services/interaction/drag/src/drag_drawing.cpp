@@ -145,7 +145,6 @@ bool CheckNodesValid()
 
 float GetScaling()
 {
-    CALL_DEBUG_ENTER;
     if (g_drawingInfo.isExistScalingVallue) {
         FI_HILOGD("deviceDpi:%{public}f", g_drawingInfo.scalingValue);
         return g_drawingInfo.scalingValue;
@@ -219,7 +218,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
 
 int32_t DragDrawing::CheckDragData(const DragData &dragData)
 {
-    CALL_DEBUG_ENTER;
     if (g_drawingInfo.isRunning) {
         FI_HILOGE("Drag drawing is running, can not init again");
         return INIT_CANCEL;
@@ -239,7 +237,6 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
 
 void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 {
-    CALL_DEBUG_ENTER;
     if (displayId < 0) {
         FI_HILOGE("Invalid displayId:%{public}d", displayId);
         return;
@@ -269,7 +266,6 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
 
 int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
-    CALL_DEBUG_ENTER;
     FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
         FI_HILOGE("Invalid style:%{public}d", style);
@@ -440,7 +436,6 @@ void DragDrawing::UpdateDrawingState()
 
 void DragDrawing::UpdateDragWindowState(bool visible)
 {
-    CALL_DEBUG_ENTER;
     CHKPV(g_drawingInfo.surfaceNode);
     if (visible) {
         g_drawingInfo.surfaceNode->SetVisible(true);
@@ -745,7 +740,6 @@ void DragDrawing::OnVsync()
 
 void DragDrawing::InitDrawingInfo(const DragData &dragData)
 {
-    CALL_DEBUG_ENTER;
     g_drawingInfo.isRunning = true;
     g_drawingInfo.currentDragNum = dragData.dragNum;
     g_drawingInfo.sourceType = dragData.sourceType;
@@ -761,7 +755,6 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     dragAnimationData.pixelMap = g_drawingInfo.pixelMap;
     dragAnimationData.displayX = g_drawingInfo.displayX;
@@ -1136,7 +1129,6 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
-    CALL_DEBUG_ENTER;
     if (g_drawingInfo.filterInfo.empty()) {
         FI_HILOGD("FilterInfo is empty");
         return false;
