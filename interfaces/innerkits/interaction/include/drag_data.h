@@ -69,20 +69,11 @@ struct DragData {
 
     bool operator == (const DragData &other) const
     {
-        if (shadowInfos.size() != other.shadowInfos.size()) {
-            return false;
-        }
-        int32_t size = shadowInfos.size();
-        for (int32_t i = 0; i < size; i++) {
-            if (!(shadowInfos[i] == other.shadowInfos[i])) {
-                return false;
-            }
-        }
-        return buffer == other.buffer && udKey == other.udKey && filterInfo == other.filterInfo &&
-               extraInfo == other.extraInfo && sourceType == other.sourceType && dragNum == other.dragNum &&
-               pointerId == other.pointerId && displayX == other.displayX && displayY == other.displayY &&
-               displayId == other.displayId && hasCanceledAnimation == other.hasCanceledAnimation &&
-               summarys == other.summarys;
+        return shadowInfos == other.shadowInfos && buffer == other.buffer && udKey == other.udKey &&
+               filterInfo == other.filterInfo && extraInfo == other.extraInfo && sourceType == other.sourceType &&
+               dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
+               displayY == other.displayY && displayId == other.displayId &&
+               hasCanceledAnimation == other.hasCanceledAnimation && summarys == other.summarys;
     }
 
     bool operator != (const DragData &other) const
