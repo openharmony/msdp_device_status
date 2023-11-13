@@ -82,7 +82,7 @@ void DeviceStatusSrvStub::InitCoordination()
 void DeviceStatusSrvStub::InitDrag()
 {
     CALL_DEBUG_ENTER;
-    std::map<uint32_t, ConnFunc> dragFuncs_ = {
+    std::map<uint32_t, ConnFunc> dragFuncs = {
         { static_cast<uint32_t>(DeviceInterfaceCode::ALLOC_SOCKET_FD),
             &DeviceStatusSrvStub::HandleAllocSocketFdStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::START_DRAG),
@@ -114,7 +114,7 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
             &DeviceStatusSrvStub::GetDropTypeStub }
     };
-    connFuncs_.insert(dragFuncs_.begin(), dragFuncs_.end());
+    connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
 
 bool DeviceStatusSrvStub::CheckCooperatePermission()
@@ -384,13 +384,13 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
         (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
         (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+        FI_HILOGE("Start drag invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
             dragData.shadowInfo.x, dragData.shadowInfo.y);
         return RET_ERR;
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+        FI_HILOGE("Start drag invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
             "displayX:%{public}d, displayY:%{public}d",
             dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;

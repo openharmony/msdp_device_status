@@ -83,12 +83,12 @@ int32_t Device::Open()
             if (nRetries-- > 0) {
                 static constexpr int32_t DEFAULT_WAIT_TIME { 500 };
                 std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_WAIT_TIME));
-                FI_HILOGI("Retry opening device \'%{public}s\'", buf);
+                FI_HILOGI("Retry opening the device \'%{public}s\'", buf);
             } else {
                 return RET_ERR;
             }
         } else {
-            FI_HILOGD("Opening \'%{public}s\' successfully", buf);
+            FI_HILOGD("Successful opening \'%{public}s\'", buf);
             break;
         }
     }

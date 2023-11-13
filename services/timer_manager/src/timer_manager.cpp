@@ -102,8 +102,8 @@ int32_t TimerManager::ResetTimer(int32_t timerId)
 
 bool TimerManager::OnIsExist(int32_t timerId) const
 {
-    for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
-        if ((*tIter)->id == timerId) {
+    for (auto iter = timers_.begin(); iter != timers_.end(); ++iter) {
+        if ((*iter)->id == timerId) {
             return true;
         }
     }
@@ -151,9 +151,9 @@ int32_t TimerManager::TakeNextTimerId()
         [] (uint64_t s, const auto &timer) {
             return (s |= (uint64_t(1U) << timer->id));
         });
-    for (size_t count = 0; count < MAX_TIMER_COUNT; ++count) {
-        if ((timerSlot & (uint64_t(1U) << count)) == 0) {
-            return count;
+    for (size_t tmpCount = 0; tmpCount < MAX_TIMER_COUNT; ++tmpCount) {
+        if ((timerSlot & (uint64_t(1U) << tmpCount)) == 0) {
+            return tmpCount;
         }
     }
     return NONEXISTENT_ID;

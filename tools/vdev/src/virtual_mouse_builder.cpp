@@ -212,22 +212,22 @@ void VirtualMouseBuilder::Act(int32_t argc, char *argv[])
     }
     do {
         {
-            auto action = regularActions_.find(opt);
-            if (action != regularActions_.end()) {
+            auto action = ruleMouseActions_.find(opt);
+            if (action != ruleMouseActions_.end()) {
                 action->second();
                 continue;
             }
         }
         {
-            auto action = readActions_.find(opt);
-            if (action != readActions_.end()) {
+            auto action = readMouseActions_.find(opt);
+            if (action != readMouseActions_.end()) {
                 action->second(optarg);
                 continue;
             }
         }
         {
-            auto action = moveActions_.find(opt);
-            if (action != moveActions_.end()) {
+            auto action = moveMouseActions_.find(opt);
+            if (action != moveMouseActions_.end()) {
                 action->second(argc, argv);
                 continue;
             }
@@ -358,9 +358,9 @@ void VirtualMouseBuilder::ReadActions(const char *path)
 {
     CALL_DEBUG_ENTER;
     json model;
-    int32_t ret = VirtualDeviceBuilder::ReadFile(path, model);
-    if (ret == RET_ERR) {
-        FI_HILOGE("Failed to read the file");
+    int32_t result = VirtualDeviceBuilder::ReadFile(path, model);
+    if (result == RET_ERR) {
+        FI_HILOGE("Failed to read mouse data from the files");
         return;
     }
     ReadModel(model, MAXIMUM_LEVEL_ALLOWED);
@@ -474,9 +474,9 @@ void VirtualMouseBuilder::ReadRawInput(const char *path)
 {
     CALL_DEBUG_ENTER;
     json model;
-    int32_t ret = VirtualDeviceBuilder::ReadFile(path, model);
-    if (ret == RET_ERR) {
-        FI_HILOGE("Failed to read raw input data");
+    int32_t result = VirtualDeviceBuilder::ReadFile(path, model);
+    if (result == RET_ERR) {
+        FI_HILOGE("Failed to read the raw mouse data");
         return;
     }
     ReadRawModel(model, MAXIMUM_LEVEL_ALLOWED);

@@ -32,20 +32,20 @@ constexpr int32_t DEFAULT_DISPLAY_ID { 0 };
 DragDataManager::DragDataManager() = default;
 DragDataManager::~DragDataManager() = default;
 
+void DragDataManager::SetDragStyle(DragCursorStyle style)
+{
+    dragStyle_ = style;
+}
+
 void DragDataManager::Init(const DragData &dragData)
 {
     dragData_ = dragData;
     if (dragData.displayId < DEFAULT_DISPLAY_ID) {
         dragData_.displayId = DEFAULT_DISPLAY_ID;
-        FI_HILOGW("The value of displayId(%{public}d) is correcting to 0", dragData.displayId);
+        FI_HILOGW("Correct the value of displayId(%{public}d) to 0", dragData.displayId);
     }
-    targetTid_ = -1;
     targetPid_ = -1;
-}
-
-void DragDataManager::SetDragStyle(DragCursorStyle style)
-{
-    dragStyle_ = style;
+    targetTid_ = -1;
 }
 
 void DragDataManager::SetShadowInfo(const ShadowInfo &shadowInfo)

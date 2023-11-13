@@ -79,14 +79,16 @@ public:
     int32_t PostAsyncTask(DTaskCallback callback) override;
     void ProcessTasks();
 
-    int32_t GetReadFd() const
-    {
-        return fds_[0];
-    }
     void SetWorkerThreadId(uint64_t tid)
     {
         workerTid_ = tid;
     }
+
+    int32_t GetReadFd() const
+    {
+        return fds_[0];
+    }
+
     bool IsCallFromWorkerThread() const
     {
         return (GetThisThreadId() == workerTid_);
@@ -97,10 +99,10 @@ private:
     TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
-    uint64_t workerTid_ { 0 };
-    int32_t fds_[2] {};
-    std::mutex mux_;
     std::queue<TaskPtr> tasks_;
+    std::mutex mux_;
+    int32_t fds_[2] {};
+    uint64_t workerTid_ { 0 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

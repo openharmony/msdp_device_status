@@ -137,10 +137,10 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
     MessageParcel reply;
     MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
         data, reply, option);
     if (ret != RET_OK) {
