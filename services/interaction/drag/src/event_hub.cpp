@@ -17,9 +17,10 @@
 
 #include <map>
 
+#include "want.h"
+
 #include "drag_manager.h"
 #include "fi_log.h"
-#include "want.h"
 
 namespace OHOS {
 namespace Msdp {
