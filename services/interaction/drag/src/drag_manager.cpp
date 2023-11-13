@@ -146,6 +146,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     dragState_ = DragState::START;
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
+    if (eventHub_ == nullptr) {
+        eventHub_ = EventHub::GetEventHub(context_);
+        if (eventHub_ == nullptr) {
+            FI_HILOGE("Failed to get event");
+        }
+    }
+    EventHub::RegisterEvent(eventHub_);
     return RET_OK;
 }
 
@@ -174,6 +181,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    EventHub::UnRegisterEvent(eventHub_);
     return ret;
 }
 
