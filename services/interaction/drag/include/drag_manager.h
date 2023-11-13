@@ -73,7 +73,7 @@ public:
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t GetDropType(DropType& dropType) const;
-    #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
+#ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
         InterceptorConsumer(IContext *context,
