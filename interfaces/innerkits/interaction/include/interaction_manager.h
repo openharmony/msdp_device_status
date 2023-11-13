@@ -224,6 +224,14 @@ public:
     int32_t GetDropType(DropType &dropType);
 
     /**
+     * @brief 获取拖拽数据中的 'extraInfo' 字段。
+     * @param extraInfo 拖拽数据中的 'extraInfo' 字段, 主要用于保存是否允许跨设备拖拽的"drag_allow_distributed"字段。
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetExtraInfo(std::string &extraInfo);
+
+    /**
      * @brief Registers a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.

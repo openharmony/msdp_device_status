@@ -430,8 +430,8 @@ int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
     WRITEINT32(data, dragData.shadowInfo.y, ERR_INVALID_VALUE);
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
@@ -775,6 +775,28 @@ int32_t DeviceStatusSrvProxy::EnterTextEditorArea(bool enable)
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::GetExtraInfo(std::string &extraInfo)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READSTRING(reply, extraInfo, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
 } // namespace DeviceStatus

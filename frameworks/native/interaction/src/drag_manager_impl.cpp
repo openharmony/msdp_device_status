@@ -280,6 +280,11 @@ int32_t DragManagerImpl::EnterTextEditorArea(bool enable)
 {
     return DeviceStatusClient::GetInstance().EnterTextEditorArea(enable);
 }
+
+int32_t DragManagerImpl::GetExtraInfo(std::string &extraInfo)
+{
+    return DeviceStatusClient::GetInstance().GetExtraInfo(extraInfo);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

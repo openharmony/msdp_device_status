@@ -156,6 +156,7 @@ public:
     void RegisterRemoteNetworkId(std::function<void(std::string)> callback);
     void RegisterMouseLocation(std::function<void(int32_t, int32_t)> callback);
     void RegisterNotifyDragCancel(std::function<void(void)> callback);
+    void RegisterNotifyDragAllowed(std::function<void(bool &)> callback);
     void OnInterceptorInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -204,6 +205,7 @@ private:
     std::function<void(std::string)> remoteNetworkIdCallback_;
     std::function<void(int32_t, int32_t)> mouseLocationCallback_;
     std::function<void(void)> notifyDragCancelCallback_;
+    std::function<void(bool &)> notifyDragAllowedCallback_;
     std::map<CoordinationState, std::shared_ptr<ICoordinationState>> coordinationStates_;
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
     std::shared_ptr<CoordinationEventHandler> eventHandler_ { nullptr };
