@@ -1060,7 +1060,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
         std::promise<bool> promiseFlag;
         std::future<bool> futureFlag = promiseFlag.get_future();
         auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            FI_HILOGD("Start drag, displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
@@ -1111,7 +1111,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragTargetPid
+ * @tc.name: GetDragTargetPid_Mouse
  * @tc.desc: Get the target pid dragged by the mouse
  * @tc.type: FUNC
  * @tc.require:
@@ -1150,7 +1150,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragTargetPid
+ * @tc.name: GetDragTargetPid_Touch
  * @tc.desc: Get the target pid dragged by the touchscreen
  * @tc.type: FUNC
  * @tc.require:
@@ -1190,7 +1190,7 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_TouchEventDispatch
+ * @tc.name: TouchEventDispatch
  * @tc.desc: Dispatch the touchscreen events
  * @tc.type: FUNC
  * @tc.require:
@@ -1231,7 +1231,7 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_MouseEventDispatch
+ * @tc.name: MouseEventDispatch
  * @tc.desc: Dispatch the mouse events
  * @tc.type: FUNC
  * @tc.require:
@@ -1325,7 +1325,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetUdKey
+ * @tc.name: GetUdKey_Mouse
  * @tc.desc: Get the udKey dragged by the mouse
  * @tc.type: FUNC
  * @tc.require:
@@ -1343,7 +1343,7 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Mouse, TestSize.Level1)
         std::promise<bool> promiseFlag;
         std::future<bool> futureFlag = promiseFlag.get_future();
         auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            FI_HILOGD("Get ud key, displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
@@ -1362,7 +1362,7 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Mouse, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetUdKey
+ * @tc.name: GetUdKey_Touch
  * @tc.desc: Get the udKey dragged by the touchscreen
  * @tc.type: FUNC
  * @tc.require:
@@ -1400,7 +1400,7 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Touch, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragData_Success
+ * @tc.name: GetDragData_Success
  * @tc.desc: Get the dragData from interface successfully
  * @tc.type: FUNC
  * @tc.require:
@@ -1414,7 +1414,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
         std::promise<bool> promiseFlag;
         std::future<bool> futureFlag = promiseFlag.get_future();
         auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            FI_HILOGD("Get drag data, displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
@@ -1451,7 +1451,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragData_Failed
+ * @tc.name: GetDragData_Failed
  * @tc.desc: Get the dragData from interface failed
  * @tc.type: FUNC
  * @tc.require:
@@ -1472,7 +1472,7 @@ HWTEST_F(InteractionManagerTest, GetDragData_Failed, TestSize.Level1)
 }
 
 /**
- * @tc.name: InteractionManagerTest_GetDragState
+ * @tc.name: GetDragState
  * @tc.desc: Get the dragState from interface
  * @tc.type: FUNC
  * @tc.require:
@@ -1483,7 +1483,7 @@ HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+        FI_HILOGD("Drag state, displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
     };
@@ -1496,7 +1496,7 @@ HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
 
     DragState dragState;
     ret = InteractionManager::GetInstance()->GetDragState(dragState);
-    FI_HILOGD("dragState:%{public}d", dragState);
+    FI_HILOGD("InteractionManager::dragState:%{public}d", dragState);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(dragState, DragState::START);
 

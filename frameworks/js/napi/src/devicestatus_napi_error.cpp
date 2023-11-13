@@ -40,9 +40,9 @@ napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::stri
 
 std::optional <std::string> GetErrMsg(int32_t errorCode)
 {
-    auto iter = ERROR_MESSAGES.find(errorCode);
-    if (iter != ERROR_MESSAGES.end()) {
-        return iter->second;
+    auto emiter = ERROR_MESSAGES.find(errorCode);
+    if (emiter != ERROR_MESSAGES.end()) {
+        return emiter->second;
     }
     FI_HILOGE("Error messages not found");
     return std::nullopt;

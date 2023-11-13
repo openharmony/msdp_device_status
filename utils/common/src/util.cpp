@@ -98,31 +98,31 @@ void SetThreadName(const std::string &name)
     prctl(PR_SET_NAME, name.c_str());
 }
 
-static size_t StringToken(std::string &str, const std::string &sep, std::string &token)
+static size_t StringToken(std::string &strs, const std::string &sep, std::string &token)
 {
     token = "";
-    if (str.empty()) {
-        return str.npos;
+    if (strs.empty()) {
+        return strs.npos;
     }
-    size_t seat = str.npos;
+    size_t seat = strs.npos;
     size_t temp = 0;
     for (auto &item : sep) {
-        temp = str.find(item);
-        if (str.npos != temp) {
+        temp = strs.find(item);
+        if (strs.npos != temp) {
             seat = (std::min)(seat, temp);
         }
     }
-    if (str.npos != seat) {
-        token = str.substr(0, seat);
-        if (str.npos != seat + 1) {
-            str = str.substr(seat + 1, str.npos);
+    if (strs.npos != seat) {
+        token = strs.substr(0, seat);
+        if (strs.npos != seat + 1) {
+            strs = strs.substr(seat + 1, strs.npos);
         }
         if (seat == 0) {
-            return StringToken(str, sep, token);
+            return StringToken(strs, sep, token);
         }
     } else {
-        token = str;
-        str = "";
+        token = strs;
+        strs = "";
     }
     return token.size();
 }

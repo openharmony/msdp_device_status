@@ -42,13 +42,13 @@ public:
     {
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-    virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
     virtual void SetStartDeviceDhid(const std::string &startDeviceDhid) {}
+    virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
 
 protected:
     int32_t PrepareAndStart(const std::string &remoteNetworkId, int32_t startDeviceId);
-    bool NeedPrepare(const std::string &remoteNetworkId, const std::string &originNetworkId);
     void OnPrepareDistributedInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId);
+    bool NeedPrepare(const std::string &remoteNetworkId, const std::string &originNetworkId);
     int32_t StartRemoteInput(int32_t startDeviceId);
     virtual void OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId);
 

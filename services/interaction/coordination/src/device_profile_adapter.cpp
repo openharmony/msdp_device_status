@@ -43,6 +43,21 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
     callbacks_.clear();
 }
 
+void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
+{
+    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
+        FI_HILOGD("Synchronized result:%{public}d", syncResult.second);
+    });
+}
+
+void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
+    const ProfileChangeNotification &changeNotification)
+{
+    CALL_INFO_TRACE;
+    std::string networkId = changeNotification.GetDeviceId();
+    DP_ADAPTER->OnProfileChanged(networkId);
+}
+
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
     CALL_INFO_TRACE;
@@ -59,7 +74,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        FI_HILOGE("Put device profile failed, ret:%{public}d", ret);
+        FI_HILOGE("Failed to put the device profile, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;
@@ -72,7 +87,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
     if (ret != 0) {
-        FI_HILOGE("Sync device profile failed");
+        FI_HILOGE("Failed to synchronize the device profile");
     }
     return ret;
 }
@@ -202,21 +217,6 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
     } else {
         callbacks_.erase(it);
     }
-}
-
-void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
-    const ProfileChangeNotification &changeNotification)
-{
-    CALL_INFO_TRACE;
-    std::string networkId = changeNotification.GetDeviceId();
-    DP_ADAPTER->OnProfileChanged(networkId);
-}
-
-void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
-{
-    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        FI_HILOGD("Sync result:%{public}d", syncResult.second);
-    });
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -31,26 +31,26 @@ class DeviceProfileAdapter final {
     DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
     class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
-        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
+        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
     };
 public:
-    using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using DPCallback = std::function<void(const std::string &, bool)>;
+    using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
-    int32_t UpdateCrossingSwitchState(bool state);
     int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
+    int32_t UpdateCrossingSwitchState(bool state);
     bool GetCrossingSwitchState(const std::string &networkId);
-    int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
     int32_t UnregisterCrossingStateListener(const std::string &networkId);
+    int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
 
 private:
-    int32_t RegisterProfileListener(const std::string &networkId);
     void OnProfileChanged(const std::string &networkId);
-    std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
+    int32_t RegisterProfileListener(const std::string &networkId);
     std::mutex adapterLock_;
     std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
+    std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
     const std::string characteristicsName_ { "currentStatus" };
 };
 
