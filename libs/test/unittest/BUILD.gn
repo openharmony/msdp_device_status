@@ -62,8 +62,12 @@ ohos_unittest("device_status_algorithm_test") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
+  defines = []
+  if (device_status_sensor_enable) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
 }
 
 ohos_unittest("device_status_datahub_test") {
@@ -96,8 +100,12 @@ ohos_unittest("device_status_datahub_test") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
+  defines = []
+  if (device_status_sensor_enable) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
 }
 
 ohos_unittest("device_status_mock_test") {
@@ -131,8 +139,12 @@ ohos_unittest("device_status_mock_test") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
+  defines = []
+  if (device_status_sensor_enable) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
 }
 
 group("unittest") {

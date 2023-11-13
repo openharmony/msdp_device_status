@@ -99,6 +99,10 @@ ohos_shared_library("devicestatus_service") {
     "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
   ]
 
+  defines = []
+  if (device_status_sensor_enable) {
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
   external_deps = external_deps_set
   if (fusion_interaction_coordination) {
     external_deps += [
@@ -134,6 +138,11 @@ ohos_static_library("devicestatus_static_service") {
 
   if (fusion_interaction_coordination) {
     deps += [ "interaction/coordination:coordination" ]
+  }
+
+  defines = []
+  if (device_status_sensor_enable) {
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
   }
 
   public_deps = [

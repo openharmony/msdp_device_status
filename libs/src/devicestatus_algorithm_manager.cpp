@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "devicestatus_algorithm_manager.h"
 
 #include <cerrno>
@@ -261,3 +262,4 @@ extern "C" void Destroy(const IMsdp* algorithm)
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE

@@ -19,8 +19,9 @@
 #include <functional>
 
 #include "cJSON.h"
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "sensor_agent.h"
-
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #include "stationary_data.h"
 
 namespace OHOS {
@@ -57,7 +58,9 @@ struct JsonParser {
     }
     cJSON *json = nullptr;
 };
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 using SensorCallback = std::function<void(int32_t, AccelData*)>;
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
