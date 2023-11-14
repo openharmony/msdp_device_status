@@ -113,6 +113,7 @@ int32_t DeviceManager::OnEnable()
 
 DISABLE_MONITOR:
     monitor_.Disable();
+
 CLOSE_EPOLL:
     epollMgr_.reset();
     return ret;
