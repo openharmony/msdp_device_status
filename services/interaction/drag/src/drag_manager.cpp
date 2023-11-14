@@ -213,12 +213,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     }
     FI_HILOGI("Update drag style successfully");
     DRAG_DATA_MGR.SetDragStyle(style);
-    stateNotify_.StyleChangedNotify(style);
+    DragCursorStyle updateStyle = DragCursorStyle::DEFAULT;
     if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
-        return dragDrawing_.UpdateDragStyle(DragCursorStyle::COPY);
+        updateStyle = DragCursorStyle::COPY;
     } else {
-        return dragDrawing_.UpdateDragStyle(style);
+        updateStyle = style;
     }
+    stateNotify_.StyleChangedNotify(updateStyle);
+    return dragDrawing_.UpdateDragStyle(updateStyle);
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -794,9 +796,6 @@ void DragManager::MoveTo(int32_t x, int32_t y)
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
-    if (DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE) {
-        return;
-    }
     CHKPV(keyEvent);
     auto keys = keyEvent->GetKeyItems();
     int32_t keyCode = keyEvent->GetKeyCode();
@@ -825,6 +824,9 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 void DragManager::HandleCtrlKeyDown()
 {
     CALL_DEBUG_ENTER;
+    if (DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE) {
+        return;
+    }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
     std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
