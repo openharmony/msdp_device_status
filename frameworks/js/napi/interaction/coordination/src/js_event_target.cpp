@@ -205,7 +205,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
     }
 
 MONITOR_LABEL:
-    if (isListeningProcess_ && iter->second.empty()) {
+    if (iter->second.empty() && isListeningProcess_) {
         isListeningProcess_ = false;
         INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
     }
@@ -312,7 +312,7 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Prepare ansy, check data is nullptr");
+        FI_HILOGE("Prepare async, check data is nullptr");
         return;
     }
     sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
@@ -322,13 +322,13 @@ void JsEventTarget::CallPrepareAsyncWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        FI_HILOGE("Prepare ansy, scope is nullptr");
+        FI_HILOGE("Prepare async, scope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
     napi_value object = JsUtil::GetPrepareInfo(cb);
     if (object == nullptr) {
-        FI_HILOGE("Prepare ansy, object is nullptr");
+        FI_HILOGE("Prepare async, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;
@@ -574,7 +574,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        FI_HILOGE("Check data is nullptr");
+        FI_HILOGE("Emit coordination message event, check data is nullptr");
         return;
     }
 

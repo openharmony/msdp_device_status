@@ -225,10 +225,10 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
-    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     const std::string GROUP_ID = "fi_softbus_group_id";
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     if (CheckDeviceSessionState(remoteNetworkId)) {
-        FI_HILOGD("Softbus session has already opened");
+        FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
     }
 
@@ -238,12 +238,12 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         return RET_ERR;
     }
 
-    std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
+    std::string peerSessionName = remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH) + SESSION_NAME;
     FI_HILOGE("PeerSessionName:%{public}s", peerSessionName.c_str());
     int32_t sessionId = OpenSession(localSessionName_.c_str(), peerSessionName.c_str(), remoteNetworkId.c_str(),
         GROUP_ID.c_str(), &g_sessionAttr);
     if (sessionId < 0) {
-        FI_HILOGE("OpenSession failed");
+        FI_HILOGE("Open session failed");
         return RET_ERR;
     }
     return WaitSessionOpend(remoteNetworkId, sessionId);
@@ -252,12 +252,12 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
 int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId)
 {
     CALL_INFO_TRACE;
-    std::unique_lock<std::mutex> waitLock(operationMutex_);
     sessionDevs_[remoteNetworkId] = sessionId;
+    std::unique_lock<std::mutex> waitLock(operationMutex_);
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
         [this, remoteNetworkId] () { return channelStatuss_[remoteNetworkId]; });
     if (!status) {
-        FI_HILOGE("OpenSession timeout");
+        FI_HILOGE("Open session timeout");
         return RET_ERR;
     }
     channelStatuss_[remoteNetworkId] = false;
@@ -269,7 +269,7 @@ void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteNetw
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGI("SessionDevIdMap not found");
+        FI_HILOGI("SessionDevIdMap is not found");
         return;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -301,7 +301,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     auto pointerEvent = COOR_SM->GetLastPointerEvent();
     bool isPointerButtonPressed = false;
-    if (pointerEvent != nullptr && checkButtonDown) {
+    if (checkButtonDown && pointerEvent != nullptr) {
         for (const auto &item : pointerEvent->GetPressedButtons()) {
             if (item == MMI::PointerEvent::MOUSE_BUTTON_LEFT) {
                 isPointerButtonPressed = true;
@@ -327,7 +327,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
         FI_HILOGD("Across with button down, waiting");
         auto status = openSessionWaitCond_.wait_for(sessionLock, std::chrono::seconds(FILTER_WAIT_TIMEOUT_SECOND));
         if (status == std::cv_status::timeout) {
-            FI_HILOGE("Filter add timeout");
+            FI_HILOGE("Add filter timeout");
             return RET_ERR;
         }
     }

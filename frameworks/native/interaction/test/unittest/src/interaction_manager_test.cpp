@@ -438,12 +438,12 @@ void InteractionManagerTest::TestRemoveMonitor(int32_t monitorId)
 void InteractionManagerTest::PrintDragData(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
+    FI_HILOGD("PixelAlphaType:%{public}d, PixelFormat:%{public}d, PixelAllocatorType:%{public}d,"
         " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
         " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
         " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
+        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,

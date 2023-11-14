@@ -68,7 +68,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to open softbus");
+        FI_HILOGE("Failed to open InputSoftbus");
         return ret;
     }
     ret = COOR_SOFTBUS_ADAPTER->StopRemoteCoordination(networkId, isUnchained);

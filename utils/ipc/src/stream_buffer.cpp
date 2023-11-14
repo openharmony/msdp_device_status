@@ -182,9 +182,9 @@ bool StreamBuffer::ChkRWError() const
 const std::string &StreamBuffer::GetErrorStatusRemark() const
 {
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
-        {ErrorStatus::ERROR_STATUS_OK, "OK"},
-        {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
-        {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"}
+        { ErrorStatus::ERROR_STATUS_OK, "OK" },
+        { ErrorStatus::ERROR_STATUS_READ, "READ_ERROR" },
+        { ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR" }
     };
     static const std::string invalidStatus { "UNKNOWN" };
 

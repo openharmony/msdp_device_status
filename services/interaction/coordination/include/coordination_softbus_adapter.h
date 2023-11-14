@@ -81,12 +81,12 @@ private:
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();
 
-    std::map<std::string, int32_t> sessionDevs_;
-    std::map<std::string, bool> channelStatuss_;
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
+    std::map<std::string, bool> channelStatuss_;
+    std::map<std::string, int32_t> sessionDevs_;
     std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvs_;
     int32_t sessionId_ { -1 };
 };

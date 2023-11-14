@@ -168,22 +168,22 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
 
 std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) const
 {
-    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = { 0 };
+    unsigned char out[1 + SHA256_DIGEST_LENGTH * 2] = { 0 };
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, in.data(), in.size());
     SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
 
-    constexpr int32_t width = 4;
-    constexpr unsigned char mask = 0x0F;
     const char* hexCode = "0123456789abcdef";
     constexpr int32_t DOUBLE_TIMES = 2;
+    constexpr int32_t width = 4;
+    constexpr unsigned char mask = 0x0F;
     for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
         unsigned char value = out[SHA256_DIGEST_LENGTH + i];
         out[i * DOUBLE_TIMES] = hexCode[(value >> width) & mask];
         out[i * DOUBLE_TIMES + 1] = hexCode[value & mask];
     }
-    out[SHA256_DIGEST_LENGTH * DOUBLE_TIMES] = 0;
+    out[DOUBLE_TIMES * SHA256_DIGEST_LENGTH] = 0;
     return reinterpret_cast<char*>(out);
 }
 
@@ -212,16 +212,16 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
     std::vector<std::string> inputDeviceDhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
-        FI_HILOGW("Cannot find pointer id:%{public}d", deviceId);
+        FI_HILOGW("Failed to search for the pointer id, id:%{public}d", deviceId);
         return inputDeviceDhids;
     }
     if (devIter->second == nullptr) {
-        FI_HILOGW("Device is nullptr");
+        FI_HILOGW("Cannot find the device");
         return inputDeviceDhids;
     }
     std::shared_ptr<Device> dev = devIter->second;
     if (!dev->IsPointerDevice()) {
-        FI_HILOGD("Not pointer device");
+        FI_HILOGD("It is not pointer device");
         return inputDeviceDhids;
     }
     inputDeviceDhids.push_back(dev->GetDhid());
@@ -238,7 +238,7 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
         }
         if (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             inputDeviceDhids.push_back(dev->GetDhid());
-            FI_HILOGD("unq:%{public}s, type:%{public}s", inputDeviceDhids.back().c_str(), "supportkey");
+            FI_HILOGD("type:%{public}s, unq:%{public}s", "supportkey", inputDeviceDhids.back().c_str());
         }
     }
     return inputDeviceDhids;
@@ -262,7 +262,7 @@ std::string CoordinationDeviceManager::GetOriginNetworkId(int32_t id) const
     CALL_INFO_TRACE;
     auto devIter = devices_.find(id);
     if (devIter == devices_.end()) {
-        FI_HILOGE("Failed to search for the device, id:%{public}d", id);
+        FI_HILOGE("Cannot find the device, id:%{public}d", id);
         return {};
     }
     CHKPS(devIter->second);
@@ -297,7 +297,7 @@ std::string CoordinationDeviceManager::GetDhid(int32_t deviceId) const
         if (devIter->second != nullptr) {
             return devIter->second->GetDhid();
         }
-        FI_HILOGW("Device is nullptr");
+        FI_HILOGW("Cannot find the device");
     }
     return {};
 }

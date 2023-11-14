@@ -44,9 +44,11 @@ struct Range {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VInputDevice" };
 
-const struct Range KEY_BLOCKS[] { { KEY_ESC, BTN_MISC },
+const struct Range KEY_BLOCKS[] {
+    { KEY_ESC, BTN_MISC },
     { KEY_OK, BTN_DPAD_UP },
-    { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY } };
+    { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY }
+};
 } // namespace
 
 VInputDevice::VInputDevice(const std::string &node) : devPath_(node) {}
@@ -256,14 +258,15 @@ bool VInputDevice::HasJoystickAxesOrButtons() const
 void VInputDevice::PrintCapsDevice() const
 {
     std::map<std::size_t, std::string> deviceComparisonTable {
-        {DEVICE_CAP_KEYBOARD, "keyboard"},
-        {DEVICE_CAP_TOUCH, "touch device"},
-        {DEVICE_CAP_TABLET_TOOL, "tablet tool"},
-        {DEVICE_CAP_POINTER, "pointer"},
-        {DEVICE_CAP_TABLET_PAD, "pad"},
-        {DEVICE_CAP_GESTURE, "gesture"},
-        {DEVICE_CAP_SWITCH, "switch"},
-        {DEVICE_CAP_JOYSTICK, "joystick"}};
+        { DEVICE_CAP_KEYBOARD, "keyboard" },
+        { DEVICE_CAP_TOUCH, "touch device" },
+        { DEVICE_CAP_TABLET_TOOL, "tablet tool" },
+        { DEVICE_CAP_POINTER, "pointer" },
+        { DEVICE_CAP_TABLET_PAD, "pad" },
+        { DEVICE_CAP_GESTURE, "gesture" },
+        { DEVICE_CAP_SWITCH, "switch" },
+        { DEVICE_CAP_JOYSTICK, "joystick" }
+    };
     for (const auto& [cap, name] : deviceComparisonTable) {
         if (caps_.test(cap)) {
             FI_HILOGD("This is %{public}s", name.c_str());
