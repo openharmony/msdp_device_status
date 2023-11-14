@@ -1185,6 +1185,15 @@ void DragDrawing::ProcessFilter()
     }
 }
 
+int32_t DragDrawing::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    if (enable) {
+        return RET_OK;
+    }
+    return RET_ERR;
+}
+
 float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
 {
     float radiusPx = radiusVp * dipScale;
