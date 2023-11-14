@@ -46,6 +46,7 @@ public:
         std::string deviceDescriptor;
         int32_t errCode { 0 };
         CoordinationMessage msg = CoordinationMessage::PREPARE;
+        std::string type;
     };
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;

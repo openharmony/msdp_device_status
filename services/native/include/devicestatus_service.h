@@ -64,13 +64,15 @@ public:
     std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void ReportSensorSysEvent(int32_t type, bool enable);
-    int32_t RegisterCoordinationListener() override;
-    int32_t UnregisterCoordinationListener() override;
-    int32_t PrepareCoordination(int32_t userData) override;
-    int32_t UnprepareCoordination(int32_t userData) override;
-    int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    int32_t DeactivateCoordination(int32_t userData, bool isUnchained) override;
-    int32_t GetCoordinationState(int32_t userData, const std::string &networkId) override;
+    int32_t RegisterCoordinationListener(bool isCheckPermission = false) override;
+    int32_t UnregisterCoordinationListener(bool isCheckPermission = false) override;
+    int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false) override;
+    int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false) override;
+    int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId,
+        bool isCheckPermission = false) override;
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false) override;
+    int32_t GetCoordinationState(int32_t userData, const std::string &networkId,
+        bool isCheckPermission = false) override;
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;

@@ -52,12 +52,24 @@ napi_value JsCoordinationContext::Export(napi_env env, napi_value exports)
     CHKPP(instance);
     DeclareDeviceCoordinationInterface(env, exports);
     DeclareDeviceCoordinationData(env, exports);
+    DeclareDeviceCooperateData(env, exports);
     return exports;
 }
 
 napi_value JsCoordinationContext::Prepare(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
+    return PrepareCompatible(env, info);
+}
+
+napi_value JsCoordinationContext::PrepareCooperate(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    return PrepareCompatible(env, info, true);
+}
+
+napi_value JsCoordinationContext::PrepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+{
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -67,20 +79,31 @@ napi_value JsCoordinationContext::Prepare(napi_env env, napi_callback_info info)
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
-        return jsCoordinationMgr->Prepare(env);
+        return jsCoordinationMgr->Prepare(env, isCheckPermission);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Prepare(env, argv[0]);
+    return jsCoordinationMgr->Prepare(env, isCheckPermission, argv[0]);
 }
 
 napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    napi_value argv[1] = { nullptr };
+    return UnprepareCompatible(env, info);
+}
+
+napi_value JsCoordinationContext::UnprepareCooperate(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    return UnprepareCompatible(env, info, true);
+}
+
+napi_value JsCoordinationContext::UnprepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+{
     size_t argc = 1;
+    napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
@@ -88,18 +111,29 @@ napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info inf
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
-        return jsCoordinationMgr->Unprepare(env);
+        return jsCoordinationMgr->Unprepare(env, isCheckPermission);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Unprepare(env, argv[0]);
+    return jsCoordinationMgr->Unprepare(env, isCheckPermission, argv[0]);
 }
 
 napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
+    return ActivateCompatible(env, info);
+}
+
+napi_value JsCoordinationContext::ActivateCooperate(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    return ActivateCompatible(env, info, true);
+}
+
+napi_value JsCoordinationContext::ActivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+{
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -128,18 +162,29 @@ napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 2) {
-        return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId);
+        return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId, isCheckPermission);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Activate(env, std::string(remoteNetworkId), startDeviceId, argv[2]);
+    return jsCoordinationMgr->Activate(env, std::string(remoteNetworkId), startDeviceId, isCheckPermission, argv[2]);
 }
 
 napi_value JsCoordinationContext::Deactivate(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
+    return DeactivateCompatible(env, info);
+}
+
+napi_value JsCoordinationContext::DeactivateCooperate(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    return DeactivateCompatible(env, info, true);
+}
+
+napi_value JsCoordinationContext::DeactivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+{
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -160,18 +205,30 @@ napi_value JsCoordinationContext::Deactivate(napi_env env, napi_callback_info in
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->Deactivate(env, isUnchained);
+        return jsCoordinationMgr->Deactivate(env, isUnchained, isCheckPermission);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Deactivate(env, isUnchained, argv[1]);
+    return jsCoordinationMgr->Deactivate(env, isUnchained, isCheckPermission, argv[1]);
 }
 
 napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
+    return GetCrossingSwitchStateCompatible(env, info);
+}
+
+napi_value JsCoordinationContext::GetCooperateSwitchState(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    return GetCrossingSwitchStateCompatible(env, info, true);
+}
+
+napi_value JsCoordinationContext::GetCrossingSwitchStateCompatible(napi_env env,
+    napi_callback_info info, bool isCheckPermission)
+{
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -195,13 +252,13 @@ napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_call
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp);
+        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCheckPermission);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, argv[1]);
+    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCheckPermission, argv[1]);
 }
 
 napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
@@ -222,7 +279,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
-    if ((COOPERATE_NAME.compare(type)) != 0) {
+    if ((COOPERATE_NAME.compare(type)) != 0 && (COOPERATE_MESSAGE_NAME.compare(type)) != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate");
         return nullptr;
     }
@@ -380,7 +437,7 @@ JsCoordinationContext *JsCoordinationContext::GetInstance(napi_env env)
     return instance;
 }
 
-void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, napi_value exports)
+void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_value exports)
 {
     napi_value prepare = nullptr;
     CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::PREPARE), &prepare),
@@ -424,14 +481,63 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
     CHKRV(napi_set_named_property(env, exports, "CooperateMsg", cooperateMsg), SET_NAMED_PROPERTY);
 }
 
-void JsCoordinationContext::DeclareDeviceCoordinationData(napi_env env, napi_value exports)
+void JsCoordinationContext::DeclareDeviceCooperateData(napi_env env, napi_value exports)
+{
+    napi_value prepare = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::PREPARE), &prepare),
+        CREATE_INT32);
+    napi_value unprepare = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::UNPREPARE), &unprepare),
+        CREATE_INT32);
+    napi_value activate = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::ACTIVATE), &activate),
+        CREATE_INT32);
+    napi_value activateSuccess = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::ACTIVATE_SUCCESS), &activateSuccess),
+        CREATE_INT32);
+    napi_value activateFail = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::ACTIVATE_FAIL), &activateFail),
+        CREATE_INT32);
+    napi_value deactivateSuccess = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::DEACTIVATE_SUCCESS), &deactivateSuccess),
+        CREATE_INT32);
+    napi_value deactivateFail = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::DEACTIVATE_FAIL), &deactivateFail),
+        CREATE_INT32);
+    napi_value sessionClosed = nullptr;
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CoordinationMessage::SESSION_CLOSED), &sessionClosed),
+        CREATE_INT32);
+
+    napi_property_descriptor msg[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_PREPARE", prepare),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_UNPREPARE", unprepare),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE", activate),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE_SUCCESS", activateSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_ACTIVATE_FAILURE", activateFail),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_SUCCESS", deactivateSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_DEACTIVATE_FAILURE", deactivateFail),
+        DECLARE_NAPI_STATIC_PROPERTY("COOPERATE_SESSION_DISCONNECTED", sessionClosed)
+    };
+
+    napi_value cooperateMsg = nullptr;
+    CHKRV(napi_define_class(env, "CooperateState", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(msg) / sizeof(*msg), msg, &cooperateMsg), DEFINE_CLASS);
+    CHKRV(napi_set_named_property(env, exports, "CooperateState", cooperateMsg), SET_NAMED_PROPERTY);
+}
+
+void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("prepare", Prepare),
+        DECLARE_NAPI_STATIC_FUNCTION("prepareCooperate", PrepareCooperate),
         DECLARE_NAPI_STATIC_FUNCTION("unprepare", Unprepare),
+        DECLARE_NAPI_STATIC_FUNCTION("unprepareCooperate", UnprepareCooperate),
         DECLARE_NAPI_STATIC_FUNCTION("activate", Activate),
+        DECLARE_NAPI_STATIC_FUNCTION("activateCooperate", ActivateCooperate),
         DECLARE_NAPI_STATIC_FUNCTION("deactivate", Deactivate),
+        DECLARE_NAPI_STATIC_FUNCTION("deactivateCooperate", DeactivateCooperate),
         DECLARE_NAPI_STATIC_FUNCTION("getCrossingSwitchState", GetCrossingSwitchState),
+        DECLARE_NAPI_STATIC_FUNCTION("getCooperateSwitchState", GetCooperateSwitchState),
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off)
     };

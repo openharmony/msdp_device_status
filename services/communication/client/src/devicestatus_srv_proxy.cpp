@@ -129,7 +129,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type& type)
     return devicestatusData;
 }
 
-int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
+int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -137,6 +137,7 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -149,7 +150,7 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener()
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
+int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -159,6 +160,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageOption option;
     MessageParcel reply;
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
@@ -169,7 +171,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener()
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -178,6 +180,7 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageOption option;
     MessageParcel reply;
     sptr<IRemoteObject> remote = Remote();
@@ -190,7 +193,7 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
+int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -199,6 +202,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -212,7 +216,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData)
 }
 
 int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
-    int32_t startDeviceId)
+    int32_t startDeviceId, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -223,6 +227,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITESTRING(data, remoteNetworkId, ERR_INVALID_VALUE);
     WRITEINT32(data, startDeviceId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -235,7 +240,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -245,6 +250,7 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUn
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITEBOOL(data, isUnchained, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -391,7 +397,8 @@ int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::string &networkId)
+int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
+    const std::string &networkId, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -401,6 +408,7 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData, const std::
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITESTRING(data, networkId, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
