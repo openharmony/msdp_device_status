@@ -110,6 +110,7 @@ void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
     dragData_ = { };
+    dragItemStyle_ = { };
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)
@@ -127,11 +128,6 @@ bool DragDataManager::IsMotionDrag() const
 void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
 {
     dragItemStyle_ = dragItemStyle;
-}
-
-void DragDataManager::ResetDragItemStyle()
-{
-    dragItemStyle_ = {};
 }
 
 DragItemStyle DragDataManager::GetDragItemStyle()

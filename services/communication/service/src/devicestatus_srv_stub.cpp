@@ -25,7 +25,6 @@
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
-#include "drag_item_style_packer.h"
 #include "fi_log.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
@@ -595,10 +594,9 @@ int32_t DeviceStatusSrvStub::UpdateDragItemStyleStub(MessageParcel& data, Messag
 {
     CALL_DEBUG_ENTER;
     DragItemStyle dragItemStyle;
-    if (DragItemStylePacker::UnMarshallingDragItemStyle(data, dragItemStyle) != RET_OK) {
-        FI_HILOGE("UnMarshallingDragItemStyle failed");
-        return RET_ERR;
-    }
+    READUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
+    READINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
+    READUINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     int32_t ret = UpdateDragItemStyle(dragItemStyle);
     if (ret != RET_OK) {
         FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
