@@ -238,7 +238,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         return RET_ERR;
     }
 
-    std::string peerSessionName = remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH) + SESSION_NAME;
+    std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
     FI_HILOGE("PeerSessionName:%{public}s", peerSessionName.c_str());
     int32_t sessionId = OpenSession(localSessionName_.c_str(), peerSessionName.c_str(), remoteNetworkId.c_str(),
         GROUP_ID.c_str(), &g_sessionAttr);
@@ -252,8 +252,8 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
 int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId)
 {
     CALL_INFO_TRACE;
-    sessionDevs_[remoteNetworkId] = sessionId;
     std::unique_lock<std::mutex> waitLock(operationMutex_);
+    sessionDevs_[remoteNetworkId] = sessionId;
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
         [this, remoteNetworkId] () { return channelStatuss_[remoteNetworkId]; });
     if (!status) {
