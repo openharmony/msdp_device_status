@@ -143,16 +143,17 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
-    dragState_ = DragState::START;
-    stateNotify_.StateChangedNotify(DragState::START);
-    StateChangedNotify(DragState::START);
     if (eventHub_ == nullptr) {
         eventHub_ = EventHub::GetEventHub(context_);
         if (eventHub_ == nullptr) {
             FI_HILOGE("Failed to get event");
+            return RET_ERR;
         }
     }
     EventHub::RegisterEvent(eventHub_);
+    dragState_ = DragState::START;
+    stateNotify_.StateChangedNotify(DragState::START);
+    StateChangedNotify(DragState::START);
     return RET_OK;
 }
 

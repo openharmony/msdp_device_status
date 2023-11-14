@@ -43,15 +43,14 @@ std::shared_ptr<EventHub> EventHub::GetEventHub(IContext* context)
         skill->AddEvent(actionPair.first);
     }
     auto info = std::make_shared<EventFwk::CommonEventSubscribeInfo>(*skill);
-    auto eventHub = std::make_shared<EventHub>(*info, context);
-    return eventHub;
+    return std::make_shared<EventHub>(*info, context);
 }
 
 void EventHub::RegisterEvent(std::shared_ptr<EventHub> eventHub)
 {
     CALL_DEBUG_ENTER;
     bool result = EventFwk::CommonEventManager::SubscribeCommonEvent(eventHub);
-    if (result != true) {
+    if (!result) {
         FI_HILOGE("Failed to subscribe common event");
     }
 }
@@ -60,7 +59,7 @@ void EventHub::UnRegisterEvent(std::shared_ptr<EventHub> eventHub)
 {
     CALL_DEBUG_ENTER;
     bool result = EventFwk::CommonEventManager::UnSubscribeCommonEvent(eventHub);
-    if (result != true) {
+    if (!result) {
         FI_HILOGE("Failed to unSubscribe common event");
     }
 }
