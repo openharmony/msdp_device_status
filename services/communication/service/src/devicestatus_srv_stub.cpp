@@ -633,9 +633,9 @@ int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel 
 int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    bool visible = false;
-    READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = EnterTextEditorArea(visible);
+    bool enable = false;
+    READBOOL(data, enable, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = EnterTextEditorArea(enable);
     if (ret != RET_OK) {
         FI_HILOGE("Call EnterTextEditorArea failed, ret:%{public}d", ret);
     }
