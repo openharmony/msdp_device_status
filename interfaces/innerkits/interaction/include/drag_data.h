@@ -90,7 +90,7 @@ struct DragAnimationData {
 struct DragItemStyle {
     uint32_t foregroundColor;
     int32_t radius;
-    int32_t alpha;
+    uint32_t alpha;
 
     bool operator == (const DragItemStyle &style) const
     {

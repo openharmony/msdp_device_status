@@ -39,7 +39,7 @@ int32_t DragItemStylePacker::MarshallingDragItemStyle(const DragItemStyle &dragI
     CALL_DEBUG_ENTER;
     WRITEUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
     WRITEINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
+    WRITEUINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
@@ -48,7 +48,7 @@ int32_t DragItemStylePacker::UnMarshallingDragItemStyle(MessageParcel &data, Dra
     CALL_DEBUG_ENTER;
     READUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
     READINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
-    READINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
+    READUINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
     return RET_OK;
 }
 } // namespace DeviceStatus

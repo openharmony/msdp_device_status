@@ -70,7 +70,7 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 constexpr int32_t FOREGROUND_COLOR { 0x99FF0000 };
 constexpr int32_t RADIUS { 42 };
-constexpr int32_t ALPHA { 51 };
+constexpr int32_t ALPHA { 10 };
 const std::string UD_KEY { "Unified data key" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
