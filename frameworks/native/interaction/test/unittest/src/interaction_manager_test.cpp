@@ -68,9 +68,12 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
-constexpr int32_t FOREGROUND_COLOR { 0x99FF0000 };
-constexpr int32_t RADIUS { 42 };
-constexpr int32_t ALPHA { 10 };
+constexpr int32_t FOREGROUND_COLOR_IN { 0x00FF0000 };
+constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
+constexpr int32_t RADIUS_IN { 42 };
+constexpr int32_t RADIUS_OUT { 42 };
+constexpr int32_t ALPHA_IN { 10 };
+constexpr int32_t ALPHA_OUT { 0 };
 const std::string UD_KEY { "Unified data key" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
@@ -1676,20 +1679,20 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdateDragItemStyle, Tes
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    const std::string udType = "general.message";
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     EXPECT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle { FOREGROUND_COLOR, RADIUS, ALPHA };
-    int32_t stopX = 300;
-    int32_t stopY = 300;
+    int32_t stopX = 600;
+    int32_t stopY = 50;
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { stopX, stopY },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
-    ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
+    ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_IN, RADIUS_IN, ALPHA_IN });
     EXPECT_EQ(ret, RET_OK);
     SimulateMoveEvent({ stopX, stopY }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_OUT, RADIUS_OUT, ALPHA_OUT });
+    EXPECT_EQ(ret, RET_OK);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=

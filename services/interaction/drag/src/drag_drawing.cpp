@@ -62,7 +62,7 @@ constexpr int32_t SVG_WIDTH { 40 };
 constexpr int32_t SVG_HEIGHT { 40 };
 constexpr int32_t SIXTEEN { 16 };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
-constexpr int32_t GRADIENT_COLOR_DURATION { 1000 };
+constexpr int32_t GRADIENT_COLOR_DURATION { 250 };
 constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
@@ -93,7 +93,6 @@ constexpr int32_t INVALID_COLOR_VALUE { -1 };
 constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
-constexpr int32_t TRANSPARENT_COLOR { 0x00000000 };
 constexpr int32_t ALPHA_SHIFT { 24 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
@@ -1220,7 +1219,8 @@ int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
         FI_HILOGD("PixelMapNode is nullptr");
         return RET_ERR;
     }
-    pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR);
+    auto foregroundColor = pixelMapNode->GetShowingProperties().GetForegroundColor();
+    pixelMapNode->SetForegroundColor(foregroundColor->AsArgbInt());
     pixelMapNode->SetCornerRadius(dragItemStyle.radius);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(GRADIENT_COLOR_DURATION);
