@@ -54,10 +54,14 @@ ErrCode DeviceStatusMsdpClientImpl::InitMsdpImpl(Type type)
         FI_HILOGI("GetSensorHdi is support");
         return RET_OK;
     }
+    #ifdef DEVICE_STATUS_SENSOR_ENABLE
     if (AlgoHandle(type) == RET_OK) {
         FI_HILOGI("AlgoHandle is support");
         return RET_OK;
     }
+    #else
+    FI_HILOGE("Enable:sensor is not exist");
+    #endif // DEVICE_STATUS_SENSOR_ENABLE
     if (MockHandle(type) == RET_OK) {
         FI_HILOGI("MockHandle is support");
         return RET_OK;
@@ -174,6 +178,7 @@ ErrCode DeviceStatusMsdpClientImpl::SensorHdiDisable(Type type)
 
 ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
 {
+    #ifdef DEVICE_STATUS_SENSOR_ENABLE
     CALL_DEBUG_ENTER;
     CHKPR(iAlgo_, RET_ERR);
     auto iter = algoCallCounts_.find(type);
@@ -200,6 +205,10 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
     }
     FI_HILOGI("algoCallCounts_:%{public}d", algoCallCounts_[type]);
     return RET_OK;
+    #else
+    FI_HILOGE("Disable:sensor is not exist");
+    return RET_ERR;
+    #endif // DEVICE_STATUS_SENSOR_ENABLE
 }
 
 ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)

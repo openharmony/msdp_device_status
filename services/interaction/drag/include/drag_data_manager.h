@@ -46,6 +46,7 @@ public:
     int32_t GetTargetPid() const;
     bool IsMotionDrag() const;
     void SetDragItemStyle(const DragItemStyle &dragItemStyle);
+    void ResetDragItemStyle();
     DragItemStyle GetDragItemStyle();
     void ResetDragData();
     DragData GetDragData() const;

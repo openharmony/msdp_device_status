@@ -172,6 +172,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         FI_HILOGE("Notify drag result failed");
     }
     DRAG_DATA_MGR.ResetDragData();
+    DRAG_DATA_MGR.ResetDragItemStyle();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
     return ret;
@@ -318,6 +319,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CALL_INFO_TRACE;
     CHKPV(pointerEvent);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    DRAG_DATA_MGR.ResetDragItemStyle();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         FI_HILOGI("Set the pointer cursor visible");

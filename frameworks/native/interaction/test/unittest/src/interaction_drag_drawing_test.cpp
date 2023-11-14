@@ -56,6 +56,9 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
+constexpr int32_t FOREGROUND_COLOR { 0x99FF0000 };
+constexpr int32_t RADIUS { 42 };
+constexpr int32_t ALPHA { 51 };
 const std::string UD_KEY { "Unified data key" };
 const std::string FILTER_INFO { "Undefined filter info" };
 const std::string EXTRA_INFO { "Undefined extra info" };
@@ -426,7 +429,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemSt
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle { 0x99FF0000, 41, 51 };
+    DragItemStyle dragItemStyle { FOREGROUND_COLOR, RADIUS, ALPHA };
     ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);

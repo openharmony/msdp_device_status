@@ -16,6 +16,7 @@
 #ifndef DEVICESTATUS_ALGORITHM_MANAGER_H
 #define DEVICESTATUS_ALGORITHM_MANAGER_H
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include <map>
 #include <memory>
 #include <mutex>
@@ -67,4 +68,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #endif // DEVICESTATUS_ALGORITHM_MANAGER_H

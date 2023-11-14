@@ -109,9 +109,7 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
 void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
-    ShadowInfo shadowInfo;
-    std::vector<uint8_t> buffer;
-    dragData_ = { shadowInfo, buffer, "", "", "", -1, -1, -1, -1, -1, -1, false };
+    dragData_ = { };
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)
@@ -129,6 +127,11 @@ bool DragDataManager::IsMotionDrag() const
 void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
 {
     dragItemStyle_ = dragItemStyle;
+}
+
+void DragDataManager::ResetDragItemStyle()
+{
+    dragItemStyle_ = {};
 }
 
 DragItemStyle DragDataManager::GetDragItemStyle()

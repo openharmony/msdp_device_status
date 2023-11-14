@@ -22,13 +22,13 @@
 #include <vector>
 
 #include "pixel_map.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
-constexpr size_t MAX_SHADOW_INFO_MEMO_SIZE { 10000000 }; // shadowInfo 的最大内存占用
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };

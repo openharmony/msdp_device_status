@@ -44,10 +44,13 @@ ohos_shared_library("devicestatus_mock") {
     "//third_party/cJSON:cjson_static",
   ]
 
-  external_deps = [
-    "hilog:libhilog",
-    "sensor:sensor_interface_native",
-  ]
+  external_deps = [ "hilog:libhilog" ]
+
+  defines = []
+  if (device_status_sensor_enable) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
 
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
@@ -93,8 +96,12 @@ ohos_shared_library("devicestatus_algo") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
+  defines = []
+  if (device_status_sensor_enable) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "DEVICE_STATUS_SENSOR_ENABLE" ]
+  }
 
   subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
