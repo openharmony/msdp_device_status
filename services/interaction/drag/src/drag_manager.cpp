@@ -817,7 +817,6 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
     if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN) {
         dragAction_.store(DragAction::COPY);
         HandleCtrlKeyDown();
-        FI_HILOGI("the current drag action is copy");
     }
 }
 
