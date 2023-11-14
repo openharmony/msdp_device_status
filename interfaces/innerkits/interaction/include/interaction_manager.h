@@ -217,11 +217,11 @@ public:
 
     /**
      * @brief Obtains the current droping type.
-     * @param dropType dropping type while user pressed ctrl or not.
+     * @param dragAction dropping type while user pressed ctrl or not.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
-    int32_t GetDropType(DropType &dropType);
+    int32_t GetDragAction(DragAction &dragAction);
 
     /**
      * @brief Registers a listener for screen hot area of the mouse pointer.

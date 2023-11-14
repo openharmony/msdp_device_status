@@ -838,12 +838,12 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return ret;
 }
 
-int32_t DeviceStatusService::GetDropType(DropType& dropType)
+int32_t DeviceStatusService::GetDragAction(DragAction& dragAction)
 {
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDropType, &dragMgr_, std::ref(dropType)));
+        std::bind(&DragManager::GetDragAction, &dragMgr_, std::ref(dragAction)));
     if (ret != RET_OK) {
-        FI_HILOGE("Get drop type failed, ret:%{public}d", ret);
+        FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
     }
     return ret;
 }

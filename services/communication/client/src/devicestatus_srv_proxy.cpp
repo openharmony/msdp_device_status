@@ -734,7 +734,7 @@ int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &sum
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetDropType(DropType& dropType)
+int32_t DeviceStatusSrvProxy::GetDragAction(DragAction& dragAction)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -746,14 +746,15 @@ int32_t DeviceStatusSrvProxy::GetDropType(DropType& dropType)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
     }
     int32_t type;
     READINT32(reply, type, IPC_PROXY_DEAD_OBJECT_ERR);
-    dropType = static_cast<DropType>(type);
+    dragAction = static_cast<DragAction>(type);
     return ret;
 }
 
