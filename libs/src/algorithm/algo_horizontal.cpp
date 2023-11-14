@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "algo_horizontal.h"
 
 #include "devicestatus_define.h"
@@ -74,3 +75,4 @@ void AlgoHorizontal::ExecuteOperation()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE

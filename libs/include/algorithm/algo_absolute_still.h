@@ -16,6 +16,7 @@
 #ifndef ALGO_ABSOLUTE_STILL_H
 #define ALGO_ABSOLUTE_STILL_H
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "algo_base.h"
 
 namespace OHOS {
@@ -35,4 +36,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #endif // ALGO_ABSOLUTE_STILL_H

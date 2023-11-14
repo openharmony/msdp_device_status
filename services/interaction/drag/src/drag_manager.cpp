@@ -360,17 +360,10 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
     CHKPV(context_);
     pointerEventCallback_(pointerEvent);
     pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    auto fun = [] (std::shared_ptr<MMI::PointerEvent> pointerEvent) -> int32_t {
-        MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-        if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-            FI_HILOGI("Pointer button is released, appened extra data");
-            MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
-        }
-        return RET_OK;
-    };
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(std::bind(fun, pointerEvent));
-    if (ret != RET_OK) {
-        FI_HILOGE("Post async task failed");
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
+        FI_HILOGI("Pointer button is released, appened extra data");
+        MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     }
 }
 

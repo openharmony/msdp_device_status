@@ -18,6 +18,12 @@ declare_args() {
   fusion_interaction_coordination = false
   fusion_drag_enable_monitor = false
   fusion_drag_enable_interceptor = true
+  device_status_sensor_enable = true
+  if (defined(global_parts_info)) {
+    if (!defined(global_parts_info.sensors_sensor)) {
+      device_status_sensor_enable = false
+    }
+  }
 }
 
 if (fusion_interaction_coordination) {

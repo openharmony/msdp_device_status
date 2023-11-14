@@ -16,6 +16,7 @@
 #ifndef SENSOR_DATA_CALLBACK_H
 #define SENSOR_DATA_CALLBACK_H
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include <atomic>
 #include <list>
 #include <map>
@@ -63,4 +64,6 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #endif // SENSOR_DATA_CALLBACK_H
+
