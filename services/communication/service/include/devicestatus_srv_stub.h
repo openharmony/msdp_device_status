@@ -30,7 +30,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusSrvStub : public IRemoteStub<Idevicestatus> {
 public:
-    using ConnFunc = int32_t (DeviceStatusSrvStub::*)(MessageParcel& data, MessageParcel& reply);
+    using ConnFunc = int32_t ((DeviceStatusSrvStub:: *))(MessageParcel& data, MessageParcel& reply);
 
     DeviceStatusSrvStub();
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvStub);

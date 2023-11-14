@@ -97,6 +97,7 @@ int32_t DeviceManager::OnEnable()
     CALL_DEBUG_ENTER;
     epollMgr_ = std::make_shared<EpollManager>();
     int32_t ret = epollMgr_->Open();
+    //int32_t ret = epollMgr_.Open();
     if (ret != RET_OK) {
         return ret;
     }
@@ -105,6 +106,7 @@ int32_t DeviceManager::OnEnable()
         goto CLOSE_EPOLL;
     }
     ret = epollMgr_->Add(monitor_);
+    //ret = epollMgr_.Add(monitor_);
     if (ret != RET_OK) {
         goto DISABLE_MONITOR;
     }
@@ -113,9 +115,9 @@ int32_t DeviceManager::OnEnable()
 
 DISABLE_MONITOR:
     monitor_.Disable();
-
 CLOSE_EPOLL:
     epollMgr_.reset();
+    //epollMgr_.Close();
     return ret;
 }
 
@@ -135,8 +137,10 @@ int32_t DeviceManager::OnDisable()
 {
     CHKPR(epollMgr_, RET_ERR);
     epollMgr_->Remove(monitor_);
+    //epollMgr_.Remove(monitor_);
     monitor_.Disable();
     epollMgr_.reset();
+    //epollMgr_.Close();
     return RET_OK;
 }
 
@@ -283,6 +287,9 @@ int32_t DeviceManager::OnEpollDispatch(uint32_t events)
 
     CHKPR(epollMgr_, RET_ERR);
     epollMgr_->Dispatch(ev);
+
+    //ev.data.ptr = &epollMgr_;
+    //epollMgr_.Dispatch(ev);
     return RET_OK;
 }
 

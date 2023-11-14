@@ -44,7 +44,7 @@ void IntentionService::OnDump()
 void IntentionService::OnStart()
 {
     CALL_INFO_TRACE;
-    if (!Publish(DelayedSpSingleton<IntentionService>::GetInstance())) {
+    if (!Publish(this)) {
         FI_HILOGE("On start register to system ability manager failed");
     }
 }
