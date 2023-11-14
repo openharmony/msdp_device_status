@@ -214,7 +214,11 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     FI_HILOGI("Update drag style successfully");
     DRAG_DATA_MGR.SetDragStyle(style);
     stateNotify_.StyleChangedNotify(style);
-    return dragDrawing_.UpdateDragStyle(style);
+    if ((dragBehavior_ == DragBehavior::COPY) && (style == DragCursorStyle::MOVE)) {
+        return dragDrawing_.UpdateDragStyle(DragCursorStyle::COPY);
+    } else {
+        return dragDrawing_.UpdateDragStyle(style);
+    }
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -576,10 +580,6 @@ int32_t DragManager::RemovePointerEventHandler()
     }
     MMI::InputManager::GetInstance()->RemoveMonitor(pointerEventMonitorId_);
     pointerEventMonitorId_ = -1;
-    if (RemoveKeyEventMointor() != RET_OK) {
-        FI_HILOGE("Failed to remove key event monitor");
-        return RET_ERR;
-    }
 #else
     if (pointerEventInterceptorId_ <= 0) {
         FI_HILOGE("Invalid pointer event interceptor id:%{public}d", pointerEventInterceptorId_);
@@ -794,32 +794,64 @@ void DragManager::MoveTo(int32_t x, int32_t y)
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
+    if (DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE) {
+        return;
+    }
     CHKPV(keyEvent);
     auto keys = keyEvent->GetKeyItems();
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t keyAction = keyEvent->GetKeyAction();
     if (keys.size() != SIGNLE_KEY_ITEM) {
-        dropType_.store(DropType::MOVE);
+        dragBehavior_.store(DragBehavior::MOVE);
         return;
     }
-    if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN && (
-        keyCode == MMI::KeyEvent::KEYCODE_CTRL_LEFT ||
-        keyCode == MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
-        dropType_.store(DropType::COPY);
-        FI_HILOGI("the current drop type is copy");
-    } else {
-        dropType_.store(DropType::MOVE);
+    if ((keyCode != MMI::KeyEvent::KEYCODE_CTRL_LEFT) &&
+        (keyCode != MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
+        dragBehavior_.store(DragBehavior::MOVE);
+        return;
+    }
+    if (keyAction == MMI::KeyEvent::KEY_ACTION_UP) {
+        dragBehavior_.store(DragBehavior::MOVE);
+        HandleCtrlKeyUp();
+        return;
+    }
+    if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN) {
+        dragBehavior_.store(DragBehavior::COPY);
+        HandleCtrlKeyDown();
+        FI_HILOGI("the current drag behavior is copy");
     }
 }
 
-int32_t DragManager::GetDropType(DropType& dropType) const
+void DragManager::HandleCtrlKeyDown()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+    std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+void DragManager::HandleCtrlKeyUp()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+    std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DRAG_DATA_MGR.GetDragStyle()));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+int32_t DragManager::GetDragBehavior(DragBehavior& dragBehavior) const
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
-        FI_HILOGE("No drag instance running, can not get drag drop type");
+        FI_HILOGE("No drag instance running, can not get drag behavior");
         return RET_ERR;
     }
-    dropType = dropType_.load();
+    dragBehavior = dragBehavior_.load();
     return RET_OK;
 }
 } // namespace DeviceStatus

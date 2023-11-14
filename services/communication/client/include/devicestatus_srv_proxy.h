@@ -64,7 +64,7 @@ public:
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
-    virtual int32_t GetDropType(DropType& dropType) override;
+    virtual int32_t GetDragBehavior(DragBehavior& dragBehavior) override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

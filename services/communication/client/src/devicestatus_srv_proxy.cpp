@@ -734,7 +734,7 @@ int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &sum
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetDropType(DropType& dropType)
+int32_t DeviceStatusSrvProxy::GetDragBehavior(DragBehavior& dragBehavior)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -753,7 +753,7 @@ int32_t DeviceStatusSrvProxy::GetDropType(DropType& dropType)
     }
     int32_t type;
     READINT32(reply, type, IPC_PROXY_DEAD_OBJECT_ERR);
-    dropType = static_cast<DropType>(type);
+    dragBehavior = static_cast<DragBehavior>(type);
     return ret;
 }
 } // namespace DeviceStatus

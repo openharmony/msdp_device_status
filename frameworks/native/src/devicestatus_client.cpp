@@ -437,11 +437,11 @@ int32_t DeviceStatusClient::GetDragState(DragState &dragState)
     return devicestatusProxy_->GetDragState(dragState);
 }
 
-int32_t DeviceStatusClient::GetDropType(DropType& dropType)
+int32_t DeviceStatusClient::GetDragBehavior(DragBehavior& dragBehavior)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetDropType(dropType);
+    return devicestatusProxy_->GetDragBehavior(dragBehavior);
 }
 
 int32_t DeviceStatusClient::AddHotAreaListener()

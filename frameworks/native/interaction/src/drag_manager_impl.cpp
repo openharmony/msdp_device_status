@@ -271,9 +271,9 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
 }
 
-int32_t DragManagerImpl::GetDropType(DropType& dropType)
+int32_t DragManagerImpl::GetDragBehavior(DragBehavior& dragBehavior)
 {
-    return DeviceStatusClient::GetInstance().GetDropType(dropType);
+    return DeviceStatusClient::GetInstance().GetDragBehavior(dragBehavior);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

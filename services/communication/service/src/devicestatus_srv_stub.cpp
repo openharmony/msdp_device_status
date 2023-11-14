@@ -112,7 +112,7 @@ void DeviceStatusSrvStub::InitDrag()
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
             &DeviceStatusSrvStub::GetDragSummaryStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
-            &DeviceStatusSrvStub::GetDropTypeStub }
+            &DeviceStatusSrvStub::GetDragBehaviorStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -602,15 +602,15 @@ int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParc
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel &reply)
+int32_t DeviceStatusSrvStub::GetDragBehaviorStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    DropType dropType;
-    int32_t ret = GetDropType(dropType);
+    DragBehavior dragBehavior;
+    int32_t ret = GetDragBehavior(dragBehavior);
     if (ret != RET_OK) {
         return RET_ERR;
     }
-    WRITEINT32(reply, static_cast<int32_t>(dropType), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, static_cast<int32_t>(dragBehavior), IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 } // namespace DeviceStatus
