@@ -253,6 +253,11 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (displayY < 0) {
         g_drawingInfo.displayY = 0;
     }
+    if (IsInUninstallArea(displayX, displayY)) {
+        UpdateDragItemStyle({ 0x00FF0000, 20, 51 });
+    } else {
+        UpdateDragItemStyle({ 0x00000000, 20, 0 });
+    }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
@@ -1209,6 +1214,11 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
 {
     float radiusPx = radiusVp * dipScale;
     return radiusPx > 0.0f ? BLUR_SIGMA_SCALE * radiusPx + 0.5f : 0.0f;
+}
+
+bool DragDrawing::IsInUninstallArea(int32_t x, int32_t y)
+{
+    return x >= 500 && y <= 200;
 }
 
 int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)

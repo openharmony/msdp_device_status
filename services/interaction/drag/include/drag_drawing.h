@@ -166,6 +166,7 @@ private:
     bool ParserFilterInfo(FilterInfo& filterInfo);
     void ProcessFilter();
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
+    bool IsInUninstallArea(int32_t x, int32_t y);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
