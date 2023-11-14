@@ -18,6 +18,8 @@ config("intention_epoll_public_config") {
 }
 
 ohos_source_set("intention_epoll") {
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "include" ]
 
   sources = [ "src/epoll_manager.cpp" ]

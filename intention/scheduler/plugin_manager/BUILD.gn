@@ -21,6 +21,8 @@ config("plugin_manager_config") {
 }
 
 ohos_source_set("plugin_manager") {
+  branch_protector_ret = "pac_ret"
+
   sources = [ "src/plugin_manager.cpp" ]
 
   configs = [ ":plugin_manager_config" ]

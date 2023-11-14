@@ -14,6 +14,8 @@
 import("//base/msdp/device_status/device_status.gni")
 
 ohos_shared_library("inputdevicecooperate") {
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/js_cooperate_context.cpp",
     "src/js_cooperate_manager.cpp",

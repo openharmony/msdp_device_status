@@ -73,6 +73,8 @@ external_deps_set = [
 ]
 
 ohos_shared_library("devicestatus_service") {
+  branch_protector_ret = "pac_ret"
+
   shlib_type = "sa"
   include_dirs = [ "//third_party/cJSON" ]
 
@@ -121,6 +123,8 @@ ohos_shared_library("devicestatus_service") {
 }
 
 ohos_static_library("devicestatus_static_service") {
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "//third_party/cJSON" ]
 
   sources = sources_set

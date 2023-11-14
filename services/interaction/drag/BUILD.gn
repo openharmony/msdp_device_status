@@ -18,6 +18,8 @@ config("interaction_drag_public_config") {
 }
 
 ohos_shared_library("interaction_drag") {
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",

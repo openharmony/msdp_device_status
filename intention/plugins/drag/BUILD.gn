@@ -22,6 +22,8 @@ config("intention_drag_public_config") {
 }
 
 ohos_shared_library("intention_drag") {
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "include" ]
 
   public_configs = [ ":intention_drag_public_config" ]

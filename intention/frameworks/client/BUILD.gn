@@ -27,6 +27,8 @@ config("intention_public_config") {
 }
 
 ohos_shared_library("intention_client") {
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "${intention_root_path}/frameworks/client/src/cooperate_manager_impl.cpp",
     "${intention_root_path}/frameworks/client/src/drag_manager_impl.cpp",

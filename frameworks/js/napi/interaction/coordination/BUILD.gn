@@ -14,6 +14,8 @@
 import("../../../../../device_status.gni")
 
 ohos_shared_library("cooperate") {
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/js_coordination_context.cpp",
     "src/js_coordination_manager.cpp",

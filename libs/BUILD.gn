@@ -27,6 +27,8 @@ config("devicestatus_srv_public_config") {
 }
 
 ohos_shared_library("devicestatus_mock") {
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/devicestatus_data_parse.cpp",
     "src/devicestatus_msdp_mock.cpp",
