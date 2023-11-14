@@ -72,7 +72,7 @@ constexpr int32_t FOREGROUND_COLOR_IN { 0x00FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
 constexpr int32_t RADIUS_IN { 42 };
 constexpr int32_t RADIUS_OUT { 42 };
-constexpr int32_t ALPHA_IN { 10 };
+constexpr int32_t ALPHA_IN { 51 };
 constexpr int32_t ALPHA_OUT { 0 };
 const std::string UD_KEY { "Unified data key" };
 const std::string SYSTEM_CORE { "system_core" };
