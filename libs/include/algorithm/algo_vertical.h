@@ -16,6 +16,7 @@
 #ifndef ALGO_VERTICAL_H
 #define ALGO_VERTICAL_H
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "algo_base.h"
 
 namespace OHOS {
@@ -34,4 +35,5 @@ private:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #endif // ALGO_VERTICAL_H
