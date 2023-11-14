@@ -214,7 +214,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     FI_HILOGI("Update drag style successfully");
     DRAG_DATA_MGR.SetDragStyle(style);
     stateNotify_.StyleChangedNotify(style);
-    if ((dragBehavior_ == DragBehavior::COPY) && (style == DragCursorStyle::MOVE)) {
+    if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
         return dragDrawing_.UpdateDragStyle(DragCursorStyle::COPY);
     } else {
         return dragDrawing_.UpdateDragStyle(style);
@@ -802,23 +802,23 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t keyAction = keyEvent->GetKeyAction();
     if (keys.size() != SIGNLE_KEY_ITEM) {
-        dragBehavior_.store(DragBehavior::MOVE);
+        dragAction_.store(DragAction::MOVE);
         return;
     }
     if ((keyCode != MMI::KeyEvent::KEYCODE_CTRL_LEFT) &&
         (keyCode != MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
-        dragBehavior_.store(DragBehavior::MOVE);
+        dragAction_.store(DragAction::MOVE);
         return;
     }
     if (keyAction == MMI::KeyEvent::KEY_ACTION_UP) {
-        dragBehavior_.store(DragBehavior::MOVE);
+        dragAction_.store(DragAction::MOVE);
         HandleCtrlKeyUp();
         return;
     }
     if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN) {
-        dragBehavior_.store(DragBehavior::COPY);
+        dragAction_.store(DragAction::COPY);
         HandleCtrlKeyDown();
-        FI_HILOGI("the current drag behavior is copy");
+        FI_HILOGI("the current drag action is copy");
     }
 }
 
@@ -844,14 +844,14 @@ void DragManager::HandleCtrlKeyUp()
     }
 }
 
-int32_t DragManager::GetDragBehavior(DragBehavior& dragBehavior) const
+int32_t DragManager::GetDragAction(DragAction& dragAction) const
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
-        FI_HILOGE("No drag instance running, can not get drag behavior");
+        FI_HILOGE("No drag instance running, can not get drag action");
         return RET_ERR;
     }
-    dragBehavior = dragBehavior_.load();
+    dragAction = dragAction_.load();
     return RET_OK;
 }
 } // namespace DeviceStatus

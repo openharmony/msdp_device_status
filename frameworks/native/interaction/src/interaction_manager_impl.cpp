@@ -299,10 +299,10 @@ int32_t InteractionManagerImpl::GetDragState(DragState &dragState)
     return dragManagerImpl_.GetDragState(dragState);
 }
 
-int32_t InteractionManagerImpl::GetDragBehavior(DragBehavior &dragBehavior)
+int32_t InteractionManagerImpl::GetDragAction(DragAction &dragAction)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.GetDragBehavior(dragBehavior);
+    return dragManagerImpl_.GetDragAction(dragAction);
 }
 
 int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)

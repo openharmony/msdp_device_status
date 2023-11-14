@@ -153,9 +153,9 @@ int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summa
     return INTER_MGR_IMPL.GetDragSummary(summarys);
 }
 
-int32_t InteractionManager::GetDragBehavior(DragBehavior &dragBehavior)
+int32_t InteractionManager::GetDragAction(DragAction &dragAction)
 {
-    return INTER_MGR_IMPL.GetDragBehavior(dragBehavior);
+    return INTER_MGR_IMPL.GetDragAction(dragAction);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

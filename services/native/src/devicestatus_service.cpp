@@ -827,12 +827,12 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return ret;
 }
 
-int32_t DeviceStatusService::GetDragBehavior(DragBehavior& dragBehavior)
+int32_t DeviceStatusService::GetDragAction(DragAction& dragAction)
 {
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::GetDragBehavior, &dragMgr_, std::ref(dragBehavior)));
+        std::bind(&DragManager::GetDragAction, &dragMgr_, std::ref(dragAction)));
     if (ret != RET_OK) {
-        FI_HILOGE("Get drag behavior failed, ret:%{public}d", ret);
+        FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
     }
     return ret;
 }

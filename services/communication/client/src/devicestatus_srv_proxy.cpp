@@ -734,7 +734,7 @@ int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &sum
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetDragBehavior(DragBehavior& dragBehavior)
+int32_t DeviceStatusSrvProxy::GetDragAction(DragAction& dragAction)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -753,7 +753,7 @@ int32_t DeviceStatusSrvProxy::GetDragBehavior(DragBehavior& dragBehavior)
     }
     int32_t type;
     READINT32(reply, type, IPC_PROXY_DEAD_OBJECT_ERR);
-    dragBehavior = static_cast<DragBehavior>(type);
+    dragAction = static_cast<DragAction>(type);
     return ret;
 }
 } // namespace DeviceStatus

@@ -94,7 +94,7 @@ enum class DragCursorStyle {
     MOVE
 };
 
-enum class DragBehavior {
+enum class DragAction {
     INVALID = -1,
     MOVE = 0,
     COPY = 1

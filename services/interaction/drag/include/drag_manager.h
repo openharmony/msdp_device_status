@@ -71,7 +71,7 @@ public:
     void SetDragState(DragState state) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
-    int32_t GetDragBehavior(DragBehavior& dragBehavior) const;
+    int32_t GetDragAction(DragAction& dragAction) const;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -125,7 +125,7 @@ private:
     DragState dragState_ { DragState::STOP };
     DragResult dragResult_ { DragResult::DRAG_FAIL };
     int32_t keyEventMonitorId_ { -1 };
-    std::atomic<DragBehavior> dragBehavior_ { DragBehavior::MOVE };
+    std::atomic<DragAction> dragAction_ { DragAction::MOVE };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     int32_t pointerEventInterceptorId_ { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
