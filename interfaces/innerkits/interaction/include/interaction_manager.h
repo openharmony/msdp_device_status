@@ -104,7 +104,7 @@ public:
     /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
-     * @param callback Indicates the callback used to return the dragging result.
+     * @param listener Indicates the listener used to notify dragging result etc.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
@@ -188,7 +188,6 @@ public:
      */
     int32_t SetDragWindowVisible(bool visible);
 
-    // 这个接口的行为在传入的是多个shadowInfo的时候是不是需要改变
     /**
      * @brief Obtains the position of the touch point or mouse pointer relative to
      * the upper left corner of the shadow thumbnail.
@@ -207,7 +206,6 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
-    // 这个接口的行为或者接口参数，是不是也需要改变
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
 
     /**

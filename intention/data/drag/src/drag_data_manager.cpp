@@ -54,7 +54,7 @@ void DragDataManager::ResetDragData()
     CALL_DEBUG_ENTER;
     std::vector<ShadowInfo> shadowInfos;
     std::vector<uint8_t> buffer;
-    dragData_ = { shadowInfos, buffer, "", "", "", -1, -1, -1, -1, -1, -1, false };
+    dragData_ = { };
 }
 
 bool DragDataManager::IsMotionDrag() const
