@@ -16,6 +16,7 @@
 #ifndef ALGO_BASE_H
 #define ALGO_BASE_H
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include <cmath>
 #include <cstdio>
 #include <iostream>
@@ -75,4 +76,6 @@ protected:
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
 #endif // ALGO_BASE_H
+
