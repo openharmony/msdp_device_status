@@ -112,7 +112,9 @@ void DeviceStatusSrvStub::InitDrag()
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
             &DeviceStatusSrvStub::GetDragSummaryStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
-            &DeviceStatusSrvStub::GetDropTypeStub }
+            &DeviceStatusSrvStub::GetDropTypeStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
+            &DeviceStatusSrvStub::EnterTextEditorAreaStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -612,6 +614,18 @@ int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel 
     }
     WRITEINT32(reply, static_cast<int32_t>(dropType), IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool enable = false;
+    READBOOL(data, enable, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = EnterTextEditorArea(enable);
+    if (ret != RET_OK) {
+        FI_HILOGE("Call EnterTextEditorArea failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

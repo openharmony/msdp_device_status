@@ -30,6 +30,12 @@ config("fusion_data_binding_public_config") {
 }
 
 ohos_shared_library("fusion_data_binding") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   sources = [ "src/fusion_data_binding.cpp" ]

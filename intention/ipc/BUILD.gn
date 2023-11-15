@@ -26,6 +26,12 @@ config("ipc_config") {
 }
 
 ohos_source_set("intention_ipc") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   sources = [

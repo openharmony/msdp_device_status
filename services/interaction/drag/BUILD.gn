@@ -18,6 +18,12 @@ config("interaction_drag_public_config") {
 }
 
 ohos_shared_library("interaction_drag") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   include_dirs = [
@@ -32,6 +38,7 @@ ohos_shared_library("interaction_drag") {
     "src/drag_data_manager.cpp",
     "src/drag_drawing.cpp",
     "src/drag_manager.cpp",
+    "src/event_hub.cpp",
     "src/state_change_notify.cpp",
   ]
 
@@ -55,7 +62,9 @@ ohos_shared_library("interaction_drag") {
       [ "${device_status_root_path}/intention/prototype:intention_prototype" ]
 
   external_deps = [
+    "ability_base:want",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_base",

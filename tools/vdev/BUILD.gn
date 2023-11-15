@@ -25,6 +25,12 @@ config("devicestatus_vdev_public_config") {
 }
 
 ohos_source_set("devicestatus_vdev") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   sources = [
@@ -64,6 +70,12 @@ config("devicestatus_vdev_builders_public_config") {
 }
 
 ohos_source_set("devicestatus_vdev_builders") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   sources = [
@@ -94,6 +106,12 @@ ohos_source_set("devicestatus_vdev_builders") {
 }
 
 ohos_executable("vdevadm") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   branch_protector_ret = "pac_ret"
 
   include_dirs = [
