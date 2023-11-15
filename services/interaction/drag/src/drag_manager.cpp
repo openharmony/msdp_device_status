@@ -298,6 +298,11 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(),
         pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+    if (IsInUninstallArea(pointerItem.GetDisplayX(), pointerItem.GetDisplayY())) {
+        UpdateDragItemStyle({ 0x00FF0000, 20, 51 });
+    } else {
+        UpdateDragItemStyle({ 0x00000000, 20, 0 });
+    }
 }
 
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
@@ -775,6 +780,11 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
     return RET_OK;
 }
 
+bool DragManager::IsInUninstallArea(int32_t x, int32_t y)
+{
+    return x >= 500 && y <= 200;
+}
+
 void DragManager::SetPointerEventFilterTime(int64_t filterTime)
 {
     CALL_DEBUG_ENTER;
@@ -836,6 +846,12 @@ int32_t DragManager::GetDropType(DropType& dropType) const
     }
     dropType = dropType_.load();
     return RET_OK;
+}
+
+int32_t DragManager::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return dragDrawing_.EnterTextEditorArea(enable);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -14,6 +14,12 @@
 import("../../../device_status.gni")
 
 ohos_shared_library("intention_service") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   shlib_type = "sa"
   include_dirs = [
     "include",

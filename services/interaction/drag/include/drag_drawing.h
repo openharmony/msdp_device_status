@@ -96,6 +96,7 @@ struct DrawingInfo {
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
+    std::shared_ptr<Rosen::RSNode> parentNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
@@ -137,13 +138,13 @@ public:
     void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
-    int32_t InitDrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
     int32_t DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode);
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -166,7 +167,8 @@ private:
     bool ParserFilterInfo(FilterInfo& filterInfo);
     void ProcessFilter();
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
-    bool IsInUninstallArea(int32_t x, int32_t y);
+    void DoDrawMouse();
+    int32_t UpdateDefaultDragStyle(DragCursorStyle style);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };

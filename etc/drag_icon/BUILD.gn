@@ -27,13 +27,6 @@ ohos_prebuilt_etc("drawing_image_Copy_One_Drag") {
   relative_install_dir = "device_status/drag_icon"
 }
 
-ohos_prebuilt_etc("drawing_image_Default_Drag") {
-  source = "src/Default_Drag.svg"
-  part_name = "${device_status_part_name}"
-  subsystem_name = "${device_status_subsystem_name}"
-  relative_install_dir = "device_status/drag_icon"
-}
-
 ohos_prebuilt_etc("drawing_image_Forbid_Drag") {
   source = "src/Forbid_Drag.svg"
   part_name = "${device_status_part_name}"
@@ -73,7 +66,6 @@ group("device_status_drag_icon") {
   deps = [
     ":drawing_image_Copy_Drag",
     ":drawing_image_Copy_One_Drag",
-    ":drawing_image_Default_Drag",
     ":drawing_image_Forbid_Drag",
     ":drawing_image_Forbid_One_Drag",
     ":drawing_image_Mouse_Drag_Cursor_Circle",

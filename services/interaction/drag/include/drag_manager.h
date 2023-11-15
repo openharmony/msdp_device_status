@@ -73,6 +73,7 @@ public:
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t GetDropType(DropType& dropType) const;
+    int32_t EnterTextEditorArea(bool enable);
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -118,6 +119,7 @@ private:
     static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
+    bool IsInUninstallArea(int32_t x, int32_t y);
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;

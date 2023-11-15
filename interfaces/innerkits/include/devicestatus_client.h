@@ -74,6 +74,7 @@ public:
     int32_t RemoveHotAreaListener();
     int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

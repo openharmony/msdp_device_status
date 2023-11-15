@@ -162,6 +162,11 @@ int32_t InteractionManager::GetDropType(DropType &dropType)
 {
     return INTER_MGR_IMPL.GetDropType(dropType);
 }
+
+int32_t InteractionManager::EnterTextEditorArea(bool enable)
+{
+    return INTER_MGR_IMPL.EnterTextEditorArea(enable);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -18,6 +18,12 @@ config("cooperate_public_config") {
 }
 
 ohos_shared_library("intention_cooperate") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "include",
     "${intention_root_path}/data/cooperate/include",
