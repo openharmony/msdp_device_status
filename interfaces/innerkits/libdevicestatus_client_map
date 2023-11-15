@@ -56,6 +56,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragAction(OHOS::Msdp::DeviceStatus::DragAction&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetExtraInfo(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         };
     local:
         *;

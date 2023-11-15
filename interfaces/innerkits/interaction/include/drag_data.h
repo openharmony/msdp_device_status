@@ -39,8 +39,8 @@ struct DragData {
     ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     std::string udKey;
-    std::string filterInfo;
     std::string extraInfo;
+    std::string filterInfo;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };

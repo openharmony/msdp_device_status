@@ -66,6 +66,7 @@ public:
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     virtual int32_t EnterTextEditorArea(bool enable) override;
     virtual int32_t GetDragAction(DragAction& dragAction) override;
+    virtual int32_t GetExtraInfo(std::string &extraInfo) override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

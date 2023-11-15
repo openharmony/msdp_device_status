@@ -57,6 +57,7 @@ public:
     int32_t GetDragState(DragState &dragState);
     int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction& dragAction);
+    int32_t GetExtraInfo(std::string &extraInfo);
 
 private:
     std::mutex mtx_;

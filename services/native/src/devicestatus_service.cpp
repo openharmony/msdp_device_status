@@ -84,7 +84,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
-    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
+    if (!Publish(this)) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
@@ -167,8 +167,7 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
@@ -844,6 +843,16 @@ int32_t DeviceStatusService::GetDragAction(DragAction& dragAction)
         std::bind(&DragManager::GetDragAction, &dragMgr_, std::ref(dragAction)));
     if (ret != RET_OK) {
         FI_HILOGE("Get drag action failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetExtraInfo, &dragMgr_, std::ref(extraInfo)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
     }
     return ret;
 }

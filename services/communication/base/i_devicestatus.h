@@ -64,6 +64,7 @@ public:
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) = 0;
     virtual int32_t EnterTextEditorArea(bool enable) = 0;
     virtual int32_t GetDragAction(DragAction &dragAction) = 0;
+    virtual int32_t GetExtraInfo(std::string &extraInfo) = 0;
     virtual bool IsRunning() const
     {
         return true;

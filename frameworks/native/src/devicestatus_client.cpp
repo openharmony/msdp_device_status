@@ -444,6 +444,13 @@ int32_t DeviceStatusClient::GetDragAction(DragAction& dragAction)
     return devicestatusProxy_->GetDragAction(dragAction);
 }
 
+int32_t DeviceStatusClient::GetExtraInfo(std::string &extraInfo)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetExtraInfo(extraInfo);
+}
+
 int32_t DeviceStatusClient::AddHotAreaListener()
 {
     CALL_DEBUG_ENTER;
