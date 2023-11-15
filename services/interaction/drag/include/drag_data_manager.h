@@ -45,6 +45,8 @@ public:
     void SetTargetPid(int32_t pid);
     int32_t GetTargetPid() const;
     bool IsMotionDrag() const;
+    void SetDragItemStyle(const DragItemStyle &dragItemStyle);
+    DragItemStyle GetDragItemStyle();
     void ResetDragData();
     DragData GetDragData() const;
     void SetMotionDrag(bool isMotionDrag);
@@ -52,6 +54,7 @@ private:
     bool isMotionDrag_ { false };
     bool visible_ { false };
     int32_t targetPid_ { -1 };
+    DragItemStyle dragItemStyle_;
     int32_t targetTid_ { -1 };
     std::u16string dragMessage_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };

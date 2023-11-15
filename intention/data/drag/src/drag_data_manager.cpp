@@ -51,10 +51,8 @@ DragData DragDataManager::GetDragData() const
 
 void DragDataManager::ResetDragData()
 {
-    CALL_DEBUG_ENTER;
-    std::vector<ShadowInfo> shadowInfos;
-    std::vector<uint8_t> buffer;
     dragData_ = { };
+    dragItemStyle_ = { };
 }
 
 bool DragDataManager::IsMotionDrag() const

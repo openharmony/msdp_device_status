@@ -35,8 +35,8 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
     }
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
     WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
+    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
@@ -59,8 +59,8 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
     }
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.extraInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);

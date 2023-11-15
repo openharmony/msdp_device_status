@@ -146,6 +146,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     if (eventHub_ == nullptr) {
         eventHub_ = EventHub::GetEventHub(context_);
         if (eventHub_ == nullptr) {
@@ -154,6 +155,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         }
     }
     EventHub::RegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     dragState_ = DragState::START;
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
@@ -185,7 +187,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     EventHub::UnRegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return ret;
 }
 
@@ -833,6 +837,21 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     FI_HILOGI("displayId:%{public}d, x:%{public}d, y:%{public}d", dragData.displayId, x, y);
     dragDrawing_.Draw(dragData.displayId, x, y);
+}
+
+int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    if (dragItemStyle == DRAG_DATA_MGR.GetDragItemStyle()) {
+        FI_HILOGD("Not need update drag item style");
+        return RET_OK;
+    }
+    FI_HILOGI("Update drag item style successfully");
+    DRAG_DATA_MGR.SetDragItemStyle(dragItemStyle);
+    return dragDrawing_.UpdateDragItemStyle(dragItemStyle);
 }
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)

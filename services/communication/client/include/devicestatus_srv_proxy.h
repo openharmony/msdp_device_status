@@ -63,6 +63,7 @@ public:
     virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
+    virtual int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     virtual int32_t GetDropType(DropType& dropType) override;
     virtual int32_t EnterTextEditorArea(bool enable) override;

@@ -118,6 +118,23 @@ struct DragAnimationData {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
 };
 
+struct DragItemStyle {
+    uint32_t foregroundColor { 0 };
+    int32_t radius { 0 };
+    uint32_t alpha { 0 };
+
+    bool operator == (const DragItemStyle &style) const
+    {
+        return foregroundColor == style.foregroundColor &&
+               radius == style.radius && alpha == style.alpha;
+    }
+
+    bool operator!=(const DragItemStyle &style) const
+    {
+        return !(*this == style);
+    }
+};
+
 enum class DragCursorStyle {
     DEFAULT = 0,
     FORBIDDEN,

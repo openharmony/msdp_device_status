@@ -48,9 +48,10 @@ enum class DeviceInterfaceCode {
     GET_DROP_TYPE,
     ENTER_TEXT_EDITOR_AREA,
     GET_DRAG_EXTRAINFO,
-    ALLOC_SOCKET_FD = 40,
-    ADD_HOT_AREA_MONITOR = 50,
-    REMOVE_HOT_AREA_MONITOR
+    UPDATE_DRAG_ITEM_STYLE,
+    ALLOC_SOCKET_FD = 60,
+    ADD_HOT_AREA_MONITOR = 70,
+    REMOVE_HOT_AREA_MONITOR,
 };
 } // namespace Msdp
 } // namespace OHOS
