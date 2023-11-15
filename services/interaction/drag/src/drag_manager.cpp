@@ -828,7 +828,7 @@ void DragManager::HandleCtrlKeyDown()
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-    std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
+        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }
@@ -839,7 +839,7 @@ void DragManager::HandleCtrlKeyUp()
     CALL_DEBUG_ENTER;
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-    std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DRAG_DATA_MGR.GetDragStyle()));
+        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DRAG_DATA_MGR.GetDragStyle()));
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }
