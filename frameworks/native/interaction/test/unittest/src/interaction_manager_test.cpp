@@ -71,6 +71,7 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 const std::string UD_KEY { "Unified data key" };
+const std::string EXTRA_INFO { "{ \"drag_allow_distributed\", false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
 int32_t g_deviceMouseId { -1 };
@@ -1700,6 +1701,42 @@ HWTEST_F(InteractionManagerTest, EnterTextEditorArea, TestSize.Level1)
     ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
     FI_HILOGD("ret:%{public}d", ret);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetExtraInfo
+ * @tc.desc: Get extraInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetExtraInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId >= 0) {
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        dragData->extraInfo = EXTRA_INFO;
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
+        };
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        std::string extraInfo;
+        ret = InteractionManager::GetInstance()->GetExtraInfo(extraInfo);
+        ASSERT_EQ(ret, RET_OK);
+        ASSERT_EQ(extraInfo, EXTRA_INFO);
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_EQ(ret, RET_OK);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

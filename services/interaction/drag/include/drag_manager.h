@@ -56,6 +56,7 @@ public:
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t GetDragData(DragData &dragData);
     int32_t GetDragState(DragState &dragState);
+    void GetAllowDragState(bool &isAllowDrag) override;
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
@@ -74,6 +75,7 @@ public:
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t GetDropType(DropType& dropType) const;
     int32_t EnterTextEditorArea(bool enable);
+    int32_t GetExtraInfo(std::string &extraInfo) const;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:

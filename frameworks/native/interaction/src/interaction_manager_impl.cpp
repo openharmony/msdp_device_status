@@ -307,6 +307,12 @@ int32_t InteractionManagerImpl::GetDropType(DropType &dropType)
     return dragManagerImpl_.GetDropType(dropType);
 }
 
+int32_t InteractionManagerImpl::GetExtraInfo(std::string &extraInfo)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.GetExtraInfo(extraInfo);
+}
+
 int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListener> listener)
 {
     CALL_DEBUG_ENTER;

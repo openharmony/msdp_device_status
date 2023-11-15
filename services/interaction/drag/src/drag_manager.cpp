@@ -743,6 +743,16 @@ DragState DragManager::GetDragState() const
     return dragState_;
 }
 
+void DragManager::GetAllowDragState(bool &isAllowDrag)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGW("Currently state is \'%{public}d\' not in allowed dragState", static_cast<int32_t>(dragState_));
+        return;
+    }
+    isAllowDrag = dragDrawing_.GetAllowDragState();
+}
+
 void DragManager::SetDragState(DragState state)
 {
     dragState_ = state;
@@ -860,6 +870,18 @@ int32_t DragManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
     return dragDrawing_.EnterTextEditorArea(enable);
+}
+
+int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.extraInfo.empty()) {
+        FI_HILOGE("The extraInfo is empty");
+        return RET_ERR;
+    }
+    extraInfo = dragData.extraInfo;
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
