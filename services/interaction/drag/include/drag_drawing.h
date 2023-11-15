@@ -24,8 +24,8 @@
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
 #include "modifier/rs_modifier.h"
-#include "vsync_receiver.h"
 
+#include "vsync_receiver.h"
 #include "drag_data.h"
 #include "i_drag_animation.h"
 
@@ -121,6 +121,7 @@ public:
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     int32_t StartVsync();
     void OnDragSuccess();
     void OnDragFail();

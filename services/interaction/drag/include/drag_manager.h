@@ -71,6 +71,7 @@ public:
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t GetDropType(DropType& dropType) const;

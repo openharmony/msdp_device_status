@@ -815,6 +815,21 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
 
+int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    if (dragItemStyle == DRAG_DATA_MGR.GetDragItemStyle()) {
+        FI_HILOGD("Not need update drag item style");
+        return RET_OK;
+    }
+    FI_HILOGI("Update drag item style successfully");
+    DRAG_DATA_MGR.SetDragItemStyle(dragItemStyle);
+    return dragDrawing_.UpdateDragItemStyle(dragItemStyle);
+}
+
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);

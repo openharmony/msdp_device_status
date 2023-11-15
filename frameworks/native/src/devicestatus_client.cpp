@@ -465,6 +465,12 @@ int32_t DeviceStatusClient::RemoveHotAreaListener()
     return devicestatusProxy_->RemoveHotAreaListener();
 }
 
+int32_t DeviceStatusClient::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->UpdateDragItemStyle(dragItemStyle);
+}
+
 int32_t DeviceStatusClient::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     CALL_DEBUG_ENTER;

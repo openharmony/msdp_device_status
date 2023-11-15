@@ -109,14 +109,8 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
 void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
-    ShadowInfo shadowInfo;
-    std::vector<uint8_t> buffer;
-    dragData_ = { shadowInfo, buffer, "", "", "", -1, -1, -1, -1, -1, -1, false };
-    dragStyle_ = DragCursorStyle::DEFAULT;
-    visible_ = false;
-    targetTid_ = -1;
-    targetPid_ = -1;
-    isMotionDrag_ = false;
+    dragData_ = { };
+    dragItemStyle_ = { };
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)
@@ -129,6 +123,16 @@ bool DragDataManager::IsMotionDrag() const
 {
     FI_HILOGD("isMotionDrag_:%{public}d", isMotionDrag_);
     return isMotionDrag_;
+}
+
+void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    dragItemStyle_ = dragItemStyle;
+}
+
+DragItemStyle DragDataManager::GetDragItemStyle()
+{
+    return dragItemStyle_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

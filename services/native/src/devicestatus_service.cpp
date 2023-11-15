@@ -1063,6 +1063,17 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
     return RET_OK;
 }
 
+int32_t DeviceStatusService::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateDragItemStyle, &dragMgr_, dragItemStyle));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     int32_t ret = delegateTasks_.PostSyncTask(
