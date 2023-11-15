@@ -27,6 +27,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
+#include "event_hub.h"
 #include "i_context.h"
 #include "state_change_notify.h"
 #include "stream_session.h"
@@ -138,6 +139,7 @@ private:
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+    std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
