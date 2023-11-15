@@ -739,8 +739,8 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
     g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
-    g_drawingInfo.filterInfo = dragData.filterInfo;
     g_drawingInfo.extraInfo = dragData.extraInfo;
+    g_drawingInfo.filterInfo = dragData.filterInfo;
 }
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)
@@ -1115,14 +1115,14 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
 {
-    if (g_drawingInfo.filterInfo.empty()) {
-        FI_HILOGD("FilterInfo is empty");
+    if (g_drawingInfo.extraInfo.empty()) {
+        FI_HILOGD("the extraInfo is empty");
         return false;
     }
     JsonDataParser filterParser;
-    filterParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    filterParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
     if (!cJSON_IsObject(filterParser.json)) {
         FI_HILOGE("FilterInfo is not json object");
         return false;
@@ -1142,25 +1142,53 @@ bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
         FI_HILOGE("Parser cornerRadius failed");
         return false;
     }
-    if (g_drawingInfo.extraInfo.empty()) {
+    if (g_drawingInfo.filterInfo.empty()) {
         FI_HILOGD("ExtraInfo is empty");
         return false;
     }
-    JsonDataParser extraInfoParser;
-    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
-    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s",
-        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
-    if (!cJSON_IsObject(extraInfoParser.json)) {
+    JsonDataParser dipScaleParser;
+    dipScaleParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(dipScaleParser.json)) {
         FI_HILOGE("ExtraInfo is not json object");
         return false;
     }
-    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_scale");
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(dipScaleParser.json, "dip_scale");
     if (!cJSON_IsNumber(dipScale)) {
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
     filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valuedouble };
     return true;
+}
+
+bool DragDrawing::GetAllowDragState()
+{
+    if (g_drawingInfo.extraInfo.empty()) {
+        FI_HILOGE("The extraInfo is empty");
+        return true;
+    }
+    JsonDataParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("The extraInfo is not a json object");
+        return true;
+    }
+    bool ret = static_cast<bool>(cJSON_HasObjectItem(extraInfoParser.json, "drag_allow_distributed"));
+    if (!ret) {
+        FI_HILOGE("Can't found \'drag_allow_distributed\' in extraInfo");
+        return true;
+    }
+    cJSON *json = cJSON_GetObjectItem(extraInfoParser.json, "drag_allow_distributed");
+    if (json != nullptr || !cJSON_IsBool(json)) {
+        FI_HILOGE("Can't parse \'drag_allow_distributed\' in extraInfo");
+        return true;
+    }
+    bool isAllowDrag = cJSON_IsTrue(json) ? true : false;
+    FI_HILOGD("Parse extraInfo, the \'drag_allow_distributed\' is %{public}s", isAllowDrag ? "true" : "false");
+
+    return isAllowDrag;
 }
 
 void DragDrawing::ProcessFilter()

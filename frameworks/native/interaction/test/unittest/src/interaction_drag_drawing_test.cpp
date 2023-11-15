@@ -56,7 +56,7 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
-constexpr int32_t FOREGROUND_COLOR { 0x99FF0000 };
+constexpr int32_t FOREGROUND_COLOR { 0x00FF0000 };
 constexpr int32_t RADIUS { 42 };
 constexpr int32_t ALPHA { 51 };
 const std::string UD_KEY { "Unified data key" };

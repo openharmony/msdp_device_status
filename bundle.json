@@ -43,9 +43,7 @@
         "udmf",
         "device_info_manager",
         "dsoftbus",
-        "common",
         "motion",
-        "build_framework",
         "ylong_runtime"
       ],
       "third_party": [

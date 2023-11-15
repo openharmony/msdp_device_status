@@ -307,11 +307,6 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(),
         pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-    if (IsInUninstallArea(pointerItem.GetDisplayX(), pointerItem.GetDisplayY())) {
-        UpdateDragItemStyle({ 0x00FF0000, 20, 51 });
-    } else {
-        UpdateDragItemStyle({ 0x00000000, 20, 0 });
-    }
 }
 
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
@@ -724,6 +719,16 @@ DragState DragManager::GetDragState() const
     return dragState_;
 }
 
+void DragManager::GetAllowDragState(bool &isAllowDrag)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGW("Currently state is \'%{public}d\' not in allowed dragState", static_cast<int32_t>(dragState_));
+        return;
+    }
+    isAllowDrag = dragDrawing_.GetAllowDragState();
+}
+
 void DragManager::SetDragState(DragState state)
 {
     dragState_ = state;
@@ -787,11 +792,6 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         }
     }
     return RET_OK;
-}
-
-bool DragManager::IsInUninstallArea(int32_t x, int32_t y)
-{
-    return x >= 500 && y <= 200;
 }
 
 void DragManager::SetPointerEventFilterTime(int64_t filterTime)
@@ -861,6 +861,18 @@ int32_t DragManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
     return dragDrawing_.EnterTextEditorArea(enable);
+}
+
+int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.extraInfo.empty()) {
+        FI_HILOGE("The extraInfo is empty");
+        return RET_ERR;
+    }
+    extraInfo = dragData.extraInfo;
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

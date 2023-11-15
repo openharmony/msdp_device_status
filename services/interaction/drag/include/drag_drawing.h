@@ -100,8 +100,8 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
-    std::string filterInfo;
     std::string extraInfo;
+    std::string filterInfo;
 };
 
 struct FilterInfo {
@@ -139,6 +139,7 @@ public:
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
     int32_t EnterTextEditorArea(bool enable);
+    bool GetAllowDragState();
 
 private:
     int32_t CheckDragData(const DragData &dragData);

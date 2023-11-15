@@ -167,6 +167,11 @@ int32_t InteractionManager::EnterTextEditorArea(bool enable)
 {
     return INTER_MGR_IMPL.EnterTextEditorArea(enable);
 }
+
+int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
+{
+    return INTER_MGR_IMPL.GetExtraInfo(extraInfo);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -45,6 +45,7 @@ public:
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y) = 0;
     virtual int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) = 0;
+    virtual void GetAllowDragState(bool &isAllowDrag) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

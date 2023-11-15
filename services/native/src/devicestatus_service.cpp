@@ -847,6 +847,16 @@ int32_t DeviceStatusService::GetDropType(DropType& dropType)
     return ret;
 }
 
+int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetExtraInfo, &dragMgr_, std::ref(extraInfo)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
 int32_t DeviceStatusService::OnRegisterCoordinationListener(int32_t pid)
 {

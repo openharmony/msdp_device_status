@@ -116,7 +116,9 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
             &DeviceStatusSrvStub::GetDropTypeStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
-            &DeviceStatusSrvStub::EnterTextEditorAreaStub }
+            &DeviceStatusSrvStub::EnterTextEditorAreaStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
+            &DeviceStatusSrvStub::GetExtraInfoStub },
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -372,8 +374,8 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READSTRING(data, dragData.extraInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -642,6 +644,19 @@ int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel& data, Messag
         FI_HILOGE("Call EnterTextEditorArea failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetExtraInfoStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    std::string extraInfo;
+    int32_t ret = GetExtraInfo(extraInfo);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to get extraInfo in dragData");
+        return ret;
+    }
+    WRITESTRING(reply, extraInfo, IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -39,8 +39,8 @@ struct DragData {
     ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     std::string udKey;
-    std::string filterInfo;
     std::string extraInfo;
+    std::string filterInfo;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };
@@ -88,9 +88,9 @@ struct DragAnimationData {
 };
 
 struct DragItemStyle {
-    uint32_t foregroundColor;
-    int32_t radius;
-    uint32_t alpha;
+    uint32_t foregroundColor { 0 };
+    int32_t radius { 0 };
+    uint32_t alpha { 0 };
 
     bool operator == (const DragItemStyle &style) const
     {
