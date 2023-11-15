@@ -108,9 +108,6 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
 
 void DragDataManager::ResetDragData()
 {
-    CALL_DEBUG_ENTER;
-    std::vector<ShadowInfo> shadowInfos;
-    std::vector<uint8_t> buffer;
     dragData_ = { };
 }
 

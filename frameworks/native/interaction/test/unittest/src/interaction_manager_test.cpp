@@ -1685,6 +1685,22 @@ HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer, TestSize.Level1)
     ASSERT_EQ(dragData.value(), dragDataFromParcel);
 }
 
+/*
+ * @tc.name: InteractionManagerTest_EnterTextEditorArea
+ * @tc.desc: pixelMap 8dp bit movement effect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, EnterTextEditorArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_ERR);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

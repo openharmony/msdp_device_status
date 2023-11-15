@@ -57,6 +57,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDropType(OHOS::Msdp::DeviceStatus::DropType&)";
             "OHOS::Msdp::DeviceStatus::DragDataUtil::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&)";
             "OHOS::Msdp::DeviceStatus::DragDataUtil::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
         };
     local:
         *;

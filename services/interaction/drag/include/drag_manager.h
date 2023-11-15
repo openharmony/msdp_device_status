@@ -27,6 +27,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
+#include "event_hub.h"
 #include "i_context.h"
 #include "state_change_notify.h"
 #include "stream_session.h"
@@ -72,6 +73,7 @@ public:
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t GetDropType(DropType& dropType) const;
+    int32_t EnterTextEditorArea(bool enable);
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -136,6 +138,7 @@ private:
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+    std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
