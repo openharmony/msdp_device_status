@@ -143,6 +143,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     if (eventHub_ == nullptr) {
         eventHub_ = EventHub::GetEventHub(context_);
         if (eventHub_ == nullptr) {
@@ -151,6 +152,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         }
     }
     EventHub::RegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     dragState_ = DragState::START;
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
@@ -182,7 +184,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     EventHub::UnRegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return ret;
 }
 

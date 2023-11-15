@@ -139,7 +139,9 @@ private:
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     std::shared_ptr<EventHub> eventHub_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 };
 } // namespace DeviceStatus
 } // namespace Msdp
