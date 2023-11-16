@@ -72,19 +72,19 @@ struct DragDropResult {
     int32_t windowId { -1 };
 };
 
-struct DragNotifyMsg {
-    int32_t displayX { -1 };
-    int32_t displayY { -1 };
-    int32_t targetPid { -1 };
-    DragResult result { DragResult::DRAG_FAIL };
-};
-
 struct DragAnimationData {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     int32_t offsetX { -1 };
     int32_t offsetY { -1 };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+};
+
+struct DragNotifyMsg {
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+    int32_t targetPid { -1 };
+    DragResult result { DragResult::DRAG_FAIL };
 };
 
 struct DragItemStyle {

@@ -79,7 +79,7 @@ bool StreamClient::SendMsg(const char *buf, size_t size) const
         }
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
-        FI_HILOGE("Send too many times:%{public}d/%{public}d, size:%{public}d/%{public}d, fd:%{public}d",
+        FI_HILOGE("Too many times to send :%{public}d/%{public}d, size:%{public}d/%{public}d, fd:%{public}d",
             retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
         return false;
     }

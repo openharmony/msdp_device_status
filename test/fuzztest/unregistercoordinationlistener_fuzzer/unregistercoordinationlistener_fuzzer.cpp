@@ -35,15 +35,15 @@ bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        FI_HILOGE("Write failed");
+        FI_HILOGE("Failed to write");
         return false;
     }
     if (!datas.WriteBuffer(data, size)) {
-        FI_HILOGE("Write data failed");
+        FI_HILOGE("Failed to write data");
         return false;
     }
     if (!datas.RewindRead(0)) {
-        FI_HILOGE("Read failed");
+        FI_HILOGE("failed to read");
         return false;
     }
     MessageParcel reply;

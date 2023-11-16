@@ -39,8 +39,8 @@ ICoordinationState::ICoordinationState()
 int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
-    std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
     int32_t ret = RET_ERR;
+    std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
     if (NeedPrepare(remoteNetworkId, originNetworkId)) {
         COOR_SM->UpdatePreparedDevices(remoteNetworkId, originNetworkId);
         ret = D_INPUT_ADAPTER->PrepareRemoteInput(remoteNetworkId, originNetworkId,
@@ -48,14 +48,14 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
                 this->OnPrepareDistributedInput(isSuccess, remoteNetworkId, startDeviceId);
             });
         if (ret != RET_OK) {
-            FI_HILOGE("Prepare remote input failed");
+            FI_HILOGE("Failed to prepare remote input");
             COOR_SM->OnStartFinish(false, originNetworkId, startDeviceId);
             COOR_SM->UpdatePreparedDevices("", "");
         }
     } else {
         ret = StartRemoteInput(startDeviceId);
         if (ret != RET_OK) {
-            FI_HILOGE("Start remoteNetworkId input failed");
+            FI_HILOGE("Failed to start remoteNetworkId input");
             COOR_SM->OnStartFinish(false, originNetworkId, startDeviceId);
         }
     }
@@ -65,7 +65,7 @@ int32_t ICoordinationState::PrepareAndStart(const std::string &remoteNetworkId, 
 void ICoordinationState::OnPrepareDistributedInput(bool isSuccess, const std::string &remoteNetworkId,
     int32_t startDeviceId)
 {
-    FI_HILOGI("isSuccess:%{public}s", isSuccess ? "true" : "false");
+    FI_HILOGI("The isSuccess state:%{public}s", isSuccess ? "true" : "false");
     if (!isSuccess) {
         COOR_SM->UpdatePreparedDevices("", "");
         COOR_SM->OnStartFinish(false, remoteNetworkId, startDeviceId);
@@ -113,7 +113,7 @@ bool ICoordinationState::NeedPrepare(const std::string &remoteNetworkId, const s
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> prepared = COOR_SM->GetPreparedDevices();
     bool isNeed = !(remoteNetworkId == prepared.first && originNetworkId == prepared.second);
-    FI_HILOGI("NeedPrepare?:%{public}s", isNeed ? "true" : "false");
+    FI_HILOGI("Need prepare?:%{public}s", isNeed ? "true" : "false");
     return isNeed;
 }
 } // namespace DeviceStatus

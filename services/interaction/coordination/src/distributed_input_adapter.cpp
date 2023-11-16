@@ -117,9 +117,9 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &network
 int32_t DistributedInputAdapter::RegisterSessionStateCb(std::function<void(uint32_t)> callback)
 {
     CALL_INFO_TRACE;
-    sptr<SessionStateCallback> cb = new (std::nothrow) SessionStateCallback(callback);
+    sptr<SessionStateCallback> callBack = new (std::nothrow) SessionStateCallback(callback);
     CHKPR(callback, ERROR_NULL_POINTER);
-    return DistributedInputKit::RegisterSessionStateCb(cb);
+    return DistributedInputKit::RegisterSessionStateCb(callBack);
 }
 
 int32_t DistributedInputAdapter::UnregisterSessionStateCb()
@@ -128,26 +128,26 @@ int32_t DistributedInputAdapter::UnregisterSessionStateCb()
     return DistributedInputKit::UnregisterSessionStateCb();
 }
 
-void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
+void DistributedInputAdapter::SaveCallback(CallbackType cbType, DInputCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPV(callback);
-    callbacks_[type] = callback;
-    AddTimer(type);
+    callbacks_[cbType] = callback;
+    AddTimer(cbType);
 }
 
 void DistributedInputAdapter::AddTimer(const CallbackType &type)
 {
-    FI_HILOGD("AddTimer type:%{public}d", type);
+    FI_HILOGD("AddTimer callback type:%{public}d", type);
     auto context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     int32_t timerId = context->GetTimerManager().AddTimer(DEFAULT_DELAY_TIME, RETRY_TIME, [this, type]() {
         if ((callbacks_.find(type) == callbacks_.end()) || (watchings_.find(type) == watchings_.end())) {
-            FI_HILOGE("Callback or watching is not exist");
+            FI_HILOGE("Callback or watchings is not exist");
             return;
         }
         if (watchings_[type].times == 0) {
-            FI_HILOGI("It will be retry to call callback next time");
+            FI_HILOGI("The callback will be retried next time");
             watchings_[type].times++;
             return;
         }
@@ -155,7 +155,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
         callbacks_.erase(type);
     });
     if (timerId < 0) {
-        FI_HILOGE("Add timer failed, timeId:%{public}d", timerId);
+        FI_HILOGE("Failed to add timer, timeId:%{public}d", timerId);
         return;
     }
     watchings_[type].timerId = timerId;
@@ -164,7 +164,7 @@ void DistributedInputAdapter::AddTimer(const CallbackType &type)
 
 void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
 {
-    FI_HILOGD("Remove timer type:%{public}d", type);
+    FI_HILOGD("Remove timer callback type:%{public}d", type);
     if (watchings_.find(type) != watchings_.end()) {
         auto context = COOR_EVENT_MGR->GetIContext();
         CHKPV(context);
@@ -173,12 +173,12 @@ void DistributedInputAdapter::RemoveTimer(const CallbackType &type)
     }
 }
 
-void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t status)
+void DistributedInputAdapter::ProcessDInputCallback(CallbackType cbType, int32_t status)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
-    RemoveTimer(type);
-    auto it = callbacks_.find(type);
+    RemoveTimer(cbType);
+    auto it = callbacks_.find(cbType);
     if (it == callbacks_.end()) {
         FI_HILOGI("Dinput callback not exist");
         return;
@@ -187,59 +187,59 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
     callbacks_.erase(it);
 }
 
-void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
+void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devID, const uint32_t &inputTypes,
                                                             const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StartDInputCallback, status);
 }
 
-void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
+void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &devID, const uint32_t &inputTypes,
                                                            const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StopDInputCallback, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StartDInputCallbackDHIds, status);
 }
 
-void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StopDInputCallbackDHIds, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StartDInputCallbackSink::OnResultDhids(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StartDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::StopDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StopDInputCallbackSink::OnResultDhids(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::StopDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::PrepareStartDInputCallback, status);
 }
 
-void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::UnPrepareStopDInputCallback::OnResult(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallback, status);
 }
 
-void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::PrepareStartDInputCallbackSink::OnResult(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::PrepareStartDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string &devID, const int32_t &status)
 {
     D_INPUT_ADAPTER->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::SessionStateCallback::OnResult(const std::string &devId, const uint32_t status)
+void DistributedInputAdapter::SessionStateCallback::OnResult(const std::string &devID, const uint32_t status)
 {
     CHKPV(callback_);
     callback_(status);

@@ -131,16 +131,16 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     CALL_INFO_TRACE;
     PrintDragData(dragData);
     if (dragState_ == DragState::START) {
-        FI_HILOGE("Drag instance is running, can not start drag again");
+        FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
     dragOutSession_ = sess;
     if (InitDataManager(dragData) != RET_OK) {
-        FI_HILOGE("Init data manager failed");
+        FI_HILOGE("Failed to init data manager");
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
-        FI_HILOGE("OnStartDrag failed");
+        FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
@@ -270,17 +270,17 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
-        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+        FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
     pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
     if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet write data failed");
+        FI_HILOGE("Failed to packet write data");
         return RET_ERR;
     }
     CHKPR(dragOutSession_, RET_ERR);
     if (!dragOutSession_->SendMsg(pkt)) {
-        FI_HILOGE("Send message failed");
+        FI_HILOGE("Failed to send message");
         return MSG_SEND_FAIL;
     }
     return RET_OK;

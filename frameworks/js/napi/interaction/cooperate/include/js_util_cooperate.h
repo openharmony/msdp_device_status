@@ -50,12 +50,13 @@ public:
     struct CallbackInfo : RefBase {
         CallbackInfo() = default;
         ~CallbackInfo() = default;
+        int32_t errCode { 0 };
         napi_ref ref { nullptr };
         napi_env env { nullptr };
         napi_deferred deferred { nullptr };
-        int32_t errCode { 0 };
         CallbackData data;
     };
+    
     template <typename T>
     static void DeletePtr(T &ptr)
     {
