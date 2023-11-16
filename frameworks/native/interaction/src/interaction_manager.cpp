@@ -158,9 +158,9 @@ int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summa
     return INTER_MGR_IMPL.GetDragSummary(summarys);
 }
 
-int32_t InteractionManager::GetDropType(DropType &dropType)
+int32_t InteractionManager::GetDragAction(DragAction &dragAction)
 {
-    return INTER_MGR_IMPL.GetDropType(dropType);
+    return INTER_MGR_IMPL.GetDragAction(dragAction);
 }
 
 int32_t InteractionManager::EnterTextEditorArea(bool enable)
