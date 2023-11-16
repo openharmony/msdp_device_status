@@ -181,7 +181,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->callbackCount = 0;
     int64_t nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-        FI_HILOGE("Timer internal, the addition of nextCallTime in TimerItem overflows");
+        FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
@@ -208,7 +208,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             timers_.erase(iter);
             int64_t nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-                FI_HILOGE("Reset timer internal, the addition of nextCallTime in TimerItem overflows");
+                FI_HILOGE("The addition of nextCallTime in TimerItem overflows");
                 return RET_ERR;
             }
             timer->callbackCount = 0;
@@ -235,11 +235,11 @@ int64_t TimerManager::CalcNextDelayInternal()
     int64_t delayTime = MIN_DELAY;
     if (!timers_.empty()) {
         int64_t nowTime = GetMillisTime();
-        const auto& item = *timers_.begin();
-        if (nowTime >= item->nextCallTime) {
+        const auto& items = *timers_.begin();
+        if (nowTime >= items->nextCallTime) {
             delayTime = 0;
         } else {
-            delayTime = item->nextCallTime - nowTime;
+            delayTime = items->nextCallTime - nowTime;
         }
     }
     return delayTime;
@@ -280,12 +280,12 @@ int32_t TimerManager::ArmTimer()
 {
     CALL_INFO_TRACE;
     if (timerFd_ < 0) {
-        FI_HILOGE("TimerManager is uninitialized");
+        FI_HILOGE("TimerManager is not initialized");
         return RET_ERR;
     }
     struct itimerspec tspec {};
     int64_t expire = CalcNextDelayInternal();
-    FI_HILOGI("Next expire %{public}" PRId64, expire);
+    FI_HILOGI("The next expire %{public}" PRId64, expire);
 
     if (expire == 0) {
         expire = 1;
@@ -296,7 +296,7 @@ int32_t TimerManager::ArmTimer()
     }
 
     if (timerfd_settime(timerFd_, 0, &tspec, NULL) != 0) {
-        FI_HILOGE("Timer: timerfd_settime error");
+        FI_HILOGE("Timer: the timerfd_settime is error");
         return RET_ERR;
     }
     return RET_OK;

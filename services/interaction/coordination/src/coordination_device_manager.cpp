@@ -183,7 +183,7 @@ std::string CoordinationDeviceManager::Device::Sha256(const std::string &in) con
         out[i * DOUBLE_TIMES] = hexCode[(value >> width) & mask];
         out[i * DOUBLE_TIMES + 1] = hexCode[value & mask];
     }
-    out[DOUBLE_TIMES * SHA256_DIGEST_LENGTH] = 0;
+    out[DOUBLE_TIMES * SHA256_DIGEST_LENGTH] = { 0 };
     return reinterpret_cast<char*>(out);
 }
 
@@ -335,7 +335,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     CHKPV(device);
     auto iter = devices_.find(device->GetId());
     if (iter == devices_.end()) {
-        FI_HILOGE("Device removed, the device corresponding to the current id:%{public}d cannot be found", device->GetId());
+        FI_HILOGE("Failed to find the device, current id:%{public}d", device->GetId());
         return;
     }
     std::shared_ptr<Device> dev = iter->second;

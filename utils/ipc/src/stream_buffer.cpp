@@ -116,8 +116,8 @@ bool StreamBuffer::Read(char *buf, size_t size)
         return false;
     }
 
-    rPos_ += static_cast<int32_t>(size);
     rCount_ += 1;
+    rPos_ += static_cast<int32_t>(size);
     return true;
 }
 
@@ -169,14 +169,14 @@ int32_t StreamBuffer::ResidualSize() const
     return ((wPos_ <= rPos_) ? 0 : (wPos_ - rPos_));
 }
 
-int32_t StreamBuffer::GetAvailableBufSize() const
-{
-    return ((wPos_ >= MAX_STREAM_BUF_SIZE) ? 0 : (MAX_STREAM_BUF_SIZE - wPos_));
-}
-
 bool StreamBuffer::ChkRWError() const
 {
     return (rwErrorStatus_ != ErrorStatus::ERROR_STATUS_OK);
+}
+
+int32_t StreamBuffer::GetAvailableBufSize() const
+{
+    return ((wPos_ >= MAX_STREAM_BUF_SIZE) ? 0 : (MAX_STREAM_BUF_SIZE - wPos_));
 }
 
 const std::string &StreamBuffer::GetErrorStatusRemark() const

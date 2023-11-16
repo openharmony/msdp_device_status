@@ -84,7 +84,7 @@ int32_t Coordination::GetCoordinationState(SessionPtr sess, int32_t userData, co
     COOR_EVENT_MGR->AddCoordinationEvent(event);
     int32_t ret = COOR_SM->GetCoordinationState(networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Get coordination state failed");
+        FI_HILOGE("Failed to get coordination state");
     }
     return ret;
 }

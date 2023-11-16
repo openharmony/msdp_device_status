@@ -31,12 +31,12 @@ int32_t CoordinationStateFree::ActivateCoordination(
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
-        FI_HILOGE("RemoteNetworkId is empty");
+        FI_HILOGE("The remoteNetworkId is empty");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
-        FI_HILOGE("Input Parameters err");
+        FI_HILOGE("Input Parameters error");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId, true);

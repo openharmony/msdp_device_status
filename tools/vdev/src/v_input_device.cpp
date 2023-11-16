@@ -44,11 +44,9 @@ struct Range {
 namespace {
 constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VInputDevice" };
 
-const struct Range KEY_BLOCKS[] {
-    { KEY_ESC, BTN_MISC },
+const struct Range KEY_BLOCKS[] { { KEY_ESC, BTN_MISC },
     { KEY_OK, BTN_DPAD_UP },
-    { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY }
-};
+    { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY } };
 } // namespace
 
 VInputDevice::VInputDevice(const std::string &node) : devPath_(node) {}

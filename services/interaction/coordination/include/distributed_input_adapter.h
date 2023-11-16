@@ -87,60 +87,60 @@ private:
 
     class StartDInputCallback final : public DistributedHardware::DistributedInput::StartDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
+        void OnResult(const std::string &devID, const uint32_t &inputTypes, const int32_t &status) override;
     };
 
     class StopDInputCallback final : public DistributedHardware::DistributedInput::StopDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
+        void OnResult(const std::string &devID, const uint32_t &inputTypes, const int32_t &status) override;
     };
 
     class StartDInputCallbackDHIds final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultDhids(const std::string &devId, const int32_t &status) override;
+        void OnResultDhids(const std::string &devID, const int32_t &status) override;
     };
 
     class StopDInputCallbackDHIds final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultDhids(const std::string &devId, const int32_t &status) override;
+        void OnResultDhids(const std::string &devID, const int32_t &status) override;
     };
 
     class StartDInputCallbackSink final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultDhids(const std::string &devId, const int32_t &status) override;
+        void OnResultDhids(const std::string &devID, const int32_t &status) override;
     };
 
     class StopDInputCallbackSink final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultDhids(const std::string &devId, const int32_t &status) override;
+        void OnResultDhids(const std::string &devID, const int32_t &status) override;
     };
 
     class PrepareStartDInputCallback final :
         public DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const int32_t &status) override;
+        void OnResult(const std::string &devID, const int32_t &status) override;
     };
 
     class UnPrepareStopDInputCallback final :
         public DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const int32_t &status) override;
+        void OnResult(const std::string &devID, const int32_t &status) override;
     };
 
     class PrepareStartDInputCallbackSink final :
         public DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const int32_t &status) override;
+        void OnResult(const std::string &devID, const int32_t &status) override;
     };
 
     class UnPrepareStopDInputCallbackSink final :
         public DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
     public:
-        void OnResult(const std::string &devId, const int32_t &status) override;
+        void OnResult(const std::string &devID, const int32_t &status) override;
     };
 
     class SessionStateCallback final :
@@ -149,15 +149,15 @@ private:
         SessionStateCallback() = default;
         ~SessionStateCallback() = default;
         SessionStateCallback(std::function<void(uint32_t)> callback) : callback_(callback) {}
-        void OnResult(const std::string &devId, const uint32_t status) override;
+        void OnResult(const std::string &devID, const uint32_t status) override;
     private:
         std::function<void(uint32_t)> callback_;
     };
 
-    void SaveCallback(CallbackType type, DInputCallback callback);
+    void SaveCallback(CallbackType cbtype, DInputCallback callback);
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
-    void ProcessDInputCallback(CallbackType type, int32_t status);
+    void ProcessDInputCallback(CallbackType cbtype, int32_t status);
     std::map<CallbackType, TimerInfo> watchings_;
     std::map<CallbackType, DInputCallback> callbacks_;
     std::mutex adapterLock_;

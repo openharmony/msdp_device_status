@@ -49,8 +49,8 @@ public:
             return session->GetPid() == info->session->GetPid();
         }
     };
-    void AddNotifyMsg(std::shared_ptr<MessageInfo> info);
     void RemoveNotifyMsg(std::shared_ptr<MessageInfo> info);
+    void AddNotifyMsg(std::shared_ptr<MessageInfo> info);
     int32_t StateChangedNotify(DragState state);
     int32_t StyleChangedNotify(DragCursorStyle style);
 
