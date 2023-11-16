@@ -32,6 +32,8 @@ ohos_source_set("intention_ipc") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/intention_proxy.cpp",
     "src/intention_stub.cpp",

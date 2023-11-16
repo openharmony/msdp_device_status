@@ -24,6 +24,8 @@ ohos_source_set("intention_epoll") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "include" ]
 
   sources = [ "src/epoll_manager.cpp" ]

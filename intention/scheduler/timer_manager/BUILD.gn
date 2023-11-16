@@ -27,6 +27,8 @@ ohos_source_set("timer_manager") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [ "src/timer_manager.cpp" ]
 
   configs = [ ":timer_manager_config" ]

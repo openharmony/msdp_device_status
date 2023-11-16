@@ -36,6 +36,8 @@ ohos_shared_library("fusion_data_binding") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [ "src/fusion_data_binding.cpp" ]
 
   deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]

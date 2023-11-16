@@ -20,6 +20,8 @@ ohos_shared_library("intention_service") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   shlib_type = "sa"
   include_dirs = [
     "include",
