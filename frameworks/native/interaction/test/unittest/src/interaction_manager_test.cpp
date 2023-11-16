@@ -1678,7 +1678,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdateDragItemStyle, Tes
     };
     SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -1687,15 +1687,15 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdateDragItemStyle, Tes
     std::pair<int32_t, int32_t> enterPos { 500, 50 };
     std::pair<int32_t, int32_t> leavePos { 500, 200 };
     SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_IN, RADIUS_IN, ALPHA_IN });
     EXPECT_EQ(ret, RET_OK);
     SimulateMoveEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_OUT, RADIUS_OUT, ALPHA_OUT });
     EXPECT_EQ(ret, RET_OK);
     SimulateMoveEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
