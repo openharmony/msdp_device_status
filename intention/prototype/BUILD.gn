@@ -24,6 +24,8 @@ ohos_source_set("intention_prototype") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "include" ]
 
   sources = []

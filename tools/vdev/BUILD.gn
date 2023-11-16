@@ -31,6 +31,8 @@ ohos_source_set("devicestatus_vdev") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/v_input_device.cpp",
     "src/virtual_device.cpp",
@@ -74,6 +76,8 @@ ohos_source_set("devicestatus_vdev_builders") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/virtual_device_builder.cpp",
     "src/virtual_keyboard_builder.cpp",
@@ -107,6 +111,8 @@ ohos_executable("vdevadm") {
     cfi_cross_dso = true
     debug = false
   }
+
+  branch_protector_ret = "pac_ret"
 
   include_dirs = [
     "include",

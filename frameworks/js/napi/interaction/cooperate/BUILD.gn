@@ -20,6 +20,8 @@ ohos_shared_library("inputdevicecooperate") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "src/js_cooperate_context.cpp",
     "src/js_cooperate_manager.cpp",

@@ -32,6 +32,8 @@ ohos_source_set("cooperate_params") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [ "cooperate/src/cooperate_params.cpp" ]
 
   configs = [ ":cooperate_params_config" ]
@@ -65,6 +67,8 @@ ohos_source_set("drag_params") {
     cfi_cross_dso = true
     debug = false
   }
+
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "drag/src/drag_data_manager.cpp",

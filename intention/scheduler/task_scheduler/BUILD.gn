@@ -27,6 +27,8 @@ ohos_source_set("task_scheduler") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   sources = [ "src/task_scheduler.cpp" ]
 
   configs = [ ":task_scheduler_config" ]

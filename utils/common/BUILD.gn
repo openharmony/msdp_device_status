@@ -35,6 +35,8 @@ ohos_shared_library("devicestatus_util") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   version_script = "libdevicestatus_util_map"
   sources = [
     "src/drag_data_packer.cpp",

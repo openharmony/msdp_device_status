@@ -84,6 +84,7 @@ constexpr float DEFAULT_SATURATION { 1.05f };
 constexpr float DEFAULT_BRIGHTNESS { 1.05f };
 constexpr float INCREASE_RATIO { 1.22f };
 constexpr float DRAG_WINDOW_POSITION_Z { 6999.0f };
+constexpr uint32_t TRANSPARENT_COLOR_ARGB { 0x00000000 };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
 constexpr int32_t INVALID_COLOR_VALUE { -1 };
@@ -804,6 +805,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
+    pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
     g_drawingInfo.nodes.emplace_back(pixelMapNode);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = Rosen::RSCanvasNode::Create();
     CHKPV(dragStyleNode);

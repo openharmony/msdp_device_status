@@ -24,6 +24,8 @@ ohos_shared_library("coordination") {
     debug = false
   }
 
+  branch_protector_ret = "pac_ret"
+
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
