@@ -371,7 +371,7 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
     DragData dragData;
     if (DragDataPacker::UnMarshalling(data, dragData) != RET_OK) {
         FI_HILOGE("UnMarshalling dragData failed");
-        return E_DEVICESTATUS_READ_PARCEL_ERROR; 
+        return E_DEVICESTATUS_READ_PARCEL_ERROR;
     }
     for (const auto& shadowInfo : dragData.shadowInfos) {
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||

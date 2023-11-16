@@ -111,7 +111,7 @@ int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket&
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(startDragListener_, RET_ERR);
     startDragListener_->OnHideIconMessage();
-    return RET_OK;  
+    return RET_OK;
 }
 
 int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)

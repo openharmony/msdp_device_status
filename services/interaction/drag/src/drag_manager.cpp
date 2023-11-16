@@ -124,9 +124,9 @@ void DragManager::PrintDragData(const DragData &dragData)
     FI_HILOGI("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
         " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
-       dragData.sourceType, dragData.pointerId,dragData.displayId, dragData.displayX,
-       dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-       GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
+        dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
+        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
+        GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
@@ -465,14 +465,14 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "dragData = {\n"
             "\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
             "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            udKey.c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(), dragData.sourceType, 
+            udKey.c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(), dragData.sourceType,
             dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
             dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {
         for (const auto& shadowInfo : dragData.shadowInfos) {
             CHKPV(shadowInfo.pixelMap);
             dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", shadowInfo.pixelMap->GetWidth(),
-            shadowInfo.pixelMap->GetHeight());
+                shadowInfo.pixelMap->GetHeight());
         }
     }
     dprintf(fd, "}\n");
