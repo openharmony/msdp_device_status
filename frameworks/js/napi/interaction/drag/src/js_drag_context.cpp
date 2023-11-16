@@ -25,8 +25,8 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragContext" };
-const char* DRAG_CLASS = "drag_class";
-const char* DRAG = "drag";
+const char* DRAG_CLASS { "drag_class" };
+const char* DRAG { "drag" };
 inline constexpr size_t MAX_STRING_LEN { 1024 };
 } // namespace
 

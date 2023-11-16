@@ -71,19 +71,19 @@ public:
     void Init();
     std::shared_ptr<CoordinationDeviceManager::Device> GetDevice(int32_t id) const;
     bool IsRemote(int32_t id);
+    bool HasLocalPointerDevice() const;
     std::vector<std::string> GetCoordinationDhids(int32_t deviceId) const;
     std::vector<std::string> GetCoordinationDhids(const std::string &dhid, bool isRemote) const;
+    std::string GetDhid(int32_t deviceId) const;
     std::string GetOriginNetworkId(int32_t id) const;
     std::string GetOriginNetworkId(const std::string &dhid) const;
-    std::string GetDhid(int32_t deviceId) const;
-    bool HasLocalPointerDevice() const;
 
 private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
 
-    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
+    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
 };
 #define COOR_DEV_MGR OHOS::DelayedSingleton<CoordinationDeviceManager>::GetInstance()
 } // namespace DeviceStatus

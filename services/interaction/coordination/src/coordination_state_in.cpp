@@ -61,7 +61,7 @@ int32_t CoordinationStateIn::ActivateCoordination(const std::string &remoteNetwo
 int32_t CoordinationStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    auto* context = COOR_EVENT_MGR->GetIContext();
+    IContext* context = COOR_EVENT_MGR->GetIContext();
     CHKPR(context, RET_ERR);
     std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
     if (remoteNetworkId == originNetworkId) {
@@ -98,7 +98,7 @@ int32_t CoordinationStateIn::ProcessStop()
             this->OnStopRemoteInput(isSuccess, originNetworkId, -1);
         });
     if (ret != RET_OK) {
-        FI_HILOGE("Stop remote input failed");
+        FI_HILOGE("Failed to stop remote input");
         COOR_SM->OnStopFinish(false, originNetworkId);
     }
     return RET_OK;

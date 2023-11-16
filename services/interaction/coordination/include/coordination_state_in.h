@@ -31,14 +31,14 @@ public:
     void SetStartDeviceDhid(const std::string &startDeviceDhid) override;
 
 private:
-    void ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t RelayComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
-    void OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId) override;
-    void StopRemoteInput(const std::string &originNetworkId, const std::string &remoteNetworkId,
-        const std::vector<std::string> &dhid, int32_t startDeviceId);
-    void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t ProcessStop();
+    void ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId);
+    void OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    void OnStopRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId);
+    void StopRemoteInput(const std::string &originNetworkId, const std::string &remoteNetworkId,
+        const std::vector<std::string> &dhid, int32_t startDeviceId);
     std::string startDeviceDhid_;
 };
 } // namespace DeviceStatus

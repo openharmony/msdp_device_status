@@ -201,7 +201,7 @@ void VirtualTouchScreenBuilder::Clone()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     } while ((nTries-- > 0) && (VirtualTouchScreen::GetDevice() == nullptr));
     if (VirtualTouchScreen::GetDevice() == nullptr) {
-        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        std::cout << "Clone \' " << vDev->GetName() << " \' is unsuccessful." << std::endl;
         return;
     }
 

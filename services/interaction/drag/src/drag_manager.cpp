@@ -134,16 +134,16 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     CALL_INFO_TRACE;
     PrintDragData(dragData);
     if (dragState_ == DragState::START) {
-        FI_HILOGE("Drag instance is running, can not start drag again");
+        FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
     dragOutSession_ = sess;
     if (InitDataManager(dragData) != RET_OK) {
-        FI_HILOGE("Init data manager failed");
+        FI_HILOGE("Failed to init data manager");
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
-        FI_HILOGE("OnStartDrag failed");
+        FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
@@ -229,8 +229,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     }
     FI_HILOGI("Update drag style successfully");
     DRAG_DATA_MGR.SetDragStyle(style);
-    stateNotify_.StyleChangedNotify(style);
-    return dragDrawing_.UpdateDragStyle(style);
+    DragCursorStyle updateStyle = DragCursorStyle::DEFAULT;
+    if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
+        updateStyle = DragCursorStyle::COPY;
+    } else {
+        updateStyle = style;
+    }
+    stateNotify_.StyleChangedNotify(updateStyle);
+    return dragDrawing_.UpdateDragStyle(updateStyle);
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -273,17 +279,17 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
-        FI_HILOGE("Invalid result:%{public}d", static_cast<int32_t>(result));
+        FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
     pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
     if (pkt.ChkRWError()) {
-        FI_HILOGE("Packet write data failed");
+        FI_HILOGE("Failed to packet write data");
         return RET_ERR;
     }
     CHKPR(dragOutSession_, RET_ERR);
     if (!dragOutSession_->SendMsg(pkt)) {
-        FI_HILOGE("Send message failed");
+        FI_HILOGE("Failed to send message");
         return MSG_SEND_FAIL;
     }
     return RET_OK;
@@ -613,10 +619,6 @@ int32_t DragManager::RemovePointerEventHandler()
     }
     MMI::InputManager::GetInstance()->RemoveMonitor(pointerEventMonitorId_);
     pointerEventMonitorId_ = -1;
-    if (RemoveKeyEventMointor() != RET_OK) {
-        FI_HILOGE("Failed to remove key event monitor");
-        return RET_ERR;
-    }
 #else
     if (pointerEventInterceptorId_ <= 0) {
         FI_HILOGE("Invalid pointer event interceptor id:%{public}d", pointerEventInterceptorId_);
@@ -861,27 +863,58 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
     int32_t keyCode = keyEvent->GetKeyCode();
     int32_t keyAction = keyEvent->GetKeyAction();
     if (keys.size() != SIGNLE_KEY_ITEM) {
-        dropType_.store(DropType::MOVE);
+        dragAction_.store(DragAction::MOVE);
         return;
     }
-    if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN && (
-        keyCode == MMI::KeyEvent::KEYCODE_CTRL_LEFT ||
-        keyCode == MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
-        dropType_.store(DropType::COPY);
-        FI_HILOGI("the current drop type is copy");
-    } else {
-        dropType_.store(DropType::MOVE);
+    if ((keyCode != MMI::KeyEvent::KEYCODE_CTRL_LEFT) &&
+        (keyCode != MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
+        dragAction_.store(DragAction::MOVE);
+        return;
+    }
+    if (keyAction == MMI::KeyEvent::KEY_ACTION_UP) {
+        dragAction_.store(DragAction::MOVE);
+        HandleCtrlKeyUp();
+        return;
+    }
+    if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN) {
+        dragAction_.store(DragAction::COPY);
+        HandleCtrlKeyDown();
     }
 }
 
-int32_t DragManager::GetDropType(DropType& dropType) const
+void DragManager::HandleCtrlKeyDown()
+{
+    CALL_DEBUG_ENTER;
+    if (DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE) {
+        return;
+    }
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+void DragManager::HandleCtrlKeyUp()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(context_);
+    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DRAG_DATA_MGR.GetDragStyle()));
+    if (ret != RET_OK) {
+        FI_HILOGE("Post async task failed");
+    }
+}
+
+int32_t DragManager::GetDragAction(DragAction& dragAction) const
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
-        FI_HILOGE("No drag instance running, can not get drag drop type");
+        FI_HILOGE("No drag instance running, can not get drag action");
         return RET_ERR;
     }
-    dropType = dropType_.load();
+    dragAction = dragAction_.load();
     return RET_OK;
 }
 

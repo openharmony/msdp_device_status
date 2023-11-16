@@ -287,9 +287,9 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
 }
 
-int32_t DragManagerImpl::GetDropType(DropType& dropType)
+int32_t DragManagerImpl::GetDragAction(DragAction& dragAction)
 {
-    return DeviceStatusClient::GetInstance().GetDropType(dropType);
+    return DeviceStatusClient::GetInstance().GetDragAction(dragAction);
 }
 
 int32_t DragManagerImpl::EnterTextEditorArea(bool enable)

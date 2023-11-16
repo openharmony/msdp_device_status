@@ -224,11 +224,11 @@ void VirtualKeyboardBuilder::ReadActions(const char *path)
     CHKPV(path);
     char realPath[PATH_MAX] {};
     if (realpath(path, realPath) == nullptr) {
-        std::cout << "[keyboard] invalid path: " << path << std::endl;
+        std::cout << "[keyboard] an invalid path: " << path << std::endl;
         return;
     }
     if (Utility::GetFileSize(realPath) > MAXIMUM_FILESIZE_ALLOWED) {
-        std::cout << "[keyboard] file is too large" << std::endl;
+        std::cout << "[keyboard] the file size is too large" << std::endl;
         return;
     }
     json model;

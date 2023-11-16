@@ -162,7 +162,7 @@ void VirtualMouseBuilder::Clone()
     std::cout << "Cloning \'" << vDev->GetName() << "\'." << std::endl;
     VirtualDeviceBuilder vBuilder(GetDeviceName(), vDev);
     if (!vBuilder.SetUp()) {
-        std::cout << "Failed to clone \' " << vDev->GetName() << " \'." << std::endl;
+        std::cout << "Clone  \' " << vDev->GetName() << " \' is failed." << std::endl;
         return;
     }
     int32_t nTries = 3;

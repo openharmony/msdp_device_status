@@ -86,10 +86,10 @@ public:
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
-    int32_t GetDropType(DropType& dropType) override;
+    int32_t GetDragAction(DragAction& dragAction) override;
     int32_t GetExtraInfo(std::string &extraInfo) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
-        int32_t &toReturnClientFd, int32_t &tokenType) override;
+    int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
     int32_t AddEpoll(EpollEventType type, int32_t fd) override;

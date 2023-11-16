@@ -37,8 +37,8 @@ public:
     void RegisterConnectedFunction(ConnectCallback function) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
     void Stop() override;
-    bool SendMessage(const NetPacket& pkt) const override;
     bool GetCurrentConnectedStatus() const override;
+    bool SendMessage(const NetPacket& pkt) const override;
     void OnRecvMsg(const char *buf, size_t size) override;
     int32_t Reconnect() override;
     void OnDisconnect() override;

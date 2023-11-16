@@ -114,12 +114,12 @@ void DeviceStatusSrvStub::InitDrag()
             &DeviceStatusSrvStub::GetDragStateStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_SUMMARY),
             &DeviceStatusSrvStub::GetDragSummaryStub },
-        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DROP_TYPE),
-            &DeviceStatusSrvStub::GetDropTypeStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA),
             &DeviceStatusSrvStub::EnterTextEditorAreaStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
             &DeviceStatusSrvStub::GetExtraInfoStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
+            &DeviceStatusSrvStub::GetDragActionStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -592,15 +592,15 @@ int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParc
     return RET_OK;
 }
 
-int32_t DeviceStatusSrvStub::GetDropTypeStub(MessageParcel &data, MessageParcel &reply)
+int32_t DeviceStatusSrvStub::GetDragActionStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    DropType dropType;
-    int32_t ret = GetDropType(dropType);
+    DragAction dragAction = DragAction::INVALID;
+    int32_t ret = GetDragAction(dragAction);
     if (ret != RET_OK) {
         return RET_ERR;
     }
-    WRITEINT32(reply, static_cast<int32_t>(dropType), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, static_cast<int32_t>(dragAction), IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 

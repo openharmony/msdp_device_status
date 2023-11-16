@@ -58,8 +58,8 @@ public:
     int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t GetDragState(DragState &dragState);
-    int32_t GetDropType(DropType& dropType);
     int32_t EnterTextEditorArea(bool enable);
+    int32_t GetDragAction(DragAction& dragAction);
     int32_t GetExtraInfo(std::string &extraInfo);
 
 private:

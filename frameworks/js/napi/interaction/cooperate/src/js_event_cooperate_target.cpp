@@ -557,7 +557,7 @@ void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t stat
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, scope);
     resultObj[1] = JsUtilCooperate::GetStateInfo(cb);
     if (resultObj[1] == nullptr) {
-        FI_HILOGE("Get start async, Object is nullptr");
+        FI_HILOGE("Get start async, object is nullptr");
         napi_close_handle_scope(cb->env, scope);
     }
     napi_value handlerInfo = nullptr;
