@@ -75,7 +75,7 @@ constexpr int32_t RADIUS_OUT { 42 };
 constexpr int32_t ALPHA_IN { 51 };
 constexpr int32_t ALPHA_OUT { 0 };
 const std::string UD_KEY { "Unified data key" };
-const std::string EXTRA_INFO { "{ \"drag_allow_distributed\", false }" };
+const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
 int32_t g_deviceMouseId { -1 };
