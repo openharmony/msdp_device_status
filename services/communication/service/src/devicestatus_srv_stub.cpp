@@ -625,7 +625,7 @@ int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel& data, MessageParc
 int32_t DeviceStatusSrvStub::GetDragActionStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    DragAction dragAction;
+    DragAction dragAction = DragAction::INVALID;
     int32_t ret = GetDragAction(dragAction);
     if (ret != RET_OK) {
         return RET_ERR;
