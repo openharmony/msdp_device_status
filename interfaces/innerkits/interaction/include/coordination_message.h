@@ -28,6 +28,7 @@ enum class CoordinationMessage {
     DEACTIVATE_FAIL = 6,
     SESSION_CLOSED = 7,
     PARAMETER_ERROR = 401,
+    DRAG_DISALLOWED_ERROR = 40101,
     COORDINATION_FAIL = 20900001
 };
 

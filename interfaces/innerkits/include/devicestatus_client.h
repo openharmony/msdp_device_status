@@ -68,11 +68,14 @@ public:
     int32_t GetDragData(DragData &dragData);
     int32_t GetDragState(DragState &dragState);
     int32_t GetDropType(DropType& dropType);
+    int32_t GetExtraInfo(std::string &extraInfo);
     int32_t AllocSocketPair(int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddHotAreaListener();
     int32_t RemoveHotAreaListener();
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {

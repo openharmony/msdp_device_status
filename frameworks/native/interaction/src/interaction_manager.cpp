@@ -148,6 +148,11 @@ int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListen
     return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
 
+int32_t InteractionManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    return INTER_MGR_IMPL.UpdateDragItemStyle(dragItemStyle);
+}
+
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
     return INTER_MGR_IMPL.GetDragSummary(summarys);
@@ -156,6 +161,16 @@ int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summa
 int32_t InteractionManager::GetDropType(DropType &dropType)
 {
     return INTER_MGR_IMPL.GetDropType(dropType);
+}
+
+int32_t InteractionManager::EnterTextEditorArea(bool enable)
+{
+    return INTER_MGR_IMPL.EnterTextEditorArea(enable);
+}
+
+int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
+{
+    return INTER_MGR_IMPL.GetExtraInfo(extraInfo);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

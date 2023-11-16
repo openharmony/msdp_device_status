@@ -65,12 +65,15 @@ private:
     int32_t GetDragDataStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDragStateStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetDropTypeStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetExtraInfoStub(MessageParcel &data, MessageParcel &reply);
     int32_t AddHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
     int32_t RemoveHotAreaListenerStub(MessageParcel& data, MessageParcel& reply);
+    int32_t UpdateDragItemStyleStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDragSummaryStub(MessageParcel& data, MessageParcel& reply);
     bool CheckCooperatePermission();
     void InitCoordination();
     void InitDrag();
+    int32_t EnterTextEditorAreaStub(MessageParcel& data, MessageParcel& reply);
 
 private:
     std::map<uint32_t, ConnFunc> connFuncs_;

@@ -68,7 +68,14 @@ constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
+constexpr int32_t FOREGROUND_COLOR_IN { 0x00FF0000 };
+constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
+constexpr int32_t RADIUS_IN { 42 };
+constexpr int32_t RADIUS_OUT { 42 };
+constexpr int32_t ALPHA_IN { 51 };
+constexpr int32_t ALPHA_OUT { 0 };
 const std::string UD_KEY { "Unified data key" };
+const std::string EXTRA_INFO { "{ \"drag_allow_distributed\", false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
 int32_t g_deviceMouseId { -1 };
@@ -1651,6 +1658,101 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_UpdateDragItemStyle
+ * @tc.desc: Update drag item style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdateDragItemStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    EXPECT_EQ(ret, RET_OK);
+    std::pair<int32_t, int32_t> enterPos { 500, 50 };
+    std::pair<int32_t, int32_t> leavePos { 500, 200 };
+    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_IN, RADIUS_IN, ALPHA_IN });
+    EXPECT_EQ(ret, RET_OK);
+    SimulateMoveEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    ret = InteractionManager::GetInstance()->UpdateDragItemStyle({ FOREGROUND_COLOR_OUT, RADIUS_OUT, ALPHA_OUT });
+    EXPECT_EQ(ret, RET_OK);
+    SimulateMoveEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/*
+ * @tc.name: InteractionManagerTest_EnterTextEditorArea
+ * @tc.desc: pixelMap 8dp bit movement effect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, EnterTextEditorArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetExtraInfo
+ * @tc.desc: Get extraInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetExtraInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId >= 0) {
+        SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        dragData->extraInfo = EXTRA_INFO;
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
+        };
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        std::string extraInfo;
+        ret = InteractionManager::GetInstance()->GetExtraInfo(extraInfo);
+        ASSERT_EQ(ret, RET_OK);
+        ASSERT_EQ(extraInfo, EXTRA_INFO);
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_EQ(ret, RET_OK);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

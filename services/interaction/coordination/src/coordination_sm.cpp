@@ -243,6 +243,14 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("In transition state, not process");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
+    if (notifyDragAllowedCallback_ != nullptr) {
+        bool isAllowDrag { true };
+        notifyDragAllowedCallback_(isAllowDrag);
+        if (!isAllowDrag) {
+            FI_HILOGE("Current resource disallowed to dragged across devices");
+            return static_cast<int32_t>(CoordinationMessage::DRAG_DISALLOWED_ERROR);
+        }
+    }
     UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed");
@@ -302,6 +310,13 @@ void CoordinationSM::RegisterNotifyDragCancel(std::function<void(void)> callback
     CALL_DEBUG_ENTER;
     CHKPV(callback);
     notifyDragCancelCallback_ = callback;
+}
+
+void CoordinationSM::RegisterNotifyDragAllowed(std::function<void(bool &)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(callback);
+    notifyDragAllowedCallback_ = callback;
 }
 
 void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed)

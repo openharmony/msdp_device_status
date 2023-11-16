@@ -14,6 +14,12 @@
 import("../../../../../device_status.gni")
 
 ohos_shared_library("draginteraction") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [
     "src/js_drag_context.cpp",
     "src/js_drag_manager.cpp",

@@ -224,6 +224,14 @@ public:
     int32_t GetDropType(DropType &dropType);
 
     /**
+     * @brief 获取拖拽数据中的 'extraInfo' 字段。
+     * @param extraInfo 拖拽数据中的 'extraInfo' 字段, 主要用于保存是否允许跨设备拖拽的"drag_allow_distributed"字段。
+     * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
+     * @since 10
+     */
+    int32_t GetExtraInfo(std::string &extraInfo);
+
+    /**
      * @brief Registers a listener for screen hot area of the mouse pointer.
      * @param listener Indicates the listener for screen hot area of the mouse pointer.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
@@ -248,12 +256,29 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
     /**
+     * @brief Update item style when dragging.
+     * @param dragItemStyle Indicates the style param for dragged item.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 11
+     */
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
+    
+    /**
      * @brief 获取拖拽对象的数据摘要。
      * @param summarys 保存拖拽对象的数据摘要。
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 11
      */
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+
+    /**
+     * @brief Specifies whether to implement 8dp movement in the text editor area.
+     * @param enable Indicates whether to enable 8dp movement.
+     * The value <b>true</b> means to enable 8dp movement, and the value <b>false</b> means the opposite.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 11
+     */
+    int32_t EnterTextEditorArea(bool enable);
 
 private:
     InteractionManager() = default;

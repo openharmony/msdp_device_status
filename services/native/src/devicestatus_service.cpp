@@ -84,7 +84,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifndef OHOS_BUILD_ENABLE_RUST_IMPL
-    if (!Publish(DelayedSpSingleton<DeviceStatusService>::GetInstance())) {
+    if (!Publish(this)) {
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
@@ -167,8 +167,7 @@ bool DeviceStatusService::Init()
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
         FI_HILOGW("devicestatusManager_ is nullptr");
-        auto ms = DelayedSpSingleton<DeviceStatusService>::GetInstance();
-        devicestatusManager_ = std::make_shared<DeviceStatusManager>(ms);
+        devicestatusManager_ = std::make_shared<DeviceStatusManager>(this);
     }
     if (!devicestatusManager_->Init()) {
         FI_HILOGE("OnStart init failed");
@@ -747,6 +746,17 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
     return ret;
 }
 
+int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::EnterTextEditorArea, &dragMgr_, enable));
+    if (ret != RET_OK) {
+        FI_HILOGE("Enter Text Editor Area failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
 {
     CALL_DEBUG_ENTER;
@@ -833,6 +843,16 @@ int32_t DeviceStatusService::GetDropType(DropType& dropType)
         std::bind(&DragManager::GetDropType, &dragMgr_, std::ref(dropType)));
     if (ret != RET_OK) {
         FI_HILOGE("Get drop type failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::GetExtraInfo(std::string &extraInfo)
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::GetExtraInfo, &dragMgr_, std::ref(extraInfo)));
+    if (ret != RET_OK) {
+        FI_HILOGE("Get extraInfo failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -1041,6 +1061,17 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
     }
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
+}
+
+int32_t DeviceStatusService::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdateDragItemStyle, &dragMgr_, dragItemStyle));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summarys)

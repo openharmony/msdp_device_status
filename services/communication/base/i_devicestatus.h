@@ -63,6 +63,8 @@ public:
     virtual int32_t GetDragState(DragState &dragState) = 0;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) = 0;
     virtual int32_t GetDropType(DropType &dropType) = 0;
+    virtual int32_t EnterTextEditorArea(bool enable) = 0;
+    virtual int32_t GetExtraInfo(std::string &extraInfo) = 0;
     virtual bool IsRunning() const
     {
         return true;
@@ -70,6 +72,7 @@ public:
 
     virtual int32_t AddHotAreaListener() = 0;
     virtual int32_t RemoveHotAreaListener() = 0;
+    virtual int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };
 } // namespace DeviceStatus

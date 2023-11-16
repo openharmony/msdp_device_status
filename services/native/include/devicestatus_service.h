@@ -81,11 +81,13 @@ public:
     int32_t AddSubscriptListener() override;
     int32_t RemoveSubscriptListener() override;
     int32_t SetDragWindowVisible(bool visible) override;
+    int32_t EnterTextEditorArea(bool enable) override;
     int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
     int32_t GetDropType(DropType& dropType) override;
+    int32_t GetExtraInfo(std::string &extraInfo) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
     void OnConnected(SessionPtr s) override;
@@ -95,6 +97,7 @@ public:
     bool IsRunning() const override;
     int32_t AddHotAreaListener() override;
     int32_t RemoveHotAreaListener() override;
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
 
 private:

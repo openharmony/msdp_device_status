@@ -24,8 +24,8 @@
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
 #include "modifier/rs_modifier.h"
-#include "vsync_receiver.h"
 
+#include "vsync_receiver.h"
 #include "drag_data.h"
 #include "i_drag_animation.h"
 
@@ -96,11 +96,12 @@ struct DrawingInfo {
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
+    std::shared_ptr<Rosen::RSNode> parentNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
-    std::string filterInfo;
     std::string extraInfo;
+    std::string filterInfo;
 };
 
 struct FilterInfo {
@@ -120,6 +121,7 @@ public:
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
+    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
     int32_t StartVsync();
     void OnDragSuccess();
     void OnDragFail();
@@ -136,13 +138,14 @@ public:
     void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
+    int32_t EnterTextEditorArea(bool enable);
+    bool GetAllowDragState();
 
 private:
     int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
     void CreateWindow(int32_t displayX, int32_t displayY);
-    int32_t InitDrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode);
     int32_t DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode);
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -165,6 +168,8 @@ private:
     bool ParserFilterInfo(FilterInfo& filterInfo);
     void ProcessFilter();
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
+    void DoDrawMouse();
+    int32_t UpdateDefaultDragStyle(DragCursorStyle style);
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };

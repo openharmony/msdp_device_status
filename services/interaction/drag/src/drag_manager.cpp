@@ -143,6 +143,16 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("OnStartDrag failed");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+    if (eventHub_ == nullptr) {
+        eventHub_ = EventHub::GetEventHub(context_);
+        if (eventHub_ == nullptr) {
+            FI_HILOGE("Failed to get event");
+            return RET_ERR;
+        }
+    }
+    EventHub::RegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     dragState_ = DragState::START;
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
@@ -174,6 +184,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+    EventHub::UnRegisterEvent(eventHub_);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return ret;
 }
 
@@ -710,6 +723,16 @@ DragState DragManager::GetDragState() const
     return dragState_;
 }
 
+void DragManager::GetAllowDragState(bool &isAllowDrag)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGW("Currently state is \'%{public}d\' not in allowed dragState", static_cast<int32_t>(dragState_));
+        return;
+    }
+    isAllowDrag = dragDrawing_.GetAllowDragState();
+}
+
 void DragManager::SetDragState(DragState state)
 {
     dragState_ = state;
@@ -792,6 +815,21 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
 
+int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+{
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    if (dragItemStyle == DRAG_DATA_MGR.GetDragItemStyle()) {
+        FI_HILOGD("Not need update drag item style");
+        return RET_OK;
+    }
+    FI_HILOGI("Update drag item style successfully");
+    DRAG_DATA_MGR.SetDragItemStyle(dragItemStyle);
+    return dragDrawing_.UpdateDragItemStyle(dragItemStyle);
+}
+
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -820,6 +858,24 @@ int32_t DragManager::GetDropType(DropType& dropType) const
         return RET_ERR;
     }
     dropType = dropType_.load();
+    return RET_OK;
+}
+
+int32_t DragManager::EnterTextEditorArea(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    return dragDrawing_.EnterTextEditorArea(enable);
+}
+
+int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
+{
+    CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.extraInfo.empty()) {
+        FI_HILOGE("The extraInfo is empty");
+        return RET_ERR;
+    }
+    extraInfo = dragData.extraInfo;
     return RET_OK;
 }
 } // namespace DeviceStatus

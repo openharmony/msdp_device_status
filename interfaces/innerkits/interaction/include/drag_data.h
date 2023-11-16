@@ -39,8 +39,8 @@ struct DragData {
     ShadowInfo shadowInfo;
     std::vector<uint8_t> buffer;
     std::string udKey;
-    std::string filterInfo;
     std::string extraInfo;
+    std::string filterInfo;
     int32_t sourceType { -1 };
     int32_t dragNum { -1 };
     int32_t pointerId { -1 };
@@ -85,6 +85,23 @@ struct DragAnimationData {
     int32_t offsetX { -1 };
     int32_t offsetY { -1 };
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
+};
+
+struct DragItemStyle {
+    uint32_t foregroundColor { 0 };
+    int32_t radius { 0 };
+    uint32_t alpha { 0 };
+
+    bool operator == (const DragItemStyle &style) const
+    {
+        return foregroundColor == style.foregroundColor &&
+               radius == style.radius && alpha == style.alpha;
+    }
+
+    bool operator!=(const DragItemStyle &style) const
+    {
+        return !(*this == style);
+    }
 };
 
 enum class DragCursorStyle {
