@@ -223,6 +223,10 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
         FI_HILOGE("Drag drawing is running, can not init again");
         return INIT_CANCEL;
     }
+    if (dragData.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return INIT_FAIL;
+    }
     CHKPR(dragData.shadowInfos.front().pixelMap, INIT_FAIL);
     if ((dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
