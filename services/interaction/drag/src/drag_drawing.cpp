@@ -92,7 +92,7 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t ALPHA_SHIFT { 24 };
-constexpr size_t EXTRA_INFO_MAX_SIZE { 100 };
+constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
