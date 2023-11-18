@@ -88,6 +88,9 @@ ErrCode DeviceStatusMsdpMock::Disable(Type type)
     CALL_DEBUG_ENTER;
     alive_ = false;
     CloseTimer();
+    if (thread_->joinable()) {
+        thread_->join();
+    }
     return RET_OK;
 }
 
@@ -219,7 +222,6 @@ void DeviceStatusMsdpMock::StartThread()
 {
     CALL_DEBUG_ENTER;
     thread_ = std::make_shared<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, this);
-    thread_ ->detach();
 }
 
 void DeviceStatusMsdpMock::LoopingThreadEntry()
