@@ -170,6 +170,8 @@ private:
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
     void DoDrawMouse();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
+    int32_t UpdateValidDragStyle(DragCursorStyle style);
+
 private:
     int64_t startNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
@@ -180,7 +182,8 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
-    void* dragExtHandle_ = nullptr;
+    void* dragExtHandle_ { nullptr };
+    bool needDestroyDragWindow_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
