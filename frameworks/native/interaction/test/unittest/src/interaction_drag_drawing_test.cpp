@@ -56,9 +56,6 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
-constexpr int32_t FOREGROUND_COLOR { 0x00FF0000 };
-constexpr int32_t RADIUS { 42 };
-constexpr int32_t ALPHA { 51 };
 const std::string UD_KEY { "Unified data key" };
 const std::string FILTER_INFO { "Undefined filter info" };
 const std::string EXTRA_INFO { "Undefined extra info" };
@@ -406,39 +403,6 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-}
-
-/**
- * @tc.name: InteractionDragDrawingTest_UpdateDragItemStyle
- * @tc.desc: Drag Drawing
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemStyle, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::promise<bool> promiseFlag;
-    std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-        promiseFlag.set_value(true);
-    };
-    std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle { FOREGROUND_COLOR, RADIUS, ALPHA };
-    ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
-    ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-    ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
-    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
-    ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 }
 
 } // namespace DeviceStatus

@@ -148,9 +148,15 @@ int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListen
     return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
 
-int32_t InteractionManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t InteractionManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
-    return INTER_MGR_IMPL.UpdateDragItemStyle(dragItemStyle);
+    return INTER_MGR_IMPL.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t InteractionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    return INTER_MGR_IMPL.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)

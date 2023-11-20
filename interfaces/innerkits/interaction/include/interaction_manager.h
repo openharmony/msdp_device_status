@@ -256,12 +256,21 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
     /**
-     * @brief Update item style when dragging.
-     * @param dragItemStyle Indicates the style param for dragged item.
+     * @brief Update preview style when dragging.
+     * @param previewStyle Indicates the preview style param for dragged item.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 11
      */
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
+
+    /**
+     * @brief Update preview style with animation when dragging.
+     * @param previewStyle Indicates the preview style param for dragged item.
+     * @param animation Indicates the animation param for dragged item.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 11
+     */
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     
     /**
      * @brief 获取拖拽对象的数据摘要。

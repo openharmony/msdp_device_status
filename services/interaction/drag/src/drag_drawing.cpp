@@ -59,7 +59,6 @@ constexpr int32_t FRAMERATE { 30 };
 constexpr int32_t SVG_WIDTH { 40 };
 constexpr int32_t SIXTEEN { 16 };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
-constexpr int32_t GRADIENT_COLOR_DURATION { 250 };
 constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
@@ -91,7 +90,6 @@ constexpr int32_t INVALID_COLOR_VALUE { -1 };
 constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
-constexpr int32_t ALPHA_SHIFT { 24 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
@@ -1211,23 +1209,35 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
     return radiusPx > 0.0f ? BLUR_SIGMA_SCALE * radiusPx + 0.5f : 0.0f;
 }
 
-int32_t DragDrawing::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (ModifyPreviewStyle(g_drawingInfo.nodes[PIXEL_MAP_INDEX], previewStyle) != RET_OK) {
+        FI_HILOGE("ModifyPreviewStyle failed");
+        return RET_ERR;
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    return RET_OK;
+}
+
+int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
-    if (pixelMapNode == nullptr) {
-        FI_HILOGD("PixelMapNode is nullptr");
+    CHKPR(pixelMapNode, RET_ERR);
+    PreviewStyle originStyle;
+    originStyle.types = previewStyle.types;
+    originStyle.foregroundColor = pixelMapNode->GetShowingProperties().GetForegroundColor()->AsArgbInt();
+    if (ModifyPreviewStyle(pixelMapNode, originStyle) != RET_OK) {
+        FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }
-    auto foregroundColor = pixelMapNode->GetShowingProperties().GetForegroundColor();
-    pixelMapNode->SetForegroundColor(foregroundColor->AsArgbInt());
-    pixelMapNode->SetCornerRadius(dragItemStyle.radius);
     Rosen::RSAnimationTimingProtocol protocol;
-    protocol.SetDuration(GRADIENT_COLOR_DURATION);
-    Rosen::RSNode::Animate(protocol, SHARP_CURVE, [&]() {
-        if (pixelMapNode != nullptr) {
-            pixelMapNode->SetCornerRadius(dragItemStyle.radius);
-            pixelMapNode->SetForegroundColor(dragItemStyle.foregroundColor | (dragItemStyle.alpha << ALPHA_SHIFT));
+    protocol.SetDuration(animation.duration);
+    auto curve = CreateCurve(std::vector<float>(std::begin(animation.curve), std::end(animation.curve)));
+    Rosen::RSNode::Animate(protocol, curve, [&]() {
+        if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
+            FI_HILOGE("ModifyPreviewStyle failed");
         }
     });
     return RET_OK;
@@ -1319,6 +1329,43 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     OnDragStyle(dragStyleNode, pixelMap);
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
+    return RET_OK;
+}
+
+Rosen::RSAnimationTimingCurve DragDrawing::CreateCurve(const std::vector<float> &curve)
+{
+    if (curve.size() != CURVE_SIZE) {
+        FI_HILOGE("Size of curve is invalid");
+        return Rosen::RSAnimationTimingCurve();
+    }
+    return Rosen::RSAnimationTimingCurve::CreateCubicCurve(curve[0], curve[1], curve[2], curve[3]);
+}
+
+int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle)
+{
+    CHKPR(node, RET_ERR);
+    for (const auto &type : previewStyle.types) {
+        switch (type) {
+            case PreviewType::FOREGROUND_COLOR: {
+                node->SetForegroundColor(previewStyle.foregroundColor);
+                break;
+            }
+            case PreviewType::OPACITY: {
+                node->SetForegroundColor(previewStyle.opacity);
+                break;
+            }
+            case PreviewType::RADIUS: {
+                node->SetCornerRadius(previewStyle.radius);
+                break;
+            }
+            case PreviewType::SCALE: {
+                node->SetForegroundColor(previewStyle.scale);
+                break;
+            }
+            default:
+                break;
+        }
+    }
     return RET_OK;
 }
 

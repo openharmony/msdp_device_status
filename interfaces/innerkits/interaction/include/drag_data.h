@@ -29,6 +29,7 @@ namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
+constexpr int32_t CURVE_SIZE { 4 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -87,21 +88,39 @@ struct DragNotifyMsg {
     DragResult result { DragResult::DRAG_FAIL };
 };
 
-struct DragItemStyle {
-    uint32_t foregroundColor { 0 };
-    int32_t radius { 0 };
-    uint32_t alpha { 0 };
+enum class PreviewType {
+    FOREGROUND_COLOR,
+    OPACITY,
+    RADIUS,
+    SCALE
+};
 
-    bool operator == (const DragItemStyle &style) const
+struct PreviewStyle {
+    std::vector<PreviewType> types;
+    uint32_t foregroundColor;
+    int32_t opacity;
+    int32_t radius;
+    int32_t scale;
+
+    bool operator == (const PreviewStyle &other) const
     {
-        return foregroundColor == style.foregroundColor &&
-               radius == style.radius && alpha == style.alpha;
+        return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
+               radius == other.radius && scale == other.scale;
     }
 
-    bool operator!=(const DragItemStyle &style) const
+    bool operator!=(const PreviewStyle &other) const
     {
-        return !(*this == style);
+        return !(*this == other);
     }
+};
+
+struct PreviewAnimation {
+    int32_t duration { -1 };
+    float tempo { -1 };
+    int32_t delay { 0 };
+    int32_t interactions { 1 };
+    int32_t playMode { 0 };
+    float curve[CURVE_SIZE];
 };
 
 enum class DragCursorStyle {
