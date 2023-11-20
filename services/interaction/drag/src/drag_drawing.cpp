@@ -654,7 +654,6 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 
 int32_t DragDrawing::StartVsync()
 {
-    Rosen::RSTransaction::FlushImplicitTransaction();
     if (receiver_ == nullptr) {
         CHKPR(handler_, RET_ERR);
         receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
