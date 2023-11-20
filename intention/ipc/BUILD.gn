@@ -27,6 +27,9 @@ config("ipc_config") {
 
 ohos_source_set("intention_ipc") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
