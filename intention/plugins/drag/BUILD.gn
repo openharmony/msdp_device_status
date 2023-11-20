@@ -41,7 +41,7 @@ ohos_shared_library("intention_drag") {
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
-    defines += [ "USE_ROSEN_DRAWING" ]
+    defines = [ "USE_ROSEN_DRAWING" ]
   }
 
   deps = [
