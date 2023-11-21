@@ -30,42 +30,46 @@ InteractionManager *InteractionManager::GetInstance()
     return instance_;
 }
 
-int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
+int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
+    bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.RegisterCoordinationListener(listener);
+    return INTER_MGR_IMPL.RegisterCoordinationListener(listener, isCheckPermission);
 }
 
-int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
+int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
+    bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.UnregisterCoordinationListener(listener);
+    return INTER_MGR_IMPL.UnregisterCoordinationListener(listener, isCheckPermission);
 }
 
-int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
+int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
+    bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.PrepareCoordination(callback);
+    return INTER_MGR_IMPL.PrepareCoordination(callback, isCheckPermission);
 }
 
-int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback)
+int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
+    bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.UnprepareCoordination(callback);
+    return INTER_MGR_IMPL.UnprepareCoordination(callback, isCheckPermission);
 }
 
 int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(const std::string&, CoordinationMessage)> callback)
+    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
+    return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCheckPermission);
 }
 
 int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
-    std::function<void(const std::string&, CoordinationMessage)> callback)
+    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback);
+    return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback, isCheckPermission);
 }
 
 int32_t InteractionManager::GetCoordinationState(
-    const std::string &networkId, std::function<void(bool)> callback)
+    const std::string &networkId, std::function<void(bool)> callback, bool isCheckPermission)
 {
-    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback);
+    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback, isCheckPermission);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)

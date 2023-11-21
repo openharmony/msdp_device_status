@@ -81,7 +81,8 @@ void InteractionManagerImpl::InitMsgHandler()
     }
 }
 
-int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
+int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
+    bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -90,28 +91,32 @@ int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICo
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.RegisterCoordinationListener(listener);
+    return coordinationManagerImpl_.RegisterCoordinationListener(listener, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener)
+int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
+    bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
-    return coordinationManagerImpl_.UnregisterCoordinationListener(listener);
+    return coordinationManagerImpl_.UnregisterCoordinationListener(listener, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::string, CoordinationMessage)> callback,
+    bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -120,15 +125,17 @@ int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::stri
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.PrepareCoordination(callback);
+    return coordinationManagerImpl_.PrepareCoordination(callback, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::string, CoordinationMessage)> callback)
+int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::string, CoordinationMessage)> callback,
+    bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -137,16 +144,17 @@ int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::st
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.UnprepareCoordination(callback);
+    return coordinationManagerImpl_.UnprepareCoordination(callback, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(std::string, CoordinationMessage)> callback)
+    std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -155,18 +163,19 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.ActivateCoordination(remoteNetworkId, startDeviceId, callback);
+    return coordinationManagerImpl_.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(remoteNetworkId);
     (void)(startDeviceId);
     (void)(callback);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
-    std::function<void(std::string, CoordinationMessage)> callback)
+    std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -175,16 +184,17 @@ int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback);
+    return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback, isCheckPermission);
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
+    (void)(isCheckPermission);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
 int32_t InteractionManagerImpl::GetCoordinationState(
-    const std::string &networkId, std::function<void(bool)> callback)
+    const std::string &networkId, std::function<void(bool)> callback, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -193,10 +203,11 @@ int32_t InteractionManagerImpl::GetCoordinationState(
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.GetCoordinationState(networkId, callback);
+    return coordinationManagerImpl_.GetCoordinationState(networkId, callback, isCheckPermission);
 #else
     (void)(networkId);
     (void)(callback);
+    (void)(isCheckPermission);
     FI_HILOGW("Coordination does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION

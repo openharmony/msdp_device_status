@@ -293,42 +293,7 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
         ((style == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE))) {
         return UpdateDefaultDragStyle(style);
     }
-    g_drawingInfo.currentStyle = style;
-    if (g_drawingInfo.isCurrentDefaultStyle) {
-        if (!CheckNodesValid()) {
-            FI_HILOGE("Check nodes valid failed");
-            return RET_ERR;
-        }
-        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-        CHKPR(dragStyleNode, RET_ERR);
-        CHKPR(g_drawingInfo.parentNode, RET_ERR);
-        g_drawingInfo.parentNode->AddChild(dragStyleNode);
-    }
-    std::string filePath;
-    if (GetFilePath(filePath) != RET_OK) {
-        FI_HILOGD("Get file path failed");
-        return RET_ERR;
-    }
-    if (!IsValidSvgFile(filePath)) {
-        FI_HILOGE("Svg file is invalid");
-        return RET_ERR;
-    }
-    std::shared_ptr<Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
-    CHKPR(pixelMap, RET_ERR);
-    bool isPreviousDefaultStyle = g_drawingInfo.isCurrentDefaultStyle;
-    g_drawingInfo.isPreviousDefaultStyle = isPreviousDefaultStyle;
-    g_drawingInfo.isCurrentDefaultStyle = false;
-    g_drawingInfo.stylePixelMap = pixelMap;
-    if (!CheckNodesValid()) {
-        FI_HILOGE("Check nodes valid failed");
-        return RET_ERR;
-    }
-    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    CHKPR(dragStyleNode, RET_ERR);
-    OnDragStyle(dragStyleNode, pixelMap);
-    CHKPR(rsUiDirector_, RET_ERR);
-    rsUiDirector_->SendMessages();
-    return RET_OK;
+    return UpdateValidDragStyle(style);
 }
 
 int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -408,6 +373,7 @@ void DragDrawing::DestroyDragWindow()
 {
     CALL_INFO_TRACE;
     startNum_ = START_TIME;
+    needDestroyDragWindow_ = false;
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
@@ -561,6 +527,8 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         FI_HILOGE("Send animationExtFunc failed");
         RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
     } else {
+        startNum_ = START_TIME;
+        needDestroyDragWindow_ = true;
         StartVsync();
     }
 }
@@ -591,6 +559,8 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         FI_HILOGE("Send animationExtFunc failed");
         RunAnimation(END_ALPHA, END_SCALE_FAIL);
     } else {
+        startNum_ = START_TIME;
+        needDestroyDragWindow_ = true;
         StartVsync();
     }
 }
@@ -662,7 +632,6 @@ int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNod
 int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 {
     CALL_DEBUG_ENTER;
-    startNum_ = START_TIME;
     CHKPR(g_drawingInfo.rootNode, RET_ERR);
     if (drawDynamicEffectModifier_ != nullptr) {
         g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
@@ -679,14 +648,16 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     });
+    CHKPR(g_drawingInfo.parentNode, RET_ERR);
+    g_drawingInfo.parentNode->SetPivot(PIVOT_X, PIVOT_Y);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    startNum_ = START_TIME;
+    needDestroyDragWindow_ = true;
     return StartVsync();
 }
 
 int32_t DragDrawing::StartVsync()
 {
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
-    g_drawingInfo.parentNode->SetPivot(PIVOT_X, PIVOT_Y);
-    Rosen::RSTransaction::FlushImplicitTransaction();
     if (receiver_ == nullptr) {
         CHKPR(handler_, RET_ERR);
         receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
@@ -720,14 +691,16 @@ void DragDrawing::OnVsync()
         handler_->RemoveAllEvents();
         handler_->RemoveAllFileDescriptorListeners();
         handler_ = nullptr;
-        g_drawingInfo.isRunning = false;
         receiver_ = nullptr;
-        CHKPV(g_drawingInfo.rootNode);
-        if (drawDynamicEffectModifier_ != nullptr) {
-            g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
-            drawDynamicEffectModifier_ = nullptr;
+        if (needDestroyDragWindow_) {
+            g_drawingInfo.isRunning = false;
+            CHKPV(g_drawingInfo.rootNode);
+            if (drawDynamicEffectModifier_ != nullptr) {
+                g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
+                drawDynamicEffectModifier_ = nullptr;
+            }
+            DestroyDragWindow();
         }
-        DestroyDragWindow();
         return;
     }
     rsUiDirector_->SendMessages();
@@ -1310,6 +1283,46 @@ int32_t DragDrawing::UpdateDefaultDragStyle(DragCursorStyle style)
     bool isPreviousDefaultStyle = g_drawingInfo.isCurrentDefaultStyle;
     g_drawingInfo.isPreviousDefaultStyle = isPreviousDefaultStyle;
     g_drawingInfo.isCurrentDefaultStyle = true;
+    return RET_OK;
+}
+
+int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
+{
+    g_drawingInfo.currentStyle = style;
+    if (g_drawingInfo.isCurrentDefaultStyle) {
+        if (!CheckNodesValid()) {
+            FI_HILOGE("Check nodes valid failed");
+            return RET_ERR;
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+        CHKPR(dragStyleNode, RET_ERR);
+        CHKPR(g_drawingInfo.parentNode, RET_ERR);
+        g_drawingInfo.parentNode->AddChild(dragStyleNode);
+    }
+    std::string filePath;
+    if (GetFilePath(filePath) != RET_OK) {
+        FI_HILOGD("Get file path failed");
+        return RET_ERR;
+    }
+    if (!IsValidSvgFile(filePath)) {
+        FI_HILOGE("Svg file is invalid");
+        return RET_ERR;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = DecodeSvgToPixelMap(filePath);
+    CHKPR(pixelMap, RET_ERR);
+    bool isPreviousDefaultStyle = g_drawingInfo.isCurrentDefaultStyle;
+    g_drawingInfo.isPreviousDefaultStyle = isPreviousDefaultStyle;
+    g_drawingInfo.isCurrentDefaultStyle = false;
+    g_drawingInfo.stylePixelMap = pixelMap;
+    if (!CheckNodesValid()) {
+        FI_HILOGE("Check nodes valid failed");
+        return RET_ERR;
+    }
+    std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
+    CHKPR(dragStyleNode, RET_ERR);
+    OnDragStyle(dragStyleNode, pixelMap);
+    CHKPR(rsUiDirector_, RET_ERR);
+    rsUiDirector_->SendMessages();
     return RET_OK;
 }
 

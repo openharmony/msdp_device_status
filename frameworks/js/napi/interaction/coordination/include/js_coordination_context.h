@@ -32,20 +32,33 @@ public:
 
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value Prepare(napi_env env, napi_callback_info info);
+    static napi_value PrepareCooperate(napi_env env, napi_callback_info info);
     static napi_value Unprepare(napi_env env, napi_callback_info info);
+    static napi_value UnprepareCooperate(napi_env env, napi_callback_info info);
     static napi_value Activate(napi_env env, napi_callback_info info);
+    static napi_value ActivateCooperate(napi_env env, napi_callback_info info);
     static napi_value Deactivate(napi_env env, napi_callback_info info);
+    static napi_value DeactivateCooperate(napi_env env, napi_callback_info info);
     static napi_value GetCrossingSwitchState(napi_env env, napi_callback_info info);
+    static napi_value GetCooperateSwitchState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
     std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:
+    static napi_value PrepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
+    static napi_value UnprepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
+    static napi_value ActivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
+    static napi_value DeactivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
+    static napi_value GetCrossingSwitchStateCompatible(napi_env env,
+        napi_callback_info info, bool isCheckPermission = false);
+
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
     static JsCoordinationContext *GetInstance(napi_env env);
     static void DeclareDeviceCoordinationInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCoordinationData(napi_env env, napi_value exports);
+    static void DeclareDeviceCooperateData(napi_env env, napi_value exports);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 
     std::shared_ptr<JsCoordinationManager> mgr_ { nullptr };

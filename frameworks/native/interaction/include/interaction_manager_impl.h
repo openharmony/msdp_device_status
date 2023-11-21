@@ -33,14 +33,20 @@ class InteractionManagerImpl {
 public:
     DISALLOW_MOVE(InteractionManagerImpl);
     bool InitClient();
-    int32_t RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener);
-    int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener = nullptr);
-    int32_t PrepareCoordination(std::function<void(std::string, CoordinationMessage)> callback);
-    int32_t UnprepareCoordination(std::function<void(std::string, CoordinationMessage)> callback);
+    int32_t RegisterCoordinationListener(
+        std::shared_ptr<ICoordinationListener> listener, bool isCheckPermission = false);
+    int32_t UnregisterCoordinationListener(
+        std::shared_ptr<ICoordinationListener> listener, bool isCheckPermission = false);
+    int32_t PrepareCoordination(
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
+    int32_t UnprepareCoordination(
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(std::string, CoordinationMessage)> callback);
-    int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback);
-    int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback);
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
+    int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback,
+        bool isCheckPermission = false);
+    int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
+        bool isCheckPermission = false);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);
