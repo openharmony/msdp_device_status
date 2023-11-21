@@ -207,6 +207,14 @@ int32_t DeviceStatusSrvStub::GetLatestDeviceStatusDataStub(MessageParcel& data, 
 int32_t DeviceStatusSrvStub::RegisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = RegisterCoordinationListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call registerCoordinationEvent failed, ret:%{public}d", ret);
@@ -217,6 +225,14 @@ int32_t DeviceStatusSrvStub::RegisterCoordinationMonitorStub(MessageParcel& data
 int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = UnregisterCoordinationListener();
     if (ret != RET_OK) {
         FI_HILOGE("Call unregisterCoordinationEvent failed, ret:%{public}d", ret);
@@ -229,6 +245,14 @@ int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, Messag
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
         FI_HILOGE("Call prepareCoordination failed, ret:%{public}d", ret);
@@ -241,6 +265,14 @@ int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, Mess
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = UnprepareCoordination(userData);
     if (ret != RET_OK) {
         FI_HILOGE("Call unprepareCoordination failed, ret:%{public}d", ret);
@@ -257,6 +289,14 @@ int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, Messa
     READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t startDeviceId = 0;
     READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = ActivateCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("Call ActivateCoordination failed, ret:%{public}d", ret);
@@ -271,6 +311,14 @@ int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, Mes
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     bool isUnchained = false;
     READBOOL(data, isUnchained, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = DeactivateCoordination(userData, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Call DeactivateCoordination failed, ret:%{public}d", ret);
@@ -285,6 +333,14 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string networkId;
     READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool isCheckPermission = false;
+    READBOOL(data, isCheckPermission, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (isCheckPermission) {
+        if (!CheckCooperatePermission()) {
+            FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+            return PERMISSION_CHECK_ERROR;
+        }
+    }
     int32_t ret = GetCoordinationState(userData, networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);

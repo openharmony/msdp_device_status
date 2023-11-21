@@ -46,13 +46,14 @@ public:
     int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetDeviceStatusData(const Type type);
     void RegisterDeathListener(std::function<void()> deathListener);
-    int32_t RegisterCoordinationListener();
-    int32_t UnregisterCoordinationListener();
-    int32_t PrepareCoordination(int32_t userData);
-    int32_t UnprepareCoordination(int32_t userData);
-    int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t DeactivateCoordination(int32_t userData, bool isUnchained);
-    int32_t GetCoordinationState(int32_t userData, const std::string &networkId);
+    int32_t RegisterCoordinationListener(bool isCheckPermission = false);
+    int32_t UnregisterCoordinationListener(bool isCheckPermission = false);
+    int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false);
+    int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false);
+    int32_t ActivateCoordination(int32_t userData,
+        const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission = false);
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false);
+    int32_t GetCoordinationState(int32_t userData, const std::string &networkId, bool isCheckPermission = false);
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(const DragDropResult &dropResult);
     int32_t UpdateDragStyle(DragCursorStyle style);

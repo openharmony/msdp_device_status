@@ -45,14 +45,15 @@ public:
     CoordinationManagerImpl() = default;
     ~CoordinationManagerImpl() = default;
 
-    int32_t RegisterCoordinationListener(CoordinationListenerPtr listener);
-    int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener = nullptr);
-    int32_t PrepareCoordination(FuncCoordinationMessage callback);
-    int32_t UnprepareCoordination(FuncCoordinationMessage callback);
+    int32_t RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCheckPermission = false);
+    int32_t UnregisterCoordinationListener(CoordinationListenerPtr listener, bool isCheckPermission = false);
+    int32_t PrepareCoordination(FuncCoordinationMessage callback, bool isCheckPermission = false);
+    int32_t UnprepareCoordination(FuncCoordinationMessage callback, bool isCheckPermission = false);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        FuncCoordinationMessage callback);
-    int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback);
-    int32_t GetCoordinationState(const std::string &networkId, FuncCoordinationState callback);
+        FuncCoordinationMessage callback, bool isCheckPermission = false);
+    int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback, bool isCheckPermission = false);
+    int32_t GetCoordinationState(const std::string &networkId,
+        FuncCoordinationState callback, bool isCheckPermission = false);
     void OnDevCoordinationListener(const std::string networkId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string networkId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);
