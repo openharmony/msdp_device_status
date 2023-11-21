@@ -16,10 +16,10 @@
 #include "unregistercoordinationlistener_fuzzer.h"
 
 #include "singleton.h"
-#include "fi_log.h"
 
 #define private public
 #include "devicestatus_service.h"
+#include "fi_log.h"
 #include "message_parcel.h"
 
 using namespace OHOS::Msdp::DeviceStatus;
@@ -34,16 +34,10 @@ const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
-        FI_HILOGE("Failed to write");
-        return false;
-    }
-    if (!datas.WriteBuffer(data, size)) {
-        FI_HILOGE("Failed to write data");
-        return false;
-    }
-    if (!datas.RewindRead(0)) {
-        FI_HILOGE("failed to read");
+    bool isCheckPermission = true;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBool(isCheckPermission) ||
+        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failed");
         return false;
     }
     MessageParcel reply;

@@ -17,7 +17,6 @@
     "ram": "~4096KB",
     "deps": {
       "components": [
-        "ability_base",
         "access_token",
         "hilog",
         "ipc",
