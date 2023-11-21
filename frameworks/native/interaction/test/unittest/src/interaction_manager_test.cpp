@@ -515,7 +515,7 @@ void InteractionManagerTest::SimulateDownKeyEvent(int32_t key)
     CALL_DEBUG_ENTER;
     SetupKeyEvent(MMI::KeyEvent::KEY_ACTION_DOWN, key, true);
     FI_HILOGD("TEST:keyCode:%{public}d, keyAction: KEY_ACTION_DOWN", key);
-    MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    MMI::InputManager::GetInstance()->SimulateInputEvent(g_keyEvent);
 }
 
 void InteractionManagerTest::SimulateUpKeyEvent(int32_t key)
@@ -523,7 +523,7 @@ void InteractionManagerTest::SimulateUpKeyEvent(int32_t key)
     CALL_DEBUG_ENTER;
     SetupKeyEvent(MMI::KeyEvent::KEY_ACTION_UP, key, false);
     FI_HILOGD("TEST:keyCode:%{public}d, keyAction: KEY_ACTION_UP", key);
-    MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    MMI::InputManager::GetInstance()->SimulateInputEvent(g_keyEvent);
 }
 
 void InteractionManagerTest::PrintDragAction(DragAction dragAction)
