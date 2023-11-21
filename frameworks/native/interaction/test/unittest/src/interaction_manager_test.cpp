@@ -493,13 +493,16 @@ void InputEventCallbackTest::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationListener_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
-    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_ERR);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -511,6 +514,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationListener_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     class CoordinationListenerTest : public ICoordinationListener {
     public:
         CoordinationListenerTest() : ICoordinationListener() {}
@@ -522,18 +526,20 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
     };
     std::shared_ptr<CoordinationListenerTest> consumer =
         std::make_shared<CoordinationListenerTest>();
-    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
+    ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -545,13 +551,16 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationListener, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
-    int32_t ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -563,19 +572,22 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
-    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -587,19 +599,22 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, Tes
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnprepareCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto fun = [&promiseFlag](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
-    int32_t ret = InteractionManager::GetInstance()->UnprepareCoordination(fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->UnprepareCoordination(fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -611,18 +626,22 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnprepareCoordination, T
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::string remoteNetworkId("");
     int32_t startDeviceId = -1;
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Start coordination success");
         (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId, fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId,
+        fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -634,18 +653,21 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     auto fun = [](std::string listener, CoordinationMessage coordinationMessages) {
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
-    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(false, fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(false, fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
-    ret = InteractionManager::GetInstance()->DeactivateCoordination(true, fun);
+    ret = InteractionManager::GetInstance()->DeactivateCoordination(true, fun, isCheckPermission);
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -657,16 +679,19 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abnormal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     const std::string networkId("");
     auto fun = [](bool state) {
         FI_HILOGD("Get coordination state failed, state:%{public}d", state);
     };
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**
@@ -678,6 +703,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abn
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Normal, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     const std::string networkId("networkId");
@@ -685,13 +711,15 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Nor
         FI_HILOGD("Get coordination state success, state:%{public}d", state);
         promiseFlag.set_value(true);
     };
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun);
+    bool isCheckPermission = true;
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCheckPermission);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
 }
 
 /**

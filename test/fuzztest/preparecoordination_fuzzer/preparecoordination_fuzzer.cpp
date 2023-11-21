@@ -19,18 +19,23 @@
 
 #define private public
 #include "devicestatus_service.h"
+#include "fi_log.h"
 #include "message_parcel.h"
 
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "PrepareCoordinationFuzzTest" };
 const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 bool PrepareCoordinationFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    bool isCheckPermission = true;
+    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN) || !datas.WriteBool(isCheckPermission) ||
+        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        FI_HILOGE("Write failed");
+        return false;
+    }
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
