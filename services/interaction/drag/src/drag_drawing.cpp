@@ -715,9 +715,13 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.displayX = dragData.displayX;
     g_drawingInfo.displayY = dragData.displayY;
-    g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
-    g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
-    g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
+    if (!dragData.shadowInfos.empty()) {
+        g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+        g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
+        g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
+    } else {
+        FI_HILOGE("ShadowInfos is empty");
+    }
     g_drawingInfo.extraInfo = dragData.extraInfo;
     g_drawingInfo.filterInfo = dragData.filterInfo;
 }
