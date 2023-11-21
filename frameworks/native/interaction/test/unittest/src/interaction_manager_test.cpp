@@ -482,7 +482,7 @@ void InteractionManagerTest::SetupKeyEvent(
     int32_t action, int32_t key, bool isPressed)
 {
     CALL_DEBUG_ENTER;
-    CHKPP(g_keyEvent);
+    CHKPV(g_keyEvent);
     MMI::KeyEvent::KeyItem keyItem;
     keyItem.SetKeyCode(key);
     keyItem.SetDeviceId(1);
