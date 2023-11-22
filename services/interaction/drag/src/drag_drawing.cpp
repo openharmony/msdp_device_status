@@ -680,7 +680,8 @@ void DragDrawing::OnVsync()
 {
     CALL_DEBUG_ENTER;
     CHKPV(rsUiDirector_);
-    bool hasRunningAnimation = rsUiDirector_->RunningCustomAnimation(startNum_);
+    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(startNum_);
+    rsUiDirector_->FlushModifier();
     if (!hasRunningAnimation) {
         FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
         CHKPV(handler_);
