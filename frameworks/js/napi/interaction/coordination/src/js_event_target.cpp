@@ -156,10 +156,16 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
 void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
+    std::string listenerType = type;
+    bool isCheckPermission = false;
+    if (type == COOPERATE_MESSAGE_NAME) {
+        isCheckPermission = true;
+        listenerType = COOPERATE_NAME;
+    }
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListeners_.find(type);
+    auto iter = coordinationListeners_.find(listenerType);
     if (iter == coordinationListeners_.end()) {
-        FI_HILOGE("Not exist %{public}s", type.c_str());
+        FI_HILOGE("Not exist %{public}s", listenerType.c_str());
         return;
     }
 
@@ -176,20 +182,27 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
+    monitor->data.type = type;
     iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCheckPermission);
     }
 }
 
 void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_INFO_TRACE;
+    std::string listenerType = type;
+    bool isCheckPermission = false;
+    if (type == COOPERATE_MESSAGE_NAME) {
+        isCheckPermission = true;
+        listenerType = COOPERATE_NAME;
+    }
     std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = coordinationListeners_.find(type);
+    auto iter = coordinationListeners_.find(listenerType);
     if (iter == coordinationListeners_.end()) {
-        FI_HILOGE("Not exist %{public}s", type.c_str());
+        FI_HILOGE("Not exist %{public}s", listenerType.c_str());
         return;
     }
     if (handle == nullptr) {
@@ -207,7 +220,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 MONITOR_LABEL:
     if (iter->second.empty() && isListeningProcess_) {
         isListeningProcess_ = false;
-        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this());
+        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this(), isCheckPermission);
     }
 }
 
@@ -605,7 +618,8 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "msg", eventMsg),
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object,
+            ((item->data.type == COOPERATE_MESSAGE_NAME) ? "CooperateState" : "msg"), eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;

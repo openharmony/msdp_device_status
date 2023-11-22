@@ -218,54 +218,54 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
 
 #else // OHOS_BUILD_ENABLE_RUST_IMPL
 
-int32_t DeviceStatusClient::RegisterCoordinationListener()
+int32_t DeviceStatusClient::RegisterCoordinationListener(bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->RegisterCoordinationListener();
+    return devicestatusProxy_->RegisterCoordinationListener(isCheckPermission);
 }
 
-int32_t DeviceStatusClient::UnregisterCoordinationListener()
+int32_t DeviceStatusClient::UnregisterCoordinationListener(bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UnregisterCoordinationListener();
+    return devicestatusProxy_->UnregisterCoordinationListener(isCheckPermission);
 }
 
-int32_t DeviceStatusClient::PrepareCoordination(int32_t userData)
+int32_t DeviceStatusClient::PrepareCoordination(int32_t userData, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->PrepareCoordination(userData);
+    return devicestatusProxy_->PrepareCoordination(userData, isCheckPermission);
 }
 
-int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData)
+int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UnprepareCoordination(userData);
+    return devicestatusProxy_->UnprepareCoordination(userData, isCheckPermission);
 }
 
 int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
-    const std::string &remoteNetworkId, int32_t startDeviceId)
+    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId);
+    return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId, isCheckPermission);
 }
 
-int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained)
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained);
+    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained, isCheckPermission);
 }
 
-int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId)
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId, bool isCheckPermission)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetCoordinationState(userData, networkId);
+    return devicestatusProxy_->GetCoordinationState(userData, networkId, isCheckPermission);
 }
 
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL

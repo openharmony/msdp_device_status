@@ -89,18 +89,18 @@ struct DragNotifyMsg {
 };
 
 enum class PreviewType {
-    FOREGROUND_COLOR,
-    OPACITY,
-    RADIUS,
-    SCALE
+    FOREGROUND_COLOR = 0,
+    OPACITY = 1,
+    RADIUS = 2,
+    SCALE = 3
 };
 
 struct PreviewStyle {
     std::vector<PreviewType> types;
-    uint32_t foregroundColor;
-    int32_t opacity;
-    int32_t radius;
-    int32_t scale;
+    uint32_t foregroundColor { 0 };
+    int32_t opacity { -1 };
+    int32_t radius { -1 };
+    int32_t scale { -1 };
 
     bool operator == (const PreviewStyle &other) const
     {
@@ -117,10 +117,10 @@ struct PreviewStyle {
 struct PreviewAnimation {
     int32_t duration { -1 };
     float tempo { -1 };
-    int32_t delay { 0 };
-    int32_t interactions { 1 };
-    int32_t playMode { 0 };
-    float curve[CURVE_SIZE];
+    int32_t delay { -1 };
+    int32_t interactions { -1 };
+    int32_t playMode { -1 };
+    float curve[CURVE_SIZE] { -1 };
 };
 
 enum class DragCursorStyle {

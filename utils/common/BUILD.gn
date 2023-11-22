@@ -53,8 +53,8 @@ ohos_shared_library("devicestatus_util") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "napi:ace_napi",
     "image_framework:image_native",
+    "napi:ace_napi",
   ]
 
   innerapi_tags = [ "platformsdk" ]
