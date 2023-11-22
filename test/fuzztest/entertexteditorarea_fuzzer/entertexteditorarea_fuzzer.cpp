@@ -19,6 +19,7 @@
 
 #define private public
 #include "devicestatus_service.h"
+#include "fi_log.h"
 #include "message_parcel.h"
 
 using namespace OHOS::Msdp::DeviceStatus;
