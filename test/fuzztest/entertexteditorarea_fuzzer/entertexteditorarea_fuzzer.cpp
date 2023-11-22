@@ -27,9 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_
 
 bool EnterTextEditorAreaFuzzTest(const uint8_t* data, size_t size)
 {
-    const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
+    const std::u16string formmgrDeviceToken { u"ohos.msdp.Idevicestatus" };
     MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_DEVICE_TOKEN)) {
+    if (!datas.WriteInterfaceToken(formmgrDeviceToken)) {
         FI_HILOGE("Write failed");
         return false;
     }
@@ -47,7 +47,7 @@ bool EnterTextEditorAreaFuzzTest(const uint8_t* data, size_t size)
         static_cast<uint32_t>(Msdp::DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA), datas, reply, option);
     return true;
 }
-}// namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
