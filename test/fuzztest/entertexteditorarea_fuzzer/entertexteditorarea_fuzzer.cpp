@@ -43,6 +43,7 @@ bool EnterTextEditorAreaFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
+    int a = 0;
     DelayedSingleton<DeviceStatusService>::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(Msdp::DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA), datas, reply, option);
     return true;
