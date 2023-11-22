@@ -112,8 +112,14 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
 
 void DragDataManager::ResetDragData()
 {
+    CALL_DEBUG_ENTER;
     dragData_ = { };
     dragItemStyle_ = { };
+    dragStyle_ = DragCursorStyle::DEFAULT;
+    visible_ = false;
+    targetTid_ = -1;
+    targetPid_ = -1;
+    isMotionDrag_ = false;
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)
