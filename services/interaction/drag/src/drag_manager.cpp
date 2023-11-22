@@ -22,6 +22,7 @@
 #include "pixel_map.h"
 #include "udmf_client.h"
 #include "unified_types.h"
+#include "../wm/window.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -167,6 +168,12 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         ret = RET_ERR;
     }
     dragState_ = DragState::STOP;
+    if (dropResult.result == DragResult::DRAG_SUCCESS) {
+        Rosen::WMError result = Rosen::Window::RaiseWindowToTop(dropResult.windowId);
+        if (result != Rosen::WMError::WM_OK) {
+            FI_HILOGE("Raise window to top failed, windowId: %{public}d", dropResult.windowId);
+        }
+    }
     stateNotify_.StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(dropResult.result) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
