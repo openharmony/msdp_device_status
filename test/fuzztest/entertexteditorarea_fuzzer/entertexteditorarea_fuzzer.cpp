@@ -47,7 +47,7 @@ bool EnterTextEditorAreaFuzzTest(const uint8_t* data, size_t size)
         static_cast<uint32_t>(Msdp::DeviceInterfaceCode::ENTER_TEXT_EDITOR_AREA), datas, reply, option);
     return true;
 }
-}
+}// namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
