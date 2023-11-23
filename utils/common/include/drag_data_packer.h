@@ -31,14 +31,17 @@ namespace DeviceStatus {
 using SummaryMap = std::map<std::string, int64_t>;
 class DragDataPacker {
 public:
-    static int32_t Marshalling(const DragData &dragData, Parcel &data);
-    static int32_t UnMarshalling(Parcel &data, DragData &dragData);
+    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = false);
+    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = false);
 };
 
 class ShadowPacker {
 public:
-    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
-    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
+    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross = false);
+    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross = false);
+private:
+    static int32_t PackUpPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, Parcel &data, bool isCross = false);
+    static int32_t UnPackPixelMap(Parcel &data, std::shared_ptr<OHOS::Media::PixelMap> pixelMap, bool isCross = false);
 };
 
 class SummaryPacker {

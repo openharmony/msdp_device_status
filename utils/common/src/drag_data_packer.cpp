@@ -27,9 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDat
 
 namespace DeviceStatus {
 
-int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
+int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool isCross)
 {
-    if (ShadowPacker::Marshalling(dragData.shadowInfos, data) != RET_OK) {
+    if (ShadowPacker::Marshalling(dragData.shadowInfos, data, isCross) != RET_OK) {
         FI_HILOGE("Failed to marshalling shadowInfos");
         return RET_ERR;
     }
@@ -51,9 +51,9 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
     return RET_OK;
 }
 
-int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
+int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData, bool isCross)
 {
-    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos) != RET_OK) {
+    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos, isCross) != RET_OK) {
         FI_HILOGE("UnMarshallingShadowInfos failed");
         return RET_ERR;
     }
@@ -75,7 +75,7 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
     return RET_OK;
 }
 
-int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data)
+int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross)
 {
     CALL_DEBUG_ENTER;
     if (shadowInfos.empty()) {
@@ -91,9 +91,9 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
     WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < shadowNum; i++) {
         CHKPR(shadowInfos[i].pixelMap, RET_ERR);
-        if (!shadowInfos[i].pixelMap->Marshalling(data)) {
-            FI_HILOGE("Failed to marshalling pixelMap");
-            return ERR_INVALID_VALUE;
+        if (PackUpPixelMap(shadowInfos[i].pixelMap, data, isCross) != RET_OK) {
+            FI_HILOGE("PackUpPixelMap failed");
+            return RET_ERR;
         }
         WRITEINT32(data, shadowInfos[i].x, ERR_INVALID_VALUE);
         WRITEINT32(data, shadowInfos[i].y, ERR_INVALID_VALUE);
@@ -101,7 +101,7 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
     return RET_OK;
 }
 
-int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos)
+int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross)
 {
     CALL_DEBUG_ENTER;
     int32_t shadowNum { 0 };
@@ -112,13 +112,49 @@ int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shado
     }
     for (int32_t i = 0; i < shadowNum; i++) {
         ShadowInfo shadowInfo;
-        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-        CHKPR(pixelMap, RET_ERR);
-        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
+        if (UnPackPixelMap(data, shadowInfo.pixelMap, isCross) != RET_OK) {
+            FI_HILOGE("UnPackPixelMap failed");
+            return RET_ERR;
+        }
         READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
         READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
         shadowInfos.push_back(shadowInfo);
     }
+    return RET_OK;
+}
+
+int32_t ShadowPacker::PackUpPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, Parcel &data, bool isCross)
+{
+    CALL_DEBUG_ENTER;
+    if (isCross) {
+        std::vector<uint8_t> pixelBuffer;
+        if (!pixelMap->EncodeTlv(pixelBuffer)) {
+            FI_HILOGE("EncodeTlv pixelMap failed");
+            return ERR_INVALID_VALUE;
+        }
+        WRITEUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
+    } else {
+        if (!pixelMap->Marshalling(data)) {
+            FI_HILOGE("Marshalling pixelMap failed");
+            return ERR_INVALID_VALUE;
+        }
+    }
+    return RET_OK;
+}
+
+int32_t ShadowPacker::UnPackPixelMap(Parcel &data, std::shared_ptr<OHOS::Media::PixelMap> pixelMap, bool isCross)
+{
+    CALL_DEBUG_ENTER;
+    Media::PixelMap *rawPixelMap = nullptr;
+    if (isCross) {
+        std::vector<uint8_t> pixelBuffer;
+        READUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
+        rawPixelMap = Media::PixelMap::DecodeTlv(pixelBuffer);
+    } else {
+        rawPixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+    }
+    CHKPR(rawPixelMap, RET_ERR);
+    pixelMap = std::shared_ptr<Media::PixelMap>(rawPixelMap);
     return RET_OK;
 }
 
