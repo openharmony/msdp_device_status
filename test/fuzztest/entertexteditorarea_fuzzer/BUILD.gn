@@ -50,6 +50,7 @@ ohos_fuzztest("EnterTextEditorAreaFuzzTest") {
   }
 
   cflags = [
+    "-Dprivate=public",
     "-g",
     "-O0",
     "-fno-omit-frame-pointer",
