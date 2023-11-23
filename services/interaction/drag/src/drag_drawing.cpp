@@ -91,7 +91,6 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
-const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
@@ -678,7 +677,8 @@ void DragDrawing::OnVsync()
 {
     CALL_DEBUG_ENTER;
     CHKPV(rsUiDirector_);
-    bool hasRunningAnimation = rsUiDirector_->RunningCustomAnimation(startNum_);
+    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(startNum_);
+    rsUiDirector_->FlushModifier();
     if (!hasRunningAnimation) {
         FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
         CHKPV(handler_);
