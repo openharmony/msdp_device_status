@@ -73,7 +73,7 @@ private:
     std::mutex mutex_;
     std::vector<Type> enabledType_;
     std::atomic<bool> alive_ { false };
-    std::shared_ptr<std::thread> thread_ { nullptr };
+    std::thread thread_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
