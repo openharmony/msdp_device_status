@@ -54,7 +54,6 @@ constexpr int32_t TIME_WAIT_FOR_ANIMATION_END { 1000 };
 constexpr int32_t WINDOW_ID { -1 };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
-constexpr bool NOT_HAS_CUSTOM_ANIMATION { false };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
 constexpr int32_t FOREGROUND_COLOR { 0x00FF0000 };
 constexpr int32_t RADIUS { 42 };
@@ -401,7 +400,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -435,12 +434,76 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemSt
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
     ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 }
 
+/**
+ * @tc.name: EnterTextEditorArea001
+ * @tc.desc: normal test for pixelMap 8dp bit movement effect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    FI_HILOGD("ret:%{public}d", ret);
+    EXPECT_EQ(ret, RET_OK);
+    // Restore nodes location
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    EXPECT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+}
+
+/**
+ * @tc.name: EnterTextEditorArea002
+ * @tc.desc: abnormal test for pixelMap 8dp bit movement effect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    FI_HILOGD("ret:%{public}d", ret);
+    EXPECT_EQ(ret, RET_ERR);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
