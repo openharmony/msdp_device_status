@@ -38,6 +38,8 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
+
+#include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
 #include "include/util.h"
@@ -1227,7 +1229,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     CHKPR(pixelMapNode, RET_ERR);
     PreviewStyle originStyle;
     originStyle.types = previewStyle.types;
-    if (auto color = pixelMapNode->GetShowingProperties().GetForegroundColor(); color.value() != nullptr) {
+    if (auto color = pixelMapNode->GetShowingProperties().GetForegroundColor(); color.has_value()) {
         originStyle.foregroundColor = color->AsArgbInt();
     }
     if (ModifyPreviewStyle(pixelMapNode, originStyle) != RET_OK) {
@@ -1236,7 +1238,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
-    auto curve = CreateCurve(std::vector<float>(std::begin(animation.curve), std::end(animation.curve)));
+    auto curve =  AnimationCurve::CreateCurve(animation.curveName, animation.curve);
     Rosen::RSNode::Animate(protocol, curve, [&]() {
         if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
             FI_HILOGE("ModifyPreviewStyle failed");
@@ -1332,15 +1334,6 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
     return RET_OK;
-}
-
-Rosen::RSAnimationTimingCurve DragDrawing::CreateCurve(const std::vector<float> &curve)
-{
-    if (curve.size() != CURVE_SIZE) {
-        FI_HILOGE("Size of curve is invalid");
-        return Rosen::RSAnimationTimingCurve();
-    }
-    return Rosen::RSAnimationTimingCurve::CreateCubicCurve(curve[0], curve[1], curve[2], curve[3]);
 }
 
 int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle)

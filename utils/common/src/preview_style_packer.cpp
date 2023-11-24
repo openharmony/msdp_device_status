@@ -58,26 +58,16 @@ int32_t PreviewStylePacker::UnMarshalling(Parcel &data, PreviewStyle &previewSty
 int32_t PreviewAnimationPacker::Marshalling(const PreviewAnimation &previewAnimation, Parcel &data)
 {
     WRITEINT32(data, previewAnimation.duration, ERR_INVALID_VALUE);
-    WRITEFLOAT(data, previewAnimation.tempo, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewAnimation.delay, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewAnimation.interactions, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewAnimation.playMode, ERR_INVALID_VALUE);
-    for (int32_t i = 0; i < CURVE_SIZE; i++) {
-        WRITEFLOAT(data, previewAnimation.curve[i], ERR_INVALID_VALUE);
-    }
+    WRITESTRING(data, previewAnimation.curveName, ERR_INVALID_VALUE);
+    WRITEFLOATVECTOR(data, previewAnimation.curve, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
 int32_t PreviewAnimationPacker::UnMarshalling(Parcel &data, PreviewAnimation &previewAnimation)
 {
     READINT32(data, previewAnimation.duration, ERR_INVALID_VALUE);
-    READFLOAT(data, previewAnimation.tempo, ERR_INVALID_VALUE);
-    READINT32(data, previewAnimation.delay, ERR_INVALID_VALUE);
-    READINT32(data, previewAnimation.interactions, ERR_INVALID_VALUE);
-    READINT32(data, previewAnimation.playMode, ERR_INVALID_VALUE);
-    for (int32_t i = 0; i < CURVE_SIZE; i++) {
-        READFLOAT(data, previewAnimation.curve[i], ERR_INVALID_VALUE);
-    }
+    READSTRING(data,  previewAnimation.curveName, ERR_INVALID_VALUE);
+    READFLOATVECTOR(data, previewAnimation.curve, ERR_INVALID_VALUE);
     return RET_OK;
 }
 

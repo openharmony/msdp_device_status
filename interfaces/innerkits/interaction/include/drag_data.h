@@ -19,6 +19,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "pixel_map.h"
@@ -29,7 +30,6 @@ namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
-constexpr int32_t CURVE_SIZE { 4 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -116,11 +116,8 @@ struct PreviewStyle {
 
 struct PreviewAnimation {
     int32_t duration { -1 };
-    float tempo { -1 };
-    int32_t delay { -1 };
-    int32_t interactions { -1 };
-    int32_t playMode { -1 };
-    float curve[CURVE_SIZE] { -1 };
+    std::string curveName;
+    std::vector<float> curve;
 };
 
 enum class DragCursorStyle {

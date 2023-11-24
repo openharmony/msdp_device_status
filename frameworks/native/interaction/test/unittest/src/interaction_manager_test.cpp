@@ -77,7 +77,6 @@ const std::string UD_KEY { "Unified data key" };
 const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
-const float SHARP_CURVE[CURVE_SIZE] { 0.33, 0, 0.67, 1 };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
@@ -1876,8 +1875,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
     animationIn.duration = 500;
-    errno_t memRet = memcpy_s(animationIn.curve, sizeof(animationIn.curve), SHARP_CURVE, sizeof(SHARP_CURVE));
-    ASSERT_EQ(memRet, EOK);
+    animationIn.curveName = { "Cubic" };
+    animationIn.curve = { 0.33, 0, 0.67, 1 };
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleIn, animationIn);
     EXPECT_EQ(ret, RET_OK);
     SimulateMoveEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
@@ -1888,8 +1887,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
     animationOut.duration = 500;
-    memRet = memcpy_s(animationIn.curve, sizeof(animationIn.curve), SHARP_CURVE, sizeof(SHARP_CURVE));
-    ASSERT_EQ(memRet, EOK);
+    animationOut.curveName = { "Cubic" };
+    animationOut.curve = { 0.33, 0, 0.67, 1 };
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },

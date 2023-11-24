@@ -172,7 +172,6 @@ private:
     void DoDrawMouse();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
     int32_t UpdateValidDragStyle(DragCursorStyle style);
-    Rosen::RSAnimationTimingCurve CreateCurve(const std::vector<float> &curve);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
 
 private:

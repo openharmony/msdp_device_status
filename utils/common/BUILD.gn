@@ -39,6 +39,7 @@ ohos_shared_library("devicestatus_util") {
 
   version_script = "libdevicestatus_util_map"
   sources = [
+    "src/animation_curve.cpp",
     "src/preview_style_packer.cpp",
     "src/util.cpp",
     "src/util_napi.cpp",
@@ -52,6 +53,10 @@ ohos_shared_library("devicestatus_util") {
 
   external_deps = [
     "c_utils:utils",
+    # TODO these deps should be simplify later
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "napi:ace_napi",
