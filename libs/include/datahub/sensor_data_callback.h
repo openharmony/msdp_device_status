@@ -59,6 +59,7 @@ private:
     std::mutex initMutex_;
     std::mutex sensorMutex_;
     std::atomic<bool> alive_ { true };
+    std::map<int32_t, SensorCallback> algoMap_;
 };
 #define SENSOR_DATA_CB OHOS::Singleton<SensorDataCallback>::GetInstance()
 } // namespace DeviceStatus

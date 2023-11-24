@@ -27,14 +27,6 @@ config("fusion_subsystem_binding_public_config") {
 }
 
 ohos_shared_library("fusion_subsystem_binding") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  branch_protector_ret = "pac_ret"
-
   sources = [ "multimedia/src/fusion_image_framework.cpp" ]
 
   deps = [ "${device_status_root_path}/utils/common:devicestatus_util" ]
