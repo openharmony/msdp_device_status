@@ -166,6 +166,9 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_On
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
     ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
@@ -211,6 +214,9 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_Mu
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::FORBIDDEN);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::MOVE);
     ASSERT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_UPDATE_DRAG_STYLE));
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::DEFAULT);

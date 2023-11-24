@@ -17,6 +17,7 @@
 
 #include <atomic>
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "hitrace_meter.h"
 #include "pixel_map.h"
@@ -35,6 +36,7 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr size_t SIGNLE_KEY_ITEM { 1 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
@@ -611,6 +613,12 @@ int32_t DragManager::OnStartDrag()
     CALL_INFO_TRACE;
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+        if (foldMode == Rosen::FoldDisplayMode::MAIN) {
+            dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
+        }
+    }
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");

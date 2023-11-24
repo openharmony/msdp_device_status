@@ -368,6 +368,7 @@ void DragDrawing::EraseMouseIcon()
 void DragDrawing::DestroyDragWindow()
 {
     CALL_INFO_TRACE;
+    screenId_ = 0;
     startNum_ = START_TIME;
     needDestroyDragWindow_ = false;
     g_drawingInfo.sourceType = -1;
@@ -751,10 +752,14 @@ int32_t DragDrawing::InitLayer()
         rsUiDirector_->Init();
     }
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
-    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (display == nullptr) {
-        FI_HILOGE("Get display info failed, display is nullptr");
-        return RET_ERR;
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        if (display == nullptr) {
+            FI_HILOGE("Get display info failed, display is nullptr");
+            return RET_ERR;
+        }
     }
     InitCanvas(display->GetWidth(), display->GetHeight());
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -806,22 +811,26 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
 
 void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGD("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "drag window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     g_drawingInfo.surfaceNode = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     CHKPV(g_drawingInfo.surfaceNode);
-    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
     if (display == nullptr) {
-        FI_HILOGE("Get display info failed, display is nullptr");
-        return;
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        if (display == nullptr) {
+            FI_HILOGE("Get display info failed, display is nullptr");
+            return;
+        }
     }
     g_drawingInfo.surfaceNode->SetBounds(0, 0, display->GetWidth(), display->GetHeight());
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     g_drawingInfo.surfaceNode->SetPositionZ(DRAG_WINDOW_POSITION_Z);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
-    g_drawingInfo.surfaceNode->AttachToDisplay(g_drawingInfo.displayId);
+    g_drawingInfo.surfaceNode->AttachToDisplay(screenId_);
     g_drawingInfo.surfaceNode->SetVisible(false);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -1169,6 +1178,12 @@ bool DragDrawing::GetAllowDragState()
     FI_HILOGD("Parse extraInfo, the \'drag_allow_distributed\' is %{public}s", isAllowDrag ? "true" : "false");
 
     return isAllowDrag;
+}
+
+void DragDrawing::SetScreenId(uint64_t screenId)
+{
+    CALL_DEBUG_ENTER;
+    screenId_ = screenId;
 }
 
 void DragDrawing::ProcessFilter()
