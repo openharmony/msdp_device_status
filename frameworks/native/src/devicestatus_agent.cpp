@@ -34,6 +34,7 @@ void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
         static_cast<OnChangedValue>(devicestatusData.value));
     std::shared_ptr<DeviceStatusAgent> agent = agent_.lock();
     CHKPV(agent);
+    CHKPV(agent->agentEvent_);
     agent->agentEvent_->OnEventResult(devicestatusData);
 }
 
