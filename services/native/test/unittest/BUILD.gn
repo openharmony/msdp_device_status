@@ -119,6 +119,14 @@ ohos_unittest("DragDataManagerTest") {
 }
 
 ohos_unittest("CoordinationSMTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
   module_out_path = module_output_path
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/include",
