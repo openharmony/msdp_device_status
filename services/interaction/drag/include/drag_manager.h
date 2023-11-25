@@ -121,9 +121,9 @@ private:
     std::string GetDragCursorStyle(DragCursorStyle value) const;
     static MMI::ExtraData CreateExtraData(bool appended);
     void StateChangedNotify(DragState state);
+    void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
-    void HandleCtrlKeyDown();
-    void HandleCtrlKeyUp();
+    void HandleCtrlKeyEvent(DragCursorStyle style);
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
