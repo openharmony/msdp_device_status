@@ -141,6 +141,7 @@ public:
     void OnStopAnimation() override;
     int32_t EnterTextEditorArea(bool enable);
     bool GetAllowDragState();
+    void SetScreenId(uint64_t screenId);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
@@ -186,6 +187,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
+    uint64_t screenId_ { 0 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

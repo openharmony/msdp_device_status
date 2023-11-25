@@ -45,7 +45,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 80 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
 constexpr int32_t PROMISE_WAIT_SPAN_MS { 2000 };
-constexpr int32_t TIME_WAIT_FOR_NOTIFY_LINSTER { 100 };
+constexpr int32_t TIME_WAIT_FOR_NOTIFY_LINSTER { 600 };
 constexpr int32_t TEST_PIXEL_MAP_WIDTH { 200 };
 constexpr int32_t TEST_PIXEL_MAP_HEIGHT { 200 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
@@ -73,10 +73,12 @@ constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
 constexpr int32_t RADIUS_IN { 42 };
 constexpr int32_t RADIUS_OUT { 42 };
+constexpr int64_t DOWN_TIME { 1 };
 const std::string UD_KEY { "Unified data key" };
 const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
+const std::string CURVE_NAME { "cubic-bezier" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
@@ -513,6 +515,7 @@ void InteractionManagerTest::SimulateDownKeyEvent(int32_t key)
     SetupKeyEvent(MMI::KeyEvent::KEY_ACTION_DOWN, key, true);
     FI_HILOGD("TEST:keyCode:%{public}d, keyAction: KEY_ACTION_DOWN", key);
     MMI::InputManager::GetInstance()->SimulateInputEvent(g_keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
 }
 
 void InteractionManagerTest::SimulateUpKeyEvent(int32_t key)
@@ -521,6 +524,7 @@ void InteractionManagerTest::SimulateUpKeyEvent(int32_t key)
     SetupKeyEvent(MMI::KeyEvent::KEY_ACTION_UP, key, false);
     FI_HILOGD("TEST:keyCode:%{public}d, keyAction: KEY_ACTION_UP", key);
     MMI::InputManager::GetInstance()->SimulateInputEvent(g_keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
 }
 
 void InteractionManagerTest::PrintDragAction(DragAction dragAction)
@@ -1832,7 +1836,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     previewStyleOut.radius = RADIUS_OUT;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleOut);
     EXPECT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
+    SimulateMovePointerEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -1857,7 +1861,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
     };
-    SimulateDownEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    SimulateDownPointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
@@ -1867,7 +1871,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     EXPECT_EQ(ret, RET_OK);
     std::pair<int32_t, int32_t> enterPos { 500, 50 };
     std::pair<int32_t, int32_t> leavePos { 500, 200 };
-    SimulateMoveEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
+    SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
     previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
@@ -1875,11 +1879,11 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
     animationIn.duration = 500;
-    animationIn.curveName = { "Cubic" };
+    animationIn.curveName = CURVE_NAME;
     animationIn.curve = { 0.33, 0, 0.67, 1 };
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleIn, animationIn);
     EXPECT_EQ(ret, RET_OK);
-    SimulateMoveEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
+    SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
     previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
@@ -1887,7 +1891,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
     animationOut.duration = 500;
-    animationOut.curveName = { "Cubic" };
+    animationOut.curveName = CURVE_NAME;
     animationOut.curve = { 0.33, 0, 0.67, 1 };
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
     EXPECT_EQ(ret, RET_OK);
@@ -2009,6 +2013,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     };
     SimulateDownPointerEvent(
         { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
@@ -2039,6 +2044,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     ClearUpKeyEvent();
     SimulateUpPointerEvent(
         { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=

@@ -17,11 +17,13 @@
 
 #include <atomic>
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "hitrace_meter.h"
 #include "pixel_map.h"
 #include "udmf_client.h"
 #include "unified_types.h"
+#include "window_manager.h"
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
@@ -35,6 +37,7 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr size_t SIGNLE_KEY_ITEM { 1 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
@@ -152,7 +155,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 int32_t DragManager::StopDrag(const DragDropResult &dropResult)
 {
     CALL_INFO_TRACE;
-    FI_HILOGD("windowId:%{public}d", dropResult.windowId);
+    FI_HILOGI("windowId:%{public}d", dropResult.windowId);
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
@@ -167,6 +170,12 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         ret = RET_ERR;
     }
     dragState_ = DragState::STOP;
+    if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.windowId > 0) {
+        Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.windowId);
+        if (result != Rosen::WMError::WM_OK) {
+            FI_HILOGE("Raise window to top failed, windowId: %{public}d", dropResult.windowId);
+        }
+    }
     stateNotify_.StateChangedNotify(DragState::STOP);
     if (NotifyDragResult(dropResult.result) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
@@ -611,6 +620,12 @@ int32_t DragManager::OnStartDrag()
     CALL_INFO_TRACE;
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+        if (foldMode == Rosen::FoldDisplayMode::MAIN) {
+            dragDrawing_.SetScreenId(FOLD_SCREEN_ID);
+        }
+    }
     int32_t ret = dragDrawing_.Init(dragData);
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
@@ -819,7 +834,8 @@ int32_t DragManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
     return dragDrawing_.UpdatePreviewStyle(previewStyle);
 }
 
-int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,  const PreviewAnimation &animation)
+int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");

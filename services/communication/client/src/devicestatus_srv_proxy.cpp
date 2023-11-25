@@ -742,7 +742,8 @@ int32_t DeviceStatusSrvProxy::UpdatePreviewStyle(const PreviewStyle &previewStyl
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
+int32_t DeviceStatusSrvProxy::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

@@ -659,7 +659,7 @@ int32_t DeviceStatusSrvStub::UpdatePreviewStyleStub(MessageParcel& data, Message
     PreviewStyle previewStyle;
     if (PreviewStylePacker::UnMarshalling(data, previewStyle) != RET_OK) {
         FI_HILOGE("UnMarshalling previewStyle failed");
-        return RET_ERR; 
+        return RET_ERR;
     }
     int32_t ret = UpdatePreviewStyle(previewStyle);
     if (ret != RET_OK) {

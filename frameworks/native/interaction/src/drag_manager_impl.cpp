@@ -270,7 +270,8 @@ int32_t DragManagerImpl::UpdatePreviewStyle(const PreviewStyle &previewStyle)
     return DeviceStatusClient::GetInstance().UpdatePreviewStyle(previewStyle);
 }
 
-int32_t DragManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
+int32_t DragManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     return DeviceStatusClient::GetInstance().UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }

@@ -358,7 +358,8 @@ int32_t InteractionManagerImpl::UpdatePreviewStyle(const PreviewStyle &previewSt
     return dragManagerImpl_.UpdatePreviewStyle(previewStyle);
 }
 
-int32_t InteractionManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
+int32_t InteractionManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.UpdatePreviewStyleWithAnimation(previewStyle, animation);

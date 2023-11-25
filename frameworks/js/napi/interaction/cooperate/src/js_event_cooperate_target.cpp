@@ -371,14 +371,14 @@ void JsEventCooperateTarget::CallStartPromiseWork(uv_work_t *work, int32_t statu
         napi_close_handle_scope(cb->env, scope);
         return;
     }
-    napi_valuetype valueType = napi_undefined;
-    if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
+    napi_valuetype napiValueType = napi_undefined;
+    if (napi_typeof(cb->env, object, &napiValueType) != napi_ok) {
         FI_HILOGE("Start promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, scope);
         return;
     }
-    if (valueType != napi_undefined) {
+    if (napiValueType != napi_undefined) {
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
@@ -414,10 +414,10 @@ void JsEventCooperateTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
         napi_close_handle_scope(cb->env, scope);
         return;
     }
-    napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
+    napi_value napiHandler = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &napiHandler), GET_REFERENCE_VALUE, scope);
     napi_value ret = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, napiHandler, 1, &object, &ret), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }
@@ -435,10 +435,10 @@ void JsEventCooperateTarget::CallStopPromiseWork(uv_work_t *work, int32_t status
     JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        FI_HILOGE("Stop promise, scope is nullptr");
+    napi_handle_scope napiHandleScope = nullptr;
+    napi_open_handle_scope(cb->env, &napiHandleScope);
+    if (napiHandleScope == nullptr) {
+        FI_HILOGE("Stop promise, napiHandleScope is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
@@ -446,7 +446,7 @@ void JsEventCooperateTarget::CallStopPromiseWork(uv_work_t *work, int32_t status
     if (object == nullptr) {
         FI_HILOGE("Stop promise, object is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
-        napi_close_handle_scope(cb->env, scope);
+        napi_close_handle_scope(cb->env, napiHandleScope);
         return;
     }
 
@@ -454,16 +454,16 @@ void JsEventCooperateTarget::CallStopPromiseWork(uv_work_t *work, int32_t status
     if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
         FI_HILOGE("Stop promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
-        napi_close_handle_scope(cb->env, scope);
+        napi_close_handle_scope(cb->env, napiHandleScope);
         return;
     }
     if (valueType != napi_undefined) {
-        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, scope);
+        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, napiHandleScope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
+        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, napiHandleScope);
     }
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
-    napi_close_handle_scope(cb->env, scope);
+    napi_close_handle_scope(cb->env, napiHandleScope);
 }
 
 void JsEventCooperateTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
@@ -493,10 +493,10 @@ void JsEventCooperateTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
         napi_close_handle_scope(cb->env, scope);
         return;
     }
-    napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
-    napi_value ret = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
+    napi_value napiHandler = nullptr;
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &napiHandler), GET_REFERENCE_VALUE, scope);
+    napi_value result = nullptr;
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, napiHandler, 1, &object, &result), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, scope);
 }

@@ -471,7 +471,8 @@ int32_t DeviceStatusClient::UpdatePreviewStyle(const PreviewStyle &previewStyle)
     return devicestatusProxy_->UpdatePreviewStyle(previewStyle);
 }
 
-int32_t DeviceStatusClient::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
+int32_t DeviceStatusClient::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->UpdatePreviewStyleWithAnimation(previewStyle, animation);

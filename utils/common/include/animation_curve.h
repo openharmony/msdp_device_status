@@ -25,17 +25,20 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+using RosenCurveType = OHOS::Rosen::RSAnimationTimingCurve;
+}
 
 class AnimationCurve {
 public:
-    using CurveCreator = std::function<Rosen::RSAnimationTimingCurve(const std::vector<float> &)>;
-    static OHOS::Rosen::RSAnimationTimingCurve CreateCurve(const std::string &curveName, const std::vector<float> &curve);
+    using CurveCreator = std::function<RosenCurveType(const std::vector<float> &)>;
+    static RosenCurveType CreateCurve(const std::string &curveName, const std::vector<float> &curve);
 private:
-    static OHOS::Rosen::RSAnimationTimingCurve CreateCubicCurve(const std::vector<float> &curve);
-    static OHOS::Rosen::RSAnimationTimingCurve CreateSpringCurve(const std::vector<float> &curve);
-    static OHOS::Rosen::RSAnimationTimingCurve CreateInterpolatingSpring(const std::vector<float> &curve);
-    static OHOS::Rosen::RSAnimationTimingCurve CreateResponseSpring(const std::vector<float> &curve);
-    static OHOS::Rosen::RSAnimationTimingCurve CreateStepsCurve(const std::vector<float> &curve);
+    static RosenCurveType CreateCubicCurve(const std::vector<float> &curve);
+    static RosenCurveType CreateSpringCurve(const std::vector<float> &curve);
+    static RosenCurveType CreateInterpolatingSpring(const std::vector<float> &curve);
+    static RosenCurveType CreateResponseSpring(const std::vector<float> &curve);
+    static RosenCurveType CreateStepsCurve(const std::vector<float> &curve);
 private:
     static std::unordered_map<std::string, CurveCreator> curveMap;
 };

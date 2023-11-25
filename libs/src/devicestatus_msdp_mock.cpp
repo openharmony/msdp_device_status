@@ -51,6 +51,12 @@ DeviceStatusMsdpMock::DeviceStatusMsdpMock()
 DeviceStatusMsdpMock::~DeviceStatusMsdpMock()
 {
     callbacks_.clear();
+    CloseTimer();
+    if (thread_.joinable()) {
+        thread_.join();
+        FI_HILOGI("thread_ is stop");
+    }
+    alive_ = false;
 }
 
 bool DeviceStatusMsdpMock::Init()
@@ -78,7 +84,6 @@ ErrCode DeviceStatusMsdpMock::UnregisterCallback()
 ErrCode DeviceStatusMsdpMock::Enable(Type type)
 {
     CALL_DEBUG_ENTER;
-    alive_ = true;
     Init();
     return RET_OK;
 }
@@ -86,11 +91,12 @@ ErrCode DeviceStatusMsdpMock::Enable(Type type)
 ErrCode DeviceStatusMsdpMock::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
-    alive_ = false;
     CloseTimer();
-    if (thread_->joinable()) {
-        thread_->join();
+    if (thread_.joinable()) {
+        thread_.join();
+        FI_HILOGI("thread_ is stop");
     }
+    alive_ = false;
     return RET_OK;
 }
 
@@ -221,7 +227,10 @@ int32_t DeviceStatusMsdpMock::RegisterTimerCallback(int32_t fd, const EventType 
 void DeviceStatusMsdpMock::StartThread()
 {
     CALL_DEBUG_ENTER;
-    thread_ = std::make_shared<std::thread>(&DeviceStatusMsdpMock::LoopingThreadEntry, this);
+    if (!alive_) {
+        alive_ = true;
+        thread_ = std::thread(std::bind(&DeviceStatusMsdpMock::LoopingThreadEntry, this));
+    }
 }
 
 void DeviceStatusMsdpMock::LoopingThreadEntry()

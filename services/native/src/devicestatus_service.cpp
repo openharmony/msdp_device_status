@@ -1083,7 +1083,8 @@ int32_t DeviceStatusService::UpdatePreviewStyle(const PreviewStyle &previewStyle
     return ret;
 }
 
-int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation)
+int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
