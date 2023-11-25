@@ -51,12 +51,12 @@ DeviceStatusMsdpMock::DeviceStatusMsdpMock()
 DeviceStatusMsdpMock::~DeviceStatusMsdpMock()
 {
     callbacks_.clear();
+    alive_ = false;
     CloseTimer();
     if (thread_.joinable()) {
         thread_.join();
         FI_HILOGI("thread_ is stop");
     }
-    alive_ = false;
 }
 
 bool DeviceStatusMsdpMock::Init()
@@ -91,12 +91,12 @@ ErrCode DeviceStatusMsdpMock::Enable(Type type)
 ErrCode DeviceStatusMsdpMock::Disable(Type type)
 {
     CALL_DEBUG_ENTER;
+    alive_ = false;
     CloseTimer();
     if (thread_.joinable()) {
         thread_.join();
         FI_HILOGI("thread_ is stop");
     }
-    alive_ = false;
     return RET_OK;
 }
 
