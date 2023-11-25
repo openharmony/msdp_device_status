@@ -374,24 +374,24 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         return;
     }
-    napi_value object = JsUtil::GetActivateInfo(cb);
-    if (object == nullptr) {
-        FI_HILOGE("Activate promise, object is nullptr");
+    napi_value napiObject = JsUtil::GetActivateInfo(cb);
+    if (napiObject == nullptr) {
+        FI_HILOGE("Activate promise, napiObject is nullptr");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
     }
     napi_valuetype valueType = napi_undefined;
-    if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
+    if (napi_typeof(cb->env, napiObject, &valueType) != napi_ok) {
         FI_HILOGE("Activate promise, napi typeof failed");
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
         napi_close_handle_scope(cb->env, handleScope);
         return;
     }
     if (valueType != napi_undefined) {
-        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, handleScope);
+        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, napiObject), REJECT_DEFERRED, handleScope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, handleScope);
+        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, napiObject0), RESOLVE_DEFERRED, handleScope);
     }
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, handleScope);
