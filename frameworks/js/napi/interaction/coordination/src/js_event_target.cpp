@@ -391,7 +391,7 @@ void JsEventTarget::CallActivatePromiseWork(uv_work_t *work, int32_t status)
     if (valueType != napi_undefined) {
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, napiObject), REJECT_DEFERRED, handleScope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, napiObject0), RESOLVE_DEFERRED, handleScope);
+        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, napiObject), RESOLVE_DEFERRED, handleScope);
     }
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
     napi_close_handle_scope(cb->env, handleScope);
