@@ -94,6 +94,7 @@ constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr int32_t ALPHA_SHIFT { 24 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
 const Rosen::RSAnimationTimingCurve SHARP_CURVE = Rosen::RSAnimationTimingCurve::CreateCubicCurve(0.33, 0, 0.67, 1);
+const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
@@ -1212,13 +1213,89 @@ void DragDrawing::ProcessFilter()
     }
 }
 
+void DragDrawing::SetTextEditorAreaFlag(bool textEditorAreaFlag)
+{
+    textEditorAreaFlag_ = textEditorAreaFlag;
+}
+
+int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
+{
+    CALL_DEBUG_ENTER;
+    Rosen::RSAnimationTimingProtocol protocol;
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    CHKPR(g_drawingInfo.parentNode, RET_ERR);
+    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+    Rosen::RSNode::Animate(protocol, SPRING, [&]() {
+        g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
+            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
+        g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
+            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
+    });
+    startNum_ = START_TIME;
+    needDestroyDragWindow_ = false;
+    StartVsync();
+    return RET_OK;
+}
+
+int32_t DragDrawing::CreateEventRunner(int32_t positionX, int32_t positionY)
+{
+    CALL_DEBUG_ENTER;
+    if (handler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        CHKPR(runner, RET_ERR);
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    }
+    if (!handler_->PostTask(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY))) {
+        FI_HILOGE("Send animationExtFunc failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t DragDrawing::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    if (enable) {
-        return RET_OK;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.hasCoordinateCorrected) {
+        return RET_ERR;
     }
-    return RET_ERR;
+    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+    if (!textEditorAreaFlag_) { // Record the initial value to restore
+        resetPixelMapX_ = g_drawingInfo.pixelMapX;
+        resetPixelMapY_ = g_drawingInfo.pixelMapY;
+    }
+    int32_t adjustSize = EIGHT_SIZE * GetScaling();
+    g_drawingInfo.pixelMapX = -(g_drawingInfo.pixelMap->GetWidth() / 2);
+    g_drawingInfo.pixelMapY = -adjustSize;
+    adjustSize = TWELVE_SIZE * GetScaling();
+    int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
+    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
+    // Restore nodes location
+    if (textEditorAreaFlag_ && !enable) {
+        g_drawingInfo.pixelMapX = resetPixelMapX_;
+        g_drawingInfo.pixelMapY = resetPixelMapY_;
+        positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
+        positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
+        if (CreateEventRunner(positionX, positionY) == RET_OK) {
+            FI_HILOGD("CreateEventRunner successfully");
+            return RET_OK;
+        }
+        FI_HILOGE("CreateEventRunner failed");
+        return RET_ERR;
+    }
+
+    // Set 8dp
+    if (!enable || textEditorAreaFlag_) {
+        FI_HILOGD("enable is false or textEditorAreaFlag_ is true");
+        return RET_ERR;
+    }
+    if (CreateEventRunner(positionX, positionY) != RET_OK) {
+        FI_HILOGE("CreateEventRunner failed");
+        return RET_ERR;
+    }
+    FI_HILOGD("CreateEventRunner successfully");
+    textEditorAreaFlag_ = true;
+    return RET_OK;
 }
 
 float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)

@@ -95,6 +95,7 @@ int32_t DragManager::StopDrag(DragResult result, bool hasCustomAnimation)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(result);
     StateChangedNotify(DragState::STOP);
+    dragDrawing_.SetTextEditorAreaFlag(false);
     return RET_OK;
 }
 

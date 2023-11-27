@@ -138,6 +138,7 @@ public:
     void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
+    void SetTextEditorAreaFlag(bool textEditorAreaFlag);
     int32_t EnterTextEditorArea(bool enable);
     bool GetAllowDragState();
     void SetScreenId(uint64_t screenId);
@@ -172,6 +173,8 @@ private:
     void DoDrawMouse();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);
     int32_t UpdateValidDragStyle(DragCursorStyle style);
+    int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
+    int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
 
 private:
     int64_t startNum_ { -1 };
@@ -186,6 +189,9 @@ private:
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
     uint64_t screenId_ { 0 };
+    bool textEditorAreaFlag_ { false };
+    int32_t resetPixelMapX_ { 0 };
+    int32_t resetPixelMapY_ { 0 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
