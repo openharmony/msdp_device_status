@@ -52,7 +52,7 @@ DragData DragDataManager::GetDragData() const
 void DragDataManager::ResetDragData()
 {
     dragData_ = { };
-    dragItemStyle_ = { };
+    previewStyle_ = { };
 }
 
 bool DragDataManager::IsMotionDrag() const

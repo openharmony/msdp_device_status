@@ -74,7 +74,8 @@ public:
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddHotAreaListener();
     int32_t RemoveHotAreaListener();
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t EnterTextEditorArea(bool enable);
 

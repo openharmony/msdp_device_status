@@ -39,7 +39,7 @@ class DragManager : public IDragManager {
 public:
     DragManager() {}
     DISALLOW_COPY_AND_MOVE(DragManager);
-    ~DragManager() = default;
+    ~DragManager();
 
     int32_t Init(IContext* context);
     void OnSessionLost(SessionPtr session);
@@ -71,7 +71,9 @@ public:
     DragResult GetDragResult() const override;
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t EnterTextEditorArea(bool enable);
@@ -143,6 +145,7 @@ private:
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+    std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

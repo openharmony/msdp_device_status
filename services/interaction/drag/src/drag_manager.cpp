@@ -37,6 +37,7 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t INTERVAL_MS { 500 };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr size_t SIGNLE_KEY_ITEM { 1 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -45,11 +46,23 @@ std::atomic<int64_t> g_startFilterTime { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
+DragManager::~DragManager()
+{
+    EventHub::UnRegisterEvent(eventHub_);
+}
+
 int32_t DragManager::Init(IContext* context)
 {
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
+    int32_t repeatCount = 1;
+    context_->GetTimerManager().AddTimer(INTERVAL_MS, repeatCount, [this]() {
+        if (eventHub_ == nullptr) {
+            eventHub_ = EventHub::GetEventHub(context_);
+        }
+        EventHub::RegisterEvent(eventHub_);
+    });
     return RET_OK;
 }
 
@@ -843,19 +856,35 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
 
-int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DragManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");
         return RET_ERR;
     }
-    if (dragItemStyle == DRAG_DATA_MGR.GetDragItemStyle()) {
-        FI_HILOGD("Not need update drag item style");
+    if (previewStyle == DRAG_DATA_MGR.GetPreviewStyle()) {
+        FI_HILOGD("Not need to update previewStyle");
         return RET_OK;
     }
-    FI_HILOGI("Update drag item style successfully");
-    DRAG_DATA_MGR.SetDragItemStyle(dragItemStyle);
-    return dragDrawing_.UpdateDragItemStyle(dragItemStyle);
+    DRAG_DATA_MGR.SetPreviewStyle(previewStyle);
+    FI_HILOGI("Update previewStyle successfully");
+    return dragDrawing_.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    if (previewStyle == DRAG_DATA_MGR.GetPreviewStyle()) {
+        FI_HILOGD("Not need to update previewStyle");
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetPreviewStyle(previewStyle);
+    FI_HILOGI("Update previewStyle successfully");
+    return dragDrawing_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
