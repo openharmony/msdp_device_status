@@ -37,6 +37,7 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragManager" };
 constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t INTERVAL_MS { 500 };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr size_t SIGNLE_KEY_ITEM { 1 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -45,11 +46,23 @@ std::atomic<int64_t> g_startFilterTime { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
+DragManager::~DragManager()
+{
+    EventHub::UnRegisterEvent(eventHub_);
+}
+
 int32_t DragManager::Init(IContext* context)
 {
     CALL_INFO_TRACE;
     CHKPR(context, RET_ERR);
     context_ = context;
+    int32_t repeatCount = 1;
+    context_->GetTimerManager().AddTimer(INTERVAL_MS, repeatCount, [this]() {
+        if (eventHub_ == nullptr) {
+            eventHub_ = EventHub::GetEventHub(context_);
+        }
+        EventHub::RegisterEvent(eventHub_);
+    });
     return RET_OK;
 }
 
