@@ -1920,7 +1920,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_001, TestSize.Level1)
     EXPECT_EQ(dragAction, DragAction::MOVE);
     PrintDragAction(dragAction);
     SimulateUpPointerEvent(
-        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
@@ -1953,6 +1953,8 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
+    SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
     SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
     DragAction dragAction { DragAction::INVALID };
     ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
@@ -1977,8 +1979,163 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     PrintDragAction(dragAction);
     ClearUpKeyEvent();
     SimulateUpPointerEvent(
-        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_INJECT_MS));
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetDragAction_003
+ * @tc.desc: Get drag action with simple press and release keyboard events of keys in start drag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (g_deviceMouseId < 0) {
+        ASSERT_TRUE(g_deviceMouseId < 0);
+    } else {
+        int32_t ret = RET_ERR;
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+            FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+                notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
+        };
+        SimulateDownPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+            MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+        ASSERT_TRUE(dragData);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ASSERT_EQ(ret, RET_OK);
+        DragAction dragAction { DragAction::INVALID };
+        ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+        EXPECT_EQ(ret, RET_OK);
+        EXPECT_EQ(dragAction, DragAction::MOVE);
+        PrintDragAction(dragAction);
+        SimulateUpPointerEvent(
+            { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+        DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+        InteractionManager::GetInstance()->StopDrag(dropResult);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
+        ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+        EXPECT_EQ(ret, RET_ERR);
+    }
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetDragAction_004
+ * @tc.desc: Get drag action with multiple press and release keyboard events of keys in dragging
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownPointerEvent(
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_A);
+    DragAction dragAction { DragAction::INVALID };
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_A);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    ClearUpKeyEvent();
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_B);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::MOVE);
+    ClearUpKeyEvent();
+    SimulateUpPointerEvent(
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_GetDragAction_005
+ * @tc.desc: Get drag action with multiple press and release keyboard events of keys in dragging
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, GetDragAction_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    SimulateDownPointerEvent(
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ASSERT_EQ(ret, RET_OK);
+    SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, true);
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_B);
+    DragAction dragAction { DragAction::INVALID };
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::MOVE);
+    ClearUpKeyEvent();
+    SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_RIGHT);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_B);
+    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(dragAction, DragAction::COPY);
+    ClearUpKeyEvent();
+    SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_RIGHT);
+    ClearUpKeyEvent();
+    SimulateUpPointerEvent(
+        { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
