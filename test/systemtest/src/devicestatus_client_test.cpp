@@ -58,130 +58,36 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    Type type = Type::TYPE_VERTICAL_POSITION;
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    int32_t ret = stationaryMgr->SubscribeCallback(Type::TYPE_VERTICAL_POSITION, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_VERTICAL_POSITION, event, cb);
     ASSERT_EQ(ret, RET_OK);
-}
 
-/**
- * @tc.name: DeviceStatusCallbackTest002
- * @tc.desc: test devicestatus callback in proxy
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest002, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_NE(cb, nullptr);
-    auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    Type type = Type::TYPE_INVALID;
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ret = stationaryMgr->SubscribeCallback(Type::TYPE_INVALID, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_INVALID, event, cb);
     ASSERT_EQ(ret, RET_OK);
-}
 
-/**
- * @tc.name: DeviceStatusCallbackTest003
- * @tc.desc: test devicestatus callback in proxy
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest003, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_NE(cb, nullptr);
-    auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
-    Type type = Type::TYPE_ABSOLUTE_STILL;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ret = stationaryMgr->SubscribeCallback(Type::TYPE_ABSOLUTE_STILL, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_ABSOLUTE_STILL, event, cb);
     ASSERT_EQ(ret, RET_OK);
-}
 
-/**
- * @tc.name: DeviceStatusCallbackTest004
- * @tc.desc: test devicestatus callback in proxy
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    Type type = Type::TYPE_HORIZONTAL_POSITION;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_NE(cb, nullptr);
-    auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ret = stationaryMgr->SubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, event, cb);
     ASSERT_EQ(ret, RET_OK);
-}
 
-/**
- * @tc.name: DeviceStatusCallbackTest005
- * @tc.desc: test devicestatus callback in proxy
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    Type type = Type::TYPE_LID_OPEN;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_NE(cb, nullptr);
-    auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ret = stationaryMgr->SubscribeCallback(Type::TYPE_LID_OPEN, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_LID_OPEN, event, cb);
     ASSERT_EQ(ret, RET_OK);
-}
 
-/**
- * @tc.name: DeviceStatusCallbackTest006
- * @tc.desc: test devicestatus callback in proxy
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest006, TestSize.Level0)
-{
-    CALL_TEST_DEBUG;
-    Type type = Type::TYPE_MAX;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
-    ASSERT_NE(cb, nullptr);
-    auto stationaryMgr = StationaryManager::GetInstance();
-    GTEST_LOG_(INFO) << "Start register";
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ret = stationaryMgr->SubscribeCallback(Type::TYPE_MAX, event, latency, cb);
     ASSERT_EQ(ret, RET_OK);
-    GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_MAX, event, cb);
     ASSERT_EQ(ret, RET_OK);
 }
 
