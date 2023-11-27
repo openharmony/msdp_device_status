@@ -39,7 +39,7 @@ class DragManager : public IDragManager {
 public:
     DragManager() {}
     DISALLOW_COPY_AND_MOVE(DragManager);
-    ~DragManager() = default;
+    ~DragManager();
 
     int32_t Init(IContext* context);
     void OnSessionLost(SessionPtr session);
@@ -142,6 +142,7 @@ private:
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+    std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
