@@ -119,9 +119,9 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
             &DeviceStatusSrvStub::GetDragActionStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE),
-            &DeviceStatusSrvStub::UpdatePreviewStyleStub},
+            &DeviceStatusSrvStub::UpdatePreviewStyleStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
-            &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub}
+            &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }

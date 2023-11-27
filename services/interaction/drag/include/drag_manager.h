@@ -72,7 +72,8 @@ public:
     DragState GetDragState() const override;
     void SetDragState(DragState state) override;
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
-    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,  const PreviewAnimation &animation) override;
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t EnterTextEditorArea(bool enable);

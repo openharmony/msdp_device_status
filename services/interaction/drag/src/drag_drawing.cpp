@@ -1247,6 +1247,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     originStyle.types = previewStyle.types;
     if (auto color = pixelMapNode->GetShowingProperties().GetForegroundColor(); color.has_value()) {
         originStyle.foregroundColor = color->AsArgbInt();
+        originStyle.radius = previewStyle.radius;
     }
     if (ModifyPreviewStyle(pixelMapNode, originStyle) != RET_OK) {
         FI_HILOGE("ModifyPreviewStyle failed");

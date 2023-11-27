@@ -65,7 +65,8 @@ public:
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
-    virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation) override;
+    virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) override;
     virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     virtual int32_t EnterTextEditorArea(bool enable) override;
     virtual int32_t GetDragAction(DragAction& dragAction) override;

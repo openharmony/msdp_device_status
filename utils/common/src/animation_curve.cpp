@@ -17,6 +17,17 @@
 
 #include "devicestatus_define.h"
 
+constexpr int32_t CUBIC_PARAM_LIMIT { 4 };
+constexpr int32_t SPRING_PARAM_LIMIT { 4 };
+constexpr int32_t INTERPOLATING_SPRING_PARAM_LIMIT { 4 };
+constexpr int32_t RESPONSE_SPRING_PARAM_LIMIT { 3 };
+constexpr int32_t STEPS_PARAM_LIMIT { 2 };
+
+constexpr int32_t ARG_0 { 0 };
+constexpr int32_t ARG_1 { 1 };
+constexpr int32_t ARG_2 { 2 };
+constexpr int32_t ARG_3 { 3 };
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -44,48 +55,48 @@ RosenCurveType AnimationCurve::CreateCurve(const std::string &curveName, const s
 
 RosenCurveType AnimationCurve::CreateCubicCurve(const std::vector<float> &curve)
 {
-    if (curve.size() != 4) {
+    if (curve.size() != CUBIC_PARAM_LIMIT) {
         FI_HILOGE("Invalid parameter, use EASE");
         return EASE_CURVE;
     }
-    return RosenCurveType::CreateCubicCurve(curve[0], curve[1], curve[2], curve[3]);
+    return RosenCurveType::CreateCubicCurve(curve[ARG_0], curve[ARG_1], curve[ARG_2], curve[ARG_3]);
 }
 
 RosenCurveType AnimationCurve::CreateSpringCurve(const std::vector<float> &curve)
 {
-    if (curve.size() != 4) {
+    if (curve.size() != SPRING_PARAM_LIMIT) {
         FI_HILOGE("Invalid parameter, use EASE");
         return EASE_CURVE;
     }
-    return RosenCurveType::CreateSpringCurve(curve[0], curve[1], curve[2], curve[3]);
+    return RosenCurveType::CreateSpringCurve(curve[ARG_0], curve[ARG_1], curve[ARG_2], curve[ARG_3]);
 }
 
 RosenCurveType AnimationCurve::CreateInterpolatingSpring(const std::vector<float> &curve)
 {
-    if (curve.size() != 4) {
+    if (curve.size() != INTERPOLATING_SPRING_PARAM_LIMIT) {
         FI_HILOGE("Invalid parameter, use EASE");
         return EASE_CURVE;
     }
-    return RosenCurveType::CreateInterpolatingSpring(curve[0], curve[1], curve[2], curve[3]);
+    return RosenCurveType::CreateInterpolatingSpring(curve[ARG_0], curve[ARG_1], curve[ARG_2], curve[ARG_3]);
 }
 
 RosenCurveType AnimationCurve::CreateResponseSpring(const std::vector<float> &curve)
 {
-    if (curve.size() != 3) {
+    if (curve.size() != RESPONSE_SPRING_PARAM_LIMIT) {
         FI_HILOGE("Invalid parameter, use EASE");
         return EASE_CURVE;
     }
-    return RosenCurveType::CreateSpring(curve[0], curve[1], curve[2]);
+    return RosenCurveType::CreateSpring(curve[ARG_0], curve[ARG_1], curve[ARG_2]);
 }
 
 RosenCurveType AnimationCurve::CreateStepsCurve(const std::vector<float> &curve)
 {
-    if (curve.size() != 2) {
+    if (curve.size() != STEPS_PARAM_LIMIT) {
         FI_HILOGE("Invalid parameter, use EASE");
         return EASE_CURVE;
     }
-    auto steps = static_cast<int32_t>(curve[0]);
-    auto stepPosition = static_cast<OHOS::Rosen::StepsCurvePosition>(static_cast<int32_t>(curve[1]));
+    auto steps = static_cast<int32_t>(curve[ARG_0]);
+    auto stepPosition = static_cast<OHOS::Rosen::StepsCurvePosition>(static_cast<int32_t>(curve[ARG_1]));
     return RosenCurveType::CreateStepsCurve(steps, stepPosition);
 }
 
