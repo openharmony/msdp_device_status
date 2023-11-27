@@ -132,14 +132,15 @@ void DragManager::PrintDragData(const DragData &dragData)
         " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
         " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s,"
+        " hasCoordinateCorrected:%{public}d, summarys:%{public}s",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
         dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
+        GetAnonyString(dragData.udKey).c_str(), dragData.hasCoordinateCorrected, summarys.c_str());
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
