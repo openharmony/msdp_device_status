@@ -1373,8 +1373,10 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
                 node->SetForegroundColor(previewStyle.scale);
                 break;
             }
-            default:
+            default: {
+                FI_HILOGE("Unsupported type");
                 break;
+            }
         }
     }
     return RET_OK;
