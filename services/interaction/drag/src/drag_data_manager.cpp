@@ -114,7 +114,7 @@ void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
     dragData_ = { };
-    dragItemStyle_ = { };
+    previewStyle_ = { };
     dragStyle_ = DragCursorStyle::DEFAULT;
     visible_ = false;
     targetTid_ = -1;
@@ -134,14 +134,14 @@ bool DragDataManager::IsMotionDrag() const
     return isMotionDrag_;
 }
 
-void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
+void DragDataManager::SetPreviewStyle(const PreviewStyle &previewStyle)
 {
-    dragItemStyle_ = dragItemStyle;
+    previewStyle_ = previewStyle;
 }
 
-DragItemStyle DragDataManager::GetDragItemStyle()
+PreviewStyle DragDataManager::GetPreviewStyle()
 {
-    return dragItemStyle_;
+    return previewStyle_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

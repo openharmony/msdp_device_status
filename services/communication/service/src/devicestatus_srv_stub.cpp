@@ -27,6 +27,7 @@
 #include "devicestatus_srv_proxy.h"
 #include "drag_data_packer.h"
 #include "fi_log.h"
+#include "preview_style_packer.h"
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "include/util.h"
@@ -76,9 +77,7 @@ void DeviceStatusSrvStub::InitCoordination()
         { static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
             &DeviceStatusSrvStub::AddSubscriptListenerStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
-            &DeviceStatusSrvStub::RemoveSubscriptListenerStub },
-        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_DRAG_ITEM_STYLE),
-            &DeviceStatusSrvStub::UpdateDragItemStyleStub}
+            &DeviceStatusSrvStub::RemoveSubscriptListenerStub }
     };
 }
 
@@ -119,7 +118,11 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_EXTRAINFO),
             &DeviceStatusSrvStub::GetExtraInfoStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::GET_DRAG_ACTION),
-            &DeviceStatusSrvStub::GetDragActionStub }
+            &DeviceStatusSrvStub::GetDragActionStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE),
+            &DeviceStatusSrvStub::UpdatePreviewStyleStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
+            &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -620,16 +623,37 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel& data, Mess
     return ret;
 }
 
-int32_t DeviceStatusSrvStub::UpdateDragItemStyleStub(MessageParcel& data, MessageParcel& reply)
+int32_t DeviceStatusSrvStub::UpdatePreviewStyleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    DragItemStyle dragItemStyle;
-    READUINT32(data, dragItemStyle.foregroundColor, ERR_INVALID_VALUE);
-    READINT32(data, dragItemStyle.radius, ERR_INVALID_VALUE);
-    READUINT32(data, dragItemStyle.alpha, ERR_INVALID_VALUE);
-    int32_t ret = UpdateDragItemStyle(dragItemStyle);
+    PreviewStyle previewStyle;
+    if (PreviewStylePacker::UnMarshalling(data, previewStyle) != RET_OK) {
+        FI_HILOGE("UnMarshalling previewStyle failed");
+        return RET_ERR;
+    }
+    int32_t ret = UpdatePreviewStyle(previewStyle);
     if (ret != RET_OK) {
-        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+        FI_HILOGE("UpdatePreviewStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    PreviewStyle previewStyle;
+    if (PreviewStylePacker::UnMarshalling(data, previewStyle) != RET_OK) {
+        FI_HILOGE("UnMarshalling previewStyle failed");
+        return RET_ERR;
+    }
+    PreviewAnimation animation;
+    if (PreviewAnimationPacker::UnMarshalling(data, animation) != RET_OK) {
+        FI_HILOGE("UnMarshalling animation failed");
+        return RET_ERR;
+    }
+    int32_t ret = UpdatePreviewStyleWithAnimation(previewStyle, animation);
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdatePreviewStyleWithAnimation failed, ret:%{public}d", ret);
     }
     return ret;
 }

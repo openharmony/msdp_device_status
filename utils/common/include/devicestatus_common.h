@@ -107,6 +107,22 @@ namespace DeviceStatus {
         } \
     } while (0)
 
+#define WRITEINT32VECTOR(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteInt32Vector(data)) { \
+            FI_HILOGE("WriteInt32Vector "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
+#define WRITEFLOATVECTOR(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteFloatVector(data)) { \
+            FI_HILOGE("WriteFloatVector "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
@@ -167,6 +183,22 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadString16(data)) { \
             FI_HILOGE("ReadString16 "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READINT32VECTOR(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadInt32Vector(&data)) { \
+            FI_HILOGE("ReadInt32Vector "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READFLOATVECTOR(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadFloatVector(&data)) { \
+            FI_HILOGE("ReadFloatVector "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)

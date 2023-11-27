@@ -1072,13 +1072,25 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DeviceStatusService::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateDragItemStyle, &dragMgr_, dragItemStyle));
+        std::bind(&DragManager::UpdatePreviewStyle, &dragMgr_, previewStyle));
     if (ret != RET_OK) {
-        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+        FI_HILOGE("UpdatePreviewStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdatePreviewStyleWithAnimation, &dragMgr_, previewStyle, animation));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdatePreviewStyleWithAnimation failed, ret:%{public}d", ret);
     }
     return ret;
 }

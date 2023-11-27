@@ -354,10 +354,17 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t InteractionManagerImpl::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.UpdateDragItemStyle(dragItemStyle);
+    return dragManagerImpl_.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t InteractionManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t InteractionManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys)
