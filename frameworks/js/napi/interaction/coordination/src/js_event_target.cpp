@@ -604,7 +604,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         CHKPC(item->env);
-        if (item->ref !=  temp->ref) {
+        if (item->ref != temp->ref) {
             continue;
         }
 

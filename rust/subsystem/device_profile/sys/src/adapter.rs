@@ -452,7 +452,7 @@ impl Drop for CStringGuard {
         }
         // SAFETY: `data` is valid, because null pointer check has been performed.
         unsafe {
-            if let Some(destruct) =  (*self.data).destruct {
+            if let Some(destruct) = (*self.data).destruct {
                 destruct(self.data);
             }
         }

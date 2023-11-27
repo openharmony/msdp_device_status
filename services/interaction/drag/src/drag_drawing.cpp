@@ -1255,7 +1255,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
-    auto curve =  AnimationCurve::CreateCurve(animation.curveName, animation.curve);
+    auto curve = AnimationCurve::CreateCurve(animation.curveName, animation.curve);
     Rosen::RSNode::Animate(protocol, curve, [&]() {
         if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
             FI_HILOGE("ModifyPreviewStyle failed");
