@@ -48,7 +48,7 @@ bool DeviceStatusAgentListenerMockFirstClient::OnEventResult(
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
     EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
         (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+        devicestatusData.value <= OnChangedValue::VALUE_EXIT));
     return true;
 }
 
@@ -59,7 +59,7 @@ bool DeviceStatusAgentListenerMockSecondClient::OnEventResult(
     GTEST_LOG_(INFO) << "agent value: " << devicestatusData.value;
     EXPECT_TRUE(devicestatusData.type == DeviceStatusAgentTest::g_agentTest &&
         (devicestatusData.value >= OnChangedValue::VALUE_INVALID &&
-        devicestatusData.value <= OnChangedValue::VALUE_ENTER));
+        devicestatusData.value <= OnChangedValue::VALUE_EXIT));
     return true;
 }
 
