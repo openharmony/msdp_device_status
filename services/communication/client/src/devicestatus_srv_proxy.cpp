@@ -93,7 +93,7 @@ void DeviceStatusSrvProxy::Unsubscribe(Type type, ActivityEvent event, sptr<IRem
     }
 }
 
-Data DeviceStatusSrvProxy::GetCache(const Type& type)
+Data DeviceStatusSrvProxy::GetCache(const Type &type)
 {
     CALL_DEBUG_ENTER;
     Data devicestatusData;
@@ -593,7 +593,7 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -764,7 +764,7 @@ int32_t DeviceStatusSrvProxy::GetDragSummary(std::map<std::string, int64_t> &sum
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetDragAction(DragAction& dragAction)
+int32_t DeviceStatusSrvProxy::GetDragAction(DragAction &dragAction)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

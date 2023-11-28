@@ -59,7 +59,7 @@ public:
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback) override;
-    Data GetCache(const Type& type) override;
+    Data GetCache(const Type &type) override;
     bool IsServiceReady() const;
     std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
@@ -84,11 +84,11 @@ public:
     int32_t RemoveSubscriptListener() override;
     int32_t SetDragWindowVisible(bool visible) override;
     int32_t EnterTextEditorArea(bool enable) override;
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) override;
+    int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;
     int32_t GetDragState(DragState &dragState) override;
-    int32_t GetDragAction(DragAction& dragAction) override;
+    int32_t GetDragAction(DragAction &dragAction) override;
     int32_t GetExtraInfo(std::string &extraInfo) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
     int32_t &toReturnClientFd, int32_t &tokenType) override;

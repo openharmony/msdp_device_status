@@ -239,20 +239,20 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
     return RET_OK;
 }
 
-ErrCode DeviceStatusMsdpClientImpl::ImplCallback(const Data& data)
+ErrCode DeviceStatusMsdpClientImpl::ImplCallback(const Data &data)
 {
     CHKPR(callBacksMgr_, RET_ERR);
     callBacksMgr_(data);
     return RET_OK;
 }
 
-ErrCode DeviceStatusMsdpClientImpl::RegisterImpl(const CallbackManager& callback)
+ErrCode DeviceStatusMsdpClientImpl::RegisterImpl(const CallbackManager &callback)
 {
     callBacksMgr_ = callback;
     return RET_OK;
 }
 
-void DeviceStatusMsdpClientImpl::OnResult(const Data& data)
+void DeviceStatusMsdpClientImpl::OnResult(const Data &data)
 {
     FI_HILOGD("type:%{public}d, value:%{public}d", data.type, data.value);
     MsdpCallback(data);
@@ -294,7 +294,7 @@ ErrCode DeviceStatusMsdpClientImpl::UnregisterAlgo()
     return RET_OK;
 }
 
-int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
+int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data &data)
 {
     CALL_DEBUG_ENTER;
     DS_DUMPER->PushDeviceStatus(data);
@@ -306,7 +306,7 @@ int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data& data)
     return RET_OK;
 }
 
-Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data& data)
+Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data &data)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mutex_);

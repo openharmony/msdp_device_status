@@ -1106,7 +1106,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     }
 }
 
-bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
+bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
 {
     if (g_drawingInfo.extraInfo.empty()) {
         FI_HILOGD("the extraInfo is empty");
@@ -1263,7 +1263,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
-    auto curve =  AnimationCurve::CreateCurve(animation.curveName, animation.curve);
+    auto curve = AnimationCurve::CreateCurve(animation.curveName, animation.curve);
     Rosen::RSNode::Animate(protocol, curve, [&]() {
         if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
             FI_HILOGE("ModifyPreviewStyle failed");

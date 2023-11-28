@@ -62,7 +62,7 @@ public:
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
-    int32_t OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
+    int32_t OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(void)> callback) override;
@@ -77,7 +77,7 @@ public:
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
     int32_t EnterTextEditorArea(bool enable);
-    int32_t GetDragAction(DragAction& dragAction) const;
+    int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
@@ -138,7 +138,7 @@ private:
     int32_t pointerEventInterceptorId_ { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
-    int32_t pointerEventMonitorId_  { -1 };
+    int32_t pointerEventMonitorId_ { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
     SessionPtr dragOutSession_ { nullptr };
     DragDrawing dragDrawing_;

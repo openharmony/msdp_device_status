@@ -54,7 +54,7 @@ public:
     ErrCode DisableCount(Type type) override;
     ErrCode RegisterCallback(std::shared_ptr<IMsdp::MsdpAlgoCallback> callback) override;
     ErrCode UnregisterCallback() override;
-    ErrCode NotifyMsdpImpl(const Data& data);
+    ErrCode NotifyMsdpImpl(const Data &data);
     int32_t GetDeviceStatusData();
     std::shared_ptr<MsdpAlgoCallback> GetCallbackImpl()
     {

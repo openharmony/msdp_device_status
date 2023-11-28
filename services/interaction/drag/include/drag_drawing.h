@@ -167,7 +167,7 @@ private:
     int32_t GetFilePath(std::string &filePath);
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
-    bool ParserFilterInfo(FilterInfo& filterInfo);
+    bool ParserFilterInfo(FilterInfo &filterInfo);
     void ProcessFilter();
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
     void DoDrawMouse();

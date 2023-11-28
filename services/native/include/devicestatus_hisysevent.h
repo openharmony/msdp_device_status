@@ -21,8 +21,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-void WriteSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type);
-void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type);
+void WriteSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int32_t type);
+void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int32_t type);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

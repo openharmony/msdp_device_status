@@ -37,14 +37,14 @@ public:
     ErrCode Disable(Type type);
     ErrCode GetSensorHdi(Type type);
     ErrCode GetAlgoAbility(Type type);
-    ErrCode RegisterImpl(const CallbackManager& callback);
-    int32_t MsdpCallback(const Data& data);
+    ErrCode RegisterImpl(const CallbackManager &callback);
+    int32_t MsdpCallback(const Data &data);
     ErrCode StartMock(Type type);
     ErrCode RegisterMock();
     ErrCode UnregisterMock();
     ErrCode RegisterAlgo();
     ErrCode UnregisterAlgo();
-    Data SaveObserverData(const Data& data);
+    Data SaveObserverData(const Data &data);
     std::map<Type, OnChangedValue> GetObserverData() const;
     void GetDeviceStatusTimestamp();
     void GetLongtitude();
@@ -61,10 +61,10 @@ public:
     ErrCode SensorHdiDisable(Type type);
 
 private:
-    ErrCode ImplCallback(const Data& data);
+    ErrCode ImplCallback(const Data &data);
     IMsdp* GetAlgoInst(Type type);
     IMsdp* GetMockInst(Type type);
-    void OnResult(const Data& data) override;
+    void OnResult(const Data &data) override;
 
 private:
     std::shared_ptr<MsdpAlgoCallback> callback_ { nullptr };

@@ -83,7 +83,7 @@ int32_t DragManagerImpl::GetUdKey(std::string &udKey)
     return DeviceStatusClient::GetInstance().GetUdKey(udKey);
 }
 
-int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     DragNotifyMsg notifyMsg;
@@ -114,7 +114,7 @@ int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket&
     return RET_OK;
 }
 
-int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t state = 0;
@@ -130,7 +130,7 @@ int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPa
     return RET_OK;
 }
 
-int32_t DragManagerImpl::OnDragStyleChangedMessage(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t style = 0;
@@ -244,7 +244,7 @@ int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
     return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
 }
 
-int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DragManagerImpl::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY, width, height);
@@ -293,7 +293,7 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
 }
 
-int32_t DragManagerImpl::GetDragAction(DragAction& dragAction)
+int32_t DragManagerImpl::GetDragAction(DragAction &dragAction)
 {
     return DeviceStatusClient::GetInstance().GetDragAction(dragAction);
 }

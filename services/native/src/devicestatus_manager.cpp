@@ -121,13 +121,13 @@ int32_t DeviceStatusManager::InitDataCallback()
     return true;
 }
 
-int32_t DeviceStatusManager::MsdpDataCallback(const Data& data)
+int32_t DeviceStatusManager::MsdpDataCallback(const Data &data)
 {
     NotifyDeviceStatusChange(data);
     return RET_OK;
 }
 
-int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusData)
+int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     FI_HILOGI("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);

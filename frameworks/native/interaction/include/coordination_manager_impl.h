@@ -58,13 +58,13 @@ public:
     void OnCoordinationMessageEvent(int32_t userData, const std::string networkId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);
     int32_t GetUserData() const;
-    int32_t OnCoordinationListener(const StreamClient& client, NetPacket& pkt);
-    int32_t OnCoordinationMessage(const StreamClient& client, NetPacket& pkt);
-    int32_t OnCoordinationState(const StreamClient& client, NetPacket& pkt);
+    int32_t OnCoordinationListener(const StreamClient &client, NetPacket &pkt);
+    int32_t OnCoordinationMessage(const StreamClient &client, NetPacket &pkt);
+    int32_t OnCoordinationState(const StreamClient &client, NetPacket &pkt);
 
     int32_t AddHotAreaListener(HotAreaListenerPtr listener);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
-    int32_t OnHotAreaListener(const StreamClient& client, NetPacket& pkt);
+    int32_t OnHotAreaListener(const StreamClient &client, NetPacket &pkt);
     int32_t RemoveHotAreaListener(HotAreaListenerPtr listener = nullptr);
 
 private:
