@@ -23,7 +23,7 @@
 #include <string>
 
 #include "nocopyable.h"
-#include "session.h"
+#include "socket"
 
 #include "coordination_util.h"
 
@@ -59,9 +59,9 @@ public:
     void Release();
     int32_t OpenInputSoftbus(const std::string &remoteNetworkId);
     void CloseInputSoftbus(const std::string &remoteNetworkId);
-    int32_t OnSessionOpened(int32_t sessionId, int32_t result);
-    void OnSessionClosed(int32_t sessionId);
-    void OnBytesReceived(int32_t sessionId, const void* data, uint32_t dataLen);
+    int32_t OnBind(int32_t socket, PeerSocketInfo info);
+    void OnShutdown(int32_t socket, ShutdownReason reason);
+    void OnBytes(int32_t sessionId, const void* data, uint32_t dataLen);
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
     int32_t SendData(const std::string &networkId, MessageId messageId, void* data, uint32_t dataLen);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
@@ -81,14 +81,12 @@ private:
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();
 
+    std::map<std::string, int32_t> sessionDevs_;
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
-    ISessionListener sessListener_;
-    std::map<std::string, bool> channelStatuss_;
-    std::map<std::string, int32_t> sessionDevs_;
     std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvs_;
-    int32_t sessionId_ { -1 };
+    int32_t socketFd_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
