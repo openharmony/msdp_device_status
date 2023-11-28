@@ -163,7 +163,7 @@ int32_t CoordinationSoftbusAdapter::Init()
         { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
     ISocketListener listener = {
-        .Onbind = BindLink,
+        .OnBind = BindLink,
         .OnShutdown = ShutdownLink,
         .OnBytes = BytesReceived
     };
