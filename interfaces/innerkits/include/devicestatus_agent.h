@@ -32,14 +32,14 @@ public:
     class DeviceStatusAgentEvent {
     public:
         virtual ~DeviceStatusAgentEvent() = default;
-        virtual bool OnEventResult(const Data& devicestatusData) = 0;
+        virtual bool OnEventResult(const Data &devicestatusData) = 0;
     };
 
     class DeviceStatusAgentCallback : public DeviceStatusCallbackStub {
     public:
         explicit DeviceStatusAgentCallback(std::shared_ptr<DeviceStatusAgent> agent) : agent_(agent) {};
         virtual ~DeviceStatusAgentCallback() {};
-        void OnDeviceStatusChanged(const Data& devicestatusData) override;
+        void OnDeviceStatusChanged(const Data &devicestatusData) override;
 
     private:
         std::weak_ptr<DeviceStatusAgent> agent_;

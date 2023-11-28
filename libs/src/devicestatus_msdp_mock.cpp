@@ -108,7 +108,7 @@ ErrCode DeviceStatusMsdpMock::DisableCount(Type type)
     return RET_OK;
 }
 
-ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data& data)
+ErrCode DeviceStatusMsdpMock::NotifyMsdpImpl(const Data &data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(g_msdpMock, RET_ERR);

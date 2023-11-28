@@ -28,7 +28,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 } // namespace
 
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
-    const Data& devicestatusData)
+    const Data &devicestatusData)
 {
     FI_HILOGI("type:%{public}d, value:%{public}d", static_cast<Type>(devicestatusData.type),
         static_cast<OnChangedValue>(devicestatusData.value));

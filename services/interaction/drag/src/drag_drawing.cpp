@@ -1098,7 +1098,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     }
 }
 
-bool DragDrawing::ParserFilterInfo(FilterInfo& filterInfo)
+bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
 {
     if (g_drawingInfo.extraInfo.empty()) {
         FI_HILOGD("the extraInfo is empty");

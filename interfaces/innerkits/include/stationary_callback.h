@@ -30,7 +30,7 @@ public:
         DEVICESTATUS_CHANGE = 0
     };
 
-    virtual void OnDeviceStatusChanged(const Data& devicestatusData) = 0;
+    virtual void OnDeviceStatusChanged(const Data &devicestatusData) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.IRemoteDevStaCallback");
 };
