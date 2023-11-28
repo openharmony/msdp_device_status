@@ -36,16 +36,6 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
-// constexpr int32_t DINPUT_LINK_TYPE_MAX { 4 };
-// const SessionAttribute g_sessionAttr = {
-//     .dataType = SessionType::TYPE_BYTES,
-//     .linkTypeNum = DINPUT_LINK_TYPE_MAX,
-//     .linkType = {
-//         LINK_TYPE_WIFI_P2P,
-//         LINK_TYPE_WIFI_WLAN_2G,
-//         LINK_TYPE_WIFI_WLAN_5G
-//     }
-// };
 
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
@@ -249,9 +239,9 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     };
     int32_t socket = Socket(info);
     QosTV clientQos[] = {
-        { .qos = QOS_TYPE_MIN_BW,             .value = 160 * 1024 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY,             .value = 1600 },
-        { .qos = QOS_TYPE_MIN_LATENCY,             .value = 1600 },
+        { .qos = QOS_TYPE_MIN_BW, .value = 160 * 1024 * 1024 },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = 1600 },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = 1600 },
     };
 
     ISocketListener listener = {
