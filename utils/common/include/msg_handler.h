@@ -43,7 +43,7 @@ public:
         return (GetMsgCallback(id) != nullptr);
     }
 
-    const std::string &GetDebugInfo() const
+    const std::string& GetDebugInfo() const
     {
         std::string str;
         for (auto &iter : callbacks_) {
@@ -57,7 +57,7 @@ public:
         return std::move(str);
     }
 
-    bool RegisterEvent(MsgCallback &msg)
+    bool RegisterEvent(MsgCallback& msg)
     {
         auto it = callbacks_.find(msg.id);
         if (it != callbacks_.end()) {
