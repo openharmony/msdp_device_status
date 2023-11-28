@@ -444,7 +444,7 @@ int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteN
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Remote device not discovered");
+        FI_HILOGE("Failed to discover the remote device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
