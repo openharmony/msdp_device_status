@@ -302,7 +302,7 @@ impl Inner {
             return Err(FusionErrorCode::Fail);
         }
 
-        // let network_id_ptr: *const c_char =  local_node.network_id.as_ptr() as *const c_char;
+        // let network_id_ptr: *const c_char = local_node.network_id.as_ptr() as *const c_char;
         // // SAFETY: no `None` here, cause `network_id_ptr` is valid.
         // let network_id_str = unsafe {CStr::from_ptr(network_id_ptr)};
         // let network_id_slice: &str = network_id_str.to_str().unwrap();
@@ -408,7 +408,7 @@ impl Inner {
         self.init()?;
      
         let data: u8 = 0;
-        let session_attr =  SessionAttribute {
+        let session_attr = SessionAttribute {
             data_type: TYPE_BYTES,
             link_type_num: DINPUT_LINK_TYPE_MAX,
             link_type: [LINK_TYPE_WIFI_WLAN_2G, LINK_TYPE_WIFI_WLAN_5G, LINK_TYPE_WIFI_P2P,
