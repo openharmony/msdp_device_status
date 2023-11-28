@@ -711,18 +711,18 @@ void DragDrawing::OnVsync()
 void DragDrawing::InitDrawingInfo(const DragData &dragData)
 {
     g_drawingInfo.isRunning = true;
+    if (dragData.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return;
+    }
+    g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+    g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
+    g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     g_drawingInfo.currentDragNum = dragData.dragNum;
     g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.displayX = dragData.displayX;
     g_drawingInfo.displayY = dragData.displayY;
-    if (!dragData.shadowInfos.empty()) {
-        g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
-        g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
-        g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
-    } else {
-        FI_HILOGE("ShadowInfos is empty");
-    }
     g_drawingInfo.extraInfo = dragData.extraInfo;
     g_drawingInfo.filterInfo = dragData.filterInfo;
 }

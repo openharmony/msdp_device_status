@@ -1896,7 +1896,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     EXPECT_EQ(ret, RET_OK);
