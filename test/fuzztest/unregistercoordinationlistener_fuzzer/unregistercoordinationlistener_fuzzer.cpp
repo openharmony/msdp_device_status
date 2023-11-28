@@ -34,8 +34,7 @@ const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 bool UnRegisterCoordinationListenerFuzzTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
-    bool isCheckPermission = true;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBool(isCheckPermission) ||
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
         !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
         FI_HILOGE("Write failed");
         return false;
