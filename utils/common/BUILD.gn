@@ -39,8 +39,8 @@ ohos_shared_library("devicestatus_util") {
 
   version_script = "libdevicestatus_util_map"
   sources = [
-    "src/drag_data_packer.cpp",
     "src/animation_curve.cpp",
+    "src/drag_data_packer.cpp",
     "src/preview_style_packer.cpp",
     "src/util.cpp",
     "src/util_napi.cpp",
