@@ -68,7 +68,7 @@ void CooperateIn::PrepareRemoteInput::OnProgress(Context &context, CooperateEven
 void CooperateIn::PrepareRemoteInput::OnReset(Context &context, CooperateEvent &event)
 {
     if (context.isUnchain_) {
-        // UnprepareRemoteInput(prepared_.first, prepared_.second);
+        UnprepareRemoteInput(prepared_.first, prepared_.second);
     }
     Reset(context, event);
 }
