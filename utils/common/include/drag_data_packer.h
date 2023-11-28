@@ -31,17 +31,17 @@ namespace DeviceStatus {
 using SummaryMap = std::map<std::string, int64_t>;
 class DragDataPacker {
 public:
-    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = true);
-    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = true);
+    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = false);
+    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = false);
 };
 
 class ShadowPacker {
 public:
-    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross = true);
-    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross = true);
+    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross = false);
+    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross = false);
 private:
-    static int32_t PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &data, bool isCross = true);
-    static int32_t UnPackShadowInfo(Parcel &data, ShadowInfo &shadowInfo, bool isCross = true);
+    static int32_t PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &data, bool isCross = false);
+    static int32_t UnPackShadowInfo(Parcel &data, ShadowInfo &shadowInfo, bool isCross = false);
 };
 
 class SummaryPacker {
