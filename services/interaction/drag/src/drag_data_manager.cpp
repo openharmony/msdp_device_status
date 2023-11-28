@@ -93,7 +93,7 @@ int32_t DragDataManager::GetTargetPid() const
     return targetPid_;
 }
 
-int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
+int32_t DragDataManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) const
 {
     offsetX = dragData_.shadowInfo.x;
     offsetY = dragData_.shadowInfo.y;

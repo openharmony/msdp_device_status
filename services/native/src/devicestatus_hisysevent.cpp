@@ -25,7 +25,7 @@ constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Devic
 } // namespace
 
 template<typename... Types>
-static void WriteEvent(const std::string& packageName, Types ... args)
+static void WriteEvent(const std::string &packageName, Types ... args)
 {
     int32_t ret = HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::MSDP, packageName,
         HiviewDFX::HiSysEvent::EventType::STATISTIC, args...);
@@ -34,12 +34,12 @@ static void WriteEvent(const std::string& packageName, Types ... args)
     }
 }
 
-void WriteSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type)
+void WriteSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int32_t type)
 {
     WriteEvent("SUBSCRIBE", "UID", uid, "PACKAGE_NAME", packageName, "TYPE", type);
 }
 
-void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string& packageName, int32_t type)
+void WriteUnSubscribeHiSysEvent(int32_t uid, const std::string &packageName, int32_t type)
 {
     WriteEvent("UNSUBSCRIBE", "UID", uid, "PACKAGE_NAME", packageName, "TYPE", type);
 }

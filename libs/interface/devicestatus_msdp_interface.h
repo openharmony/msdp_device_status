@@ -33,7 +33,7 @@ public:
     public:
         MsdpAlgoCallback() = default;
         virtual ~MsdpAlgoCallback() = default;
-        virtual void OnResult(const Data& data) = 0;
+        virtual void OnResult(const Data &data) = 0;
     };
 
     virtual ErrCode RegisterCallback(std::shared_ptr<IMsdp::MsdpAlgoCallback> callback) = 0;

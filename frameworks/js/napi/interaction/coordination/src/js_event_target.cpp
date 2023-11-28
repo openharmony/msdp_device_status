@@ -42,7 +42,7 @@ JsEventTarget::JsEventTarget()
     }
 }
 
-void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId, CoordinationMessage msg)
+void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId, CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
     CHKPV(cb);
@@ -69,7 +69,7 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     }
 }
 
-void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string& remoteNetworkId,
+void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string &remoteNetworkId,
     CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
@@ -97,7 +97,7 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     }
 }
 
-void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string& networkId,
+void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
     CoordinationMessage msg)
 {
     CALL_INFO_TRACE;
