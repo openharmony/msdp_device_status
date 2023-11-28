@@ -59,36 +59,36 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest001, TestSize.Level0)
     ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
-    int32_t ret = stationaryMgr->SubscribeCallback(Type::TYPE_VERTICAL_POSITION, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_VERTICAL_POSITION, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    ActivityEvent activityEvent = ActivityEvent::EVENT_INVALID;
+    int32_t result = stationaryMgr->SubscribeCallback(Type::TYPE_VERTICAL_POSITION, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_VERTICAL_POSITION, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 
-    ret = stationaryMgr->SubscribeCallback(Type::TYPE_INVALID, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_INVALID, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->SubscribeCallback(Type::TYPE_INVALID, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_INVALID, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 
-    ret = stationaryMgr->SubscribeCallback(Type::TYPE_ABSOLUTE_STILL, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_ABSOLUTE_STILL, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->SubscribeCallback(Type::TYPE_ABSOLUTE_STILL, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_ABSOLUTE_STILL, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 
-    ret = stationaryMgr->SubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->SubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_HORIZONTAL_POSITION, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 
-    ret = stationaryMgr->SubscribeCallback(Type::TYPE_LID_OPEN, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_LID_OPEN, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->SubscribeCallback(Type::TYPE_LID_OPEN, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_LID_OPEN, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 
-    ret = stationaryMgr->SubscribeCallback(Type::TYPE_MAX, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
-    ret = stationaryMgr->UnsubscribeCallback(Type::TYPE_MAX, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->SubscribeCallback(Type::TYPE_MAX, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(Type::TYPE_MAX, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 }
 
 /**

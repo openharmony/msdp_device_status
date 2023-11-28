@@ -73,7 +73,9 @@ public:
 
     virtual int32_t AddHotAreaListener() = 0;
     virtual int32_t RemoveHotAreaListener() = 0;
-    virtual int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) = 0;
+    virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
+    virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };
 } // namespace DeviceStatus

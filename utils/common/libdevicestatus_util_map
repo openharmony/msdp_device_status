@@ -40,6 +40,11 @@
             "OHOS::Msdp::DeviceStatus::Utility::Marshalling(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>> const&, OHOS::Parcel&)";
             "OHOS::Msdp::DeviceStatus::Utility::Unmarshalling(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&, OHOS::Parcel&)";
             "OHOS::Msdp::DeviceStatus::Utility::Marshalling(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>> const&, OHOS::Parcel&)";
+            "OHOS::Msdp::DeviceStatus::PreviewStylePacker::Marshalling(OHOS::Msdp::DeviceStatus::PreviewStyle const&, OHOS::Parcel&)";
+            "OHOS::Msdp::DeviceStatus::PreviewStylePacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::PreviewStyle&)";
+            "OHOS::Msdp::DeviceStatus::PreviewAnimationPacker::Marshalling(OHOS::Msdp::DeviceStatus::PreviewAnimation const&, OHOS::Parcel&)";
+            "OHOS::Msdp::DeviceStatus::PreviewAnimationPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::PreviewAnimation&)";
+            "OHOS::Msdp::DeviceStatus::AnimationCurve::CreateCurve(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<float, std::__h::allocator<float>> const&)";
         };
     local:
         *;

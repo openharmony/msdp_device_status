@@ -99,7 +99,9 @@ public:
     bool IsRunning() const override;
     int32_t AddHotAreaListener() override;
     int32_t RemoveHotAreaListener() override;
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) override;
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
 
 private:
