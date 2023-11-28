@@ -121,7 +121,8 @@ public:
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
     void OnDragSuccess();
     void OnDragFail();
@@ -175,6 +176,7 @@ private:
     int32_t UpdateValidDragStyle(DragCursorStyle style);
     int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
     int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
+    int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
 
 private:
     int64_t startNum_ { -1 };

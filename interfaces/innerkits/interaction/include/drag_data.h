@@ -19,6 +19,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "pixel_map.h"
@@ -48,7 +49,6 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
-    bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
 };
 
@@ -88,21 +88,36 @@ struct DragNotifyMsg {
     DragResult result { DragResult::DRAG_FAIL };
 };
 
-struct DragItemStyle {
+enum class PreviewType {
+    FOREGROUND_COLOR = 0,
+    OPACITY = 1,
+    RADIUS = 2,
+    SCALE = 3
+};
+
+struct PreviewStyle {
+    std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };
-    int32_t radius { 0 };
-    uint32_t alpha { 0 };
+    int32_t opacity { -1 };
+    int32_t radius { -1 };
+    int32_t scale { -1 };
 
-    bool operator == (const DragItemStyle &style) const
+    bool operator == (const PreviewStyle &other) const
     {
-        return foregroundColor == style.foregroundColor &&
-               radius == style.radius && alpha == style.alpha;
+        return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
+               radius == other.radius && scale == other.scale;
     }
 
-    bool operator!=(const DragItemStyle &style) const
+    bool operator!=(const PreviewStyle &other) const
     {
-        return !(*this == style);
+        return !(*this == other);
     }
+};
+
+struct PreviewAnimation {
+    int32_t duration { -1 };
+    std::string curveName;
+    std::vector<float> curve;
 };
 
 enum class DragCursorStyle {

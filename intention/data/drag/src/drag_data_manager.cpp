@@ -53,7 +53,7 @@ void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
     dragData_ = { };
-    dragItemStyle_ = { };
+    previewStyle_ = { };
 }
 
 bool DragDataManager::IsMotionDrag() const

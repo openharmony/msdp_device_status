@@ -132,15 +132,14 @@ void DragManager::PrintDragData(const DragData &dragData)
         " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
         " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s,"
-        " hasCoordinateCorrected:%{public}d, summarys:%{public}s",
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
         static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
         dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
         dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
         dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        GetAnonyString(dragData.udKey).c_str(), dragData.hasCoordinateCorrected, summarys.c_str());
+        GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
@@ -833,19 +832,35 @@ void DragManager::MoveTo(int32_t x, int32_t y)
     dragDrawing_.Draw(dragData.displayId, x, y);
 }
 
-int32_t DragManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DragManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");
         return RET_ERR;
     }
-    if (dragItemStyle == DRAG_DATA_MGR.GetDragItemStyle()) {
-        FI_HILOGD("Not need update drag item style");
+    if (previewStyle == DRAG_DATA_MGR.GetPreviewStyle()) {
+        FI_HILOGD("Not need to update previewStyle");
         return RET_OK;
     }
-    FI_HILOGI("Update drag item style successfully");
-    DRAG_DATA_MGR.SetDragItemStyle(dragItemStyle);
-    return dragDrawing_.UpdateDragItemStyle(dragItemStyle);
+    DRAG_DATA_MGR.SetPreviewStyle(previewStyle);
+    FI_HILOGI("Update previewStyle successfully");
+    return dragDrawing_.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    if (previewStyle == DRAG_DATA_MGR.GetPreviewStyle()) {
+        FI_HILOGD("Not need to update previewStyle");
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetPreviewStyle(previewStyle);
+    FI_HILOGI("Update previewStyle successfully");
+    return dragDrawing_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)

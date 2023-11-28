@@ -55,9 +55,6 @@ constexpr int32_t WINDOW_ID { -1 };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
-constexpr int32_t FOREGROUND_COLOR { 0x00FF0000 };
-constexpr int32_t RADIUS { 42 };
-constexpr int32_t ALPHA { 51 };
 const std::string UD_KEY { "Unified data key" };
 const std::string FILTER_INFO { "Undefined filter info" };
 const std::string EXTRA_INFO { "Undefined extra info" };
@@ -69,8 +66,7 @@ public:
     void TearDown();
     static void SetUpTestCase();
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum
-        , bool hasCoordinateCorrected);
+    static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum);
 };
 
 void InteractionDragDrawingTest::SetUpTestCase() {}
@@ -117,7 +113,7 @@ std::shared_ptr<Media::PixelMap> InteractionDragDrawingTest::CreatePixelMap(int3
 }
 
 std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourceType,
-    int32_t pointerId, int32_t dragNum, bool hasCoordinateCorrected)
+    int32_t pointerId, int32_t dragNum)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
@@ -140,7 +136,6 @@ std::optional<DragData> InteractionDragDrawingTest::CreateDragData(int32_t sourc
     dragData.displayY = DISPLAY_Y;
     dragData.displayId = DISPLAY_ID;
     dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
-    DragData.hasCoordinateCorrected = hasCoordinateCorrected;
     return dragData;
 }
 
@@ -154,7 +149,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_On
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
@@ -205,7 +200,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_Mu
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_MULTIPLE, false);
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_MULTIPLE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -249,7 +244,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -283,7 +278,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE);
     ASSERT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
@@ -331,7 +326,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateShadowPic,
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -368,7 +363,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_Animation,
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -400,7 +395,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
@@ -413,39 +408,6 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-}
-
-/**
- * @tc.name: InteractionDragDrawingTest_UpdateDragItemStyle
- * @tc.desc: Drag Drawing
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateDragItemStyle, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::promise<bool> promiseFlag;
-    std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
-            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
-        promiseFlag.set_value(true);
-    };
-    std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false);
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-    ASSERT_EQ(ret, RET_OK);
-    DragItemStyle dragItemStyle { FOREGROUND_COLOR, RADIUS, ALPHA };
-    ret = InteractionManager::GetInstance()->UpdateDragItemStyle(dragItemStyle);
-    ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->SetDragWindowVisible(DRAG_WINDOW_VISIBLE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-    ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
-    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
-    ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
 }
 
 /**
@@ -465,17 +427,14 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
-    FI_HILOGD("ret:%{public}d", ret);
     EXPECT_EQ(ret, RET_OK);
-    // Restore nodes location
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
     ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
-    FI_HILOGD("ret:%{public}d", ret);
     EXPECT_EQ(ret, RET_OK);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -500,34 +459,16 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
-    FI_HILOGD("ret:%{public}d", ret);
     EXPECT_EQ(ret, RET_ERR);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
-}
-
-/**
- * @tc.name: EnterTextEditorArea003
- * @tc.desc: abnormal test for pixelMap 8dp bit movement effect
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, true);
-    ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
-    FI_HILOGD("ret:%{public}d", ret);
-    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
