@@ -125,6 +125,7 @@ void DragManager::PrintDragData(const DragData &dragData)
 {
     CALL_INFO_TRACE;
     for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPV(shadowInfo.pixelMap);
         FI_HILOGI("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
             " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
             static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
