@@ -27,7 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusSrvProxy : public IRemoteProxy<Idevicestatus> {
 public:
-    explicit DeviceStatusSrvProxy(const sptr<IRemoteObject> &impl)
+    explicit DeviceStatusSrvProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<Idevicestatus>(impl) {}
     DISALLOW_COPY_AND_MOVE(DeviceStatusSrvProxy);
     ~DeviceStatusSrvProxy() = default;

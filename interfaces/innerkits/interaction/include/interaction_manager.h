@@ -61,7 +61,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
-    int32_t PrepareCoordination(std::function<void(const std::string &, CoordinationMessage)> callback,
+    int32_t PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
         bool isCheckPermission = false);
 
     /**
@@ -70,7 +70,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 9
      */
-    int32_t UnprepareCoordination(std::function<void(const std::string &, CoordinationMessage)> callback,
+    int32_t UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
         bool isCheckPermission = false);
 
     /**
@@ -82,7 +82,7 @@ public:
      * @since 9
      */
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(const std::string &, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission = false);
 
     /**
      * @brief Stops screen hopping for the mouse pointer.
@@ -93,7 +93,7 @@ public:
      * @since 9
      */
     int32_t DeactivateCoordination(bool isUnchained,
-        std::function<void(const std::string &, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission = false);
 
     /**
      * @brief Obtains the screen hopping status of a mouse pointer.

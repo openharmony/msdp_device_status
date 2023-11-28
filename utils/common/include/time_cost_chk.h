@@ -29,7 +29,7 @@ template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimeCostChk" };
 public:
-    TimeCostChk(const std::string &strReason, const std::string &strOutputStr, int64_t tmChk, T llParam1,
+    TimeCostChk(const std::string& strReason, const std::string& strOutputStr, int64_t tmChk, T llParam1,
                 int64_t llParam2 = 0)
         : beginTime_(std::chrono::high_resolution_clock::now()),
           strOutput_(strOutputStr),

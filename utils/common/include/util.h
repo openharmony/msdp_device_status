@@ -88,12 +88,12 @@ bool MultiplyInt(T op1, T op2, T minVal, T maxVal, T &res)
     return true;
 }
 
-inline bool MultiplyInt32(int32_t op1, int32_t op2, int32_t &res)
+inline bool MultiplyInt32(int32_t op1, int32_t op2, int32_t& res)
 {
     return MultiplyInt(op1, op2, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max(), res);
 }
 
-inline bool MultiplyInt64(int64_t op1, int64_t op2, int64_t &res)
+inline bool MultiplyInt64(int64_t op1, int64_t op2, int64_t& res)
 {
     return MultiplyInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
 }
