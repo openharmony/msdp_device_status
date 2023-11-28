@@ -80,7 +80,6 @@ void CooperateFree::Initial::OnReset(Context &context, CooperateEvent &event)
     CALL_INFO_TRACE;
 }
 
-
 void  CooperateFree::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateFree &parent)
 {
     CALL_INFO_TRACE;
