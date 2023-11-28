@@ -380,7 +380,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("Sending sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -405,7 +405,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("The sendMsg send failed, ret:%{public}d", ret);
+        FI_HILOGE("SendMsg sending failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -433,7 +433,7 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Send the sendMsg failed, ret:%{public}d", ret);
+        FI_HILOGE("Sending sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -469,7 +469,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(originNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the origin device");
+        FI_HILOGE("Failed to discover the original device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[originNetworkId];
@@ -482,7 +482,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("The sendMsg is failed to send, ret:%{public}d", ret);
+        FI_HILOGE("Sending sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
