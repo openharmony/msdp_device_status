@@ -1,0 +1,312 @@
+diff --git a/frameworks/native/interaction/src/drag_data_util.cpp b/frameworks/native/interaction/src/drag_data_util.cpp
+index 2a2f4e3c..2469690e 100644
+--- a/frameworks/native/interaction/src/drag_data_util.cpp
++++ b/frameworks/native/interaction/src/drag_data_util.cpp
+@@ -24,14 +24,14 @@ namespace Msdp {
+ 
+ namespace DeviceStatus {
+ 
+-int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data)
++int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data, bool isCross)
+ {
+-    return DragDataPacker::Marshalling(dragData, data);
++    return DragDataPacker::Marshalling(dragData, data, isCross);
+ }
+ 
+-int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData)
++int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData, bool isCross)
+ {
+-    return DragDataPacker::UnMarshalling(data, dragData);
++    return DragDataPacker::UnMarshalling(data, dragData, isCross);
+ }
+ 
+ } // namespace DeviceStatus
+diff --git a/frameworks/native/interaction/test/unittest/src/interaction_manager_test.cpp b/frameworks/native/interaction/test/unittest/src/interaction_manager_test.cpp
+index 9c4313dc..4b0a817f 100644
+--- a/frameworks/native/interaction/test/unittest/src/interaction_manager_test.cpp
++++ b/frameworks/native/interaction/test/unittest/src/interaction_manager_test.cpp
+@@ -2003,10 +2003,31 @@ HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer, TestSize.Level1)
+         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+     ASSERT_TRUE(dragData);
+     Parcel parcel;
+-    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel);
++    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel, false);
+     ASSERT_EQ(ret, RET_OK);
+     DragData dragDataFromParcel;
+-    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel);
++    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel, false);
++    ASSERT_EQ(ret, RET_OK);
++    ASSERT_EQ(dragData.value(), dragDataFromParcel);
++}
++
++/**
++ * @tc.name: TestDragDataUtil_Packer_Cross
++ * @tc.desc: Pack up dragData
++ * @tc.type: FUNC
++ * @tc.require:
++ */
++HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer_Cross, TestSize.Level1)
++{
++    CALL_TEST_DEBUG;
++    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
++        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
++    ASSERT_TRUE(dragData);
++    Parcel parcel;
++    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel, true);
++    ASSERT_EQ(ret, RET_OK);
++    DragData dragDataFromParcel;
++    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel, true);
+     ASSERT_EQ(ret, RET_OK);
+     ASSERT_EQ(dragData.value(), dragDataFromParcel);
+ }
+@@ -2023,7 +2044,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_001, TestSize.Level1)
+     std::promise<bool> promiseFlag;
+     std::future<bool> futureFlag = promiseFlag.get_future();
+     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
++        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+         promiseFlag.set_value(true);
+     };
+@@ -2062,7 +2083,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
+     std::promise<bool> promiseFlag;
+     std::future<bool> futureFlag = promiseFlag.get_future();
+     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+-        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
++        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+         promiseFlag.set_value(true);
+     };
+diff --git a/interfaces/innerkits/interaction/include/drag_data_util.h b/interfaces/innerkits/interaction/include/drag_data_util.h
+index 2a355585..83b4932e 100644
+--- a/interfaces/innerkits/interaction/include/drag_data_util.h
++++ b/interfaces/innerkits/interaction/include/drag_data_util.h
+@@ -25,8 +25,8 @@ namespace Msdp {
+ namespace DeviceStatus {
+ class DragDataUtil {
+ public:
+-    static int32_t Marshalling(const DragData &dragData, Parcel &data);
+-    static int32_t UnMarshalling(Parcel &data, DragData &dragData);
++    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = true);
++    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = true);
+ };
+ } // namespace DeviceStatus
+ } // namespace Msdp
+diff --git a/interfaces/innerkits/libdevicestatus_client_map b/interfaces/innerkits/libdevicestatus_client_map
+index c91c96a5..99ca4810 100644
+--- a/interfaces/innerkits/libdevicestatus_client_map
++++ b/interfaces/innerkits/libdevicestatus_client_map
+@@ -57,8 +57,8 @@
+             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&)";
+             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";
+             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDropType(OHOS::Msdp::DeviceStatus::DropType&)";
+-            "OHOS::Msdp::DeviceStatus::DragDataUtil::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&)";
+-            "OHOS::Msdp::DeviceStatus::DragDataUtil::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&)";
++            "OHOS::Msdp::DeviceStatus::DragDataUtil::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&, bool)";
++            "OHOS::Msdp::DeviceStatus::DragDataUtil::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&, bool)";
+             "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
+             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragAction(OHOS::Msdp::DeviceStatus::DragAction&)";
+             "OHOS::Msdp::DeviceStatus::InteractionManager::GetExtraInfo(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+diff --git a/test/systemtest/src/devicestatus_client_test.cpp b/test/systemtest/src/devicestatus_client_test.cpp
+index 7e198218..881d2c98 100644
+--- a/test/systemtest/src/devicestatus_client_test.cpp
++++ b/test/systemtest/src/devicestatus_client_test.cpp
+@@ -125,18 +125,18 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
+ {
+     CALL_TEST_DEBUG;
+     Type type = Type::TYPE_HORIZONTAL_POSITION;
+-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
++    ActivityEvent activityEvent = ActivityEvent::EVENT_INVALID;
+     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
+     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
+     ASSERT_NE(cb, nullptr);
+     auto stationaryMgr = StationaryManager::GetInstance();
+     GTEST_LOG_(INFO) << "Start register";
+-    int32_t ret = RET_OK;
+-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+-    ASSERT_EQ(ret, RET_OK);
++    int32_t result = RET_OK;
++    result = stationaryMgr->SubscribeCallback(type, activityEvent, latency, cb);
++    ASSERT_EQ(result, RET_OK);
+     GTEST_LOG_(INFO) << "Cancel register";
+-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+-    ASSERT_EQ(ret, RET_OK);
++    result = stationaryMgr->UnsubscribeCallback(type, activityEvent, cb);
++    ASSERT_EQ(result, RET_OK);
+ }
+ 
+ /**
+@@ -154,12 +154,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
+     ASSERT_NE(cb, nullptr);
+     auto stationaryMgr = StationaryManager::GetInstance();
+     GTEST_LOG_(INFO) << "Start register";
+-    int32_t ret = RET_OK;
+-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+-    ASSERT_EQ(ret, RET_OK);
++    int32_t result = RET_OK;
++    result = stationaryMgr->SubscribeCallback(type, event, latency, cb);
++    ASSERT_EQ(result, RET_OK);
+     GTEST_LOG_(INFO) << "Cancel register";
+-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
+-    ASSERT_EQ(ret, RET_OK);
++    result = stationaryMgr->UnsubscribeCallback(type, event, cb);
++    ASSERT_EQ(result, RET_OK);
+ }
+ 
+ /**
+diff --git a/utils/common/include/drag_data_packer.h b/utils/common/include/drag_data_packer.h
+index 74c0f602..0a502bf9 100644
+--- a/utils/common/include/drag_data_packer.h
++++ b/utils/common/include/drag_data_packer.h
+@@ -31,14 +31,17 @@ namespace DeviceStatus {
+ using SummaryMap = std::map<std::string, int64_t>;
+ class DragDataPacker {
+ public:
+-    static int32_t Marshalling(const DragData &dragData, Parcel &data);
+-    static int32_t UnMarshalling(Parcel &data, DragData &dragData);
++    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = false);
++    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = false);
+ };
+ 
+ class ShadowPacker {
+ public:
+-    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data);
+-    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos);
++    static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross = false);
++    static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross = false);
++private:
++    static int32_t PackUpPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, Parcel &data, bool isCross = false);
++    static int32_t UnPackPixelMap(Parcel &data, std::shared_ptr<OHOS::Media::PixelMap> pixelMap, bool isCross = false);
+ };
+ 
+ class SummaryPacker {
+diff --git a/utils/common/libdevicestatus_util_map b/utils/common/libdevicestatus_util_map
+index cb9a631a..6c654a75 100644
+--- a/utils/common/libdevicestatus_util_map
++++ b/utils/common/libdevicestatus_util_map
+@@ -36,8 +36,8 @@
+             "OHOS::Msdp::DeviceStatus::StringSplit(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
+             "OHOS::Msdp::DeviceStatus::StringPrintf(char const*, ...)";
+             "OHOS::Msdp::DeviceStatus::GetAnonyString(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+-            "OHOS::Msdp::DeviceStatus::DragDataPacker::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&)";
+-            "OHOS::Msdp::DeviceStatus::DragDataPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&)";
++            "OHOS::Msdp::DeviceStatus::DragDataPacker::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&, bool)";
++            "OHOS::Msdp::DeviceStatus::DragDataPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&, bool)";
+             "OHOS::Msdp::DeviceStatus::SummaryPacker::UnMarshalling(OHOS::Parcel&, std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&)";
+             "OHOS::Msdp::DeviceStatus::SummaryPacker::Marshalling(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>> const&, OHOS::Parcel&)";
+             "OHOS::Msdp::DeviceStatus::SummaryPacker::UnMarshalling(OHOS::Parcel&, std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";
+diff --git a/utils/common/src/drag_data_packer.cpp b/utils/common/src/drag_data_packer.cpp
+index 8733992e..580f925c 100644
+--- a/utils/common/src/drag_data_packer.cpp
++++ b/utils/common/src/drag_data_packer.cpp
+@@ -27,9 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDat
+ 
+ namespace DeviceStatus {
+ 
+-int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
++int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool isCross)
+ {
+-    if (ShadowPacker::Marshalling(dragData.shadowInfos, data) != RET_OK) {
++    if (ShadowPacker::Marshalling(dragData.shadowInfos, data, isCross) != RET_OK) {
+         FI_HILOGE("Failed to marshalling shadowInfos");
+         return RET_ERR;
+     }
+@@ -51,9 +51,9 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
+     return RET_OK;
+ }
+ 
+-int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
++int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData, bool isCross)
+ {
+-    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos) != RET_OK) {
++    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos, isCross) != RET_OK) {
+         FI_HILOGE("UnMarshallingShadowInfos failed");
+         return RET_ERR;
+     }
+@@ -75,7 +75,7 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
+     return RET_OK;
+ }
+ 
+-int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data)
++int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross)
+ {
+     CALL_DEBUG_ENTER;
+     if (shadowInfos.empty()) {
+@@ -91,9 +91,9 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
+     WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
+     for (int32_t i = 0; i < shadowNum; i++) {
+         CHKPR(shadowInfos[i].pixelMap, RET_ERR);
+-        if (!shadowInfos[i].pixelMap->Marshalling(data)) {
+-            FI_HILOGE("Failed to marshalling pixelMap");
+-            return ERR_INVALID_VALUE;
++        if (PackUpPixelMap(shadowInfos[i].pixelMap, data, isCross) != RET_OK) {
++            FI_HILOGE("PackUpPixelMap failed");
++            return RET_ERR;
+         }
+         WRITEINT32(data, shadowInfos[i].x, ERR_INVALID_VALUE);
+         WRITEINT32(data, shadowInfos[i].y, ERR_INVALID_VALUE);
+@@ -101,7 +101,7 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
+     return RET_OK;
+ }
+ 
+-int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos)
++int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross)
+ {
+     CALL_DEBUG_ENTER;
+     int32_t shadowNum { 0 };
+@@ -112,9 +112,10 @@ int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shado
+     }
+     for (int32_t i = 0; i < shadowNum; i++) {
+         ShadowInfo shadowInfo;
+-        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+-        CHKPR(pixelMap, RET_ERR);
+-        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
++        if (UnPackPixelMap(data, shadowInfo.pixelMap, isCross) != RET_OK) {
++            FI_HILOGE("UnPackPixelMap failed");
++            return RET_ERR;
++        }
+         READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+         READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+         shadowInfos.push_back(shadowInfo);
+@@ -122,6 +123,41 @@ int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shado
+     return RET_OK;
+ }
+ 
++int32_t ShadowPacker::PackUpPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap, Parcel &data, bool isCross)
++{
++    CALL_DEBUG_ENTER;
++    if (isCross) {
++        std::vector<uint8_t> pixelBuffer;
++        if (!pixelMap->EncodeTlv(pixelBuffer)) {
++            FI_HILOGE("EncodeTlv pixelMap failed");
++            return ERR_INVALID_VALUE;
++        }
++        WRITEUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
++    } else {
++        if (!pixelMap->Marshalling(data)) {
++            FI_HILOGE("Marshalling pixelMap failed");
++            return ERR_INVALID_VALUE;
++        }
++    }
++    return RET_OK;
++}
++
++int32_t ShadowPacker::UnPackPixelMap(Parcel &data, std::shared_ptr<OHOS::Media::PixelMap> pixelMap, bool isCross)
++{
++    CALL_DEBUG_ENTER;
++    Media::PixelMap *rawPixelMap = nullptr;
++    if (isCross) {
++        std::vector<uint8_t> pixelBuffer;
++        READUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
++        rawPixelMap = Media::PixelMap::DecodeTlv(pixelBuffer);
++    } else {
++        rawPixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
++    }
++    CHKPR(rawPixelMap, RET_ERR);
++    pixelMap = std::shared_ptr<Media::PixelMap>(rawPixelMap);
++    return RET_OK;
++}
++
+ int32_t SummaryPacker::Marshalling(const SummaryMap &val, Parcel &parcel)
+ {
+     WRITEINT32(parcel, static_cast<int32_t>(val.size()), ERR_INVALID_VALUE);
