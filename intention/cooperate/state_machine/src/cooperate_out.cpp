@@ -48,8 +48,7 @@ void CooperateOut::OnLeaveState(Context & context)
     CALL_DEBUG_ENTER;
 }
 
-CooperateOut::Initial::Initial(CooperateOut &parent)
-    : ICooperateStep(parent, nullptr)
+CooperateOut::Initial::Initial(CooperateOut &parent) : ICooperateStep(parent, nullptr)
 {}
 
 void CooperateOut::Initial::OnEvent(Context &context, CooperateEvent &event)
@@ -119,7 +118,8 @@ void CooperateOut::UnprepareRemoteInput::OnEvent(Context &context, CooperateEven
 
 void CooperateOut::UnprepareRemoteInput::OnProgress(Context &context, CooperateEvent &event)
 {
-    FI_HILOGD("unprepare remote input (remote:%{public}s)", context.cooperated_.c_str());
+    CALL_DEBUG_ENTER;
+    FI_HILOGD("Unprepare remote input remote: %{public}s", context.cooperated_.c_str());
     context.sender.Send(CooperateEvent(CooperateEventType::UPDATE_STATE, UpdateStateEvent {
         .current = 0,
     }));
