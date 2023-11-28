@@ -36,7 +36,9 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
-
+constexpr uint32_t QOS_LEN = 3;
+constexpr int32_t MIN_BW = 160 * 1024 * 1024;
+constexpr int32_t LATENCY = 1600;
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
@@ -149,7 +151,6 @@ int32_t CoordinationSoftbusAdapter::Init()
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
-
     SocketInfo info = {
         .name = name,
         .pkgName = pkgName,
@@ -157,16 +158,16 @@ int32_t CoordinationSoftbusAdapter::Init()
     };
     socketFd_ = Socket(info);
     QosTV serverQos[] = {
-        { .qos = QOS_TYPE_MIN_BW,             .value = 160 * 1024 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY,             .value = 1600 },
-        { .qos = QOS_TYPE_MIN_LATENCY,             .value = 1600 },
+        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
     ISocketListener listener = {
         .Onbind = BindLink,
         .OnShutdown = ShutdownLink,
         .OnBytes = BytesReceived
     };
-    int32_t ret = Listen(socketFd_, serverQos, 3, &listener);
+    int32_t ret = Listen(socketFd_, serverQos, QOS_LEN, &listener);
     if (ret == 0) {
         FI_HILOGI("server set ok");
     } else {
@@ -210,20 +211,18 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
     }
-
     char name[DEVICE_NAME_SIZE_MAX] = {};
     if (strcpy_s(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != EOK) {
         FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
     std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
-    char peerName[DEVICE_NAME_SIZE_MAX0] = {};
+    char peerName[DEVICE_NAME_SIZE_MAX] = {};
     if (strcpy_s(peerName, DEVICE_NAME_SIZE_MAX, peerSessionName.c_str()) != EOK) {
         FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
         return RET_ERR;
     }
     FI_HILOGI("PeerSessionName:%{public}s", peerSessionName.c_str());
-    
     char peerNetworkId[PKG_NAME_SIZE_MAX] = {};
     if (strcpy_s(peerNetworkId, DEVICE_NAME_SIZE_MAX, remoteNetworkId.c_str()) != EOK) {
         FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
@@ -239,17 +238,16 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     };
     int32_t socket = Socket(info);
     QosTV clientQos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = 160 * 1024 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = 1600 },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = 1600 },
+        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
-
     ISocketListener listener = {
         .Onbind = BindLink,
         .OnShutdown = ShutdownLink,
         .OnBytes = BytesReceived
     };
-    int32_t ret = Bind(socket, clientQos, 3, &listener);
+    int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
     if (ret == 0) {
         FI_HILOGI("bind success");
         sessionDevs_[remoteNetworkId] = socket;
