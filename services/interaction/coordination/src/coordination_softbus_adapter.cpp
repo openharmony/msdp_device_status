@@ -39,7 +39,6 @@ std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr uint32_t QOS_LEN = 3;
 constexpr int32_t MIN_BW = 160 * 1024 * 1024;
 constexpr int32_t LATENCY = 1600;
-constexpr std::string SESSION_NAME = "ohos.msdp.device_status.";
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
@@ -169,7 +168,7 @@ int32_t CoordinationSoftbusAdapter::Init()
         .OnBytes = BytesReceived
     };
     int32_t ret = Listen(socketFd_, serverQos, QOS_LEN, &listener);
-    if (ret == 0) {
+    if (ret == RET_OK) {
         FI_HILOGI("server set ok");
     } else {
         FI_HILOGE("server set failed, ret:%{public}d", ret);
@@ -207,6 +206,7 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
+    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     if (CheckDeviceSessionState(remoteNetworkId)) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
@@ -242,12 +242,12 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
     };
     ISocketListener listener = {
-        .Onbind = BindLink,
+        .OnBind = BindLink,
         .OnShutdown = ShutdownLink,
         .OnBytes = BytesReceived
     };
     int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
-    if (ret == 0) {
+    if (ret == RET_OK) {
         FI_HILOGI("bind success");
         sessionDevs_[remoteNetworkId] = socket;
     } else {
@@ -280,7 +280,7 @@ void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteNetw
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
 
-    CloseSession(sessionId);
+    Shutdown(sessionId);
     sessionDevs_.erase(remoteNetworkId);
 }
 
@@ -531,7 +531,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::st
 void CoordinationSoftbusAdapter::OnBytes(int32_t socket, const void *data, uint32_t dataLen)
 {
     FI_HILOGD("dataLen:%{public}d", dataLen);
-    if ((sessionId < 0) || (data == nullptr) || (dataLen <= 0)) {
+    if ((socket < 0) || (data == nullptr) || (dataLen <= 0)) {
         FI_HILOGE("Param check failed");
         return;
     }
