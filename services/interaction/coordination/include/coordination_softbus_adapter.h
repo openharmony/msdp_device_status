@@ -61,7 +61,7 @@ public:
     void CloseInputSoftbus(const std::string &remoteNetworkId);
     int32_t OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
-    void OnBytes(int32_t sessionId, const void* data, uint32_t dataLen);
+    void OnBytes(int32_t socket, const void* data, uint32_t dataLen);
     void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
     int32_t SendData(const std::string &networkId, MessageId messageId, void* data, uint32_t dataLen);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
@@ -73,10 +73,10 @@ public:
 private:
     CoordinationSoftbusAdapter() = default;
     DISALLOW_COPY_AND_MOVE(CoordinationSoftbusAdapter);
-    std::string FindDevice(int32_t sessionId);
-    int32_t SendMsg(int32_t sessionId, const std::string &message);
+    std::string FindDevice(int32_t socket);
+    int32_t SendMsg(int32_t socket, const std::string &message);
     bool CheckDeviceSessionState(const std::string &remoteNetworkId);
-    void HandleSessionData(int32_t sessionId, const std::string &messageData);
+    void HandleSessionData(int32_t socket, const std::string &messageData);
     void HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();

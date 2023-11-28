@@ -39,6 +39,7 @@ std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr uint32_t QOS_LEN = 3;
 constexpr int32_t MIN_BW = 160 * 1024 * 1024;
 constexpr int32_t LATENCY = 1600;
+constexpr std::string SESSION_NAME = "ohos.msdp.device_status.";
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
@@ -206,7 +207,6 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
-    const std::string SESSION_NAME = "ohos.msdp.device_status.";
     if (CheckDeviceSessionState(remoteNetworkId)) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
@@ -222,9 +222,8 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
         return RET_ERR;
     }
-    FI_HILOGI("PeerSessionName:%{public}s", peerSessionName.c_str());
     char peerNetworkId[PKG_NAME_SIZE_MAX] = {};
-    if (strcpy_s(peerNetworkId, DEVICE_NAME_SIZE_MAX, remoteNetworkId.c_str()) != EOK) {
+    if (strcpy_s(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != EOK) {
         FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
         return RET_ERR;
     }
@@ -493,7 +492,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     return RET_OK;
 }
 
-void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string &message)
+void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::string &message)
 {
     if (message.empty()) {
         FI_HILOGE("Handle session data, message is empty");
@@ -526,7 +525,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         return;
     }
-    HandleCoordinationSessionData(sessionId, parser);
+    HandleCoordinationSessionData(socket, parser);
 }
 
 void CoordinationSoftbusAdapter::OnBytes(int32_t socket, const void *data, uint32_t dataLen)
