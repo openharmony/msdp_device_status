@@ -21,9 +21,7 @@
 
 namespace OHOS {
 namespace Msdp {
-
 namespace DeviceStatus {
-
 int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data)
 {
     return DragDataPacker::Marshalling(dragData, data);
@@ -33,7 +31,6 @@ int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData)
 {
     return DragDataPacker::UnMarshalling(data, dragData);
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
