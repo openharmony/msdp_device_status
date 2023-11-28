@@ -31,7 +31,7 @@ CooperateFree::CooperateFree()
 void CooperateFree::OnEvent(Context &context, CooperateEvent &event)
 {
     CALL_INFO_TRACE;
-    if(current_ != nullptr) {
+    if (current_ != nullptr) {
         current_->OnEvent(context, event);
     } else {
         FI_HILOGE("In CooperateFree::OnEvent, current step is null");
@@ -146,7 +146,8 @@ void CooperateFree::StartRemoteInput::OnEvent(Context &context, CooperateEvent &
         case CooperateEventType::START_DINPUT_RESULT: {
             StartRemoteInputResult result = std::get<StartRemoteInputResult>(event.event);
             if (result.success) {
-                context.sender.Send(CooperateEvent(CooperateEventType::UPDATE_STATE, UpdateStateEvent { .current = 1,}));
+                context.sender.Send(CooperateEvent(CooperateEventType::UPDATE_STATE,
+                    UpdateStateEvent { .current = 1 }));
                 Proceed(context, event);
             } else {
                 Reset(context, event);
