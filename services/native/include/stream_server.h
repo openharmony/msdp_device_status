@@ -47,20 +47,20 @@ public:
     DISALLOW_COPY_AND_MOVE(StreamServer);
     virtual ~StreamServer();
     void UdsStop();
-    bool SendMsg(int32_t fd, NetPacket& pkt);
-    void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
+    bool SendMsg(int32_t fd, NetPacket &pkt);
+    void Multicast(const std::vector<int32_t> &fdList, NetPacket &pkt);
     int32_t GetClientFd(int32_t pid) const;
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(int32_t pid, std::function<void(SessionPtr)> callback);
-    int32_t AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid, int32_t pid,
-        int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType) override;
+    int32_t AddSocketPairInfo(const std::string &programName, int32_t moduleType, int32_t uid, int32_t pid,
+        int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType) override;
 
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const override;
 
 private:
-    int32_t SetSockOpt(int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType);
-    int32_t CloseFd(int32_t& serverFd, int32_t& toReturnClientFd);
+    int32_t SetSockOpt(int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType);
+    int32_t CloseFd(int32_t &serverFd, int32_t &toReturnClientFd);
 
 protected:
     virtual void OnConnected(SessionPtr s) = 0;
@@ -68,13 +68,13 @@ protected:
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) = 0;
 
     void SetRecvFun(MsgServerFunCallback fun);
-    void ReleaseSession(int32_t fd, epoll_event& ev);
-    void OnPacket(int32_t fd, NetPacket& pkt);
-    void OnEpollRecv(int32_t fd, epoll_event& ev);
-    void OnEpollEvent(epoll_event& ev);
+    void ReleaseSession(int32_t fd, epoll_event &ev);
+    void OnPacket(int32_t fd, NetPacket &pkt);
+    void OnEpollRecv(int32_t fd, epoll_event &ev);
+    void OnEpollEvent(epoll_event &ev);
     bool AddSession(SessionPtr ses);
     void DelSession(int32_t fd);
-    void DumpSession(const std::string& title);
+    void DumpSession(const std::string &title);
     void NotifySessionDeleted(SessionPtr ses);
 
 protected:

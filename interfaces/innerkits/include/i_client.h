@@ -35,7 +35,7 @@ public:
     virtual IClientPtr GetSharedPtr() = 0;
     virtual bool GetCurrentConnectedStatus() const = 0;
     virtual bool Start() = 0;
-    virtual bool SendMessage(const NetPacket& pkt) const = 0;
+    virtual bool SendMessage(const NetPacket &pkt) const = 0;
     virtual void RegisterConnectedFunction(ConnectCallback function) = 0;
     virtual void RegisterDisconnectedFunction(ConnectCallback fun) = 0;
     virtual void OnRecvMsg(const char *buf, size_t size) = 0;

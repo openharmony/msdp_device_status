@@ -57,11 +57,11 @@ private:
     void OnReconnect();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
-    void OnPacket(NetPacket& pkt);
-    const std::string& GetErrorStr(ErrCode code) const;
+    void OnPacket(NetPacket &pkt);
+    const std::string &GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
-    void OnMsgHandler(const StreamClient& client, NetPacket& pkt);
+    void OnMsgHandler(const StreamClient &client, NetPacket &pkt);
 
 private:
     ConnectCallback funConnected_ { nullptr };

@@ -83,7 +83,7 @@ struct Data {
     Action action { ACTION_INVALID };
     double movement { 0.0 };
 
-    bool operator !=(const Data& r) const
+    bool operator !=(const Data &r) const
     {
         if (type == r.type && value == r.value &&
             status - r.status && action == r.action && (movement - r.movement) < MOVEMENT_THRESHOLD) {

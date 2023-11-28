@@ -25,8 +25,8 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragDataUtil {
 public:
-    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = false);
-    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = false);
+    static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = true);
+    static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = true);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

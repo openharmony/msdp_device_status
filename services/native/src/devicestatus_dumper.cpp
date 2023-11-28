@@ -321,7 +321,7 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     }
 }
 
-void DeviceStatusDumper::PushDeviceStatus(const Data& data)
+void DeviceStatusDumper::PushDeviceStatus(const Data &data)
 {
     CALL_DEBUG_ENTER;
     std::unique_lock lock(mutex_);
