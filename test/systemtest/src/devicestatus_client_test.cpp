@@ -125,18 +125,18 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest004, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     Type type = Type::TYPE_HORIZONTAL_POSITION;
-    ActivityEvent event = ActivityEvent::EVENT_INVALID;
+    ActivityEvent activityEvent = ActivityEvent::EVENT_INVALID;
     ReportLatencyNs latency = ReportLatencyNs::Latency_INVALID;
     sptr<IRemoteDevStaCallback> cb = new (std::nothrow) DeviceStatusClientTestCallback();
     ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
+    int32_t result = RET_OK;
+    result = stationaryMgr->SubscribeCallback(type, activityEvent, latency, cb);
+    ASSERT_EQ(result, RET_OK);
     GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(type, activityEvent, cb);
+    ASSERT_EQ(result, RET_OK);
 }
 
 /**
@@ -154,12 +154,12 @@ HWTEST_F(DeviceStatusClientTest, DeviceStatusCallbackTest005, TestSize.Level0)
     ASSERT_NE(cb, nullptr);
     auto stationaryMgr = StationaryManager::GetInstance();
     GTEST_LOG_(INFO) << "Start register";
-    int32_t ret = RET_OK;
-    ret = stationaryMgr->SubscribeCallback(type, event, latency, cb);
-    ASSERT_EQ(ret, RET_OK);
+    int32_t result = RET_OK;
+    result = stationaryMgr->SubscribeCallback(type, event, latency, cb);
+    ASSERT_EQ(result, RET_OK);
     GTEST_LOG_(INFO) << "Cancel register";
-    ret = stationaryMgr->UnsubscribeCallback(type, event, cb);
-    ASSERT_EQ(ret, RET_OK);
+    result = stationaryMgr->UnsubscribeCallback(type, event, cb);
+    ASSERT_EQ(result, RET_OK);
 }
 
 /**
