@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 declare_args() {
   fusion_rust_enabled = false
-  fusion_interaction_coordination = true
+  fusion_interaction_coordination = false
   fusion_drag_enable_monitor = false
   fusion_drag_enable_interceptor = true
   device_status_sensor_enable = true
