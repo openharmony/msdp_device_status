@@ -37,10 +37,10 @@ public:
     ~StateMachine() = default;
 
     int32_t Init(Channel<CooperateEvent>::Sender sender);
-    void OnEvent(CooperateEvent &event);
+    void OnEvent(const CooperateEvent &event);
 
 private:
-    void UpdateState(UpdateStateEvent &event);
+    void UpdateState(const UpdateStateEvent &event);
 
     size_t current_ { 0 };
     std::array<std::shared_ptr<ICooperateState>, NUM_COOPERATE_STATES> states_;
