@@ -223,7 +223,11 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
         FI_HILOGE("Drag drawing is running, can not init again");
         return INIT_CANCEL;
     }
-    CHKPR(dragData.shadowInfo.pixelMap, INIT_FAIL);
+    if (dragData.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return INIT_FAIL;
+    }
+    CHKPR(dragData.shadowInfos.front().pixelMap, INIT_FAIL);
     if ((dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
@@ -708,14 +712,18 @@ void DragDrawing::OnVsync()
 void DragDrawing::InitDrawingInfo(const DragData &dragData)
 {
     g_drawingInfo.isRunning = true;
+    if (dragData.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return;
+    }
+    g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+    g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
+    g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     g_drawingInfo.currentDragNum = dragData.dragNum;
     g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.displayX = dragData.displayX;
     g_drawingInfo.displayY = dragData.displayY;
-    g_drawingInfo.pixelMap = dragData.shadowInfo.pixelMap;
-    g_drawingInfo.pixelMapX = dragData.shadowInfo.x;
-    g_drawingInfo.pixelMapY = dragData.shadowInfo.y;
     g_drawingInfo.extraInfo = dragData.extraInfo;
     g_drawingInfo.filterInfo = dragData.filterInfo;
 }

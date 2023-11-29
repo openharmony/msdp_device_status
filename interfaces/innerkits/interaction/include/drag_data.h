@@ -30,14 +30,31 @@ namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
+constexpr int32_t SHADOW_NUM_LIMIT { 3 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
+
+    bool operator == (const ShadowInfo &other) const
+    {
+        if (pixelMap == nullptr && other.pixelMap == nullptr) {
+            return x == other.x && y == other.y;
+        }
+        if (pixelMap == nullptr || other.pixelMap == nullptr) {
+            return false;
+        }
+        return pixelMap->IsSameImage(*(other.pixelMap)) && x == other.x && y == other.y;
+    }
+
+    bool operator !=  (const ShadowInfo &other) const
+    {
+        return !(*this == other);
+    }
 };
 
 struct DragData {
-    ShadowInfo shadowInfo;
+    std::vector<ShadowInfo> shadowInfos;
     std::vector<uint8_t> buffer;
     std::string udKey;
     std::string extraInfo;
@@ -51,6 +68,20 @@ struct DragData {
     bool hasCanceledAnimation { false };
     bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
+
+    bool operator == (const DragData &other) const
+    {
+        return shadowInfos == other.shadowInfos && buffer == other.buffer && udKey == other.udKey &&
+               filterInfo == other.filterInfo && extraInfo == other.extraInfo && sourceType == other.sourceType &&
+               dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
+               displayY == other.displayY && displayId == other.displayId &&
+               hasCanceledAnimation == other.hasCanceledAnimation && summarys == other.summarys;
+    }
+
+    bool operator != (const DragData &other) const
+    {
+        return !(*this == other);
+    }
 };
 
 enum class DragState {

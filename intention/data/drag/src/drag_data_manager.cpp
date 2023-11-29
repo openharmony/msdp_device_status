@@ -51,7 +51,6 @@ DragData DragDataManager::GetDragData() const
 
 void DragDataManager::ResetDragData()
 {
-    CALL_DEBUG_ENTER;
     dragData_ = { };
     previewStyle_ = { };
 }

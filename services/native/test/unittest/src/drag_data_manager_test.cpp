@@ -102,10 +102,9 @@ std::optional<DragData> DragDataManagerTest::CreateDragData(int32_t sourceType,
         FI_HILOGE("Create pixelmap failed");
         return std::nullopt;
     }
+
     DragData dragData;
-    dragData.shadowInfo.x = 0;
-    dragData.shadowInfo.y = 0;
-    dragData.shadowInfo.pixelMap = pixelMap;
+    dragData.shadowInfos.push_back({ pixelMap, 0, 0 });
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.udKey = UD_KEY;
     dragData.sourceType = sourceType;
@@ -206,9 +205,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
     EXPECT_FALSE(pixelMap == nullptr);
     DragData dragData;
-    dragData.shadowInfo.pixelMap = pixelMap;
-    dragData.shadowInfo.x = SHADOWINFO_X;
-    dragData.shadowInfo.y = SHADOWINFO_Y;
+    dragData.shadowInfos.push_back({ pixelMap, SHADOWINFO_X, SHADOWINFO_Y });
     dragData.displayX = DISPLAY_X;
     dragData.displayY = DISPLAY_Y;
     DRAG_DATA_MGR.Init(dragData);
@@ -239,9 +236,7 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     DragData dragData;
-    dragData.shadowInfo.pixelMap = nullptr;
-    dragData.shadowInfo.x = SHADOWINFO_X;
-    dragData.shadowInfo.y = SHADOWINFO_Y;
+    dragData.shadowInfos.push_back({ nullptr, SHADOWINFO_X, SHADOWINFO_Y });
     dragData.displayX = DISPLAY_X;
     dragData.displayY = DISPLAY_Y;
     DRAG_DATA_MGR.Init(dragData);

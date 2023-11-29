@@ -43,6 +43,7 @@ ohos_shared_library("devicestatus_client") {
 
   version_script = "libdevicestatus_client_map"
   sources = [
+    "${device_status_frameworks_path}/native/interaction/src/drag_data_util.cpp",
     "${device_status_frameworks_path}/native/interaction/src/drag_manager_impl.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager_impl.cpp",

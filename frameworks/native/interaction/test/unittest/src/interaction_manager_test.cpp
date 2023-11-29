@@ -25,12 +25,14 @@
 #include <gtest/gtest.h>
 #include "input_device.h"
 #include "input_manager.h"
+#include "parcel.h"
 #include "pointer_event.h"
 #include "securec.h"
 
 #include "coordination_message.h"
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
+#include "drag_data_util.h"
 #include "interaction_manager.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -242,6 +244,27 @@ private:
     std::string moduleName_;
 };
 
+class TestStartDragListener : public IStartDragListener {
+public:
+    explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
+    void OnDragEndMessage(const DragNotifyMsg &msg) override
+    {
+        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
+            msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
+        if (function_ != nullptr) {
+            function_(msg);
+        }
+        FI_HILOGD("Test OnDragEndMessage");
+    }
+
+    void OnHideIconMessage() override
+    {
+        FI_HILOGI("Test OnHideIconMessage");
+    }
+private:
+    std::function<void(const DragNotifyMsg&)> function_;
+};
+
 std::vector<int32_t> InteractionManagerTest::GetInputDeviceIds()
 {
     std::vector<int32_t> realDeviceIds;
@@ -339,10 +362,9 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<i
         FI_HILOGE("Create pixelmap failed");
         return std::nullopt;
     }
+    ShadowInfo shadowInfo { pixelMap, 0, 0 };
     DragData dragData;
-    dragData.shadowInfo.pixelMap = pixelMap;
-    dragData.shadowInfo.x = 0;
-    dragData.shadowInfo.y = 0;
+    dragData.shadowInfos.push_back(shadowInfo);
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.udKey = UD_KEY;
     dragData.sourceType = sourceType;
@@ -464,17 +486,19 @@ void InteractionManagerTest::TestRemoveMonitor(int32_t monitorId)
 void InteractionManagerTest::PrintDragData(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("PixelAlphaType:%{public}d, PixelFormat:%{public}d, PixelAllocatorType:%{public}d,"
-        " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d,"
-        " sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
+    for (const auto &shadowInfo : dragData.shadowInfos) {
+        CHKPV(shadowInfo.pixelMap);
+        FI_HILOGD("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
+            " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
+            static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAlphaType()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAllocatorType()),
+            shadowInfo.pixelMap->GetWidth(), shadowInfo.pixelMap->GetHeight(), shadowInfo.x, shadowInfo.y);
+    }
+    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d, displayX:%{public}d,"
         " displayY:%{public}d, dragNum:%{public}d, hasCanceledAnimation:%{public}d, udKey:%{public}s",
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
-        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
-        dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
-        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
+        dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX, dragData.displayY,
+        dragData.dragNum, dragData.hasCanceledAnimation, dragData.udKey.substr(0, SUBSTR_UDKEY_LEN).c_str());
 }
 
 void InteractionManagerTest::SetupKeyEvent(
@@ -833,7 +857,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener_Mouse, Test
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         EXPECT_EQ(ret, RET_OK);
@@ -875,7 +900,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener_Touch, Test
         std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
@@ -923,7 +949,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_Draglistener, TestSize.L
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
@@ -971,7 +998,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SubscriptListener_001, T
         std::optional<DragData> dragData = CreateDragData({ MAX_PIXEL_MAP_WIDTH, MAX_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
@@ -1016,7 +1044,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SubscriptListener_002, T
         ASSERT_TRUE(dragData);
         SimulateDownPointerEvent(
             { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         ASSERT_EQ(ret, RET_OK);
@@ -1065,7 +1094,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Mouse, TestSiz
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         EXPECT_EQ(ret, RET_OK);
@@ -1105,9 +1135,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Failed_Mouse, 
 
         int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), nullptr);
         ASSERT_EQ(ret, RET_ERR);
-
-        dragData->shadowInfo.pixelMap = nullptr;
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        dragData->shadowInfos = {};
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_ERR);
     }
 }
@@ -1136,7 +1166,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Mouse, TestSize
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
         InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -1195,7 +1226,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Touch, TestSiz
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         EXPECT_EQ(ret, RET_OK);
@@ -1233,7 +1265,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StopDrag_Touch, TestSize
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
         InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -1266,7 +1299,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Mouse, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         EXPECT_EQ(ret, RET_OK);
@@ -1307,7 +1341,8 @@ HWTEST_F(InteractionManagerTest, GetDragTargetPid_Touch, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         EXPECT_EQ(ret, RET_OK);
@@ -1346,7 +1381,8 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
@@ -1387,7 +1423,8 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         std::promise<bool> promiseEventFlag;
         std::future<bool> futureEventFlag = promiseEventFlag.get_future();
@@ -1449,7 +1486,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
@@ -1485,7 +1523,8 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Mouse, TestSize.Level1)
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         std::string udKey;
         ret = InteractionManager::GetInstance()->GetUdKey(udKey);
@@ -1524,7 +1563,8 @@ HWTEST_F(InteractionManagerTest, GetUdKey_Touch, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         std::string udKey;
         ret = InteractionManager::GetInstance()->GetUdKey(udKey);
@@ -1562,25 +1602,14 @@ HWTEST_F(InteractionManagerTest, GetDragData_Success, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
 
         DragData replyDragData;
         ret = InteractionManager::GetInstance()->GetDragData(replyDragData);
         ASSERT_EQ(ret, RET_OK);
-        ASSERT_NE(replyDragData.shadowInfo.pixelMap, nullptr);
-        ASSERT_EQ(replyDragData.shadowInfo.pixelMap->GetWidth(), TEST_PIXEL_MAP_WIDTH);
-        ASSERT_EQ(replyDragData.shadowInfo.pixelMap->GetHeight(), TEST_PIXEL_MAP_HEIGHT);
-        ASSERT_EQ(dragData->udKey, replyDragData.udKey);
-        ASSERT_EQ(dragData->shadowInfo.x, replyDragData.shadowInfo.x);
-        ASSERT_EQ(dragData->shadowInfo.y, replyDragData.shadowInfo.y);
-        ASSERT_EQ(dragData->sourceType, replyDragData.sourceType);
-        ASSERT_EQ(dragData->pointerId, replyDragData.pointerId);
-        ASSERT_EQ(dragData->dragNum, replyDragData.dragNum);
-        ASSERT_EQ(dragData->displayX, replyDragData.displayX);
-        ASSERT_EQ(dragData->displayY, replyDragData.displayY);
-        ASSERT_EQ(dragData->displayId, replyDragData.displayId);
-        ASSERT_EQ(dragData->hasCanceledAnimation, replyDragData.hasCanceledAnimation);
+        ASSERT_EQ(replyDragData, dragData.value());
         PrintDragData(replyDragData);
         SimulateUpPointerEvent(
             { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID);
@@ -1635,7 +1664,8 @@ HWTEST_F(InteractionManagerTest, GetDragState, TestSize.Level1)
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
 
     DragState dragState;
@@ -1781,7 +1811,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetDragSummary, TestSize
     constexpr int64_t recordSize = 20;
     std::map<std::string, int64_t> summarys = { { udType, recordSize } };
     dragData.value().summarys = summarys;
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     summarys.clear();
     ret = InteractionManager::GetInstance()->GetDragSummary(summarys);
@@ -1814,7 +1845,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     EXPECT_EQ(ret, RET_OK);
@@ -1865,7 +1897,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
     EXPECT_EQ(ret, RET_OK);
@@ -1926,7 +1959,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetExtraInfo, TestSize.L
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
             promiseFlag.set_value(true);
         };
-        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+        int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         ASSERT_EQ(ret, RET_OK);
         std::string extraInfo;
         ret = InteractionManager::GetInstance()->GetExtraInfo(extraInfo);
@@ -1938,6 +1972,27 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetExtraInfo, TestSize.L
         ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
     }
+}
+
+/**
+ * @tc.name: TestDragDataUtil_Packer
+ * @tc.desc: Pack up dragData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    Parcel parcel;
+    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel);
+    ASSERT_EQ(ret, RET_OK);
+    DragData dragDataFromParcel;
+    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(dragData.value(), dragDataFromParcel);
 }
 
 /**
@@ -1961,7 +2016,8 @@ HWTEST_F(InteractionManagerTest, GetDragAction_001, TestSize.Level1)
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     DragAction dragAction { DragAction::INVALID };
     ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
@@ -1990,7 +2046,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
     };
@@ -2000,7 +2056,8 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
     DragAction dragAction { DragAction::INVALID };

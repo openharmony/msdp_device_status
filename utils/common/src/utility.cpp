@@ -215,37 +215,6 @@ void Utility::ShowUserAndGroup()
         }
     }
 }
-
-bool Utility::Marshalling(const summaryMap &val, Parcel &parcel)
-{
-    WRITEINT32(parcel, static_cast<int32_t>(val.size()), false);
-    for (auto const &[k, v] : val) {
-        WRITESTRING(parcel, k, false);
-        WRITEINT64(parcel, v, false);
-    }
-    return true;
-}
-
-bool Utility::Unmarshalling(summaryMap &val, Parcel &parcel)
-{
-    int32_t size = 0;
-    READINT32(parcel, size, false);
-    if (size < 0) {
-        FI_HILOGE("Invalid size:%{public}d", size);
-        return false;
-    }
-    size_t readAbleSize = parcel.GetReadableBytes();
-    if ((static_cast<size_t>(size) > readAbleSize) || static_cast<size_t>(size) > val.max_size()) {
-        return false;
-    }
-
-    for (int32_t i = 0; i < size; ++i) {
-        std::string key;
-        READSTRING(parcel, key, E_DEVICESTATUS_READ_PARCEL_ERROR);
-        READINT64(parcel, val[key], E_DEVICESTATUS_READ_PARCEL_ERROR);
-    }
-    return true;
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

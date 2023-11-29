@@ -68,6 +68,8 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
         {MessageId::DRAG_STATE_LISTENER,
             MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)},
+        {MessageId::DRAG_NOTIFY_HIDE_ICON,
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyHideIcon, &dragManagerImpl_)},
         {MessageId::DRAG_STYLE_LISTENER,
             MsgCallbackBind2(&DragManagerImpl::OnDragStyleChangedMessage, &dragManagerImpl_)}
     };
@@ -217,7 +219,7 @@ int32_t InteractionManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return dragManagerImpl_.UpdateDragStyle(style);
 }
 
-int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -225,7 +227,7 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return dragManagerImpl_.StartDrag(dragData, callback);
+    return dragManagerImpl_.StartDrag(dragData, listener);
 }
 
 int32_t InteractionManagerImpl::StopDrag(const DragDropResult &dropResult)

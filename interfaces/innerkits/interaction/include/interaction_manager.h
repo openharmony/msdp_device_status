@@ -25,6 +25,7 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
+#include "i_start_drag_listener.h"
 #include "i_hotarea_listener.h"
 #include "i_subscript_listener.h"
 
@@ -108,11 +109,11 @@ public:
     /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
-     * @param callback Indicates the callback used to return the dragging result.
+     * @param listener Indicates the listener used to notify dragging result etc.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 
     /**
      * @brief Stops dragging.
