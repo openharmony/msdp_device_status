@@ -26,12 +26,10 @@ ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::sh
 void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 {
     if (setp == nullptr) {
-        USS_HILOGE ("current_ is nullptr");
+        FI_HILOGE("In ICooperateState::Switch, setp is null");
         return;
 }
-    if (step != nullptr) {
         current_ = step;
-    }
 }
 
 void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> next)
@@ -46,25 +44,21 @@ void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> ste
 void ICooperateState::ICooperateStep::Proceed(Context &context, CooperateEvent &event)
 {
     if (next_ == nullptr) {
-        USS_HILOGE ("event is nullptr");
+       FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_  is null");
         return;
 }
-    if (next_ != nullptr) {
         Switch(next_);
         next_->OnProgress(context, event);
-    }
 }
 
 void ICooperateState::ICooperateStep::Reset(Context &context, CooperateEvent &event)
 {
     if (prev_ == nullptr) {
-        USS_HILOGE ("event is nullptr");
+         FI_HILOGE("In  ICooperateState::ICooperateStep::Reset, prev_ is null");
         return;
 }
-    if (prev_ != nullptr) {
         Switch(prev_);
         prev_->OnReset(context, event);
-    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp
