@@ -48,9 +48,9 @@ void DragDataManager::Init(const DragData &dragData)
     targetTid_ = -1;
 }
 
-void DragDataManager::SetShadowInfo(const ShadowInfo &shadowInfo)
+void DragDataManager::SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos)
 {
-    dragData_.shadowInfo = shadowInfo;
+    dragData_.shadowInfos = shadowInfos;
 }
 
 DragCursorStyle DragDataManager::GetDragStyle() const
@@ -95,9 +95,13 @@ int32_t DragDataManager::GetTargetPid() const
 
 int32_t DragDataManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) const
 {
-    offsetX = dragData_.shadowInfo.x;
-    offsetY = dragData_.shadowInfo.y;
-    auto pixelMap = dragData_.shadowInfo.pixelMap;
+    if (dragData_.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return  RET_ERR;
+    }
+    offsetX = dragData_.shadowInfos.front().x;
+    offsetY = dragData_.shadowInfos.front().y;
+    auto pixelMap = dragData_.shadowInfos.front().pixelMap;
     CHKPR(pixelMap, RET_ERR);
     width = pixelMap->GetWidth();
     height = pixelMap->GetHeight();

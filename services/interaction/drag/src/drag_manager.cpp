@@ -123,22 +123,26 @@ int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
 
 void DragManager::PrintDragData(const DragData &dragData)
 {
+    CALL_INFO_TRACE;
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPV(shadowInfo.pixelMap);
+        FI_HILOGI("PixelFormat:%{public}d, PixelAlphaType:%{public}d, PixelAllocatorType:%{public}d,"
+            " PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d, shadowY:%{public}d",
+            static_cast<int32_t>(shadowInfo.pixelMap->GetPixelFormat()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAlphaType()),
+            static_cast<int32_t>(shadowInfo.pixelMap->GetAllocatorType()),
+            shadowInfo.pixelMap->GetWidth(), shadowInfo.pixelMap->GetHeight(), shadowInfo.x, shadowInfo.y);
+    }
     std::string summarys;
     for (const auto &[udKey, recordSize] : dragData.summarys) {
         std::string str = udKey + "-" + std::to_string(recordSize) + ";";
         summarys += str;
     }
-    FI_HILOGI("dragData value Contains PixelFormat:%{public}d, PixelAlphaType:%{public}d,"
-        " PixelAllocatorType:%{public}d, PixelWidth:%{public}d, PixelHeight:%{public}d, shadowX:%{public}d,"
-        " shadowY:%{public}d, sourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
+    FI_HILOGI("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
         " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetPixelFormat()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAllocatorType()),
-        static_cast<int32_t>(dragData.shadowInfo.pixelMap->GetAlphaType()),
-        dragData.shadowInfo.pixelMap->GetWidth(), dragData.shadowInfo.pixelMap->GetHeight(),
-        dragData.shadowInfo.x, dragData.shadowInfo.y, dragData.sourceType, dragData.pointerId,
-        dragData.displayId, dragData.displayX, dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
+        dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
+        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
         GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
 }
 
@@ -252,7 +256,7 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
         FI_HILOGE("No drag instance running, can not update shadow picture");
         return RET_ERR;
     }
-    DRAG_DATA_MGR.SetShadowInfo(shadowInfo);
+    DRAG_DATA_MGR.SetShadowInfos({ shadowInfo });
     return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
@@ -296,6 +300,22 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     CHKPR(dragOutSession_, RET_ERR);
     if (!dragOutSession_->SendMsg(pkt)) {
         FI_HILOGE("Failed to send message");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t DragManager::NotifyHideIcon()
+{
+    CALL_DEBUG_ENTER;
+    NetPacket pkt(MessageId::DRAG_NOTIFY_HIDE_ICON);
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    CHKPR(dragOutSession_, RET_ERR);
+    if (!dragOutSession_->SendMsg(pkt)) {
+        FI_HILOGE("Send message failed");
         return MSG_SEND_FAIL;
     }
     return RET_OK;
@@ -449,16 +469,21 @@ void DragManager::Dump(int32_t fd) const
         FI_HILOGE("Target udKey is empty");
         udKey = "";
     }
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        dprintf(fd, "dragData = {\n""\tshadowInfoX:%d\n\tshadowInfoY\n", shadowInfo.x, shadowInfo.y);
+    }
     dprintf(fd, "dragData = {\n"
-            "\tshadowInfoX:%d\n\tshadowInfoY:%d\n\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
+            "\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
             "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            dragData.shadowInfo.x, dragData.shadowInfo.y, udKey.c_str(), dragData.filterInfo.c_str(),
-            dragData.extraInfo.c_str(), dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX,
-            dragData.displayY, dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
+            GetAnonyString(dragData.udKey).c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(), dragData.sourceType,
+            dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
+            dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {
-        std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfo.pixelMap;
-        CHKPV(pixelMap);
-        dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", pixelMap->GetWidth(), pixelMap->GetHeight());
+        for (const auto& shadowInfo : dragData.shadowInfos) {
+            CHKPV(shadowInfo.pixelMap);
+            dprintf(fd, "\tpixelMapWidth:%d\n\tpixelMapHeight:%d\n", shadowInfo.pixelMap->GetWidth(),
+                shadowInfo.pixelMap->GetHeight());
+        }
     }
     dprintf(fd, "}\n");
 }

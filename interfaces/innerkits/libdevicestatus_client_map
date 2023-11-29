@@ -42,7 +42,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::ActivateCoordination(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>, bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::DeactivateCoordination(bool, std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, OHOS::Msdp::CoordinationMessage)>, bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetCoordinationState(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::function<void (bool)>, bool)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::function<void (OHOS::Msdp::DeviceStatus::DragNotifyMsg const&)>)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IStartDragListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragDropResult const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
@@ -56,6 +56,9 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdatePreviewStyleWithAnimation(OHOS::Msdp::DeviceStatus::PreviewStyle const&, OHOS::Msdp::DeviceStatus::PreviewAnimation const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragSummary(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetDropType(OHOS::Msdp::DeviceStatus::DropType&)";
+            "OHOS::Msdp::DeviceStatus::DragDataUtil::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&)";
+            "OHOS::Msdp::DeviceStatus::DragDataUtil::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragAction(OHOS::Msdp::DeviceStatus::DragAction&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetExtraInfo(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";

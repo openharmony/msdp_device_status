@@ -25,6 +25,7 @@
 #include "devicestatus_define.h"
 #include "devicestatus_service.h"
 #include "devicestatus_srv_proxy.h"
+#include "drag_data_packer.h"
 #include "fi_log.h"
 #include "preview_style_packer.h"
 #include "stationary_callback.h"
@@ -377,7 +378,7 @@ int32_t DeviceStatusSrvStub::GetUdKeyStub(MessageParcel &data, MessageParcel &re
         FI_HILOGE("Get udKey failed, ret:%{public}d", ret);
     }
     WRITESTRING(reply, udKey, IPC_STUB_WRITE_PARCEL_ERR);
-    FI_HILOGD("Target udKey:%{public}s", udKey.c_str());
+    FI_HILOGD("Target udKey:%{public}s", GetAnonyString(udKey).c_str());
     return RET_OK;
 }
 
@@ -425,33 +426,19 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel &data, Messag
 
 int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel &data, MessageParcel &reply)
 {
-    auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-    CHKPR(pixelMap, RET_ERR);
+    CALL_DEBUG_ENTER;
     DragData dragData;
-    dragData.shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
-    READINT32(data, dragData.shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(data, dragData.udKey, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(data, dragData.extraInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READSTRING(data, dragData.filterInfo, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.sourceType, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.dragNum, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.pointerId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.displayX, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (!Utility::Unmarshalling(dragData.summarys, data)) {
-        FI_HILOGE("Failed to summarys unmarshalling");
+    if (DragDataPacker::UnMarshalling(data, dragData) != RET_OK) {
+        FI_HILOGE("UnMarshalling dragData failed");
         return E_DEVICESTATUS_READ_PARCEL_ERROR;
     }
-    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
-        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
-        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Start drag invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            dragData.shadowInfo.x, dragData.shadowInfo.y);
-        return RET_ERR;
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d", shadowInfo.x, shadowInfo.y);
+            return RET_ERR;
+        }
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
@@ -565,6 +552,7 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel &data, MessagePar
     shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
     READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
     if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
         (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
         (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
@@ -589,25 +577,9 @@ int32_t DeviceStatusSrvStub::GetDragDataStub(MessageParcel &data, MessageParcel 
         FI_HILOGE("Get DragData failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if (!dragData.shadowInfo.pixelMap->Marshalling(reply)) {
-        FI_HILOGE("Failed to marshalling pixelMap");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(reply, dragData.shadowInfo.x, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.shadowInfo.y, ERR_INVALID_VALUE);
-    WRITEUINT8VECTOR(reply, dragData.buffer, ERR_INVALID_VALUE);
-    WRITESTRING(reply, dragData.udKey, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.sourceType, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.dragNum, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.pointerId, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.displayX, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.displayY, ERR_INVALID_VALUE);
-    WRITEINT32(reply, dragData.displayId, ERR_INVALID_VALUE);
-    WRITEBOOL(reply, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
-    if (!Utility::Marshalling(dragData.summarys, reply)) {
-        FI_HILOGE("Failed to summarys unmarshalling");
-        return ERR_INVALID_VALUE;
+    if (DragDataPacker::Marshalling(dragData, reply) != RET_OK) {
+        FI_HILOGE("Marshalling dragData failed");
+        return RET_ERR;
     }
     return ret;
 }
@@ -695,7 +667,7 @@ int32_t DeviceStatusSrvStub::GetDragSummaryStub(MessageParcel &data, MessageParc
         FI_HILOGE("Get summarys failed");
         return RET_ERR;
     }
-    if (!Utility::Marshalling(summarys, reply)) {
+    if (SummaryPacker::Marshalling(summarys, reply) != RET_OK) {
         FI_HILOGE("Failed to summarys unmarshalling");
         return ERR_INVALID_VALUE;
     }
