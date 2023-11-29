@@ -259,7 +259,7 @@ public:
 
     void OnHideIconMessage() override
     {
-        FI_HILOGI("Test OnHideIconMessage");
+        FI_HILOGD("Test OnHideIconMessage");
     }
 private:
     std::function<void(const DragNotifyMsg&)> function_;
