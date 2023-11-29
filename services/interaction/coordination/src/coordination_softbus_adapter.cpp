@@ -205,7 +205,7 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 
 int32_t CoordinationSoftbusAdapter::ChkAndCpyStr(char* dest, uint32_t len, const std::string &src)
 {
-    if (len < src.length()) {
+    if (len < src.length() + 1) {
         return RET_ERR;
     }
     if (strcpy_s(dest, len, src.c_str()) != EOK) {
