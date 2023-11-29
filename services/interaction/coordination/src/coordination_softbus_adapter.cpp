@@ -420,9 +420,9 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
         FI_HILOGE("Failed to discover the remote device");
         return RET_ERR;
     }
-    CHKPR(jsonStr, RET_ERR);
-    CHKPR(jsonStr, RET_ERR);
     int32_t sessionId = sessionDevs_[remoteNetworkId];
+    cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_UNCHAINED_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(result));
