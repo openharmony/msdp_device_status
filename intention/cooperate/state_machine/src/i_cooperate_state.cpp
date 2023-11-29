@@ -34,13 +34,17 @@ void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 
 void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> next)
 {
+     if (next == nullptr) {
+        FI_HILOGE("In ICooperateState::ICooperateStep::SetNext, next is nullptr");
+        return;
+    }
     next_ = next;
 }
 
 void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> step)
 {
     if (step == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Switch, step is null");
+        FI_HILOGE("In ICooperateState::ICooperateStep::Switch, step is nullptr");
         return;
     }
     parent_.Switch(step);
@@ -49,7 +53,7 @@ void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> ste
 void ICooperateState::ICooperateStep::Proceed(Context &context, CooperateEvent &event)
 {
     if (next_ == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_ is null");
+        FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_ is nullptr");
         return;
     }
     Switch(next_);
@@ -59,11 +63,11 @@ void ICooperateState::ICooperateStep::Proceed(Context &context, CooperateEvent &
 void ICooperateState::ICooperateStep::Reset(Context &context, CooperateEvent &event)
 {
     if (prev_ == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Reset, prev_ is null");
+        FI_HILOGE("In ICooperateState::ICooperateStep::Reset, prev_ is nullptr");
         return;
     }
-        Switch(prev_);
-        prev_->OnReset(context, event);
+    Switch(prev_);
+    prev_->OnReset(context, event);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
