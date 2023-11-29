@@ -26,6 +26,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "i_drag_listener.h"
+#include "i_start_drag_listener.h"
 #include "i_subscript_listener.h"
 #include "include/util.h"
 
@@ -37,9 +38,10 @@ public:
     DragManagerImpl() = default;
     ~DragManagerImpl() = default;
 
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);
     int32_t OnNotifyResult(const StreamClient &client, NetPacket &pkt);
+    int32_t OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt);
     int32_t OnStateChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt);
     int32_t AddDraglistener(DragListenerPtr listener);
@@ -66,8 +68,8 @@ private:
     std::atomic_bool hasRegistered_ { false };
     std::atomic_bool hasSubscriptRegistered_ { false };
     std::list<DragListenerPtr> dragListener_;
+    std::shared_ptr<IStartDragListener> startDragListener_ { nullptr };
     std::list<SubscriptListenerPtr> subscriptListener_;
-    std::function<void(const DragNotifyMsg&)> stopCallback_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -37,17 +37,19 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, RET_ERR);
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
-        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
-        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Start drag, invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            dragData.shadowInfo.x, dragData.shadowInfo.y);
-        return RET_ERR;
+    CHKPR(listener, RET_ERR);
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
+            (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+                shadowInfo.x, shadowInfo.y);
+            return RET_ERR;
+        }
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
@@ -58,7 +60,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        stopCallback_ = callback;
+        startDragListener_ = listener;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -98,8 +100,17 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient &client, NetPacket &p
     }
     notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(notifyMsg);
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnDragEndMessage(notifyMsg);
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnHideIconMessage();
     return RET_OK;
 }
 
