@@ -146,7 +146,7 @@ int32_t CoordinationSoftbusAdapter::Init()
     }
     localSessionName_ = sessionName;
     char name[DEVICE_NAME_SIZE_MAX] = {};
-    if (strcpy_s(name, localSessionName_.length(), localSessionName_.c_str()) != EOK) {
+    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
         FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
@@ -203,6 +203,18 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
     return true;
 }
 
+int32_t CoordinationSoftbusAdapter::ChkAndCpyStr(char* dest, uint32_t len, const std::string &src)
+{
+    if (len < src.length()) {
+        return RET_ERR;
+    }
+    if (strcpy_s(dest, len, src.c_str()) != EOK) {
+        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
@@ -212,18 +224,18 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         return RET_OK;
     }
     char name[DEVICE_NAME_SIZE_MAX] = {};
-    if (strcpy_s(name, localSessionName_.length(), localSessionName_.c_str()) != EOK) {
+    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
         FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
     std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
     char peerName[DEVICE_NAME_SIZE_MAX] = {};
-    if (strcpy_s(peerName, peerSessionName.length(), peerSessionName.c_str()) != EOK) {
+    if (ChkAndCpyStr(peerName, DEVICE_NAME_SIZE_MAX, peerSessionName.c_str()) != RET_OK) {
         FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
         return RET_ERR;
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] = {};
-    if (strcpy_s(peerNetworkId, remoteNetworkId.length(), remoteNetworkId.c_str()) != EOK) {
+    if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
         FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
         return RET_ERR;
     }
