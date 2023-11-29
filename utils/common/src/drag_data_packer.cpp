@@ -112,12 +112,12 @@ int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shado
     for (int32_t i = 0; i < shadowNum; i++) {
         FI_HILOGI("ShadowNum:%{public}d", shadowNum);
         ShadowInfo shadowInfo;
-        shadowInfos.push_back(shadowInfo);
-        if (UnPackShadowInfo(data, shadowInfos[i], isCross) != RET_OK) {
+        if (UnPackShadowInfo(data, shadowInfo, isCross) != RET_OK) {
             FI_HILOGE("UnPackShadowInfo failed");
             return RET_ERR;
         }
-        CHKPR(shadowInfos[i].pixelMap, RET_ERR);// 挂在这行了, 共享指针苦啊函数传输有问题
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        shadowInfos.push_back(shadowInfo);
     }
     return RET_OK;
 }
