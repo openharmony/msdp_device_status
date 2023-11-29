@@ -29,7 +29,7 @@ public:
     CooperateIn();
     ~CooperateIn() = default;
 
-    void OnEvent(Context &context, CooperateEvent &event) override;
+    void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &event) override;
     void OnLeaveState(Context &event) override;
 
