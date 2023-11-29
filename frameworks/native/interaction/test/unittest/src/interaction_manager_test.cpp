@@ -47,7 +47,6 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 80 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
 constexpr int32_t PROMISE_WAIT_SPAN_MS { 2000 };
-constexpr int32_t TIME_WAIT_FOR_NOTIFY_LINSTER { 600 };
 constexpr int32_t TEST_PIXEL_MAP_WIDTH { 200 };
 constexpr int32_t TEST_PIXEL_MAP_HEIGHT { 200 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
@@ -191,15 +190,9 @@ private:
 class SubscriptListenerTest : public ISubscriptListener {
 public:
     SubscriptListenerTest() {}
-    explicit SubscriptListenerTest(const std::string& name) : moduleName_(name)
-    {
-        futureFlag_ = promiseFlag_.get_future();
-    }
+    explicit SubscriptListenerTest(const std::string& name) : moduleName_(name) {}
     void OnMessage(DragCursorStyle style) override
     {
-        if (style != dragStyle_) {
-            promiseFlag_.set_value(true);
-        }
         SetDragSyle(style);
         if (moduleName_.empty()) {
             moduleName_ = std::string("SubscriptListenerTest");
@@ -234,10 +227,6 @@ private:
         }
         return type;
     }
-
-public:
-    std::promise<bool> promiseFlag_;
-    std::future<bool> futureFlag_;
 
 private:
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
@@ -1049,22 +1038,23 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SubscriptListener_002, T
         ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
         ASSERT_EQ(ret, RET_OK);
-        DragCursorStyle style = DragCursorStyle::DEFAULT;
+        DragCursorStyle style = DragCursorStyle::COPY;
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(style);
+        ASSERT_EQ(ret, RET_OK);
+        style = DragCursorStyle::MOVE;
         ret = InteractionManager::GetInstance()->UpdateDragStyle(style);
         ASSERT_EQ(ret, RET_OK);
         SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
             MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
-        EXPECT_TRUE(listener->futureFlag_.wait_for(std::chrono::milliseconds(TIME_WAIT_FOR_NOTIFY_LINSTER)) !=
-            std::future_status::timeout);
-        DragCursorStyle recvStyle = listener->GetDragStyle();
-        FI_HILOGD("Recived style:%{public}d, expected style:%{public}d", static_cast<int32_t>(recvStyle),
-            static_cast<int32_t>(style));
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
         SimulateUpPointerEvent(
             { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
         InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
             std::future_status::timeout);
+        DragCursorStyle recvStyle = listener->GetDragStyle();
+        FI_HILOGD("Recived style:%{public}d, expected style:%{public}d", static_cast<int32_t>(recvStyle),
+            static_cast<int32_t>(style));
         ret = InteractionManager::GetInstance()->RemoveSubscriptListener(listener);
         ASSERT_EQ(ret, RET_OK);
     }
@@ -1371,9 +1361,12 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
     if (g_deviceTouchId < 0) {
         ASSERT_TRUE(g_deviceTouchId < 0);
     } else {
-        auto callback = [](const DragNotifyMsg& notifyMessage) {
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
             FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
         };
         SimulateDownPointerEvent(
             { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID);
@@ -1397,6 +1390,8 @@ HWTEST_F(InteractionManagerTest, TouchEventDispatch, TestSize.Level1)
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
         ret = InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_EQ(ret, RET_OK);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
     }
     RemovePermission();
 }
@@ -1414,9 +1409,12 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
     if (g_deviceMouseId < 0) {
         ASSERT_TRUE(g_deviceMouseId < 0);
     } else {
-        auto callback = [](const DragNotifyMsg& notifyMessage) {
+        std::promise<bool> promiseFlag;
+        std::future<bool> futureFlag = promiseFlag.get_future();
+        auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
             FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
                 notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+            promiseFlag.set_value(true);
         };
         SimulateDownPointerEvent(
             { DRAG_SRC_X, DRAG_SRC_Y }, MMI::PointerEvent::SOURCE_TYPE_MOUSE, 0);
@@ -1439,6 +1437,8 @@ HWTEST_F(InteractionManagerTest, MouseEventDispatch, TestSize.Level1)
         DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
         ret = InteractionManager::GetInstance()->StopDrag(dropResult);
         ASSERT_EQ(ret, RET_OK);
+        ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+            std::future_status::timeout);
     }
     RemovePermission();
 }
