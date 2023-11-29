@@ -203,14 +203,14 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
     return true;
 }
 
-int32_t CoordinationSoftbusAdapter::ChkAndCpyStr(char* dest, uint32_t len, const std::string &src)
+int32_t CoordinationSoftbusAdapter::ChkAndCpyStr(char* dest, uint32_t destLen, const std::string &src)
 {
-    if (len < src.length() + 1) {
+    if (destLen < src.length() + 1) {
         FI_HILOGE("Invalid src length");
         return RET_ERR;
     }
-    if (strcpy_s(dest, len, src.c_str()) != EOK) {
-        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
+    if (strcpy_s(dest, destLen, src.c_str()) != EOK) {
+        FI_HILOGE("Invalid src");
         return RET_ERR;
     }
     return RET_OK;
@@ -261,7 +261,6 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     };
     int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
     if (ret == RET_OK) {
-        FI_HILOGI("bind success");
         sessionDevs_[remoteNetworkId] = socket;
     } else {
         FI_HILOGE("bind failed, ret:%{public}d", ret);

@@ -71,7 +71,7 @@ public:
     void ConfigTcpAlive();
 
 private:
-    int32_t ChkAndCpyStr(char* dest, uint32_t len, const std::string &src);
+    int32_t ChkAndCpyStr(char* dest, uint32_t destLen, const std::string &src);
     CoordinationSoftbusAdapter() = default;
     DISALLOW_COPY_AND_MOVE(CoordinationSoftbusAdapter);
     std::string FindDevice(int32_t socket);
