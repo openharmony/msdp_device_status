@@ -36,16 +36,16 @@ public:
 private:
     class Initial final : public ICooperateStep {
     public:
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
     };
 
     class PrepareRemoteInput final : public ICooperateStep {
     public:
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
     
     private:
         std::pair<std::string, std::string> prepared_;
@@ -53,9 +53,9 @@ private:
 
     class StartRemoteInput final : public ICooperateStep {
     public:
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
     };
 };
 } // namespace DeviceStatus
