@@ -25,11 +25,11 @@ ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::sh
 
 void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 {
-    if (setp == nullptr) {
-        FI_HILOGE("In ICooperateState::Switch, setp is null");
+    if (step == nullptr) {
+        FI_HILOGE("In ICooperateState::Switch, step is null");
         return;
-}
-        current_ = step;
+    }
+    current_ = step;
 }
 
 void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> next)
@@ -39,24 +39,29 @@ void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> ne
 
 void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> step)
 {
+    if (step == nullptr) {
+        FI_HILOGE("In ICooperateState::ICooperateStep::Switch, step is null");
+        return;
+    }
     parent_.Switch(step);
 }
+
 void ICooperateState::ICooperateStep::Proceed(Context &context, CooperateEvent &event)
 {
     if (next_ == nullptr) {
-       FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_  is null");
+        FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_ is null");
         return;
-}
-        Switch(next_);
-        next_->OnProgress(context, event);
+    }
+    Switch(next_);
+    next_->OnProgress(context, event);
 }
 
 void ICooperateState::ICooperateStep::Reset(Context &context, CooperateEvent &event)
 {
     if (prev_ == nullptr) {
-         FI_HILOGE("In  ICooperateState::ICooperateStep::Reset, prev_ is null");
+        FI_HILOGE("In ICooperateState::ICooperateStep::Reset, prev_ is null");
         return;
-}
+    }
         Switch(prev_);
         prev_->OnReset(context, event);
 }
