@@ -190,6 +190,7 @@ int32_t SummaryPacker::UnMarshalling(Parcel &parcel, SummaryMap &val)
     }
     size_t readAbleSize = parcel.GetReadableBytes();
     if ((static_cast<size_t>(size) > readAbleSize) || static_cast<size_t>(size) > val.max_size()) {
+        FI_HILOGE("Invalid size:%{public}d", size);
         return RET_ERR;
     }
     for (int32_t i = 0; i < size; ++i) {

@@ -378,7 +378,7 @@ int32_t DeviceStatusSrvStub::GetUdKeyStub(MessageParcel &data, MessageParcel &re
         FI_HILOGE("Get udKey failed, ret:%{public}d", ret);
     }
     WRITESTRING(reply, udKey, IPC_STUB_WRITE_PARCEL_ERR);
-    FI_HILOGD("Target udKey:%{public}s", udKey.c_str());
+    FI_HILOGD("Target udKey:%{public}s", GetAnonyString(udKey).c_str());
     return RET_OK;
 }
 

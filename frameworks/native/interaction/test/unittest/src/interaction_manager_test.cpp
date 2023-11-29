@@ -249,12 +249,12 @@ public:
     explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
     void OnDragEndMessage(const DragNotifyMsg &msg) override
     {
-        FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
+        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
             msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
         if (function_ != nullptr) {
             function_(msg);
         }
-        FI_HILOGI("Test OnDragEndMessage");
+        FI_HILOGD("Test OnDragEndMessage");
     }
 
     void OnHideIconMessage() override
@@ -2067,7 +2067,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
-        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
     };

@@ -121,12 +121,12 @@ public:
     explicit TestStartDragListener(std::function<void(const DragNotifyMsg&)> function) : function_(function) { }
     void OnDragEndMessage(const DragNotifyMsg &msg) override
     {
-        FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
+        FI_HILOGD("DisplayX:%{public}d, displayY:%{public}d, targetPid:%{public}d, result:%{public}d",
             msg.displayX, msg.displayY, msg.targetPid, static_cast<int32_t>(msg.result));
         if (function_ != nullptr) {
             function_(msg);
         }
-        FI_HILOGI("Test OnDragEndMessage");
+        FI_HILOGD("Test OnDragEndMessage");
     }
 
     void OnHideIconMessage() override
@@ -435,7 +435,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -467,7 +467,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_ONE_Shadow, Test
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -499,7 +499,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Multiple_Shadow,
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
     ASSERT_EQ(ret, RET_OK);
-    DragDropResult dropResult { DragResult::DRAG_FAIL, NOT_HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -586,9 +586,10 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
         promiseFlag.set_value(true);
     };
     std::optional<DragData> dragData = CreateDragData(
-        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE);
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
     EXPECT_EQ(ret, RET_ERR);
