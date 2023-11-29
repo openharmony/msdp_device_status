@@ -93,6 +93,7 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
+constexpr int32_t HEX_FF { 0xFF };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
@@ -1442,7 +1443,7 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
                 break;
             }
             case PreviewType::OPACITY: {
-                node->SetForegroundColor(previewStyle.opacity);
+                node->SetAlpha(previewStyle.opacity / static_cast<float>(HEX_FF));
                 break;
             }
             case PreviewType::RADIUS: {
@@ -1450,7 +1451,7 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
                 break;
             }
             case PreviewType::SCALE: {
-                node->SetForegroundColor(previewStyle.scale);
+                node->SetScale(previewStyle.scale);
                 break;
             }
             default: {
