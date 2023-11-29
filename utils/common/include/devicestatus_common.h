@@ -75,6 +75,14 @@ namespace DeviceStatus {
         } \
     } while (0)
 
+#define WRITEFLOAT(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteFloat(data)) { \
+            FI_HILOGE("WriteFloat "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
 #define WRITESTRING(parcel, data, ...) \
     do { \
         if (!(parcel).WriteString(data)) { \
@@ -159,6 +167,14 @@ namespace DeviceStatus {
     do { \
         if (!(parcel).ReadDouble(data)) { \
             FI_HILOGE("ReadDouble "#data" failed"); \
+            return __VA_ARGS__; \
+        } \
+    } while (0)
+
+#define READFLOAT(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadFloat(data)) { \
+            FI_HILOGE("ReadFloat "#data" failed"); \
             return __VA_ARGS__; \
         } \
     } while (0)

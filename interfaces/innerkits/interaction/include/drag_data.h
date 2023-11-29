@@ -131,7 +131,7 @@ struct PreviewStyle {
     uint32_t foregroundColor { 0 };
     int32_t opacity { -1 };
     int32_t radius { -1 };
-    int32_t scale { -1 };
+    float scale { -1 };
 
     bool operator == (const PreviewStyle &other) const
     {

@@ -37,7 +37,7 @@ int32_t PreviewStylePacker::Marshalling(const PreviewStyle &previewStyle, Parcel
     WRITEUINT32(data, previewStyle.foregroundColor, ERR_INVALID_VALUE);
     WRITEINT32(data, previewStyle.opacity, ERR_INVALID_VALUE);
     WRITEINT32(data, previewStyle.radius, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewStyle.scale, ERR_INVALID_VALUE);
+    WRITEFLOAT(data, previewStyle.scale, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
@@ -51,7 +51,7 @@ int32_t PreviewStylePacker::UnMarshalling(Parcel &data, PreviewStyle &previewSty
     READUINT32(data, previewStyle.foregroundColor, ERR_INVALID_VALUE);
     READINT32(data, previewStyle.opacity, ERR_INVALID_VALUE);
     READINT32(data, previewStyle.radius, ERR_INVALID_VALUE);
-    READINT32(data, previewStyle.scale, ERR_INVALID_VALUE);
+    READFLOAT(data, previewStyle.scale, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
