@@ -19,6 +19,9 @@ config("coordination_public_config") {
 
 ohos_shared_library("coordination") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
