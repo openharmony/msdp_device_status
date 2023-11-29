@@ -377,10 +377,10 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *sendMsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
-    int32_t result = SendMsg(sessionId, sendMsg);
+    int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
-    if (result != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, result:%{public}d", result);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -402,10 +402,10 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *sendMsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
-    int32_t result = SendMsg(sessionId, sendMsg);
+    int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
-    if (result == RET_ERR) {
-        FI_HILOGE("Failed to send the sendMsg, result:%{public}d", result);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -454,10 +454,10 @@ int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteN
     char *sendmsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     CHKPR(sendmsg, RET_ERR);
-    int32_t result = SendMsg(sessionId, sendmsg);
+    int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
-    if (result != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, result:%{public}d", result);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -481,7 +481,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
