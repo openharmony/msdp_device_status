@@ -622,7 +622,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 DeactivateCoordination(isUnchained_);
                 return;
             }
-            COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
             preparedNetworkId_ = std::make_pair("", "");
             RegisterSessionCallback();
             break;
@@ -640,7 +639,6 @@ void CoordinationSM::UpdateState(CoordinationState state)
                 DeactivateCoordination(isUnchained_);
                 return;
             }
-            COOR_SOFTBUS_ADAPTER->ConfigTcpAlive();
             RegisterSessionCallback();
             break;
         }
