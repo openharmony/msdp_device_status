@@ -136,7 +136,7 @@ std::string DeviceManager::GetDhid(int32_t deviceId)
 class Context {
 public:
     DeviceManager devMgr_;
-    Channel<CooperateEvent>::Sender sender;
+    Channel<CooperateEvent>::Sender sender_;
     std::string cooperated_;
     std::string startDeviceId_;
     bool isUnchain_;
