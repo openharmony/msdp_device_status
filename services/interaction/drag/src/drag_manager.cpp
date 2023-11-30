@@ -200,6 +200,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    dragDrawing_.SetTextEditorAreaFlag(false);
     return ret;
 }
 
