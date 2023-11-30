@@ -909,7 +909,7 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
     }
     if (!iter->IsPressed()) {
         CtrlKeyStyleChangedNotify(DRAG_DATA_MGR.GetDragStyle(), DragAction::MOVE);
-        HandleCtrlKeyEvent(DRAG_DATA_MGR.GetDragStyle());
+        HandleCtrlKeyEvent(DRAG_DATA_MGR.GetDragStyle(), DragAction::MOVE);
         dragAction_.store(DragAction::MOVE);
         return;
     }
@@ -919,14 +919,18 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
             return;
         }
         CtrlKeyStyleChangedNotify(DragCursorStyle::COPY, DragAction::COPY);
-        HandleCtrlKeyEvent(DragCursorStyle::COPY);
+        HandleCtrlKeyEvent(DragCursorStyle::COPY, DragAction::COPY);
         dragAction_.store(DragAction::COPY);
     }
 }
 
-void DragManager::HandleCtrlKeyEvent(DragCursorStyle style)
+void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
 {
-    FI_HILOGD("Update drag style:%{public}d", style);
+    CALL_DEBUG_ENTER;
+    if (action == dragAction_.load()) {
+        FI_HILOGD("Not need update drag style");
+        return;
+    }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
         std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, style));
