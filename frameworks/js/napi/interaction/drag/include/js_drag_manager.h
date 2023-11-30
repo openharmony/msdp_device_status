@@ -42,6 +42,7 @@ public:
     void OnDragMessage(DragState state) override;
     void RegisterListener(napi_env env, napi_value handle);
     void UnregisterListener(napi_env env, napi_value handle = nullptr);
+    napi_value GetDataSummary(napi_env env);
 
 private:
     struct CallbackInfo : public RefBase {
