@@ -1487,7 +1487,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
-            std::make_shared<TestStartDragListener>(callback));
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
@@ -2109,8 +2109,8 @@ HWTEST_F(InteractionManagerTest, GetDragAction_003, TestSize.Level1)
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
-        ASSERT_EQ(ret, RET_OK);
+        ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+            std::make_shared<TestStartDragListener>(callback));
         DragAction dragAction { DragAction::INVALID };
         ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
         EXPECT_EQ(ret, RET_OK);
@@ -2144,7 +2144,8 @@ HWTEST_F(InteractionManagerTest, GetDragAction_004, TestSize.Level1)
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
@@ -2178,13 +2179,16 @@ HWTEST_F(InteractionManagerTest, GetDragAction_004, TestSize.Level1)
 
 /**
  * @tc.name: InteractionManagerTest_GetDragAction_005
- * @tc.desc: Get drag action with multiple press and release keyboard events of keys in dragging
+ * @tc.desc: Get style notification with multiple press and release keyboard events of keys in dragging
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InteractionManagerTest, GetDragAction_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto listener = std::make_shared<SubscriptListenerTest>("SubscriptListener");
+    int32_t ret = InteractionManager::GetInstance()->AddSubscriptListener(listener);
+    ASSERT_EQ(ret, RET_OK);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
@@ -2195,38 +2199,40 @@ HWTEST_F(InteractionManagerTest, GetDragAction_005, TestSize.Level1)
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), callback);
+    ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { DRAG_DST_X, DRAG_DST_Y },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
+    DragCursorStyle recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::MOVE);
     SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
     SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_B);
-    DragAction dragAction { DragAction::INVALID };
-    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragAction, DragAction::COPY);
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::COPY);
     SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
-    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragAction, DragAction::MOVE);
     ClearUpKeyEvent();
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::MOVE);
     SimulateDownKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_RIGHT);
-    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragAction, DragAction::COPY);
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::COPY);
     SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_B);
-    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
-    EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragAction, DragAction::COPY);
     ClearUpKeyEvent();
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::COPY);
     SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_RIGHT);
     ClearUpKeyEvent();
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::MOVE);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
-    ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
-    EXPECT_EQ(ret, RET_ERR);
+    recvStyle = listener->GetDragStyle();
+    EXPECT_EQ(recvStyle, DragCursorStyle::MOVE);
+    ret = InteractionManager::GetInstance()->RemoveSubscriptListener(listener);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

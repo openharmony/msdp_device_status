@@ -238,12 +238,14 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
     }
     FI_HILOGI("Update drag style successfully");
     DRAG_DATA_MGR.SetDragStyle(style);
-    stateNotify_.StyleChangedNotify(style);
+    DragCursorStyle updateStyle = DragCursorStyle::DEFAULT;
     if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
-        return dragDrawing_.UpdateDragStyle(DragCursorStyle::COPY);
+        updateStyle = DragCursorStyle::COPY;
     } else {
-        return dragDrawing_.UpdateDragStyle(style);
+        updateStyle = style;
     }
+    stateNotify_.StyleChangedNotify(updateStyle);
+    return dragDrawing_.UpdateDragStyle(updateStyle);
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
