@@ -28,15 +28,15 @@ class DeviceStatusDataParse {
 public:
     DeviceStatusDataParse() = default;
     ~DeviceStatusDataParse() = default;
-    bool ParseDeviceStatusData(Type type, Data& data);
+    bool ParseDeviceStatusData(Type type, Data &data);
     bool DisableCount(const Type type);
-    bool DeviceStatusDataInit(const std::string& fileData, bool logStatus, Type& type, Data& data);
+    bool DeviceStatusDataInit(const std::string &fileData, bool logStatus, Type &type, Data &data);
     int32_t CreateJsonFile();
 
 private:
-    bool CheckFileDir(const std::string& filePath, const std::string& dir);
-    bool CheckFileSize(const std::string& filePath);
-    bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension);
+    bool CheckFileDir(const std::string &filePath, const std::string &dir);
+    bool CheckFileSize(const std::string &filePath);
+    bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension);
     std::string ReadFile(const std::string &filePath);
     std::string ReadJsonFile(const std::string &filePath);
     static std::vector<int32_t> tempcount_;

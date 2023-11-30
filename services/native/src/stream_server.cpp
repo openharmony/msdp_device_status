@@ -69,7 +69,7 @@ int32_t StreamServer::GetClientPid(int32_t fd) const
     return it->second->GetPid();
 }
 
-bool StreamServer::SendMsg(int32_t fd, NetPacket& pkt)
+bool StreamServer::SendMsg(int32_t fd, NetPacket &pkt)
 {
     if (fd < 0) {
         FI_HILOGE("The fd is less than 0");
@@ -91,8 +91,8 @@ void StreamServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
     }
 }
 
-int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t moduleType, int32_t uid, int32_t pid,
-    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+int32_t StreamServer::AddSocketPairInfo(const std::string &programName, int32_t moduleType, int32_t uid, int32_t pid,
+    int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     int32_t sockFds[2] = { -1 };
@@ -126,7 +126,7 @@ int32_t StreamServer::AddSocketPairInfo(const std::string& programName, int32_t 
     return RET_OK;
 }
 
-int32_t StreamServer::SetSockOpt(int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
+int32_t StreamServer::SetSockOpt(int32_t &serverFd, int32_t &toReturnClientFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     static constexpr size_t bufferSize = 32 * 1024;
@@ -162,7 +162,7 @@ int32_t StreamServer::SetSockOpt(int32_t& serverFd, int32_t& toReturnClientFd, i
     return RET_OK;
 }
 
-int32_t StreamServer::CloseFd(int32_t& serverFd, int32_t& toReturnClientFd)
+int32_t StreamServer::CloseFd(int32_t &serverFd, int32_t &toReturnClientFd)
 {
     if (close(serverFd) < 0) {
         FI_HILOGE("Close server fd failed, error:%{public}s, serverFd:%{public}d", strerror(errno), serverFd);
@@ -180,7 +180,7 @@ void StreamServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-void StreamServer::ReleaseSession(int32_t fd, epoll_event& ev)
+void StreamServer::ReleaseSession(int32_t fd, epoll_event &ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
@@ -201,14 +201,14 @@ void StreamServer::ReleaseSession(int32_t fd, epoll_event& ev)
     }
 }
 
-void StreamServer::OnPacket(int32_t fd, NetPacket& pkt)
+void StreamServer::OnPacket(int32_t fd, NetPacket &pkt)
 {
     auto sess = GetSession(fd);
     CHKPV(sess);
     recvFun_(sess, pkt);
 }
 
-void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
+void StreamServer::OnEpollRecv(int32_t fd, epoll_event &ev)
 {
     if (fd < 0) {
         FI_HILOGE("Invalid fd:%{public}d", fd);
@@ -242,7 +242,7 @@ void StreamServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     }
 }
 
-void StreamServer::OnEpollEvent(epoll_event& ev)
+void StreamServer::OnEpollEvent(epoll_event &ev)
 {
     CHKPV(ev.data.ptr);
     int32_t fd = *static_cast<int32_t*>(ev.data.ptr);

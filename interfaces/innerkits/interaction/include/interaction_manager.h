@@ -25,6 +25,7 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
+#include "i_start_drag_listener.h"
 #include "i_hotarea_listener.h"
 #include "i_subscript_listener.h"
 
@@ -108,11 +109,11 @@ public:
     /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
-     * @param callback Indicates the callback used to return the dragging result.
+     * @param listener Indicates the listener used to notify dragging result etc.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback);
+    int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 
     /**
      * @brief Stops dragging.
@@ -202,7 +203,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height);
+    int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
 
     /**
      * @brief Updates the shadow thumbnail information used for dragging.
@@ -261,12 +262,21 @@ public:
     int32_t RemoveHotAreaListener(std::shared_ptr<IHotAreaListener> listener = nullptr);
 
     /**
-     * @brief Update item style when dragging.
-     * @param dragItemStyle Indicates the style param for dragged item.
+     * @brief Update preview style when dragging.
+     * @param previewStyle Indicates the preview style param for dragged item.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 11
      */
-    int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle);
+    int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
+
+    /**
+     * @brief Update preview style with animation when dragging.
+     * @param previewStyle Indicates the preview style param for dragged item.
+     * @param animation Indicates the animation param for dragged item.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 11
+     */
+    int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     
     /**
      * @brief 获取拖拽对象的数据摘要。

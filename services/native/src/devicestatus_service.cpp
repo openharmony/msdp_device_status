@@ -261,7 +261,7 @@ void DeviceStatusService::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     WriteUnSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }
 
-Data DeviceStatusService::GetCache(const Type& type)
+Data DeviceStatusService::GetCache(const Type &type)
 {
     CALL_DEBUG_ENTER;
     if (devicestatusManager_ == nullptr) {
@@ -766,7 +766,7 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
     return ret;
 }
 
-int32_t DeviceStatusService::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DeviceStatusService::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset, &dragMgr_,
@@ -846,7 +846,7 @@ int32_t DeviceStatusService::GetDragTargetPid()
     return ret;
 }
 
-int32_t DeviceStatusService::GetDragAction(DragAction& dragAction)
+int32_t DeviceStatusService::GetDragAction(DragAction &dragAction)
 {
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::GetDragAction, &dragMgr_, std::ref(dragAction)));
@@ -1072,13 +1072,25 @@ int32_t DeviceStatusService::RemoveHotAreaListener()
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DeviceStatusService::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::UpdateDragItemStyle, &dragMgr_, dragItemStyle));
+        std::bind(&DragManager::UpdatePreviewStyle, &dragMgr_, previewStyle));
     if (ret != RET_OK) {
-        FI_HILOGE("UpdateDragItemStyle failed, ret:%{public}d", ret);
+        FI_HILOGE("UpdatePreviewStyle failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceStatusService::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::UpdatePreviewStyleWithAnimation, &dragMgr_, previewStyle, animation));
+    if (ret != RET_OK) {
+        FI_HILOGE("UpdatePreviewStyleWithAnimation failed, ret:%{public}d", ret);
     }
     return ret;
 }

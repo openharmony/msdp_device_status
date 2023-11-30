@@ -37,17 +37,19 @@ int32_t DragManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return DeviceStatusClient::GetInstance().UpdateDragStyle(style);
 }
 
-int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, RET_ERR);
-    CHKPR(dragData.shadowInfo.pixelMap, RET_ERR);
-    if ((dragData.shadowInfo.x > 0) || (dragData.shadowInfo.y > 0) ||
-        (dragData.shadowInfo.x < -dragData.shadowInfo.pixelMap->GetWidth()) ||
-        (dragData.shadowInfo.y < -dragData.shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Start drag, invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            dragData.shadowInfo.x, dragData.shadowInfo.y);
-        return RET_ERR;
+    CHKPR(listener, RET_ERR);
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
+        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
+            (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
+                shadowInfo.x, shadowInfo.y);
+            return RET_ERR;
+        }
     }
     if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
         (dragData.displayX < 0) || (dragData.displayY < 0)) {
@@ -58,7 +60,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::function<void(
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
-        stopCallback_ = callback;
+        startDragListener_ = listener;
     }
     return DeviceStatusClient::GetInstance().StartDrag(dragData);
 }
@@ -81,7 +83,7 @@ int32_t DragManagerImpl::GetUdKey(std::string &udKey)
     return DeviceStatusClient::GetInstance().GetUdKey(udKey);
 }
 
-int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnNotifyResult(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     DragNotifyMsg notifyMsg;
@@ -98,12 +100,21 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient& client, NetPacket& p
     }
     notifyMsg.result = static_cast<DragResult>(result);
     std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(stopCallback_, RET_ERR);
-    stopCallback_(notifyMsg);
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnDragEndMessage(notifyMsg);
     return RET_OK;
 }
 
-int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnNotifyHideIcon(const StreamClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(startDragListener_, RET_ERR);
+    startDragListener_->OnHideIconMessage();
+    return RET_OK;
+}
+
+int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t state = 0;
@@ -119,7 +130,7 @@ int32_t DragManagerImpl::OnStateChangedMessage(const StreamClient& client, NetPa
     return RET_OK;
 }
 
-int32_t DragManagerImpl::OnDragStyleChangedMessage(const StreamClient& client, NetPacket& pkt)
+int32_t DragManagerImpl::OnDragStyleChangedMessage(const StreamClient &client, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t style = 0;
@@ -233,7 +244,7 @@ int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
     return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
 }
 
-int32_t DragManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DragManagerImpl::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY, width, height);
@@ -265,9 +276,15 @@ int32_t DragManagerImpl::GetDragState(DragState &dragState)
     return DeviceStatusClient::GetInstance().GetDragState(dragState);
 }
 
-int32_t DragManagerImpl::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DragManagerImpl::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
-    return DeviceStatusClient::GetInstance().UpdateDragItemStyle(dragItemStyle);
+    return DeviceStatusClient::GetInstance().UpdatePreviewStyle(previewStyle);
+}
+
+int32_t DragManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    return DeviceStatusClient::GetInstance().UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys)
@@ -276,7 +293,7 @@ int32_t DragManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys
     return DeviceStatusClient::GetInstance().GetDragSummary(summarys);
 }
 
-int32_t DragManagerImpl::GetDragAction(DragAction& dragAction)
+int32_t DragManagerImpl::GetDragAction(DragAction &dragAction)
 {
     return DeviceStatusClient::GetInstance().GetDragAction(dragAction);
 }

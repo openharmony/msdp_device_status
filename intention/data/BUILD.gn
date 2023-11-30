@@ -27,6 +27,9 @@ config("cooperate_params_config") {
 
 ohos_source_set("cooperate_params") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -63,6 +66,9 @@ config("drag_params_config") {
 
 ohos_source_set("drag_params") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false

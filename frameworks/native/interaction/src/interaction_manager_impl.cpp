@@ -68,6 +68,8 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
         {MessageId::DRAG_STATE_LISTENER,
             MsgCallbackBind2(&DragManagerImpl::OnStateChangedMessage, &dragManagerImpl_)},
+        {MessageId::DRAG_NOTIFY_HIDE_ICON,
+            MsgCallbackBind2(&DragManagerImpl::OnNotifyHideIcon, &dragManagerImpl_)},
         {MessageId::DRAG_STYLE_LISTENER,
             MsgCallbackBind2(&DragManagerImpl::OnDragStyleChangedMessage, &dragManagerImpl_)}
     };
@@ -217,7 +219,7 @@ int32_t InteractionManagerImpl::UpdateDragStyle(DragCursorStyle style)
     return dragManagerImpl_.UpdateDragStyle(style);
 }
 
-int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -225,7 +227,7 @@ int32_t InteractionManagerImpl::StartDrag(const DragData &dragData, std::functio
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return dragManagerImpl_.StartDrag(dragData, callback);
+    return dragManagerImpl_.StartDrag(dragData, listener);
 }
 
 int32_t InteractionManagerImpl::StopDrag(const DragDropResult &dropResult)
@@ -286,7 +288,7 @@ int32_t InteractionManagerImpl::SetDragWindowVisible(bool visible)
     return dragManagerImpl_.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManagerImpl::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t InteractionManagerImpl::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.GetShadowOffset(offsetX, offsetY, width, height);
@@ -352,10 +354,17 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t InteractionManagerImpl::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.UpdateDragItemStyle(dragItemStyle);
+    return dragManagerImpl_.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t InteractionManagerImpl::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t InteractionManagerImpl::GetDragSummary(std::map<std::string, int64_t> &summarys)

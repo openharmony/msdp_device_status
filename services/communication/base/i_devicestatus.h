@@ -35,7 +35,7 @@ public:
     virtual void Unsubscribe(Type type,
         ActivityEvent event,
         sptr<IRemoteDevStaCallback> callback) = 0;
-    virtual Data GetCache(const Type& type) = 0;
+    virtual Data GetCache(const Type &type) = 0;
 
     virtual int32_t RegisterCoordinationListener(bool isCheckPermission = false) = 0;
     virtual int32_t UnregisterCoordinationListener(bool isCheckPermission = false) = 0;
@@ -58,7 +58,7 @@ public:
     virtual int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t SetDragWindowVisible(bool visible) = 0;
-    virtual int32_t GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) = 0;
+    virtual int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) = 0;
     virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragState(DragState &dragState) = 0;
@@ -73,7 +73,9 @@ public:
 
     virtual int32_t AddHotAreaListener() = 0;
     virtual int32_t RemoveHotAreaListener() = 0;
-    virtual int32_t UpdateDragItemStyle(const DragItemStyle &dragItemStyle) = 0;
+    virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
+    virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+        const PreviewAnimation &animation) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.msdp.Idevicestatus");
 };
 } // namespace DeviceStatus

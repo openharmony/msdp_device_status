@@ -19,6 +19,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "pixel_map.h"
@@ -29,14 +30,31 @@ namespace DeviceStatus {
 constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
+constexpr int32_t SHADOW_NUM_LIMIT { 3 };
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
     int32_t y { -1 };
+
+    bool operator == (const ShadowInfo &other) const
+    {
+        if (pixelMap == nullptr && other.pixelMap == nullptr) {
+            return x == other.x && y == other.y;
+        }
+        if (pixelMap == nullptr || other.pixelMap == nullptr) {
+            return false;
+        }
+        return pixelMap->IsSameImage(*(other.pixelMap)) && x == other.x && y == other.y;
+    }
+
+    bool operator !=  (const ShadowInfo &other) const
+    {
+        return !(*this == other);
+    }
 };
 
 struct DragData {
-    ShadowInfo shadowInfo;
+    std::vector<ShadowInfo> shadowInfos;
     std::vector<uint8_t> buffer;
     std::string udKey;
     std::string extraInfo;
@@ -49,6 +67,20 @@ struct DragData {
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
     std::map<std::string, int64_t> summarys;
+
+    bool operator == (const DragData &other) const
+    {
+        return shadowInfos == other.shadowInfos && buffer == other.buffer && udKey == other.udKey &&
+               filterInfo == other.filterInfo && extraInfo == other.extraInfo && sourceType == other.sourceType &&
+               dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
+               displayY == other.displayY && displayId == other.displayId &&
+               hasCanceledAnimation == other.hasCanceledAnimation && summarys == other.summarys;
+    }
+
+    bool operator != (const DragData &other) const
+    {
+        return !(*this == other);
+    }
 };
 
 enum class DragState {
@@ -87,21 +119,36 @@ struct DragNotifyMsg {
     DragResult result { DragResult::DRAG_FAIL };
 };
 
-struct DragItemStyle {
+enum class PreviewType {
+    FOREGROUND_COLOR = 0,
+    OPACITY = 1,
+    RADIUS = 2,
+    SCALE = 3
+};
+
+struct PreviewStyle {
+    std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };
-    int32_t radius { 0 };
-    uint32_t alpha { 0 };
+    int32_t opacity { -1 };
+    int32_t radius { -1 };
+    float scale { -1 };
 
-    bool operator == (const DragItemStyle &style) const
+    bool operator == (const PreviewStyle &other) const
     {
-        return foregroundColor == style.foregroundColor &&
-               radius == style.radius && alpha == style.alpha;
+        return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
+               radius == other.radius && scale == other.scale;
     }
 
-    bool operator!=(const DragItemStyle &style) const
+    bool operator!=(const PreviewStyle &other) const
     {
-        return !(*this == style);
+        return !(*this == other);
     }
+};
+
+struct PreviewAnimation {
+    int32_t duration { -1 };
+    std::string curveName;
+    std::vector<float> curve;
 };
 
 enum class DragCursorStyle {

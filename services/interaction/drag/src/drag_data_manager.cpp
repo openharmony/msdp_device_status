@@ -48,9 +48,9 @@ void DragDataManager::Init(const DragData &dragData)
     targetTid_ = -1;
 }
 
-void DragDataManager::SetShadowInfo(const ShadowInfo &shadowInfo)
+void DragDataManager::SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos)
 {
-    dragData_.shadowInfo = shadowInfo;
+    dragData_.shadowInfos = shadowInfos;
 }
 
 DragCursorStyle DragDataManager::GetDragStyle() const
@@ -93,11 +93,15 @@ int32_t DragDataManager::GetTargetPid() const
     return targetPid_;
 }
 
-int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height) const
+int32_t DragDataManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) const
 {
-    offsetX = dragData_.shadowInfo.x;
-    offsetY = dragData_.shadowInfo.y;
-    auto pixelMap = dragData_.shadowInfo.pixelMap;
+    if (dragData_.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return  RET_ERR;
+    }
+    offsetX = dragData_.shadowInfos.front().x;
+    offsetY = dragData_.shadowInfos.front().y;
+    auto pixelMap = dragData_.shadowInfos.front().pixelMap;
     CHKPR(pixelMap, RET_ERR);
     width = pixelMap->GetWidth();
     height = pixelMap->GetHeight();
@@ -109,10 +113,8 @@ int32_t DragDataManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int
 void DragDataManager::ResetDragData()
 {
     CALL_DEBUG_ENTER;
-    ShadowInfo shadowInfo;
-    std::vector<uint8_t> buffer;
-    dragData_ = { shadowInfo, buffer, "", "", "", -1, -1, -1, -1, -1, -1, false };
-    dragItemStyle_ = { };
+    dragData_ = { };
+    previewStyle_ = { };
     dragStyle_ = DragCursorStyle::DEFAULT;
     visible_ = false;
     targetTid_ = -1;
@@ -132,14 +134,14 @@ bool DragDataManager::IsMotionDrag() const
     return isMotionDrag_;
 }
 
-void DragDataManager::SetDragItemStyle(const DragItemStyle &dragItemStyle)
+void DragDataManager::SetPreviewStyle(const PreviewStyle &previewStyle)
 {
-    dragItemStyle_ = dragItemStyle;
+    previewStyle_ = previewStyle;
 }
 
-DragItemStyle DragDataManager::GetDragItemStyle()
+PreviewStyle DragDataManager::GetPreviewStyle()
 {
-    return dragItemStyle_;
+    return previewStyle_;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

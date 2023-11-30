@@ -36,17 +36,9 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
-constexpr int32_t DINPUT_LINK_TYPE_MAX { 4 };
-const SessionAttribute g_sessionAttr = {
-    .dataType = SessionType::TYPE_BYTES,
-    .linkTypeNum = DINPUT_LINK_TYPE_MAX,
-    .linkType = {
-        LINK_TYPE_WIFI_P2P,
-        LINK_TYPE_WIFI_WLAN_2G,
-        LINK_TYPE_WIFI_WLAN_5G
-    }
-};
-
+constexpr uint32_t QOS_LEN = 3;
+constexpr int32_t MIN_BW = 160 * 1024 * 1024;
+constexpr int32_t LATENCY = 1600;
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
@@ -122,35 +114,19 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser &p
 }
 } // namespace
 
-static int32_t SessionOpened(int32_t sessionId, int32_t result)
+static void BindLink(int32_t socket, PeerSocketInfo info)
 {
-    return COOR_SOFTBUS_ADAPTER->OnSessionOpened(sessionId, result);
+    COOR_SOFTBUS_ADAPTER->OnBind(socket, info);
 }
 
-static void SessionClosed(int32_t sessionId)
+static void ShutdownLink(int32_t socket, ShutdownReason reason)
 {
-    COOR_SOFTBUS_ADAPTER->OnSessionClosed(sessionId);
+    COOR_SOFTBUS_ADAPTER->OnShutdown(socket, reason);
 }
 
-static void BytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+static void BytesReceived(int32_t socket, const void *data, uint32_t dataLen)
 {
-    COOR_SOFTBUS_ADAPTER->OnBytesReceived(sessionId, data, dataLen);
-}
-
-static void MessageReceived(int32_t sessionId, const void *data, uint32_t dataLen)
-{
-    (void)sessionId;
-    (void)data;
-    (void)dataLen;
-}
-
-static void StreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
-    const StreamFrameInfo *param)
-{
-    (void)sessionId;
-    (void)data;
-    (void)ext;
-    (void)param;
+    COOR_SOFTBUS_ADAPTER->OnBytes(socket, data, dataLen);
 }
 
 int32_t CoordinationSoftbusAdapter::Init()
@@ -158,13 +134,6 @@ int32_t CoordinationSoftbusAdapter::Init()
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     const std::string SESS_NAME = "ohos.msdp.device_status.";
-    sessListener_ = {
-        .OnSessionOpened = SessionOpened,
-        .OnSessionClosed = SessionClosed,
-        .OnBytesReceived = BytesReceived,
-        .OnMessageReceived = MessageReceived,
-        .OnStreamReceived = StreamReceived
-    };
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty()) {
         FI_HILOGE("Local network id is empty");
@@ -175,22 +144,36 @@ int32_t CoordinationSoftbusAdapter::Init()
         FI_HILOGI("Softbus session server has already created");
         return RET_OK;
     }
-    int32_t ret = RET_ERR;
-    if (!localSessionName_.empty()) {
-        FI_HILOGD("Remove last sesison server, sessionName:%{public}s", localSessionName_.c_str());
-        ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
-        if (ret != RET_OK) {
-            FI_HILOGE("Remove softbus session server failed, error code:%{public}d", ret);
-        }
-    }
-
     localSessionName_ = sessionName;
-    ret = CreateSessionServer(FI_PKG_NAME, localSessionName_.c_str(), &sessListener_);
-    if (ret != RET_OK) {
-        FI_HILOGE("Create softbus session server failed, error code:%{public}d", ret);
+    char name[DEVICE_NAME_SIZE_MAX] = {};
+    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
+        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
-    return RET_OK;
+    char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
+    SocketInfo info = {
+        .name = name,
+        .pkgName = pkgName,
+        .dataType = DATA_TYPE_BYTES
+    };
+    socketFd_ = Socket(info);
+    QosTV serverQos[] = {
+        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
+    };
+    ISocketListener listener = {
+        .OnBind = BindLink,
+        .OnShutdown = ShutdownLink,
+        .OnBytes = BytesReceived
+    };
+    int32_t ret = Listen(socketFd_, serverQos, QOS_LEN, &listener);
+    if (ret == RET_OK) {
+        FI_HILOGI("server set ok");
+    } else {
+        FI_HILOGE("server set failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 CoordinationSoftbusAdapter::~CoordinationSoftbusAdapter()
@@ -203,13 +186,11 @@ void CoordinationSoftbusAdapter::Release()
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     std::for_each(sessionDevs_.begin(), sessionDevs_.end(), [](auto item) {
-        CloseSession(item.second);
+        Shutdown(item.second);
         FI_HILOGD("Session closed successful");
     });
-    int32_t ret = RemoveSessionServer(FI_PKG_NAME, localSessionName_.c_str());
-    FI_HILOGD("Release removeSessionServer ret:%{public}d", ret);
+    Shutdown(socketFd_);
     sessionDevs_.clear();
-    channelStatuss_.clear();
 }
 
 bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remoteNetworkId)
@@ -222,31 +203,69 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
     return true;
 }
 
+int32_t CoordinationSoftbusAdapter::ChkAndCpyStr(char* dest, uint32_t destLen, const std::string &src)
+{
+    if (destLen < src.length() + 1) {
+        FI_HILOGE("Invalid src length");
+        return RET_ERR;
+    }
+    if (strcpy_s(dest, destLen, src.c_str()) != EOK) {
+        FI_HILOGE("Invalid src");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
-    const std::string GROUP_ID = "fi_softbus_group_id";
     const std::string SESSION_NAME = "ohos.msdp.device_status.";
     if (CheckDeviceSessionState(remoteNetworkId)) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
     }
-
-    int32_t ret = Init();
-    if (ret != RET_OK) {
-        FI_HILOGE("Init failed");
+    char name[DEVICE_NAME_SIZE_MAX] = {};
+    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
+        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
-
     std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
-    FI_HILOGE("PeerSessionName:%{public}s", peerSessionName.c_str());
-    int32_t sessionId = OpenSession(localSessionName_.c_str(), peerSessionName.c_str(), remoteNetworkId.c_str(),
-        GROUP_ID.c_str(), &g_sessionAttr);
-    if (sessionId < 0) {
-        FI_HILOGE("Open session failed");
+    char peerName[DEVICE_NAME_SIZE_MAX] = {};
+    if (ChkAndCpyStr(peerName, DEVICE_NAME_SIZE_MAX, peerSessionName.c_str()) != RET_OK) {
+        FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
         return RET_ERR;
     }
-    return WaitSessionOpend(remoteNetworkId, sessionId);
+    char peerNetworkId[PKG_NAME_SIZE_MAX] = {};
+    if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
+        return RET_ERR;
+    }
+    char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
+    SocketInfo info = {
+        .name = name,
+        .peerName = peerName,
+        .peerNetworkId = peerNetworkId,
+        .pkgName = pkgName,
+        .dataType = DATA_TYPE_BYTES
+    };
+    int32_t socket = Socket(info);
+    QosTV clientQos[] = {
+        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
+    };
+    ISocketListener listener = {
+        .OnBind = BindLink,
+        .OnShutdown = ShutdownLink,
+        .OnBytes = BytesReceived
+    };
+    int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
+    if (ret == RET_OK) {
+        sessionDevs_[remoteNetworkId] = socket;
+    } else {
+        FI_HILOGE("bind failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId)
@@ -255,12 +274,11 @@ int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNe
     std::unique_lock<std::mutex> waitLock(operationMutex_);
     sessionDevs_[remoteNetworkId] = sessionId;
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
-        [this, remoteNetworkId] () { return channelStatuss_[remoteNetworkId]; });
+        [this, remoteNetworkId] () { return false; });
     if (!status) {
         FI_HILOGE("Open session timeout");
         return RET_ERR;
     }
-    channelStatuss_[remoteNetworkId] = false;
     return RET_OK;
 }
 
@@ -274,10 +292,8 @@ void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteNetw
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
 
-    CloseSession(sessionId);
+    Shutdown(sessionId);
     sessionDevs_.erase(remoteNetworkId);
-    channelStatuss_.erase(remoteNetworkId);
-    sessionId_ = -1;
 }
 
 std::shared_ptr<CoordinationSoftbusAdapter> CoordinationSoftbusAdapter::GetInstance()
@@ -356,7 +372,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("Sent sendMsg unsuccessful, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -380,7 +396,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("Sent sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -405,7 +421,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("SendMsg sent failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -433,7 +449,7 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("Sent sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -457,7 +473,7 @@ int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteN
     int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("SendMsg sent failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -469,7 +485,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(originNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the origin device");
+        FI_HILOGE("Failed to discover the original device");
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[originNetworkId];
@@ -482,13 +498,13 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        FI_HILOGE("Sent sendMsg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
 }
 
-void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string &message)
+void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::string &message)
 {
     if (message.empty()) {
         FI_HILOGE("Handle session data, message is empty");
@@ -521,36 +537,36 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t sessionId, const std:
         }
         return;
     }
-    HandleCoordinationSessionData(sessionId, parser);
+    HandleCoordinationSessionData(socket, parser);
 }
 
-void CoordinationSoftbusAdapter::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
+void CoordinationSoftbusAdapter::OnBytes(int32_t socket, const void *data, uint32_t dataLen)
 {
     FI_HILOGD("dataLen:%{public}d", dataLen);
-    if ((sessionId < 0) || (data == nullptr) || (dataLen <= 0)) {
+    if ((socket < 0) || (data == nullptr) || (dataLen <= 0)) {
         FI_HILOGE("Param check failed");
         return;
     }
     std::string message = std::string(static_cast<const char *>(data), dataLen);
-    HandleSessionData(sessionId, message);
+    HandleSessionData(socket, message);
 }
 
-int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
+int32_t CoordinationSoftbusAdapter::SendMsg(int32_t socket, const std::string &message)
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
         FI_HILOGW("Error:the message size:%{public}zu beyond the maximum limit", message.size());
         return RET_ERR;
     }
-    return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
+    return SendBytes(socket, message.c_str(), strlen(message.c_str()));
 }
 
-std::string CoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
+std::string CoordinationSoftbusAdapter::FindDevice(int32_t socket)
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     auto find_item = std::find_if(sessionDevs_.begin(), sessionDevs_.end(),
-        [sessionId](const std::map<std::string, int32_t>::value_type item) {
-        return item.second == sessionId;
+        [socket](const std::map<std::string, int32_t>::value_type item) {
+        return item.second == socket;
     });
     if (find_item == sessionDevs_.end()) {
         FI_HILOGE("Find device error");
@@ -559,57 +575,33 @@ std::string CoordinationSoftbusAdapter::FindDevice(int32_t sessionId)
     return find_item->first;
 }
 
-int32_t CoordinationSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t result)
+int32_t CoordinationSoftbusAdapter::OnBind(int32_t socket, PeerSocketInfo info)
 {
     CALL_INFO_TRACE;
-    char peerDevId[DEVICE_ID_SIZE_MAX] = {};
-    sessionId_ = sessionId;
-    int32_t getPeerDeviceIdResult = GetPeerDeviceId(sessionId, peerDevId, sizeof(peerDevId));
-    FI_HILOGD("Get peer device id ret:%{public}d", getPeerDeviceIdResult);
-    if (result != RET_OK) {
-        std::string networkId = FindDevice(sessionId);
-        FI_HILOGE("Failed to open session, result:%{public}d", result);
+    if (socket == -1) {
+        std::string networkId = FindDevice(socket);
         std::unique_lock<std::mutex> sessionLock(operationMutex_);
         if (sessionDevs_.find(networkId) != sessionDevs_.end()) {
             sessionDevs_.erase(networkId);
         }
-        if (getPeerDeviceIdResult == RET_OK) {
-            channelStatuss_[peerDevId] = true;
-        }
-        openSessionWaitCond_.notify_all();
         return RET_OK;
     }
-
-    int32_t sessSide = GetSessionSide(sessionId);
-    FI_HILOGI("SoftbusSession open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
-        sessionId, sessSide);
-    std::lock_guard<std::mutex> notifyLock(operationMutex_);
-    if (sessSide == SESSION_SIDE_SERVER) {
-        if (getPeerDeviceIdResult == RET_OK) {
-            sessionDevs_[peerDevId] = sessionId;
-        }
-    } else {
-        if (getPeerDeviceIdResult == RET_OK) {
-            channelStatuss_[peerDevId] = true;
-        }
-        openSessionWaitCond_.notify_all();
-    }
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    sessionDevs_[info.deviceId] = socket;
     return RET_OK;
 }
 
-void CoordinationSoftbusAdapter::OnSessionClosed(int32_t sessionId)
+void CoordinationSoftbusAdapter::OnShutdown(int32_t socket, ShutdownReason reason)
 {
     CALL_DEBUG_ENTER;
-    std::string networkId = FindDevice(sessionId);
+    (void)reason;
+    std::string networkId = FindDevice(socket);
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(networkId) != sessionDevs_.end()) {
         sessionDevs_.erase(networkId);
     }
-    if (GetSessionSide(sessionId) != 0) {
-        channelStatuss_.erase(networkId);
-    }
     COOR_SM->OnSoftbusSessionClosed(networkId);
-    sessionId_ = -1;
+    socketFd_ = -1;
 }
 
 void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)
@@ -700,14 +692,14 @@ void CoordinationSoftbusAdapter::HandleCoordinationSessionData(int32_t sessionId
 void CoordinationSoftbusAdapter::ConfigTcpAlive()
 {
     CALL_DEBUG_ENTER;
-    if (sessionId_ < 0) {
+    if (socketFd_ < 0) {
         FI_HILOGW("Config tcp alive, invalid sessionId");
         return;
     }
     int32_t handle { -1 };
-    int32_t result = GetSessionHandle(sessionId_, &handle);
+    int32_t result = GetSessionHandle(socketFd_, &handle);
     if (result != RET_OK) {
-        FI_HILOGE("Failed to get the session handle, sessionId:%{public}d, handle:%{public}d", sessionId_, handle);
+        FI_HILOGE("Failed to get the session handle, sessionId:%{public}d, handle:%{public}d", socketFd_, handle);
         return;
     }
     int32_t keepAliveTimeout { 10 };

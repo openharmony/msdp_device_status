@@ -409,7 +409,7 @@ int32_t DeviceStatusClient::SetDragWindowVisible(bool visible)
     return devicestatusProxy_->SetDragWindowVisible(visible);
 }
 
-int32_t DeviceStatusClient::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DeviceStatusClient::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
@@ -465,10 +465,17 @@ int32_t DeviceStatusClient::RemoveHotAreaListener()
     return devicestatusProxy_->RemoveHotAreaListener();
 }
 
-int32_t DeviceStatusClient::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t DeviceStatusClient::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UpdateDragItemStyle(dragItemStyle);
+    return devicestatusProxy_->UpdatePreviewStyle(previewStyle);
+}
+
+int32_t DeviceStatusClient::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t DeviceStatusClient::GetDragSummary(std::map<std::string, int64_t> &summarys)

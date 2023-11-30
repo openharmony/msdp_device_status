@@ -19,6 +19,9 @@ config("interaction_drag_public_config") {
 
 ohos_shared_library("interaction_drag") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false

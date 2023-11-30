@@ -77,9 +77,9 @@ int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
     return INTER_MGR_IMPL.UpdateDragStyle(style);
 }
 
-int32_t InteractionManager::StartDrag(const DragData &dragData, std::function<void(const DragNotifyMsg&)> callback)
+int32_t InteractionManager::StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener)
 {
-    return INTER_MGR_IMPL.StartDrag(dragData, callback);
+    return INTER_MGR_IMPL.StartDrag(dragData, listener);
 }
 
 int32_t InteractionManager::StopDrag(const DragDropResult &dropResult)
@@ -122,7 +122,7 @@ int32_t InteractionManager::SetDragWindowVisible(bool visible)
     return INTER_MGR_IMPL.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManager::GetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     return INTER_MGR_IMPL.GetShadowOffset(offsetX, offsetY, width, height);
 }
@@ -152,9 +152,15 @@ int32_t InteractionManager::RemoveHotAreaListener(std::shared_ptr<IHotAreaListen
     return INTER_MGR_IMPL.RemoveHotAreaListener(listener);
 }
 
-int32_t InteractionManager::UpdateDragItemStyle(const DragItemStyle &dragItemStyle)
+int32_t InteractionManager::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
-    return INTER_MGR_IMPL.UpdateDragItemStyle(dragItemStyle);
+    return INTER_MGR_IMPL.UpdatePreviewStyle(previewStyle);
+}
+
+int32_t InteractionManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
+    const PreviewAnimation &animation)
+{
+    return INTER_MGR_IMPL.UpdatePreviewStyleWithAnimation(previewStyle, animation);
 }
 
 int32_t InteractionManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
