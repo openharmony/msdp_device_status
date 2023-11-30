@@ -74,7 +74,6 @@ public:
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;
-    int32_t SendCommonData(DeviceInterfaceCode interfaceCode);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

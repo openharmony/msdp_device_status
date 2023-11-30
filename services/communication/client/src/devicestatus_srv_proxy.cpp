@@ -34,25 +34,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
 } // namespace
 
-int32_t DeviceStatusSrvProxy::SendCommonData(DeviceInterfaceCode interfaceCode)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
-        FI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(interfaceCode), data, reply, option);
-    if (ret != RET_OK) {
-        FI_HILOGE("Send request failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
 {
@@ -546,25 +527,81 @@ int32_t DeviceStatusSrvProxy::AllocSocketFd(const std::string &programName, int3
 int32_t DeviceStatusSrvProxy::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::REGISTER_DRAG_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_DRAG_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_DRAG_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::AddSubscriptListener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_SUBSCRIPT_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::RemoveSubscriptListener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_SUBSCRIPT_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
@@ -644,13 +681,41 @@ int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
 int32_t DeviceStatusSrvProxy::AddHotAreaListener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::RemoveHotAreaListener()
 {
     CALL_DEBUG_ENTER;
-    return SendCommonData(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceStatusSrvProxy::UpdatePreviewStyle(const PreviewStyle &previewStyle)
