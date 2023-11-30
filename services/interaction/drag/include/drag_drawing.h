@@ -95,6 +95,8 @@ struct DrawingInfo {
     int32_t rootNodeHeight { -1 };
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
+    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> mutilSelectedNodes;
+    std::vector<std::shared_ptr<Media::PixelMap>> mutilSelectedPixelMaps;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<Rosen::RSNode> parentNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
@@ -177,6 +179,9 @@ private:
     int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
     int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
+    void MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
+    void InitMutilSelectedNodes();
+    void ClearMutilSelectedData();
 
 private:
     int64_t startNum_ { -1 };
