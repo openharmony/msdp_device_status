@@ -79,14 +79,13 @@ int32_t InputAdapter::AddFilter(std::function<void(std::shared_ptr<MMI::PointerE
     int32_t POINTER_DEFAULT_PRIORITY = 220;
     auto filter = std::make_shared<PointerFilter>(callback);
     uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
-    FI_HILOGE("touchtags:%{public}d", static_cast<int32_t>(touchTags));
     if (filterId_ >= 0) {
         RemoveFilter(filterId_);
     }
     filterId_ =
         MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
     if (filterId_ < 0) {
-        FI_HILOGE("Add Event Filter failed");
+        return;
     }
     filter->UpdateCurrentFilterId(filterId_);
 }
