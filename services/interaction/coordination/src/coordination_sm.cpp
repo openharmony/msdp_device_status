@@ -831,14 +831,6 @@ void CoordinationSM::Dump(int32_t fd)
 void CoordinationSM::UpdateLastPointerEventCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     lastPointerEvent_ = pointerEvent;
-    CHKPV(pointerEvent);
-    auto *context = COOR_EVENT_MGR->GetIContext();
-    CHKPV(context);
-    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
-        std::bind(&CoordinationHotArea::ProcessData, HOT_AREA, pointerEvent));
-    if (ret != RET_OK) {
-        FI_HILOGE("Posting async task failed");
-    }
 }
 
 std::shared_ptr<MMI::PointerEvent> CoordinationSM::GetLastPointerEvent() const
@@ -1022,6 +1014,11 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
         if (!COOR_DEV_MGR->IsRemote(deviceId)) {
             DeactivateCoordination(isUnchained_);
         }
+    }
+
+    int32_t ret = HOT_AREA->ProcessData(pointerEvent);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to compute hot area");
     }
 }
 
