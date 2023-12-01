@@ -16,6 +16,7 @@
 #ifndef DRAG_DATA_H
 #define DRAG_DATA_H
 
+#include <cmath>
 #include <functional>
 #include <map>
 #include <memory>
@@ -31,6 +32,8 @@ constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
 constexpr int32_t SHADOW_NUM_LIMIT { 3 };
+constexpr float PERCISION { 1E-6 };
+
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -136,7 +139,7 @@ struct PreviewStyle {
     bool operator == (const PreviewStyle &other) const
     {
         return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
-               radius == other.radius && scale == other.scale;
+               radius == other.radius && fabsf(scale - other.scale) < PERCISION;
     }
 
     bool operator!=(const PreviewStyle &other) const

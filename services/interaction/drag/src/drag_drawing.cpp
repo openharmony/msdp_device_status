@@ -735,9 +735,6 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     for (size_t i = 1; i < shadowInfosSize; ++i) {
         g_drawingInfo.mutilSelectedPixelMaps.emplace_back(dragData.shadowInfos[i].pixelMap);
     }
-    if (!g_drawingInfo.mutilSelectedPixelMaps.empty()) {
-        reverse(g_drawingInfo.mutilSelectedPixelMaps.begin(), g_drawingInfo.mutilSelectedPixelMaps.end());
-    }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
@@ -1342,6 +1339,12 @@ int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }
+    size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], previewStyle) != RET_OK) {
+            FI_HILOGE("ModifyPreviewStyle failed");
+        }
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
@@ -1358,9 +1361,22 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
         originStyle.foregroundColor = color->AsArgbInt();
         originStyle.radius = previewStyle.radius;
     }
+    size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (auto color =  g_drawingInfo.mutilSelectedNodes[i]->GetShowingProperties().GetForegroundColor();
+            color.has_value()) {
+            originStyle.foregroundColor = color->AsArgbInt();
+            originStyle.radius = previewStyle.radius;
+        }
+    }
     if (ModifyPreviewStyle(pixelMapNode, originStyle) != RET_OK) {
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
+    }
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], originStyle) != RET_OK) {
+            FI_HILOGE("ModifyPreviewStyle failed");
+        }
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
@@ -1368,6 +1384,11 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     Rosen::RSNode::Animate(protocol, curve, [&]() {
         if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
             FI_HILOGE("ModifyPreviewStyle failed");
+        }
+        for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+            if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], previewStyle) != RET_OK) {
+                FI_HILOGE("ModifyPreviewStyle failed");
+            }
         }
     });
     return RET_OK;
@@ -1525,6 +1546,7 @@ void DragDrawing::InitMutilSelectedNodes()
         mutilSelectedNode->SetBgImageHeight(mutilSelectedPixelMap->GetHeight());
         mutilSelectedNode->SetBgImagePositionX(0);
         mutilSelectedNode->SetBgImagePositionY(0);
+        mutilSelectedNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
         auto rosenImage = std::make_shared<Rosen::RSImage>();
         rosenImage->SetPixelMap(mutilSelectedPixelMap);
         rosenImage->SetImageRepeat(0);
