@@ -117,7 +117,7 @@ int32_t SubscribeProfileEvents(const CISubscribeInfos* subscribeInfos,
 
     for (size_t index = 0; index < subscribeInfos->nSubscribeInfos; ++index) {
         const CSubscribeInfo &cSub = subscribeInfos->subscribeInfos[index];
-        
+
         if ((cSub.profileEvent >= ProfileEvent::EVENT_UNKNOWN) &&
             (cSub.profileEvent < ProfileEvent::EVENT_PROFILE_END)) {
             CHKPC(cSub.extraInfo);
