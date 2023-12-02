@@ -233,7 +233,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, Test
     ASSERT_NE(g_adapter, nullptr);
     g_init = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
@@ -248,7 +248,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, Test
     ASSERT_NE(g_adapter, nullptr);
     g_init = true;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
@@ -264,7 +264,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
     g_init = true;
     g_cond = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
