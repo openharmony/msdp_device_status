@@ -789,7 +789,8 @@ int32_t DragDrawing::InitLayer()
             return RET_ERR;
         }
     }
-    InitCanvas(display->GetWidth(), display->GetHeight());
+    int32_t rootNodeSize = std::max(display->GetWidth(), display->GetHeight());
+    InitCanvas(rootNodeSize, rootNodeSize);
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
@@ -862,7 +863,8 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
             return;
         }
     }
-    g_drawingInfo.surfaceNode->SetBounds(0, 0, display->GetWidth(), display->GetHeight());
+    int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
+    g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     g_drawingInfo.surfaceNode->SetPositionZ(DRAG_WINDOW_POSITION_Z);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
