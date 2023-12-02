@@ -37,7 +37,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr uint32_t QOS_LEN = 3;
-constexpr int32_t MIN_BW = 160 * 1024 * 1024;
+constexpr int32_t MIN_BW = 80 * 1024 * 1024;
 constexpr int32_t LATENCY = 1600;
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
@@ -262,6 +262,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
     if (ret == RET_OK) {
         sessionDevs_[remoteNetworkId] = socket;
+        ConfigTcpAlive(socket);
     } else {
         FI_HILOGE("bind failed, ret:%{public}d", ret);
     }
@@ -588,6 +589,7 @@ int32_t CoordinationSoftbusAdapter::OnBind(int32_t socket, PeerSocketInfo info)
     }
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     sessionDevs_[info.deviceId] = socket;
+    ConfigTcpAlive(socket);
     return RET_OK;
 }
 
@@ -689,23 +691,23 @@ void CoordinationSoftbusAdapter::HandleCoordinationSessionData(int32_t sessionId
     }
 }
 
-void CoordinationSoftbusAdapter::ConfigTcpAlive()
+void CoordinationSoftbusAdapter::ConfigTcpAlive(int32_t socket)
 {
     CALL_DEBUG_ENTER;
-    if (socketFd_ < 0) {
+    if (socket < 0) {
         FI_HILOGW("Config tcp alive, invalid sessionId");
         return;
     }
     int32_t handle { -1 };
-    int32_t result = GetSessionHandle(socketFd_, &handle);
+    int32_t result = GetSessionHandle(socket, &handle);
     if (result != RET_OK) {
-        FI_HILOGE("Failed to get the session handle, sessionId:%{public}d, handle:%{public}d", socketFd_, handle);
+        FI_HILOGE("Failed to get the session handle, socketId:%{public}d, handle:%{public}d", socket, handle);
         return;
     }
     int32_t keepAliveTimeout { 10 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPIDLE, &keepAliveTimeout, sizeof(keepAliveTimeout));
     if (result != RET_OK) {
-        FI_HILOGE("Config tcp alive, setsockopt set idle falied");
+        FI_HILOGE("Config tcp alive, setsockopt set idle falied, result:%{public}d", result);
         return;
     }
     int32_t keepAliveCount { 5 };
