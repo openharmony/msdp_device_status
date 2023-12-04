@@ -45,7 +45,7 @@ public:
      * @since 9
      */
     int32_t RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
 
     /**
      * @brief Unregisters a listener for screen hopping events of the mouse pointer.
@@ -54,7 +54,7 @@ public:
      * @since 9
      */
     int32_t UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
 
     /**
      * @brief Prepares for screen hopping.
@@ -63,7 +63,7 @@ public:
      * @since 9
      */
     int32_t PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
 
     /**
      * @brief Cancels the preparation for screen hopping.
@@ -72,7 +72,7 @@ public:
      * @since 9
      */
     int32_t UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
 
     /**
      * @brief Starts screen hopping for the mouse pointer.
@@ -83,7 +83,7 @@ public:
      * @since 9
      */
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible = false);
 
     /**
      * @brief Stops screen hopping for the mouse pointer.
@@ -94,7 +94,7 @@ public:
      * @since 9
      */
     int32_t DeactivateCoordination(bool isUnchained,
-        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible = false);
 
     /**
      * @brief Obtains the screen hopping status of a mouse pointer.
@@ -104,7 +104,7 @@ public:
      * @since 9
      */
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
 
     /**
      * @brief Starts dragging.

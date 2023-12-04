@@ -46,12 +46,12 @@ public:
     std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:
-    static napi_value PrepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
-    static napi_value UnprepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
-    static napi_value ActivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
-    static napi_value DeactivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission = false);
+    static napi_value PrepareCompatible(napi_env env, napi_callback_info info, bool isCompatible = false);
+    static napi_value UnprepareCompatible(napi_env env, napi_callback_info info, bool isCompatible = false);
+    static napi_value ActivateCompatible(napi_env env, napi_callback_info info, bool isCompatible = false);
+    static napi_value DeactivateCompatible(napi_env env, napi_callback_info info, bool isCompatible = false);
     static napi_value GetCrossingSwitchStateCompatible(napi_env env,
-        napi_callback_info info, bool isCheckPermission = false);
+        napi_callback_info info, bool isCompatible = false);
 
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);

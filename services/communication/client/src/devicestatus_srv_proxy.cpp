@@ -131,7 +131,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type &type)
     return devicestatusData;
 }
 
-int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -144,7 +144,7 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermissio
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COOPERATE_MONITOR),
             data, reply, option);
     } else {
@@ -157,7 +157,7 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermissio
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -170,7 +170,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermiss
     MessageOption option;
     MessageParcel reply;
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COOPERATE_MONITOR),
             data, reply, option);
     } else {
@@ -183,7 +183,7 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermiss
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -197,7 +197,7 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheck
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COOPERATE),
             data, reply, option);
     } else {
@@ -210,7 +210,7 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheck
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -224,7 +224,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isChe
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COOPERATE),
             data, reply, option);
     } else {
@@ -238,7 +238,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isChe
 }
 
 int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
-    int32_t startDeviceId, bool isCheckPermission)
+    int32_t startDeviceId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -254,7 +254,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COOPERATE),
             data, reply, option);
     } else {
@@ -267,7 +267,7 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -282,7 +282,7 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUn
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COOPERATE),
             data, reply, option);
     } else {
@@ -415,7 +415,7 @@ int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
 }
 
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
-    const std::string &networkId, bool isCheckPermission)
+    const std::string &networkId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -430,7 +430,7 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = -1;
-    if (isCheckPermission) {
+    if (isCompatible) {
         ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COOPERATE_STATE),
             data, reply, option);
     } else {

@@ -196,7 +196,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest004, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest004 start");
+    CALL_TEST_DEBUG;
     std::shared_ptr<AlgoMgr> g_manager = std::make_shared<AlgoMgr>();
     int32_t ret = g_manager->UnregisterCallback();
     GTEST_LOG_(INFO) << "10";
@@ -220,7 +220,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest004, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest005, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest005 start");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_LID_OPEN);
     ASSERT_TRUE(ret);
 }
@@ -232,7 +232,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest005, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest006 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
@@ -254,7 +254,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest006, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest007 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
@@ -276,7 +276,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest007, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest008 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
@@ -298,7 +298,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest008, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest009 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
@@ -323,7 +323,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest009, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest010 start");
+    CALL_TEST_DEBUG;
     int32_t typeError = 5;
     int32_t ret = g_manager->Enable(static_cast<Type>(typeError));
     ASSERT_TRUE(ret);
@@ -340,7 +340,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest010, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest011, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest011 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
@@ -355,7 +355,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest011, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest012, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest012 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
     EXPECT_FALSE(result);
 }
@@ -367,7 +367,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest012, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest013, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest013 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_HORIZONTAL_POSITION);
@@ -382,7 +382,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest013, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest014, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest014 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_VERTICAL_POSITION);
@@ -397,7 +397,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest014, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest015 start");
+    CALL_TEST_DEBUG;
     int32_t typeError = 5;
     bool result = g_manager->StartSensor(static_cast<Type>(typeError));
     EXPECT_FALSE(result);
@@ -410,7 +410,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest015, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest016, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest016 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
     EXPECT_FALSE(result);
     g_manager->GetSensorTypeId(Type::TYPE_INVALID);
@@ -426,7 +426,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest016, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest017, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest017 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -446,7 +446,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest017, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest018 start");
+    CALL_TEST_DEBUG;
     bool state = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(state);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -465,7 +465,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest018, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest019, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest019 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -484,7 +484,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest019, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest020 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_ABSOLUTE_STILL);
@@ -503,7 +503,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest020, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest021, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest021 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_HORIZONTAL_POSITION);
@@ -519,7 +519,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest021, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest022, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest022 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_VERTICAL_POSITION);
@@ -535,7 +535,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest022, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest023, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest023 start");
+    CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_VERTICAL_POSITION);
     EXPECT_TRUE(result);
     g_manager->GetSensorTypeId(Type::TYPE_MAX);
@@ -551,7 +551,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest023, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest024, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest024 start");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_MAX);
     EXPECT_TRUE(ret == RET_ERR);
 }
@@ -563,7 +563,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest024, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest025, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest025 start");
+    CALL_TEST_DEBUG;
     g_manager->callAlgoNums_[Type::TYPE_ABSOLUTE_STILL] = 2;
     int32_t ret = g_manager->Disable(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(ret == RET_ERR);
@@ -576,7 +576,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest025, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest026, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest026 start");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_MAX);
     ASSERT_TRUE(ret);
     g_manager->callAlgoNums_[Type::TYPE_MAX] = 1;
@@ -591,7 +591,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest026, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest027, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest027 start");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->UnregisterSensor(Type::TYPE_MAX);
     EXPECT_TRUE(ret == false);
 }
@@ -603,7 +603,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest027, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest028 start");
+    CALL_TEST_DEBUG;
     SENSOR_DATA_CB.user_.callback = nullptr;
     bool result = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_TRUE(!result);
@@ -616,7 +616,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest029, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest029 start.");
+    CALL_TEST_DEBUG;
     std::shared_ptr<MsdpAlgoHandle> algo = std::make_shared<MsdpAlgoHandle>();
     int32_t ret = LoadAlgoLibrary(algo);
     ASSERT_EQ(ret, RET_OK);
@@ -637,7 +637,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest029, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest030, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest030 start.");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_ABSOLUTE_STILL);
     EXPECT_EQ(ret, RET_OK);
 
@@ -656,7 +656,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest030, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest031, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest031 start.");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_HORIZONTAL_POSITION);
     EXPECT_EQ(ret, RET_OK);
 
@@ -675,7 +675,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest031, TestSize.Level
  */
 HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest032, TestSize.Level1)
 {
-    FI_HILOGI("DeviceStatusAlgorithmTest032 start.");
+    CALL_TEST_DEBUG;
     int32_t ret = g_manager->Enable(Type::TYPE_VERTICAL_POSITION);
     EXPECT_EQ(ret, RET_OK);
 
