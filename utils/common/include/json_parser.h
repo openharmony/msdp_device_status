@@ -13,18 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_UTIL_H
-#define COOPERATE_UTIL_H
+# ifndef JSON_PARSER_H
+# define JSON_PARSER_H
 
-#include <string>
+#include "cJSON.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace COOPERATE {
-std::string GetLocalNetworkId();
-} // namespace COOPERATE
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json != nullptr) {
+            cJSON_Delete(json);
+            json = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json;
+    }
+    cJSON *json = nullptr;
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COOPERATE_UTIL_H
+# endif //JSON_PARSER_H

@@ -24,6 +24,7 @@
 
 #include "cooperate_util.h"
 #include "devicestatus_define.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Msdp {

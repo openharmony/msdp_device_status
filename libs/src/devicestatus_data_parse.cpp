@@ -23,6 +23,7 @@
 #include "devicestatus_data_define.h"
 #include "devicestatus_errors.h"
 #include "fi_log.h"
+#include "json_parser.h"
 #include "utility.h"
 
 namespace OHOS {

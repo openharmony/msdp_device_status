@@ -17,7 +17,6 @@
 
 #include <sstream>
 
-#include "cJSON.h"
 #include "distributed_device_profile_client.h"
 
 #include "devicestatus_define.h"
@@ -28,22 +27,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
-
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON* json = nullptr;
-};
 
 class ProfileEventCallbackImpl final : public IProfileEventCallback {
 public:

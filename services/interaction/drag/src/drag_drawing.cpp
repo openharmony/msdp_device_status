@@ -22,7 +22,6 @@
 
 #include <dlfcn.h>
 
-#include "cJSON.h"
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
@@ -42,6 +41,7 @@
 #include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
+#include "json_parser.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -122,22 +122,6 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 #endif
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
-
-struct JsonDataParser {
-    JsonDataParser() = default;
-    ~JsonDataParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON *json = nullptr;
-};
 
 bool CheckNodesValid()
 {
@@ -1142,7 +1126,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
         FI_HILOGD("the extraInfo is empty");
         return false;
     }
-    JsonDataParser filterParser;
+    JsonParser filterParser;
     filterParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
@@ -1169,7 +1153,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
         FI_HILOGD("ExtraInfo is empty");
         return false;
     }
-    JsonDataParser dipScaleParser;
+    JsonParser dipScaleParser;
     dipScaleParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
         g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
@@ -1196,7 +1180,7 @@ bool DragDrawing::GetAllowDragState()
         FI_HILOGE("The extraInfo is greater than the length limit");
         return true;
     }
-    JsonDataParser extraInfoParser;
+    JsonParser extraInfoParser;
     extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     if (!cJSON_IsObject(extraInfoParser.json)) {
         FI_HILOGE("The extraInfo is not a json object");
