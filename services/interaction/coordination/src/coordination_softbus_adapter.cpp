@@ -25,6 +25,7 @@
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
 
+#include "coordination_hisysevent.h"
 #include "coordination_sm.h"
 #include "device_coordination_softbus_define.h"
 #include "devicestatus_define.h"
@@ -276,6 +277,7 @@ int32_t CoordinationSoftbusAdapter::WaitSessionOpend(const std::string &remoteNe
     auto status = openSessionWaitCond_.wait_for(waitLock, std::chrono::seconds(SESSION_WAIT_TIMEOUT_SECOND),
         [this, remoteNetworkId] () { return false; });
     if (!status) {
+        CoordinationDFX::WriteOpenSoftbusResult(remoteNetworkId, 0, STATUS_SIGN);
         FI_HILOGE("Open session timeout");
         return RET_ERR;
     }
@@ -336,6 +338,8 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
+        CoordinationDFX::WriteActivate(localNetworkId, remoteNetworkId, sessionDevs_,
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
@@ -343,6 +347,8 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
         FI_HILOGD("Across with button down, waiting");
         auto status = openSessionWaitCond_.wait_for(sessionLock, std::chrono::seconds(FILTER_WAIT_TIMEOUT_SECOND));
         if (status == std::cv_status::timeout) {
+            CoordinationDFX::WriteActivate(localNetworkId, remoteNetworkId, sessionDevs_,
+                OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             FI_HILOGE("Add filter timeout");
             return RET_ERR;
         }
@@ -372,6 +378,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
+        CoordinationDFX::WriteActivateResult(remoteNetworkId, isSuccess);
         FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
@@ -396,6 +403,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
+        CoordinationDFX::WriteDeactivate(remoteNetworkId, sessionDevs_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
@@ -421,6 +429,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     int32_t ret = SendMsg(sessionId, sendMsg);
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
+        CoordinationDFX::WriteDeactivateResult(remoteNetworkId, sessionDevs_);
         FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
@@ -629,9 +638,12 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string &networkId, Messa
         free(dataPacket);
         return RET_ERR;
     }
+    CoordinationState curState = COOR_SM->GetCurrentCoordinationState();
     int32_t result = SendBytes(sessionDevs_[networkId], dataPacket, sizeof(DataPacket) + dataLen);
     free(dataPacket);
     if (result != RET_OK) {
+        CoordinationDFX::WriteCooperateDragResult(networkId, curState,
+            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Send bytes failed");
         return RET_ERR;
     }
