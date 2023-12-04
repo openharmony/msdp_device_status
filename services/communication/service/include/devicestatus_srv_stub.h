@@ -50,6 +50,13 @@ private:
     int32_t ActivateCoordinationStub(MessageParcel &data, MessageParcel &reply);
     int32_t DeactivateCoordinationStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetCoordinationStateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t RegisterCooperateMonitorStub(MessageParcel &data, MessageParcel &reply);
+    int32_t UnregisterCooperateMonitorStub(MessageParcel &data, MessageParcel &reply);
+    int32_t PrepareCooperateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t UnPrepareCooperateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t ActivateCooperateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t DeactivateCooperateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetCooperateStateStub(MessageParcel &data, MessageParcel &reply);
     int32_t StartDragStub(MessageParcel &data, MessageParcel &reply);
     int32_t StopDragStub(MessageParcel &data, MessageParcel &reply);
     int32_t UpdateDragStyleStub(MessageParcel &data, MessageParcel &reply);
