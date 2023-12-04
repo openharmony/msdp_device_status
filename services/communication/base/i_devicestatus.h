@@ -37,15 +37,15 @@ public:
         sptr<IRemoteDevStaCallback> callback) = 0;
     virtual Data GetCache(const Type &type) = 0;
 
-    virtual int32_t RegisterCoordinationListener(bool isCheckPermission = false) = 0;
-    virtual int32_t UnregisterCoordinationListener(bool isCheckPermission = false) = 0;
-    virtual int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false) = 0;
-    virtual int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false) = 0;
+    virtual int32_t RegisterCoordinationListener(bool isCompatible = false) = 0;
+    virtual int32_t UnregisterCoordinationListener(bool isCompatible = false) = 0;
+    virtual int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) = 0;
+    virtual int32_t UnprepareCoordination(int32_t userData, bool isCompatible = false) = 0;
     virtual int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
-        int32_t startDeviceId, bool isCheckPermission = false) = 0;
-    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false) = 0;
+        int32_t startDeviceId, bool isCompatible = false) = 0;
+    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false) = 0;
     virtual int32_t GetCoordinationState(int32_t userData,
-        const std::string &networkId, bool isCheckPermission = false) = 0;
+        const std::string &networkId, bool isCompatible = false) = 0;
     virtual int32_t StartDrag(const DragData &dragData) = 0;
     virtual int32_t StopDrag(const DragDropResult &dropResult) = 0;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) = 0;

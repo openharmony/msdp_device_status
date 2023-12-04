@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
 } // namespace
 
-int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCheckPermission)
+int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
@@ -39,7 +39,7 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
     }
     if (!isListeningProcess_) {
         FI_HILOGI("Start monitoring");
-        int32_t ret = DeviceStatusClient::GetInstance().RegisterCoordinationListener(isCheckPermission);
+        int32_t ret = DeviceStatusClient::GetInstance().RegisterCoordinationListener(isCompatible);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register, ret:%{public}d", ret);
             return ret;
@@ -51,7 +51,7 @@ int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListen
 }
 
 int32_t CoordinationManagerImpl::UnregisterCoordinationListener(
-    CoordinationListenerPtr listener, bool isCheckPermission)
+    CoordinationListenerPtr listener, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -69,12 +69,12 @@ int32_t CoordinationManagerImpl::UnregisterCoordinationListener(
 LISTENER_LABEL:
     if (isListeningProcess_ && devCoordinationListener_.empty()) {
         isListeningProcess_ = false;
-        return DeviceStatusClient::GetInstance().UnregisterCoordinationListener(isCheckPermission);
+        return DeviceStatusClient::GetInstance().UnregisterCoordinationListener(isCompatible);
     }
     return RET_OK;
 }
 
-int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage callback, bool isCheckPermission)
+int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage callback, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -84,7 +84,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_, isCheckPermission);
+    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Prepare coordination failed");
         return ret;
@@ -94,7 +94,7 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
     return RET_OK;
 }
 
-int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage callback, bool isCheckPermission)
+int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage callback, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     CoordinationEvent event;
@@ -104,7 +104,7 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_, isCheckPermission);
+    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Unprepare coordination failed");
         return ret;
@@ -115,7 +115,7 @@ int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage c
 }
 
 int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteNetworkId,
-    int32_t startDeviceId, FuncCoordinationMessage callback, bool isCheckPermission)
+    int32_t startDeviceId, FuncCoordinationMessage callback, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -126,7 +126,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
         return RET_ERR;
     }
     int32_t ret = DeviceStatusClient::GetInstance().ActivateCoordination(
-        userData_, remoteNetworkId, startDeviceId, isCheckPermission);
+        userData_, remoteNetworkId, startDeviceId, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Activate coordination failed");
         return ret;
@@ -137,7 +137,7 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
 }
 
 int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback,
-    bool isCheckPermission)
+    bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -147,7 +147,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained, isCheckPermission);
+    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed");
         return ret;
@@ -158,7 +158,7 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
 }
 
 int32_t CoordinationManagerImpl::GetCoordinationState(
-    const std::string &networkId, FuncCoordinationState callback, bool isCheckPermission)
+    const std::string &networkId, FuncCoordinationState callback, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -168,7 +168,7 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
         FI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
-    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, networkId, isCheckPermission);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, networkId, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
         return ret;
