@@ -140,15 +140,16 @@ int32_t CoordinationSoftbusAdapter::Init()
         FI_HILOGE("Local network id is empty");
         return RET_ERR;
     }
+    std::string bindName = SESS_NAME + localNetworkId.substr(0, BIND_STRING_LENGTH);
     std::string sessionName = SESS_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
-    if (sessionName == localSessionName_) {
+    if (bindName == localSessionName_) {
         FI_HILOGI("Softbus session server has already created");
         return RET_OK;
     }
-    localSessionName_ = sessionName;
+    localSessionName_ = bindName;
     char name[DEVICE_NAME_SIZE_MAX] = {};
-    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
-        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
+    if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, sessionName.c_str()) != RET_OK) {
+        FI_HILOGE("Invalid name:%{public}s", sessionName.c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
