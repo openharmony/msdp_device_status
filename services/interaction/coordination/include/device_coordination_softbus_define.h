@@ -28,6 +28,7 @@ constexpr int32_t SESSION_SIDE_SERVER { 0 };
 constexpr int32_t SESSION_WAIT_TIMEOUT_SECOND { 5 };
 constexpr uint32_t DEVICE_NAME_SIZE_MAX { 256 };
 constexpr uint32_t PKG_NAME_SIZE_MAX { 65 };
+constexpr uint32_t BIND_STRING_LENGTH { 10 };
 constexpr uint32_t INTERCEPT_STRING_LENGTH { 20 };
 constexpr uint32_t SESSION_NAME_SIZE_MAX { 256 };
 constexpr size_t MSG_MAX_SIZE { 45 * 1024 };
