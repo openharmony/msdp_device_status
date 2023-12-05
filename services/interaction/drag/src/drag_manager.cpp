@@ -684,10 +684,6 @@ int32_t DragManager::OnStartDrag()
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        FI_HILOGI("Set the pointer cursor invisible");
-        MMI::InputManager::GetInstance()->SetPointerVisible(false);
-    }
     return RET_OK;
 }
 
@@ -726,6 +722,11 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     }
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
+        FI_HILOGI("Set the pointer cursor invisible");
+        MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    }
     return RET_OK;
 }
 
