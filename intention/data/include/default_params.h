@@ -13,44 +13,33 @@
  * limitations under the License.
  */
 
-#include "state_machine.h"
+#ifndef INTENTION_DEFAULT_PARAMS_H
+#define INTENTION_DEFAULT_PARAMS_H
 
-#include "devicestatus_define.h"
+#include "intention_identity.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateMachine" };
-} // namespace
+struct DefaultParam final : public ParamBase {
+    DefaultParam() = default;
+    DefaultParam(int32_t userData);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
 
-void StateMachine::EnableCooperate()
-{
-    CALL_INFO_TRACE;
-}
+    int32_t userData { -1 };
+};
 
-void StateMachine::DisableCooperate()
-{
-    CALL_INFO_TRACE;
-}
+struct DefaultReply final : public ParamBase {
+    DefaultReply() = default;
+    DefaultReply(int32_t result);
 
-int32_t StateMachine::StartCooperate(const std::string &remoteNetworkId, int32_t startDeviceId)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
 
-int32_t StateMachine::StopCooperate(bool isUnchained)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
-
-int32_t StateMachine::GetCooperateState(const std::string &networkId)
-{
-    CALL_INFO_TRACE;
-    return RET_ERR;
-}
+    int32_t result { -1 };
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // INTENTION_DEFAULT_PARAMS_H

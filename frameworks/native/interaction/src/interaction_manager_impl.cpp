@@ -55,6 +55,16 @@ void InteractionManagerImpl::InitMsgHandler()
     CALL_DEBUG_ENTER;
     Client::MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+        {MessageId::COORDINATION_ADD_LISTENER,
+            MsgCallbackBind2(&CooperateClient::OnCoordinationListener, &cooperate_)},
+        {MessageId::COORDINATION_MESSAGE,
+            MsgCallbackBind2(&CooperateClient::OnCoordinationMessage, &cooperate_)},
+        {MessageId::COORDINATION_GET_STATE,
+            MsgCallbackBind2(&CooperateClient::OnCoordinationState, &cooperate_)},
+        {MessageId::HOT_AREA_ADD_LISTENER,
+            MsgCallbackBind2(&CooperateClient::OnHotAreaListener, &cooperate_)},
+#else
         {MessageId::COORDINATION_ADD_LISTENER,
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationListener, &coordinationManagerImpl_)},
         {MessageId::COORDINATION_MESSAGE,
@@ -63,6 +73,7 @@ void InteractionManagerImpl::InitMsgHandler()
             MsgCallbackBind2(&CoordinationManagerImpl::OnCoordinationState, &coordinationManagerImpl_)},
         {MessageId::HOT_AREA_ADD_LISTENER,
             MsgCallbackBind2(&CoordinationManagerImpl::OnHotAreaListener, &coordinationManagerImpl_)},
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragManagerImpl::OnNotifyResult, &dragManagerImpl_)},
@@ -91,7 +102,11 @@ int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICo
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.RegisterListener(tunnel_, listener, isCompatible);
+#else
     return coordinationManagerImpl_.RegisterCoordinationListener(listener, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
@@ -106,7 +121,11 @@ int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<I
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.UnregisterListener(tunnel_, listener, isCompatible);
+#else
     return coordinationManagerImpl_.UnregisterCoordinationListener(listener, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
@@ -125,7 +144,11 @@ int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::stri
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.Enable(tunnel_, callback, isCompatible);
+#else
     return coordinationManagerImpl_.PrepareCoordination(callback, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
@@ -144,7 +167,11 @@ int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::st
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.Disable(tunnel_, callback, isCompatible);
+#else
     return coordinationManagerImpl_.UnprepareCoordination(callback, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
@@ -163,7 +190,11 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.Start(tunnel_, remoteNetworkId, startDeviceId, callback, isCompatible);
+#else
     return coordinationManagerImpl_.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(remoteNetworkId);
@@ -184,7 +215,11 @@ int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.Stop(tunnel_, isUnchained, callback, isCompatible);
+#else
     return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(callback);
@@ -203,7 +238,11 @@ int32_t InteractionManagerImpl::GetCoordinationState(
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.GetCooperateState(tunnel_, networkId, callback, isCompatible);
+#else
     return coordinationManagerImpl_.GetCoordinationState(networkId, callback, isCompatible);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     (void)(networkId);
     (void)(callback);
@@ -333,7 +372,11 @@ int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListe
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.AddHotAreaListener(tunnel_, listener);
+#else
     return coordinationManagerImpl_.AddHotAreaListener(listener);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);
@@ -346,7 +389,11 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    return cooperate_.RemoveHotAreaListener(tunnel_, listener);
+#else
     return coordinationManagerImpl_.RemoveHotAreaListener(listener);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
     FI_HILOGW("Coordination does not support");
     (void)(listener);

@@ -61,7 +61,7 @@ void CooperateEventManager::RemoveCooperateEvent(sptr<EventInfo> event)
     }
 }
 
-int32_t CooperateEventManager::OnCooperateMessage(CooperateMessage msg, const std::string &networkId)
+int32_t CooperateEventManager::OnCooperateMessage(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -77,7 +77,7 @@ int32_t CooperateEventManager::OnCooperateMessage(CooperateMessage msg, const st
     return RET_OK;
 }
 
-void CooperateEventManager::OnEnable(CooperateMessage msg, const std::string &networkId)
+void CooperateEventManager::OnEnable(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -87,7 +87,7 @@ void CooperateEventManager::OnEnable(CooperateMessage msg, const std::string &ne
     cooperateCallbacks_[EventType::ENABLE] = nullptr;
 }
 
-void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &networkId)
+void CooperateEventManager::OnStart(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -97,7 +97,7 @@ void CooperateEventManager::OnStart(CooperateMessage msg, const std::string &net
     cooperateCallbacks_[EventType::START] = nullptr;
 }
 
-void CooperateEventManager::OnStop(CooperateMessage msg, const std::string &networkId)
+void CooperateEventManager::OnStop(CoordinationMessage msg, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -117,7 +117,7 @@ void CooperateEventManager::OnGetCrossingSwitchState(bool state)
     cooperateCallbacks_[EventType::STATE] = nullptr;
 }
 
-void CooperateEventManager::OnErrorMessage(EventType type, CooperateMessage msg)
+void CooperateEventManager::OnErrorMessage(EventType type, CoordinationMessage msg)
 {
     std::lock_guard<std::mutex> guard(lock_);
     sptr<EventInfo> info = cooperateCallbacks_[type];
@@ -137,7 +137,7 @@ IContext* CooperateEventManager::GetIContext() const
 }
 
 void CooperateEventManager::NotifyCooperateMessage(
-    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &networkId, CooperateMessage msg)
+    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);

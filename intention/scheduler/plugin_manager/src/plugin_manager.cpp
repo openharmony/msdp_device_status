@@ -17,6 +17,8 @@
 
 #include <dlfcn.h>
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -24,19 +26,43 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PluginManager" };
 }
 
+using CreatePlugin = IPlugin* (*)(IContext *context);
+using DestroyPlugin = void (*)(IPlugin *);
+
 PluginManager::Plugin::Plugin(IContext *context, void *handle)
     : context_(context), handle_(handle)
 {}
 
+PluginManager::Plugin::Plugin(Plugin &&other)
+    : context_(other.context_), handle_(other.handle_), instance_(other.instance_)
+{
+    other.context_ = nullptr;
+    other.handle_ = nullptr;
+    other.instance_ = nullptr;
+}
+
 PluginManager::Plugin::~Plugin()
 {
     if (instance_ != nullptr) {
-        auto destroy = reinterpret_cast<DestroyInstance>(dlsym(handle_, "DestroyInstance"));
+        DestroyPlugin destroy = reinterpret_cast<DestroyPlugin>(dlsym(handle_, "DestroyInstance"));
         if (destroy != nullptr) {
             destroy(instance_);
         }
     }
-    dlclose(handle_);
+    if (handle_ != nullptr) {
+        dlclose(handle_);
+    }
+}
+
+PluginManager::Plugin& PluginManager::Plugin::operator=(Plugin &&other)
+{
+    context_ = other.context_;
+    handle_ = other.handle_;
+    instance_ = other.instance_;
+    other.context_ = nullptr;
+    other.handle_ = nullptr;
+    other.instance_ = nullptr;
+    return *this;
 }
 
 IPlugin* PluginManager::Plugin::GetInstance()
@@ -44,7 +70,7 @@ IPlugin* PluginManager::Plugin::GetInstance()
     if (instance_ != nullptr) {
         return instance_;
     }
-    auto func = reinterpret_cast<CreateInstance>(dlsym(handle_, "CreateInstance"));
+    CreatePlugin func = reinterpret_cast<CreatePlugin>(dlsym(handle_, "CreateInstance"));
     if (func == nullptr) {
         FI_HILOGE("dlsym msg:%{public}s", dlerror());
         return nullptr;
@@ -73,42 +99,41 @@ IPlugin* PluginManager::LoadPlugin(Intention intention)
     return nullptr;
 }
 
-int32_t PluginManager::LoadLibrary(Intention intention)
+void PluginManager::LoadLibrary(Intention intention)
 {
     std::string libPath;
 
     switch (intention) {
         case Intention::DRAG: {
             libPath = "/system/lib/libintention_drag.z.so";
+            break;
         }
         case Intention::COOPERATE: {
             libPath = "/system/lib/libintention_cooperate.z.so";
+            break;
         }
         default: {
             FI_HILOGW("Intention is invalid");
-            return RET_ERR;
+            return;
         }
     }
 
     void *handle = ::dlopen(libPath.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         FI_HILOGE("Open plugin failed, plugin name:%{public}s, msg:%{public}s", libPath.c_str(), dlerror());
-        return RET_ERR;
+        return;
     }
     libs_.emplace(intention, Plugin(context_, handle));
-    return RET_OK;
 }
 
 IPlugin* PluginManager::DoLoadPlugin(Intention intention)
 {
-    if (libs_.find(intention) == libs_.end()) {
-        if (LoadLibrary(intention) != RET_OK) {
-            return nullptr;
-        }
-    }
     auto iter = libs_.find(intention);
     if (iter == libs_.end()) {
-        return nullptr;
+        LoadLibrary(intention);
+        if (iter = libs_.find(intention); iter == libs_.end()) {
+            return nullptr;
+        }
     }
     return iter->second.GetInstance();
 }

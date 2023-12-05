@@ -15,14 +15,7 @@
 
 #include "intention_service.h"
 
-#include <unistd.h>
-#include <vector>
-
-#include "if_system_ability_manager.h"
-#include <ipc_skeleton.h>
-#include "system_ability_definition.h"
-
-#include "devicestatus_common.h"
+#include "devicestatus_define.h"
 #include "i_plugin.h"
 
 namespace OHOS {
@@ -32,152 +25,202 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionService" };
 } // namespace
 
-IntentionService::IntentionService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
-{}
-
-IntentionService::~IntentionService()
-{}
-
-void IntentionService::OnDump()
-{}
-
-void IntentionService::OnStart()
+int32_t IntentionService::Init(IContext *context)
 {
-    CALL_INFO_TRACE;
-    if (!Publish(DelayedSpSingleton<IntentionService>::GetInstance())) {
-        FI_HILOGE("On start register to system ability manager failed");
-    }
+    CHKPR(context, RET_ERR);
+    context_ = context;
+    pluginMgr_.Init(context);
+    return RET_OK;
 }
 
-void IntentionService::OnStop()
+int32_t IntentionService::Enable(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
-    CALL_INFO_TRACE;
-}
-
-int32_t IntentionService::Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply)
-{
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::Enable, plugin, context, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::Enable1, this,
+        std::ref(context), std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("Enable failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::Disable(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::Disable, plugin, context, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::Disable1, this,
+        std::ref(context), std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("Disable failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::Start(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::Start(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::Start, plugin, context, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::Start1, this,
+        std::ref(context), std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("Start failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::Stop(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::Stop, plugin, context, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::Stop1, this,
+        std::ref(context), std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("Stop failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::AddWatch, plugin, context, id, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::AddWatch1, this,
+        std::ref(context), id, std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("AddWatch failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::RemoveWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::RemoveWatch, plugin, context, id, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::RemoveWatch1, this,
+        std::ref(context), id, std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("RemoveWatch failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::SetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::SetParam, plugin, context, id, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::SetParam1, this,
+        std::ref(context), id, std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("SetParam failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::GetParam, plugin, context, id, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::GetParam1, this,
+        std::ref(context), id, std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("GetParam failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t IntentionService::Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    IPlugin *plugin = pluginMgr_.LoadPlugin(static_cast<Intention>(intention));
-    CHKPR(plugin, RET_ERR);
-    CallingContext context;
-
-    int32_t ret = taskScheduler_.PostSyncTask(
-        std::bind(&IPlugin::Control, plugin, context, id, std::ref(data), std::ref(reply)));
+    CallingContext context {
+        .intention = intention,
+    };
+    CHKPR(context_, RET_ERR);
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(std::bind(&IntentionService::Control1, this,
+        std::ref(context), id, std::ref(data), std::ref(reply)));
     if (ret != RET_OK) {
         FI_HILOGE("Control failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t IntentionService::Enable1(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->Enable(context, data, reply);
+}
+
+int32_t IntentionService::Disable1(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->Disable(context, data, reply);
+}
+
+int32_t IntentionService::Start1(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->Start(context, data, reply);
+}
+
+int32_t IntentionService::Stop1(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->Stop(context, data, reply);
+}
+
+int32_t IntentionService::AddWatch1(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->AddWatch(context, id, data, reply);
+}
+
+int32_t IntentionService::RemoveWatch1(CallingContext &context, uint32_t id,
+                                       MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->RemoveWatch(context, id, data, reply);
+}
+
+int32_t IntentionService::SetParam1(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->SetParam(context, id, data, reply);
+}
+
+int32_t IntentionService::GetParam1(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->GetParam(context, id, data, reply);
+}
+
+int32_t IntentionService::Control1(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
+{
+    IPlugin *plugin = pluginMgr_.LoadPlugin(context.intention);
+    CHKPR(plugin, RET_ERR);
+    return plugin->Control(context, id, data, reply);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

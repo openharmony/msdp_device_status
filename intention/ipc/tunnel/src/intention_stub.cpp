@@ -15,13 +15,8 @@
 
 #include "intention_stub.h"
 
-#include "message_parcel.h"
-#include "pixel_map.h"
-
-#include "devicestatus_common.h"
 #include "devicestatus_define.h"
-#include "i_plugin.h"
-#include "include/util.h"
+#include "intention_identity.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -30,8 +25,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionStub" };
 } // namespace
 
-int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-    MessageOption &option)
+int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string descriptor = IntentionStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
@@ -39,34 +33,38 @@ int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messa
         FI_HILOGE("IntentionStub::OnRemoteRequest failed, descriptor is not matched");
         return E_DEVICESTATUS_GET_SERVICE_FAILED;
     }
+    Intention intention = static_cast<Intention>(GINTENTION(code));
 
     switch (GACTION(code)) {
         case CommonAction::ENABLE: {
-            return Enable(GINTENTION(code), data, reply);
+            return Enable(intention, data, reply);
         }
         case CommonAction::DISABLE: {
-            return Disable(GINTENTION(code), data, reply);
+            return Disable(intention, data, reply);
         }
         case CommonAction::START: {
-            return Start(GINTENTION(code), data, reply);
+            return Start(intention, data, reply);
         }
         case CommonAction::STOP: {
-            return Stop(GINTENTION(code), data, reply);
+            return Stop(intention, data, reply);
         }
         case CommonAction::ADD_WATCH: {
-            return AddWatch(GINTENTION(code), GPARAM(code), data, reply);
+            return AddWatch(intention, GPARAM(code), data, reply);
         }
         case CommonAction::REMOVE_WATCH: {
-            return RemoveWatch(GINTENTION(code), GPARAM(code), data, reply);
+            return RemoveWatch(intention, GPARAM(code), data, reply);
         }
         case CommonAction::SET_PARAM: {
-            return SetParam(GINTENTION(code), GPARAM(code), data, reply);
+            return SetParam(intention, GPARAM(code), data, reply);
         }
         case CommonAction::GET_PARAM: {
-            return GetParam(GINTENTION(code), GPARAM(code), data, reply);
+            return GetParam(intention, GPARAM(code), data, reply);
         }
         case CommonAction::CONTROL: {
-            return Control(GINTENTION(code), GPARAM(code), data, reply);
+            return Control(intention, GPARAM(code), data, reply);
+        }
+        default: {
+            FI_HILOGE("Unknown action");
         }
     }
     return RET_ERR;

@@ -13,15 +13,12 @@
 
 import("../../../device_status.gni")
 
-config("cooperate_public_config") {
+config("intention_cooperate_data_public_config") {
   include_dirs = [ "include" ]
 }
 
-ohos_shared_library("intention_cooperate") {
+ohos_source_set("intention_cooperate_data") {
   sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -29,33 +26,21 @@ ohos_shared_library("intention_cooperate") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [
-    "include",
-    "${intention_root_path}/data/cooperate/include",
-    "${device_status_root_path}/utils/ipc/include",
-    "${intention_root_path}/data/include",
-  ]
+  include_dirs = [ "include" ]
 
-  sources = [
-    "src/cooperate.cpp",
-    "src/state_machine.cpp",
-  ]
+  sources = [ "src/cooperate_params.cpp" ]
 
-  public_configs = [ ":cooperate_public_config" ]
-
-  defines = device_status_default_defines
+  public_configs = [ ":intention_cooperate_data_public_config" ]
 
   deps = [
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/data:cooperate_params",
   ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
-    "input:libmmi-client",
+    "ipc:ipc_core",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

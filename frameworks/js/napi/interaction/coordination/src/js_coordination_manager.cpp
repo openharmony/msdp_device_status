@@ -15,7 +15,6 @@
 
 #include "js_coordination_manager.h"
 
-#include "coordination_manager_impl.h"
 #include "devicestatus_define.h"
 #include "interaction_manager.h"
 #include "util_napi.h"
