@@ -40,6 +40,7 @@ private:
     static RosenCurveType CreateResponseSpring(const std::vector<float> &curve);
     static RosenCurveType CreateStepsCurve(const std::vector<float> &curve);
 private:
+    static std::unordered_map<std::string, RosenCurveType> specialCurveMap;
     static std::unordered_map<std::string, CurveCreator> curveMap;
 };
 

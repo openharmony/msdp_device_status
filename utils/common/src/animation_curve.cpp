@@ -33,8 +33,16 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AnimationCurve" };
-static const RosenCurveType EASE_CURVE = RosenCurveType::CreateCubicCurve(0.25f, 0.1f, 0.25f, 1.0f);
+static const RosenCurveType EASE_CURVE = Rosen::RSAnimationTimingCurve::EASE;
 } // namespace
+
+std::unordered_map<std::string, RosenCurveType> AnimationCurve::specialCurveMap = {
+    { "ease", Rosen::RSAnimationTimingCurve::EASE },
+    { "ease-in", Rosen::RSAnimationTimingCurve::EASE_IN },
+    { "ease-out", Rosen::RSAnimationTimingCurve::EASE_OUT },
+    { "ease-in-out", Rosen::RSAnimationTimingCurve::EASE_IN_OUT },
+    { "linear", Rosen::RSAnimationTimingCurve::LINEAR }
+};
 
 std::unordered_map<std::string, AnimationCurve::CurveCreator> AnimationCurve::curveMap = {
     { "cubic-bezier", std::bind(&AnimationCurve::CreateCubicCurve, std::placeholders::_1) },
@@ -46,6 +54,9 @@ std::unordered_map<std::string, AnimationCurve::CurveCreator> AnimationCurve::cu
 
 RosenCurveType AnimationCurve::CreateCurve(const std::string &curveName, const std::vector<float> &curve)
 {
+    if (specialCurveMap.find(curveName) != specialCurveMap.end()) {
+        return specialCurveMap[curveName];
+    }
     if (curveMap.find(curveName) == curveMap.end() || curveMap[curveName] == nullptr) {
         FI_HILOGE("Unknow curve type, use EASE");
         return EASE_CURVE;
