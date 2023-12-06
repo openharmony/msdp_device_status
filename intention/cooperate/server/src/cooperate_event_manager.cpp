@@ -49,6 +49,7 @@ void CooperateEventManager::AddCooperateEvent(sptr<EventInfo> event)
 void CooperateEventManager::RemoveCooperateEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (remoteCooperateCallbacks_.empty() || event == nullptr) {
         FI_HILOGE("Remove listener failed");
         return;
