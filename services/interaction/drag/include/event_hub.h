@@ -19,10 +19,13 @@
 #include <string>
 #include <vector>
 
-#include <refbase.h>
-
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "iservice_registry.h"
+#include "refbase.h"
+#include "system_ability_definition.h"
+#include "system_ability_status_change_stub.h"
+
 #include "i_context.h"
 
 namespace OHOS {
@@ -52,6 +55,16 @@ public:
 
 private:
     IContext* context_ { nullptr };
+};
+class DragAbilityStatusChange : public SystemAbilityStatusChangeStub {
+public:
+    explicit DragAbilityStatusChange(std::shared_ptr<EventHub> eventHub);
+    ~DragAbilityStatusChange() = default;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
+private:
+    std::shared_ptr<EventHub> eventHub_ = nullptr;
 };
 }  // namespace DeviceStatus
 }  // namespace Msdp

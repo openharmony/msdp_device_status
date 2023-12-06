@@ -61,7 +61,18 @@ int32_t DragManager::Init(IContext* context)
         if (eventHub_ == nullptr) {
             eventHub_ = EventHub::GetEventHub(context_);
         }
-        EventHub::RegisterEvent(eventHub_);
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            FI_HILOGE("samgrProxy is nullptr");
+            return;
+        }
+        statusListener_ = new (std::nothrow) DragAbilityStatusChange(eventHub_);
+        if (statusListener_ == nullptr) {
+            FI_HILOGE("statusListener_ is nullptr");
+            return;
+        }
+        int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusListener_);
+        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
     });
     return RET_OK;
 }
