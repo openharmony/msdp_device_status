@@ -96,7 +96,7 @@ DragAbilityStatusChange::DragAbilityStatusChange(std::shared_ptr<EventHub> event
 
 void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    FI_HILOGI("OnAddSystemAbility: systemAbilityId:%{public}d!", systemAbilityId);
+    FI_HILOGI("OnAddSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
     if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
         FI_HILOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
         return;
@@ -110,7 +110,7 @@ void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const 
 
 void DragAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    FI_HILOGI("OnRemoveSystemAbility: systemAbilityId:%{public}d!", systemAbilityId);
+    FI_HILOGI("OnRemoveSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
     return;
 }
 }  // namespace DeviceStatus

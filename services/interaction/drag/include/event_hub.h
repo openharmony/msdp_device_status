@@ -64,7 +64,7 @@ public:
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 private:
-    std::shared_ptr<EventHub> eventHub_ = nullptr;
+    std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
 }  // namespace DeviceStatus
 }  // namespace Msdp
