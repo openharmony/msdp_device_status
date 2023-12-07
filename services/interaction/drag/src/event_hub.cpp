@@ -94,7 +94,7 @@ DragAbilityStatusChange::DragAbilityStatusChange(std::shared_ptr<EventHub> event
     : eventHub_(eventHub)
 {}
 
-void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     FI_HILOGI("OnAddSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
     if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
@@ -102,13 +102,13 @@ void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const 
         return;
     }
     if (eventHub_ == nullptr) {
-        FI_HILOGE("OnAddSystemAbility COMMON_EVENT_SERVICE_ID eventHub_ is nullptr");
+        FI_HILOGE("OnAddSystemAbility eventHub_ is nullptr");
         return;
     }
     EventHub::RegisterEvent(eventHub_);
 }
 
-void DragAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+void DragAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     FI_HILOGI("OnRemoveSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
     return;

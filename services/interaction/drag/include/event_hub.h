@@ -60,8 +60,8 @@ class DragAbilityStatusChange : public SystemAbilityStatusChangeStub {
 public:
     explicit DragAbilityStatusChange(std::shared_ptr<EventHub> eventHub);
     ~DragAbilityStatusChange() = default;
-    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
 private:
     std::shared_ptr<EventHub> eventHub_ { nullptr };
