@@ -68,7 +68,7 @@ public:
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
     int32_t NotifyFilterAdded(const std::string &remoteNetworkId);
-    void ConfigTcpAlive();
+    void ConfigTcpAlive(int32_t socket);
 
 private:
     int32_t ChkAndCpyStr(char* dest, uint32_t destLen, const std::string &src);
