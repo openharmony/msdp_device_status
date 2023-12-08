@@ -146,6 +146,7 @@ private:
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
     std::function<void(void)> notifyPUllUpCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
+    sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
