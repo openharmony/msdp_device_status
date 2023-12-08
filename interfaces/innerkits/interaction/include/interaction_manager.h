@@ -277,7 +277,7 @@ public:
      * @since 11
      */
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
-    
+
     /**
      * @brief 获取拖拽对象的数据摘要。
      * @param summarys 保存拖拽对象的数据摘要。

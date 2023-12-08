@@ -56,7 +56,7 @@ public:
         napi_deferred deferred { nullptr };
         CallbackData data;
     };
-    
+
     template <typename T>
     static void DeletePtr(T &ptr)
     {

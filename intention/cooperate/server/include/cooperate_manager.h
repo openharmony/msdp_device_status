@@ -29,8 +29,8 @@ public:
     void PrepareCooperate();
     void UnprepareCooperate();
     int32_t ActivateCooperate(SessionPtr sess,
-                              int32_t userData, 
-                              const std::string &remoteNetworkId, 
+                              int32_t userData,
+                              const std::string &remoteNetworkId,
                               int32_t startDeviceId);
     int32_t DeactivateCooperate(SessionPtr sess, int32_t userData, bool isUnchained);
     int32_t GetCooperateState(SessionPtr sess, int32_t userData, const std::string &networkId);
