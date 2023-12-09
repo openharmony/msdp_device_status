@@ -253,6 +253,13 @@ void Client::OnConnected()
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+int32_t Client::Socket()
+{
+    CALL_DEBUG_ENTER;
+    return -1;
+}
+#else
 int32_t Client::Socket()
 {
     CALL_DEBUG_ENTER;
@@ -268,6 +275,7 @@ int32_t Client::Socket()
     FI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     return fd_;
 }
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 void Client::Stop()
 {

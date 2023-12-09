@@ -19,7 +19,12 @@
 #include <mutex>
 
 #include "client.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "tunnel_client.h"
+#include "cooperate_client.h"
+#else
 #include "coordination_manager_impl.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 #include "interaction_manager.h"
@@ -77,7 +82,12 @@ private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
     DragManagerImpl dragManagerImpl_;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    TunnelClient tunnel_;
+    CooperateClient cooperate_;
+#else
     CoordinationManagerImpl coordinationManagerImpl_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

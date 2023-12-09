@@ -28,12 +28,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateManager" };
 } // namespace
 
-void CooperateManager::PrepareCooperate()
+void CooperateManager::Enable()
 {
     COOR_SM->PrepareCooperate();
 }
 
-void CooperateManager::UnprepareCooperate()
+void CooperateManager::Diable()
 {
     COOR_SM->UnprepareCooperate();
 }
@@ -51,7 +51,7 @@ int32_t CooperateManager::ActivateCooperate(SessionPtr sess, int32_t userData,
     int32_t ret = COOR_SM->ActivateCooperate(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
         FI_HILOGE("ActivateCooperate failed, ret:%{public}d", ret);
-        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CooperateMessage>(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
     }
     return ret;
 }
@@ -68,7 +68,7 @@ int32_t CooperateManager::DeactivateCooperate(SessionPtr sess, int32_t userData,
     int32_t ret = COOR_SM->DeactivateCooperate(isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate cooperate manager failed, ret:%{public}d", ret);
-        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CooperateMessage>(ret));
+        COOR_EVENT_MGR->OnErrorMessage(event->type, static_cast<CoordinationMessage>(ret));
     }
     return ret;
 }

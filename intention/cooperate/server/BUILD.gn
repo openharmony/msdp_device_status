@@ -34,6 +34,7 @@ ohos_shared_library("intention_cooperate") {
     "${intention_root_path}/data/cooperate/include",
     "${intention_root_path}/data/include",
     "${intention_root_path}/interfaces/include",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
     "${device_status_root_path}/utils/ipc/include",
     "${intention_root_path}/data/include",
   ]
@@ -60,9 +61,11 @@ ohos_shared_library("intention_cooperate") {
   defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/data:cooperate_params",
+    "${intention_root_path}/cooperate/data:intention_cooperate_data",
+    "${intention_root_path}/data:intention_data",
     "//third_party/cJSON:cjson",
     "//third_party/openssl:libcrypto_shared",
   ]

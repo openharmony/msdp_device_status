@@ -26,8 +26,8 @@ public:
     CooperateManager() = default;
     ~CooperateManager() = default;
 
-    void PrepareCooperate();
-    void UnprepareCooperate();
+    void Enable();
+    void Diable();
     int32_t ActivateCooperate(SessionPtr sess,
                               int32_t userData,
                               const std::string &remoteNetworkId,

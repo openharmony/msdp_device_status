@@ -17,7 +17,7 @@
 #define INTENTION_PROXY_H
 
 #include "iremote_proxy.h"
-#include <nocopyable.h>
+#include "nocopyable.h"
 
 #include "i_intention.h"
 
@@ -26,20 +26,19 @@ namespace Msdp {
 namespace DeviceStatus {
 class IntentionProxy : public IRemoteProxy<IIntention> {
 public:
-    explicit IntentionProxy(const sptr<IRemoteObject>& impl)
-        : IRemoteProxy<IIntention>(impl) {}
+    explicit IntentionProxy(const sptr<IRemoteObject>& impl);
     DISALLOW_COPY_AND_MOVE(IntentionProxy);
     ~IntentionProxy() = default;
 
-    int32_t Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Start(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply) override;
-    int32_t AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Enable(Intention intention, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Disable(Intention intention, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Start(Intention intention, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Stop(Intention intention, MessageParcel &data, MessageParcel &reply) override;
+    int32_t AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t RemoveWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t SetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t GetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Control(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
 
 private:
     static inline BrokerDelegator<IntentionProxy> delegator_;
