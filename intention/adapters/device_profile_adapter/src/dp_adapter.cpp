@@ -34,7 +34,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceP
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
 
-DeviceProfileAdapter::~DeviceProfileAdapter() {
+DeviceProfileAdapter::~DeviceProfileAdapter()
+{
     std::lock_guard<std::mutex> mapGuard(mapLock_);
     profileEventCallbacks_.clear();
     profileChangedCallbacks_.clear();
@@ -145,8 +146,7 @@ int32_t DeviceProfileAdapter::GetDPValue(DP_VALUE &dpValue, ValueType valueType,
             if (cJSON_IsNumber(jsonValue)) {
                 DP_VALUE valueTemp { std::in_place_type<int32_t>, jsonValue->valueint };
                 dpValue = valueTemp;
-            }
-            else {
+            } else {
                 FI_HILOGE("dpValue is not number type");
                 return RET_ERR;
             }
@@ -155,8 +155,7 @@ int32_t DeviceProfileAdapter::GetDPValue(DP_VALUE &dpValue, ValueType valueType,
             if (cJSON_IsNumber(jsonValue)) {
                 DP_VALUE valueTemp { std::in_place_type<bool>, static_cast<bool>(jsonValue->valueint) };
                 dpValue = valueTemp;
-            }
-            else {
+            } else {
                 FI_HILOGE("dpValue is not bool type");
                 return RET_ERR;
             }
@@ -165,8 +164,7 @@ int32_t DeviceProfileAdapter::GetDPValue(DP_VALUE &dpValue, ValueType valueType,
             if (cJSON_IsString(jsonValue)) {
                 DP_VALUE valueTemp { std::in_place_type<std::string>, jsonValue->valuestring };
                 dpValue = valueTemp;
-            }
-            else {
+            } else {
                 FI_HILOGE("dpValue is not string type");
                 return RET_ERR;
             }
@@ -256,8 +254,7 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
         cJSON_AddItemToObject(data, characteristicsName.c_str(), item);
         smsg = cJSON_Print(data);
         cJSON_Delete(data);
-    }
-    else {
+    } else {
         JsonParser parser;
         parser.json = cJSON_Parse(jsonData.c_str());
         if (!cJSON_IsObject(parser.json)) {
@@ -271,11 +268,10 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
                 FI_HILOGE("Modify property failed");
                 return RET_ERR;
             }
-        }
-        else {
+        } else {
             cJSON* item = nullptr;
             CreatJsonItem(item, dpValue, valueType);
-            cJSON_AddItemToObject(parser.json, characteristicsName.c_str(), item);    
+            cJSON_AddItemToObject(parser.json, characteristicsName.c_str(), item);
         }
         
         smsg = cJSON_Print(parser.json);
@@ -314,8 +310,7 @@ int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValu
             if (cJSON_IsNumber(data)) {
                 cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
                     cJSON_CreateNumber(std::get<int32_t>(dpValue)));
-            }
-            else {
+            } else {
                 return RET_ERR;
             }
             break;
@@ -323,8 +318,7 @@ int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValu
             if (cJSON_IsNumber(data)) {
                 cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
                     cJSON_CreateNumber(static_cast<int32_t>(std::get<bool>(dpValue))));
-            }
-            else {
+            } else {
                 return RET_ERR;
             }
             break;
@@ -332,8 +326,7 @@ int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValu
             if (cJSON_IsString(data)) {
                 cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
                     cJSON_CreateString(std::get<std::string>(dpValue).c_str()));
-            }
-            else {
+            } else {
                 return RET_ERR;
             }
             break;

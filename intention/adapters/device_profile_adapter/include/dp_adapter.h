@@ -72,7 +72,6 @@ private:
         const DP_VALUE &dpValue, ValueType valueType);
     int32_t GetDPValue(DP_VALUE &dpValue, ValueType valueType, cJSON* jsonValue);
 
-    
     std::mutex mapLock_;
     std::map<std::string, ProfileChangedCallback> profileChangedCallbacks_;
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
