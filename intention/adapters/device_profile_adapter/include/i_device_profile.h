@@ -19,8 +19,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IDeviceProfileObserver
-{
+class IDeviceProfileObserver {
 public:
     IDeviceProfileObserver() = default;
     virtual ~IDeviceProfileObserver() = default;

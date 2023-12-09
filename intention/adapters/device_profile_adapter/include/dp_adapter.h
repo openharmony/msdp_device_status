@@ -37,15 +37,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
-class DeviceProfileAdapter
-{
+class DeviceProfileAdapter {
     DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
     class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
         void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
     };
-    
+
 public:
     using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using ProfileChangedCallback = std::function<void(const std::string &)>;
@@ -71,6 +70,8 @@ private:
     void PackSubscribeInfos(std::list<SubscribeInfo> &subscribeInfos, const std::string &deviceId);
     int32_t SetProfile(ServiceCharacteristicProfile &profile, const std::string &characteristicsName,
         const DP_VALUE &dpValue, ValueType valueType);
+    int32_t GetDPValue(DP_VALUE &dpValue, ValueType valueType, cJSON* jsonValue);
+
     
     std::mutex mapLock_;
     std::map<std::string, ProfileChangedCallback> profileChangedCallbacks_;
