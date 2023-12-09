@@ -32,8 +32,8 @@ ohos_source_set("device_profile_adapter") {
   defines = device_status_default_defines
 
   deps = [
-    "//third_party/cJSON:cjson",
     "${device_status_utils_path}:devicestatus_util",
+    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
