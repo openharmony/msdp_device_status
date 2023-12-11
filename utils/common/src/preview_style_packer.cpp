@@ -66,7 +66,7 @@ int32_t PreviewAnimationPacker::Marshalling(const PreviewAnimation &previewAnima
 int32_t PreviewAnimationPacker::UnMarshalling(Parcel &data, PreviewAnimation &previewAnimation)
 {
     READINT32(data, previewAnimation.duration, ERR_INVALID_VALUE);
-    READSTRING(data,  previewAnimation.curveName, ERR_INVALID_VALUE);
+    READSTRING(data, previewAnimation.curveName, ERR_INVALID_VALUE);
     READFLOATVECTOR(data, previewAnimation.curve, ERR_INVALID_VALUE);
     return RET_OK;
 }

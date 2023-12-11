@@ -66,7 +66,7 @@ public:
 private:
     std::shared_ptr<EventHub> eventHub_ { nullptr };
 };
-}  // namespace DeviceStatus
-}  // namespace Msdp
-}  // namespace OHOS
-#endif  // EVENT_HUB_H
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
+#endif // EVENT_HUB_H

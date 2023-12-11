@@ -68,10 +68,10 @@ private:
     std::mutex lock_;
     std::list<sptr<EventInfo>> remoteCooperateCallbacks_;
     std::map<EventType, sptr<EventInfo>> cooperateCallbacks_{
-        {EventType::ENABLE, nullptr},
-        {EventType::START, nullptr},
-        {EventType::STOP, nullptr},
-        {EventType::STATE, nullptr}
+        { EventType::ENABLE, nullptr },
+        { EventType::START, nullptr },
+        { EventType::STOP, nullptr },
+        { EventType::STATE, nullptr }
     };
     IContext *context_ { nullptr };
 };
