@@ -149,9 +149,8 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     CALL_INFO_TRACE;
     std::string deviceId = changeNotification.GetDeviceId();
     std::lock_guard<std::mutex> guard(DP_ADAPTER->mapLock_);
-    for (auto it = DP_ADAPTER->profileChangedCallbacks_.begin();
-        it != DP_ADAPTER->profileChangedCallbacks_.end(); it++) {
-        it->second(deviceId);
+    for (const auto &callback : DP_ADAPTER->profileChangedCallbacks_) {
+        callback.second(deviceId);
     }
 }
 
