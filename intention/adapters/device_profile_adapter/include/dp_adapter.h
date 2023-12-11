@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DP_ADAPER_H
-#define DP_ADAPER_H
+#ifndef DP_ADAPTER_H
+#define DP_ADAPTER_H
 
 #include "cJSON.h"
 
@@ -41,7 +41,6 @@ class DeviceProfileAdapter {
     DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
     class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
-        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
     };
 
@@ -50,14 +49,15 @@ public:
     using ProfileChangedCallback = std::function<void(const std::string &)>;
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
-    void AddProfileCallback(std::string pluginName, ProfileChangedCallback &callback);
-    void RemoveProfileCallback(std::string pluginName, ProfileChangedCallback &callback);
+    void AddProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback);
+    void UpdateProfileCallback(std::string pluginName, const ProfileChangedCallback &callback);
+    void RemoveProfileCallback(const std::string pluginName);
 
     int32_t RegisterProfileListener(const std::string &deviceId);
     int32_t UnRegisterProfileListener(const std::string &deviceId);
 
-    int32_t GetProperty(const std::string &deviceId, const std::string &characteristicsName, DP_VALUE &dpValue,
-        ValueType valueType);
+    int32_t GetProperty(const std::string &deviceId, const std::string &characteristicsName, ValueType valueType,
+        DP_VALUE &dpValue);
     int32_t SetProperty(const DP_VALUE &dpValue, ValueType value,
         const std::string &characteristicsName, const std::vector<std::string> &deviceIds);
 
@@ -70,7 +70,7 @@ private:
     void PackSubscribeInfos(std::list<SubscribeInfo> &subscribeInfos, const std::string &deviceId);
     int32_t SetProfile(ServiceCharacteristicProfile &profile, const std::string &characteristicsName,
         const DP_VALUE &dpValue, ValueType valueType);
-    int32_t GetDPValue(DP_VALUE &dpValue, ValueType valueType, cJSON* jsonValue);
+    int32_t GetDPValue(ValueType valueType, cJSON* jsonValue, DP_VALUE &dpValue);
 
     std::mutex mapLock_;
     std::map<std::string, ProfileChangedCallback> profileChangedCallbacks_;

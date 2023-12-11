@@ -16,14 +16,12 @@
 #include "dp_adapter.h"
 
 #include <optional>
-#include <mutex>
 
 #include "cJSON.h"
+#include "devicestatus_data_define.h"
 #include "devicestatus_define.h"
-#include "dp_define.h"
 #include "fi_log.h"
 #include "sync_options.h"
-#include "i_cooperate.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -41,7 +39,20 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
     profileChangedCallbacks_.clear();
 }
 
-void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, ProfileChangedCallback &callback)
+void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, const ProfileChangedCallback &callback)
+{
+    CALL_INFO_TRACE;
+    CHKPV(callback);
+    std::lock_guard<std::mutex> guard(mapLock_);
+    auto it = profileChangedCallbacks_.find(pluginName);
+    if (it != profileChangedCallbacks_.end()) {
+        UpdateProfileCallback(pluginName, callback);
+    } else {
+        profileChangedCallbacks_[pluginName] = callback;
+    }
+}
+
+void DeviceProfileAdapter::UpdateProfileCallback(std::string pluginName, const ProfileChangedCallback &callback)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
@@ -49,38 +60,41 @@ void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, ProfileCha
     profileChangedCallbacks_[pluginName] = callback;
 }
 
-void DeviceProfileAdapter::RemoveProfileCallback(std::string pluginName, ProfileChangedCallback &callback)
+void DeviceProfileAdapter::RemoveProfileCallback(std::string pluginName)
 {
     CALL_INFO_TRACE;
-    CHKPV(callback);
     std::lock_guard<std::mutex> guard(mapLock_);
     auto it = profileChangedCallbacks_.find(pluginName);
-    if (it != profileChangedCallbacks_.end()) {
-        profileChangedCallbacks_.erase(it);
-    } else {
+    if (it == profileChangedCallbacks_.end()) {
         FI_HILOGE("The plugin not has callback, pluginName:%{public}s", pluginName.c_str());
     }
+    profileChangedCallbacks_.erase(it);
 }
 
 int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceId)
 {
     CALL_INFO_TRACE;
     if (deviceId.empty()) {
-        FI_HILOGE("DeviceId is empty");
+        FI_HILOGE("deviceId is empty");
         return RET_ERR;
     }
-    std::list<ProfileEvent> failedEvents;
-    std::list<SubscribeInfo> subscribeInfos;
-    PackSubscribeInfos(subscribeInfos, deviceId);
-
+    
     std::lock_guard<std::mutex> guard(mapLock_);
     auto it = profileEventCallbacks_.find(deviceId);
     if (it == profileEventCallbacks_.end() || it->second == nullptr) {
         profileEventCallbacks_[deviceId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     }
-    
-    return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(subscribeInfos,
+
+    std::list<SubscribeInfo> subscribeInfos;
+    PackSubscribeInfos(subscribeInfos, deviceId);
+    std::list<ProfileEvent> failedEvents;
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(subscribeInfos,
         profileEventCallbacks_[deviceId], failedEvents);
+    if (ret != RET_OK) {
+        profileEventCallbacks_.erase(it);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &deviceId)
@@ -99,7 +113,11 @@ int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &devic
     std::list<ProfileEvent> profileEvents;
     profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
     std::list<ProfileEvent> failedEvents;
-    DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents, it->second, failedEvents);
+    int32_t ret =  DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents, it->second, failedEvents);
+    if (ret != RET_OK) {
+        FI_HILOGE("UnsubscribeProfileEvents failed");
+        return RET_ERR;
+    }
     profileEventCallbacks_.erase(it);
     return RET_OK;
 }
@@ -135,52 +153,53 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     }
 }
 
-void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
-{
-}
-
-int32_t DeviceProfileAdapter::GetDPValue(DP_VALUE &dpValue, ValueType valueType, cJSON* jsonValue)
+int32_t DeviceProfileAdapter::GetDPValue(ValueType valueType, cJSON* jsonValue, DP_VALUE &dpValue)
 {
     switch (valueType) {
-        case ValueType::INT_TYPE:
-            if (cJSON_IsNumber(jsonValue)) {
-                DP_VALUE valueTemp { std::in_place_type<int32_t>, jsonValue->valueint };
-                dpValue = valueTemp;
-            } else {
+        case ValueType::INT_TYPE: {
+            if (!cJSON_IsNumber(jsonValue)) {
                 FI_HILOGE("dpValue is not number type");
-                return RET_ERR;
+                return RET_ERR;     
             }
+            DP_VALUE valueTemp { std::in_place_type<int32_t>, jsonValue->valueint };
+            dpValue = valueTemp;
             break;
-        case ValueType::BOOL_TYPE:
-            if (cJSON_IsNumber(jsonValue)) {
-                DP_VALUE valueTemp { std::in_place_type<bool>, static_cast<bool>(jsonValue->valueint) };
-                dpValue = valueTemp;
-            } else {
+        }
+        case ValueType::BOOL_TYPE: {
+            if (!cJSON_IsNumber(jsonValue)) {
                 FI_HILOGE("dpValue is not bool type");
                 return RET_ERR;
             }
+            DP_VALUE valueTemp { std::in_place_type<bool>, static_cast<bool>(jsonValue->valueint) };
+            dpValue = valueTemp;
             break;
-        case ValueType::STRING_TYPE:
-            if (cJSON_IsString(jsonValue)) {
-                DP_VALUE valueTemp { std::in_place_type<std::string>, jsonValue->valuestring };
-                dpValue = valueTemp;
-            } else {
+        }
+        case ValueType::STRING_TYPE: {
+            if (!cJSON_IsString(jsonValue)) {
                 FI_HILOGE("dpValue is not string type");
                 return RET_ERR;
             }
+            DP_VALUE valueTemp { std::in_place_type<std::string>, jsonValue->valuestring };
+            dpValue = valueTemp;
             break;
-        default:
-            break;
+        }
+        default: {
+            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type");
+            return RET_ERR;
+        }
     }
     return RET_OK;
 }
 
 int32_t DeviceProfileAdapter::GetProperty(const std::string &deviceId, const std::string &characteristicsName,
-    DP_VALUE &dpValue, ValueType valueType)
+    ValueType valueType, DP_VALUE &dpValue)
 {
     CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
-    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
+    if (RET_OK != DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile)) {
+        FI_HILOGE("GetDeviceProfile failed");
+        return RET_ERR;
+    }
     std::string jsonData = profile.GetCharacteristicProfileJson();
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
@@ -190,7 +209,7 @@ int32_t DeviceProfileAdapter::GetProperty(const std::string &deviceId, const std
     }
     cJSON* jsonValue = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName.c_str());
     if (jsonValue != nullptr) {
-        if (RET_OK != GetDPValue(dpValue, valueType, jsonValue)) {
+        if (RET_OK != GetDPValue(valueType, jsonValue, dpValue)) {
             FI_HILOGE("GetDPValue failed");
             return RET_ERR;
         }
@@ -209,13 +228,13 @@ int32_t DeviceProfileAdapter::SetProperty(const DP_VALUE &dpValue, ValueType val
     }
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
-    if (ret != 0) {
+    if (ret != RET_OK) {
         FI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
 
     ret = SyncDeviceFile(deviceIds);
-    if (ret != 0) {
+    if (ret != RET_OK) {
         FI_HILOGE("Sync device profile failed, ret:%{public}d", ret);
         return ret;
     }
@@ -232,7 +251,7 @@ int32_t DeviceProfileAdapter::SyncDeviceFile(const std::vector<std::string> &dev
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     int32_t ret = DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
-    if (ret != 0) {
+    if (ret != RET_OK) {
         FI_HILOGE("Sync device profile failed");
     }
     return ret;
@@ -245,14 +264,18 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
     profile.SetServiceType(SERVICE_TYPE);
 
     char* smsg = nullptr;
-    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile("", SERVICE_ID, profile);
+    if (RET_OK != DistributedDeviceProfileClient::GetInstance().GetDeviceProfile("", SERVICE_ID, profile)) {
+        FI_HILOGE("GetDeviceProfile failed");
+        return RET_ERR;
+    }
     std::string jsonData = profile.GetCharacteristicProfileJson();
     if (jsonData.empty() || jsonData == JSON_NULL) {
         cJSON* data = cJSON_CreateObject();
-        cJSON* item = nullptr;
+        cJSON* item = cJSON_CreateNull();
         CreatJsonItem(item, dpValue, valueType);
         cJSON_AddItemToObject(data, characteristicsName.c_str(), item);
         smsg = cJSON_Print(data);
+        CHKPR(smsg, RET_ERR);
         cJSON_Delete(data);
     } else {
         JsonParser parser;
@@ -269,12 +292,13 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
                 return RET_ERR;
             }
         } else {
-            cJSON* item = nullptr;
+            cJSON* item = cJSON_CreateNull();
             CreatJsonItem(item, dpValue, valueType);
             cJSON_AddItemToObject(parser.json, characteristicsName.c_str(), item);
         }
         
         smsg = cJSON_Print(parser.json);
+        CHKPR(smsg, RET_ERR);
         cJSON_Delete(parser.json);
     }
     profile.SetCharacteristicProfileJson(smsg);
@@ -285,53 +309,58 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
 void DeviceProfileAdapter::CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, ValueType valueType)
 {
     switch (valueType) {
-        case ValueType::INT_TYPE:
+        case ValueType::INT_TYPE: {
             item = cJSON_CreateNumber(std::get<int32_t>(dpValue));
             break;
-        case ValueType::BOOL_TYPE:
+        }
+        case ValueType::BOOL_TYPE: {
             item = cJSON_CreateNumber(std::get<bool>(dpValue));
             break;
-        case ValueType::STRING_TYPE:
+        }
+        case ValueType::STRING_TYPE: {
             item = cJSON_CreateString(std::get<std::string>(dpValue).c_str());
             break;
-        default:
+        }
+        default: {
+            FI_HILOGE("valueType is neither an int type, nor a bool type, nor a string type");
             break;
+        }
     }
 }
 
 int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValue, ValueType valueType,
     const std::string &characteristicsName)
 {
-    if (nullptr == data) {
-        return RET_ERR;
-    }
+    CHKPR(data, RET_ERR);
     switch (valueType) {
-        case ValueType::INT_TYPE:
-            if (cJSON_IsNumber(data)) {
-                cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
-                    cJSON_CreateNumber(std::get<int32_t>(dpValue)));
-            } else {
+        case ValueType::INT_TYPE: {
+            if (!cJSON_IsNumber(data)) {
                 return RET_ERR;
             }
+            cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
+                cJSON_CreateNumber(std::get<int32_t>(dpValue)));
             break;
-        case ValueType::BOOL_TYPE:
-            if (cJSON_IsNumber(data)) {
-                cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
-                    cJSON_CreateNumber(static_cast<int32_t>(std::get<bool>(dpValue))));
-            } else {
+        }
+        case ValueType::BOOL_TYPE: {
+            if (!cJSON_IsNumber(data)) {
                 return RET_ERR;
             }
+            cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
+                cJSON_CreateNumber(static_cast<int32_t>(std::get<bool>(dpValue))));
             break;
-        case ValueType::STRING_TYPE:
-            if (cJSON_IsString(data)) {
-                cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
-                    cJSON_CreateString(std::get<std::string>(dpValue).c_str()));
-            } else {
+        }
+        case ValueType::STRING_TYPE: {
+            if (!cJSON_IsString(data)) {
                 return RET_ERR;
             }
+            cJSON_ReplaceItemInObject(data, characteristicsName.c_str(),
+                cJSON_CreateString(std::get<std::string>(dpValue).c_str()));
             break;
-        default:
+        }
+        default: {
+            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type");
             break;
+        }
     }
     return RET_OK;
 }

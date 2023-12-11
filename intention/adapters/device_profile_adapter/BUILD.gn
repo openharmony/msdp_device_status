@@ -21,6 +21,8 @@ config("device_profile_adapter_config") {
 ohos_source_set("device_profile_adapter") {
   include_dirs = [
     "include",
+    "${device_status_root_path}/libs/include",
+    "${device_status_root_path}/interfaces/innerkits/include",
     "${device_status_root_path}/utils/common/include",
     "${intention_root_path}/prototype/include",
   ]
