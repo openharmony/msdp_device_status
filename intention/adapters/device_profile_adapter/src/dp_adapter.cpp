@@ -113,7 +113,8 @@ int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &devic
     std::list<ProfileEvent> profileEvents;
     profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
     std::list<ProfileEvent> failedEvents;
-    int32_t ret =  DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents, it->second, failedEvents);
+    int32_t ret =  DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents, it->second,
+        failedEvents);
     if (ret != RET_OK) {
         FI_HILOGE("UnsubscribeProfileEvents failed");
         return RET_ERR;
@@ -159,7 +160,7 @@ int32_t DeviceProfileAdapter::GetDPValue(ValueType valueType, cJSON* jsonValue, 
         case ValueType::INT_TYPE: {
             if (!cJSON_IsNumber(jsonValue)) {
                 FI_HILOGE("dpValue is not number type");
-                return RET_ERR;     
+                return RET_ERR;
             }
             DP_VALUE valueTemp { std::in_place_type<int32_t>, jsonValue->valueint };
             dpValue = valueTemp;
