@@ -17,7 +17,6 @@
 
 #include "cooperate_device_manager.h"
 #include "cooperate_event_manager.h"
-#include "cooperate_message.h"
 #include "cooperate_sm.h"
 #include "cooperate_softbus_adapter.h"
 #include "cooperate_util.h"

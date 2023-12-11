@@ -15,13 +15,12 @@
 
 #include "intention_proxy.h"
 
-#include "hitrace_meter.h"
 #include "iremote_object.h"
-#include <message_option.h>
-#include <message_parcel.h>
+#include "message_option.h"
+#include "message_parcel.h"
 
-#include "fi_log.h"
-#include "i_plugin.h"
+#include "devicestatus_define.h"
+#include "intention_identity.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -30,15 +29,19 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionProxy" };
 } // namespace
 
-int32_t IntentionProxy::Enable(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+IntentionProxy::IntentionProxy(const sptr<IRemoteObject>& impl)
+    : IRemoteProxy<IIntention>(impl)
+{}
+
+int32_t IntentionProxy::Enable(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::ENABLE, intention, 0u)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::ENABLE, static_cast<uint32_t>(intention), 0u),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -46,15 +49,15 @@ int32_t IntentionProxy::Enable(uint32_t intention, MessageParcel &data, MessageP
     return ret;
 }
 
-int32_t IntentionProxy::Disable(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::Disable(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::DISABLE, intention, 0u)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::DISABLE, static_cast<uint32_t>(intention), 0u),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -62,15 +65,15 @@ int32_t IntentionProxy::Disable(uint32_t intention, MessageParcel &data, Message
     return ret;
 }
 
-int32_t IntentionProxy::Start(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::Start(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::START, intention, 0u)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::START, static_cast<uint32_t>(intention), 0u),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -78,15 +81,15 @@ int32_t IntentionProxy::Start(uint32_t intention, MessageParcel &data, MessagePa
     return ret;
 }
 
-int32_t IntentionProxy::Stop(uint32_t intention, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::Stop(Intention intention, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::STOP, intention, 0u)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::STOP, static_cast<uint32_t>(intention), 0u),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -94,15 +97,15 @@ int32_t IntentionProxy::Stop(uint32_t intention, MessageParcel &data, MessagePar
     return ret;
 }
 
-int32_t IntentionProxy::AddWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::AddWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::ADD_WATCH, intention, id)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::ADD_WATCH, static_cast<uint32_t>(intention), id),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -110,15 +113,15 @@ int32_t IntentionProxy::AddWatch(uint32_t intention, uint32_t id, MessageParcel 
     return ret;
 }
 
-int32_t IntentionProxy::RemoveWatch(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::RemoveWatch(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::REMOVE_WATCH, intention, id)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::REMOVE_WATCH, static_cast<uint32_t>(intention), id),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -126,15 +129,15 @@ int32_t IntentionProxy::RemoveWatch(uint32_t intention, uint32_t id, MessageParc
     return ret;
 }
 
-int32_t IntentionProxy::SetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::SetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::SET_PARAM, intention, id)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::SET_PARAM, static_cast<uint32_t>(intention), id),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -142,15 +145,15 @@ int32_t IntentionProxy::SetParam(uint32_t intention, uint32_t id, MessageParcel 
     return ret;
 }
 
-int32_t IntentionProxy::GetParam(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::GetParam(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::GET_PARAM, intention, id)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::GET_PARAM, static_cast<uint32_t>(intention), id),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);
@@ -158,15 +161,15 @@ int32_t IntentionProxy::GetParam(uint32_t intention, uint32_t id, MessageParcel 
     return ret;
 }
 
-int32_t IntentionProxy::Control(uint32_t intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
+int32_t IntentionProxy::Control(Intention intention, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageOption option;
 
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-        PARAMID(CommonAction::CONTROL, intention, id)),
+    int32_t ret = remote->SendRequest(
+        PARAMID(CommonAction::CONTROL, static_cast<uint32_t>(intention), id),
         data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("SendRequest is failed, ret:%{public}d", ret);

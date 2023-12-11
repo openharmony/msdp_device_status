@@ -13,30 +13,38 @@
  * limitations under the License.
  */
 
-#ifndef INTENTION_STUB_H
-#define INTENTION_STUB_H
-
-#include <map>
-
-#include <iremote_stub.h>
-#include "message_option.h"
-#include "message_parcel.h"
-#include <nocopyable.h>
-
-#include "i_intention.h"
+#include "default_params.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class IntentionStub : public IRemoteStub<IIntention> {
-public:
-    IntentionStub() = default;
-    DISALLOW_COPY_AND_MOVE(IntentionStub);
-    virtual ~IntentionStub() = default;
+DefaultParam::DefaultParam(int32_t userData)
+    : userData(userData)
+{}
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-};
+bool DefaultParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteInt32(userData);
+}
+
+bool DefaultParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadInt32(userData);
+}
+
+DefaultReply::DefaultReply(int32_t result)
+    : result(result)
+{}
+
+bool DefaultReply::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteInt32(result);
+}
+
+bool DefaultReply::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadInt32(result);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INTENTION_STUB_H

@@ -30,6 +30,9 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "intention_service.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -141,6 +144,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     std::unique_ptr<MotionDrag> motionDrag_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    sptr<IntentionService> intention_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

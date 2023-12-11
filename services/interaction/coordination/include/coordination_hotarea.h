@@ -52,7 +52,7 @@ private:
     void CheckInHotArea();
     void CheckPointerToEdge(HotAreaType type);
     void NotifyHotAreaMessage(SessionPtr sess, MessageId msgId, HotAreaType msg, bool isEdge);
-    
+
 private:
     int32_t width_ { 720 };
     int32_t height_ { 1280 };

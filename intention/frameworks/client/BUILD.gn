@@ -47,9 +47,6 @@ ohos_shared_library("intention_client") {
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/data:cooperate_params",
-    "${intention_root_path}/data:drag_params",
-    "${intention_root_path}/ipc:intention_ipc",
   ]
 
   public_configs = [ ":intention_public_config" ]

@@ -16,60 +16,51 @@
 #ifndef COOPERATE_PARAMS_H
 #define COOPERATE_PARAMS_H
 
-#include "i_plugin.h"
+#include "intention_identity.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-enum CooperateParam : uint32_t {
-    PREPARE,
-    STATE,
-    REGISTER
-};
-
-struct DefaultCooperateParam final : public ParamBase {
-    DefaultCooperateParam() = default;
-    DefaultCooperateParam(int32_t userData);
-    bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data) override;
-
-    int32_t userData { -1 };
-};
-
-struct DefaultCooperateReply final : public ParamBase {
-    bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data) override;
+enum CooperateAction : uint32_t {
+    UNKNOWN_COOPERATE_ACTION,
+    REGISTER_LISTENER,
+    UNREGISTER_LISTENER,
+    GET_COOPERATE_STATE,
 };
 
 struct StartCooperateParam final : public ParamBase {
     StartCooperateParam() = default;
-    StartCooperateParam(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId);
-    bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data) override;
+    StartCooperateParam(int32_t userData, const std::string &remoteNetworkId,
+                        int32_t startDeviceId, bool checkPermission);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
 
     std::string remoteNetworkId;
-    int32_t startDeviceId { -1 };
     int32_t userData { -1 };
+    int32_t startDeviceId { -1 };
+    bool checkPermission { false };
 };
 
 struct StopCooperateParam final : public ParamBase {
     StopCooperateParam() = default;
-    StopCooperateParam(int32_t userData, bool isUnchained);
-    bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data) override;
+    StopCooperateParam(int32_t userData, bool isUnchained, bool checkPermission);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
 
     int32_t userData { -1 };
     bool isUnchained { false };
+    bool checkPermission { false };
 };
 
 struct GetCooperateStateParam final : public ParamBase {
     GetCooperateStateParam() = default;
-    GetCooperateStateParam(std::string networkId, int32_t userData);
-    bool Marshalling(Parcel &data) const override;
-    bool Unmarshalling(Parcel &data) override;
+    GetCooperateStateParam(int32_t userData, const std::string &networkId, bool checkPermission);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
 
     std::string networkId;
     int32_t userData { -1 };
+    bool checkPermission { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

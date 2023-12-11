@@ -104,7 +104,7 @@ extern "C" fn on_stream_received(session_id: i32, byte_data: *const StreamData,
     ext_data: *const StreamData, param_data: *const StreamFrameInfo) {
 }
 
-/// Callback trait used for handling events in the DSoftbus instance. 
+/// Callback trait used for handling events in the DSoftbus instance.
 pub trait IDSoftbufCallback {
     /// Handles the event when a session is closed.
     fn on_session_closed(&self, device_id: &str);
@@ -205,7 +205,7 @@ impl Inner {
         }
         Ok(())
     }
-    
+
     /// Create a session listener object with the given callback functions.
     ///
     /// # Arguments
@@ -234,7 +234,7 @@ impl Inner {
             on_message_received: on_message_received_ptr.ok_or(FusionErrorCode::Fail)?,
             on_stream_received: on_stream_received_ptr.ok_or(FusionErrorCode::Fail)?,
         };
-    
+
         Ok(session_listener)
     }
 
@@ -453,7 +453,7 @@ impl Inner {
         } else {
             error!(LOG_LABEL, "SessionDevIdMap not found");
             return;
-        } 
+        }
         self.session_dev_map.remove(remote_network_id);
         self.channel_status_map.remove(remote_network_id);
         self.session_id = -1;
@@ -520,7 +520,7 @@ impl Inner {
         peer_dev_id.extend(vec![0; 65]);
         let peer_dev_id_ptr = peer_dev_id.as_mut_ptr() as *mut c_char;
         let len: u32 = (C_CHAR_SIZE * DEVICE_ID_SIZE_MAX) as u32;
-        
+
         // SAFETY: Assumes valid input arguments and that `peer_dev_id_ptr` points to a memory block of at least `len`
         // bytes. Caller must ensure these conditions for correct behavior and to prevent memory issues or security
         // vulnerabilities.
@@ -533,7 +533,7 @@ impl Inner {
             let device_id = self.find_device(session_id).map_err(|_|{
                 error!(LOG_LABEL, "find_device error");
                 FusionErrorCode::Fail
-            })?; 
+            })?;
 
             if let Some(value) = self.session_dev_map.get(&device_id) {
                 self.session_dev_map.remove(&device_id);
@@ -861,7 +861,7 @@ impl DSoftbus {
             }
         }
     }
-   
+
     /// Releases the resources held by the SoftBus instance.
     ///
     /// # Note
@@ -953,7 +953,7 @@ impl DSoftbus {
                 error!(LOG_LABEL, "lock error: {:?}", err);
             }
         }
-    }   
+    }
 
     /// Callback function triggered when a session is opened.
     ///

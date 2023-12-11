@@ -13,23 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef STATE_MACHINE_H
-#define STATE_MACHINE_H
+#ifndef INTENTION_STUB_H
+#define INTENTION_STUB_H
 
-#include <string>
+#include "iremote_stub.h"
+#include "message_option.h"
+#include "message_parcel.h"
+
+#include "i_intention.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class StateMachine final {
+class IntentionStub : public IRemoteStub<IIntention> {
 public:
-    void EnableCooperate();
-    void DisableCooperate();
-    int32_t StartCooperate(const std::string &remoteNetworkId, int32_t startDeviceId);
-    int32_t StopCooperate(bool isUnchained);
-    int32_t GetCooperateState(const std::string &networkId);
+    IntentionStub() = default;
+    virtual ~IntentionStub() = default;
+
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // STATE_MACHINE_H
+#endif // INTENTION_STUB_H

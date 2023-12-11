@@ -51,7 +51,7 @@ struct ShadowInfo {
         return pixelMap->IsSameImage(*(other.pixelMap)) && x == other.x && y == other.y;
     }
 
-    bool operator !=  (const ShadowInfo &other) const
+    bool operator != (const ShadowInfo &other) const
     {
         return !(*this == other);
     }

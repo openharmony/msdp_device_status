@@ -29,90 +29,93 @@ Cooperate::Cooperate(IContext *context)
     : context_(context)
 {}
 
-int32_t Cooperate::Enable(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    cooperateMgr_.PrepareCooperate();
+    CALL_DEBUG_ENTER;
+    cooperateMgr_.Enable();
     return RET_OK;
 }
 
-int32_t Cooperate::Disable(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    cooperateMgr_.UnprepareCooperate();
+    CALL_DEBUG_ENTER;
+    cooperateMgr_.Diable();
     return RET_OK;
 }
 
-int32_t Cooperate::Start(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::Start(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
-    CHKPR(context_, RET_ERR);
+    CALL_DEBUG_ENTER;
     StartCooperateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-
-    int32_t ret = cooperateMgr_.ActivateCooperate(context.session, param.userData, param.remoteNetworkId,
-        param.startDeviceId);
-    if (ret != RET_OK) {
-        FI_HILOGE("Activate cooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
+    FI_HILOGD("Start cooperate");
+    CHKPR(context_, RET_ERR);
+    return RET_OK;
 }
 
-int32_t Cooperate::Stop(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
+    CALL_DEBUG_ENTER;
     StopCooperateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-
-    int32_t ret = cooperateMgr_.DeactivateCooperate(context.session, param.userData, param.isUnchained);
-    if (ret != RET_OK) {
-        FI_HILOGE("Deactivate cooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
+    FI_HILOGD("Stop cooperate");
+    CHKPR(context_, RET_ERR);
+    return RET_OK;
 }
 
-int32_t Cooperate::AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t ret = cooperateMgr_.RegisterCooperateListener(context.session);
-    if (ret != RET_OK) {
-        FI_HILOGE("Register cooperate listener failed, ret:%{public}d", ret);
+    CALL_DEBUG_ENTER;
+    if (id != CooperateAction::REGISTER_LISTENER) {
+        FI_HILOGE("Unknown action");
+        return RET_ERR;
     }
-    return ret;
+    FI_HILOGD("Register cooperate listener");
+    return RET_OK;
 }
 
-int32_t Cooperate::RemoveWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t ret = cooperateMgr_.UnregisterCooperateListener(context.session);
-    if (ret != RET_OK) {
-        FI_HILOGE("Unregister cooperate listener failed, ret:%{public}d", ret);
+    CALL_DEBUG_ENTER;
+    if (id != CooperateAction::UNREGISTER_LISTENER) {
+        FI_HILOGE("Unknown action");
+        return RET_ERR;
     }
-    return ret;
+    FI_HILOGD("Unregister cooperate listener");
+    return RET_OK;
 }
 
-int32_t Cooperate::SetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::SetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CALL_DEBUG_ENTER;
     return RET_ERR;
 }
 
-int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CALL_DEBUG_ENTER;
+    if (id != CooperateAction::GET_COOPERATE_STATE) {
+        FI_HILOGE("Unknown action");
+        return RET_ERR;
+    }
     GetCooperateStateParam param;
     if (!param.Unmarshalling(data)) {
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-
-    int32_t ret = cooperateMgr_.GetCooperateState(context.session, param.userData, param.deviceId);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get cooperate state failed");
-    }
-    return ret;
+    FI_HILOGD("Get cooperate state");
+    return RET_OK;
 }
 
-int32_t Cooperate::Control(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
+    CALL_DEBUG_ENTER;
     return RET_ERR;
 }
 

@@ -89,6 +89,30 @@ void EventHub::OnReceiveEvent(const EventFwk::CommonEventData &event)
         FI_HILOGE("Post async task failed");
     }
 }
-}  // namespace DeviceStatus
-}  // namespace Msdp
-}  // namespace OHOS
+
+DragAbilityStatusChange::DragAbilityStatusChange(std::shared_ptr<EventHub> eventHub)
+    : eventHub_(eventHub)
+{}
+
+void DragAbilityStatusChange::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("OnAddSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        FI_HILOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+    if (eventHub_ == nullptr) {
+        FI_HILOGE("OnAddSystemAbility eventHub_ is nullptr");
+        return;
+    }
+    EventHub::RegisterEvent(eventHub_);
+}
+
+void DragAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    FI_HILOGI("OnRemoveSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
+    return;
+}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -48,6 +48,32 @@ bool JsDragManager::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     return isEqual;
 }
 
+napi_value JsDragManager::GetDataSummary(napi_env env)
+{
+    CALL_INFO_TRACE;
+    std::map<std::string, int64_t> summarys;
+    if (INTERACTION_MGR->GetDragSummary(summarys) != RET_OK) {
+        FI_HILOGE("Failed to GetDragSummary");
+        return nullptr;
+    }
+    napi_value arr = nullptr;
+    CHKRP(napi_create_array(env, &arr), CREATE_ARRAY);
+    uint32_t index = 0;
+    for (const auto &summary : summarys) {
+        napi_value dataType = nullptr;
+        CHKRP(napi_create_string_utf8(env, summary.first.c_str(), NAPI_AUTO_LENGTH, &dataType), CREATE_STRING_UTF8);
+        napi_value dataSize = nullptr;
+        CHKRP(napi_create_int64(env, summary.second, &dataSize), CREATE_INT64);
+        napi_value object = nullptr;
+        CHKRP(napi_create_object(env, &object), CREATE_OBJECT);
+        CHKRP(napi_set_named_property(env, object, "dataType", dataType), SET_NAMED_PROPERTY);
+        CHKRP(napi_set_named_property(env, object, "dataSize", dataSize), SET_NAMED_PROPERTY);
+        CHKRP(napi_set_element(env, arr, index, object), SET_ELEMENT);
+        ++index;
+    }
+    return arr;
+}
+
 void JsDragManager::RegisterListener(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;

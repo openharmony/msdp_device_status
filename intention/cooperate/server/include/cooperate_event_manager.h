@@ -25,7 +25,7 @@
 #include "singleton.h"
 #include "stream_session.h"
 
-#include "cooperate_message.h"
+#include "coordination_message.h"
 #include "fi_log.h"
 #include "i_context.h"
 
@@ -42,7 +42,7 @@ public:
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
         std::string networkId;
-        CooperateMessage msg { CooperateMessage::PREPARE };
+        CoordinationMessage msg { CoordinationMessage::PREPARE };
         bool state { false };
     };
 
@@ -50,28 +50,28 @@ public:
 
     void AddCooperateEvent(sptr<EventInfo> event);
     void RemoveCooperateEvent(sptr<EventInfo> event);
-    int32_t OnCooperateMessage(CooperateMessage msg, const std::string &networkId = "");
-    void OnEnable(CooperateMessage msg, const std::string &networkId = "");
-    void OnStart(CooperateMessage msg, const std::string &networkId = "");
-    void OnStop(CooperateMessage msg, const std::string &networkId = "");
+    int32_t OnCooperateMessage(CoordinationMessage msg, const std::string &networkId = "");
+    void OnEnable(CoordinationMessage msg, const std::string &networkId = "");
+    void OnStart(CoordinationMessage msg, const std::string &networkId = "");
+    void OnStop(CoordinationMessage msg, const std::string &networkId = "");
     void OnGetCrossingSwitchState(bool state);
-    void OnErrorMessage(EventType type, CooperateMessage msg);
+    void OnErrorMessage(EventType type, CoordinationMessage msg);
     void SetIContext(IContext *context);
     IContext* GetIContext() const;
 
 private:
     void NotifyCooperateMessage(SessionPtr sess, MessageId msgId, int32_t userData,
-        const std::string &networkId, CooperateMessage msg);
+        const std::string &networkId, CoordinationMessage msg);
     void NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
 
 private:
     std::mutex lock_;
     std::list<sptr<EventInfo>> remoteCooperateCallbacks_;
     std::map<EventType, sptr<EventInfo>> cooperateCallbacks_{
-        {EventType::ENABLE, nullptr},
-        {EventType::START, nullptr},
-        {EventType::STOP, nullptr},
-        {EventType::STATE, nullptr}
+        { EventType::ENABLE, nullptr },
+        { EventType::START, nullptr },
+        { EventType::STOP, nullptr },
+        { EventType::STATE, nullptr }
     };
     IContext *context_ { nullptr };
 };

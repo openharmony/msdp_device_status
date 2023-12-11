@@ -642,6 +642,7 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string &networkId, Messa
         return RET_ERR;
     }
     CoordinationState curState = COOR_SM->GetCurrentCoordinationState();
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
     int32_t result = SendBytes(sessionDevs_[networkId], dataPacket, sizeof(DataPacket) + dataLen);
     free(dataPacket);
     if (result != RET_OK) {

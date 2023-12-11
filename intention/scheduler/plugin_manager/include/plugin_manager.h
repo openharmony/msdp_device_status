@@ -20,6 +20,7 @@
 
 #include "nocopyable.h"
 
+#include "i_context.h"
 #include "i_plugin_manager.h"
 
 namespace OHOS {
@@ -27,12 +28,15 @@ namespace Msdp {
 namespace DeviceStatus {
 
 // Loading、unloading and bookkeeping of modules.
-class PluginManager : public IPluginManager {
+class PluginManager final : public IPluginManager {
 public:
     class Plugin {
     public:
         Plugin(IContext *context, void *handle);
+        Plugin(Plugin &&other);
+        DISALLOW_COPY(Plugin);
         ~Plugin();
+        Plugin& operator=(Plugin &&other);
 
         IPlugin* GetInstance();
 
@@ -55,15 +59,13 @@ public:
     void UnloadPlugin(Intention intention);
 
 private:
-    int32_t LoadLibrary(Intention intention);
+    void LoadLibrary(Intention intention);
     IPlugin* DoLoadPlugin(Intention intention);
 
 private:
     IContext *context_ { nullptr };
     std::map<Intention, Plugin> libs_;
 };
-using DestroyInstance = void (*)(IPlugin *);
-using CreateInstance = IPlugin* (*)(IContext *);
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
