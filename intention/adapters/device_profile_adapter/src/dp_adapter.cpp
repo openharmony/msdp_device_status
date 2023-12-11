@@ -91,7 +91,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(subscribeInfos,
         profileEventCallbacks_[deviceId], failedEvents);
     if (ret != RET_OK) {
-        profileEventCallbacks_.erase(it);
+        profileEventCallbacks_.erase(profileEventCallbacks_.find(deviceId));
         return RET_ERR;
     }
     return RET_OK;
