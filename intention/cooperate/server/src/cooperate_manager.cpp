@@ -33,7 +33,7 @@ void CooperateManager::Enable()
     COOR_SM->PrepareCooperate();
 }
 
-void CooperateManager::Diable()
+void CooperateManager::Disable()
 {
     COOR_SM->UnprepareCooperate();
 }

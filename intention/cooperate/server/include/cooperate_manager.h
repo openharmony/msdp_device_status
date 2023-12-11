@@ -27,7 +27,7 @@ public:
     ~CooperateManager() = default;
 
     void Enable();
-    void Diable();
+    void Disable();
     int32_t ActivateCooperate(SessionPtr sess,
                               int32_t userData,
                               const std::string &remoteNetworkId,

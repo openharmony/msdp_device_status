@@ -39,7 +39,7 @@ int32_t Cooperate::Enable(CallingContext &context, MessageParcel &data, MessageP
 int32_t Cooperate::Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    cooperateMgr_.Diable();
+    cooperateMgr_.Disable();
     return RET_OK;
 }
 
@@ -73,7 +73,7 @@ int32_t Cooperate::AddWatch(CallingContext &context, uint32_t id, MessageParcel 
 {
     CALL_DEBUG_ENTER;
     if (id != CooperateAction::REGISTER_LISTENER) {
-        FI_HILOGE("Unknown action");
+        FI_HILOGE("Unknown action:%{public}u", id);
         return RET_ERR;
     }
     FI_HILOGD("Register cooperate listener");
@@ -84,7 +84,7 @@ int32_t Cooperate::RemoveWatch(CallingContext &context, uint32_t id, MessageParc
 {
     CALL_DEBUG_ENTER;
     if (id != CooperateAction::UNREGISTER_LISTENER) {
-        FI_HILOGE("Unknown action");
+        FI_HILOGE("Unknown action:%{public}u", id);
         return RET_ERR;
     }
     FI_HILOGD("Unregister cooperate listener");
@@ -101,7 +101,7 @@ int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, MessageParcel 
 {
     CALL_DEBUG_ENTER;
     if (id != CooperateAction::GET_COOPERATE_STATE) {
-        FI_HILOGE("Unknown action");
+        FI_HILOGE("Unknown action:%{public}u", id);
         return RET_ERR;
     }
     GetCooperateStateParam param;
