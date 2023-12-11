@@ -32,6 +32,9 @@ ohos_shared_library("coordination") {
   include_dirs = [
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_service_path}/context/include",
+    "${device_status_service_path}/interaction/coordination/include",
+    "${device_status_service_path}/interaction/drag/include",
     "//third_party/cJSON",
   ]
 
@@ -40,6 +43,7 @@ ohos_shared_library("coordination") {
     "src/coordination_device_manager.cpp",
     "src/coordination_event_handler.cpp",
     "src/coordination_event_manager.cpp",
+    "src/coordination_hisysevent.cpp",
     "src/coordination_hotarea.cpp",
     "src/coordination_sm.cpp",
     "src/coordination_softbus_adapter.cpp",
@@ -72,6 +76,7 @@ ohos_shared_library("coordination") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
     "input:libmmi-client",

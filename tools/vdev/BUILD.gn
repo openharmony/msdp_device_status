@@ -1,0 +1,113 @@
+#Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("../../device_status.gni")
+
+config("devicestatus_vdev_config") {
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
+}
+
+config("devicestatus_vdev_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_source_set("devicestatus_vdev") {
+  sources = [
+    "src/v_input_device.cpp",
+    "src/virtual_device.cpp",
+    "src/virtual_keyboard.cpp",
+    "src/virtual_mouse.cpp",
+    "src/virtual_touchscreen.cpp",
+  ]
+
+  configs = [ ":devicestatus_vdev_config" ]
+
+  public_configs = [ ":devicestatus_vdev_public_config" ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "input:libmmi-client",
+    "window_manager:libdm",
+  ]
+
+  subsystem_name = "${device_status_subsystem_name}"
+  part_name = "${device_status_part_name}"
+}
+
+config("devicestatus_vdev_builders_config") {
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
+}
+
+config("devicestatus_vdev_builders_public_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_source_set("devicestatus_vdev_builders") {
+  sources = [
+    "src/virtual_device_builder.cpp",
+    "src/virtual_keyboard_builder.cpp",
+    "src/virtual_mouse_builder.cpp",
+    "src/virtual_touchscreen_builder.cpp",
+  ]
+
+  configs = [ ":devicestatus_vdev_builders_config" ]
+
+  public_configs = [ ":devicestatus_vdev_builders_public_config" ]
+
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
+
+  public_deps = [ ":devicestatus_vdev" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "window_manager:libdm",
+  ]
+
+  subsystem_name = "${device_status_subsystem_name}"
+  part_name = "${device_status_part_name}"
+}
+
+ohos_executable("vdevadm") {
+  include_dirs = [
+    "include",
+    "//third_party/json/include",
+  ]
+
+  sources = [ "src/vdevadm.cpp" ]
+
+  deps = [
+    ":devicestatus_vdev_builders",
+    "${device_status_utils_path}:devicestatus_util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+
+  install_enable = true
+  subsystem_name = "${device_status_subsystem_name}"
+  part_name = "${device_status_part_name}"
+}

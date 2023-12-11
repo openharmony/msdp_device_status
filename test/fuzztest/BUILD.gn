@@ -43,12 +43,19 @@ group("device_status_fuzztest") {
   ]
   if (fusion_interaction_coordination) {
     deps += [
+      "activatecooperate_fuzzer:fuzztest",
       "activatecoordination_fuzzer:fuzztest",
+      "deactivatecooperate_fuzzer:fuzztest",
       "deactivatecoordination_fuzzer:fuzztest",
+      "getcooperatestate_fuzzer:fuzztest",
       "getcoordinationstate_fuzzer:fuzztest",
+      "preparecooperate_fuzzer:fuzztest",
       "preparecoordination_fuzzer:fuzztest",
+      "registercooperatemonitor_fuzzer:fuzztest",
       "registercoordinationlistener_fuzzer:fuzztest",
+      "unpreparecooperate_fuzzer:fuzztest",
       "unpreparecoordination_fuzzer:fuzztest",
+      "unregistercooperatemonitor_fuzzer:fuzztest",
     ]
   }
 }

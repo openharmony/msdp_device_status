@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "devicestatus_algorithm_manager.h"
 
@@ -240,9 +240,9 @@ ErrCode AlgoMgr::UnregisterSensor(Type type)
     }
     if (!SENSOR_DATA_CB.UnregisterCallbackSensor(sensorType)) {
         FI_HILOGE("Failed to unregister callback sensor");
-        return RET_ERR;
+        return false;
     }
-    return RET_OK;
+    return true;
 }
 
 extern "C" IMsdp *Create(void)

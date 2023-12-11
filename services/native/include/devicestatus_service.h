@@ -30,6 +30,9 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "intention_service.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -64,15 +67,15 @@ public:
     std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void ReportSensorSysEvent(int32_t type, bool enable);
-    int32_t RegisterCoordinationListener(bool isCheckPermission = false) override;
-    int32_t UnregisterCoordinationListener(bool isCheckPermission = false) override;
-    int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false) override;
-    int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false) override;
+    int32_t RegisterCoordinationListener(bool isCompatible = false) override;
+    int32_t UnregisterCoordinationListener(bool isCompatible = false) override;
+    int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) override;
+    int32_t UnprepareCoordination(int32_t userData, bool isCompatible = false) override;
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId,
-        bool isCheckPermission = false) override;
-    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false) override;
+        bool isCompatible = false) override;
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &networkId,
-        bool isCheckPermission = false) override;
+        bool isCompatible = false) override;
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
@@ -141,6 +144,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     std::unique_ptr<MotionDrag> motionDrag_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    sptr<IntentionService> intention_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

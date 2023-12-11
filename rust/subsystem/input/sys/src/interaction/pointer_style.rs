@@ -39,7 +39,7 @@ impl CPointerStyle {
     /// Create a CPointerStyle object.
     pub fn new() -> Self {
         Self {
-            size: -1, 
+            size: -1,
             color: 0,
             id: 0,
         }

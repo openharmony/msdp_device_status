@@ -157,9 +157,9 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 {
     CALL_INFO_TRACE;
     std::string listenerType = type;
-    bool isCheckPermission = false;
+    bool isCompatible = false;
     if (type == COOPERATE_MESSAGE_NAME) {
-        isCheckPermission = true;
+        isCompatible = true;
         listenerType = COOPERATE_NAME;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -186,7 +186,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCheckPermission);
+        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCompatible);
     }
 }
 
@@ -194,9 +194,9 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 {
     CALL_INFO_TRACE;
     std::string listenerType = type;
-    bool isCheckPermission = false;
+    bool isCompatible = false;
     if (type == COOPERATE_MESSAGE_NAME) {
-        isCheckPermission = true;
+        isCompatible = true;
         listenerType = COOPERATE_NAME;
     }
     std::lock_guard<std::mutex> guard(mutex_);
@@ -220,7 +220,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 MONITOR_LABEL:
     if (iter->second.empty() && isListeningProcess_) {
         isListeningProcess_ = false;
-        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this(), isCheckPermission);
+        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this(), isCompatible);
     }
 }
 

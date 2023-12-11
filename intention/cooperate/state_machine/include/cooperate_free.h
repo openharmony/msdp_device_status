@@ -59,7 +59,7 @@ private:
         void OnProgress(Context &context, CooperateEvent &event) override;
         void OnReset(Context &context, CooperateEvent &event) override;
     };
-    
+
     class StartRemoteInput final : public ICooperateStep
     {
     public:

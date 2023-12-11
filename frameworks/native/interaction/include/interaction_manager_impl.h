@@ -19,7 +19,12 @@
 #include <mutex>
 
 #include "client.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "tunnel_client.h"
+#include "cooperate_client.h"
+#else
 #include "coordination_manager_impl.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 #include "interaction_manager.h"
@@ -34,19 +39,19 @@ public:
     DISALLOW_MOVE(InteractionManagerImpl);
     bool InitClient();
     int32_t RegisterCoordinationListener(
-        std::shared_ptr<ICoordinationListener> listener, bool isCheckPermission = false);
+        std::shared_ptr<ICoordinationListener> listener, bool isCompatible = false);
     int32_t UnregisterCoordinationListener(
-        std::shared_ptr<ICoordinationListener> listener, bool isCheckPermission = false);
+        std::shared_ptr<ICoordinationListener> listener, bool isCompatible = false);
     int32_t PrepareCoordination(
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
     int32_t UnprepareCoordination(
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-        std::function<void(std::string, CoordinationMessage)> callback, bool isCheckPermission = false);
+        std::function<void(std::string, CoordinationMessage)> callback, bool isCompatible = false);
     int32_t DeactivateCoordination(bool isUnchained, std::function<void(std::string, CoordinationMessage)> callback,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
-        bool isCheckPermission = false);
+        bool isCompatible = false);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);
@@ -77,7 +82,12 @@ private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
     DragManagerImpl dragManagerImpl_;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    TunnelClient tunnel_;
+    CooperateClient cooperate_;
+#else
     CoordinationManagerImpl coordinationManagerImpl_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

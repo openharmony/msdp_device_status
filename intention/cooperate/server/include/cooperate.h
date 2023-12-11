@@ -28,15 +28,15 @@ public:
     Cooperate(IContext *context);
     virtual ~Cooperate() = default;
 
-    int32_t Enable(CallingContext &context, Parcel &data, Parcel &reply);
-    int32_t Disable(CallingContext &context, Parcel &data, Parcel &reply);
-    int32_t Start(CallingContext &context, Parcel &data, Parcel &reply);
-    int32_t Stop(CallingContext &context, Parcel &data, Parcel &reply);
-    int32_t AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
-    int32_t RemoveWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
-    int32_t SetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
-    int32_t GetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
-    int32_t Control(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply);
+    int32_t Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Start(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
+    int32_t AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t SetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
 
 private:
     IContext *context_ { nullptr };

@@ -46,7 +46,7 @@ private:
         void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
-    
+
     private:
         std::pair<std::string, std::string> prepared_;
     };

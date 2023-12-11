@@ -41,6 +41,7 @@
 #include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
+#include "drag_hisysevent.h"
 #include "json_parser.h"
 #include "include/util.h"
 
@@ -284,6 +285,7 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
     FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+        DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
@@ -1466,6 +1468,7 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     OnDragStyle(dragStyleNode, pixelMap);
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
+    DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 

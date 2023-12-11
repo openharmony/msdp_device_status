@@ -592,8 +592,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_ERR);
 #else
@@ -623,14 +623,14 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
     };
     std::shared_ptr<CoordinationListenerTest> consumer =
         std::make_shared<CoordinationListenerTest>();
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCheckPermission);
+    ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -650,8 +650,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnregisterCoordinationLi
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::shared_ptr<ICoordinationListener> consumer = nullptr;
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -676,8 +676,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_PrepareCoordination, Tes
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->PrepareCoordination(fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -703,8 +703,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UnprepareCoordination, T
         FI_HILOGD("Prepare coordination success, listener:%{public}s", listener.c_str());
         promiseFlag.set_value(true);
     };
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->UnprepareCoordination(fun, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->UnprepareCoordination(fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);
@@ -730,9 +730,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
         FI_HILOGD("Start coordination success");
         (void) listener;
     };
-    bool isCheckPermission = true;
+    bool isCompatible = true;
     int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId,
-        fun, isCheckPermission);
+        fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -755,13 +755,13 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_DeactivateCoordination, 
         FI_HILOGD("Stop coordination success");
         (void) listener;
     };
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(false, fun, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->DeactivateCoordination(false, fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
-    ret = InteractionManager::GetInstance()->DeactivateCoordination(true, fun, isCheckPermission);
+    ret = InteractionManager::GetInstance()->DeactivateCoordination(true, fun, isCompatible);
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     RemovePermission();
@@ -781,8 +781,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Abn
     auto fun = [](bool state) {
         FI_HILOGD("Get coordination state failed, state:%{public}d", state);
     };
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_NE(ret, RET_OK);
 #else
@@ -808,8 +808,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Nor
         FI_HILOGD("Get coordination state success, state:%{public}d", state);
         promiseFlag.set_value(true);
     };
-    bool isCheckPermission = true;
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCheckPermission);
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
     ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) != std::future_status::timeout);

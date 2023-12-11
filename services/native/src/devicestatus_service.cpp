@@ -53,10 +53,8 @@ struct device_status_epoll_event {
     EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
-#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSpSingleton<DeviceStatusService>::GetInstance().GetRefPtr());
-#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 } // namespace
 
 DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
@@ -83,12 +81,16 @@ void DeviceStatusService::OnStart()
         FI_HILOGE("On start call init failed");
         return;
     }
-#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    intention_ = sptr<IntentionService>::MakeSptr();
+    intention_->Init(this);
+    if (!Publish(intention_)) {
+#else
     if (!Publish(this)) {
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
-#endif // OHOS_BUILD_ENABLE_RUST_IMPL
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
     worker_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
@@ -527,10 +529,10 @@ void DeviceStatusService::DisableDevMgr()
     devMgr_.Disable();
 }
 
-int32_t DeviceStatusService::RegisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusService::RegisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -543,10 +545,10 @@ int32_t DeviceStatusService::RegisterCoordinationListener(bool isCheckPermission
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -559,10 +561,10 @@ int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCheckPermissi
     return RET_OK;
 }
 
-int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     AddSessionDeletedCallback(pid, std::bind(&CoordinationSM::OnSessionLost, COOR_SM, std::placeholders::_1));
@@ -578,10 +580,10 @@ int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCheckP
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -597,10 +599,10 @@ int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isChec
 }
 
 int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
-    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission)
+    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -619,10 +621,10 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
 }
 
 int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnchained,
-    bool isCheckPermission)
+    bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -639,10 +641,10 @@ int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnc
 }
 
 int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::string &networkId,
-    bool isCheckPermission)
+    bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(

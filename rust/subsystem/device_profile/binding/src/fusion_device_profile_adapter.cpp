@@ -231,7 +231,7 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
     subscribeInfos.emplace_back(syncEventInfo);
 
     SaveSubscribeInfos(deviceId, callback, subscribeInfos);
-  
+
     if (subscribeInfos.empty()) {
         FI_HILOGI("Profile events have been subscribed");
         return RET_ERR;
