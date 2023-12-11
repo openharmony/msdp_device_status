@@ -54,7 +54,7 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &remoteNetwo
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StartDInputCallbackSink, callback);
-    int32_t ret =  DistributedInputKit::StartRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
+    int32_t ret = DistributedInputKit::StartRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
     if (ret != RET_OK) {
         CoordinationDFX::WriteInputFunc(CoorType::INPUT_START_REMOTE_INPUT, "remoteNetworkId",
             remoteNetworkId.substr(0, SUB_LEN), "originNetworkId", originNetworkId.substr(0, SUB_LEN));

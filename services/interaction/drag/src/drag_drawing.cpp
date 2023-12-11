@@ -1367,7 +1367,7 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     }
     size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
     for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
-        if (auto color =  g_drawingInfo.mutilSelectedNodes[i]->GetShowingProperties().GetForegroundColor();
+        if (auto color = g_drawingInfo.mutilSelectedNodes[i]->GetShowingProperties().GetForegroundColor();
             color.has_value()) {
             originStyle.foregroundColor = color->AsArgbInt();
             originStyle.radius = previewStyle.radius;

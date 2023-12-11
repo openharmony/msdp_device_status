@@ -113,6 +113,6 @@ void DragAbilityStatusChange::OnRemoveSystemAbility(int32_t systemAbilityId, con
     FI_HILOGI("OnRemoveSystemAbility,systemAbilityId:%{public}d", systemAbilityId);
     return;
 }
-}  // namespace DeviceStatus
-}  // namespace Msdp
-}  // namespace OHOS
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
