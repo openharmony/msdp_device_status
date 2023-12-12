@@ -1003,7 +1003,7 @@ int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
     return RET_OK;
 }
 
-int32_t DragManager::AddPrivilege()
+int32_t DragManager::AddPrivilege(int32_t tokenId)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
@@ -1011,9 +1011,8 @@ int32_t DragManager::AddPrivilege()
         return RET_ERR;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("Target window drag tid:%{public}d", targetTid);
-    SendDragData(targetTid, dragData.udKey);
+    FI_HILOGD("Target window drag tid:%{public}d", tokenId);
+    SendDragData(tokenId, dragData.udKey);
     return RET_OK;
 }
 } // namespace DeviceStatus

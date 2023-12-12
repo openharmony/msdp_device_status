@@ -1110,8 +1110,10 @@ int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summ
 
 int32_t DeviceStatusService::AddPrivilege()
 {
+    CALL_DEBUG_ENTER;
+    int32_t tokenId = static_cast<int32_t>(GetCallingTokenID());
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::AddPrivilege, &dragMgr_));
+        std::bind(&DragManager::AddPrivilege, &dragMgr_, tokenId));
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
         return RET_ERR;
