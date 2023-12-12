@@ -34,6 +34,7 @@ group("device_status_fuzztest") {
     "handleallocsocketfd_fuzzer:fuzztest",
     "removedraglistener_fuzzer:fuzztest",
     "removehotarealistener_fuzzer:fuzztest",
+    "removesubscriptlistener_fuzzer:fuzztest",
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
