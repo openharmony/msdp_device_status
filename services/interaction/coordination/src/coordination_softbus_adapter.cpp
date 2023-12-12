@@ -37,9 +37,12 @@ namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
-constexpr uint32_t QOS_LEN = 3;
-constexpr int32_t MIN_BW = 80 * 1024 * 1024;
-constexpr int32_t LATENCY = 1600;
+constexpr uint32_t QOS_LEN { 3 };
+constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
+constexpr int32_t LATENCY { 1600 };
+constexpr int32_t SOCKET_SERVER { 0 };
+constexpr int32_t SOCKET_CLIENT { 0 };
+
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
     CALL_DEBUG_ENTER;
@@ -130,6 +133,28 @@ static void BytesReceived(int32_t socket, const void *data, uint32_t dataLen)
     COOR_SOFTBUS_ADAPTER->OnBytes(socket, data, dataLen);
 }
 
+int32_t CoordinationSoftbusAdapter::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
+{
+    socket = Socket(info);
+    QosTV socketQos[] = {
+        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
+        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
+        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
+    };
+    ISocketListener listener = {
+        .OnBind = BindLink,
+        .OnShutdown = ShutdownLink,
+        .OnBytes = BytesReceived
+    };
+
+    if (socketType == SOCKET_SERVER) {
+        return Listen(socket, socketQos, QOS_LEN, &listener);
+    } else if (socketType == SOCKET_CLIENT) {
+        return Bind(socket, socketQos, QOS_LEN, &listener);
+    }
+    return RET_ERR;
+}
+
 int32_t CoordinationSoftbusAdapter::Init()
 {
     CALL_INFO_TRACE;
@@ -158,19 +183,8 @@ int32_t CoordinationSoftbusAdapter::Init()
         .pkgName = pkgName,
         .dataType = DATA_TYPE_BYTES
     };
-    socketFd_ = Socket(info);
-    QosTV serverQos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
-    };
-    ISocketListener listener = {
-        .OnBind = BindLink,
-        .OnShutdown = ShutdownLink,
-        .OnBytes = BytesReceived
-    };
-    int32_t ret = Listen(socketFd_, serverQos, QOS_LEN, &listener);
-    if (ret == RET_OK) {
+    int32_t ret = InitSocket(info, SOCKET_SERVER, socketFd_);
+    if (ret == RET_OK && socketFd_ != -1) {
         FI_HILOGI("server set ok");
     } else {
         FI_HILOGE("server set failed, ret:%{public}d", ret);
@@ -250,19 +264,9 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         .pkgName = pkgName,
         .dataType = DATA_TYPE_BYTES
     };
-    int32_t socket = Socket(info);
-    QosTV clientQos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = MIN_BW },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = LATENCY },
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = LATENCY },
-    };
-    ISocketListener listener = {
-        .OnBind = BindLink,
-        .OnShutdown = ShutdownLink,
-        .OnBytes = BytesReceived
-    };
-    int32_t ret = Bind(socket, clientQos, QOS_LEN, &listener);
-    if (ret == RET_OK) {
+    int32_t socket = -1;
+    int32_t ret = InitSocket(info, SOCKET_CLIENT, socket);
+    if (ret == RET_OK && socket != -1) {
         sessionDevs_[remoteNetworkId] = socket;
         ConfigTcpAlive(socket);
     } else {
