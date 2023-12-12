@@ -30,6 +30,7 @@
 #include "device_coordination_softbus_define.h"
 #include "devicestatus_define.h"
 #include "dfs_session.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Msdp {
