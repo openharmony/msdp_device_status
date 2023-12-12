@@ -41,7 +41,7 @@ constexpr uint32_t QOS_LEN { 3 };
 constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
 constexpr int32_t LATENCY { 1600 };
 constexpr int32_t SOCKET_SERVER { 0 };
-constexpr int32_t SOCKET_CLIENT { 0 };
+constexpr int32_t SOCKET_CLIENT { 1 };
 
 void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser)
 {
