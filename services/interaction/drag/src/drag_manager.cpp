@@ -1006,14 +1006,13 @@ int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
 int32_t DragManager::AddPrivilege()
 {
     CALL_DEBUG_ENTER;
-    if (dragState_ != DragState::START || dragState_ != DragState::MOTION_DRAGGING) {
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
         FI_HILOGE("Drag instance not running");
         return RET_ERR;
     }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d,Target window drag tid:%{public}d",
-        targetTid, pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
+    FI_HILOGD("Target window drag tid:%{public}d", targetTid);
     SendDragData(targetTid, dragData.udKey);
     return RET_OK;
 }

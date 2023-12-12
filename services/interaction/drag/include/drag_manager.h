@@ -79,7 +79,7 @@ public:
     int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
-    int32_t AddPrivilege(); const;
+    int32_t AddPrivilege();
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
