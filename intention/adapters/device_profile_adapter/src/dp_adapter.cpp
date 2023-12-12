@@ -19,8 +19,8 @@
 
 #include "cJSON.h"
 #include "devicestatus_data_define.h"
-#include "devicestatus_define.h"
 #include "fi_log.h"
+#include "json_parser.h"
 #include "sync_options.h"
 
 namespace OHOS {
@@ -305,7 +305,6 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
         }
         smsg = cJSON_Print(parser.json);
         CHKPR(smsg, RET_ERR);
-        cJSON_Delete(parser.json);
     }
     profile.SetCharacteristicProfileJson(smsg);
     cJSON_free(smsg);
