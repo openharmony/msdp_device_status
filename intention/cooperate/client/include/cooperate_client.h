@@ -24,9 +24,9 @@
 #include "nocopyable.h"
 
 #include "coordination_message.h"
-#include "i_tunnel_client.h"
 #include "i_coordination_listener.h"
 #include "i_hotarea_listener.h"
+#include "i_tunnel_client.h"
 #include "net_packet.h"
 #include "stream_client.h"
 
