@@ -29,7 +29,7 @@ enum class ValueType {
 
 const std::string SERVICE_ID { "deviceStatus" };
 const std::string SERVICE_TYPE { "deviceStatus" };
-const std::string JSON_NULL = "null";
+const std::string JSON_NULL = { "null" };
 using DP_VALUE = std::variant<int32_t, bool, std::string>;
 } // namespace DeviceStatus
 } // namespace Msdp

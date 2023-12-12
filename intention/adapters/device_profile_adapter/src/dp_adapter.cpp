@@ -52,7 +52,7 @@ void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, const Prof
     }
 }
 
-void DeviceProfileAdapter::UpdateProfileCallback(std::string pluginName, const ProfileChangedCallback &callback)
+void DeviceProfileAdapter::UpdateProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
@@ -67,6 +67,7 @@ void DeviceProfileAdapter::RemoveProfileCallback(std::string pluginName)
     auto it = profileChangedCallbacks_.find(pluginName);
     if (it == profileChangedCallbacks_.end()) {
         FI_HILOGE("The plugin not has callback, pluginName:%{public}s", pluginName.c_str());
+        return;
     }
     profileChangedCallbacks_.erase(it);
 }
@@ -263,7 +264,6 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
 {
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-
     char* smsg = nullptr;
     if (RET_OK != DistributedDeviceProfileClient::GetInstance().GetDeviceProfile("", SERVICE_ID, profile)) {
         FI_HILOGE("GetDeviceProfile failed");
@@ -273,7 +273,10 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
     if (jsonData.empty() || jsonData == JSON_NULL) {
         cJSON* data = cJSON_CreateObject();
         cJSON* item = cJSON_CreateNull();
-        CreatJsonItem(item, dpValue, valueType);
+        if (RET_OK != CreatJsonItem(item, dpValue, valueType)) {
+            FI_HILOGE("CreatJsonItem failed");
+            return RET_ERR;
+        }
         cJSON_AddItemToObject(data, characteristicsName.c_str(), item);
         smsg = cJSON_Print(data);
         CHKPR(smsg, RET_ERR);
@@ -288,16 +291,18 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
 
         cJSON* data = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName.c_str());
         if (data != nullptr) {
-            if (!ModifyJsonItem(data, dpValue, valueType, characteristicsName)) {
+            if (RET_OK != ModifyJsonItem(data, dpValue, valueType, characteristicsName)) {
                 FI_HILOGE("Modify property failed");
                 return RET_ERR;
             }
         } else {
             cJSON* item = cJSON_CreateNull();
-            CreatJsonItem(item, dpValue, valueType);
+            if (RET_OK != CreatJsonItem(item, dpValue, valueType)) {
+                FI_HILOGE("CreatJsonItem failed");
+                return RET_ERR;
+            }
             cJSON_AddItemToObject(parser.json, characteristicsName.c_str(), item);
         }
-        
         smsg = cJSON_Print(parser.json);
         CHKPR(smsg, RET_ERR);
         cJSON_Delete(parser.json);
@@ -307,7 +312,7 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
     return RET_OK;
 }
 
-void DeviceProfileAdapter::CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, ValueType valueType)
+int32_t DeviceProfileAdapter::CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, ValueType valueType)
 {
     switch (valueType) {
         case ValueType::INT_TYPE: {
@@ -324,9 +329,10 @@ void DeviceProfileAdapter::CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, V
         }
         default: {
             FI_HILOGE("valueType is neither an int type, nor a bool type, nor a string type");
-            break;
+            return RET_ERR;
         }
     }
+    return RET_OK;
 }
 
 int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValue, ValueType valueType,
@@ -360,7 +366,7 @@ int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValu
         }
         default: {
             FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type");
-            break;
+            return RET_ERR;
         }
     }
     return RET_OK;

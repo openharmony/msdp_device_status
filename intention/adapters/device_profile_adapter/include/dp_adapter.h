@@ -16,8 +16,6 @@
 #ifndef DP_ADAPTER_H
 #define DP_ADAPTER_H
 
-#include "cJSON.h"
-
 #include <list>
 #include <mutex>
 #include <set>
@@ -25,6 +23,7 @@
 #include <variant>
 #include <vector>
 
+#include "cJSON.h"
 #include "distributed_device_profile_client.h"
 #include "dp_define.h"
 #include "i_device_profile.h"
@@ -50,7 +49,7 @@ public:
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
     void AddProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback);
-    void UpdateProfileCallback(std::string pluginName, const ProfileChangedCallback &callback);
+    void UpdateProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback);
     void RemoveProfileCallback(const std::string pluginName);
 
     int32_t RegisterProfileListener(const std::string &deviceId);
@@ -62,9 +61,8 @@ public:
         const std::string &characteristicsName, const std::vector<std::string> &deviceIds);
 
 private:
-    int32_t AddNewProperty(const std::string &characteristicsName, const int value);
     int32_t SyncDeviceFile(const std::vector<std::string> &deviceIds);
-    void CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, ValueType valueType);
+    int32_t CreatJsonItem(cJSON* item, const DP_VALUE &dpValue, ValueType valueType);
     int32_t ModifyJsonItem(cJSON* data, const DP_VALUE &dpValue, ValueType valueType,
         const std::string &characteristicsName);
     void PackSubscribeInfos(std::list<SubscribeInfo> &subscribeInfos, const std::string &deviceId);
