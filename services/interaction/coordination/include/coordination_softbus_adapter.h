@@ -81,6 +81,7 @@ private:
     void HandleCoordinationSessionData(int32_t sessionId, const JsonParser &parser);
     int32_t WaitSessionOpend(const std::string &remoteNetworkId, int32_t sessionId);
     void ResponseNotifyFilterAdded();
+    int32_t InitSocket(SocketInfo info, int32_t socketType, int32_t &socket);
 
     std::map<std::string, int32_t> sessionDevs_;
     std::mutex operationMutex_;
