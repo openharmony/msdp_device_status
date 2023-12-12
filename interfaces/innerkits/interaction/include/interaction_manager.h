@@ -295,6 +295,8 @@ public:
      */
     int32_t EnterTextEditorArea(bool enable);
 
+    int32_t AddPrivilege();
+
 private:
     InteractionManager() = default;
     DISALLOW_COPY_AND_MOVE(InteractionManager);

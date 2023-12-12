@@ -307,6 +307,11 @@ int32_t DragManagerImpl::GetExtraInfo(std::string &extraInfo)
 {
     return DeviceStatusClient::GetInstance().GetExtraInfo(extraInfo);
 }
+
+int32_t DragManagerImpl::AddPrivilege()
+{
+    return DeviceStatusClient::GetInstance().AddPrivilege();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

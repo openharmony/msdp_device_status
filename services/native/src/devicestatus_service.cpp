@@ -1107,6 +1107,17 @@ int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summ
     }
     return RET_OK;
 }
+
+int32_t DeviceStatusService::AddPrivilege()
+{
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::AddPrivilege, &dragMgr_));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

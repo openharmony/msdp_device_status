@@ -425,6 +425,12 @@ int32_t InteractionManagerImpl::EnterTextEditorArea(bool enable)
     CALL_DEBUG_ENTER;
     return dragManagerImpl_.EnterTextEditorArea(enable);
 }
+
+int32_t InteractionManagerImpl::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    return dragManagerImpl_.AddPrivilege();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

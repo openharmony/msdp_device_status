@@ -136,7 +136,9 @@ void DeviceStatusSrvStub::InitDrag()
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE),
             &DeviceStatusSrvStub::UpdatePreviewStyleStub },
         {static_cast<uint32_t>(DeviceInterfaceCode::UPDATE_PREVIEW_STYLE_WITH_ANIMATION),
-            &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub }
+            &DeviceStatusSrvStub::UpdatePreviewStyleWithAnimationStub },
+        {static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
+            &DeviceStatusSrvStub::AddPrivilegeStub }
     };
     connFuncs_.insert(dragFuncs.begin(), dragFuncs.end());
 }
@@ -784,6 +786,17 @@ int32_t DeviceStatusSrvStub::GetExtraInfoStub(MessageParcel &data, MessageParcel
         return ret;
     }
     WRITESTRING(reply, extraInfo, IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
+}
+
+int32_t DeviceStatusSrvStub::AddPrivilegeStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = AddPrivilege();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to get extraInfo in dragData");
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace DeviceStatus

@@ -17,8 +17,8 @@ declare_args() {
   fusion_intention_framework = false
   fusion_rust_enabled = false
   fusion_interaction_coordination = false
-  fusion_drag_enable_monitor = false
-  fusion_drag_enable_interceptor = true
+  fusion_drag_enable_monitor = true
+  fusion_drag_enable_interceptor = false
   device_status_sensor_enable = true
   if (defined(global_parts_info)) {
     if (!defined(global_parts_info.sensors_sensor)) {

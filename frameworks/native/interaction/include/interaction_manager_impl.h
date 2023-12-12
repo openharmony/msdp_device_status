@@ -74,6 +74,7 @@ public:
     int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction &dragAction);
     int32_t GetExtraInfo(std::string &extraInfo);
+    int32_t AddPrivilege();
 
 private:
     void InitMsgHandler();
