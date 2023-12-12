@@ -417,12 +417,10 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
             && pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
             FI_HILOGW("Invalid event");
             return;
-        } else {
-            g_startFilterTime = -1;
         }
+        g_startFilterTime = -1;
     }
     CHKPV(pointerEventCallback_);
-    CHKPV(context_);
     pointerEventCallback_(pointerEvent);
     pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -611,7 +609,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
     }
 #else
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
-    auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
+    auto interceptor = std::make_shared<InterceptorConsumer>(callback);
     pointerEventInterceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(
         interceptor, DRAG_PRIORITY, deviceTags);
     if (pointerEventInterceptorId_ <= 0) {
@@ -933,15 +931,13 @@ void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
         dragAction_.store(DragAction::MOVE);
         return;
     }
-    if (iter->IsPressed()) {
-        if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
-            FI_HILOGD("Not need update drag style");
-            return;
-        }
-        CtrlKeyStyleChangedNotify(DragCursorStyle::COPY, DragAction::COPY);
-        HandleCtrlKeyEvent(DragCursorStyle::COPY, DragAction::COPY);
-        dragAction_.store(DragAction::COPY);
+    if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
+        FI_HILOGD("Not need update drag style");
+        return;
     }
+    CtrlKeyStyleChangedNotify(DragCursorStyle::COPY, DragAction::COPY);
+    HandleCtrlKeyEvent(DragCursorStyle::COPY, DragAction::COPY);
+    dragAction_.store(DragAction::COPY);
 }
 
 void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
