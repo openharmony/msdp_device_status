@@ -305,7 +305,7 @@ int32_t TunnelClient::Control(Intention intention, uint32_t id, ParamBase &data,
 ErrCode TunnelClient::Connect()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     if (devicestatusProxy_ != nullptr) {
         return RET_OK;
     }
@@ -316,7 +316,7 @@ ErrCode TunnelClient::Connect()
     sptr<IRemoteObject> remoteObject = sa->CheckSystemAbility(MSDP_DEVICESTATUS_SERVICE_ID);
     CHKPR(remoteObject, E_DEVICESTATUS_GET_SERVICE_FAILED);
 
-    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) DeathRecipient(*this));
+    deathRecipient_ = sptr<DeathRecipient>::MakeSptr(shared_from_this());
     CHKPR(deathRecipient_, ERR_NO_MEMORY);
 
     if (remoteObject->IsProxyObject()) {
@@ -331,31 +331,29 @@ ErrCode TunnelClient::Connect()
     return RET_OK;
 }
 
-void TunnelClient::ResetProxy(const wptr<IRemoteObject>& remote)
+void TunnelClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard lock(mutex_);
     CHKPV(devicestatusProxy_);
     auto serviceRemote = devicestatusProxy_->AsObject();
     if ((serviceRemote != nullptr) && (serviceRemote == remote.promote())) {
         serviceRemote->RemoveDeathRecipient(deathRecipient_);
         devicestatusProxy_ = nullptr;
     }
-    if (deathListener_ != nullptr) {
-        FI_HILOGI("Notify death listener");
-        deathListener_();
-    }
 }
 
-TunnelClient::DeathRecipient::DeathRecipient(TunnelClient &parent)
+TunnelClient::DeathRecipient::DeathRecipient(std::shared_ptr<TunnelClient> parent)
     : parent_(parent)
 {}
 
-void TunnelClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void TunnelClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
+    std::shared_ptr<TunnelClient> parent = parent_.lock();
+    CHKPV(parent);
     CHKPV(remote);
-    parent_.ResetProxy(remote);
+    parent->ResetProxy(remote);
     FI_HILOGD("Recv death notice");
 }
 } // namespace DeviceStatus

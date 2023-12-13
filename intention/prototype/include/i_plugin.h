@@ -24,8 +24,8 @@ namespace DeviceStatus {
 struct CallingContext {
     Intention intention { Intention::UNKNOWN_INTENTION };
     uint32_t tokenId { 0 };
+    int32_t uid { -1 };
     int32_t pid { -1 };
-    int32_t tid { -1 };
 };
 
 class IPlugin {

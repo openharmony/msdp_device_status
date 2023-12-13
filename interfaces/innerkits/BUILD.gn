@@ -75,6 +75,7 @@ ohos_shared_library("devicestatus_client") {
   if (fusion_intention_framework) {
     deps += [
       "${device_status_root_path}/intention/cooperate/client:intention_cooperate_client",
+      "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
       "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
       "${device_status_root_path}/intention/prototype:intention_prototype",
     ]
