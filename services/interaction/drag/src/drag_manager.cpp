@@ -393,7 +393,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
     int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d,Target window drag tid:%{public}d",
+    FI_HILOGD("sourceType:%{public}d, pointerId:%{public}d,Target window drag tid:%{public}d",
         targetTid, pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
     SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);

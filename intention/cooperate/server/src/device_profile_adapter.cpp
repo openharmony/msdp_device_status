@@ -104,12 +104,12 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &networkId)
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("Parser json is not object");
+        FI_HILOGE("parser json is not object");
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());
     if (!cJSON_IsNumber(state)) {
-        FI_HILOGE("State is not number type");
+        FI_HILOGE("state is not number type");
         return false;
     }
     return (static_cast<bool>(state->valueint));
