@@ -43,13 +43,14 @@ PluginManager::Plugin::Plugin(Plugin &&other)
 
 PluginManager::Plugin::~Plugin()
 {
-    if (instance_ != nullptr) {
-        DestroyPlugin destroy = reinterpret_cast<DestroyPlugin>(dlsym(handle_, "DestroyInstance"));
-        if (destroy != nullptr) {
-            destroy(instance_);
-        }
-    }
     if (handle_ != nullptr) {
+        if (instance_ != nullptr) {
+            DestroyPlugin destroy =
+                reinterpret_cast<DestroyPlugin>(dlsym(handle_, "DestroyInstance"));
+            if (destroy != nullptr) {
+                destroy(instance_);
+            }
+        }
         dlclose(handle_);
     }
 }
@@ -70,6 +71,7 @@ IPlugin* PluginManager::Plugin::GetInstance()
     if (instance_ != nullptr) {
         return instance_;
     }
+    CHKPP(handle_);
     CreatePlugin func = reinterpret_cast<CreatePlugin>(dlsym(handle_, "CreateInstance"));
     if (func == nullptr) {
         FI_HILOGE("dlsym msg:%{public}s", dlerror());
@@ -79,10 +81,9 @@ IPlugin* PluginManager::Plugin::GetInstance()
     return instance_;
 }
 
-void PluginManager::Init(IContext *context)
-{
-    context_ = context;
-}
+PluginManager::PluginManager(IContext *context)
+    : context_(context)
+{}
 
 IPlugin* PluginManager::LoadPlugin(Intention intention)
 {

@@ -18,18 +18,19 @@
 #ifndef TUNNEL_CLIENT_H
 #define TUNNEL_CLIENT_H
 
+#include <memory>
+
 #include "i_tunnel_client.h"
 #include "i_intention.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class TunnelClient final : public ITunnelClient {
-    DISALLOW_COPY_AND_MOVE(TunnelClient);
-
+class TunnelClient final : public ITunnelClient, public std::enable_shared_from_this<TunnelClient> {
 public:
     TunnelClient() = default;
     ~TunnelClient();
+    DISALLOW_COPY_AND_MOVE(TunnelClient);
 
     // Request to enable the service identified by [`intention`].
     int32_t Enable(Intention intention, ParamBase &data, ParamBase &reply) override;
@@ -60,22 +61,21 @@ public:
 private:
     class DeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        DeathRecipient(TunnelClient &parent);
+        DeathRecipient(std::shared_ptr<TunnelClient> parent);
         ~DeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+        void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     private:
-        TunnelClient &parent_;
+        std::weak_ptr<TunnelClient> parent_;
     };
 
     ErrCode Connect();
-    void ResetProxy(const wptr<IRemoteObject>& remote);
+    void ResetProxy(const wptr<IRemoteObject> &remote);
 
 private:
     std::mutex mutex_;
     sptr<IIntention> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
-    std::function<void()> deathListener_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

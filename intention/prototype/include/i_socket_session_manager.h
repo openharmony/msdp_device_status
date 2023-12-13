@@ -13,28 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef INTENTION_DEFAULT_PARAMS_H
-#define INTENTION_DEFAULT_PARAMS_H
+#ifndef I_SOCKET_SESSION_MANAGER_H
+#define I_SOCKET_SESSION_MANAGER_H
 
-#include "intention_identity.h"
+#include "i_socket_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct DefaultParam final : public ParamBase {
-    DefaultParam() = default;
-    DefaultParam(int32_t userData);
-    bool Marshalling(MessageParcel &parcel) const override;
-    bool Unmarshalling(MessageParcel &parcel) override;
+class ISocketSessionManager {
+public:
+    ISocketSessionManager() = default;
+    virtual ~ISocketSessionManager() = default;
 
-    int32_t userData { -1 };
-};
-
-struct DefaultReply final : public ParamBase {
-    bool Marshalling(MessageParcel &parcel) const override;
-    bool Unmarshalling(MessageParcel &parcel) override;
+    virtual void AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback) = 0;
+    virtual int32_t AllocSocketFd(const std::string& programName, int32_t moduleType, int32_t tokenType,
+                          int32_t uid, int32_t pid, int32_t& clientFd) = 0;
+    virtual SocketSessionPtr FindSessionByPid(int32_t pid) const = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INTENTION_DEFAULT_PARAMS_H
+#endif // I_SOCKET_SESSION_MANAGER_H

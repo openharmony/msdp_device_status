@@ -82,8 +82,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    intention_ = sptr<IntentionService>::MakeSptr();
-    intention_->Init(this);
+    intention_ = sptr<IntentionService>::MakeSptr(this);
     if (!Publish(intention_)) {
 #else
     if (!Publish(this)) {
@@ -133,6 +132,13 @@ IDragManager& DeviceStatusService::GetDragManager()
 {
     return dragMgr_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
+{
+    return socketSessionMgr_;
+}
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
@@ -203,6 +209,12 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    if (socketSessionMgr_.Init() != RET_OK) {
+        FI_HILOGE("Failed to initialize socket session manager");
+        goto INIT_FAIL;
+    }
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     COOR_EVENT_MGR->SetIContext(this);
     COOR_SM->Init();

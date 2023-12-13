@@ -29,6 +29,9 @@
 #include "drag_manager_impl.h"
 #include "interaction_manager.h"
 #include "singleton.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "socket_client.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -81,10 +84,14 @@ private:
 
 private:
     std::mutex mutex_;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    std::shared_ptr<TunnelClient> tunnel_ { nullptr };
+    std::shared_ptr<SocketClient> client_ { nullptr };
+#else // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IClientPtr client_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     DragManagerImpl dragManagerImpl_;
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    TunnelClient tunnel_;
     CooperateClient cooperate_;
 #else
     CoordinationManagerImpl coordinationManagerImpl_;

@@ -27,10 +27,16 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerImpl" };
 } // namespace
 
-InteractionManagerImpl::InteractionManagerImpl() {}
+InteractionManagerImpl::InteractionManagerImpl()
+{
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    tunnel_ = std::make_shared<TunnelClient>();
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+}
+
 InteractionManagerImpl::~InteractionManagerImpl()
 {
-    CALL_DEBUG_ENTER;
+    client_.reset();
 }
 
 bool InteractionManagerImpl::InitClient()
@@ -39,7 +45,11 @@ bool InteractionManagerImpl::InitClient()
     if (client_ != nullptr && client_->CheckValidFd()) {
         return true;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    client_ = std::make_shared<SocketClient>(tunnel_);
+#else
     client_ = std::make_shared<Client>();
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     InitMsgHandler();
     if (!(client_->Start())) {
         client_.reset();
@@ -86,7 +96,11 @@ void InteractionManagerImpl::InitMsgHandler()
     };
     CHKPV(client_);
     for (auto &it : funs) {
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+        if (!client_->RegisterEvent(it.id, it.fun)) {
+#else
         if (!client_->RegisterEvent(it)) {
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
             FI_HILOGI("RegistER event handler msg:%{publid}d already exists", it.id);
         }
     }
@@ -103,7 +117,7 @@ int32_t InteractionManagerImpl::RegisterCoordinationListener(std::shared_ptr<ICo
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.RegisterListener(tunnel_, listener, isCompatible);
+    return cooperate_.RegisterListener(*tunnel_, listener, isCompatible);
 #else
     return coordinationManagerImpl_.RegisterCoordinationListener(listener, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -122,7 +136,7 @@ int32_t InteractionManagerImpl::UnregisterCoordinationListener(std::shared_ptr<I
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.UnregisterListener(tunnel_, listener, isCompatible);
+    return cooperate_.UnregisterListener(*tunnel_, listener, isCompatible);
 #else
     return coordinationManagerImpl_.UnregisterCoordinationListener(listener, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -145,7 +159,7 @@ int32_t InteractionManagerImpl::PrepareCoordination(std::function<void(std::stri
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.Enable(tunnel_, callback, isCompatible);
+    return cooperate_.Enable(*tunnel_, callback, isCompatible);
 #else
     return coordinationManagerImpl_.PrepareCoordination(callback, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -168,7 +182,7 @@ int32_t InteractionManagerImpl::UnprepareCoordination(std::function<void(std::st
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.Disable(tunnel_, callback, isCompatible);
+    return cooperate_.Disable(*tunnel_, callback, isCompatible);
 #else
     return coordinationManagerImpl_.UnprepareCoordination(callback, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -191,7 +205,7 @@ int32_t InteractionManagerImpl::ActivateCoordination(const std::string &remoteNe
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.Start(tunnel_, remoteNetworkId, startDeviceId, callback, isCompatible);
+    return cooperate_.Start(*tunnel_, remoteNetworkId, startDeviceId, callback, isCompatible);
 #else
     return coordinationManagerImpl_.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -216,7 +230,7 @@ int32_t InteractionManagerImpl::DeactivateCoordination(bool isUnchained,
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.Stop(tunnel_, isUnchained, callback, isCompatible);
+    return cooperate_.Stop(*tunnel_, isUnchained, callback, isCompatible);
 #else
     return coordinationManagerImpl_.DeactivateCoordination(isUnchained, callback, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -239,7 +253,7 @@ int32_t InteractionManagerImpl::GetCoordinationState(
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.GetCooperateState(tunnel_, networkId, callback, isCompatible);
+    return cooperate_.GetCooperateState(*tunnel_, networkId, callback, isCompatible);
 #else
     return coordinationManagerImpl_.GetCoordinationState(networkId, callback, isCompatible);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -373,7 +387,7 @@ int32_t InteractionManagerImpl::AddHotAreaListener(std::shared_ptr<IHotAreaListe
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.AddHotAreaListener(tunnel_, listener);
+    return cooperate_.AddHotAreaListener(*tunnel_, listener);
 #else
     return coordinationManagerImpl_.AddHotAreaListener(listener);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -390,7 +404,7 @@ int32_t InteractionManagerImpl::RemoveHotAreaListener(std::shared_ptr<IHotAreaLi
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     std::lock_guard<std::mutex> guard(mutex_);
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    return cooperate_.RemoveHotAreaListener(tunnel_, listener);
+    return cooperate_.RemoveHotAreaListener(*tunnel_, listener);
 #else
     return coordinationManagerImpl_.RemoveHotAreaListener(listener);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK

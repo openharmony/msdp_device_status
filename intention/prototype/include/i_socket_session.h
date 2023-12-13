@@ -13,28 +13,40 @@
  * limitations under the License.
  */
 
-#ifndef INTENTION_DEFAULT_PARAMS_H
-#define INTENTION_DEFAULT_PARAMS_H
+#ifndef I_SOCKET_SESSION_H
+#define I_SOCKET_SESSION_H
 
-#include "intention_identity.h"
+#include <cstdint>
+#include <memory>
+#include <string>
+
+#include "net_packet.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct DefaultParam final : public ParamBase {
-    DefaultParam() = default;
-    DefaultParam(int32_t userData);
-    bool Marshalling(MessageParcel &parcel) const override;
-    bool Unmarshalling(MessageParcel &parcel) override;
-
-    int32_t userData { -1 };
+enum TokenType : int32_t {
+    TOKEN_INVALID = -1,
+    TOKEN_HAP = 0,
+    TOKEN_NATIVE,
+    TOKEN_SHELL
 };
 
-struct DefaultReply final : public ParamBase {
-    bool Marshalling(MessageParcel &parcel) const override;
-    bool Unmarshalling(MessageParcel &parcel) override;
+class ISocketSession {
+public:
+    ISocketSession() = default;
+    virtual ~ISocketSession() = default;
+
+    virtual bool SendMsg(NetPacket &pkt) const = 0;
+
+    virtual int32_t GetUid() const = 0;
+    virtual int32_t GetPid() const = 0;
+    virtual int32_t GetFd() const = 0;
+    virtual std::string ToString() const = 0;
 };
+
+using SocketSessionPtr = std::shared_ptr<ISocketSession>;
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // INTENTION_DEFAULT_PARAMS_H
+#endif // I_SOCKET_SESSION_H

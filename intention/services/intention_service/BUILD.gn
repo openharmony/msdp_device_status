@@ -32,6 +32,8 @@ ohos_shared_library("intention_service") {
 
   branch_protector_ret = "pac_ret"
 
+  defines = device_status_default_defines
+
   include_dirs = [
     "include",
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
@@ -41,15 +43,13 @@ ohos_shared_library("intention_service") {
 
   public_configs = [ ":intention_service_config" ]
 
-  public_deps = [
+  deps = [
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_server",
     "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_server",
     "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
+    "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
+    "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/scheduler/plugin_manager:intention_plugin_manager",
-    "${intention_root_path}/scheduler/task_scheduler:intention_task_scheduler",
-    "${intention_root_path}/scheduler/timer_manager:intention_timer_manager",
   ]
 
   external_deps = [

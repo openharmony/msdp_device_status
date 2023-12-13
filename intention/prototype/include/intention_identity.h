@@ -38,6 +38,7 @@ enum CommonAction : uint32_t {
 
 enum class Intention : uint32_t {
     UNKNOWN_INTENTION,
+    SOCKET,
     DRAG,
     COOPERATE,
 };

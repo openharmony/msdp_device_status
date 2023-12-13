@@ -32,18 +32,14 @@ bool DefaultParam::Unmarshalling(MessageParcel &parcel)
     return parcel.ReadInt32(userData);
 }
 
-DefaultReply::DefaultReply(int32_t result)
-    : result(result)
-{}
-
 bool DefaultReply::Marshalling(MessageParcel &parcel) const
 {
-    return parcel.WriteInt32(result);
+    return true;
 }
 
 bool DefaultReply::Unmarshalling(MessageParcel &parcel)
 {
-    return parcel.ReadInt32(result);
+    return true;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
