@@ -865,6 +865,27 @@ int32_t DeviceStatusSrvProxy::GetExtraInfo(std::string &extraInfo)
     READSTRING(reply, extraInfo, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
+
+int32_t DeviceStatusSrvProxy::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return ret;
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -106,6 +106,7 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
+    int32_t AddPrivilege() override;
 
 private:
     bool Init();
