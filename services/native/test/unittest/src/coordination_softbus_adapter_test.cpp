@@ -279,7 +279,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, Test
     ASSERT_NE(g_adapter, nullptr);
     PeerSocketInfo info;
     char deviceId[] = "softbus";
-    info.deviceId = deviceId;
+    info.networkId = deviceId;
     int32_t ret = g_adapter->OnBind(SOCKET, info);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->OnShutdown(SOCKET, SHUTDOWN_REASON_UNKNOWN);
@@ -296,7 +296,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, Test
     ASSERT_NE(g_adapter, nullptr);
     PeerSocketInfo info;
     char deviceId[] = "softbus";
-    info.deviceId = deviceId;
+    info.networkId = deviceId;
     int32_t ret = g_adapter->OnBind(SOCKET, info);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->OnShutdown(SOCKET, SHUTDOWN_REASON_UNKNOWN);
