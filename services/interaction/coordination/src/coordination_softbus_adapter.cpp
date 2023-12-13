@@ -603,7 +603,7 @@ int32_t CoordinationSoftbusAdapter::OnBind(int32_t socket, PeerSocketInfo info)
         return RET_OK;
     }
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
-    sessionDevs_[info.deviceId] = socket;
+    sessionDevs_[info.networkId] = socket;
     ConfigTcpAlive(socket);
     return RET_OK;
 }
