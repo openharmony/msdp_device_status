@@ -718,7 +718,7 @@ void DragDrawing::OnVsync()
                 drawDynamicEffectModifier_ = nullptr;
             }
             DestroyDragWindow();
-	    g_drawingInfo.isRunning = false;
+            g_drawingInfo.isRunning = false;
         }
         return;
     }
