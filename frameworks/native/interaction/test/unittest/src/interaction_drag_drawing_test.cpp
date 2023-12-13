@@ -179,7 +179,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_On
     ASSERT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -221,7 +221,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_DragNum_Mu
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result);
         promiseFlag.set_value(true);
@@ -266,7 +266,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
         promiseFlag.set_value(true);
@@ -311,7 +311,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Drag
     ASSERT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result);
         promiseFlag.set_value(true);
@@ -350,7 +350,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_UpdateShadowPic,
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -388,7 +388,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Mouse_Animation,
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("result:%{public}d, target:%{public}d, displayX:%{public}d, displayY:%{public}d",
             notifyMessage.result, notifyMessage.targetPid, notifyMessage.displayX, notifyMessage.displayY);
         promiseFlag.set_value(true);
@@ -421,7 +421,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Touchscreen_Anim
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, target:%{public}d, result:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.targetPid, notifyMessage.result);
         promiseFlag.set_value(true);
@@ -453,7 +453,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_ONE_Shadow, Test
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -485,7 +485,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Multiple_Shadow,
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -517,7 +517,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Too_Much_Shadow,
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -549,7 +549,7 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
@@ -582,7 +582,7 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
-    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
         promiseFlag.set_value(true);
