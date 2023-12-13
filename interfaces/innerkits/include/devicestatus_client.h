@@ -84,14 +84,14 @@ private:
     public:
         DeviceStatusDeathRecipient() = default;
         ~DeviceStatusDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+        void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     private:
         DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };
 
     ErrCode Connect();
-    void ResetProxy(const wptr<IRemoteObject>& remote);
+    void ResetProxy(const wptr<IRemoteObject> &remote);
 
     sptr<Idevicestatus> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };

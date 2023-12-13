@@ -79,7 +79,7 @@ ErrCode DeviceStatusClient::Connect()
     return RET_OK;
 }
 
-void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(devicestatusProxy_);
@@ -94,7 +94,7 @@ void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
     }
 }
 
-void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CHKPV(remote);
     DeviceStatusClient::GetInstance().ResetProxy(remote);

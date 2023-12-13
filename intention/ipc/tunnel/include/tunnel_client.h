@@ -62,14 +62,14 @@ private:
     public:
         DeathRecipient(TunnelClient &parent);
         ~DeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+        void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     private:
         TunnelClient &parent_;
     };
 
     ErrCode Connect();
-    void ResetProxy(const wptr<IRemoteObject>& remote);
+    void ResetProxy(const wptr<IRemoteObject> &remote);
 
 private:
     std::mutex mutex_;

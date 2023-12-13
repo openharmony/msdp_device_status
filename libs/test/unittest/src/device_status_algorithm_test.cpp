@@ -54,8 +54,8 @@ public:
         virtual ~DeviceStatusMock() = default;
         void OnResult(const Data& data) {};
     };
-    int32_t LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler);
-    int32_t UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler);
+    int32_t LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle> &algoHandler);
+    int32_t UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle> &algoHandler);
 };
 
 void DeviceStatusAlgorithmTest::SetUpTestCase()
@@ -72,7 +72,7 @@ void DeviceStatusAlgorithmTest::SetUp() {}
 
 void DeviceStatusAlgorithmTest::DeviceStatusAlgorithmTest::TearDown() {}
 
-int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler)
+int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle> &algoHandler)
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {
@@ -108,7 +108,7 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
     return RET_OK;
 }
 
-int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle>& algoHandler)
+int32_t DeviceStatusAlgorithmTest::UnloadAlgoLibrary(const std::shared_ptr<MsdpAlgoHandle> &algoHandler)
 {
     FI_HILOGI("Enter");
     if (algoHandler == nullptr) {

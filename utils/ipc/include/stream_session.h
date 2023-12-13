@@ -68,7 +68,7 @@ protected:
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
 };
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-} // namespace DeviceStatus
 #endif // STREAM_SESSION_H

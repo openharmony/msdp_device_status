@@ -49,8 +49,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    int32_t LoadMockLibrary(const std::shared_ptr<MsdpAlgoHandle>& mockHandler);
-    int32_t UnloadMockLibrary(const std::shared_ptr<MsdpAlgoHandle>& mockHandler);
+    int32_t LoadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler);
+    int32_t UnloadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler);
 };
 
 void DeviceStatusMsdpMocKTest::SetUpTestCase()
@@ -67,7 +67,7 @@ void DeviceStatusMsdpMocKTest::SetUp() {}
 
 void DeviceStatusMsdpMocKTest::TearDown() {}
 
-int32_t DeviceStatusMsdpMocKTest::LoadMockLibrary(const std::shared_ptr<MsdpAlgoHandle>& mockHandler)
+int32_t DeviceStatusMsdpMocKTest::LoadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler)
 {
     FI_HILOGI("Enter");
     if (mockHandler == nullptr) {
@@ -103,7 +103,7 @@ int32_t DeviceStatusMsdpMocKTest::LoadMockLibrary(const std::shared_ptr<MsdpAlgo
     return RET_OK;
 }
 
-int32_t DeviceStatusMsdpMocKTest::UnloadMockLibrary(const std::shared_ptr<MsdpAlgoHandle>& mockHandler)
+int32_t DeviceStatusMsdpMocKTest::UnloadMockLibrary(const std::shared_ptr<MsdpAlgoHandle> &mockHandler)
 {
     FI_HILOGI("Enter");
     if (mockHandler == nullptr) {

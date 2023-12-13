@@ -331,7 +331,7 @@ ErrCode TunnelClient::Connect()
     return RET_OK;
 }
 
-void TunnelClient::ResetProxy(const wptr<IRemoteObject>& remote)
+void TunnelClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lock(mutex_);
@@ -351,7 +351,7 @@ TunnelClient::DeathRecipient::DeathRecipient(TunnelClient &parent)
     : parent_(parent)
 {}
 
-void TunnelClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void TunnelClient::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CALL_DEBUG_ENTER;
     CHKPV(remote);
