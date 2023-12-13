@@ -43,7 +43,8 @@
         "device_info_manager",
         "dsoftbus",
         "motion",
-        "ylong_runtime"
+        "ylong_runtime",
+        "dfs_service"
       ],
       "third_party": [
         "cJSON",

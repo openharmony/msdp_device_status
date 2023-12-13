@@ -23,7 +23,7 @@
 #include "display_manager.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
-
+#include "distributed_file_daemon_manager.h"
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
 #include "coordination_hisysevent.h"
@@ -177,6 +177,12 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
             }
             D_INPUT_ADAPTER->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [](bool isSuccess) {});
+            DistributedHardware::DmDeviceInfo remoteDeviceInfo;
+            if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
+                         preparedNetworkId_.first.c_str()) != EOK) {
+                FI_HILOGW("Invalid networkid");
+            }
+            Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().CloseP2PConnection(remoteDeviceInfo);
         }
     }
     preparedNetworkId_ = std::make_pair("", "");
@@ -608,6 +614,12 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
         FI_HILOGE("Failed to call distributed UnprepareRemoteInput");
         return false;
     }
+    DistributedHardware::DmDeviceInfo remoteDeviceInfo;
+    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
+                 localNetworkId.c_str()) != EOK) {
+        FI_HILOGW("Invalid networkid");
+    }
+    Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().CloseP2PConnection(remoteDeviceInfo);
     preparedNetworkId_ = std::make_pair("", "");
     return true;
 }
