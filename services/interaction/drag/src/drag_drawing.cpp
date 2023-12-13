@@ -712,13 +712,13 @@ void DragDrawing::OnVsync()
         handler_ = nullptr;
         receiver_ = nullptr;
         if (needDestroyDragWindow_) {
-            g_drawingInfo.isRunning = false;
             CHKPV(g_drawingInfo.rootNode);
             if (drawDynamicEffectModifier_ != nullptr) {
                 g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
                 drawDynamicEffectModifier_ = nullptr;
             }
             DestroyDragWindow();
+	    g_drawingInfo.isRunning = false;
         }
         return;
     }
