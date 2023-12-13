@@ -1277,6 +1277,10 @@ int32_t DragDrawing::CreateEventRunner(int32_t positionX, int32_t positionY)
 int32_t DragDrawing::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.hasCoordinateCorrected) {
+        return RET_ERR;
+    }
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     if (!textEditorAreaFlag_) {
         resetPixelMapX_ = g_drawingInfo.pixelMapX;
