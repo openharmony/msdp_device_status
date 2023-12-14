@@ -138,14 +138,14 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data &devicestatusDa
         FI_HILOGE("type:%{public}d is not exits", devicestatusData.type);
         return false;
     }
+    if ((devicestatusData.type <= TYPE_INVALID) || (devicestatusData.type >= TYPE_MAX)) {
+        FI_HILOGE("Check devicestatusData.type is invalid");
+        return false;
+    }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
     for (const auto &listener : listeners) {
         if (listener == nullptr) {
             FI_HILOGE("Listener is nullptr");
-            return false;
-        }
-        if ((devicestatusData.type <= TYPE_INVALID) || (devicestatusData.type >= TYPE_MAX)) {
-            FI_HILOGE("Check devicestatusData.type is invalid");
             return false;
         }
         FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
