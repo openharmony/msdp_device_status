@@ -86,7 +86,7 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
     if (shadowNum > SHADOW_NUM_LIMIT) {
         FI_HILOGW("Only %{public}d shadowInfos are allowed to be packaged at most, now %{public}d exceeding the limit",
             SHADOW_NUM_LIMIT, shadowNum);
-        shadowNum  = SHADOW_NUM_LIMIT;
+        shadowNum = SHADOW_NUM_LIMIT;
     }
     WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < shadowNum; i++) {

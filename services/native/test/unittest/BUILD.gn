@@ -131,6 +131,7 @@ ohos_unittest("CoordinationSMTest") {
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_root_path}/intention/services/device_manager/include",
   ]
   sources = [ "src/coordination_sm_test.cpp" ]
 
