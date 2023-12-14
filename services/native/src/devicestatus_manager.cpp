@@ -75,8 +75,8 @@ Data DeviceStatusManager::GetLatestDeviceStatusData(Type type)
 bool DeviceStatusManager::Enable(Type type)
 {
     CALL_DEBUG_ENTER;
-    if (type == Type::TYPE_INVALID) {
-        FI_HILOGE("Enable is failed");
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
+        FI_HILOGE("Check type is invalid");
         return false;
     }
     InitAlgoMngrInterface(type);
@@ -144,6 +144,10 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data &devicestatusDa
             FI_HILOGE("Listener is nullptr");
             return false;
         }
+        if ((devicestatusData.type <= TYPE_INVALID) || (devicestatusData.type >= TYPE_MAX)) {
+            FI_HILOGE("Check devicestatusData.type is invalid");
+            return false;
+        }
         FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
         switch (arrs_[devicestatusData.type]) {
             case ENTER: {
@@ -176,9 +180,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
-    event_ = event;
-    type_ = type;
-    if ((type_ <= TYPE_INVALID) || (type_ >= TYPE_MAX)) {
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
         FI_HILOGE("Subscribe type_:%{public}d is error", type_);
         return;
     }
@@ -186,6 +188,8 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
         FI_HILOGE("Subscribe event_:%{public}d is error", event_);
         return;
     }
+    event_ = event;
+    type_ = type;
     arrs_ [type_] = event_;
     FI_HILOGI("type_:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
@@ -235,8 +239,8 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     auto object = callback->AsObject();
     CHKPV(object);
     std::lock_guard lock(mutex_);
-    FI_HILOGI("listeners_.size:%{public}zu, arrs_:%{public}d event:%{public}d", listeners_.size(),
-        arrs_ [type_], event);
+    FI_HILOGI("listeners_.size:%{public}zu, type:%{public}d event:%{public}d", listeners_.size(),
+        static_cast<int32_t>type, event);
     auto dtTypeIter = listeners_.find(type);
     if (dtTypeIter == listeners_.end()) {
         FI_HILOGE("Failed to find listener for type");
