@@ -141,7 +141,7 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data &devicestatusDa
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
     for (const auto &listener : listeners) {
         if (listener == nullptr) {
-            FI_HILOGE("Listener is nullptr");
+            FI_HILOGE("listener is nullptr");
             return false;
         }
         FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);

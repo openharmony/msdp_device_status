@@ -74,6 +74,7 @@ constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
 constexpr int32_t RADIUS_IN { 42 };
 constexpr int32_t RADIUS_OUT { 42 };
+constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int64_t DOWN_TIME { 1 };
 const std::string UD_KEY { "Unified data key" };
 const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
@@ -121,6 +122,7 @@ public:
     static void SimulateDownKeyEvent(int32_t key);
     static void SimulateUpKeyEvent(int32_t key);
     static void PrintDragAction(DragAction dragAction);
+    static void AssignToAnimation(PreviewAnimation &animation);
 };
 
 void InteractionManagerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
@@ -553,6 +555,13 @@ void InteractionManagerTest::PrintDragAction(DragAction dragAction)
             FI_HILOGD("drag action: UNKNOWN");
             break;
     }
+}
+
+void InteractionManagerTest::AssignToAnimation(PreviewAnimation &animation)
+{
+    animation.duration = ANIMATION_DURATION;
+    animation.curveName = CURVE_NAME;
+    animation.curve = { 0.33, 0, 0.67, 1 };
 }
 
 class InputEventCallbackTest : public MMI::IInputEventConsumer {
@@ -1911,9 +1920,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
     previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
-    animationIn.duration = 500;
-    animationIn.curveName = CURVE_NAME;
-    animationIn.curve = { 0.33, 0, 0.67, 1 };
+    AssignToAnimation(animationIn);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleIn, animationIn);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
@@ -1923,9 +1930,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
     previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
-    animationOut.duration = 500;
-    animationOut.curveName = CURVE_NAME;
-    animationOut.curve = { 0.33, 0, 0.67, 1 };
+    AssignToAnimation(animationOut);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
