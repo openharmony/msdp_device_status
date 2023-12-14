@@ -43,7 +43,7 @@ void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
 
 void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
-    if (msgInfos_[info->msgType].empty() || info == nullptr) {
+    if (info == nullptr || msgInfos_.empty() || msgInfos_[info->msgType].empty()) {
         FI_HILOGE("Remove listener failed");
         return;
     }
