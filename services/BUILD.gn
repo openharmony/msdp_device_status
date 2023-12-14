@@ -32,6 +32,11 @@ config("devicestatus_services_private_config") {
     include_dirs += [ "${motion_service_path}/native/include" ]
   }
 
+  if (fusion_intention_framework) {
+    include_dirs +=
+        [ "${device_status_root_path}/intention/ipc/socket/include" ]
+  }
+
   defines = device_status_default_defines
 }
 
@@ -42,6 +47,11 @@ config("devicestatus_services_public_config") {
     "timer_manager/include",
     "interaction/drag/include",
   ]
+
+  if (fusion_intention_framework) {
+    include_dirs +=
+        [ "${device_status_root_path}/intention/ipc/socket/include" ]
+  }
 }
 
 sources_set = [
@@ -111,7 +121,12 @@ ohos_shared_library("devicestatus_service") {
   ]
 
   if (fusion_intention_framework) {
-    public_deps += [ "${device_status_root_path}/intention/services/intention_service:intention_service" ]
+    public_deps += [
+      "${device_status_root_path}/intention/ipc/socket:intention_socket_session_manager",
+      "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_server",
+      "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
+      "${device_status_root_path}/intention/services/intention_service:intention_service",
+    ]
   }
 
   defines = []
@@ -167,7 +182,12 @@ ohos_static_library("devicestatus_static_service") {
   ]
 
   if (fusion_intention_framework) {
-    public_deps += [ "${device_status_root_path}/intention/services/intention_service:intention_service" ]
+    public_deps += [
+      "${device_status_root_path}/intention/ipc/socket:intention_socket_session_manager",
+      "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_server",
+      "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
+      "${device_status_root_path}/intention/services/intention_service:intention_service",
+    ]
   }
 
   external_deps = external_deps_set

@@ -78,20 +78,21 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t EnterTextEditorArea(bool enable);
+    int32_t AddPrivilege();
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         DeviceStatusDeathRecipient() = default;
         ~DeviceStatusDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+        void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     private:
         DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };
 
     ErrCode Connect();
-    void ResetProxy(const wptr<IRemoteObject>& remote);
+    void ResetProxy(const wptr<IRemoteObject> &remote);
 
     sptr<Idevicestatus> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };

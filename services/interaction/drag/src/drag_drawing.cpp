@@ -507,15 +507,16 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
+    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
     if (dragExtHandle_ == nullptr) {
         FI_HILOGE("Failed to open drag extension library");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
         return;
     }
     auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragSuccessExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
         dlclose(dragExtHandle_);
         dragExtHandle_ = nullptr;
         return;
@@ -527,7 +528,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     }
     if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
     } else {
         startNum_ = START_TIME;
         needDestroyDragWindow_ = true;
@@ -539,15 +540,16 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     std::shared_ptr<Rosen::RSNode> rootNode)
 {
     CALL_DEBUG_ENTER;
+    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
     if (dragExtHandle_ == nullptr) {
         FI_HILOGE("Failed to open drag extension library");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
         return;
     }
     auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragFailExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
         dlclose(dragExtHandle_);
         dragExtHandle_ = nullptr;
         return;
@@ -559,7 +561,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     }
     if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
     } else {
         startNum_ = START_TIME;
         needDestroyDragWindow_ = true;
@@ -572,17 +574,19 @@ void DragDrawing::OnStopAnimation()
     CALL_DEBUG_ENTER;
 }
 
-void DragDrawing::RunAnimation(float endAlpha, float endScale)
+int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 {
     CALL_DEBUG_ENTER;
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
+        CHKPR(runner, RET_ERR);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
+    if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
+        return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
@@ -696,13 +700,13 @@ void DragDrawing::OnVsync()
         handler_ = nullptr;
         receiver_ = nullptr;
         if (needDestroyDragWindow_) {
-            g_drawingInfo.isRunning = false;
             CHKPV(g_drawingInfo.rootNode);
             if (drawDynamicEffectModifier_ != nullptr) {
                 g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
                 drawDynamicEffectModifier_ = nullptr;
             }
             DestroyDragWindow();
+            g_drawingInfo.isRunning = false;
         }
         return;
     }
@@ -1259,24 +1263,13 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
     return RET_OK;
 }
 
-int32_t DragDrawing::CreateEventRunner(int32_t positionX, int32_t positionY)
-{
-    CALL_DEBUG_ENTER;
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPR(runner, RET_ERR);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
-    if (!handler_->PostTask(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY))) {
-        FI_HILOGE("Send animationExtFunc failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t DragDrawing::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.hasCoordinateCorrected) {
+        return RET_ERR;
+    }
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     if (!textEditorAreaFlag_) {
         resetPixelMapX_ = g_drawingInfo.pixelMapX;
@@ -1293,11 +1286,11 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         g_drawingInfo.pixelMapY = resetPixelMapY_;
         positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
         positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-        if (CreateEventRunner(positionX, positionY) == RET_OK) {
-            FI_HILOGD("CreateEventRunner successfully");
+        if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) == RET_OK) {
+            FI_HILOGD("RunAnimation successfully");
             return RET_OK;
         }
-        FI_HILOGE("CreateEventRunner failed");
+        FI_HILOGE("RunAnimation failed");
         return RET_ERR;
     }
 
@@ -1305,11 +1298,11 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         FI_HILOGD("enable is false or textEditorAreaFlag_ is true");
         return RET_ERR;
     }
-    if (CreateEventRunner(positionX, positionY) != RET_OK) {
-        FI_HILOGE("CreateEventRunner failed");
+    if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) != RET_OK) {
+        FI_HILOGE("RunAnimation failed");
         return RET_ERR;
     }
-    FI_HILOGD("CreateEventRunner successfully");
+    FI_HILOGD("RunAnimation successfully");
     textEditorAreaFlag_ = true;
     return RET_OK;
 }

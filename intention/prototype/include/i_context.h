@@ -19,6 +19,9 @@
 #include "i_delegate_tasks.h"
 #include "i_device_manager.h"
 #include "i_drag_manager.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "i_socket_session_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "i_timer_manager.h"
 
 namespace OHOS {
@@ -38,6 +41,10 @@ public:
     virtual IDeviceManager& GetDeviceManager() = 0;
     virtual ITimerManager& GetTimerManager() = 0;
     virtual IDragManager& GetDragManager() = 0;
+
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    virtual ISocketSessionManager& GetSocketSessionManager() = 0;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

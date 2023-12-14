@@ -46,11 +46,9 @@ public:
         IPlugin *instance_ { nullptr };
     };
 
-    PluginManager() = default;
+    PluginManager(IContext *context);
     ~PluginManager() = default;
     DISALLOW_COPY_AND_MOVE(PluginManager);
-
-    void Init(IContext *context);
 
     // Load module identified by [`intention`].
     IPlugin* LoadPlugin(Intention intention);

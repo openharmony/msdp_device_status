@@ -113,4 +113,4 @@ RosenCurveType AnimationCurve::CreateStepsCurve(const std::vector<float> &curve)
 
 } // namespace DeviceStatus
 } // namespace Msdp
-} // namespace OHO
+} // namespace OHOS

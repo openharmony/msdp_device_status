@@ -26,7 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class IntentionProxy : public IRemoteProxy<IIntention> {
 public:
-    explicit IntentionProxy(const sptr<IRemoteObject>& impl);
+    explicit IntentionProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(IntentionProxy);
     ~IntentionProxy() = default;
 

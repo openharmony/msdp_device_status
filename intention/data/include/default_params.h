@@ -31,13 +31,8 @@ struct DefaultParam final : public ParamBase {
 };
 
 struct DefaultReply final : public ParamBase {
-    DefaultReply() = default;
-    DefaultReply(int32_t result);
-
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
-
-    int32_t result { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

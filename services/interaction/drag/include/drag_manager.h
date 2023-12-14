@@ -79,18 +79,16 @@ public:
     int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
+    int32_t AddPrivilege(int32_t tokenId);
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
-        InterceptorConsumer(IContext *context,
-            std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb)
-            : context_(context),
-            pointerEventCallback_(cb) {}
+        InterceptorConsumer(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb)
+            : pointerEventCallback_(cb) {}
         void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override;
     private:
-        IContext* context_ { nullptr };
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> pointerEventCallback_ { nullptr };
     };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR

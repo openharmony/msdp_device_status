@@ -79,7 +79,7 @@ ErrCode DeviceStatusClient::Connect()
     return RET_OK;
 }
 
-void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(devicestatusProxy_);
@@ -94,7 +94,7 @@ void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
     }
 }
 
-void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CHKPV(remote);
     DeviceStatusClient::GetInstance().ResetProxy(remote);
@@ -490,6 +490,13 @@ int32_t DeviceStatusClient::EnterTextEditorArea(bool enable)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->EnterTextEditorArea(enable);
+}
+
+int32_t DeviceStatusClient::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->AddPrivilege();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

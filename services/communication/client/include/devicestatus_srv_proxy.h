@@ -71,6 +71,7 @@ public:
     virtual int32_t EnterTextEditorArea(bool enable) override;
     virtual int32_t GetDragAction(DragAction &dragAction) override;
     virtual int32_t GetExtraInfo(std::string &extraInfo) override;
+    virtual int32_t AddPrivilege() override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

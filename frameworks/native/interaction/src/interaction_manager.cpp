@@ -182,6 +182,11 @@ int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
 {
     return INTER_MGR_IMPL.GetExtraInfo(extraInfo);
 }
+
+int32_t InteractionManager::AddPrivilege()
+{
+    return INTER_MGR_IMPL.AddPrivilege();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
