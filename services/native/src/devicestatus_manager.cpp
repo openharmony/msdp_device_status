@@ -240,7 +240,7 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     CHKPV(object);
     std::lock_guard lock(mutex_);
     FI_HILOGI("listeners_.size:%{public}zu, type:%{public}d event:%{public}d", listeners_.size(),
-        static_cast<int32_t>type, event);
+        static_cast<int32_t>(type), event);
     auto dtTypeIter = listeners_.find(type);
     if (dtTypeIter == listeners_.end()) {
         FI_HILOGE("Failed to find listener for type");
