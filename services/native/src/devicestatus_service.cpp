@@ -138,6 +138,11 @@ ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
 {
     return socketSessionMgr_;
 }
+
+IPluginManager& DeviceStatusService::GetPluginManager()
+{
+    return pluginMgr_;
+}
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
@@ -214,6 +219,7 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Failed to initialize socket session manager");
         goto INIT_FAIL;
     }
+    pluginMgr_.Init(this);
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     COOR_EVENT_MGR->SetIContext(this);

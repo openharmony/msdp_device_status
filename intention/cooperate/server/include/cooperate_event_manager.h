@@ -23,11 +23,10 @@
 #include "nocopyable.h"
 #include "refbase.h"
 #include "singleton.h"
-#include "stream_session.h"
 
 #include "coordination_message.h"
-#include "fi_log.h"
 #include "i_context.h"
+#include "i_socket_session.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -38,7 +37,7 @@ public:
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
     struct EventInfo : public RefBase {
         EventType type { LISTENER };
-        SessionPtr sess { nullptr };
+        std::shared_ptr<ISocketSession> sess { nullptr };
         MessageId msgId { MessageId::INVALID };
         int32_t userData { -1 };
         std::string networkId;
@@ -60,9 +59,9 @@ public:
     IContext* GetIContext() const;
 
 private:
-    void NotifyCooperateMessage(SessionPtr sess, MessageId msgId, int32_t userData,
-        const std::string &networkId, CoordinationMessage msg);
-    void NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state);
+    void NotifyCooperateMessage(std::shared_ptr<ISocketSession> sess,
+        MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg);
+    void NotifyCooperateState(std::shared_ptr<ISocketSession> sess, MessageId msgId, int32_t userData, bool state);
 
 private:
     std::mutex lock_;

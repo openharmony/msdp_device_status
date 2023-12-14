@@ -21,10 +21,12 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-enum CooperateAction : uint32_t {
+enum CooperateRequestID : uint32_t {
     UNKNOWN_COOPERATE_ACTION,
     REGISTER_LISTENER,
     UNREGISTER_LISTENER,
+    REGISTER_HOTAREA_LISTENER,
+    UNREGISTER_HOTAREA_LISTENER,
     GET_COOPERATE_STATE,
 };
 

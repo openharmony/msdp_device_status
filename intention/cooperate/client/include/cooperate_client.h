@@ -28,6 +28,7 @@
 #include "i_hotarea_listener.h"
 #include "i_tunnel_client.h"
 #include "net_packet.h"
+#include "socket_client.h"
 #include "stream_client.h"
 
 namespace OHOS {
@@ -80,7 +81,6 @@ public:
 private:
     int32_t GenerateRequestID();
 
-private:
     std::list<CooperateListenerPtr> devCooperateListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;

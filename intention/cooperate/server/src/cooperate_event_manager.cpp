@@ -137,8 +137,8 @@ IContext* CooperateEventManager::GetIContext() const
     return context_;
 }
 
-void CooperateEventManager::NotifyCooperateMessage(
-    SessionPtr sess, MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg)
+void CooperateEventManager::NotifyCooperateMessage(std::shared_ptr<ISocketSession> sess,
+    MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
@@ -154,7 +154,8 @@ void CooperateEventManager::NotifyCooperateMessage(
     }
 }
 
-void CooperateEventManager::NotifyCooperateState(SessionPtr sess, MessageId msgId, int32_t userData, bool state)
+void CooperateEventManager::NotifyCooperateState(std::shared_ptr<ISocketSession> sess,
+    MessageId msgId, int32_t userData, bool state)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);

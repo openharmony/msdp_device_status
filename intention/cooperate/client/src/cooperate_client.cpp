@@ -18,6 +18,7 @@
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
+#include "devicestatus_func_callback.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -43,7 +44,7 @@ int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel,
         DefaultParam param;
         DefaultReply reply;
 
-        int32_t ret = tunnel.AddWatch(Intention::COOPERATE, CooperateAction::REGISTER_LISTENER, param, reply);
+        int32_t ret = tunnel.AddWatch(Intention::COOPERATE, CooperateRequestID::REGISTER_LISTENER, param, reply);
         if (ret != RET_OK) {
             FI_HILOGE("Failed to register, ret:%{public}d", ret);
             return ret;
@@ -75,7 +76,7 @@ listenerLabel:
         isListeningProcess_ = false;
         DefaultParam param;
         DefaultReply reply;
-        return tunnel.RemoveWatch(Intention::COOPERATE, CooperateAction::UNREGISTER_LISTENER, param, reply);
+        return tunnel.RemoveWatch(Intention::COOPERATE, CooperateRequestID::UNREGISTER_LISTENER, param, reply);
     }
     return RET_OK;
 }
@@ -161,7 +162,7 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel,
     GetCooperateStateParam param { GenerateRequestID(), networkId, isCheckPermission };
     DefaultReply reply;
 
-    int32_t ret = tunnel.GetParam(Intention::COOPERATE, CooperateAction::GET_COOPERATE_STATE, param, reply);
+    int32_t ret = tunnel.GetParam(Intention::COOPERATE, CooperateRequestID::GET_COOPERATE_STATE, param, reply);
     if (ret != RET_OK) {
         FI_HILOGE("Get cooperate state failed");
         return ret;

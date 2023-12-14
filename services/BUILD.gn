@@ -33,8 +33,11 @@ config("devicestatus_services_private_config") {
   }
 
   if (fusion_intention_framework) {
-    include_dirs +=
-        [ "${device_status_root_path}/intention/ipc/socket/include" ]
+    include_dirs += [
+      "${device_status_root_path}/intention/cooperate/server/include",
+      "${device_status_root_path}/intention/drag/server/include",
+      "${device_status_root_path}/intention/ipc/socket/include",
+    ]
   }
 
   defines = device_status_default_defines
@@ -49,8 +52,11 @@ config("devicestatus_services_public_config") {
   ]
 
   if (fusion_intention_framework) {
-    include_dirs +=
-        [ "${device_status_root_path}/intention/ipc/socket/include" ]
+    include_dirs += [
+      "${device_status_root_path}/intention/cooperate/server/include",
+      "${device_status_root_path}/intention/drag/server/include",
+      "${device_status_root_path}/intention/ipc/socket/include",
+    ]
   }
 }
 

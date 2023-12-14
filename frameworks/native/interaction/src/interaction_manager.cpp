@@ -17,7 +17,11 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "intention_manager.h"
+#else
 #include "interaction_manager_impl.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {

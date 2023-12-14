@@ -110,7 +110,7 @@ public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(CooperateSM);
     void Init();
-    void OnSessionLost(SessionPtr session);
+    void OnSessionLost(std::shared_ptr<ISocketSession> session);
     void PrepareCooperate();
     void UnprepareCooperate();
     int32_t ActivateCooperate(const std::string &remoteNetworkId, int32_t startDeviceId);
