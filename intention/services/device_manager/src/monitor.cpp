@@ -80,7 +80,7 @@ void Monitor::Disable()
     }
     if (inotifyFd_ >= 0) {
         if (close(inotifyFd_) < 0) {
-            FI_HILOGE("Close inotify fd failed, error:%{public}s, inotifyFd_:%{public}d", strerror(errno), inotifyFd_);
+            FI_HILOGE("close inotify fd failed, error:%{public}s, inotifyFd_:%{public}d", strerror(errno), inotifyFd_);
         }
         inotifyFd_ = -1;
     }

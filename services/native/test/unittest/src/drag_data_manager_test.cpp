@@ -73,7 +73,7 @@ std::shared_ptr<Media::PixelMap> DragDataManagerTest::CreatePixelMap(int32_t wid
     int32_t colorLen = width * height;
     uint32_t *colorPixels = new (std::nothrow) uint32_t[colorLen];
     if (colorPixels == nullptr) {
-        FI_HILOGE("ColorPixels is nullptr");
+        FI_HILOGE("colorPixels is nullptr");
         return nullptr;
     }
     int32_t colorByteCount = colorLen * INT32_BYTE;

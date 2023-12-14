@@ -496,13 +496,13 @@ int32_t CooperateSoftbusAdapter::StartCooperateOtherResult(const std::string &or
 void CooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string &message)
 {
     if (message.empty()) {
-        FI_HILOGE("Message is empty");
+        FI_HILOGE("message is empty");
         return;
     }
     JsonParser parser;
     parser.json = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGI("Parser json is not object");
+        FI_HILOGI("parser json is not object");
         if (message.size() < sizeof(DataPacket)) {
             FI_HILOGE("Data packet is incomplete");
             return;
@@ -513,10 +513,10 @@ void CooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::st
             return;
         }
         if (registerRecvs_.find(dataPacket->messageId) == registerRecvs_.end()) {
-            FI_HILOGW("Message:%{public}d does not register", dataPacket->messageId);
+            FI_HILOGW("message:%{public}d does not register", dataPacket->messageId);
             return;
         }
-        FI_HILOGI("Message:%{public}d", dataPacket->messageId);
+        FI_HILOGI("message:%{public}d", dataPacket->messageId);
         if ((dataPacket->messageId == DRAGGING_DATA) ||
             (dataPacket->messageId == STOPDRAG_DATA) ||
             (dataPacket->messageId == IS_PULL_UP) ||

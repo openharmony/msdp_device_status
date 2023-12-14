@@ -34,7 +34,7 @@ void CooperateOut::OnEvent(Context &context, CooperateEvent &event)
     if (current_ != nullptr) {
         current_->OnEvent(context, event);
     } else {
-        FI_HILOGE("Current step is null");
+        FI_HILOGE("current_ step is null");
     }
 }
 

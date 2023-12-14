@@ -36,7 +36,7 @@ int32_t CooperateStateIn::ActivateCooperate(const std::string &remoteNetworkId,
 {
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
-        FI_HILOGE("RemoteNetworkId is empty");
+        FI_HILOGE("remoteNetworkId is empty");
         return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     std::string localNetworkId = COOPERATE::GetLocalNetworkId();

@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <string>
 
 #include <dlfcn.h>
@@ -1132,7 +1133,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
         g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
         g_drawingInfo.filterInfo.c_str());
     if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
-        FI_HILOGD("ExtraInfo is empty, or filterInfo is empty");
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
         return false;
     }
     JsonParser extraInfoParser;
@@ -1168,7 +1169,7 @@ bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
-    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valuedouble };
+    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valuedouble, dipScale->valuedouble };
     return true;
 }
 
@@ -1230,6 +1231,12 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
+        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 ||
+            std::numeric_limits<float>::max() / filterInfo.dipScale < filterInfo.cornerRadius) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                filterInfo.cornerRadius, filterInfo.dipScale);
+            return;
+        }
         filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         FI_HILOGD("Add filter successfully");
     }
@@ -1465,9 +1472,9 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
 {
     CALL_DEBUG_ENTER;
     CHKPR(node, RET_ERR);
-    if (float radius = 0; ParserRadius(radius)) {
+    if (float radius = 0.0; ParserRadius(radius)) {
         node->SetCornerRadius(radius);
-        FI_HILOGI("SetCornerRadius by radius:%{public}f", radius);
+        FI_HILOGD("SetCornerRadius by radius:%{public}f", radius);
     }
     for (const auto &type : previewStyle.types) {
         switch (type) {
@@ -1564,13 +1571,43 @@ void DragDrawing::ClearMutilSelectedData()
 
 bool DragDrawing::ParserRadius(float &radius)
 {
-    CALL_DEBUG_ENTER;
-    FilterInfo filterInfo;
-    if (!ParserFilterInfo(filterInfo)) {
-        FI_HILOGE("ParserRadius failed");
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
+        g_drawingInfo.filterInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
         return false;
     }
-    radius = filterInfo.cornerRadius * filterInfo.dipScale;
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("ExtraInfo is not json object");
+        return false;
+    }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
+    if (!cJSON_IsNumber(cornerRadius)) {
+        FI_HILOGE("Parser cornerRadius failed");
+        return false;
+    }
+
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return false;
+    }
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
+    if (!cJSON_IsNumber(dipScale)) {
+        FI_HILOGE("Parser dipScale failed");
+        return false;
+    }
+    if (cornerRadius->valuedouble < 0 || dipScale->valuedouble <= 0 ||
+        std::numeric_limits<float>::max() / dipScale->valuedouble < cornerRadius->valuedouble) {
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            cornerRadius->valuedouble, dipScale->valuedouble);
+        return false;
+    }
+    radius = cornerRadius->valuedouble * dipScale->valuedouble;
     return true;
 }
 

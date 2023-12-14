@@ -186,9 +186,9 @@ int32_t CoordinationSoftbusAdapter::Init()
     };
     int32_t ret = InitSocket(info, SOCKET_SERVER, socketFd_);
     if (ret == RET_OK && socketFd_ != -1) {
-        FI_HILOGI("server set ok");
+        FI_HILOGI("Server set ok");
     } else {
-        FI_HILOGE("server set failed, ret:%{public}d", ret);
+        FI_HILOGE("Server set failed, ret:%{public}d", ret);
     }
     return ret;
 }
@@ -271,7 +271,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         sessionDevs_[remoteNetworkId] = socket;
         ConfigTcpAlive(socket);
     } else {
-        FI_HILOGE("bind failed, ret:%{public}d", ret);
+        FI_HILOGE("Bind failed, ret:%{public}d", ret);
     }
     return ret;
 }

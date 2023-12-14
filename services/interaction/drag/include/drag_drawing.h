@@ -108,9 +108,9 @@ struct DrawingInfo {
 
 struct FilterInfo {
     std::string componentType;
-    int32_t blurStyle;
-    float cornerRadius;
-    float dipScale;
+    int32_t blurStyle { -1 };
+    float cornerRadius { 0.0 };
+    float dipScale { 0.0 };
 };
 
 class DragDrawing : public IDragAnimation {

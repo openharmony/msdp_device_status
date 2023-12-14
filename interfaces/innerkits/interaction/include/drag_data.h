@@ -135,8 +135,8 @@ struct PreviewStyle {
     std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };
     int32_t opacity { -1 };
-    float radius { -1 };
-    float scale { -1 };
+    float radius { -1.0 };
+    float scale { -1.0 };
 
     bool operator == (const PreviewStyle &other) const
     {
