@@ -155,7 +155,7 @@ private:
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
         std::shared_ptr<Media::PixelMap> stylePixelMap);
-    void RunAnimation(float endAlpha, float endScale);
+    int32_t RunAnimation(std::function<int32_t()> cb);
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);

@@ -52,6 +52,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
@@ -86,6 +87,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
