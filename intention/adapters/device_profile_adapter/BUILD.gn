@@ -29,7 +29,7 @@ ohos_source_set("device_profile_adapter") {
   }
 
   branch_protector_ret = "pac_ret"
-  
+
   include_dirs = [
     "include",
     "${device_status_root_path}/utils/common/include",
