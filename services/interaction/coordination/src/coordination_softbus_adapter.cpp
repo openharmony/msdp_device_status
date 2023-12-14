@@ -347,7 +347,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     if (ret != RET_OK) {
         CoordinationDFX::WriteActivate(localNetworkId, remoteNetworkId, sessionDevs_,
             OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        FI_HILOGE("The sendMsg failed, ret:%{public}d", ret);
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     if (isPointerButtonPressed) {
@@ -374,12 +374,12 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
-    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_X, cJSON_CreateNumber(xPercent));
-    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_Y, cJSON_CreateNumber(yPercent));
-    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDeviceDhid.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_X, cJSON_CreateNumber(xPercent));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_POINTER_Y, cJSON_CreateNumber(yPercent));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *sendMsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     int32_t ret = SendMsg(sessionId, sendMsg);
@@ -411,7 +411,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     cJSON_free(sendMsg);
     if (ret != RET_OK) {
         CoordinationDFX::WriteDeactivate(remoteNetworkId, sessionDevs_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        FI_HILOGE("SendMsg sending failed, ret:%{public}d", ret);
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -455,17 +455,17 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
-    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_UNCHAINED_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(result));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
     char *sendmsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     CHKPR(sendmsg, RET_ERR);
-    int32_t result = SendMsg(sessionId, sendmsg);
+    int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
-    if (result != RET_OK) {
-        FI_HILOGE("Failed to send the sendMsg, result:%{public}d", result);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -479,13 +479,13 @@ int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteN
         FI_HILOGE("Failed to discover the remote device");
         return RET_ERR;
     }
+    int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_FILTER_ADDED));
     char *sendmsg = cJSON_Print(jsonStr);
     cJSON_Delete(jsonStr);
     CHKPR(sendmsg, RET_ERR);
-    int32_t sessionId = sessionDevs_[remoteNetworkId];
     int32_t ret = SendMsg(sessionId, sendmsg);
     cJSON_free(sendmsg);
     if (ret != RET_OK) {
