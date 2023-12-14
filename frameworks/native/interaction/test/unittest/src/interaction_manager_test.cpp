@@ -72,14 +72,14 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
-constexpr int32_t RADIUS_IN { 42 };
-constexpr int32_t RADIUS_OUT { 42 };
 constexpr int64_t DOWN_TIME { 1 };
 const std::string UD_KEY { "Unified data key" };
-const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
 const std::string CURVE_NAME { "cubic-bezier" };
+const std::string EXTRA_INFO { "{ \"drag_data_type\": \"demo\", \"drag_blur_style\": 1, \"drag_corner_radius\": 20,"
+    " \"drag_allow_distributed\": false }" };
+const std::string FILTER_INFO { "{ \"dip_scale\": 3.5 }" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
@@ -1845,6 +1845,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
+    dragData->extraInfo = EXTRA_INFO;
+    dragData->filterInfo = FILTER_INFO;
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -1855,17 +1857,15 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
-    previewStyleIn.radius = RADIUS_IN;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleIn);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
-    previewStyleOut.radius = RADIUS_OUT;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleOut);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
@@ -1897,6 +1897,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
+    dragData->extraInfo = EXTRA_INFO;
+    dragData->filterInfo = FILTER_INFO;
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -1907,9 +1909,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
-    previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
     animationIn.duration = 500;
     animationIn.curveName = CURVE_NAME;
@@ -1919,9 +1920,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
-    previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
     animationOut.duration = 500;
     animationOut.curveName = CURVE_NAME;

@@ -109,7 +109,7 @@ struct DrawingInfo {
 struct FilterInfo {
     std::string componentType;
     int32_t blurStyle;
-    int32_t cornerRadius;
+    float cornerRadius;
     float dipScale;
 };
 
@@ -182,6 +182,7 @@ private:
     void MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
     void InitMutilSelectedNodes();
     void ClearMutilSelectedData();
+    bool ParserRadius(float &radius);
 
 private:
     int64_t startNum_ { -1 };
