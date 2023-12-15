@@ -72,15 +72,14 @@ constexpr bool HAS_CUSTOM_ANIMATION { true };
 constexpr int32_t MOVE_STEP { 10 };
 constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
-constexpr int32_t RADIUS_IN { 42 };
-constexpr int32_t RADIUS_OUT { 42 };
 constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int64_t DOWN_TIME { 1 };
 const std::string UD_KEY { "Unified data key" };
-const std::string EXTRA_INFO { "{ \"drag_allow_distributed\" : false }" };
 const std::string SYSTEM_CORE { "system_core" };
 const std::string SYSTEM_BASIC { "system_basic" };
 const std::string CURVE_NAME { "cubic-bezier" };
+const std::string EXTRA_INFO { "{ \"drag_corner_radius\": 20, \"drag_allow_distributed\": false }" };
+const std::string FILTER_INFO { "{ \"dip_scale\": 3.5 }" };
 int32_t g_deviceMouseId { -1 };
 int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
@@ -365,6 +364,8 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<i
     dragData.displayY = location.second;
     dragData.displayId = displayId;
     dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
+    dragData.extraInfo = EXTRA_INFO;
+    dragData.filterInfo = FILTER_INFO;
     return dragData;
 }
 
@@ -1864,17 +1865,15 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
-    previewStyleIn.radius = RADIUS_IN;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleIn);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
-    previewStyleOut.radius = RADIUS_OUT;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleOut);
     EXPECT_EQ(ret, RET_OK);
     SimulateMovePointerEvent({ leavePos.first, leavePos.second }, { DRAG_DST_X, DRAG_DST_Y },
@@ -1916,9 +1915,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
-    previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
     AssignToAnimation(animationIn);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleIn, animationIn);
@@ -1926,9 +1924,8 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
-    previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
     AssignToAnimation(animationOut);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
@@ -1956,7 +1953,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetExtraInfo, TestSize.L
         std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
             MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
         ASSERT_TRUE(dragData);
-        dragData->extraInfo = EXTRA_INFO;
         std::promise<bool> promiseFlag;
         std::future<bool> futureFlag = promiseFlag.get_future();
         auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {

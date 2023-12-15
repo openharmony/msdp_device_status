@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <string>
 
 #include <dlfcn.h>
@@ -1128,51 +1129,47 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
 {
-    if (g_drawingInfo.extraInfo.empty()) {
-        FI_HILOGD("the extraInfo is empty");
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
+        g_drawingInfo.filterInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
         return false;
     }
-    JsonParser filterParser;
-    filterParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
-    if (!cJSON_IsObject(filterParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("ExtraInfo is not json object");
         return false;
     }
-    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_data_type");
+    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_data_type");
     if (!cJSON_IsString(componentType)) {
         FI_HILOGE("Parser componentType failed");
         return false;
     }
-    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_blur_style");
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_blur_style");
     if (!cJSON_IsNumber(blurStyle)) {
         FI_HILOGE("Parser blurStyle failed");
         return false;
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_corner_radius");
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
     if (!cJSON_IsNumber(cornerRadius)) {
         FI_HILOGE("Parser cornerRadius failed");
         return false;
     }
-    if (g_drawingInfo.filterInfo.empty()) {
-        FI_HILOGD("ExtraInfo is empty");
+
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
         return false;
     }
-    JsonParser dipScaleParser;
-    dipScaleParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
-    if (!cJSON_IsObject(dipScaleParser.json)) {
-        FI_HILOGE("ExtraInfo is not json object");
-        return false;
-    }
-    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(dipScaleParser.json, "dip_scale");
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (!cJSON_IsNumber(dipScale)) {
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
-    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valuedouble };
+    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valuedouble, dipScale->valuedouble };
     return true;
 }
 
@@ -1234,6 +1231,12 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
+        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 ||
+            std::numeric_limits<float>::max() / filterInfo.dipScale < filterInfo.cornerRadius) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                filterInfo.cornerRadius, filterInfo.dipScale);
+            return;
+        }
         filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         FI_HILOGD("Add filter successfully");
     }
@@ -1467,7 +1470,12 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
 
 int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle)
 {
+    CALL_DEBUG_ENTER;
     CHKPR(node, RET_ERR);
+    if (float radius = 0.0; ParserRadius(radius)) {
+        node->SetCornerRadius(radius);
+        FI_HILOGD("SetCornerRadius by radius:%{public}f", radius);
+    }
     for (const auto &type : previewStyle.types) {
         switch (type) {
             case PreviewType::FOREGROUND_COLOR: {
@@ -1559,6 +1567,48 @@ void DragDrawing::ClearMutilSelectedData()
         g_drawingInfo.mutilSelectedPixelMaps.clear();
         g_drawingInfo.mutilSelectedPixelMaps.shrink_to_fit();
     }
+}
+
+bool DragDrawing::ParserRadius(float &radius)
+{
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
+        g_drawingInfo.filterInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
+        return false;
+    }
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("ExtraInfo is not json object");
+        return false;
+    }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
+    if (!cJSON_IsNumber(cornerRadius)) {
+        FI_HILOGE("Parser cornerRadius failed");
+        return false;
+    }
+
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return false;
+    }
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
+    if (!cJSON_IsNumber(dipScale)) {
+        FI_HILOGE("Parser dipScale failed");
+        return false;
+    }
+    if (cornerRadius->valuedouble < 0 || dipScale->valuedouble <= 0 ||
+        std::numeric_limits<float>::max() / dipScale->valuedouble < cornerRadius->valuedouble) {
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            cornerRadius->valuedouble, dipScale->valuedouble);
+        return false;
+    }
+    radius = cornerRadius->valuedouble * dipScale->valuedouble;
+    return true;
 }
 
 DragDrawing::~DragDrawing()
