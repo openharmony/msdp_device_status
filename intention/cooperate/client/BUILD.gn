@@ -44,12 +44,13 @@ ohos_source_set("intention_cooperate_client") {
   defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/cooperate/data:intention_cooperate_data",
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
+    "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-    "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/cooperate/data:intention_cooperate_data",
-    "${intention_root_path}/data:intention_data",
-    "${intention_root_path}/ipc/tunnel:intention_tunnel_client",
   ]
 
   external_deps = [

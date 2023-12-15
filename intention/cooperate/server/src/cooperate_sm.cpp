@@ -91,7 +91,7 @@ void CooperateSM::OnReset(const std::string &networkId)
     Reset(networkId);
 }
 
-void CooperateSM::OnSessionLost(SessionPtr session)
+void CooperateSM::OnSessionLost(std::shared_ptr<ISocketSession> session)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);

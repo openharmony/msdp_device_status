@@ -29,6 +29,11 @@ config("devicestatus_public_config") {
     "${device_status_root_path}/services/communication/client/include",
   ]
 
+  if (fusion_intention_framework) {
+    include_dirs +=
+        [ "${device_status_root_path}/intention/frameworks/client/include" ]
+  }
+
   defines = device_status_default_defines
 }
 
@@ -49,7 +54,6 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/interaction/src/drag_data_util.cpp",
     "${device_status_frameworks_path}/native/interaction/src/drag_manager_impl.cpp",
     "${device_status_frameworks_path}/native/interaction/src/interaction_manager.cpp",
-    "${device_status_frameworks_path}/native/interaction/src/interaction_manager_impl.cpp",
     "${device_status_frameworks_path}/native/src/client.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_proxy.cpp",
     "${device_status_frameworks_path}/native/src/devicestatus_callback_stub.cpp",
@@ -58,6 +62,12 @@ ohos_shared_library("devicestatus_client") {
     "${device_status_frameworks_path}/native/src/stationary_manager.cpp",
     "${device_status_root_path}/services/communication/client/src/devicestatus_srv_proxy.cpp",
   ]
+
+  if (fusion_intention_framework) {
+    sources += [ "${device_status_root_path}/intention/frameworks/client/src/intention_manager.cpp" ]
+  } else {
+    sources += [ "${device_status_frameworks_path}/native/interaction/src/interaction_manager_impl.cpp" ]
+  }
 
   if (fusion_interaction_coordination) {
     sources += [ "${device_status_frameworks_path}/native/interaction/src/coordination_manager_impl.cpp" ]
@@ -75,6 +85,7 @@ ohos_shared_library("devicestatus_client") {
   if (fusion_intention_framework) {
     deps += [
       "${device_status_root_path}/intention/cooperate/client:intention_cooperate_client",
+      "${device_status_root_path}/intention/drag/client:intention_drag_client",
       "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
       "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
       "${device_status_root_path}/intention/prototype:intention_prototype",

@@ -31,6 +31,7 @@
 #include "drag_manager.h"
 #include "i_context.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "plugin_manager.h"
 #include "intention_service.h"
 #include "socket_session_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -61,6 +62,7 @@ public:
     IDragManager& GetDragManager() override;
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
@@ -152,6 +154,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
+    PluginManager pluginMgr_;
     sptr<IntentionService> intention_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };

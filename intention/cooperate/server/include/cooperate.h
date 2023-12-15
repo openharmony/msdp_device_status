@@ -16,31 +16,36 @@
 #ifndef COOPERATE_H
 #define COOPERATE_H
 
+#include "nocopyable.h"
+
 #include "i_context.h"
-#include "i_plugin.h"
-#include "cooperate_manager.h"
+#include "i_cooperate.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class Cooperate : public IPlugin {
+class Cooperate final : public ICooperate {
 public:
     Cooperate(IContext *context);
-    virtual ~Cooperate() = default;
+    ~Cooperate() = default;
+    DISALLOW_COPY_AND_MOVE(Cooperate);
 
-    int32_t Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Start(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply) override;
-    int32_t AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t RemoveWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t SetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t GetParam(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
-    int32_t Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
+    int32_t RegisterListener(int32_t pid) override;
+    int32_t UnregisterListener(int32_t pid) override;
+    int32_t RegisterHotAreaListener(int32_t pid) override;
+    int32_t UnregisterHotAreaListener(int32_t pid) override;
+
+    int32_t Enable(int32_t pid) override;
+    int32_t Disable(int32_t pid) override;
+    int32_t Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
+    int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) override;
+
+    int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) override;
+
+    void Dump(int32_t fd) override;
 
 private:
     IContext *context_ { nullptr };
-    CooperateManager cooperateMgr_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
