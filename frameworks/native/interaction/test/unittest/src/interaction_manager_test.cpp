@@ -86,8 +86,8 @@ int32_t g_deviceTouchId { -1 };
 int32_t g_screenWidth { 720 };
 int32_t g_screenHeight { 1280 };
 uint64_t g_tokenID { 0 };
-const char *g_cores[] = { "ohos.permission.INPUT_MONITORING" };
-const char *g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
+const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const char* g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
 std::shared_ptr<MMI::KeyEvent> g_keyEvent = MMI::KeyEvent::Create();
 } // namespace
 
@@ -326,7 +326,7 @@ std::shared_ptr<Media::PixelMap> InteractionManagerTest::CreatePixelMap(int32_t 
     opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
 
     int32_t colorLen = width * height;
-    uint32_t *colors = new (std::nothrow) uint32_t[colorLen];
+    uint32_t* colors = new (std::nothrow) uint32_t[colorLen];
     CHKPP(colors);
     int32_t colorByteCount = colorLen * INT32_BYTE;
     if (memset_s(colors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount) != EOK) {
@@ -1864,7 +1864,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
     previewStyleIn.radius = RADIUS_IN;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleIn);
@@ -1872,7 +1872,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyle, Test
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
     previewStyleOut.radius = RADIUS_OUT;
     ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleOut);
@@ -1916,7 +1916,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ DRAG_SRC_X, DRAG_SRC_Y }, { enterPos.first, enterPos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleIn;
-    previewStyleIn.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
     previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
     previewStyleIn.radius = RADIUS_IN;
     PreviewAnimation animationIn;
@@ -1926,7 +1926,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_UpdatePreviewStyleWithAn
     SimulateMovePointerEvent({ enterPos.first, enterPos.second }, { leavePos.first, leavePos.second },
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, true);
     PreviewStyle previewStyleOut;
-    previewStyleOut.types  = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR, PreviewType::RADIUS };
     previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
     previewStyleOut.radius = RADIUS_OUT;
     PreviewAnimation animationOut;
