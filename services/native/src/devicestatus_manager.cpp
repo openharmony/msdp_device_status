@@ -184,7 +184,7 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
         FI_HILOGE("Subscribe type_:%{public}d is error", type_);
         return;
     }
-    if ((event_ < ENTER) || (event_ > ENTER_EXIT)) {
+    if ((event < ENTER) || (event > ENTER_EXIT)) {
         FI_HILOGE("Subscribe event_:%{public}d is error", event_);
         return;
     }
