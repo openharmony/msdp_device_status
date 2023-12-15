@@ -121,10 +121,10 @@ void TaskScheduler::PopPendingTaskList(std::vector<TaskPtr> &tasks)
         if (tasks_.empty()) {
             break;
         }
-        auto task = tasks_.front();
-        CHKPB(task);
-        RecoveryId(task->GetId());
-        tasks.push_back(task->GetSharedPtr());
+        auto firstTask = tasks_.front();
+        CHKPB(firstTask);
+        RecoveryId(firstTask->GetId());
+        tasks.push_back(firstTask->GetSharedPtr());
         tasks_.pop();
     }
 }
