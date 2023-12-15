@@ -16,7 +16,7 @@
 #ifndef I_PLUGIN_MANAGER_H
 #define I_PLUGIN_MANAGER_H
 
-#include "i_plugin.h"
+#include "i_cooperate.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -26,8 +26,8 @@ public:
     IPluginManager() = default;
     virtual ~IPluginManager() = default;
 
-    virtual IPlugin* LoadPlugin(Intention intention) = 0;
-    virtual void UnloadPlugin(Intention intention) = 0;
+    virtual ICooperate* LoadCooperate() = 0;
+    virtual void UnloadCooperate() = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -16,11 +16,14 @@
 #ifndef PLUGIN_MANAGER_H
 #define PLUGIN_MANAGER_H
 
-#include <map>
+#include <memory>
+
+#include <dlfcn.h>
 
 #include "nocopyable.h"
 
 #include "i_context.h"
+#include "i_cooperate.h"
 #include "i_plugin_manager.h"
 
 namespace OHOS {
@@ -29,14 +32,12 @@ namespace DeviceStatus {
 
 // Loading、unloading and bookkeeping of modules.
 class PluginManager final : public IPluginManager {
-public:
-    class Plugin {
+    template<typename IPlugin>
+    class Plugin final {
     public:
         Plugin(IContext *context, void *handle);
-        Plugin(Plugin &&other);
-        DISALLOW_COPY(Plugin);
         ~Plugin();
-        Plugin& operator=(Plugin &&other);
+        DISALLOW_COPY_AND_MOVE(Plugin);
 
         IPlugin* GetInstance();
 
@@ -46,24 +47,68 @@ public:
         IPlugin *instance_ { nullptr };
     };
 
-    PluginManager(IContext *context);
+    template<typename IPlugin>
+    using CreatePlugin = IPlugin* (*)(IContext *context);
+
+    template<typename IPlugin>
+    using DestroyPlugin = void (*)(IPlugin *);
+
+public:
+    PluginManager() = default;
     ~PluginManager() = default;
     DISALLOW_COPY_AND_MOVE(PluginManager);
 
-    // Load module identified by [`intention`].
-    IPlugin* LoadPlugin(Intention intention);
+    void Init(IContext *context);
 
-    // Unload module identified by [`intention`].
-    void UnloadPlugin(Intention intention);
+    ICooperate* LoadCooperate() override;
+    void UnloadCooperate() override;
 
 private:
-    void LoadLibrary(Intention intention);
-    IPlugin* DoLoadPlugin(Intention intention);
+    template<typename IPlugin>
+    std::unique_ptr<Plugin<IPlugin>> LoadLibrary(IContext *context, const char *libPath);
 
 private:
     IContext *context_ { nullptr };
-    std::map<Intention, Plugin> libs_;
+    std::unique_ptr<Plugin<ICooperate>> cooperate_ { nullptr };
 };
+
+template<typename IPlugin>
+PluginManager::Plugin<IPlugin>::Plugin(IContext *context, void *handle)
+    : context_(context), handle_(handle)
+{}
+
+template<typename IPlugin>
+PluginManager::Plugin<IPlugin>::~Plugin()
+{
+    if (instance_ != nullptr) {
+        DestroyPlugin<IPlugin> destroy =
+            reinterpret_cast<DestroyPlugin<IPlugin>>(::dlsym(handle_, "DestroyInstance"));
+        if (destroy != nullptr) {
+            destroy(instance_);
+        }
+    }
+    ::dlclose(handle_);
+}
+
+template<typename IPlugin>
+IPlugin* PluginManager::Plugin<IPlugin>::GetInstance()
+{
+    if (instance_ != nullptr) {
+        return instance_;
+    }
+    CreatePlugin<IPlugin> create = reinterpret_cast<CreatePlugin<IPlugin>>(::dlsym(handle_, "CreateInstance"));
+    if (create != nullptr) {
+        instance_ = create(context_);
+    }
+    return instance_;
+}
+
+template<typename IPlugin>
+std::unique_ptr<PluginManager::Plugin<IPlugin>> PluginManager::LoadLibrary(IContext *context, const char *libPath)
+{
+    void *handle = ::dlopen(libPath, RTLD_NOW);
+    return (handle != nullptr ? std::make_unique<Plugin<IPlugin>>(context, handle) : nullptr);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
