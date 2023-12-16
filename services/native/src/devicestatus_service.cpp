@@ -362,7 +362,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    FI_HILOGD("eventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    FI_HILOGD("EventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev {};
     ev.events = EPOLLIN;
