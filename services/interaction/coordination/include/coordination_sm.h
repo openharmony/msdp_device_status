@@ -180,6 +180,7 @@ private:
     void OnReset(const std::string &networkId);
     std::shared_ptr<ICoordinationState> GetCurrentState();
     void RegisterSessionCallback();
+    void OpenP2PConnection(const std::string &remoteNetworkId);
 
 private:
     std::pair<std::string, std::string> preparedNetworkId_;
