@@ -249,6 +249,16 @@ void CoordinationSM::UnprepareCoordination()
     D_INPUT_ADAPTER->UnregisterSessionStateCb();
 }
 
+void CoordinationSM::OpenP2PConnection(const std::string &remoteNetworkId)
+{
+    DistributedHardware::DmDeviceInfo remoteDeviceInfo;
+    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
+                 remoteNetworkId.c_str()) != EOK) {
+        FI_HILOGW("Invalid networkid");
+    }
+    Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().OpenP2PConnection(remoteDeviceInfo);
+}
+
 int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
@@ -270,6 +280,12 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("Open input softbus failed");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
+
+    std::string taskName = "open_p2p_onnection";
+    std::function<void()> handleFunc =
+        std::bind(&CoordinationSM::OpenP2PConnection, this, remoteNetworkId);
+    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
+
     isStarting_ = true;
     SetSinkNetworkId(remoteNetworkId);
     auto state = GetCurrentState();
