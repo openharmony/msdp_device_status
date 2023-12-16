@@ -18,7 +18,7 @@
 #include <optional>
 
 #include "cJSON.h"
-#include "devicestatus_data_define.h"
+#include "devicestatus_define.h"
 #include "fi_log.h"
 #include "json_parser.h"
 #include "sync_options.h"
@@ -32,18 +32,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceP
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
 
-DeviceProfileAdapter::~DeviceProfileAdapter()
-{
-    std::lock_guard<std::mutex> mapGuard(mapLock_);
-    profileEventCallbacks_.clear();
-    profileChangedCallbacks_.clear();
-}
+DeviceProfileAdapter::~DeviceProfileAdapter() {}
 
-void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, const ProfileChangedCallback &callback)
+void DeviceProfileAdapter::AddProfileCallback(const std::string &pluginName, ProfileChangedCallback callback)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
-    std::lock_guard<std::mutex> guard(mapLock_);
+    std::lock_guard<std::mutex> guard(mutex_);
     auto it = profileChangedCallbacks_.find(pluginName);
     if (it != profileChangedCallbacks_.end()) {
         UpdateProfileCallback(pluginName, callback);
@@ -52,18 +47,18 @@ void DeviceProfileAdapter::AddProfileCallback(std::string pluginName, const Prof
     }
 }
 
-void DeviceProfileAdapter::UpdateProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback)
+void DeviceProfileAdapter::UpdateProfileCallback(const std::string &pluginName, ProfileChangedCallback callback)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
-    std::lock_guard<std::mutex> guard(mapLock_);
+    std::lock_guard<std::mutex> guard(mutex_);
     profileChangedCallbacks_[pluginName] = callback;
 }
 
-void DeviceProfileAdapter::RemoveProfileCallback(std::string pluginName)
+void DeviceProfileAdapter::RemoveProfileCallback(const std::string &pluginName)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mapLock_);
+    std::lock_guard<std::mutex> guard(mutex_);
     auto it = profileChangedCallbacks_.find(pluginName);
     if (it == profileChangedCallbacks_.end()) {
         FI_HILOGE("The plugin not has callback, pluginName:%{public}s", pluginName.c_str());
@@ -80,7 +75,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
         return RET_ERR;
     }
     
-    std::lock_guard<std::mutex> guard(mapLock_);
+    std::lock_guard<std::mutex> guard(mutex_);
     auto it = profileEventCallbacks_.find(deviceId);
     if (it == profileEventCallbacks_.end() || it->second == nullptr) {
         profileEventCallbacks_[deviceId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
@@ -106,7 +101,7 @@ int32_t DeviceProfileAdapter::UnRegisterProfileListener(const std::string &devic
         FI_HILOGE("deviceId is empty");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mapLock_);
+    std::lock_guard<std::mutex> guard(mutex_);
     auto it = profileEventCallbacks_.find(deviceId);
     if (it == profileEventCallbacks_.end()) {
         FI_HILOGE("This device has no profileEventCallback");
@@ -149,9 +144,13 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 {
     CALL_INFO_TRACE;
     std::string deviceId = changeNotification.GetDeviceId();
-    std::lock_guard<std::mutex> guard(DP_ADAPTER->mapLock_);
+    std::lock_guard<std::mutex> guard(DP_ADAPTER->mutex_);
     for (const auto &callback : DP_ADAPTER->profileChangedCallbacks_) {
-        callback.second(deviceId);
+        if (callback.second != nullptr) {
+            callback.second(deviceId);
+        } else {
+            FI_HILOGE("callback is nullptr, plugin game:%{public}s", callback.first.c_str());
+        }
     }
 }
 
@@ -186,7 +185,7 @@ int32_t DeviceProfileAdapter::GetDPValue(ValueType valueType, cJSON* jsonValue, 
             break;
         }
         default: {
-            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type");
+            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type, type:%{public}d", valueType);
             return RET_ERR;
         }
     }
@@ -279,8 +278,8 @@ int32_t DeviceProfileAdapter::SetProfile(ServiceCharacteristicProfile &profile, 
         }
         cJSON_AddItemToObject(data, characteristicsName.c_str(), item);
         smsg = cJSON_Print(data);
-        CHKPR(smsg, RET_ERR);
         cJSON_Delete(data);
+        CHKPR(smsg, RET_ERR);
     } else {
         JsonParser parser;
         parser.json = cJSON_Parse(jsonData.c_str());
@@ -327,7 +326,7 @@ int32_t DeviceProfileAdapter::CreatJsonItem(cJSON* item, const DP_VALUE &dpValue
             break;
         }
         default: {
-            FI_HILOGE("valueType is neither an int type, nor a bool type, nor a string type");
+            FI_HILOGE("valueType is neither an int type, nor a bool type, nor a string type, type:%{public}d", valueType);
             return RET_ERR;
         }
     }
@@ -364,7 +363,7 @@ int32_t DeviceProfileAdapter::ModifyJsonItem(cJSON* data, const DP_VALUE &dpValu
             break;
         }
         default: {
-            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type");
+            FI_HILOGE("dpValue is neither an int type, nor a bool type, nor a string type, type:%{public}d", valueType);
             return RET_ERR;
         }
     }

@@ -48,9 +48,9 @@ public:
     using ProfileChangedCallback = std::function<void(const std::string &)>;
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
-    void AddProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback);
-    void UpdateProfileCallback(const std::string pluginName, const ProfileChangedCallback &callback);
-    void RemoveProfileCallback(const std::string pluginName);
+    void AddProfileCallback(const std::string &pluginName, ProfileChangedCallback callback);
+    void UpdateProfileCallback(const std::string &pluginName, ProfileChangedCallback callback);
+    void RemoveProfileCallback(const std::string &pluginName);
 
     int32_t RegisterProfileListener(const std::string &deviceId);
     int32_t UnRegisterProfileListener(const std::string &deviceId);
@@ -70,7 +70,7 @@ private:
         const DP_VALUE &dpValue, ValueType valueType);
     int32_t GetDPValue(ValueType valueType, cJSON* jsonValue, DP_VALUE &dpValue);
 
-    std::mutex mapLock_;
+    std::mutex mutex_;
     std::map<std::string, ProfileChangedCallback> profileChangedCallbacks_;
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
 };
