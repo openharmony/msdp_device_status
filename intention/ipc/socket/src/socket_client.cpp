@@ -32,11 +32,9 @@ const std::string THREAD_NAME { "os_ClientEventHandler" };
 
 SocketClient::SocketClient(std::shared_ptr<ITunnelClient> tunnel)
     : tunnel_(tunnel)
-{}
-
-SocketClient::~SocketClient()
 {
-    Stop();
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
 }
 
 bool SocketClient::RegisterEvent(MessageId id, std::function<int32_t(const StreamClient&, NetPacket&)> callback)
@@ -46,43 +44,14 @@ bool SocketClient::RegisterEvent(MessageId id, std::function<int32_t(const Strea
     return inserted;
 }
 
-bool SocketClient::Start()
+void SocketClient::Start()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
-    return (
-        StartEventRunner() &&
-        Connect()
-    );
+    Reconnect();
 }
 
 void SocketClient::Stop()
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
-    eventHandler_.reset();
-    socket_.reset();
-}
-
-bool SocketClient::CheckValidFd() const
-{
-    std::lock_guard guard(lock_);
-    return ((socket_ != nullptr) && (socket_->GetFd() > 0));
-}
-
-bool SocketClient::StartEventRunner()
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    if (eventHandler_ != nullptr) {
-        return true;
-    }
-    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-    CHKPF(runner);
-    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    FI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-    return true;
-}
+{}
 
 bool SocketClient::Connect()
 {
@@ -134,7 +103,6 @@ void SocketClient::OnDisconnected()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    CHKPV(eventHandler_);
     if (socket_ != nullptr) {
         eventHandler_->RemoveFileDescriptorListener(socket_->GetFd());
         eventHandler_->RemoveAllEvents();
@@ -151,7 +119,6 @@ void SocketClient::Reconnect()
     if (Connect()) {
         return;
     }
-    CHKPV(eventHandler_);
     if (!eventHandler_->PostTask(std::bind(&SocketClient::Reconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
         FI_HILOGE("Failed to post reconnection task");
     }

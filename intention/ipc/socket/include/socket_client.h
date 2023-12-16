@@ -32,15 +32,13 @@ class SocketClient final : public StreamClient {
 public:
     SocketClient(std::shared_ptr<ITunnelClient> tunnel);
     DISALLOW_COPY_AND_MOVE(SocketClient);
-    ~SocketClient();
+    ~SocketClient() = default;
 
     bool RegisterEvent(MessageId id, std::function<int32_t(const StreamClient&, NetPacket&)> callback);
-    bool Start();
+    void Start();
     void Stop() override;
-    bool CheckValidFd() const;
 
 private:
-    bool StartEventRunner();
     bool Connect();
     int32_t Socket() override;
     void OnPacket(NetPacket &pkt);
