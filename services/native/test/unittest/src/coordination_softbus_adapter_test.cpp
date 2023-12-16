@@ -30,17 +30,16 @@ const std::string LOCAL_NETWORKID { "testLocalNetworkId" };
 const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
 const std::string ORIGIN_NETWORKID { "testOriginNetworkId" };
 const std::string DEVICE_ID { "testDeviceId" };
-constexpr int32_t SESSION_ID { 1 };
+constexpr int32_t SOCKET { 1 };
 constexpr uint32_t TRUNCATE_STRING_LENGTH { 20 };
 } // namespace
 
 void ClearCoordinationSoftbusAdapter()
 {
-    COOR_SOFTBUS_ADAPTER->sessionId_ = -1;
+    COOR_SOFTBUS_ADAPTER->socketFd_ = -1;
     COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
     COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
     COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
-    COOR_SOFTBUS_ADAPTER->channelStatuss_.clear();
 }
 
 int32_t CoordinationSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
@@ -216,7 +215,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest009, Test
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
-    g_adapter->sessionDevs_[REMOTE_NETWORKID] = SESSION_ID;
+    g_adapter->sessionDevs_[REMOTE_NETWORKID] = SOCKET;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
     EXPECT_EQ(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
@@ -234,7 +233,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest010, Test
     ASSERT_NE(g_adapter, nullptr);
     g_init = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
@@ -249,7 +248,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest011, Test
     ASSERT_NE(g_adapter, nullptr);
     g_init = true;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
@@ -265,36 +264,42 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest012, Test
     g_init = true;
     g_cond = false;
     int32_t ret = g_adapter->OpenInputSoftbus(REMOTE_NETWORKID);
-    EXPECT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_OK);
     g_adapter->CloseInputSoftbus(REMOTE_NETWORKID);
 }
 
 /**
  * @tc.name: CoordinationSoftbusAdapterTest013
- * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
+ * @tc.desc: test normal func named OnBind and OnShutdown in devicestatus
  * @tc.type: FUNC
  */
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest013, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
-    int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_ERR);
+    PeerSocketInfo info;
+    char deviceId[] = "softbus";
+    info.networkId = deviceId;
+    int32_t ret = g_adapter->OnBind(SOCKET, info);
     EXPECT_EQ(ret, RET_OK);
-    g_adapter->OnSessionClosed(SESSION_ID);
+    g_adapter->OnShutdown(SOCKET, SHUTDOWN_REASON_UNKNOWN);
 }
 
 /**
  * @tc.name: CoordinationSoftbusAdapterTest014
- * @tc.desc: test normal func named OnSessionOpened and OnSessionClosed in devicestatus
+ * @tc.desc: test normal func named OnBind and OnShutdown in devicestatus
  * @tc.type: FUNC
  */
 HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest014, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
-    int32_t ret = g_adapter->OnSessionOpened(SESSION_ID, RET_OK);
+    PeerSocketInfo info;
+    char deviceId[] = "softbus";
+    info.networkId = deviceId;
+    int32_t ret = g_adapter->OnBind(SOCKET, info);
     EXPECT_EQ(ret, RET_OK);
-    g_adapter->OnSessionClosed(SESSION_ID);
+    g_adapter->OnShutdown(SOCKET, SHUTDOWN_REASON_UNKNOWN);
 }
 
 /**
@@ -307,7 +312,7 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, Test
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
     std::string data = "TestSendData";
-    g_adapter->sessionDevs_[DEVICE_ID] = SESSION_ID;
+    g_adapter->sessionDevs_[DEVICE_ID] = SOCKET;
     int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
         TRUNCATE_STRING_LENGTH);
     EXPECT_EQ(ret, RET_ERR);

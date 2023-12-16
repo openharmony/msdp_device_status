@@ -82,7 +82,7 @@ bool DeviceStatusEvent::SaveCallbackByEvent(int32_t eventType, napi_value handle
     }
     auto iter = events_.find(eventType);
     if (iter == events_.end()) {
-        FI_HILOGE("EventType:%{public}d not exists", eventType);
+        FI_HILOGE("eventType:%{public}d not exists", eventType);
         events_[eventType] = std::list<std::shared_ptr<DeviceStatusEventListener>>();
     }
     if (events_[eventType].empty()) {

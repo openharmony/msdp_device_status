@@ -63,7 +63,7 @@ private:
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t ResetTimerInternal(int32_t timerId);
     int32_t RemoveTimerInternal(int32_t timerId);
-    void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
+    void InsertTimerInternal(std::unique_ptr<TimerItem> &timer);
     void ProcessTimersInternal();
     int64_t CalcNextDelayInternal();
     int32_t ArmTimer();

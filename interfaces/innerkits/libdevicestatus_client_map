@@ -62,6 +62,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::EnterTextEditorArea(bool)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragAction(OHOS::Msdp::DeviceStatus::DragAction&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetExtraInfo(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::AddPrivilege()";
         };
     local:
         *;

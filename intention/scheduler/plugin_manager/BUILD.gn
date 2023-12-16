@@ -16,12 +16,15 @@ import("../../../device_status.gni")
 config("plugin_manager_config") {
   include_dirs = [
     "include",
-    "${intention_root_path}/data/include",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
   ]
 }
 
-ohos_source_set("plugin_manager") {
+ohos_source_set("intention_plugin_manager") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -29,11 +32,17 @@ ohos_source_set("plugin_manager") {
 
   branch_protector_ret = "pac_ret"
 
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
+  ]
+
   sources = [ "src/plugin_manager.cpp" ]
 
-  configs = [ ":plugin_manager_config" ]
+  public_configs = [ ":plugin_manager_config" ]
 
   deps = [
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
   ]
@@ -41,6 +50,8 @@ ohos_source_set("plugin_manager") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
   ]
 
   subsystem_name = "msdp"

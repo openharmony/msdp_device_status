@@ -26,7 +26,6 @@
 
 #include "cooperate_device_manager.h"
 #include "cooperate_event_manager.h"
-#include "cooperate_message.h"
 #include "cooperate_softbus_adapter.h"
 #include "cooperate_state_free.h"
 #include "cooperate_state_in.h"
@@ -92,7 +91,7 @@ void CooperateSM::OnReset(const std::string &networkId)
     Reset(networkId);
 }
 
-void CooperateSM::OnSessionLost(SessionPtr session)
+void CooperateSM::OnSessionLost(std::shared_ptr<ISocketSession> session)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
@@ -148,10 +147,10 @@ void CooperateSM::Reset(bool adjustAbsolutionLocation)
 void CooperateSM::OnCooperateChanged(const std::string &networkId, bool isOpen)
 {
     CALL_DEBUG_ENTER;
-    CooperateMessage msg = isOpen ? CooperateMessage::PREPARE : CooperateMessage::UNPREPARE;
+    CoordinationMessage msg = isOpen ? CoordinationMessage::PREPARE : CoordinationMessage::UNPREPARE;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
-    int32_t ret = context->GetTaskScheduler().PostAsyncTask(
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
         std::bind(&CooperateEventManager::OnCooperateMessage, COOR_EVENT_MGR, msg, networkId));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
@@ -196,7 +195,7 @@ int32_t CooperateSM::GetCooperateState(const std::string &networkId)
     CALL_INFO_TRACE;
     if (networkId.empty()) {
         FI_HILOGE("Transfer network id is empty");
-        return static_cast<int32_t>(CooperateMessage::PARAMETER_ERROR);
+        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
     }
     bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
@@ -235,12 +234,12 @@ int32_t CooperateSM::ActivateCooperate(const std::string &remoteNetworkId, int32
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         FI_HILOGE("In transition state, not process");
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed");
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     isStarting_ = true;
     SetSinkNetworkId(remoteNetworkId);
@@ -306,8 +305,8 @@ void CooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId, bool 
     CHKPV(context);
     COOR_SM->SetSinkNetworkId(remoteNetworkId);
     FI_HILOGD("The remoteNetworkId:%{public}s", remoteNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
-    int32_t ret = context->GetTaskScheduler().PostAsyncTask(std::bind(&CooperateEventManager::OnCooperateMessage,
-        COOR_EVENT_MGR, CooperateMessage::ACTIVATE, remoteNetworkId));
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(std::bind(&CooperateEventManager::OnCooperateMessage,
+        COOR_EVENT_MGR, CoordinationMessage::ACTIVATE, remoteNetworkId));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
     }
@@ -348,10 +347,10 @@ void CooperateSM::StartRemoteCooperateResult(bool isSuccess, const std::string &
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
-    CooperateMessage msg = isSuccess ? CooperateMessage::ACTIVATE_SUCCESS : CooperateMessage::ACTIVATE_FAIL;
+    CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
-    int32_t ret = context->GetTaskScheduler().PostAsyncTask(
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
         std::bind(&CooperateEventManager::OnCooperateMessage, COOR_EVENT_MGR, msg, ""));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
@@ -523,7 +522,7 @@ void CooperateSM::NotifyRemoteStartFail(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     COOR_SOFTBUS_ADAPTER->StartRemoteCooperateResult(remoteNetworkId, false, "", 0, 0);
-    COOR_EVENT_MGR->OnStart(CooperateMessage::ACTIVATE_FAIL);
+    COOR_EVENT_MGR->OnStart(CoordinationMessage::ACTIVATE_FAIL);
 }
 
 void CooperateSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDeviceDhid)
@@ -531,7 +530,7 @@ void CooperateSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, c
     CALL_DEBUG_ENTER;
     COOR_SOFTBUS_ADAPTER->StartRemoteCooperateResult(remoteNetworkId, true, startDeviceDhid, mouseLocation_.first,
         mouseLocation_.second);
-    COOR_EVENT_MGR->OnStart(CooperateMessage::ACTIVATE_SUCCESS);
+    COOR_EVENT_MGR->OnStart(CoordinationMessage::ACTIVATE_SUCCESS);
 }
 
 void CooperateSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId)
@@ -539,9 +538,9 @@ void CooperateSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remo
     CALL_DEBUG_ENTER;
     COOR_SOFTBUS_ADAPTER->StopRemoteCooperateResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
-        COOR_EVENT_MGR->OnStop(CooperateMessage::COOPERATE_FAIL);
+        COOR_EVENT_MGR->OnStop(CoordinationMessage::COORDINATION_FAIL);
     } else {
-        COOR_EVENT_MGR->OnStop(CooperateMessage::DEACTIVATE_SUCCESS);
+        COOR_EVENT_MGR->OnStop(CoordinationMessage::DEACTIVATE_SUCCESS);
     }
 }
 
@@ -754,10 +753,10 @@ void CooperateSM::OnDeviceOffline(const std::string &networkId)
         }
     }
     if ((currentState_ == CooperateState::STATE_IN) && (sinkNetworkId_ == networkId)) {
-        COOR_EVENT_MGR->OnCooperateMessage(CooperateMessage::SESSION_CLOSED);
+        COOR_EVENT_MGR->OnCooperateMessage(CoordinationMessage::SESSION_CLOSED);
     }
     if ((currentState_ == CooperateState::STATE_OUT) && (remoteNetworkId_ == networkId)) {
-        COOR_EVENT_MGR->OnCooperateMessage(CooperateMessage::SESSION_CLOSED);
+        COOR_EVENT_MGR->OnCooperateMessage(CoordinationMessage::SESSION_CLOSED);
     }
 }
 
@@ -1099,10 +1098,10 @@ void CooperateSM::SetUnchainStatus(bool isUnchained)
 void CooperateSM::NotifyChainRemoved()
 {
     CALL_DEBUG_ENTER;
-    CooperateMessage msg = CooperateMessage::SESSION_CLOSED;
+    CoordinationMessage msg = CoordinationMessage::SESSION_CLOSED;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
-    int32_t ret = context->GetTaskScheduler().PostAsyncTask(
+    int32_t ret = context->GetDelegateTasks().PostAsyncTask(
         std::bind(&CooperateEventManager::OnCooperateMessage, COOR_EVENT_MGR, msg, ""));
     if (ret != RET_OK) {
         FI_HILOGE("Posting async task failed");
@@ -1152,7 +1151,7 @@ void CooperateSM::RegisterSessionCallback()
         FI_HILOGI("Recv session callback status:%{public}u", status);
         if (status == P2P_SESSION_CLOSED) {
             preparedNetworkId_ = std::pair("", "");
-            COOR_EVENT_MGR->OnCooperateMessage(CooperateMessage::SESSION_CLOSED);
+            COOR_EVENT_MGR->OnCooperateMessage(CoordinationMessage::SESSION_CLOSED);
             Reset();
         }
     });
@@ -1166,7 +1165,7 @@ bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent
         FI_HILOGI("Current event is down");
         auto *context = COOR_EVENT_MGR->GetIContext();
         CHKPF(context);
-        int32_t ret = context->GetTaskScheduler().PostAsyncTask(
+        int32_t ret = context->GetDelegateTasks().PostAsyncTask(
             std::bind(&MMI::InputManager::RemoveInputEventFilter, MMI::InputManager::GetInstance(), filterId_));
         if (ret != RET_OK) {
             FI_HILOGE("Posting async task failed");

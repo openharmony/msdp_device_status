@@ -61,7 +61,6 @@ ohos_unittest("test_devicestatus_service") {
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
@@ -131,6 +130,7 @@ ohos_unittest("CoordinationSMTest") {
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_root_path}/intention/services/device_manager/include",
   ]
   sources = [ "src/coordination_sm_test.cpp" ]
 

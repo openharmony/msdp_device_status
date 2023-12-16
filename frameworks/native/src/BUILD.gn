@@ -48,7 +48,6 @@ ohos_shared_library("deviceagent") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "image_framework:image_native",
     "ipc:ipc_single",
   ]
 

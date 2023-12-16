@@ -16,6 +16,7 @@
 #ifndef DRAG_DATA_H
 #define DRAG_DATA_H
 
+#include <cmath>
 #include <functional>
 #include <map>
 #include <memory>
@@ -31,6 +32,9 @@ constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
 constexpr int32_t SHADOW_NUM_LIMIT { 3 };
+constexpr float EPSILON { 1E-6 };
+constexpr int32_t MAX_ANIMATION_DURATION_MS { 1000 };
+
 struct ShadowInfo {
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap { nullptr };
     int32_t x { -1 };
@@ -47,7 +51,7 @@ struct ShadowInfo {
         return pixelMap->IsSameImage(*(other.pixelMap)) && x == other.x && y == other.y;
     }
 
-    bool operator !=  (const ShadowInfo &other) const
+    bool operator != (const ShadowInfo &other) const
     {
         return !(*this == other);
     }
@@ -66,6 +70,7 @@ struct DragData {
     int32_t displayY { -1 };
     int32_t displayId { -1 };
     bool hasCanceledAnimation { false };
+    bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
 
     bool operator == (const DragData &other) const
@@ -130,13 +135,13 @@ struct PreviewStyle {
     std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };
     int32_t opacity { -1 };
-    int32_t radius { -1 };
-    int32_t scale { -1 };
+    float radius { -1.0F };
+    float scale { -1.0F };
 
     bool operator == (const PreviewStyle &other) const
     {
         return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
-               radius == other.radius && scale == other.scale;
+               radius == other.radius && fabsf(scale - other.scale) < EPSILON;
     }
 
     bool operator!=(const PreviewStyle &other) const

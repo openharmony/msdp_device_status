@@ -217,6 +217,16 @@ napi_value JsDragContext::Off(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+napi_value JsDragContext::GetDataSummary(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    JsDragContext *jsDev = JsDragContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsDragMgr = jsDev->GetJsDragMgr();
+    CHKPP(jsDragMgr);
+    return jsDragMgr->GetDataSummary(env);
+}
+
 void JsDragContext::DeclareDragData(napi_env env, napi_value exports)
 {
     napi_value startMsg = nullptr;
@@ -245,7 +255,8 @@ void JsDragContext::DeclareDragInterface(napi_env env, napi_value exports)
 {
     napi_property_descriptor functions[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
-        DECLARE_NAPI_STATIC_FUNCTION("off", Off)
+        DECLARE_NAPI_STATIC_FUNCTION("off", Off),
+        DECLARE_NAPI_STATIC_FUNCTION("getDataSummary", GetDataSummary)
     };
     CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);

@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "coordination_event_manager.h"
+#include "coordination_hisysevent.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -53,7 +54,12 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &remoteNetwo
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StartDInputCallbackSink, callback);
-    return DistributedInputKit::StartRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
+    int32_t ret = DistributedInputKit::StartRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_START_REMOTE_INPUT, "remoteNetworkId",
+            remoteNetworkId.substr(0, SUB_LEN), "originNetworkId", originNetworkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &originNetworkId,
@@ -63,7 +69,12 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &originNetwor
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackDHIds();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallbackDHIds, callback);
-    return DistributedInputKit::StopRemoteInput(originNetworkId, inputDeviceDhids, cb);
+    int32_t ret = DistributedInputKit::StopRemoteInput(originNetworkId, inputDeviceDhids, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_STOP_REMOTE_T, "originNetworkId",
+            originNetworkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
@@ -73,7 +84,12 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &remoteNetwor
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallbackSink, callback);
-    return DistributedInputKit::StopRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
+    int32_t ret = DistributedInputKit::StopRemoteInput(remoteNetworkId, originNetworkId, inputDeviceDhids, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_STOP_REMOTE_O, "remoteNetworkId",
+            remoteNetworkId.substr(0, SUB_LEN), "originNetworkId", originNetworkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &remoteNetworkId,
@@ -83,7 +99,12 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &remoteNet
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
-    return DistributedInputKit::PrepareRemoteInput(remoteNetworkId, originNetworkId, cb);
+    int32_t ret = DistributedInputKit::PrepareRemoteInput(remoteNetworkId, originNetworkId, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_PRE_REMOTE_T, "remoteNetworkId",
+            remoteNetworkId.substr(0, SUB_LEN), "originNetworkId", originNetworkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &remoteNetworkId,
@@ -93,7 +114,12 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &remoteN
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallbackSink, callback);
-    return DistributedInputKit::UnprepareRemoteInput(remoteNetworkId, originNetworkId, cb);
+    int32_t ret = DistributedInputKit::UnprepareRemoteInput(remoteNetworkId, originNetworkId, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_UNPRE_REMOTE_T, "remoteNetworkId",
+            remoteNetworkId.substr(0, SUB_LEN), "originNetworkId", originNetworkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &networkId, DInputCallback callback)
@@ -102,7 +128,11 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &networkId
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallback, callback);
-    return DistributedInputKit::PrepareRemoteInput(networkId, cb);
+    int32_t ret = DistributedInputKit::PrepareRemoteInput(networkId, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_PRE_REMOTE_O, "remoteNetworkId", networkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback)
@@ -111,7 +141,12 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &network
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallback, callback);
-    return DistributedInputKit::UnprepareRemoteInput(networkId, cb);
+    int32_t ret = DistributedInputKit::UnprepareRemoteInput(networkId, cb);
+    if (ret != RET_OK) {
+        CoordinationDFX::WriteInputFunc(CoorType::INPUT_UNPRE_REMOTE_O, "remoteNetworkId",
+            networkId.substr(0, SUB_LEN));
+    }
+    return ret;
 }
 
 int32_t DistributedInputAdapter::RegisterSessionStateCb(std::function<void(uint32_t)> callback)

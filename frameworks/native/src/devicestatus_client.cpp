@@ -79,7 +79,7 @@ ErrCode DeviceStatusClient::Connect()
     return RET_OK;
 }
 
-void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(devicestatusProxy_);
@@ -94,7 +94,7 @@ void DeviceStatusClient::ResetProxy(const wptr<IRemoteObject>& remote)
     }
 }
 
-void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void DeviceStatusClient::DeviceStatusDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     CHKPV(remote);
     DeviceStatusClient::GetInstance().ResetProxy(remote);
@@ -218,54 +218,54 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
 
 #else // OHOS_BUILD_ENABLE_RUST_IMPL
 
-int32_t DeviceStatusClient::RegisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusClient::RegisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->RegisterCoordinationListener(isCheckPermission);
+    return devicestatusProxy_->RegisterCoordinationListener(isCompatible);
 }
 
-int32_t DeviceStatusClient::UnregisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusClient::UnregisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UnregisterCoordinationListener(isCheckPermission);
+    return devicestatusProxy_->UnregisterCoordinationListener(isCompatible);
 }
 
-int32_t DeviceStatusClient::PrepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusClient::PrepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->PrepareCoordination(userData, isCheckPermission);
+    return devicestatusProxy_->PrepareCoordination(userData, isCompatible);
 }
 
-int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusClient::UnprepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->UnprepareCoordination(userData, isCheckPermission);
+    return devicestatusProxy_->UnprepareCoordination(userData, isCompatible);
 }
 
 int32_t DeviceStatusClient::ActivateCoordination(int32_t userData,
-    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission)
+    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId, isCheckPermission);
+    return devicestatusProxy_->ActivateCoordination(userData, remoteNetworkId, startDeviceId, isCompatible);
 }
 
-int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission)
+int32_t DeviceStatusClient::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained, isCheckPermission);
+    return devicestatusProxy_->DeactivateCoordination(userData, isUnchained, isCompatible);
 }
 
-int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId, bool isCheckPermission)
+int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::string &networkId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetCoordinationState(userData, networkId, isCheckPermission);
+    return devicestatusProxy_->GetCoordinationState(userData, networkId, isCompatible);
 }
 
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
@@ -490,6 +490,13 @@ int32_t DeviceStatusClient::EnterTextEditorArea(bool enable)
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
     return devicestatusProxy_->EnterTextEditorArea(enable);
+}
+
+int32_t DeviceStatusClient::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->AddPrivilege();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

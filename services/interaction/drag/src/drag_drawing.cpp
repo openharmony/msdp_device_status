@@ -18,11 +18,11 @@
 #include <atomic>
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <string>
 
 #include <dlfcn.h>
 
-#include "cJSON.h"
 #include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
@@ -42,6 +42,8 @@
 #include "animation_curve.h"
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
+#include "drag_hisysevent.h"
+#include "json_parser.h"
 #include "include/util.h"
 
 namespace OHOS {
@@ -66,6 +68,10 @@ constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
 constexpr int32_t PIXEL_MAP_INDEX { 1 };
 constexpr int32_t DRAG_STYLE_INDEX { 2 };
 constexpr int32_t MOUSE_ICON_INDEX { 3 };
+constexpr int32_t SHORT_DURATION { 55 };
+constexpr int32_t LONG_DURATION { 90 };
+constexpr int32_t FIRST_PIXELMAP_INDEX { 0 };
+constexpr int32_t SECOND_PIXELMAP_INDEX { 1 };
 constexpr size_t TOUCH_NODE_MIN_COUNT { 3 };
 constexpr size_t MOUSE_NODE_MIN_COUNT { 4 };
 constexpr double ONETHOUSAND { 1000.0 };
@@ -85,6 +91,12 @@ constexpr float DEFAULT_SATURATION { 1.05f };
 constexpr float DEFAULT_BRIGHTNESS { 1.05f };
 constexpr float INCREASE_RATIO { 1.22f };
 constexpr float DRAG_WINDOW_POSITION_Z { 6999.0f };
+constexpr float DEFAULT_ANGLE { 0.0f };
+constexpr float POSITIVE_ANGLE { 8.0f };
+constexpr float NEGATIVE_ANGLE { -8.0f };
+constexpr float DEFAULT_ALPHA { 1.0f };
+constexpr float FIRST_PIXELMAP_ALPHA { 0.6f };
+constexpr float SECOND_PIXELMAP_ALPHA { 0.3f };
 constexpr uint32_t TRANSPARENT_COLOR_ARGB { 0x00000000 };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
@@ -93,6 +105,7 @@ constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
+constexpr int32_t HEX_FF { 0xFF };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
 const std::string DEVICE_TYPE_DEFAULT { "default" };
 const std::string DEVICE_TYPE_PHONE { "phone" };
@@ -111,22 +124,6 @@ const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/
 #endif
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
-
-struct JsonDataParser {
-    JsonDataParser() = default;
-    ~JsonDataParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON *json = nullptr;
-};
 
 bool CheckNodesValid()
 {
@@ -204,6 +201,10 @@ int32_t DragDrawing::Init(const DragData &dragData)
         FI_HILOGE("Failed to open drag extension library");
     }
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
+    if (!g_drawingInfo.mutilSelectedNodes.empty()) {
+        g_drawingInfo.isCurrentDefaultStyle = true;
+        UpdateDragStyle(DragCursorStyle::MOVE);
+    }
     CHKPR(rsUiDirector_, INIT_FAIL);
     if (g_drawingInfo.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         rsUiDirector_->SendMessages();
@@ -275,6 +276,9 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         DoDrawMouse();
     }
+    if (!g_drawingInfo.mutilSelectedNodes.empty() && !g_drawingInfo.mutilSelectedPixelMaps.empty()) {
+        MutilSelectedAnimation(positionX, positionY, adjustSize);
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -282,12 +286,9 @@ int32_t DragDrawing::UpdateDragStyle(DragCursorStyle style)
 {
     FI_HILOGD("style:%{public}d", style);
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+        DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
-    }
-    if (g_drawingInfo.currentStyle == style) {
-        FI_HILOGD("Not need update drag style");
-        return RET_OK;
     }
     if ((style == DragCursorStyle::DEFAULT) ||
         ((style == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE))) {
@@ -393,6 +394,7 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.filterInfo.clear();
     g_drawingInfo.extraInfo.clear();
     RemoveModifier();
+    ClearMutilSelectedData();
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
         g_drawingInfo.nodes.shrink_to_fit();
@@ -506,15 +508,16 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
     CALL_DEBUG_ENTER;
+    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
     if (dragExtHandle_ == nullptr) {
         FI_HILOGE("Failed to open drag extension library");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
         return;
     }
     auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragSuccessExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
         dlclose(dragExtHandle_);
         dragExtHandle_ = nullptr;
         return;
@@ -526,7 +529,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     }
     if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
-        RunAnimation(END_ALPHA, END_SCALE_SUCCESS);
+        RunAnimation(animateCb);
     } else {
         startNum_ = START_TIME;
         needDestroyDragWindow_ = true;
@@ -538,15 +541,16 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     std::shared_ptr<Rosen::RSNode> rootNode)
 {
     CALL_DEBUG_ENTER;
+    auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
     if (dragExtHandle_ == nullptr) {
         FI_HILOGE("Failed to open drag extension library");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
         return;
     }
     auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragFailExt"));
     if (animationExtFunc == nullptr) {
         FI_HILOGE("Failed to get drag extension func");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
         dlclose(dragExtHandle_);
         dragExtHandle_ = nullptr;
         return;
@@ -558,7 +562,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     }
     if (!handler_->PostTask(std::bind(animationExtFunc, this, &g_drawingInfo))) {
         FI_HILOGE("Send animationExtFunc failed");
-        RunAnimation(END_ALPHA, END_SCALE_FAIL);
+        RunAnimation(animateCb);
     } else {
         startNum_ = START_TIME;
         needDestroyDragWindow_ = true;
@@ -571,17 +575,19 @@ void DragDrawing::OnStopAnimation()
     CALL_DEBUG_ENTER;
 }
 
-void DragDrawing::RunAnimation(float endAlpha, float endScale)
+int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 {
     CALL_DEBUG_ENTER;
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
+        CHKPR(runner, RET_ERR);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(&DragDrawing::InitVSync, this, endAlpha, endScale))) {
+    if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
+        return RET_ERR;
     }
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
@@ -695,13 +701,13 @@ void DragDrawing::OnVsync()
         handler_ = nullptr;
         receiver_ = nullptr;
         if (needDestroyDragWindow_) {
-            g_drawingInfo.isRunning = false;
             CHKPV(g_drawingInfo.rootNode);
             if (drawDynamicEffectModifier_ != nullptr) {
                 g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
                 drawDynamicEffectModifier_ = nullptr;
             }
             DestroyDragWindow();
+            g_drawingInfo.isRunning = false;
         }
         return;
     }
@@ -715,6 +721,10 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     if (dragData.shadowInfos.empty()) {
         FI_HILOGE("ShadowInfos is empty");
         return;
+    }
+    size_t shadowInfosSize = dragData.shadowInfos.size();
+    for (size_t i = 1; i < shadowInfosSize; ++i) {
+        g_drawingInfo.mutilSelectedPixelMaps.emplace_back(dragData.shadowInfos[i].pixelMap);
     }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
@@ -770,7 +780,8 @@ int32_t DragDrawing::InitLayer()
             return RET_ERR;
         }
     }
-    InitCanvas(display->GetWidth(), display->GetHeight());
+    int32_t rootNodeSize = std::max(display->GetWidth(), display->GetHeight());
+    InitCanvas(rootNodeSize, rootNodeSize);
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
@@ -804,17 +815,25 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     }
     g_drawingInfo.parentNode->AddChild(filterNode);
     g_drawingInfo.parentNode->AddChild(pixelMapNode);
+    if (!g_drawingInfo.mutilSelectedPixelMaps.empty()) {
+        InitMutilSelectedNodes();
+        if (!g_drawingInfo.mutilSelectedNodes.empty()) {
+            size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+            for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+                g_drawingInfo.rootNode->AddChild(g_drawingInfo.mutilSelectedNodes[i]);
+            }
+        }
+    }
+    g_drawingInfo.rootNode->AddChild(g_drawingInfo.parentNode);
     CHKPV(rsUiDirector_);
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = Rosen::RSCanvasNode::Create();
         CHKPV(mouseIconNode);
         g_drawingInfo.nodes.emplace_back(mouseIconNode);
-        g_drawingInfo.rootNode->AddChild(g_drawingInfo.parentNode);
         g_drawingInfo.rootNode->AddChild(mouseIconNode);
         rsUiDirector_->SetRoot(g_drawingInfo.rootNode->GetId());
         return;
     }
-    g_drawingInfo.rootNode->AddChild(g_drawingInfo.parentNode);
     rsUiDirector_->SetRoot(g_drawingInfo.rootNode->GetId());
 }
 
@@ -835,7 +854,8 @@ void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
             return;
         }
     }
-    g_drawingInfo.surfaceNode->SetBounds(0, 0, display->GetWidth(), display->GetHeight());
+    int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
+    g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     g_drawingInfo.surfaceNode->SetPositionZ(DRAG_WINDOW_POSITION_Z);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -1109,51 +1129,47 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 bool DragDrawing::ParserFilterInfo(FilterInfo &filterInfo)
 {
-    if (g_drawingInfo.extraInfo.empty()) {
-        FI_HILOGD("the extraInfo is empty");
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
+        g_drawingInfo.filterInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
         return false;
     }
-    JsonDataParser filterParser;
-    filterParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str());
-    if (!cJSON_IsObject(filterParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("ExtraInfo is not json object");
         return false;
     }
-    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_data_type");
+    cJSON *componentType = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_data_type");
     if (!cJSON_IsString(componentType)) {
         FI_HILOGE("Parser componentType failed");
         return false;
     }
-    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_blur_style");
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_blur_style");
     if (!cJSON_IsNumber(blurStyle)) {
         FI_HILOGE("Parser blurStyle failed");
         return false;
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterParser.json, "drag_corner_radius");
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
     if (!cJSON_IsNumber(cornerRadius)) {
         FI_HILOGE("Parser cornerRadius failed");
         return false;
     }
-    if (g_drawingInfo.filterInfo.empty()) {
-        FI_HILOGD("ExtraInfo is empty");
+
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
         return false;
     }
-    JsonDataParser dipScaleParser;
-    dipScaleParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        g_drawingInfo.filterInfo.size(), g_drawingInfo.filterInfo.c_str());
-    if (!cJSON_IsObject(dipScaleParser.json)) {
-        FI_HILOGE("ExtraInfo is not json object");
-        return false;
-    }
-    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(dipScaleParser.json, "dip_scale");
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (!cJSON_IsNumber(dipScale)) {
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
-    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valueint, dipScale->valuedouble };
+    filterInfo = { componentType->valuestring, blurStyle->valueint, cornerRadius->valuedouble, dipScale->valuedouble };
     return true;
 }
 
@@ -1167,7 +1183,7 @@ bool DragDrawing::GetAllowDragState()
         FI_HILOGE("The extraInfo is greater than the length limit");
         return true;
     }
-    JsonDataParser extraInfoParser;
+    JsonParser extraInfoParser;
     extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
     if (!cJSON_IsObject(extraInfoParser.json)) {
         FI_HILOGE("The extraInfo is not a json object");
@@ -1215,6 +1231,12 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
+        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 || fabs(filterInfo.dipScale) < EPSILON ||
+            std::numeric_limits<float>::max() / filterInfo.dipScale < filterInfo.cornerRadius) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                filterInfo.cornerRadius, filterInfo.dipScale);
+            return;
+        }
         filterNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
         FI_HILOGD("Add filter successfully");
     }
@@ -1244,24 +1266,13 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
     return RET_OK;
 }
 
-int32_t DragDrawing::CreateEventRunner(int32_t positionX, int32_t positionY)
-{
-    CALL_DEBUG_ENTER;
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPR(runner, RET_ERR);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
-    if (!handler_->PostTask(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY))) {
-        FI_HILOGE("Send animationExtFunc failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t DragDrawing::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.hasCoordinateCorrected) {
+        return RET_ERR;
+    }
     CHKPR(g_drawingInfo.pixelMap, RET_ERR);
     if (!textEditorAreaFlag_) {
         resetPixelMapX_ = g_drawingInfo.pixelMapX;
@@ -1278,11 +1289,11 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         g_drawingInfo.pixelMapY = resetPixelMapY_;
         positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
         positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-        if (CreateEventRunner(positionX, positionY) == RET_OK) {
-            FI_HILOGD("CreateEventRunner successfully");
+        if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) == RET_OK) {
+            FI_HILOGD("RunAnimation successfully");
             return RET_OK;
         }
-        FI_HILOGE("CreateEventRunner failed");
+        FI_HILOGE("RunAnimation failed");
         return RET_ERR;
     }
 
@@ -1290,11 +1301,11 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         FI_HILOGD("enable is false or textEditorAreaFlag_ is true");
         return RET_ERR;
     }
-    if (CreateEventRunner(positionX, positionY) != RET_OK) {
-        FI_HILOGE("CreateEventRunner failed");
+    if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) != RET_OK) {
+        FI_HILOGE("RunAnimation failed");
         return RET_ERR;
     }
-    FI_HILOGD("CreateEventRunner successfully");
+    FI_HILOGD("RunAnimation successfully");
     textEditorAreaFlag_ = true;
     return RET_OK;
 }
@@ -1312,6 +1323,12 @@ int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }
+    size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], previewStyle) != RET_OK) {
+            FI_HILOGE("ModifyPreviewStyle failed");
+        }
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
@@ -1328,9 +1345,22 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
         originStyle.foregroundColor = color->AsArgbInt();
         originStyle.radius = previewStyle.radius;
     }
+    size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (auto color = g_drawingInfo.mutilSelectedNodes[i]->GetShowingProperties().GetForegroundColor();
+            color.has_value()) {
+            originStyle.foregroundColor = color->AsArgbInt();
+            originStyle.radius = previewStyle.radius;
+        }
+    }
     if (ModifyPreviewStyle(pixelMapNode, originStyle) != RET_OK) {
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
+    }
+    for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+        if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], originStyle) != RET_OK) {
+            FI_HILOGE("ModifyPreviewStyle failed");
+        }
     }
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(animation.duration);
@@ -1338,6 +1368,11 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
     Rosen::RSNode::Animate(protocol, curve, [&]() {
         if (ModifyPreviewStyle(pixelMapNode, previewStyle) != RET_OK) {
             FI_HILOGE("ModifyPreviewStyle failed");
+        }
+        for (size_t i = 0; i < mutilSelectedNodesSize; ++i) {
+            if (ModifyPreviewStyle(g_drawingInfo.mutilSelectedNodes[i], previewStyle) != RET_OK) {
+                FI_HILOGE("ModifyPreviewStyle failed");
+            }
         }
     });
     return RET_OK;
@@ -1429,12 +1464,18 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     OnDragStyle(dragStyleNode, pixelMap);
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
+    DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
 int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle)
 {
+    CALL_DEBUG_ENTER;
     CHKPR(node, RET_ERR);
+    if (float radius = 0.0F; ParserRadius(radius)) {
+        node->SetCornerRadius(radius);
+        FI_HILOGD("SetCornerRadius by radius:%{public}f", radius);
+    }
     for (const auto &type : previewStyle.types) {
         switch (type) {
             case PreviewType::FOREGROUND_COLOR: {
@@ -1442,7 +1483,7 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
                 break;
             }
             case PreviewType::OPACITY: {
-                node->SetForegroundColor(previewStyle.opacity);
+                node->SetAlpha(previewStyle.opacity / static_cast<float>(HEX_FF));
                 break;
             }
             case PreviewType::RADIUS: {
@@ -1450,7 +1491,7 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
                 break;
             }
             case PreviewType::SCALE: {
-                node->SetForegroundColor(previewStyle.scale);
+                node->SetScale(previewStyle.scale);
                 break;
             }
             default: {
@@ -1460,6 +1501,114 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
         }
     }
     return RET_OK;
+}
+
+void DragDrawing::MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize)
+{
+    size_t mutilSelectedNodesSize = g_drawingInfo.mutilSelectedNodes.size();
+    size_t mutilSelectedPixelMapsSize = g_drawingInfo.mutilSelectedPixelMaps.size();
+    for (size_t i = 0; (i < mutilSelectedNodesSize) && (i < mutilSelectedPixelMapsSize); ++i) {
+        std::shared_ptr<Rosen::RSCanvasNode> mutilSelectedNode = g_drawingInfo.mutilSelectedNodes[i];
+        std::shared_ptr<Media::PixelMap> mutilSelectedPixelMap = g_drawingInfo.mutilSelectedPixelMaps[i];
+        Rosen::RSAnimationTimingProtocol protocol;
+        if (i == FIRST_PIXELMAP_INDEX) {
+            protocol.SetDuration(SHORT_DURATION);
+        } else {
+            protocol.SetDuration(LONG_DURATION);
+        }
+        Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
+            mutilSelectedNode->SetBounds(positionX, positionY + adjustSize, mutilSelectedPixelMap->GetWidth(),
+                mutilSelectedPixelMap->GetHeight());
+            mutilSelectedNode->SetFrame(positionX, positionY + adjustSize, mutilSelectedPixelMap->GetWidth(),
+                mutilSelectedPixelMap->GetHeight());
+        });
+    }
+}
+
+void DragDrawing::InitMutilSelectedNodes()
+{
+    CALL_DEBUG_ENTER;
+    size_t mutilSelectedPixelMapsSize = g_drawingInfo.mutilSelectedPixelMaps.size();
+    for (size_t i = 0; i < mutilSelectedPixelMapsSize; ++i) {
+        std::shared_ptr<Media::PixelMap> mutilSelectedPixelMap = g_drawingInfo.mutilSelectedPixelMaps[i];
+        std::shared_ptr<Rosen::RSCanvasNode> mutilSelectedNode = Rosen::RSCanvasNode::Create();
+        mutilSelectedNode->SetBgImageWidth(mutilSelectedPixelMap->GetWidth());
+        mutilSelectedNode->SetBgImageHeight(mutilSelectedPixelMap->GetHeight());
+        mutilSelectedNode->SetBgImagePositionX(0);
+        mutilSelectedNode->SetBgImagePositionY(0);
+        mutilSelectedNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
+        auto rosenImage = std::make_shared<Rosen::RSImage>();
+        rosenImage->SetPixelMap(mutilSelectedPixelMap);
+        rosenImage->SetImageRepeat(0);
+        mutilSelectedNode->SetBgImage(rosenImage);
+        float alpha = DEFAULT_ALPHA;
+        float degrees = DEFAULT_ANGLE;
+        if (i == FIRST_PIXELMAP_INDEX) {
+            alpha = FIRST_PIXELMAP_ALPHA;
+            degrees = POSITIVE_ANGLE;
+        } else if (i == SECOND_PIXELMAP_INDEX) {
+            alpha = SECOND_PIXELMAP_ALPHA;
+            degrees = NEGATIVE_ANGLE;
+        }
+        mutilSelectedNode->SetRotation(degrees);
+        mutilSelectedNode->SetAlpha(alpha);
+        g_drawingInfo.mutilSelectedNodes.emplace_back(mutilSelectedNode);
+    }
+}
+
+void DragDrawing::ClearMutilSelectedData()
+{
+    CALL_DEBUG_ENTER;
+    if (!g_drawingInfo.mutilSelectedNodes.empty()) {
+        g_drawingInfo.mutilSelectedNodes.clear();
+        g_drawingInfo.mutilSelectedNodes.shrink_to_fit();
+    }
+    if (!g_drawingInfo.mutilSelectedPixelMaps.empty()) {
+        g_drawingInfo.mutilSelectedPixelMaps.clear();
+        g_drawingInfo.mutilSelectedPixelMaps.shrink_to_fit();
+    }
+}
+
+bool DragDrawing::ParserRadius(float &radius)
+{
+    FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
+        g_drawingInfo.extraInfo.size(), g_drawingInfo.extraInfo.c_str(), g_drawingInfo.filterInfo.size(),
+        g_drawingInfo.filterInfo.c_str());
+    if (g_drawingInfo.extraInfo.empty() || g_drawingInfo.filterInfo.empty()) {
+        FI_HILOGD("ExtraInfo or filterInfo is empty");
+        return false;
+    }
+    JsonParser extraInfoParser;
+    extraInfoParser.json = cJSON_Parse(g_drawingInfo.extraInfo.c_str());
+    if (!cJSON_IsObject(extraInfoParser.json)) {
+        FI_HILOGE("ExtraInfo is not json object");
+        return false;
+    }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
+    if (!cJSON_IsNumber(cornerRadius)) {
+        FI_HILOGE("Parser cornerRadius failed");
+        return false;
+    }
+
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(g_drawingInfo.filterInfo.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return false;
+    }
+    cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
+    if (!cJSON_IsNumber(dipScale)) {
+        FI_HILOGE("Parser dipScale failed");
+        return false;
+    }
+    if (cornerRadius->valuedouble < 0 || dipScale->valuedouble < 0 || fabs(dipScale->valuedouble) < EPSILON ||
+        std::numeric_limits<float>::max() / dipScale->valuedouble < cornerRadius->valuedouble) {
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            cornerRadius->valuedouble, dipScale->valuedouble);
+        return false;
+    }
+    radius = cornerRadius->valuedouble * dipScale->valuedouble;
+    return true;
 }
 
 DragDrawing::~DragDrawing()

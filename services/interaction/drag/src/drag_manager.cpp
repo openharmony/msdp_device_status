@@ -28,6 +28,7 @@
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_data_manager.h"
+#include "drag_hisysevent.h"
 #include "fi_log.h"
 #include "proto.h"
 
@@ -39,10 +40,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragMan
 constexpr int32_t TIMEOUT_MS { 2000 };
 constexpr int32_t INTERVAL_MS { 500 };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
-constexpr size_t SIGNLE_KEY_ITEM { 1 };
+std::atomic<int64_t> g_startFilterTime { -1 };
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
-std::atomic<int64_t> g_startFilterTime { -1 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 } // namespace
 
@@ -61,7 +61,18 @@ int32_t DragManager::Init(IContext* context)
         if (eventHub_ == nullptr) {
             eventHub_ = EventHub::GetEventHub(context_);
         }
-        EventHub::RegisterEvent(eventHub_);
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy == nullptr) {
+            FI_HILOGE("samgrProxy is nullptr");
+            return;
+        }
+        statusListener_ = new (std::nothrow) DragAbilityStatusChange(eventHub_);
+        if (statusListener_ == nullptr) {
+            FI_HILOGE("statusListener_ is nullptr");
+            return;
+        }
+        int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusListener_);
+        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
     });
     return RET_OK;
 }
@@ -140,10 +151,10 @@ void DragManager::PrintDragData(const DragData &dragData)
     }
     FI_HILOGI("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s, summarys:%{public}s",
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s",
         dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
         dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        GetAnonyString(dragData.udKey).c_str(), summarys.c_str());
+        GetAnonyString(dragData.udKey).c_str(), dragData.hasCoordinateCorrected, summarys.c_str());
 }
 
 int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
@@ -160,6 +171,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     if (OnStartDrag() != RET_OK) {
+        DragDFX::WriteStartDrag(dragState_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
@@ -183,6 +195,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     }
     int32_t ret = RET_OK;
     if (OnStopDrag(dropResult.result, dropResult.hasCustomAnimation) != RET_OK) {
+        DragDFX::WriteStopDrag(dragState_, dropResult, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
@@ -200,6 +213,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    dragDrawing_.SetTextEditorAreaFlag(false);
     return ret;
 }
 
@@ -228,6 +242,7 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         return RET_ERR;
     }
     if ((style < DragCursorStyle::DEFAULT) || (style > DragCursorStyle::MOVE)) {
+        DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
@@ -246,7 +261,11 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         updateStyle = style;
     }
     stateNotify_.StyleChangedNotify(updateStyle);
-    return dragDrawing_.UpdateDragStyle(updateStyle);
+    int32_t ret = dragDrawing_.UpdateDragStyle(updateStyle);
+    if (ret != RET_OK) {
+        DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
+    return ret;
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -289,6 +308,7 @@ int32_t DragManager::NotifyDragResult(DragResult result)
     int32_t targetPid = GetDragTargetPid();
     NetPacket pkt(MessageId::DRAG_NOTIFY_RESULT);
     if ((result < DragResult::DRAG_SUCCESS) || (result > DragResult::DRAG_EXCEPTION)) {
+        DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
@@ -302,6 +322,7 @@ int32_t DragManager::NotifyDragResult(DragResult result)
         FI_HILOGE("Failed to send message");
         return MSG_SEND_FAIL;
     }
+    DragDFX::WriteNotifyDragResult(result, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
@@ -371,10 +392,6 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         FI_HILOGI("Set the pointer cursor visible");
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
-    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
-    FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d,Target window drag tid:%{public}d",
-        targetTid, pointerEvent->GetSourceType(), pointerEvent->GetPointerId());
-    SendDragData(targetTid, dragData.udKey);
     CHKPV(context_);
     int32_t repeatCount = 1;
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
@@ -400,12 +417,10 @@ void DragManager::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::Pointer
             && pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
             FI_HILOGW("Invalid event");
             return;
-        } else {
-            g_startFilterTime = -1;
         }
+        g_startFilterTime = -1;
     }
     CHKPV(pointerEventCallback_);
-    CHKPV(context_);
     pointerEventCallback_(pointerEvent);
     pointerEvent->AddFlag(MMI::InputEvent::EVENT_FLAG_NO_INTERCEPT);
     MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -558,8 +573,8 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
 int32_t DragManager::AddDragEventHandler(int32_t sourceType)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     uint32_t deviceTags = 0;
+#ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     if (sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         deviceTags = MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
     } else if (sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
@@ -594,7 +609,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
     }
 #else
     auto callback = std::bind(&DragManager::DragCallback, this, std::placeholders::_1);
-    auto interceptor = std::make_shared<InterceptorConsumer>(context_, callback);
+    auto interceptor = std::make_shared<InterceptorConsumer>(callback);
     pointerEventInterceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(
         interceptor, DRAG_PRIORITY, deviceTags);
     if (pointerEventInterceptorId_ <= 0) {
@@ -683,10 +698,7 @@ int32_t DragManager::OnStartDrag()
         dragDrawing_.DestroyDragWindow();
         return RET_ERR;
     }
-    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
-        FI_HILOGI("Set the pointer cursor invisible");
-        MMI::InputManager::GetInstance()->SetPointerVisible(false);
-    }
+    dragAction_.store(DragAction::MOVE);
     return RET_OK;
 }
 
@@ -701,6 +713,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("Failed to remove key event handler");
         return RET_ERR;
     }
+    dragAction_.store(DragAction::MOVE);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
         dragDrawing_.EraseMouseIcon();
@@ -725,6 +738,12 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     }
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
+        FI_HILOGI("Set the pointer cursor invisible");
+        MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    }
+    DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
@@ -891,49 +910,61 @@ int32_t DragManager::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
 void DragManager::DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    auto keys = keyEvent->GetKeyItems();
-    int32_t keyCode = keyEvent->GetKeyCode();
-    int32_t keyAction = keyEvent->GetKeyAction();
-    if (keys.size() != SIGNLE_KEY_ITEM) {
+    auto keyItems = keyEvent->GetKeyItems();
+    auto iter = std::find_if(keyItems.begin(), keyItems.end(),
+        [] (std::optional<MMI::KeyEvent::KeyItem> keyItem) {
+            return ((keyItem->GetKeyCode() == MMI::KeyEvent::KEYCODE_CTRL_LEFT) ||
+                    (keyItem->GetKeyCode() == MMI::KeyEvent::KEYCODE_CTRL_RIGHT));
+        });
+    if (iter == keyItems.end()) {
         dragAction_.store(DragAction::MOVE);
         return;
     }
-    if ((keyCode != MMI::KeyEvent::KEYCODE_CTRL_LEFT) &&
-        (keyCode != MMI::KeyEvent::KEYCODE_CTRL_RIGHT)) {
+    if ((DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::DEFAULT) ||
+        (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::FORBIDDEN)) {
         dragAction_.store(DragAction::MOVE);
         return;
     }
-    if (keyAction == MMI::KeyEvent::KEY_ACTION_UP) {
+    if (!iter->IsPressed()) {
+        CtrlKeyStyleChangedNotify(DRAG_DATA_MGR.GetDragStyle(), DragAction::MOVE);
+        HandleCtrlKeyEvent(DRAG_DATA_MGR.GetDragStyle(), DragAction::MOVE);
         dragAction_.store(DragAction::MOVE);
-        HandleCtrlKeyUp();
         return;
     }
-    if (keyAction == MMI::KeyEvent::KEY_ACTION_DOWN) {
-        dragAction_.store(DragAction::COPY);
-        HandleCtrlKeyDown();
+    if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
+        FI_HILOGD("Not need update drag style");
+        return;
     }
+    CtrlKeyStyleChangedNotify(DragCursorStyle::COPY, DragAction::COPY);
+    HandleCtrlKeyEvent(DragCursorStyle::COPY, DragAction::COPY);
+    dragAction_.store(DragAction::COPY);
 }
 
-void DragManager::HandleCtrlKeyDown()
+void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
 {
     CALL_DEBUG_ENTER;
-    if (DRAG_DATA_MGR.GetDragStyle() != DragCursorStyle::MOVE) {
+    if (action == dragAction_.load()) {
+        FI_HILOGD("Not need update drag style");
         return;
     }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DragCursorStyle::COPY));
+        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, style));
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }
 }
 
-void DragManager::HandleCtrlKeyUp()
+void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action)
 {
     CALL_DEBUG_ENTER;
+    if (action == dragAction_.load()) {
+        FI_HILOGD("Has notified");
+        return;
+    }
     CHKPV(context_);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
-        std::bind(&DragDrawing::UpdateDragStyle, &dragDrawing_, DRAG_DATA_MGR.GetDragStyle()));
+        std::bind(&StateChangeNotify::StyleChangedNotify, &stateNotify_, style));
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }
@@ -965,6 +996,19 @@ int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
         return RET_ERR;
     }
     extraInfo = dragData.extraInfo;
+    return RET_OK;
+}
+
+int32_t DragManager::AddPrivilege(int32_t tokenId)
+{
+    CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGE("Drag instance not running");
+        return RET_ERR;
+    }
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
+    FI_HILOGD("Target window drag tid:%{public}d", tokenId);
+    SendDragData(tokenId, dragData.udKey);
     return RET_OK;
 }
 } // namespace DeviceStatus

@@ -38,7 +38,7 @@ constexpr size_t MAX_TIMER_COUNT { 64 };
 int32_t TimerManager::Init(IContext *context)
 {
     CHKPR(context, RET_ERR);
-    return context->GetTaskScheduler().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
+    return context->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
 }
 
 int32_t TimerManager::OnInit(IContext *context)
@@ -58,7 +58,7 @@ int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::fun
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetTaskScheduler().PostSyncTask(
+    return context_->GetDelegateTasks().PostSyncTask(
         std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
 }
 
@@ -73,7 +73,7 @@ int32_t TimerManager::RemoveTimer(int32_t timerId)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetTaskScheduler().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
 }
 
 int32_t TimerManager::OnRemoveTimer(int32_t timerId)
@@ -89,7 +89,7 @@ int32_t TimerManager::ResetTimer(int32_t timerId)
 {
     CALL_INFO_TRACE;
     CHKPR(context_, RET_ERR);
-    return context_->GetTaskScheduler().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
+    return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnResetTimer, this, timerId));
 }
 
 int32_t TimerManager::OnResetTimer(int32_t timerId)
@@ -105,7 +105,7 @@ bool TimerManager::IsExist(int32_t timerId) const
     std::packaged_task<bool(int32_t)> task { std::bind(&TimerManager::OnIsExist, this, std::placeholders::_1) };
     auto fu = task.get_future();
 
-    int32_t ret = context_->GetTaskScheduler().PostSyncTask(
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&TimerManager::RunIsExist, this, std::ref(task), timerId));
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
@@ -134,7 +134,7 @@ void TimerManager::ProcessTimers()
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    context_->GetTaskScheduler().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
+    context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
 }
 
 int32_t TimerManager::OnProcessTimers()
@@ -216,7 +216,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
     return RET_ERR;
 }
 
-void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
+void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem> &timer)
 {
     for (auto tIter = timers_.begin(); tIter != timers_.end(); ++tIter) {
         if ((*tIter)->nextCallTime > timer->nextCallTime) {

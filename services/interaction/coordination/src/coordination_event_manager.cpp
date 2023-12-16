@@ -49,6 +49,7 @@ void CoordinationEventManager::AddCoordinationEvent(sptr<EventInfo> event)
 void CoordinationEventManager::RemoveCoordinationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (remoteCoordinationCallbacks_.empty() || event == nullptr) {
         FI_HILOGE("Remove listener failed");
         return;

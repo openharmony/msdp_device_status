@@ -24,6 +24,7 @@
 
 #include "coordination_util.h"
 #include "devicestatus_define.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -66,6 +67,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     profile.SetServiceType(SERVICE_TYPE);
     profile.SetServiceId(SERVICE_ID);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);
@@ -100,6 +102,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
+    CHKPR(data, RET_ERR);
     cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
     char *smsg = cJSON_Print(data);
     cJSON_Delete(data);

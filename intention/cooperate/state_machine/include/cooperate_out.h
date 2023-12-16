@@ -44,7 +44,7 @@ private:
         void OnReset(Context &context, CooperateEvent &event) override;
 
         static void BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent);
-    
+
     private:
         void OnStart(Context &context, CooperateEvent &event);
 
@@ -65,7 +65,7 @@ private:
     public:
         UnprepareRemoteInput(CooperateOut &parent, std::shared_ptr<ICooperateStep> prev);
         ~UnprepareRemoteInput() = default;
-    
+
         void OnEvent(Context &context, CooperateEvent &event) override;
         void OnProgress(Context &context, CooperateEvent &event) override;
         void OnReset(Context &context, CooperateEvent &event) override;

@@ -85,7 +85,7 @@ int32_t ICooperateState::StartRemoteInput(int32_t startDeviceId)
     std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCooperateDhids(startDeviceId);
     if (inputDeviceDhids.empty()) {
         COOR_SM->OnStartFinish(false, networkIds.first, startDeviceId);
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     int32_t ret = D_INPUT_ADAPTER->StartRemoteInput(networkIds.first, networkIds.second, inputDeviceDhids,
         [this, remoteNetworkId = networkIds.first, startDeviceId](bool isSuccess) {
@@ -93,7 +93,7 @@ int32_t ICooperateState::StartRemoteInput(int32_t startDeviceId)
         });
     if (ret != RET_OK) {
         COOR_SM->OnStartFinish(false, networkIds.first, startDeviceId);
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     return RET_OK;
 }

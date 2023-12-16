@@ -77,6 +77,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockHandle(Type type)
     }
     CHKPR(iMock_, RET_ERR);
     iMock_->Enable(type);
+    std::unique_lock lock(mutex_);
     auto iter = mockCallCounts_.find(type);
     if (iter == mockCallCounts_.end()) {
         auto ret = mockCallCounts_.emplace(type, 0);
@@ -215,6 +216,7 @@ ErrCode DeviceStatusMsdpClientImpl::MockDisable(Type type)
 {
     CALL_DEBUG_ENTER;
     CHKPR(iMock_, RET_ERR);
+    std::unique_lock lock(mutex_);
     auto iter = mockCallCounts_.find(type);
     if (iter == mockCallCounts_.end()) {
         FI_HILOGE("Failed to find record type");
@@ -309,7 +311,6 @@ int32_t DeviceStatusMsdpClientImpl::MsdpCallback(const Data &data)
 Data DeviceStatusMsdpClientImpl::SaveObserverData(const Data &data)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(mutex_);
     for (auto iter = deviceStatusDatas_.begin(); iter != deviceStatusDatas_.end(); ++iter) {
         if (iter->first == data.type) {
             iter->second = data.value;
@@ -343,6 +344,7 @@ void DeviceStatusMsdpClientImpl::GetLatitude()
 ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     if (mock_.handle != nullptr) {
         FI_HILOGW("mock handle is not nullptr");
         return RET_OK;
@@ -379,6 +381,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadMockLibrary()
 ErrCode DeviceStatusMsdpClientImpl::UnloadMockLibrary()
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     CHKPR(mock_.handle, RET_ERR);
     if (mock_.pAlgorithm != nullptr) {
         mock_.destroy(mock_.pAlgorithm);
@@ -392,9 +395,9 @@ ErrCode DeviceStatusMsdpClientImpl::UnloadMockLibrary()
 IMsdp* DeviceStatusMsdpClientImpl::GetMockInst(Type type)
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     CHKPP(mock_.handle);
     if (mock_.pAlgorithm == nullptr) {
-        std::unique_lock lock(mutex_);
         mock_.pAlgorithm = mock_.create();
         mockCallCounts_[type] = 0;
     }
@@ -404,6 +407,7 @@ IMsdp* DeviceStatusMsdpClientImpl::GetMockInst(Type type)
 ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     if (algo_.handle != nullptr) {
         FI_HILOGE("Algo handle has exists");
         return RET_OK;
@@ -440,6 +444,7 @@ ErrCode DeviceStatusMsdpClientImpl::LoadAlgoLibrary()
 ErrCode DeviceStatusMsdpClientImpl::UnloadAlgoLibrary()
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     CHKPR(algo_.handle, RET_ERR);
     if (algo_.pAlgorithm != nullptr) {
         algo_.destroy(algo_.pAlgorithm);
@@ -453,9 +458,9 @@ ErrCode DeviceStatusMsdpClientImpl::UnloadAlgoLibrary()
 IMsdp* DeviceStatusMsdpClientImpl::GetAlgoInst(Type type)
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     CHKPP(algo_.handle);
     if (algo_.pAlgorithm == nullptr) {
-        std::unique_lock lock(mutex_);
         algo_.pAlgorithm = algo_.create();
     }
     return algo_.pAlgorithm;

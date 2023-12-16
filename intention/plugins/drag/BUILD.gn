@@ -23,6 +23,9 @@ config("intention_drag_public_config") {
 
 ohos_shared_library("intention_drag") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -47,7 +50,8 @@ ohos_shared_library("intention_drag") {
   deps = [
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "${intention_root_path}/data:drag_params",
+    "${intention_root_path}/cooperate/data:intention_cooperate_data",
+    "${intention_root_path}/data:intention_data",
   ]
 
   external_deps = [

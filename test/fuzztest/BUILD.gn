@@ -20,6 +20,7 @@ group("device_status_fuzztest") {
   deps += [
     "adddraglistener_fuzzer:fuzztest",
     "addhotarealistener_fuzzer:fuzztest",
+    "addsubscriptlistener_fuzzer:fuzztest",
     "devicegetcachestub_fuzzer:fuzztest",
     "devicestatusagent_fuzzer:fuzztest",
     "devicestatusclient_fuzzer:fuzztest",
@@ -29,11 +30,13 @@ group("device_status_fuzztest") {
     "getdragdata_fuzzer:fuzztest",
     "getdragstate_fuzzer:fuzztest",
     "getdragtargetpid_fuzzer:fuzztest",
+    "getextrainfo_fuzzer:fuzztest",
     "getshadowoffset_fuzzer:fuzztest",
     "getudkey_fuzzer:fuzztest",
     "handleallocsocketfd_fuzzer:fuzztest",
     "removedraglistener_fuzzer:fuzztest",
     "removehotarealistener_fuzzer:fuzztest",
+    "removesubscriptlistener_fuzzer:fuzztest",
     "setdragwindowvisible_fuzzer:fuzztest",
     "startdrag_fuzzer:fuzztest",
     "stopdrag_fuzzer:fuzztest",
@@ -43,12 +46,19 @@ group("device_status_fuzztest") {
   ]
   if (fusion_interaction_coordination) {
     deps += [
+      "activatecooperate_fuzzer:fuzztest",
       "activatecoordination_fuzzer:fuzztest",
+      "deactivatecooperate_fuzzer:fuzztest",
       "deactivatecoordination_fuzzer:fuzztest",
+      "getcooperatestate_fuzzer:fuzztest",
       "getcoordinationstate_fuzzer:fuzztest",
+      "preparecooperate_fuzzer:fuzztest",
       "preparecoordination_fuzzer:fuzztest",
+      "registercooperatemonitor_fuzzer:fuzztest",
       "registercoordinationlistener_fuzzer:fuzztest",
+      "unpreparecooperate_fuzzer:fuzztest",
       "unpreparecoordination_fuzzer:fuzztest",
+      "unregistercooperatemonitor_fuzzer:fuzztest",
     ]
   }
 }

@@ -30,6 +30,11 @@
 #include "drag_data.h"
 #include "drag_manager.h"
 #include "i_context.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "plugin_manager.h"
+#include "intention_service.h"
+#include "socket_session_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stationary_callback.h"
 #include "stationary_data.h"
 #include "stream_server.h"
@@ -56,6 +61,11 @@ public:
     ITimerManager& GetTimerManager() override;
     IDragManager& GetDragManager() override;
 
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    IPluginManager& GetPluginManager() override;
+    ISocketSessionManager& GetSocketSessionManager() override;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
         sptr<IRemoteDevStaCallback> callback) override;
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback) override;
@@ -64,15 +74,15 @@ public:
     std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void ReportSensorSysEvent(int32_t type, bool enable);
-    int32_t RegisterCoordinationListener(bool isCheckPermission = false) override;
-    int32_t UnregisterCoordinationListener(bool isCheckPermission = false) override;
-    int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false) override;
-    int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false) override;
+    int32_t RegisterCoordinationListener(bool isCompatible = false) override;
+    int32_t UnregisterCoordinationListener(bool isCompatible = false) override;
+    int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) override;
+    int32_t UnprepareCoordination(int32_t userData, bool isCompatible = false) override;
     int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId,
-        bool isCheckPermission = false) override;
-    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false) override;
+        bool isCompatible = false) override;
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &networkId,
-        bool isCheckPermission = false) override;
+        bool isCompatible = false) override;
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
@@ -103,6 +113,7 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
+    int32_t AddPrivilege() override;
 
 private:
     bool Init();
@@ -141,6 +152,11 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     std::unique_ptr<MotionDrag> motionDrag_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    SocketSessionManager socketSessionMgr_;
+    PluginManager pluginMgr_;
+    sptr<IntentionService> intention_;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

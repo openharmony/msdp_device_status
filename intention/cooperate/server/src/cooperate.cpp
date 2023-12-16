@@ -15,7 +15,6 @@
 
 #include "cooperate.h"
 
-#include "cooperate_params.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -29,100 +28,72 @@ Cooperate::Cooperate(IContext *context)
     : context_(context)
 {}
 
-int32_t Cooperate::Enable(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::RegisterListener(int32_t pid)
 {
-    cooperateMgr_.PrepareCooperate();
-    return RET_OK;
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
 }
 
-int32_t Cooperate::Disable(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::UnregisterListener(int32_t pid)
 {
-    cooperateMgr_.UnprepareCooperate();
-    return RET_OK;
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
 }
 
-int32_t Cooperate::Start(CallingContext &context, Parcel &data, Parcel &reply)
+int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 {
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::Enable(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::Disable(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
+{
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    StartCooperateParam param;
-    if (!param.Unmarshalling(data)) {
-        FI_HILOGE("Failed to unmarshalling param");
-        return RET_ERR;
-    }
-
-    int32_t ret = cooperateMgr_.ActivateCooperate(context.session, param.userData, param.remoteNetworkId,
-        param.startDeviceId);
-    if (ret != RET_OK) {
-        FI_HILOGE("Activate cooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t Cooperate::Stop(CallingContext &context, Parcel &data, Parcel &reply)
-{
-    StopCooperateParam param;
-    if (!param.Unmarshalling(data)) {
-        FI_HILOGE("Failed to unmarshalling param");
-        return RET_ERR;
-    }
-
-    int32_t ret = cooperateMgr_.DeactivateCooperate(context.session, param.userData, param.isUnchained);
-    if (ret != RET_OK) {
-        FI_HILOGE("Deactivate cooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t Cooperate::AddWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
-{
-    int32_t ret = cooperateMgr_.RegisterCooperateListener(context.session);
-    if (ret != RET_OK) {
-        FI_HILOGE("Register cooperate listener failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t Cooperate::RemoveWatch(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
-{
-    int32_t ret = cooperateMgr_.UnregisterCooperateListener(context.session);
-    if (ret != RET_OK) {
-        FI_HILOGE("Unregister cooperate listener failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t Cooperate::SetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
-{
     return RET_ERR;
 }
 
-int32_t Cooperate::GetParam(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
+int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 {
-    GetCooperateStateParam param;
-    if (!param.Unmarshalling(data)) {
-        FI_HILOGE("Failed to unmarshalling param");
-        return RET_ERR;
-    }
-
-    int32_t ret = cooperateMgr_.GetCooperateState(context.session, param.userData, param.deviceId);
-    if (ret != RET_OK) {
-        FI_HILOGE("Get cooperate state failed");
-    }
-    return ret;
-}
-
-int32_t Cooperate::Control(CallingContext &context, uint32_t id, Parcel &data, Parcel &reply)
-{
+    CALL_DEBUG_ENTER;
     return RET_ERR;
 }
 
-extern "C" IPlugin* CreateInstance(IContext *context)
+int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId)
 {
-    CHKPP(context);
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+void Cooperate::Dump(int32_t fd)
+{
+    CALL_DEBUG_ENTER;
+}
+
+extern "C" ICooperate* CreateInstance(IContext *context)
+{
     return new (std::nothrow) Cooperate(context);
 }
 
-extern "C" void DestroyInstance(IPlugin *instance)
+extern "C" void DestroyInstance(ICooperate *instance)
 {
     if (instance != nullptr) {
         delete instance;

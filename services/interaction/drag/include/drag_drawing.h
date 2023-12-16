@@ -95,6 +95,8 @@ struct DrawingInfo {
     int32_t rootNodeHeight { -1 };
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
+    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> mutilSelectedNodes;
+    std::vector<std::shared_ptr<Media::PixelMap>> mutilSelectedPixelMaps;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<Rosen::RSNode> parentNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
@@ -106,9 +108,9 @@ struct DrawingInfo {
 
 struct FilterInfo {
     std::string componentType;
-    int32_t blurStyle;
-    int32_t cornerRadius;
-    float dipScale;
+    int32_t blurStyle { -1 };
+    float cornerRadius { 0.0F };
+    float dipScale { 0.0F };
 };
 
 class DragDrawing : public IDragAnimation {
@@ -153,7 +155,7 @@ private:
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
         std::shared_ptr<Media::PixelMap> stylePixelMap);
-    void RunAnimation(float endAlpha, float endScale);
+    int32_t RunAnimation(std::function<int32_t()> cb);
     int32_t InitVSync(float endAlpha, float endScale);
     void OnVsync();
     void InitDrawingInfo(const DragData &dragData);
@@ -177,6 +179,10 @@ private:
     int32_t SetNodesLocation(int32_t positionX, int32_t positionY);
     int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
+    void MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
+    void InitMutilSelectedNodes();
+    void ClearMutilSelectedData();
+    bool ParserRadius(float &radius);
 
 private:
     int64_t startNum_ { -1 };

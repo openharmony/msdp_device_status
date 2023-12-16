@@ -13,15 +13,15 @@
 
 import("../../../device_status.gni")
 
-config("task_scheduler_config") {
-  include_dirs = [
-    "include",
-    "${intention_root_path}/data/include",
-  ]
+config("intention_task_scheduler_config") {
+  include_dirs = [ "include" ]
 }
 
-ohos_source_set("task_scheduler") {
+ohos_source_set("intention_task_scheduler") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -29,12 +29,14 @@ ohos_source_set("task_scheduler") {
 
   branch_protector_ret = "pac_ret"
 
+  include_dirs = [ "include" ]
+
   sources = [ "src/task_scheduler.cpp" ]
 
-  configs = [ ":task_scheduler_config" ]
+  public_configs = [ ":intention_task_scheduler_config" ]
 
   deps = [
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_utils_path}:devicestatus_util",
   ]
 
@@ -43,6 +45,6 @@ ohos_source_set("task_scheduler") {
     "hilog:libhilog",
   ]
 
-  subsystem_name = "msdp"
+  subsystem_name = "${device_status_subsystem_name}"
   part_name = "${device_status_part_name}"
 }

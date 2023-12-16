@@ -131,7 +131,7 @@ Data DeviceStatusSrvProxy::GetCache(const Type &type)
     return devicestatusData;
 }
 
-int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -139,20 +139,25 @@ int32_t DeviceStatusSrvProxy::RegisterCoordinationListener(bool isCheckPermissio
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COOPERATE_MONITOR),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::REGISTER_COORDINATION_MONITOR),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -162,18 +167,23 @@ int32_t DeviceStatusSrvProxy::UnregisterCoordinationListener(bool isCheckPermiss
     }
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageOption option;
     MessageParcel reply;
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COOPERATE_MONITOR),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNREGISTER_COORDINATION_MONITOR),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -182,20 +192,25 @@ int32_t DeviceStatusSrvProxy::PrepareCoordination(int32_t userData, bool isCheck
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageOption option;
     MessageParcel reply;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COOPERATE),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::PREPARE_COORDINATION),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -204,13 +219,18 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isChe
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COORDINATION),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COOPERATE),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::UNPREPARE_COORDINATION),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -218,7 +238,7 @@ int32_t DeviceStatusSrvProxy::UnprepareCoordination(int32_t userData, bool isChe
 }
 
 int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
-    int32_t startDeviceId, bool isCheckPermission)
+    int32_t startDeviceId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -229,20 +249,25 @@ int32_t DeviceStatusSrvProxy::ActivateCoordination(int32_t userData, const std::
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITESTRING(data, remoteNetworkId, ERR_INVALID_VALUE);
     WRITEINT32(data, startDeviceId, ERR_INVALID_VALUE);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COORDINATION),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COOPERATE),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::START_COORDINATION),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission)
+int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -252,13 +277,18 @@ int32_t DeviceStatusSrvProxy::DeactivateCoordination(int32_t userData, bool isUn
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITEBOOL(data, isUnchained, ERR_INVALID_VALUE);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COORDINATION),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COOPERATE),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::STOP_COORDINATION),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -385,7 +415,7 @@ int32_t DeviceStatusSrvProxy::GetDragState(DragState &dragState)
 }
 
 int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
-    const std::string &networkId, bool isCheckPermission)
+    const std::string &networkId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -395,13 +425,18 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
     }
     WRITEINT32(data, userData, ERR_INVALID_VALUE);
     WRITESTRING(data, networkId, ERR_INVALID_VALUE);
-    WRITEBOOL(data, isCheckPermission, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
-        data, reply, option);
+    int32_t ret = -1;
+    if (isCompatible) {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COOPERATE_STATE),
+            data, reply, option);
+    } else {
+        ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
+            data, reply, option);
+    }
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -828,6 +863,27 @@ int32_t DeviceStatusSrvProxy::GetExtraInfo(std::string &extraInfo)
         return ret;
     }
     READSTRING(reply, extraInfo, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
+int32_t DeviceStatusSrvProxy::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::ADD_PRIVILEGE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
     return ret;
 }
 } // namespace DeviceStatus

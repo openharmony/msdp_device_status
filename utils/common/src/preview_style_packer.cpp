@@ -36,8 +36,8 @@ int32_t PreviewStylePacker::Marshalling(const PreviewStyle &previewStyle, Parcel
     WRITEINT32VECTOR(data, types, ERR_INVALID_VALUE);
     WRITEUINT32(data, previewStyle.foregroundColor, ERR_INVALID_VALUE);
     WRITEINT32(data, previewStyle.opacity, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewStyle.radius, ERR_INVALID_VALUE);
-    WRITEINT32(data, previewStyle.scale, ERR_INVALID_VALUE);
+    WRITEFLOAT(data, previewStyle.radius, ERR_INVALID_VALUE);
+    WRITEFLOAT(data, previewStyle.scale, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
@@ -50,8 +50,8 @@ int32_t PreviewStylePacker::UnMarshalling(Parcel &data, PreviewStyle &previewSty
     }
     READUINT32(data, previewStyle.foregroundColor, ERR_INVALID_VALUE);
     READINT32(data, previewStyle.opacity, ERR_INVALID_VALUE);
-    READINT32(data, previewStyle.radius, ERR_INVALID_VALUE);
-    READINT32(data, previewStyle.scale, ERR_INVALID_VALUE);
+    READFLOAT(data, previewStyle.radius, ERR_INVALID_VALUE);
+    READFLOAT(data, previewStyle.scale, ERR_INVALID_VALUE);
     return RET_OK;
 }
 
@@ -66,6 +66,10 @@ int32_t PreviewAnimationPacker::Marshalling(const PreviewAnimation &previewAnima
 int32_t PreviewAnimationPacker::UnMarshalling(Parcel &data, PreviewAnimation &previewAnimation)
 {
     READINT32(data, previewAnimation.duration, ERR_INVALID_VALUE);
+    if (previewAnimation.duration > MAX_ANIMATION_DURATION_MS) {
+        FI_HILOGW("Duration:%{public}d too long, use default value", previewAnimation.duration);
+        previewAnimation.duration = MAX_ANIMATION_DURATION_MS;
+    }
     READSTRING(data,  previewAnimation.curveName, ERR_INVALID_VALUE);
     READFLOATVECTOR(data, previewAnimation.curve, ERR_INVALID_VALUE);
     return RET_OK;

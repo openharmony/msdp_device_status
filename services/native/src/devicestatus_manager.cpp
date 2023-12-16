@@ -75,8 +75,8 @@ Data DeviceStatusManager::GetLatestDeviceStatusData(Type type)
 bool DeviceStatusManager::Enable(Type type)
 {
     CALL_DEBUG_ENTER;
-    if (type == Type::TYPE_INVALID) {
-        FI_HILOGE("Enable is failed");
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
+        FI_HILOGE("Check type is invalid");
         return false;
     }
     InitAlgoMngrInterface(type);
@@ -138,10 +138,14 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data &devicestatusDa
         FI_HILOGE("type:%{public}d is not exits", devicestatusData.type);
         return false;
     }
+    if ((devicestatusData.type <= TYPE_INVALID) || (devicestatusData.type >= TYPE_MAX)) {
+        FI_HILOGE("Check devicestatusData.type is invalid");
+        return false;
+    }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
     for (const auto &listener : listeners) {
         if (listener == nullptr) {
-            FI_HILOGE("Listener is nullptr");
+            FI_HILOGE("listener is nullptr");
             return false;
         }
         FI_HILOGI("type:%{public}d, arrs_:%{public}d", devicestatusData.type, arrs_[devicestatusData.type]);
@@ -176,23 +180,23 @@ void DeviceStatusManager::Subscribe(Type type, ActivityEvent event, ReportLatenc
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
-    event_ = event;
-    type_ = type;
-    if ((type_ <= TYPE_INVALID) || (type_ >= TYPE_MAX)) {
+    if ((type <= TYPE_INVALID) || (type >= TYPE_MAX)) {
         FI_HILOGE("Subscribe type_:%{public}d is error", type_);
         return;
     }
-    if ((event_ < ENTER) || (event_ > ENTER_EXIT)) {
+    if ((event < ENTER) || (event > ENTER_EXIT)) {
         FI_HILOGE("Subscribe event_:%{public}d is error", event_);
         return;
     }
+    event_ = event;
+    type_ = type;
     arrs_ [type_] = event_;
     FI_HILOGI("type_:%{public}d, event:%{public}d", type_, event);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
-    FI_HILOGI("listeners_.size:%{public}zu", listeners_.size());
     auto object = callback->AsObject();
     CHKPV(object);
     std::lock_guard lock(mutex_);
+    FI_HILOGI("listeners_.size:%{public}zu", listeners_.size());
     auto dtTypeIter = listeners_.find(type);
     if (dtTypeIter == listeners_.end()) {
         if (listeners.insert(callback).second) {
@@ -234,9 +238,9 @@ void DeviceStatusManager::Unsubscribe(Type type, ActivityEvent event, sptr<IRemo
     }
     auto object = callback->AsObject();
     CHKPV(object);
-    FI_HILOGE("listeners_.size:%{public}zu, arrs_:%{public}d", listeners_.size(), arrs_ [type_]);
-    FI_HILOGE("UNevent:%{public}d", event);
     std::lock_guard lock(mutex_);
+    FI_HILOGI("listeners_.size:%{public}zu, type:%{public}d event:%{public}d", listeners_.size(),
+        static_cast<int32_t>(type), event);
     auto dtTypeIter = listeners_.find(type);
     if (dtTypeIter == listeners_.end()) {
         FI_HILOGE("Failed to find listener for type");

@@ -19,6 +19,9 @@ config("interaction_drag_public_config") {
 
 ohos_shared_library("interaction_drag") {
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -30,6 +33,9 @@ ohos_shared_library("interaction_drag") {
     "include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
     "${device_status_utils_path}/include",
+    "${device_status_service_path}/context/include",
+    "${device_status_service_path}/interaction/coordination/include",
+    "${device_status_service_path}/interaction/drag/include",
     "${device_status_service_path}/native/include",
     "//third_party/cJSON",
   ]
@@ -37,6 +43,7 @@ ohos_shared_library("interaction_drag") {
   sources = [
     "src/drag_data_manager.cpp",
     "src/drag_drawing.cpp",
+    "src/drag_hisysevent.cpp",
     "src/drag_manager.cpp",
     "src/event_hub.cpp",
     "src/state_change_notify.cpp",
@@ -65,16 +72,22 @@ ohos_shared_library("interaction_drag") {
     "ability_base:want",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "device_info_manager:distributed_device_profile_client",
+    "device_manager:devicemanagersdk",
+    "distributed_input:libdinput_sdk",
+    "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_base",
     "graphic_2d:window_animation",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbegetutil",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
     "udmf:udmf_client",
     "window_manager:libdm",
     "window_manager:libwm",

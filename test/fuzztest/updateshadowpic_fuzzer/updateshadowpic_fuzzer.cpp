@@ -50,13 +50,13 @@ std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height)
     int32_t colorLen = width * height;
     uint32_t* colors = new (std::nothrow) uint32_t[colorLen];
     if (colors == nullptr) {
-        FI_HILOGE("ColorPixels is nullptr");
+        FI_HILOGE("colorPixels is nullptr");
         return nullptr;
     }
     int32_t colorByteCount = colorLen * INT32_BYTE;
     auto ret = memset_s(colors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
     if (ret != EOK) {
-        FI_HILOGE("Memset_s failed");
+        FI_HILOGE("memset_s failed");
         delete[] colors;
         return nullptr;
     }

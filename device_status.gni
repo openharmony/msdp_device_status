@@ -14,10 +14,11 @@
 import("//build/ohos.gni")
 
 declare_args() {
+  fusion_intention_framework = false
   fusion_rust_enabled = false
   fusion_interaction_coordination = false
-  fusion_drag_enable_monitor = false
-  fusion_drag_enable_interceptor = true
+  fusion_drag_enable_monitor = true
+  fusion_drag_enable_interceptor = false
   device_status_sensor_enable = true
   if (defined(global_parts_info)) {
     if (!defined(global_parts_info.sensors_sensor)) {
@@ -44,6 +45,10 @@ device_status_fuzz_output_path = "${device_status_part_name}/device_status"
 intention_root_path = "//base/msdp/device_status/intention"
 
 device_status_default_defines = []
+
+if (fusion_intention_framework) {
+  device_status_default_defines += [ "OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK" ]
+}
 
 if (defined(fusion_interaction_motion_drag) && fusion_interaction_motion_drag) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_MOTION_DRAG" ]

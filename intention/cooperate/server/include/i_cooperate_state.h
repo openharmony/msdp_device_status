@@ -35,12 +35,12 @@ public:
     virtual ~ICooperateState() = default;
     virtual int32_t ActivateCooperate(const std::string &remoteNetworkId, int32_t startDeviceId)
     {
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     virtual int32_t DeactivateCooperate(const std::string &networkId, bool isUnchained,
         const std::pair<std::string, std::string> &preparedNetworkId)
     {
-        return static_cast<int32_t>(CooperateMessage::COOPERATE_FAIL);
+        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
     virtual void OnKeyboardOnline(const std::string &dhid, const std::pair<std::string, std::string> &networkIds) {}
     virtual void SetStartDeviceDhid(const std::string &startDeviceDhid) {}

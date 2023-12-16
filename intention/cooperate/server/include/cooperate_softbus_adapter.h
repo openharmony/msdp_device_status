@@ -26,6 +26,7 @@
 #include "session.h"
 
 #include "cooperate_util.h"
+#include "json_parser.h"
 
 namespace OHOS {
 namespace Msdp {

@@ -311,6 +311,7 @@ int32_t CooperateSoftbusAdapter::StartRemoteCooperate(const std::string &localNe
     }
     FI_HILOGD("isPointerButtonPressed:%{public}d", isPointerButtonPressed);
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
@@ -345,6 +346,7 @@ int32_t CooperateSoftbusAdapter::StartRemoteCooperateResult(const std::string &r
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_START_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDeviceDhid.c_str()));
@@ -372,6 +374,7 @@ int32_t CooperateSoftbusAdapter::StopRemoteCooperate(const std::string &remoteNe
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isUnchained));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
@@ -397,6 +400,7 @@ int32_t CooperateSoftbusAdapter::StopRemoteCooperateResult(const std::string &re
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
@@ -474,6 +478,7 @@ int32_t CooperateSoftbusAdapter::StartCooperateOtherResult(const std::string &or
     }
     int32_t sessionId = sessionDevs_[originNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COOPERATE_STOP_OTHER_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_OTHER_DEVICE_ID, cJSON_CreateString(remoteNetworkId.c_str()));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_SESSION_ID, cJSON_CreateNumber(sessionId));
@@ -491,13 +496,13 @@ int32_t CooperateSoftbusAdapter::StartCooperateOtherResult(const std::string &or
 void CooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::string &message)
 {
     if (message.empty()) {
-        FI_HILOGE("Message is empty");
+        FI_HILOGE("message is empty");
         return;
     }
     JsonParser parser;
     parser.json = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGI("Parser json is not object");
+        FI_HILOGI("parser json is not object");
         if (message.size() < sizeof(DataPacket)) {
             FI_HILOGE("Data packet is incomplete");
             return;
@@ -508,10 +513,10 @@ void CooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const std::st
             return;
         }
         if (registerRecvs_.find(dataPacket->messageId) == registerRecvs_.end()) {
-            FI_HILOGW("Message:%{public}d does not register", dataPacket->messageId);
+            FI_HILOGW("message:%{public}d does not register", dataPacket->messageId);
             return;
         }
-        FI_HILOGI("Message:%{public}d", dataPacket->messageId);
+        FI_HILOGI("message:%{public}d", dataPacket->messageId);
         if ((dataPacket->messageId == DRAGGING_DATA) ||
             (dataPacket->messageId == STOPDRAG_DATA) ||
             (dataPacket->messageId == IS_PULL_UP) ||
@@ -637,6 +642,7 @@ int32_t CooperateSoftbusAdapter::SendData(const std::string &networkId, MessageI
         free(dataPacket);
         return RET_ERR;
     }
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
     int32_t result = SendBytes(sessionDevs_[networkId], dataPacket, sizeof(DataPacket) + dataLen);
     free(dataPacket);
     if (result != RET_OK) {

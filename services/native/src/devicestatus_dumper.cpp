@@ -168,6 +168,7 @@ void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 void DeviceStatusDumper::DumpDeviceStatusChanges(int32_t fd)
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     if (deviceStatusQueue_.empty()) {
         FI_HILOGI("deviceStatusQueue_ is empty");
         return;
@@ -299,15 +300,14 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CALL_DEBUG_ENTER;
     CHKPV(appInfo);
     CHKPV(appInfo->callback);
-    FI_HILOGI("appInfoMap size:%{public}zu", appInfos_.size());
     std::unique_lock lock(mutex_);
     auto appInfoSetIter = appInfos_.find(appInfo->type);
     if (appInfoSetIter == appInfos_.end()) {
         FI_HILOGE("Not exist %{public}d type appInfo", appInfo->type);
         return;
     }
-    FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu",
-        appInfo->type, appInfos_[appInfoSetIter->first].size());
+    FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu, appInfoMap size:%{public}zu",
+        appInfo->type, appInfos_[appInfoSetIter->first].size(), appInfos_.size());
     auto iter = appInfos_.find(appInfo->type);
     if (iter == appInfos_.end()) {
         FI_HILOGW("Remove app info is not exists");

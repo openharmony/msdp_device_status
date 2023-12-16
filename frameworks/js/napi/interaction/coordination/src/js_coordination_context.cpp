@@ -68,7 +68,7 @@ napi_value JsCoordinationContext::PrepareCooperate(napi_env env, napi_callback_i
     return PrepareCompatible(env, info, true);
 }
 
-napi_value JsCoordinationContext::PrepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+napi_value JsCoordinationContext::PrepareCompatible(napi_env env, napi_callback_info info, bool isCompatible)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -79,13 +79,13 @@ napi_value JsCoordinationContext::PrepareCompatible(napi_env env, napi_callback_
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
-        return jsCoordinationMgr->Prepare(env, isCheckPermission);
+        return jsCoordinationMgr->Prepare(env, isCompatible);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Prepare(env, isCheckPermission, argv[0]);
+    return jsCoordinationMgr->Prepare(env, isCompatible, argv[0]);
 }
 
 napi_value JsCoordinationContext::Unprepare(napi_env env, napi_callback_info info)
@@ -100,7 +100,7 @@ napi_value JsCoordinationContext::UnprepareCooperate(napi_env env, napi_callback
     return UnprepareCompatible(env, info, true);
 }
 
-napi_value JsCoordinationContext::UnprepareCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+napi_value JsCoordinationContext::UnprepareCompatible(napi_env env, napi_callback_info info, bool isCompatible)
 {
     size_t argc = 1;
     napi_value argv[1] = { nullptr };
@@ -111,13 +111,13 @@ napi_value JsCoordinationContext::UnprepareCompatible(napi_env env, napi_callbac
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 0) {
-        return jsCoordinationMgr->Unprepare(env, isCheckPermission);
+        return jsCoordinationMgr->Unprepare(env, isCompatible);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Unprepare(env, isCheckPermission, argv[0]);
+    return jsCoordinationMgr->Unprepare(env, isCompatible, argv[0]);
 }
 
 napi_value JsCoordinationContext::Activate(napi_env env, napi_callback_info info)
@@ -132,7 +132,7 @@ napi_value JsCoordinationContext::ActivateCooperate(napi_env env, napi_callback_
     return ActivateCompatible(env, info, true);
 }
 
-napi_value JsCoordinationContext::ActivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+napi_value JsCoordinationContext::ActivateCompatible(napi_env env, napi_callback_info info, bool isCompatible)
 {
     size_t argc = 3;
     napi_value argv[3] = { nullptr };
@@ -162,13 +162,13 @@ napi_value JsCoordinationContext::ActivateCompatible(napi_env env, napi_callback
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 2) {
-        return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId, isCheckPermission);
+        return jsCoordinationMgr->Activate(env, remoteNetworkId, startDeviceId, isCompatible);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Activate(env, std::string(remoteNetworkId), startDeviceId, isCheckPermission, argv[2]);
+    return jsCoordinationMgr->Activate(env, std::string(remoteNetworkId), startDeviceId, isCompatible, argv[2]);
 }
 
 napi_value JsCoordinationContext::Deactivate(napi_env env, napi_callback_info info)
@@ -183,7 +183,7 @@ napi_value JsCoordinationContext::DeactivateCooperate(napi_env env, napi_callbac
     return DeactivateCompatible(env, info, true);
 }
 
-napi_value JsCoordinationContext::DeactivateCompatible(napi_env env, napi_callback_info info, bool isCheckPermission)
+napi_value JsCoordinationContext::DeactivateCompatible(napi_env env, napi_callback_info info, bool isCompatible)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -205,13 +205,13 @@ napi_value JsCoordinationContext::DeactivateCompatible(napi_env env, napi_callba
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->Deactivate(env, isUnchained, isCheckPermission);
+        return jsCoordinationMgr->Deactivate(env, isUnchained, isCompatible);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->Deactivate(env, isUnchained, isCheckPermission, argv[1]);
+    return jsCoordinationMgr->Deactivate(env, isUnchained, isCompatible, argv[1]);
 }
 
 napi_value JsCoordinationContext::GetCrossingSwitchState(napi_env env, napi_callback_info info)
@@ -227,7 +227,7 @@ napi_value JsCoordinationContext::GetCooperateSwitchState(napi_env env, napi_cal
 }
 
 napi_value JsCoordinationContext::GetCrossingSwitchStateCompatible(napi_env env,
-    napi_callback_info info, bool isCheckPermission)
+    napi_callback_info info, bool isCompatible)
 {
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
@@ -252,13 +252,13 @@ napi_value JsCoordinationContext::GetCrossingSwitchStateCompatible(napi_env env,
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
     if (argc == 1) {
-        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCheckPermission);
+        return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCompatible);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCheckPermission, argv[1]);
+    return jsCoordinationMgr->GetCrossingSwitchState(env, networkIdTemp, isCompatible, argv[1]);
 }
 
 napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)

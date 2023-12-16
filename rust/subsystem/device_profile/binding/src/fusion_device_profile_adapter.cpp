@@ -17,11 +17,11 @@
 
 #include <set>
 
-#include "cJSON.h"
 #include "distributed_device_profile_client.h"
 #include "singleton.h"
 
 #include "devicestatus_define.h"
+#include "json_parser.h"
 
 using namespace OHOS;
 using namespace OHOS::DeviceProfile;
@@ -30,22 +30,6 @@ namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
-
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON* json = nullptr;
-};
 
 class ProfileEventCallback final : public IProfileEventCallback {
 public:
@@ -212,7 +196,7 @@ bool FusionDeviceProfileAdapter::GetCrossSwitchState(const std::string &deviceId
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("Parser json is not object");
+        FI_HILOGE("parser json is not object");
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());
@@ -247,7 +231,7 @@ int32_t FusionDeviceProfileAdapter::RegisterCrossStateListener(const std::string
     subscribeInfos.emplace_back(syncEventInfo);
 
     SaveSubscribeInfos(deviceId, callback, subscribeInfos);
-  
+
     if (subscribeInfos.empty()) {
         FI_HILOGI("Profile events have been subscribed");
         return RET_ERR;

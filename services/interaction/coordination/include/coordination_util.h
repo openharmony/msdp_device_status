@@ -18,26 +18,10 @@
 
 #include <string>
 
-#include "cJSON.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON *json { nullptr };
-};
+
 namespace COORDINATION {
 std::string GetLocalNetworkId();
 } // namespace COORDINATION

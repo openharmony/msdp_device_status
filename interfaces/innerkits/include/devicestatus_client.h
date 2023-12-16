@@ -46,14 +46,14 @@ public:
     int32_t UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback);
     Data GetDeviceStatusData(const Type type);
     void RegisterDeathListener(std::function<void()> deathListener);
-    int32_t RegisterCoordinationListener(bool isCheckPermission = false);
-    int32_t UnregisterCoordinationListener(bool isCheckPermission = false);
-    int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false);
-    int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false);
+    int32_t RegisterCoordinationListener(bool isCompatible = false);
+    int32_t UnregisterCoordinationListener(bool isCompatible = false);
+    int32_t PrepareCoordination(int32_t userData, bool isCompatible = false);
+    int32_t UnprepareCoordination(int32_t userData, bool isCompatible = false);
     int32_t ActivateCoordination(int32_t userData,
-        const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission = false);
-    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false);
-    int32_t GetCoordinationState(int32_t userData, const std::string &networkId, bool isCheckPermission = false);
+        const std::string &remoteNetworkId, int32_t startDeviceId, bool isCompatible = false);
+    int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false);
+    int32_t GetCoordinationState(int32_t userData, const std::string &networkId, bool isCompatible = false);
     int32_t StartDrag(const DragData &dragData);
     int32_t StopDrag(const DragDropResult &dropResult);
     int32_t UpdateDragStyle(DragCursorStyle style);
@@ -78,20 +78,21 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t EnterTextEditorArea(bool enable);
+    int32_t AddPrivilege();
 
 private:
     class DeviceStatusDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         DeviceStatusDeathRecipient() = default;
         ~DeviceStatusDeathRecipient() = default;
-        void OnRemoteDied(const wptr<IRemoteObject>& remote);
+        void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
     private:
         DISALLOW_COPY_AND_MOVE(DeviceStatusDeathRecipient);
     };
 
     ErrCode Connect();
-    void ResetProxy(const wptr<IRemoteObject>& remote);
+    void ResetProxy(const wptr<IRemoteObject> &remote);
 
     sptr<Idevicestatus> devicestatusProxy_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };

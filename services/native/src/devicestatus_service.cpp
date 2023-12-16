@@ -53,10 +53,8 @@ struct device_status_epoll_event {
     EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
-#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
 const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSpSingleton<DeviceStatusService>::GetInstance().GetRefPtr());
-#endif // OHOS_BUILD_ENABLE_RUST_IMPL
 } // namespace
 
 DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
@@ -83,12 +81,15 @@ void DeviceStatusService::OnStart()
         FI_HILOGE("On start call init failed");
         return;
     }
-#ifndef OHOS_BUILD_ENABLE_RUST_IMPL
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    intention_ = sptr<IntentionService>::MakeSptr(this);
+    if (!Publish(intention_)) {
+#else
     if (!Publish(this)) {
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
         FI_HILOGE("On start register to system ability manager failed");
         return;
     }
-#endif // OHOS_BUILD_ENABLE_RUST_IMPL
     state_ = ServiceRunningState::STATE_RUNNING;
     ready_ = true;
     worker_ = std::thread(std::bind(&DeviceStatusService::OnThread, this));
@@ -131,6 +132,18 @@ IDragManager& DeviceStatusService::GetDragManager()
 {
     return dragMgr_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
+{
+    return socketSessionMgr_;
+}
+
+IPluginManager& DeviceStatusService::GetPluginManager()
+{
+    return pluginMgr_;
+}
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
@@ -201,6 +214,13 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    if (socketSessionMgr_.Init() != RET_OK) {
+        FI_HILOGE("Failed to initialize socket session manager");
+        goto INIT_FAIL;
+    }
+    pluginMgr_.Init(this);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     COOR_EVENT_MGR->SetIContext(this);
     COOR_SM->Init();
@@ -342,7 +362,7 @@ int32_t DeviceStatusService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    FI_HILOGD("eventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
+    FI_HILOGD("EventData:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev {};
     ev.events = EPOLLIN;
@@ -527,10 +547,10 @@ void DeviceStatusService::DisableDevMgr()
     devMgr_.Disable();
 }
 
-int32_t DeviceStatusService::RegisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusService::RegisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -543,10 +563,10 @@ int32_t DeviceStatusService::RegisterCoordinationListener(bool isCheckPermission
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCheckPermission)
+int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -559,10 +579,10 @@ int32_t DeviceStatusService::UnregisterCoordinationListener(bool isCheckPermissi
     return RET_OK;
 }
 
-int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     AddSessionDeletedCallback(pid, std::bind(&CoordinationSM::OnSessionLost, COOR_SM, std::placeholders::_1));
@@ -578,10 +598,10 @@ int32_t DeviceStatusService::PrepareCoordination(int32_t userData, bool isCheckP
     return RET_OK;
 }
 
-int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isCheckPermission)
+int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -597,10 +617,10 @@ int32_t DeviceStatusService::UnprepareCoordination(int32_t userData, bool isChec
 }
 
 int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
-    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCheckPermission)
+    const std::string &remoteNetworkId, int32_t startDeviceId, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -619,10 +639,10 @@ int32_t DeviceStatusService::ActivateCoordination(int32_t userData,
 }
 
 int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnchained,
-    bool isCheckPermission)
+    bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -639,10 +659,10 @@ int32_t DeviceStatusService::DeactivateCoordination(int32_t userData, bool isUnc
 }
 
 int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::string &networkId,
-    bool isCheckPermission)
+    bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    (void)(isCheckPermission);
+    (void)(isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1101,6 +1121,19 @@ int32_t DeviceStatusService::GetDragSummary(std::map<std::string, int64_t> &summ
         std::bind(&DragManager::GetDragSummary, &dragMgr_, std::ref(summarys)));
     if (ret != RET_OK) {
         FI_HILOGE("Failed to get drag summarys, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::AddPrivilege()
+{
+    CALL_DEBUG_ENTER;
+    int32_t tokenId = static_cast<int32_t>(GetCallingTokenID());
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DragManager::AddPrivilege, &dragMgr_, tokenId));
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add privilege, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

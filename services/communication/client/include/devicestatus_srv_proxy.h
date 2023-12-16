@@ -39,15 +39,15 @@ public:
     virtual Data GetCache(const Type &type) override;
     int32_t AllocSocketFd(const std::string &programName, int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
-    virtual int32_t RegisterCoordinationListener(bool isCheckPermission = false) override;
-    virtual int32_t UnregisterCoordinationListener(bool isCheckPermission = false) override;
-    virtual int32_t PrepareCoordination(int32_t userData, bool isCheckPermission = false) override;
-    virtual int32_t UnprepareCoordination(int32_t userData, bool isCheckPermission = false) override;
+    virtual int32_t RegisterCoordinationListener(bool isCompatible = false) override;
+    virtual int32_t UnregisterCoordinationListener(bool isCompatible = false) override;
+    virtual int32_t PrepareCoordination(int32_t userData, bool isCompatible = false) override;
+    virtual int32_t UnprepareCoordination(int32_t userData, bool isCompatible = false) override;
     virtual int32_t ActivateCoordination(int32_t userData, const std::string &remoteNetworkId,
-        int32_t startDeviceId, bool isCheckPermission = false) override;
-    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCheckPermission = false) override;
+        int32_t startDeviceId, bool isCompatible = false) override;
+    virtual int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false) override;
     virtual int32_t GetCoordinationState(int32_t userData,
-        const std::string &networkId, bool isCheckPermission = false) override;
+        const std::string &networkId, bool isCompatible = false) override;
     virtual int32_t StartDrag(const DragData &dragData) override;
     virtual int32_t StopDrag(const DragDropResult &dropResult) override;
     virtual int32_t UpdateDragStyle(DragCursorStyle style) override;
@@ -71,6 +71,7 @@ public:
     virtual int32_t EnterTextEditorArea(bool enable) override;
     virtual int32_t GetDragAction(DragAction &dragAction) override;
     virtual int32_t GetExtraInfo(std::string &extraInfo) override;
+    virtual int32_t AddPrivilege() override;
 
 private:
     static inline BrokerDelegator<DeviceStatusSrvProxy> delegator_;

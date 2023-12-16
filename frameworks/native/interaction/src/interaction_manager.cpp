@@ -17,7 +17,11 @@
 
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "intention_manager.h"
+#else
 #include "interaction_manager_impl.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {
@@ -31,45 +35,45 @@ InteractionManager *InteractionManager::GetInstance()
 }
 
 int32_t InteractionManager::RegisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
-    bool isCheckPermission)
+    bool isCompatible)
 {
-    return INTER_MGR_IMPL.RegisterCoordinationListener(listener, isCheckPermission);
+    return INTER_MGR_IMPL.RegisterCoordinationListener(listener, isCompatible);
 }
 
 int32_t InteractionManager::UnregisterCoordinationListener(std::shared_ptr<ICoordinationListener> listener,
-    bool isCheckPermission)
+    bool isCompatible)
 {
-    return INTER_MGR_IMPL.UnregisterCoordinationListener(listener, isCheckPermission);
+    return INTER_MGR_IMPL.UnregisterCoordinationListener(listener, isCompatible);
 }
 
 int32_t InteractionManager::PrepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-    bool isCheckPermission)
+    bool isCompatible)
 {
-    return INTER_MGR_IMPL.PrepareCoordination(callback, isCheckPermission);
+    return INTER_MGR_IMPL.PrepareCoordination(callback, isCompatible);
 }
 
 int32_t InteractionManager::UnprepareCoordination(std::function<void(const std::string&, CoordinationMessage)> callback,
-    bool isCheckPermission)
+    bool isCompatible)
 {
-    return INTER_MGR_IMPL.UnprepareCoordination(callback, isCheckPermission);
+    return INTER_MGR_IMPL.UnprepareCoordination(callback, isCompatible);
 }
 
 int32_t InteractionManager::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId,
-    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission)
+    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible)
 {
-    return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCheckPermission);
+    return INTER_MGR_IMPL.ActivateCoordination(remoteNetworkId, startDeviceId, callback, isCompatible);
 }
 
 int32_t InteractionManager::DeactivateCoordination(bool isUnchained,
-    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCheckPermission)
+    std::function<void(const std::string&, CoordinationMessage)> callback, bool isCompatible)
 {
-    return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback, isCheckPermission);
+    return INTER_MGR_IMPL.DeactivateCoordination(isUnchained, callback, isCompatible);
 }
 
 int32_t InteractionManager::GetCoordinationState(
-    const std::string &networkId, std::function<void(bool)> callback, bool isCheckPermission)
+    const std::string &networkId, std::function<void(bool)> callback, bool isCompatible)
 {
-    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback, isCheckPermission);
+    return INTER_MGR_IMPL.GetCoordinationState(networkId, callback, isCompatible);
 }
 
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
@@ -181,6 +185,11 @@ int32_t InteractionManager::EnterTextEditorArea(bool enable)
 int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)
 {
     return INTER_MGR_IMPL.GetExtraInfo(extraInfo);
+}
+
+int32_t InteractionManager::AddPrivilege()
+{
+    return INTER_MGR_IMPL.AddPrivilege();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

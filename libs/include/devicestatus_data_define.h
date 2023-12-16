@@ -18,7 +18,6 @@
 
 #include <functional>
 
-#include "cJSON.h"
 #ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include "sensor_agent.h"
 #endif // DEVICE_STATUS_SENSOR_ENABLE
@@ -43,21 +42,6 @@ constexpr int32_t VALID_TIME_THRESHOLD { 500 };
 constexpr int32_t ACC_SAMPLE_PERIOD { 100 };
 constexpr int32_t COUNTER_THRESHOLD = VALID_TIME_THRESHOLD / ACC_SAMPLE_PERIOD;
 
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json != nullptr) {
-            cJSON_Delete(json);
-            json = nullptr;
-        }
-    }
-    operator cJSON *()
-    {
-        return json;
-    }
-    cJSON *json = nullptr;
-};
 #ifdef DEVICE_STATUS_SENSOR_ENABLE
 using SensorCallback = std::function<void(int32_t, AccelData*)>;
 #endif // DEVICE_STATUS_SENSOR_ENABLE
