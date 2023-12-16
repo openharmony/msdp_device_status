@@ -776,6 +776,15 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 void CoordinationSM::OnDeviceOffline(const std::string &networkId)
 {
     CALL_INFO_TRACE;
+    std::string localNetworkId = COORDINATION::GetLocalNetworkId();
+    FI_HILOGI("Local device networkId: %{public}s", localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGI("Remote device networkId: %{public}s", sinkNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGI("Offline device networkId: %{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    if ((networkId != sinkNetworkId_ && networkId != localNetworkId) ||
+        (currentState_ == CoordinationState::STATE_FREE)) {
+        FI_HILOGI("Other device offline");
+        return;
+    }
     DP_ADAPTER->UnregisterCrossingStateListener(networkId);
     Reset(networkId);
     preparedNetworkId_ = std::make_pair("", "");
