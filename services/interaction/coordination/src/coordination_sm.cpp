@@ -177,12 +177,7 @@ void CoordinationSM::OnCloseCoordination(const std::string &networkId, bool isLo
             }
             D_INPUT_ADAPTER->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [](bool isSuccess) {});
-            DistributedHardware::DmDeviceInfo remoteDeviceInfo;
-            if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
-                         preparedNetworkId_.first.c_str()) != EOK) {
-                FI_HILOGW("Invalid networkid");
-            }
-            Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().CloseP2PConnection(remoteDeviceInfo);
+            CloseP2PConnection(preparedNetworkId_.first);
         }
     }
     preparedNetworkId_ = std::make_pair("", "");
@@ -256,7 +251,25 @@ void CoordinationSM::OpenP2PConnection(const std::string &remoteNetworkId)
                  remoteNetworkId.c_str()) != EOK) {
         FI_HILOGW("Invalid networkid");
     }
-    Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().OpenP2PConnection(remoteDeviceInfo);
+    int32_t status =
+        Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().OpenP2PConnection(remoteDeviceInfo);
+    if (status != RET_OK) {
+        FI_HILOGW("OpenP2PConnection, status:%{public}d.", status);
+    }
+}
+
+void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
+{
+    DistributedHardware::DmDeviceInfo remoteDeviceInfo;
+    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
+                 remoteNetworkId.c_str()) != EOK) {
+        FI_HILOGW("Invalid networkid");
+    }
+    int32_t status =
+        Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().CloseP2PConnection(remoteDeviceInfo);
+    if (status != RET_OK) {
+        FI_HILOGW("CloseP2PConnection, status:%{public}d.", status);
+    }
 }
 
 int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
@@ -280,11 +293,6 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("Open input softbus failed");
         return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
     }
-
-    std::string taskName = "open_p2p_onnection";
-    std::function<void()> handleFunc =
-        std::bind(&CoordinationSM::OpenP2PConnection, this, remoteNetworkId);
-    eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
 
     isStarting_ = true;
     SetSinkNetworkId(remoteNetworkId);
@@ -502,6 +510,10 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
             NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
             StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+            std::string taskName = "open_p2p_connection";
+            std::function<void()> handleFunc =
+                std::bind(&CoordinationSM::OpenP2PConnection, this, remoteNetworkId);
+            eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
         } else if (currentState_ == CoordinationState::STATE_IN) {
             std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
             if (!originNetworkId.empty() && (remoteNetworkId != originNetworkId)) {
@@ -635,7 +647,7 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
                  localNetworkId.c_str()) != EOK) {
         FI_HILOGW("Invalid networkid");
     }
-    Storage::DistributedFile::DistributedFileDaemonManager::GetInstance().CloseP2PConnection(remoteDeviceInfo);
+    CloseP2PConnection(localNetworkId);
     preparedNetworkId_ = std::make_pair("", "");
     return true;
 }
