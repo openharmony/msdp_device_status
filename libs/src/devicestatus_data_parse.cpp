@@ -130,7 +130,7 @@ std::string DeviceStatusDataParse::ReadJsonFile(const std::string &filePath)
         FI_HILOGE("Path is empty");
         return {};
     }
-    char realPath[PATH_MAX] = {};
+    char realPath[PATH_MAX] = { 0 };
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         FI_HILOGE("Path is error, %{public}d", errno);
         return {};
@@ -192,7 +192,7 @@ std::string DeviceStatusDataParse::ReadFile(const std::string &filePath)
         return {};
     }
     std::string dataStr;
-    char buf[READ_DATA_BUFF_SIZE] = {};
+    char buf[READ_DATA_BUFF_SIZE] = { 0 };
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
     }

@@ -137,9 +137,9 @@ int32_t DeviceStatusNapi::ConvertTypeToInt(const std::string &type)
 bool DeviceStatusNapi::CheckArguments(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    int32_t arr[ARG_4] = {};
+    int32_t arr[ARG_4] = { 0 };
     size_t argc = ARG_4;
-    napi_value args[ARG_4] = {};
+    napi_value args[ARG_4] = { nullptr };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         FI_HILOGE("Failed to get_cb_info");
@@ -178,9 +178,9 @@ bool DeviceStatusNapi::IsMatchType(napi_env env, napi_value value, napi_valuetyp
 bool DeviceStatusNapi::CheckGetArguments(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    int32_t arr[ARG_2] = {};
+    int32_t arr[ARG_2] = { 0 };
     size_t argc = ARG_2;
-    napi_value args[ARG_2] = {};
+    napi_value args[ARG_2] = { nullptr };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         FI_HILOGE("Failed to get_cb_info");
@@ -208,7 +208,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
 {
     std::tuple<bool, napi_value, std::string, int32_t, int32_t> result { false, nullptr, "", -1, -1 };
     size_t argc = ARG_4;
-    napi_value args[ARG_4] = {};
+    napi_value args[ARG_4] = { nullptr };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if ((status != napi_ok) || (argc < ARG_4)) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
@@ -224,7 +224,7 @@ std::tuple<bool, napi_value, std::string, int32_t, int32_t> DeviceStatusNapi::Ch
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    char mode[NAPI_BUF_LENGTH] = {};
+    char mode[NAPI_BUF_LENGTH] = { 0 };
     status = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get mode");
@@ -249,7 +249,7 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
 {
     std::tuple<bool, napi_value, int32_t> result { false, nullptr, -1 };
     size_t argc = ARG_2;
-    napi_value args[ARG_2] = {};
+    napi_value args[ARG_2] = { nullptr };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if ((status != napi_ok) || (argc < ARG_2)) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");
@@ -265,7 +265,7 @@ std::tuple<bool, napi_value, int32_t> DeviceStatusNapi::CheckGetParam(napi_env e
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return result;
     }
-    char mode[NAPI_BUF_LENGTH] = {};
+    char mode[NAPI_BUF_LENGTH] = { 0 };
     napiStatus = napi_get_value_string_utf8(env, args[ARG_0], mode, modLen + 1, &modLen);
     if (napiStatus != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get mode");
@@ -288,7 +288,7 @@ napi_value DeviceStatusNapi::GetParameters(napi_env env, size_t argc, const napi
         ThrowErr(env, PARAM_ERROR, "Failed to get string item");
         return nullptr;
     }
-    char mode[NAPI_BUF_LENGTH] = {};
+    char mode[NAPI_BUF_LENGTH] = { 0 };
     status = napi_get_value_string_utf8(env, args[0], mode, modLen + 1, &modLen);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Failed to get mode");
@@ -401,7 +401,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
     CALL_DEBUG_ENTER;
     CHKPP(g_obj);
     size_t argc = 3;
-    napi_value args[3] = {};
+    napi_value args[3] = { nullptr };
     napi_status status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     if (status != napi_ok) {
         ThrowErr(env, PARAM_ERROR, "Bad parameters");

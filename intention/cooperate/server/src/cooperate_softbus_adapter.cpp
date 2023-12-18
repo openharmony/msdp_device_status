@@ -567,7 +567,7 @@ std::string CooperateSoftbusAdapter::FindDevice(int32_t sessionId)
 int32_t CooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t result)
 {
     CALL_INFO_TRACE;
-    char peerDevId[DEVICE_ID_SIZE_MAX] = {};
+    char peerDevId[DEVICE_ID_SIZE_MAX] = { 0 };
     sessionId_ = sessionId;
     int32_t getPeerDeviceIdResult = GetPeerDeviceId(sessionId, peerDevId, sizeof(peerDevId));
     FI_HILOGD("Get peer device id ret:%{public}d", getPeerDeviceIdResult);

@@ -37,7 +37,7 @@ void FdListener::OnReadable(int32_t fd)
         return;
     }
     CHKPV(iClient_);
-    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    char szBuf[MAX_PACKET_BUF_SIZE] = { 0 };
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
         ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {

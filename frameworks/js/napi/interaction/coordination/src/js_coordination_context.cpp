@@ -548,7 +548,7 @@ void JsCoordinationContext::DeclareDeviceCoordinationInterface(napi_env env, nap
 napi_value JsCoordinationContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = 0;
-    napi_value args[1] = {};
+    napi_value args[1] = { nullptr };
     napi_value result = nullptr;
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);

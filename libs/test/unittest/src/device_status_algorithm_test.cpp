@@ -85,7 +85,7 @@ int32_t DeviceStatusAlgorithmTest::LoadAlgoLibrary(const std::shared_ptr<MsdpAlg
     }
 
     std::string dlName = DEVICESTATUS_ALGO_LIB_PATH;
-    char libRealPath[PATH_MAX] = {};
+    char libRealPath[PATH_MAX] = { 0 };
     if (realpath(dlName.c_str(), libRealPath) == nullptr) {
         FI_HILOGE("Get absolute algoPath is error, errno:%{public}d", errno);
         return RET_ERR;

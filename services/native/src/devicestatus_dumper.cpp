@@ -384,7 +384,7 @@ void DeviceStatusDumper::CheckDefineOutput(int32_t fd, const char* fmt, Ts... ar
 {
     CALL_DEBUG_ENTER;
     CHKPV(fmt);
-    char buf[MAX_PACKET_BUF_SIZE] = {};
+    char buf[MAX_PACKET_BUF_SIZE] = { 0 };
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
         FI_HILOGE("Call snprintf_s failed, ret:%{public}d", ret);

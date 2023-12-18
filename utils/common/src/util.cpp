@@ -54,7 +54,7 @@ static std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        char buf[BUF_TID_SIZE] = {};
+        char buf[BUF_TID_SIZE] = { 0 };
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
             FI_HILOGE("Call sprintf_s failed, ret:%{public}d", ret);
@@ -189,7 +189,7 @@ static std::string GetFileName(const std::string &path)
 
 const char* GetProgramName()
 {
-    static char programName[PROGRAM_NAME_SIZE] = {};
+    static char programName[PROGRAM_NAME_SIZE] = { 0 };
     if (programName[0] != '\0') {
         return programName;
     }
@@ -268,7 +268,7 @@ bool IsValidSvgFile(const std::string &filePath)
         FI_HILOGE("FilePath is empty");
         return false;
     }
-    char realPath[PATH_MAX] = {};
+    char realPath[PATH_MAX] = { 0 };
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         FI_HILOGE("Realpath return nullptr, realPath:%{public}s", realPath);
         return false;
