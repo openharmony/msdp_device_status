@@ -63,7 +63,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
 {
     CALL_INFO_TRACE;
     if (!isUnchained) {
-        FI_HILOGE("No stop operation is required");
+        FI_HILOGI("No stop operation is required");
         return RET_ERR;
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(networkId);
@@ -78,10 +78,10 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
     }
 
     if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
-        FI_HILOGD("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
-            preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
+        FI_HILOGI("preparedNetworkId is not empty, first:%{public}s, second:%{public}s, networkId:%{public}s",
+            preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str(),
+            networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
         if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
-            FI_HILOGD("networkId:%{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
             bool ret = COOR_SM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
             if (ret) {
                 COOR_SM->NotifyChainRemoved();

@@ -566,7 +566,7 @@ bool CooperateSM::UpdateMouseLocation()
 
 bool CooperateSM::UnchainCooperate(const std::string &localNetworkId, const std::string &remoteNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = D_INPUT_ADAPTER->UnPrepareRemoteInput(localNetworkId, remoteNetworkId, [](bool isSuccess) {});
     if (ret != RET_OK) {
         FI_HILOGE("Failed to call distributed UnprepareRemoteInput");
@@ -1110,7 +1110,7 @@ void CooperateSM::NotifyChainRemoved()
 
 void CooperateSM::NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     FI_HILOGD("Notify unchained result, isSuccess:%{public}d", isSuccess);
     if (isSuccess) {
         COOR_SM->NotifyChainRemoved();
@@ -1129,8 +1129,9 @@ void CooperateSM::SetSinkNetworkId(const std::string &sinkNetworkId)
 
 void CooperateSM::SetPointerVisible()
 {
+    CALL_INFO_TRACE;
     bool hasPointer = COOR_DEV_MGR->HasLocalPointerDevice();
-    FI_HILOGD("hasPointer:%{public}s", hasPointer ? "true" : "false");
+    FI_HILOGI("hasPointer:%{public}s", hasPointer ? "true" : "false");
     MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
 }
 

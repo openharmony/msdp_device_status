@@ -96,7 +96,7 @@ void CoordinationSM::OnReset(const std::string &networkId)
 
 void CoordinationSM::OnSessionLost(SessionPtr session)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPV(session);
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPV(event);
@@ -149,7 +149,7 @@ void CoordinationSM::Reset(bool adjustAbsolutionLocation)
 
 void CoordinationSM::OnCoordinationChanged(const std::string &networkId, bool isOpen)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CoordinationMessage msg = isOpen ? CoordinationMessage::PREPARE : CoordinationMessage::UNPREPARE;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
@@ -624,7 +624,7 @@ bool CoordinationSM::UpdateMouseLocation()
 
 bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = D_INPUT_ADAPTER->UnPrepareRemoteInput(localNetworkId, remoteNetworkId, [](bool isSuccess) {});
     if (ret != RET_OK) {
         FI_HILOGE("Failed to call distributed UnprepareRemoteInput");
@@ -1189,7 +1189,7 @@ void CoordinationSM::NotifyChainRemoved()
 
 void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     FI_HILOGD("Notify unchained result, isSuccess:%{public}d", isSuccess);
     if (isSuccess) {
         COOR_SM->NotifyChainRemoved();
@@ -1208,8 +1208,9 @@ void CoordinationSM::SetSinkNetworkId(const std::string &sinkNetworkId)
 
 void CoordinationSM::SetPointerVisible()
 {
+    CALL_INFO_TRACE;
     bool hasPointer = COOR_DEV_MGR->HasLocalPointerDevice();
-    FI_HILOGD("hasPointer:%{public}s", hasPointer ? "true" : "false");
+    FI_HILOGI("hasPointer:%{public}s", hasPointer ? "true" : "false");
     MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
 }
 
