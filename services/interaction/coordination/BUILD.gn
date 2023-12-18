@@ -35,6 +35,7 @@ ohos_shared_library("coordination") {
     "${device_status_service_path}/context/include",
     "${device_status_service_path}/interaction/coordination/include",
     "${device_status_service_path}/interaction/drag/include",
+    "${file_dfs_service_path}/services/distributedfiledaemon/include/ipc",
     "//third_party/cJSON",
   ]
 
@@ -72,6 +73,7 @@ ohos_shared_library("coordination") {
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_client",
     "device_manager:devicemanagersdk",
+    "dfs_service:distributed_file_daemon_kit_inner",
     "distributed_input:libdinput_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
