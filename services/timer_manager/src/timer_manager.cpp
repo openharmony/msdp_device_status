@@ -36,12 +36,6 @@ constexpr int32_t MAX_INTERVAL_MS { 10000 };
 constexpr size_t MAX_TIMER_COUNT { 64 };
 } // namespace
 
-int32_t TimerManager::Init(IContext *context)
-{
-    CHKPR(context, RET_ERR);
-    return context->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
-}
-
 int32_t TimerManager::OnInit(IContext *context)
 {
     CHKPR(context, RET_ERR);
@@ -53,6 +47,12 @@ int32_t TimerManager::OnInit(IContext *context)
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t TimerManager::Init(IContext *context)
+{
+    CHKPR(context, RET_ERR);
+    return context->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnInit, this, context));
 }
 
 int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
@@ -125,6 +125,13 @@ bool TimerManager::IsExist(int32_t timerId) const
     return fu.get();
 }
 
+int32_t TimerManager::OnProcessTimers()
+{
+    ProcessTimersInternal();
+    ArmTimer();
+    return RET_OK;
+}
+
 void TimerManager::ProcessTimers()
 {
     CALL_INFO_TRACE;
@@ -135,13 +142,6 @@ void TimerManager::ProcessTimers()
 int32_t TimerManager::RunIsExist(std::packaged_task<bool(int32_t)> &task, int32_t timerId) const
 {
     task(timerId);
-    return RET_OK;
-}
-
-int32_t TimerManager::OnProcessTimers()
-{
-    ProcessTimersInternal();
-    ArmTimer();
     return RET_OK;
 }
 

@@ -26,6 +26,7 @@ namespace DeviceStatus {
 class InputAdapter {
     struct PointerFilter : public MMI::IInputEventFilter {
         explicit PointerFilter(std::function<void (std::shared_ptr<MMI::PointerEvent>)> cb) : callback_(cb) {}
+        bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
         bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
         {
             return false;
@@ -34,7 +35,6 @@ class InputAdapter {
         {
             filterId_ = filterId;
         }
-        bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
     private:
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_;
         mutable int32_t filterId_ { -1 };
