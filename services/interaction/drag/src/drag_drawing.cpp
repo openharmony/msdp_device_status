@@ -61,6 +61,8 @@ constexpr int64_t START_TIME { 181154000809 };
 constexpr int64_t INTERVAL_TIME { 16666667 };
 constexpr int32_t FRAMERATE { 30 };
 constexpr int32_t SVG_WIDTH { 40 };
+constexpr float SCALE_THRESHOLD_EIGHT { 1.0F * INT32_MAX / (SVG_WIDTH + EIGHT_SIZE) };
+constexpr float SCALE_THRESHOLD_TWELVE { 1.0F * INT32_MAX / (SVG_WIDTH + TWELVE_SIZE) };
 constexpr int32_t SIXTEEN { 16 };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
 constexpr int32_t VIEW_BOX_POS { 2 };
@@ -312,7 +314,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CHKPR(shadowNode, RET_ERR);
     DrawShadow(shadowNode);
     float scalingValue = GetScaling();
-    if ((1.0 * INT32_MAX / (SVG_WIDTH + TWELVE_SIZE)) <= scalingValue) {
+    if (SCALE_THRESHOLD_TWELVE < scalingValue || fabsf(SCALE_THRESHOLD_TWELVE - scalingValue) < EPSILON) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
         return RET_ERR;
     }
@@ -1231,7 +1233,7 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
-        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 || fabs(filterInfo.dipScale) < EPSILON ||
+        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale < 0 || fabs(filterInfo.dipScale) < EPSILON ||
             std::numeric_limits<float>::max() / filterInfo.dipScale < filterInfo.cornerRadius) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
                 filterInfo.cornerRadius, filterInfo.dipScale);
@@ -1625,7 +1627,7 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     CHKPV(stylePixelMap_);
     CHKPV(g_drawingInfo.pixelMap);
     float scalingValue = GetScaling();
-    if ((1.0 * INT_MAX / (SVG_WIDTH + EIGHT_SIZE)) <= scalingValue) {
+    if (SCALE_THRESHOLD_EIGHT < scalingValue || fabsf(SCALE_THRESHOLD_EIGHT - scalingValue) < EPSILON) {
         FI_HILOGE("Invalid scalingValue:%{public}f", scalingValue);
         return;
     }
