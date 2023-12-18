@@ -16,6 +16,7 @@
 #include "devicestatus_srv_stub.h"
 
 #include <unistd.h>
+#include <tokenid_kit.h>
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
@@ -151,6 +152,26 @@ bool DeviceStatusSrvStub::CheckCooperatePermission()
     int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
         permissionName);
     return result == Security::AccessToken::PERMISSION_GRANTED;
+}
+
+bool DeviceStatusSrvStub::IsSystemServiceCalling()
+{
+    const auto tokenId = IPCSkeleton::GetCallingTokenID();
+    const auto flag = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (flag == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
+        flag == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        FI_HILOGD("system service calling, tokenId: %{public}u, flag: %{public}u", tokenId, flag);
+        return true;
+    }
+    return false;
+}
+
+bool DeviceStatusSrvStub::IsSystemCalling()
+{
+    if (IsSystemServiceCalling()) {
+        return true;
+    }
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(IPCSkeleton::GetCallingFullTokenID());
 }
 
 int32_t DeviceStatusSrvStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -316,6 +337,10 @@ int32_t DeviceStatusSrvStub::RegisterCooperateMonitorStub(MessageParcel &data,
     MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -331,6 +356,10 @@ int32_t DeviceStatusSrvStub::UnregisterCooperateMonitorStub(MessageParcel &data,
     MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -345,6 +374,10 @@ int32_t DeviceStatusSrvStub::UnregisterCooperateMonitorStub(MessageParcel &data,
 int32_t DeviceStatusSrvStub::PrepareCooperateStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -361,6 +394,10 @@ int32_t DeviceStatusSrvStub::PrepareCooperateStub(MessageParcel &data, MessagePa
 int32_t DeviceStatusSrvStub::UnPrepareCooperateStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -377,6 +414,10 @@ int32_t DeviceStatusSrvStub::UnPrepareCooperateStub(MessageParcel &data, Message
 int32_t DeviceStatusSrvStub::ActivateCooperateStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -397,6 +438,10 @@ int32_t DeviceStatusSrvStub::ActivateCooperateStub(MessageParcel &data, MessageP
 int32_t DeviceStatusSrvStub::DeactivateCooperateStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
@@ -415,6 +460,10 @@ int32_t DeviceStatusSrvStub::DeactivateCooperateStub(MessageParcel &data, Messag
 int32_t DeviceStatusSrvStub::GetCooperateStateStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return RET_ERR;
+    }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
         return RET_ERR;
