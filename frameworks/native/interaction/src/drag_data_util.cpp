@@ -22,14 +22,15 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data)
+
+int32_t DragDataUtil::Marshalling(const DragData &dragData, Parcel &data, bool isCross)
 {
-    return DragDataPacker::Marshalling(dragData, data);
+    return DragDataPacker::Marshalling(dragData, data, isCross);
 }
 
-int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData)
+int32_t DragDataUtil::UnMarshalling(Parcel &data, DragData &dragData, bool isCross)
 {
-    return DragDataPacker::UnMarshalling(data, dragData);
+    return DragDataPacker::UnMarshalling(data, dragData, isCross);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

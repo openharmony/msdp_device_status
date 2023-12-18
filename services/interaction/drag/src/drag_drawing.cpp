@@ -1231,7 +1231,7 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
-        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 ||
+        if (filterInfo.cornerRadius < 0 || filterInfo.dipScale <= 0 || fabs(filterInfo.dipScale) < EPSILON ||
             std::numeric_limits<float>::max() / filterInfo.dipScale < filterInfo.cornerRadius) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
                 filterInfo.cornerRadius, filterInfo.dipScale);
@@ -1472,7 +1472,7 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
 {
     CALL_DEBUG_ENTER;
     CHKPR(node, RET_ERR);
-    if (float radius = 0.0; ParserRadius(radius)) {
+    if (float radius = 0.0F; ParserRadius(radius)) {
         node->SetCornerRadius(radius);
         FI_HILOGD("SetCornerRadius by radius:%{public}f", radius);
     }
@@ -1601,7 +1601,7 @@ bool DragDrawing::ParserRadius(float &radius)
         FI_HILOGE("Parser dipScale failed");
         return false;
     }
-    if (cornerRadius->valuedouble < 0 || dipScale->valuedouble <= 0 ||
+    if (cornerRadius->valuedouble < 0 || dipScale->valuedouble < 0 || fabs(dipScale->valuedouble) < EPSILON ||
         std::numeric_limits<float>::max() / dipScale->valuedouble < cornerRadius->valuedouble) {
         FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
             cornerRadius->valuedouble, dipScale->valuedouble);

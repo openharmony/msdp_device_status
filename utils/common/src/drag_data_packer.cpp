@@ -27,10 +27,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDat
 
 namespace DeviceStatus {
 
-int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
+int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool isCross)
 {
-    if (ShadowPacker::Marshalling(dragData.shadowInfos, data) != RET_OK) {
-        FI_HILOGE("Failed to marshalling shadowInfos");
+    CALL_DEBUG_ENTER;
+    if (ShadowPacker::Marshalling(dragData.shadowInfos, data, isCross) != RET_OK) {
+        FI_HILOGE("Marshalling shadowInfos failed");
         return RET_ERR;
     }
     WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
@@ -45,16 +46,17 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data)
     WRITEINT32(data, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(data, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
     if (SummaryPacker::Marshalling(dragData.summarys, data) != RET_OK) {
-        FI_HILOGE("Failed to summarys marshalling");
+        FI_HILOGE("Marshalling summary failed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
+int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData, bool isCross)
 {
-    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos) != RET_OK) {
-        FI_HILOGE("UnMarshallingShadowInfos failed");
+    CALL_DEBUG_ENTER;
+    if (ShadowPacker::UnMarshalling(data, dragData.shadowInfos, isCross) != RET_OK) {
+        FI_HILOGE("UnMarshalling shadowInfos failed");
         return RET_ERR;
     }
     READUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -69,13 +71,13 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData)
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (SummaryPacker::UnMarshalling(data, dragData.summarys) != RET_OK) {
-        FI_HILOGE("Failed to summarys unmarshalling");
+        FI_HILOGE("Unmarshalling summary failed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data)
+int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross)
 {
     CALL_DEBUG_ENTER;
     if (shadowInfos.empty()) {
@@ -89,18 +91,15 @@ int32_t ShadowPacker::Marshalling(const std::vector<ShadowInfo> &shadowInfos, Pa
     }
     WRITEINT32(data, shadowNum, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < shadowNum; i++) {
-        CHKPR(shadowInfos[i].pixelMap, RET_ERR);
-        if (!shadowInfos[i].pixelMap->Marshalling(data)) {
-            FI_HILOGE("Failed to marshalling pixelMap");
-            return ERR_INVALID_VALUE;
+        if (PackUpShadowInfo(shadowInfos[i], data, isCross) != RET_OK) {
+            FI_HILOGE("PackUpShadowInfo No.%{public}d failed", i);
+            return RET_ERR;
         }
-        WRITEINT32(data, shadowInfos[i].x, ERR_INVALID_VALUE);
-        WRITEINT32(data, shadowInfos[i].y, ERR_INVALID_VALUE);
     }
     return RET_OK;
 }
 
-int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos)
+int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross)
 {
     CALL_DEBUG_ENTER;
     int32_t shadowNum { 0 };
@@ -111,13 +110,58 @@ int32_t ShadowPacker::UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shado
     }
     for (int32_t i = 0; i < shadowNum; i++) {
         ShadowInfo shadowInfo;
-        auto pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-        CHKPR(pixelMap, RET_ERR);
-        shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
-        READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-        READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+        if (UnPackShadowInfo(data, shadowInfo, isCross) != RET_OK) {
+            FI_HILOGE("UnPackShadowInfo No.%{public}d failed", i);
+            return RET_ERR;
+        }
+        CHKPR(shadowInfo.pixelMap, RET_ERR);
         shadowInfos.push_back(shadowInfo);
     }
+    return RET_OK;
+}
+
+int32_t ShadowPacker::PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &data, bool isCross)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if (isCross) {
+        FI_HILOGD("By EncodeTlv");
+        std::vector<uint8_t> pixelBuffer;
+        if (!shadowInfo.pixelMap->EncodeTlv(pixelBuffer)) {
+            FI_HILOGE("EncodeTlv pixelMap failed");
+            return ERR_INVALID_VALUE;
+        }
+        WRITEUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
+    } else {
+        FI_HILOGD("By Marshalling");
+        if (!shadowInfo.pixelMap->Marshalling(data)) {
+            FI_HILOGE("Marshalling pixelMap failed");
+            return ERR_INVALID_VALUE;
+        }
+    }
+    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
+    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    return RET_OK;
+}
+
+int32_t ShadowPacker::UnPackShadowInfo(Parcel &data, ShadowInfo &shadowInfo, bool isCross)
+{
+    CALL_DEBUG_ENTER;
+    Media::PixelMap *rawPixelMap = nullptr;
+    if (isCross) {
+        FI_HILOGD("By DecodeTlv");
+        std::vector<uint8_t> pixelBuffer;
+        READUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
+        rawPixelMap = Media::PixelMap::DecodeTlv(pixelBuffer);
+    } else {
+        FI_HILOGD("By UnMarshalling");
+        rawPixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+    }
+    CHKPR(rawPixelMap, RET_ERR);
+    shadowInfo.pixelMap = std::shared_ptr<Media::PixelMap>(rawPixelMap);
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
     return RET_OK;
 }
 
@@ -133,14 +177,10 @@ int32_t SummaryPacker::Marshalling(const SummaryMap &val, Parcel &parcel)
 
 int32_t SummaryPacker::UnMarshalling(Parcel &parcel, SummaryMap &val)
 {
+    size_t readAbleSize = parcel.GetReadableBytes();
     int32_t size = 0;
     READINT32(parcel, size, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    if (size < 0) {
-        FI_HILOGE("Invalid size:%{public}d", size);
-        return RET_ERR;
-    }
-    size_t readAbleSize = parcel.GetReadableBytes();
-    if ((static_cast<size_t>(size) > readAbleSize) || static_cast<size_t>(size) > val.max_size()) {
+    if (size < 0 || (static_cast<size_t>(size) > readAbleSize) || static_cast<size_t>(size) > val.max_size()) {
         FI_HILOGE("Invalid size:%{public}d", size);
         return RET_ERR;
     }

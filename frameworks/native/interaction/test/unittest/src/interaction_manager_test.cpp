@@ -1988,10 +1988,31 @@ HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer, TestSize.Level1)
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
     ASSERT_TRUE(dragData);
     Parcel parcel;
-    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel);
+    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel, false);
     ASSERT_EQ(ret, RET_OK);
     DragData dragDataFromParcel;
-    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel);
+    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel, false);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(dragData.value(), dragDataFromParcel);
+}
+
+/**
+ * @tc.name: TestDragDataUtil_Packer_Cross
+ * @tc.desc: Pack up dragData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, TestDragDataUtil_Packer_Cross, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, MOUSE_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    Parcel parcel;
+    int32_t ret = DragDataUtil::Marshalling(dragData.value(), parcel, true);
+    ASSERT_EQ(ret, RET_OK);
+    DragData dragDataFromParcel;
+    ret = DragDataUtil::UnMarshalling(parcel, dragDataFromParcel, true);
     ASSERT_EQ(ret, RET_OK);
     ASSERT_EQ(dragData.value(), dragDataFromParcel);
 }

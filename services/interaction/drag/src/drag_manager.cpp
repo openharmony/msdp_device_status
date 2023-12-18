@@ -490,9 +490,9 @@ void DragManager::Dump(int32_t fd) const
     dprintf(fd, "dragData = {\n"
             "\tudKey:%s\n\tfilterInfo:%s\n\textraInfo:%s\n\tsourceType:%d"
             "\tdragNum:%d\n\tpointerId:%d\n\tdisplayX:%d\n\tdisplayY:%d\n""\tdisplayId:%d\n\thasCanceledAnimation:%s\n",
-            GetAnonyString(dragData.udKey).c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(), dragData.sourceType,
-            dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY, dragData.displayId,
-            dragData.hasCanceledAnimation ? "true" : "false");
+            GetAnonyString(dragData.udKey).c_str(), dragData.filterInfo.c_str(), dragData.extraInfo.c_str(),
+            dragData.sourceType, dragData.dragNum, dragData.pointerId, dragData.displayX, dragData.displayY,
+            dragData.displayId, dragData.hasCanceledAnimation ? "true" : "false");
     if (dragState_ != DragState::STOP) {
         for (const auto& shadowInfo : dragData.shadowInfos) {
             CHKPV(shadowInfo.pixelMap);

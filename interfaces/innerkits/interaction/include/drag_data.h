@@ -32,7 +32,7 @@ constexpr size_t MAX_BUFFER_SIZE { 512 };
 constexpr size_t MAX_UDKEY_SIZE { 100 };
 constexpr size_t MAX_SUMMARY_SIZE { 200 };
 constexpr int32_t SHADOW_NUM_LIMIT { 3 };
-constexpr float PERCISION { 1E-6 };
+constexpr float EPSILON { 1E-6 };
 constexpr int32_t MAX_ANIMATION_DURATION_MS { 1000 };
 
 struct ShadowInfo {
@@ -135,13 +135,13 @@ struct PreviewStyle {
     std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };
     int32_t opacity { -1 };
-    float radius { -1.0 };
-    float scale { -1.0 };
+    float radius { -1.0F };
+    float scale { -1.0F };
 
     bool operator == (const PreviewStyle &other) const
     {
         return types == other.types && foregroundColor == other.foregroundColor && opacity == other.opacity &&
-               radius == other.radius && fabsf(scale - other.scale) < PERCISION;
+               radius == other.radius && fabsf(scale - other.scale) < EPSILON;
     }
 
     bool operator!=(const PreviewStyle &other) const
