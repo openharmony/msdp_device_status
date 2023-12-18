@@ -49,7 +49,7 @@ const SessionAttribute g_sessionAttr = {
 
 void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* networkId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
     cJSON* buttonIsPressed = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_POINTER_BUTTON_IS_PRESS);
     if (!cJSON_IsString(networkId) || !cJSON_IsBool(buttonIsPressed)) {
@@ -61,7 +61,7 @@ void ResponseStartRemoteCooperate(int32_t sessionId, const JsonParser &parser)
 
 void ResponseStartRemoteCooperateResult(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
     cJSON* dhid = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_START_DHID);
     cJSON* x = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_POINTER_X);
@@ -75,7 +75,7 @@ void ResponseStartRemoteCooperateResult(int32_t sessionId, const JsonParser &par
 
 void ResponseStopRemoteCooperate(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
@@ -87,7 +87,7 @@ void ResponseStopRemoteCooperate(int32_t sessionId, const JsonParser &parser)
 
 void ResponseStopRemoteCooperateResult(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
 
     if (!cJSON_IsBool(result)) {
@@ -99,7 +99,7 @@ void ResponseStopRemoteCooperateResult(int32_t sessionId, const JsonParser &pars
 
 void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* networkId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_LOCAL_DEVICE_ID);
     cJSON* result = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_RESULT);
     if (!cJSON_IsString(networkId) || !cJSON_IsBool(result)) {
@@ -111,7 +111,7 @@ void ResponseNotifyUnchainedResult(int32_t sessionId, const JsonParser &parser)
 
 void ResponseStartCooperateOtherResult(int32_t sessionId, const JsonParser &parser)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     cJSON* networkId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
 
     if (!cJSON_IsString(networkId)) {
@@ -292,7 +292,7 @@ std::shared_ptr<CooperateSoftbusAdapter> CooperateSoftbusAdapter::GetInstance()
 int32_t CooperateSoftbusAdapter::StartRemoteCooperate(const std::string &localNetworkId,
     const std::string &remoteNetworkId, bool checkButtonDown)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Start remote cooperate error, not found this device");
@@ -338,7 +338,7 @@ int32_t CooperateSoftbusAdapter::StartRemoteCooperate(const std::string &localNe
 int32_t CooperateSoftbusAdapter::StartRemoteCooperateResult(const std::string &remoteNetworkId,
     bool isSuccess, const std::string &startDeviceDhid, int32_t xPercent, int32_t yPercent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Stop remote cooperate error, not found this device");
@@ -366,7 +366,7 @@ int32_t CooperateSoftbusAdapter::StartRemoteCooperateResult(const std::string &r
 
 int32_t CooperateSoftbusAdapter::StopRemoteCooperate(const std::string &remoteNetworkId, bool isUnchained)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Stop remote cooperate error, not found this device");
@@ -392,7 +392,7 @@ int32_t CooperateSoftbusAdapter::StopRemoteCooperate(const std::string &remoteNe
 int32_t CooperateSoftbusAdapter::StopRemoteCooperateResult(const std::string &remoteNetworkId,
     bool isSuccess)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Stop remote cooperate result error, not found this device");
@@ -418,7 +418,7 @@ int32_t CooperateSoftbusAdapter::StopRemoteCooperateResult(const std::string &re
 int32_t CooperateSoftbusAdapter::NotifyUnchainedResult(const std::string &localNetworkId,
     const std::string &remoteNetworkId, bool result)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Stop remote cooperate result error, not found this device");
@@ -470,7 +470,7 @@ int32_t CooperateSoftbusAdapter::NotifyFilterAdded(const std::string &remoteNetw
 int32_t CooperateSoftbusAdapter::StartCooperateOtherResult(const std::string &originNetworkId,
     const std::string &remoteNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(originNetworkId) == sessionDevs_.end()) {
         FI_HILOGE("Start cooperate other result error, not found this device");
@@ -604,7 +604,7 @@ int32_t CooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_t resu
 
 void CooperateSoftbusAdapter::OnSessionClosed(int32_t sessionId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::string networkId = FindDevice(sessionId);
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(networkId) != sessionDevs_.end()) {
@@ -654,7 +654,7 @@ int32_t CooperateSoftbusAdapter::SendData(const std::string &networkId, MessageI
 
 void CooperateSoftbusAdapter::ResponseNotifyFilterAdded()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     openSessionWaitCond_.notify_all();
 }

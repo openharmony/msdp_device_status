@@ -59,7 +59,7 @@ int32_t CooperateStateIn::ActivateCooperate(const std::string &remoteNetworkId,
 
 int32_t CooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     auto* context = COOR_EVENT_MGR->GetIContext();
     CHKPR(context, RET_ERR);
     std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
@@ -73,7 +73,7 @@ int32_t CooperateStateIn::ProcessStart(const std::string &remoteNetworkId, int32
 int32_t CooperateStateIn::DeactivateCooperate(const std::string &remoteNetworkId, bool isUnchained,
     const std::pair<std::string, std::string> &preparedNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = COOR_SOFTBUS_ADAPTER->StopRemoteCooperate(remoteNetworkId, isUnchained);
     if (ret != RET_OK) {
         FI_HILOGE("Stop cooperate failed");
@@ -152,7 +152,7 @@ void CooperateStateIn::OnStopRemoteInput(bool isSuccess,
 
 void CooperateStateIn::ComeBack(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCooperateDhids(startDeviceId);
     if (inputDeviceDhids.empty()) {
         COOR_SM->OnStartFinish(false, remoteNetworkId, startDeviceId);

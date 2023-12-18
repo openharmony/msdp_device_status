@@ -292,7 +292,7 @@ std::string CooperateDeviceManager::GetOriginNetworkId(const std::string &dhid) 
 
 std::string CooperateDeviceManager::GetDhid(int32_t deviceId) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
             return devIter->second->GetDhid();

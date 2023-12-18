@@ -78,10 +78,10 @@ int32_t CooperateStateFree::DeactivateCooperate(const std::string &networkId, bo
     }
 
     if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
-        FI_HILOGD("preparedNetworkId is not empty, first:%{public}s, second:%{public}s",
-            preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str());
+        FI_HILOGI("preparedNetworkId is not empty, first:%{public}s, second:%{public}s, networkId:%{public}s",
+            preparedNetworkId.first.c_str(), preparedNetworkId.second.c_str(),
+            networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
         if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
-            FI_HILOGD("networkId:%{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
             bool ret = COOR_SM->UnchainCooperate(preparedNetworkId.first, preparedNetworkId.second);
             if (ret) {
                 COOR_SM->NotifyChainRemoved();
