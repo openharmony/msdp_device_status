@@ -79,6 +79,8 @@ private:
     int32_t UpdatePreviewStyleWithAnimationStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetDragSummaryStub(MessageParcel &data, MessageParcel &reply);
     bool CheckCooperatePermission();
+    bool IsSystemServiceCalling();
+    bool IsSystemCalling();
     void InitCoordination();
     void InitDrag();
     int32_t EnterTextEditorAreaStub(MessageParcel &data, MessageParcel &reply);
