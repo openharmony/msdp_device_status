@@ -51,13 +51,13 @@ bool JsDragManager::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 napi_value JsDragManager::GetDataSummary(napi_env env)
 {
     CALL_INFO_TRACE;
+    napi_value arr = nullptr;
+    CHKRP(napi_create_array(env, &arr), CREATE_ARRAY);
     std::map<std::string, int64_t> summarys;
     if (INTERACTION_MGR->GetDragSummary(summarys) != RET_OK) {
         FI_HILOGE("Failed to GetDragSummary");
-        return nullptr;
+        return arr;
     }
-    napi_value arr = nullptr;
-    CHKRP(napi_create_array(env, &arr), CREATE_ARRAY);
     uint32_t index = 0;
     for (const auto &summary : summarys) {
         napi_value dataType = nullptr;

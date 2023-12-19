@@ -59,7 +59,7 @@ napi_value JsCooperateContext::Enable(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = TWO_PARAM;
-    napi_value argv[TWO_PARAM] = {};
+    napi_value argv[TWO_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == ZERO_PARAM) {
@@ -91,7 +91,7 @@ napi_value JsCooperateContext::Start(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = THREE_PARAM;
-    napi_value argv[THREE_PARAM] = {};
+    napi_value argv[THREE_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc < TWO_PARAM) {
@@ -106,7 +106,7 @@ napi_value JsCooperateContext::Start(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "startDeviceId", "number");
         return nullptr;
     }
-    char remoteNetworkDescriptor[MAX_STRING_LEN] = {};
+    char remoteNetworkDescriptor[MAX_STRING_LEN] = { 0 };
     int32_t startDeviceId = ZERO_PARAM;
     size_t length = ZERO_PARAM;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], remoteNetworkDescriptor,
@@ -131,7 +131,7 @@ napi_value JsCooperateContext::Stop(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = ONE_PARAM;
-    napi_value argv[ONE_PARAM] = {};
+    napi_value argv[ONE_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsCooperateContext *jsDev = JsCooperateContext::GetInstance(env);
@@ -152,7 +152,7 @@ napi_value JsCooperateContext::GetState(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = TWO_PARAM;
-    napi_value argv[TWO_PARAM] = {};
+    napi_value argv[TWO_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == ZERO_PARAM) {
@@ -186,7 +186,7 @@ napi_value JsCooperateContext::GetState(napi_env env, napi_callback_info info)
 napi_value JsCooperateContext::On(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
-    napi_value argv[TWO_PARAM] = {};
+    napi_value argv[TWO_PARAM] = { nullptr };
     size_t argc = TWO_PARAM;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == ZERO_PARAM) {
@@ -198,7 +198,7 @@ napi_value JsCooperateContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
-    char type[MAX_STRING_LEN] = {};
+    char type[MAX_STRING_LEN] = { 0 };
     size_t length = ZERO_PARAM;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     if (std::strcmp(type, "cooperation") != ZERO_PARAM) {
@@ -221,7 +221,7 @@ napi_value JsCooperateContext::Off(napi_env env, napi_callback_info info)
 {
     CALL_INFO_TRACE;
     size_t argc = TWO_PARAM;
-    napi_value argv[TWO_PARAM] = {};
+    napi_value argv[TWO_PARAM] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == ZERO_PARAM) {
@@ -232,7 +232,7 @@ napi_value JsCooperateContext::Off(napi_env env, napi_callback_info info)
         THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
-    char type[MAX_STRING_LEN] = {};
+    char type[MAX_STRING_LEN] = { 0 };
     size_t length = ZERO_PARAM;
     CHKRP(napi_get_value_string_utf8(env, argv[ZERO_PARAM], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     std::string typeTmp = type;
@@ -403,7 +403,7 @@ void JsCooperateContext::DeclareDeviceCoordinationData(napi_env env, napi_value 
 napi_value JsCooperateContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     size_t argc = ZERO_PARAM;
-    napi_value args[ONE_PARAM] = {};
+    napi_value args[ONE_PARAM] = { nullptr };
     napi_value result = nullptr;
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);

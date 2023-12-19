@@ -175,7 +175,7 @@ int32_t CoordinationSoftbusAdapter::Init()
         return RET_OK;
     }
     localSessionName_ = bindName;
-    char name[DEVICE_NAME_SIZE_MAX] = {};
+    char name[DEVICE_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, sessionName.c_str()) != RET_OK) {
         FI_HILOGE("Invalid name:%{public}s", sessionName.c_str());
         return RET_ERR;
@@ -243,18 +243,18 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
     }
-    char name[DEVICE_NAME_SIZE_MAX] = {};
+    char name[DEVICE_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(name, DEVICE_NAME_SIZE_MAX, localSessionName_.c_str()) != RET_OK) {
         FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
         return RET_ERR;
     }
     std::string peerSessionName = SESSION_NAME + remoteNetworkId.substr(0, INTERCEPT_STRING_LENGTH);
-    char peerName[DEVICE_NAME_SIZE_MAX] = {};
+    char peerName[DEVICE_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerName, DEVICE_NAME_SIZE_MAX, peerSessionName.c_str()) != RET_OK) {
         FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
         return RET_ERR;
     }
-    char peerNetworkId[PKG_NAME_SIZE_MAX] = {};
+    char peerNetworkId[PKG_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
         FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
         return RET_ERR;
