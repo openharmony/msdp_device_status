@@ -191,7 +191,7 @@ int32_t CoordinationSoftbusAdapter::Init()
         FI_HILOGI("Server set ok");
     } else {
         FI_HILOGE("Server set failed, ret:%{public}d", ret);
-        ShutDown(socketFd_);
+        Shutdown(socketFd_);
     }
     return ret;
 }
@@ -275,7 +275,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
         ConfigTcpAlive(socket);
     } else {
         FI_HILOGE("Bind failed, ret:%{public}d", ret);
-        ShutDown(socket);
+        Shutdown(socket);
     }
     return ret;
 }
