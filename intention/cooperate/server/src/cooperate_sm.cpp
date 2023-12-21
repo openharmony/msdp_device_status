@@ -284,6 +284,7 @@ int32_t CooperateSM::DeactivateCooperate(bool isUnchained)
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device cooperate failed");
         isStopping_ = false;
+        isUnchained_ = false;
     }
     CHKPR(notifyDragCancelCallback_, ERROR_NULL_POINTER);
     notifyDragCancelCallback_();
