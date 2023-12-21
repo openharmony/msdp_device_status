@@ -337,6 +337,7 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
     if (ret != RET_OK) {
         FI_HILOGE("Stop input device coordination failed");
         isStopping_ = false;
+        isUnchained_ = false;
     }
     CHKPR(notifyDragCancelCallback_, ERROR_NULL_POINTER);
     notifyDragCancelCallback_();
