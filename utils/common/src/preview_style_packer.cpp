@@ -66,6 +66,10 @@ int32_t PreviewAnimationPacker::Marshalling(const PreviewAnimation &previewAnima
 int32_t PreviewAnimationPacker::UnMarshalling(Parcel &data, PreviewAnimation &previewAnimation)
 {
     READINT32(data, previewAnimation.duration, ERR_INVALID_VALUE);
+    if (previewAnimation.duration <= 0) {
+        FI_HILOGE("Invalid paramater duration:%{public}d", previewAnimation.duration);
+        return ERR_INVALID_VALUE;
+    }
     if (previewAnimation.duration > MAX_ANIMATION_DURATION_MS) {
         FI_HILOGW("Duration:%{public}d too long, use default value", previewAnimation.duration);
         previewAnimation.duration = MAX_ANIMATION_DURATION_MS;
