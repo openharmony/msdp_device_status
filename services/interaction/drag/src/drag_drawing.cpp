@@ -374,7 +374,7 @@ void DragDrawing::EraseMouseIcon()
 
 void DragDrawing::DestroyDragWindow()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     screenId_ = 0;
     startNum_ = START_TIME;
     needDestroyDragWindow_ = false;
