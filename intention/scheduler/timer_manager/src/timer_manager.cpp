@@ -56,7 +56,7 @@ int32_t TimerManager::OnInit(IContext *context)
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     return context_->GetDelegateTasks().PostSyncTask(
         std::bind(&TimerManager::OnAddTimer, this, intervalMs, repeatCount, callback));
@@ -71,7 +71,7 @@ int32_t TimerManager::OnAddTimer(int32_t intervalMs, int32_t repeatCount, std::f
 
 int32_t TimerManager::RemoveTimer(int32_t timerId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     return context_->GetDelegateTasks().PostSyncTask(std::bind(&TimerManager::OnRemoveTimer, this, timerId));
 }
@@ -160,7 +160,7 @@ int32_t TimerManager::TakeNextTimerId()
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
     } else if (intervalMs > MAX_INTERVAL_MS) {
@@ -275,7 +275,7 @@ void TimerManager::ProcessTimersInternal()
 
 int32_t TimerManager::ArmTimer()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (timerFd_ < 0) {
         FI_HILOGE("TimerManager is uninitialized");
         return RET_ERR;

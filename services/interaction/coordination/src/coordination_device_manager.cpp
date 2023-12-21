@@ -317,7 +317,7 @@ bool CoordinationDeviceManager::HasLocalPointerDevice() const
 
 void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(device);
     auto dev = std::make_shared<CoordinationDeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
@@ -331,7 +331,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(device);
     auto iter = devices_.find(device->GetId());
     if (iter == devices_.end()) {
