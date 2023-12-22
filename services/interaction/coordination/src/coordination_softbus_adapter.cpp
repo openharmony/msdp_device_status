@@ -150,6 +150,9 @@ int32_t CoordinationSoftbusAdapter::InitSocket(SocketInfo info, int32_t socketTy
     };
 
     FI_HILOGI("The socketType:%{public}d", socketType);
+    FI_HILOGI("The current device name:%{public}s", info.name);
+    FI_HILOGI("The peerName:%{public}s", info.peerName);
+    FI_HILOGI("The peerNetworkId:%{public}s", info.peerNetworkId);
     if (socketType == SOCKET_SERVER) {
         return Listen(socket, socketQos, QOS_LEN, &listener);
     } else if (socketType == SOCKET_CLIENT) {
