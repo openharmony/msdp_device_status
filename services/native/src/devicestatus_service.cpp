@@ -786,11 +786,11 @@ int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
     return ret;
 }
 
-int32_t DeviceStatusService::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t DeviceStatusService::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset, &dragMgr_,
-        std::ref(offsetX), std::ref(offsetY), std::ref(width), std::ref(height)));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&DragManager::OnGetShadowOffset,
+        &dragMgr_, std::ref(shadowOffset)));
     if (ret != RET_OK) {
         FI_HILOGE("Get shadow offset failed, ret:%{public}d", ret);
     }

@@ -93,20 +93,22 @@ int32_t DragDataManager::GetTargetPid() const
     return targetPid_;
 }
 
-int32_t DragDataManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) const
+int32_t DragDataManager::GetShadowOffset(ShadowOffset &shadowOffset) const
 {
     if (dragData_.shadowInfos.empty()) {
         FI_HILOGE("ShadowInfos is empty");
         return RET_ERR;
     }
-    offsetX = dragData_.shadowInfos.front().x;
-    offsetY = dragData_.shadowInfos.front().y;
     auto pixelMap = dragData_.shadowInfos.front().pixelMap;
     CHKPR(pixelMap, RET_ERR);
-    width = pixelMap->GetWidth();
-    height = pixelMap->GetHeight();
+    shadowOffset = {
+        .offsetX = dragData_.shadowInfos.front().x,
+        .offsetY = dragData_.shadowInfos.front().y,
+        .width = pixelMap->GetWidth(),
+        .height = pixelMap->GetHeight()
+    };
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
-        offsetX, offsetY, width, height);
+        shadowOffset.offsetX, shadowOffset.offsetY, shadowOffset.width, shadowOffset.height);
     return RET_OK;
 }
 

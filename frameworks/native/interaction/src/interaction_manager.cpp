@@ -126,9 +126,9 @@ int32_t InteractionManager::SetDragWindowVisible(bool visible)
     return INTER_MGR_IMPL.SetDragWindowVisible(visible);
 }
 
-int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t InteractionManager::GetShadowOffset(ShadowOffset &shadowOffset)
 {
-    return INTER_MGR_IMPL.GetShadowOffset(offsetX, offsetY, width, height);
+    return INTER_MGR_IMPL.GetShadowOffset(shadowOffset);
 }
 
 int32_t InteractionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)

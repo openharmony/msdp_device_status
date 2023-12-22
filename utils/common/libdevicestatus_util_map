@@ -38,6 +38,12 @@
             "OHOS::Msdp::DeviceStatus::GetAnonyString(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::DragDataPacker::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&, bool)";
             "OHOS::Msdp::DeviceStatus::DragDataPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&, bool)";
+            "OHOS::Msdp::DeviceStatus::DragDataPacker::CheckDragData(OHOS::Msdp::DeviceStatus::DragData const&)";
+            "OHOS::Msdp::DeviceStatus::ShadowPacker::PackUpShadowInfo(OHOS::Msdp::DeviceStatus::ShadowInfo const&, OHOS::Parcel&, bool)";
+            "OHOS::Msdp::DeviceStatus::ShadowPacker::UnPackShadowInfo(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::ShadowInfo&, bool)";
+            "OHOS::Msdp::DeviceStatus::ShadowPacker::CheckShadowInfo(OHOS::Msdp::DeviceStatus::ShadowInfo const&)";
+            "OHOS::Msdp::DeviceStatus::ShadowOffsetPacker::Marshalling(OHOS::Msdp::DeviceStatus::ShadowOffset const&, OHOS::Parcel&)";
+            "OHOS::Msdp::DeviceStatus::ShadowOffsetPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::ShadowOffset&)";
             "OHOS::Msdp::DeviceStatus::SummaryPacker::UnMarshalling(OHOS::Parcel&, std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>>&)";
             "OHOS::Msdp::DeviceStatus::SummaryPacker::Marshalling(std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long long>>> const&, OHOS::Parcel&)";
             "OHOS::Msdp::DeviceStatus::SummaryPacker::UnMarshalling(OHOS::Parcel&, std::__h::map<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, long, std::__h::less<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>, std::__h::allocator<std::__h::pair<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const, long>>>&)";

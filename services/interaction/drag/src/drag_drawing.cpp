@@ -230,7 +230,9 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
         FI_HILOGE("ShadowInfos is empty");
         return INIT_FAIL;
     }
-    CHKPR(dragData.shadowInfos.front().pixelMap, INIT_FAIL);
+    for (const auto &shadowInfo : dragData.shadowInfos) {
+        CHKPR(shadowInfo.pixelMap, INIT_FAIL);
+    }
     if ((dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
         (dragData.sourceType != MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN)) {
         FI_HILOGE("Invalid sourceType:%{public}d", dragData.sourceType);
@@ -724,10 +726,6 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         FI_HILOGE("ShadowInfos is empty");
         return;
     }
-    size_t shadowInfosSize = dragData.shadowInfos.size();
-    for (size_t i = 1; i < shadowInfosSize; ++i) {
-        g_drawingInfo.mutilSelectedPixelMaps.emplace_back(dragData.shadowInfos[i].pixelMap);
-    }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
@@ -738,6 +736,10 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.displayY = dragData.displayY;
     g_drawingInfo.extraInfo = dragData.extraInfo;
     g_drawingInfo.filterInfo = dragData.filterInfo;
+    size_t shadowInfosSize = dragData.shadowInfos.size();
+    for (size_t i = 1; i < shadowInfosSize; ++i) {
+        g_drawingInfo.mutilSelectedPixelMaps.emplace_back(dragData.shadowInfos[i].pixelMap);
+    }
 }
 
 int32_t DragDrawing::InitDragAnimationData(DragAnimationData &dragAnimationData)

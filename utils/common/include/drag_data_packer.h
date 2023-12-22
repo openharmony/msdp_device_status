@@ -33,21 +33,28 @@ class DragDataPacker {
 public:
     static int32_t Marshalling(const DragData &dragData, Parcel &data, bool isCross = false);
     static int32_t UnMarshalling(Parcel &data, DragData &dragData, bool isCross = false);
+    static int32_t CheckDragData(const DragData &dragData);
 };
 
 class ShadowPacker {
 public:
     static int32_t Marshalling(const std::vector<ShadowInfo> &shadowInfos, Parcel &data, bool isCross = false);
     static int32_t UnMarshalling(Parcel &data, std::vector<ShadowInfo> &shadowInfos, bool isCross = false);
-private:
     static int32_t PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &data, bool isCross = false);
     static int32_t UnPackShadowInfo(Parcel &data, ShadowInfo &shadowInfo, bool isCross = false);
+    static int32_t CheckShadowInfo(const ShadowInfo &shadowInfo);
 };
 
 class SummaryPacker {
 public:
     static int32_t Marshalling(const SummaryMap &val, Parcel &parcel);
     static int32_t UnMarshalling(Parcel &parcel, SummaryMap &val);
+};
+
+class ShadowOffsetPacker {
+public:
+    static int32_t Marshalling(const ShadowOffset&shadowOffset, Parcel &parcel);
+    static int32_t UnMarshalling(Parcel &parcel, ShadowOffset&shadowOffset);
 };
 } // namespace DeviceStatus
 } // namespace Msdp

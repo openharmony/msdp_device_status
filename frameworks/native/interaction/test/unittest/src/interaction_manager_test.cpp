@@ -1479,10 +1479,6 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_SetDragWindowVisible, Te
 HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    int32_t width = 0;
-    int32_t height = 0;
     std::promise<bool> promise;
     std::future<bool> futureFlag = promise.get_future();
     auto callback = [&promise](const DragNotifyMsg& notifyMessage) {
@@ -1499,9 +1495,10 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetShadowOffset, TestSiz
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragDataInfo.value(),
         std::make_shared<UnitTestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
+    ShadowOffset shadowOffset;
+    ret = InteractionManager::GetInstance()->GetShadowOffset(shadowOffset);
     FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
-        offsetX, offsetY, width, height);
+        shadowOffset.offsetX, shadowOffset.offsetY, shadowOffset.width, shadowOffset.height);
     ASSERT_EQ(ret, RET_OK);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);

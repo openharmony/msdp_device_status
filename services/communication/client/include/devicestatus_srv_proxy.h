@@ -61,7 +61,7 @@ public:
     virtual int32_t AddSubscriptListener() override;
     virtual int32_t RemoveSubscriptListener() override;
     virtual int32_t SetDragWindowVisible(bool visible) override;
-    virtual int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) override;
+    virtual int32_t GetShadowOffset(ShadowOffset &shadowOffset) override;
     virtual int32_t AddHotAreaListener() override;
     virtual int32_t RemoveHotAreaListener() override;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;

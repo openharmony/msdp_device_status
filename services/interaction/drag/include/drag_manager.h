@@ -62,7 +62,7 @@ public:
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
-    int32_t OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
+    int32_t OnGetShadowOffset(ShadowOffset &shadowOffset);
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(void)> callback) override;

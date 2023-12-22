@@ -45,7 +45,7 @@
             "OHOS::Msdp::DeviceStatus::InteractionManager::StartDrag(OHOS::Msdp::DeviceStatus::DragData const&, std::__h::shared_ptr<OHOS::Msdp::DeviceStatus::IStartDragListener>)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::StopDrag(OHOS::Msdp::DeviceStatus::DragDropResult const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::SetDragWindowVisible(bool)";
-            "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(int&, int&, int&, int&)";
+            "OHOS::Msdp::DeviceStatus::InteractionManager::GetShadowOffset(OHOS::Msdp::DeviceStatus::ShadowOffset&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateDragStyle(OHOS::Msdp::DeviceStatus::DragCursorStyle)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::UpdateShadowPic(OHOS::Msdp::DeviceStatus::ShadowInfo const&)";
             "OHOS::Msdp::DeviceStatus::InteractionManager::GetDragData(OHOS::Msdp::DeviceStatus::DragData&)";
