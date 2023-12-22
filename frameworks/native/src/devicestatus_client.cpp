@@ -154,7 +154,7 @@ Data DeviceStatusClient::GetDeviceStatusData(Type type)
 {
     CALL_DEBUG_ENTER;
     Data devicestatusData;
-    devicestatusData.type = Type::TYPE_INVALID;
+    devicestatusData.type = type;
     devicestatusData.value = OnChangedValue::VALUE_INVALID;
     if (Connect() != RET_OK) {
         FI_HILOGE("Connect failed");
