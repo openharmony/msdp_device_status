@@ -491,6 +491,7 @@ void CoordinationSM::StartCoordinationOtherResult(const std::string &remoteNetwo
 
 void CoordinationSM::OnStartFinishSuccess(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
+    CALL_INFO_TRACE;
     startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
     if (currentState_ == CoordinationState::STATE_FREE) {
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
