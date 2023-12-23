@@ -17,7 +17,7 @@ group("devicestatus_service_group") {
   deps = []
 
   if (fusion_intention_framework) {
-    deps += [ "${device_status_root_path}/intention/cooperate/server:intention_cooperate" ]
+    deps += [ "${device_status_root_path}/intention/cooperate/plugin:intention_cooperate" ]
   }
 
   if (fusion_rust_enabled) {
