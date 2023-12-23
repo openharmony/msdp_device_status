@@ -481,6 +481,8 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         isUnchained_ = false;
     }
     isStopping_ = false;
+    CHKPR(notifyDragCancelCallback_, ERROR_NULL_POINTER);
+    notifyDragCancelCallback_();
 }
 
 void CoordinationSM::StartCoordinationOtherResult(const std::string &remoteNetworkId)
