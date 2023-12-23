@@ -169,7 +169,7 @@ void CooperateFree::PrepareRemoteInput::OnProgress(Context &context, const Coope
         CHKPV(parent_.env_);
         timerId_ = parent_.env_->GetTimerManager().AddTimer(PREPARE_DINPUT_TIMEOUT, REPEAT_ONCE,
             [sender = context.sender_, remoteNetworkId = context.remoteNetworkId_,
-             originNetworkId, startDeviceId = context.startDeviceId_]() mutable {
+            originNetworkId, startDeviceId = context.startDeviceId_]() mutable {
                 sender.Send(CooperateEvent(CooperateEventType::PREPARE_DINPUT_RESULT, PrepareRemoteInputResult {
                     .remoteNetworkId = remoteNetworkId,
                     .originNetworkId = originNetworkId,
