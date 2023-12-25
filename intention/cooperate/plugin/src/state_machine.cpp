@@ -15,6 +15,8 @@
 
 #include "state_machine.h"
 
+#include "devicestatus_define.h"
+
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
@@ -22,31 +24,25 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateMachine" };
 } // namespace
 
-StateMachine::StateMachine()
-    : states_ {
-        std::make_shared<CooperateFree>(),
-        std::make_shared<CooperateOut>(),
-        std::make_shared<CooperateIn>(),
-    }
+StateMachine::StateMachine(IContext *env)
+    : env_(env)
 {
+    states_[COOPERATE_STATE_FREE] = std::make_shared<CooperateFree>(env);
+    states_[COOPERATE_STATE_OUT] = std::make_shared<CooperateOut>(env);
+    states_[COOPERATE_STATE_IN] = std::make_shared<CooperateIn>(env);
 }
 
-int32_t StateMachine::Init(Channel<CooperateEvent>::Sender sender)
+void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
-    context_.sender = sender;
-    return RET_OK;
-}
-
-void StateMachine::OnEvent(CooperateEvent &event)
-{
+    CHKPV(env_);
     switch (event.type) {
         case CooperateEventType::UPDATE_STATE : {
-            UpdateState(std::get<UpdateStateEvent>(event.event));
+            UpdateState(context, std::get<UpdateStateEvent>(event.event));
             break;
         }
         case CooperateEventType::ENABLE : {
@@ -56,26 +52,24 @@ void StateMachine::OnEvent(CooperateEvent &event)
             break;
         }
         default : {
-            if (states_[current_] != nullptr) {
-                states_[current_]->OnEvent(context_, event);
-            }
+            states_[current_]->OnEvent(context, event);
             break;
         }
     }
 }
 
-void StateMachine::UpdateState(UpdateStateEvent &event)
+void StateMachine::UpdateState(Context &context, const UpdateStateEvent &event)
 {
-    if ((event.current < NUM_COOPERATE_STATES) && (event.current != current_)) {
-        if (states_[current_] != nullptr) {
-            states_[current_]->OnLeave(context_);
-        }
+    CALL_DEBUG_ENTER;
+    if ((event.current >= COOPERATE_STATE_FREE) &&
+        (event.current < NUM_COOPERATE_STATES) &&
+        (event.current != current_)) {
+        states_[current_]->OnLeaveState(context);
         current_ = event.current;
-        if (states_[current_] != nullptr) {
-            states_[current_]->OnEvent(context_);
-        }
+        states_[current_]->OnEnterState(context);
     }
 }
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -21,61 +21,57 @@
 #include <string>
 
 #include "nocopyable.h"
-#include "refbase.h"
-#include "singleton.h"
 
 #include "coordination_message.h"
 #include "i_context.h"
-#include "i_socket_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateEventManager final {
-    DECLARE_DELAYED_SINGLETON(CooperateEventManager);
+namespace Cooperate {
+class EventManager final {
 public:
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
-    struct EventInfo : public RefBase {
+    struct EventInfo {
         EventType type { LISTENER };
-        std::shared_ptr<ISocketSession> sess { nullptr };
         MessageId msgId { MessageId::INVALID };
+        int32_t pid { -1 };
         int32_t userData { -1 };
         std::string networkId;
         CoordinationMessage msg { CoordinationMessage::PREPARE };
         bool state { false };
     };
 
-    DISALLOW_COPY_AND_MOVE(CooperateEventManager);
+    EventManager(IContext *env);
+    ~EventManager() = default;
+    DISALLOW_COPY_AND_MOVE(EventManager);
 
-    void AddCooperateEvent(sptr<EventInfo> event);
-    void RemoveCooperateEvent(sptr<EventInfo> event);
+    void AddCooperateEvent(std::shared_ptr<EventInfo> event);
+    void RemoveCooperateEvent(std::shared_ptr<EventInfo> event);
     int32_t OnCooperateMessage(CoordinationMessage msg, const std::string &networkId = "");
     void OnEnable(CoordinationMessage msg, const std::string &networkId = "");
     void OnStart(CoordinationMessage msg, const std::string &networkId = "");
     void OnStop(CoordinationMessage msg, const std::string &networkId = "");
     void OnGetCrossingSwitchState(bool state);
     void OnErrorMessage(EventType type, CoordinationMessage msg);
-    void SetIContext(IContext *context);
-    IContext* GetIContext() const;
 
 private:
-    void NotifyCooperateMessage(std::shared_ptr<ISocketSession> sess,
-        MessageId msgId, int32_t userData, const std::string &networkId, CoordinationMessage msg);
-    void NotifyCooperateState(std::shared_ptr<ISocketSession> sess, MessageId msgId, int32_t userData, bool state);
+    void NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t userData,
+        const std::string &networkId, CoordinationMessage msg);
+    void NotifyCooperateState(int32_t pid, MessageId msgId, int32_t userData, bool state);
 
 private:
+    IContext *env_ { nullptr };
     std::mutex lock_;
-    std::list<sptr<EventInfo>> remoteCooperateCallbacks_;
-    std::map<EventType, sptr<EventInfo>> cooperateCallbacks_{
+    std::list<std::shared_ptr<EventInfo>> listeners_;
+    std::map<EventType, std::shared_ptr<EventInfo>> calls_ {
         { EventType::ENABLE, nullptr },
         { EventType::START, nullptr },
         { EventType::STOP, nullptr },
         { EventType::STATE, nullptr }
     };
-    IContext *context_ { nullptr };
 };
-
-#define COOR_EVENT_MGR OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

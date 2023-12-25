@@ -196,11 +196,14 @@ public:
     /**
      * @brief Obtains the position of the touch point or mouse pointer relative to
      * the upper left corner of the shadow thumbnail.
-     * @param shadowOffset Indicates shadowOffset.
+     * @param offsetX Indicates the x coordinate.
+     * @param offsetY Indicates the y coordinate.
+     * @param width Indicates the width of the shadow thumbnail.
+     * @param height Indicates the height of the shadow thumbnail.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t GetShadowOffset(ShadowOffset &shadowOffset);
+    int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
 
     /**
      * @brief Updates the shadow thumbnail information used for dragging.

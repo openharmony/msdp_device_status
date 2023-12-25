@@ -19,15 +19,17 @@
 #include <string>
 #include <unordered_map>
 
-#include "singleton.h"
+#include "nocopyable.h"
 
-#include "i_device_manager.h"
+#include "channel.h"
+#include "cooperate_events.h"
+#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateDeviceManager {
-    DECLARE_DELAYED_SINGLETON(CooperateDeviceManager);
+namespace Cooperate {
+class DeviceManager final : public std::enable_shared_from_this<DeviceManager> {
 public:
     class Device {
     public:
@@ -55,21 +57,15 @@ public:
         std::string networkId_;
     };
 
-private:
-    class DeviceObserver final : public IDeviceObserver {
-    public:
-        explicit DeviceObserver(CooperateDeviceManager &cooDevMgr);
-        ~DeviceObserver() = default;
-        void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
-        void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
+    DeviceManager(IContext *env);
+    ~DeviceManager();
+    DISALLOW_COPY_AND_MOVE(DeviceManager);
 
-    private:
-        CooperateDeviceManager &cooDevMgr_;
-    };
+    void AttachSender(Channel<CooperateEvent>::Sender sender);
+    bool Start();
+    void Stop();
 
-public:
-    void Init();
-    std::shared_ptr<CooperateDeviceManager::Device> GetDevice(int32_t id) const;
+    std::shared_ptr<DeviceManager::Device> GetDevice(int32_t id) const;
     bool IsRemote(int32_t id);
     std::vector<std::string> GetCooperateDhids(int32_t deviceId) const;
     std::vector<std::string> GetCooperateDhids(const std::string &dhid, bool isRemote) const;
@@ -79,13 +75,27 @@ public:
     bool HasLocalPointerDevice() const;
 
 private:
+    class DeviceObserver final : public IDeviceObserver {
+    public:
+        explicit DeviceObserver(std::shared_ptr<DeviceManager> devMgr);
+        ~DeviceObserver() = default;
+
+        void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
+        void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
+
+    private:
+        std::weak_ptr<DeviceManager> devMgr_;
+    };
+
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
 
-    std::shared_ptr<DeviceObserver> devObserver_ { nullptr };
+    IContext *env_ { nullptr };
+    Channel<CooperateEvent>::Sender sender_;
+    std::shared_ptr<IDeviceObserver> observer_ { nullptr };
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
 };
-#define COOR_DEV_MGR OHOS::DelayedSingleton<CooperateDeviceManager>::GetInstance()
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

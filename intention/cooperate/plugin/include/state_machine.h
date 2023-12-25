@@ -13,26 +13,32 @@
  * limitations under the License.
  */
 
-#ifndef COOPERATE_EVENT_HANDLER_H
-#define COOPERATE_EVENT_HANDLER_H
+#ifndef COOPERATE_STATE_MACHINE_H
+#define COOPERATE_STATE_MACHINE_H
 
-#include <memory>
-
-#include "event_handler.h"
-#include "event_runner.h"
+#include "cooperate_context.h"
+#include "i_cooperate_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateEventHandler final : public AppExecFwk::EventHandler {
+namespace Cooperate {
+class StateMachine {
 public:
-    explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-    ~CooperateEventHandler() override = default;
-    bool ProxyPostTask(const Callback &callback, int64_t delayTime);
-    bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
-    void ProxyRemoveTask(const std::string &name);
+    StateMachine(IContext *env);
+    ~StateMachine() = default;
+
+    void OnEvent(Context &context, const CooperateEvent &event);
+
+private:
+    void UpdateState(Context &context, const UpdateStateEvent &event);
+
+    IContext *env_ { nullptr };
+    size_t current_ { COOPERATE_STATE_FREE };
+    std::array<std::shared_ptr<ICooperateState>, NUM_COOPERATE_STATES> states_;
 };
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COOPERATE_EVENT_HANDLER_H
+#endif // COOPERATE_STATE_MACHINE_H

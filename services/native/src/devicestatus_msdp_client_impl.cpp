@@ -193,7 +193,6 @@ ErrCode DeviceStatusMsdpClientImpl::AlgoDisable(Type type)
         iAlgo_->Disable(type);
         UnregisterAlgo();
     }
-    iter->second--;
     algoCallCounts_.erase(type);
     if (algoCallCounts_.empty()) {
         if (UnloadAlgoLibrary() == RET_ERR) {

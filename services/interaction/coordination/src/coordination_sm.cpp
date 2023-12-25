@@ -481,6 +481,8 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         isUnchained_ = false;
     }
     isStopping_ = false;
+    CHKPV(notifyDragCancelCallback_);
+    notifyDragCancelCallback_();
 }
 
 void CoordinationSM::StartCoordinationOtherResult(const std::string &remoteNetworkId)
@@ -488,6 +490,47 @@ void CoordinationSM::StartCoordinationOtherResult(const std::string &remoteNetwo
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     remoteNetworkId_ = remoteNetworkId;
+}
+
+void CoordinationSM::OnStartFinishSuccess(const std::string &remoteNetworkId, int32_t startDeviceId)
+{
+    CALL_INFO_TRACE;
+    startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
+    if (currentState_ == CoordinationState::STATE_FREE) {
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+        NotifyRemoteNetworkId(remoteNetworkId);
+        NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
+        StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+        std::string taskName = "open_p2p_connection";
+        std::function<void()> handleFunc =
+            std::bind(&CoordinationSM::OpenP2PConnection, this, remoteNetworkId);
+        eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
+    } else if (currentState_ == CoordinationState::STATE_IN) {
+        std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
+        if (!originNetworkId.empty() && (remoteNetworkId != originNetworkId)) {
+            COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
+        }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
+        NotifyRemoteNetworkId(originNetworkId);
+        NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
+        StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
+#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
+        SetPointerVisible();
+    }
+    NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
+    if (currentState_ == CoordinationState::STATE_FREE) {
+        UpdateState(CoordinationState::STATE_OUT);
+        CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_FREE,
+            CoordinationState::STATE_OUT);
+    } else if (currentState_ == CoordinationState::STATE_IN) {
+        UpdateState(CoordinationState::STATE_FREE);
+        CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_IN,
+            CoordinationState::STATE_FREE);
+    } else {
+        CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_OUT);
+        FI_HILOGI("Current state is out");
+    }
 }
 
 void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
@@ -504,42 +547,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         FI_HILOGE("Start distributed failed, startDevice:%{public}d", startDeviceId);
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
-        startDeviceDhid_ = COOR_DEV_MGR->GetDhid(startDeviceId);
-        if (currentState_ == CoordinationState::STATE_FREE) {
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-            NotifyRemoteNetworkId(remoteNetworkId);
-            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
-            StateChangedNotify(CoordinationState::STATE_FREE, CoordinationState::STATE_OUT);
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
-            std::string taskName = "open_p2p_connection";
-            std::function<void()> handleFunc =
-                std::bind(&CoordinationSM::OpenP2PConnection, this, remoteNetworkId);
-            eventHandler_->ProxyPostTask(handleFunc, taskName, 0);
-        } else if (currentState_ == CoordinationState::STATE_IN) {
-            std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceId);
-            if (!originNetworkId.empty() && (remoteNetworkId != originNetworkId)) {
-                COOR_SOFTBUS_ADAPTER->StartCoordinationOtherResult(originNetworkId, remoteNetworkId);
-            }
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-            NotifyRemoteNetworkId(originNetworkId);
-            NotifyMouseLocation(mouseLocation_.first, mouseLocation_.second);
-            StateChangedNotify(CoordinationState::STATE_IN, CoordinationState::STATE_FREE);
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
-            SetPointerVisible();
-        }
-        NotifyRemoteStartSuccess(remoteNetworkId, startDeviceDhid_);
-        if (currentState_ == CoordinationState::STATE_FREE) {
-            UpdateState(CoordinationState::STATE_OUT);
-            CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_FREE,
-                CoordinationState::STATE_OUT);
-        } else if (currentState_ == CoordinationState::STATE_IN) {
-            UpdateState(CoordinationState::STATE_FREE);
-            CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_IN,
-                CoordinationState::STATE_FREE);
-        } else {
-            CoordinationDFX::WriteCooperateDrag(remoteNetworkId, CoordinationState::STATE_OUT);
-            FI_HILOGI("Current state is out");
-        }
+        OnStartFinishSuccess(remoteNetworkId, startDeviceId);
     }
     isStarting_ = false;
 }
@@ -650,6 +658,7 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
     }
     CloseP2PConnection(localNetworkId);
     preparedNetworkId_ = std::make_pair("", "");
+    sinkNetworkId_ = "";
     return true;
 }
 
@@ -1210,6 +1219,7 @@ void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, b
     isUnchained_ = false;
     isStopping_ = false;
     preparedNetworkId_ = std::make_pair("", "");
+    sinkNetworkId_ = "";
     COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
 }
 

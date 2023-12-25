@@ -13,46 +13,6 @@
 
 import("../../../device_status.gni")
 
-config("intention_cooperate_public_config") {
-  include_dirs = [ "include" ]
-}
-
-ohos_shared_library("intention_cooperate") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  branch_protector_ret = "pac_ret"
-
-  include_dirs = [ "include" ]
-
-  sources = [ "src/cooperate.cpp" ]
-
-  public_configs = [ ":intention_cooperate_public_config" ]
-
-  defines = device_status_default_defines
-
-  deps = [
-    "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_root_path}/utils/common:devicestatus_util",
-    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
-  ]
-
-  external_deps = [
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "input:libmmi-client",
-  ]
-
-  subsystem_name = "${device_status_subsystem_name}"
-  part_name = "${device_status_part_name}"
-}
-
 config("intention_cooperate_server_public_config") {
   include_dirs = [ "include" ]
 }

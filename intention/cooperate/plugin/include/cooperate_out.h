@@ -16,20 +16,18 @@
 #ifndef COOPERATE_OUT_H
 #define COOPERATE_OUT_H
 
-#include <array>
-#include <memory>
-
 #include "i_cooperate_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
 class CooperateOut : public ICooperateState {
 public:
-    CooperateOut();
+    CooperateOut(IContext *env);
     ~CooperateOut() = default;
 
-    void OnEvent(Context &context, CooperateEvent &event) override;
+    void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &event) override;
     void OnLeaveState(Context &event) override;
 
@@ -39,14 +37,14 @@ private:
         Initial(CooperateOut &parent);
         ~Initial() = default;
 
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
 
         static void BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent);
 
     private:
-        void OnStart(Context &context, CooperateEvent &event);
+        void OnStart(Context &context, const CooperateEvent &event);
 
         std::shared_ptr<ICooperateStep> stop_ { nullptr };
     };
@@ -56,9 +54,9 @@ private:
         StopRemoteInput(CooperateOut &parent, std::shared_ptr<ICooperateStep> prev);
         ~StopRemoteInput() = default;
 
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
     };
 
     class UnprepareRemoteInput : public ICooperateStep {
@@ -66,11 +64,14 @@ private:
         UnprepareRemoteInput(CooperateOut &parent, std::shared_ptr<ICooperateStep> prev);
         ~UnprepareRemoteInput() = default;
 
-        void OnEvent(Context &context, CooperateEvent &event) override;
-        void OnProgress(Context &context, CooperateEvent &event) override;
-        void OnReset(Context &context, CooperateEvent &event) override;
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
     };
+
+    IContext *env_ { nullptr };
 };
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

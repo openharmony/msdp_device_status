@@ -13,100 +13,97 @@
  * limitations under the License.
  */
 
-#include "cooperate_device_manager.h"
+#include "device_manager.h"
 
 #include <openssl/sha.h>
 #include <regex>
 
-#include "cooperate_event_manager.h"
-#include "cooperate_sm.h"
-#include "cooperate_util.h"
 #include "devicestatus_define.h"
+#include "dsoftbus_adapter.h"
+#include "event_manager.h"
 #include "napi_constants.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateDeviceManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
 constexpr size_t NETWORK_ID_NUMS { 3 };
 constexpr size_t DESCRIPTOR_INDEX { 2 };
 } // namespace
 
-CooperateDeviceManager::CooperateDeviceManager() {}
-CooperateDeviceManager::~CooperateDeviceManager() {}
-
-CooperateDeviceManager::Device::Device(std::shared_ptr<IDevice> dev)
+DeviceManager::Device::Device(std::shared_ptr<IDevice> dev)
     : device_(dev)
 {
     Populate();
 }
 
-int32_t CooperateDeviceManager::Device::GetId() const
+int32_t DeviceManager::Device::GetId() const
 {
     CHKPR(device_, RET_ERR);
     return device_->GetId();
 }
 
-std::string CooperateDeviceManager::Device::GetName() const
+std::string DeviceManager::Device::GetName() const
 {
     CHKPS(device_);
     return device_->GetName();
 }
 
-std::string CooperateDeviceManager::Device::GetDhid() const
+std::string DeviceManager::Device::GetDhid() const
 {
     return dhid_;
 }
 
-std::string CooperateDeviceManager::Device::GetNetworkId() const
+std::string DeviceManager::Device::GetNetworkId() const
 {
     return networkId_;
 }
 
-int32_t CooperateDeviceManager::Device::GetProduct() const
+int32_t DeviceManager::Device::GetProduct() const
 {
     CHKPR(device_, RET_ERR);
     return device_->GetProduct();
 }
 
-int32_t CooperateDeviceManager::Device::GetVendor() const
+int32_t DeviceManager::Device::GetVendor() const
 {
     CHKPR(device_, RET_ERR);
     return device_->GetVendor();
 }
 
-std::string CooperateDeviceManager::Device::GetPhys() const
+std::string DeviceManager::Device::GetPhys() const
 {
     CHKPS(device_);
     return device_->GetPhys();
 }
 
-std::string CooperateDeviceManager::Device::GetUniq() const
+std::string DeviceManager::Device::GetUniq() const
 {
     CHKPS(device_);
     return device_->GetUniq();
 }
 
-bool CooperateDeviceManager::Device::IsPointerDevice() const
+bool DeviceManager::Device::IsPointerDevice() const
 {
     CHKPF(device_);
     return device_->IsPointerDevice();
 }
 
-IDevice::KeyboardType CooperateDeviceManager::Device::GetKeyboardType() const
+IDevice::KeyboardType DeviceManager::Device::GetKeyboardType() const
 {
     CHKPR(device_, IDevice::KeyboardType::KEYBOARD_TYPE_NONE);
     return device_->GetKeyboardType();
 }
 
-bool CooperateDeviceManager::Device::IsKeyboard() const
+bool DeviceManager::Device::IsKeyboard() const
 {
     CHKPF(device_);
     return device_->IsKeyboard();
 }
 
-void CooperateDeviceManager::Device::Populate()
+void DeviceManager::Device::Populate()
 {
     CALL_DEBUG_ENTER;
     if (IsRemote()) {
@@ -115,13 +112,13 @@ void CooperateDeviceManager::Device::Populate()
     dhid_ = GenerateDescriptor();
 }
 
-bool CooperateDeviceManager::Device::IsRemote()
+bool DeviceManager::Device::IsRemote()
 {
     const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
     return (GetName().find(INPUT_VIRTUAL_DEVICE_NAME) != std::string::npos);
 }
 
-std::string CooperateDeviceManager::Device::MakeNetworkId(const std::string &phys) const
+std::string DeviceManager::Device::MakeNetworkId(const std::string &phys) const
 {
     std::vector<std::string> idParts;
     const std::string SPLIT_SYMBOL { "|" };
@@ -132,7 +129,7 @@ std::string CooperateDeviceManager::Device::MakeNetworkId(const std::string &phy
     return {};
 }
 
-std::string CooperateDeviceManager::Device::GenerateDescriptor()
+std::string DeviceManager::Device::GenerateDescriptor()
 {
     const std::string phys = GetPhys();
     const std::string SPLIT_SYMBOL { "|" };
@@ -166,7 +163,7 @@ std::string CooperateDeviceManager::Device::GenerateDescriptor()
     return descriptor;
 }
 
-std::string CooperateDeviceManager::Device::Sha256(const std::string &in) const
+std::string DeviceManager::Device::Sha256(const std::string &in) const
 {
     unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = { 0 }; // 2:coefficient
     SHA256_CTX ctx;
@@ -187,17 +184,47 @@ std::string CooperateDeviceManager::Device::Sha256(const std::string &in) const
     return reinterpret_cast<char*>(out);
 }
 
-void CooperateDeviceManager::Init()
+DeviceManager::DeviceManager(IContext *env)
+    : env_(env)
+{}
+
+DeviceManager::~DeviceManager()
 {
-    CALL_INFO_TRACE;
-    auto* context = COOR_EVENT_MGR->GetIContext();
-    CHKPV(context);
-    devObserver_ = std::make_shared<DeviceObserver>(*this);
-    context->GetDeviceManager().AddDeviceObserver(devObserver_);
-    context->GetDeviceManager().RetriggerHotplug(devObserver_);
+    Stop();
 }
 
-bool CooperateDeviceManager::IsRemote(int32_t id)
+void DeviceManager::AttachSender(Channel<CooperateEvent>::Sender sender)
+{
+    sender_ = sender;
+}
+
+bool DeviceManager::Start()
+{
+    CALL_DEBUG_ENTER;
+    if (observer_ != nullptr) {
+        return true;
+    }
+    observer_ = std::make_shared<DeviceObserver>(shared_from_this());
+    int32_t ret = env_->GetDeviceManager().AddDeviceObserver(observer_);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to add observer");
+        observer_.reset();
+        return false;
+    }
+    env_->GetDeviceManager().RetriggerHotplug(observer_);
+    return true;
+}
+
+void DeviceManager::Stop()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(observer_);
+    env_->GetDeviceManager().RemoveDeviceObserver(observer_);
+    observer_.reset();
+    devices_.clear();
+}
+
+bool DeviceManager::IsRemote(int32_t id)
 {
     if (auto devIter = devices_.find(id); devIter != devices_.end()) {
         CHKPF(devIter->second);
@@ -206,7 +233,7 @@ bool CooperateDeviceManager::IsRemote(int32_t id)
     return false;
 }
 
-std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(int32_t deviceId) const
+std::vector<std::string> DeviceManager::GetCooperateDhids(int32_t deviceId) const
 {
     CALL_INFO_TRACE;
     std::vector<std::string> inputDeviceDhids;
@@ -227,7 +254,7 @@ std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(int32_t devic
     inputDeviceDhids.push_back(dev->GetDhid());
     FI_HILOGD("unq:%{public}s, type:%{public}s", inputDeviceDhids.back().c_str(), "pointer");
 
-    const std::string localNetworkId { COOPERATE::GetLocalNetworkId() };
+    const std::string localNetworkId { DSoftbusAdapter::GetLocalNetworkId() };
     const std::string pointerNetworkId { dev->IsRemote() ? dev->GetNetworkId() : localNetworkId };
 
     for (const auto &[id, dev] : devices_) {
@@ -244,7 +271,7 @@ std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(int32_t devic
     return inputDeviceDhids;
 }
 
-std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(const std::string &dhid, bool isRemote) const
+std::vector<std::string> DeviceManager::GetCooperateDhids(const std::string &dhid, bool isRemote) const
 {
     int32_t deviceId { -1 };
     for (const auto &[id, dev] : devices_) {
@@ -257,7 +284,7 @@ std::vector<std::string> CooperateDeviceManager::GetCooperateDhids(const std::st
     return GetCooperateDhids(deviceId);
 }
 
-std::string CooperateDeviceManager::GetOriginNetworkId(int32_t id) const
+std::string DeviceManager::GetOriginNetworkId(int32_t id) const
 {
     CALL_INFO_TRACE;
     auto devIter = devices_.find(id);
@@ -268,12 +295,12 @@ std::string CooperateDeviceManager::GetOriginNetworkId(int32_t id) const
     CHKPS(devIter->second);
     auto OriginNetworkId = devIter->second->GetNetworkId();
     if (OriginNetworkId.empty()) {
-        OriginNetworkId = COOPERATE::GetLocalNetworkId();
+        OriginNetworkId = DSoftbusAdapter::GetLocalNetworkId();
     }
     return OriginNetworkId;
 }
 
-std::string CooperateDeviceManager::GetOriginNetworkId(const std::string &dhid) const
+std::string DeviceManager::GetOriginNetworkId(const std::string &dhid) const
 {
     CALL_INFO_TRACE;
     if (dhid.empty()) {
@@ -290,9 +317,9 @@ std::string CooperateDeviceManager::GetOriginNetworkId(const std::string &dhid) 
     return {};
 }
 
-std::string CooperateDeviceManager::GetDhid(int32_t deviceId) const
+std::string DeviceManager::GetDhid(int32_t deviceId) const
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (auto devIter = devices_.find(deviceId); devIter != devices_.end()) {
         if (devIter->second != nullptr) {
             return devIter->second->GetDhid();
@@ -302,7 +329,7 @@ std::string CooperateDeviceManager::GetDhid(int32_t deviceId) const
     return {};
 }
 
-bool CooperateDeviceManager::HasLocalPointerDevice() const
+bool DeviceManager::HasLocalPointerDevice() const
 {
     for (const auto &[id, dev] : devices_) {
         CHKPC(dev);
@@ -315,21 +342,23 @@ bool CooperateDeviceManager::HasLocalPointerDevice() const
     return false;
 }
 
-void CooperateDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
+void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
 {
     CALL_INFO_TRACE;
     CHKPV(device);
-    auto dev = std::make_shared<CooperateDeviceManager::Device>(device);
+    auto dev = std::make_shared<DeviceManager::Device>(device);
     devices_.insert_or_assign(dev->GetId(), dev);
     if (dev->IsKeyboard()) {
-        COOR_SM->OnKeyboardOnline(dev->GetDhid());
+        sender_.Send(CooperateEvent(CooperateEventType::PLUG_KEYBOARD, HotplugEvent {
+            .dhid = dev->GetDhid()
+        }));
     }
     FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
         "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
         dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
-void CooperateDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
+void DeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
 {
     CALL_INFO_TRACE;
     CHKPV(device);
@@ -339,31 +368,44 @@ void CooperateDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
         return;
     }
     std::shared_ptr<Device> dev = iter->second;
-    CHKPV(dev);
-    auto dhids = GetCooperateDhids(dev->GetId());
     devices_.erase(iter);
-    if (device->IsPointerDevice()) {
-        COOR_SM->OnPointerOffline(dev->GetDhid(), dhids);
-    } else if (device->IsKeyboard()) {
-        if (!dev->IsRemote() && dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            COOR_SM->OnKeyboardOffline(dev->GetDhid());
-        }
+    CHKPV(dev);
+    if (dev->IsPointerDevice()) {
+        sender_.Send(CooperateEvent(CooperateEventType::UNPLUG_POINTER, HotplugEvent {
+            .dhid = dev->GetDhid()
+        }));
+    } else if (dev->IsKeyboard() && !dev->IsRemote() &&
+               (dev->GetKeyboardType() == IDevice::KEYBOARD_TYPE_ALPHABETICKEYBOARD)) {
+        sender_.Send(CooperateEvent(CooperateEventType::UNPLUG_KEYBOARD, HotplugEvent {
+            .dhid = dev->GetDhid()
+        }));
     }
 }
 
-CooperateDeviceManager::DeviceObserver::DeviceObserver(CooperateDeviceManager &cooDevMgr)
-    : cooDevMgr_(cooDevMgr)
+DeviceManager::DeviceObserver::DeviceObserver(std::shared_ptr<DeviceManager> devMgr)
+    : devMgr_(devMgr)
 {}
 
-void CooperateDeviceManager::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
+void DeviceManager::DeviceObserver::OnDeviceAdded(std::shared_ptr<IDevice> device)
 {
-    cooDevMgr_.OnDeviceAdded(device);
+    std::shared_ptr<DeviceManager> devMgr = devMgr_.lock();
+    if (devMgr == nullptr) {
+        FI_HILOGE("Reference has expired");
+        return;
+    }
+    devMgr->OnDeviceAdded(device);
 }
 
-void CooperateDeviceManager::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> device)
+void DeviceManager::DeviceObserver::OnDeviceRemoved(std::shared_ptr<IDevice> device)
 {
-    cooDevMgr_.OnDeviceRemoved(device);
+    std::shared_ptr<DeviceManager> devMgr = devMgr_.lock();
+    if (devMgr == nullptr) {
+        FI_HILOGE("Reference has expired");
+        return;
+    }
+    devMgr->OnDeviceRemoved(device);
 }
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

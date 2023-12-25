@@ -15,76 +15,97 @@
 
 #include "cooperate.h"
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Cooperate" };
 } // namespace
-int32_t Cooperate::Init()
+
+Cooperate::Cooperate(IContext *env)
+    : env_(env), context_(env), sm_(env)
 {
-    CALL_DEBUG_ENTER;
-    auto [sender, receiver] = Channel<Cooperate>::OpenChannel();
-    sender_ = sender;
+    auto [sender, receiver] = Channel<CooperateEvent>::OpenChannel();
     receiver_ = receiver;
-    return sm_.Init(sender);
+    context_.sender_ = sender;
+    context_.Enable();
 }
 
-int32_t Cooperate::Enable()
+int32_t Cooperate::RegisterListener(int32_t pid)
 {
+    CALL_DEBUG_ENTER;
+    CHKPR(env_, RET_ERR);
+    return RET_ERR;
+}
+
+int32_t Cooperate::UnregisterListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+int32_t Cooperate::Enable(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
     running_.store(true);
     worker_ = std::thread(std::bind(&Cooperate::Loop, this));
-    FI_HILOGD("enable cooperate");
     sender_.Send(CooperateEvent(CooperateEventType::ENABLE));
     return RET_OK;
 }
 
-void Cooperate::Disable()
+int32_t Cooperate::Disable(int32_t pid)
 {
+    CALL_DEBUG_ENTER;
     sender_.Send(CooperateEvent(CooperateEventType::DISABLE));
     sender_.Send(CooperateEvent(CooperateEventType::QUIT));
     if (worker_.joinable()) {
         worker_.join();
     }
+    return RET_OK;
 }
 
-int32_t Cooperate::StartCooperate(int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
+int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
+    CALL_DEBUG_ENTER;
     StartCooperateEvent event {
         .userData = userData,
         .remoteNetworkId = remoteNetworkId,
         .startDeviceId = startDeviceId
     };
     sender_.Send(CooperateEvent(CooperateEventType::START, event));
-
-    std::thread([this, &remoteNetworkId, startDeviceId] {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        sender_.Send(CooperateEvent(CooperateEventType::PREPARE_DINPUT_RESULT,
-            StartRemoteInputResult {
-                .source = "local",
-                .sink = remoteNetworkId,
-                .startDeviceId = startDeviceId,
-                .success = true }));
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        sender_.Send(CooperateEvent(CooperateEventType::START_DINPUT_RESULT,
-            StartRemoteInputResult {
-                .source = "local",
-                .sink = remoteNetworkId,
-                .startDeviceId = startDeviceId,
-                .success = true }));
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        sender_.Send(CooperateEvent(CooperateEventType::POINTER_MOVE,
-            PointerMoveEvent {
-                .deviceId = 13,
-            }
-        ));
-    }).detach();
-    return RET_OK;
+    return RET_ERR;
 }
 
-int32_t Cooperate::StopCooperate(int32_t userData, bool isUnchained)
+int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 {
+    CALL_DEBUG_ENTER;
     return RET_ERR;
+}
+
+int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    return RET_ERR;
+}
+
+void Cooperate::Dump(int32_t fd)
+{
+    CALL_DEBUG_ENTER;
 }
 
 void Cooperate::Loop()
@@ -93,22 +114,33 @@ void Cooperate::Loop()
         CooperateEvent event = receiver_.Receive();
         switch (event.type) {
             case CooperateEventType::NOOP : {
-                FI_HILOGD("noop");
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 break;
             }
             case CooperateEventType::QUIT : {
-                FI_HILOGD("quit");
                 running_.store(false);
                 break;
             }
             default : {
-                sm_.OnEvent(event);
+                sm_.OnEvent(context_, event);
                 break;
             }
         }
     }
 }
+
+extern "C" ICooperate* CreateInstance(IContext *env)
+{
+    CHKPP(env);
+    return new Cooperate(env);
+}
+
+extern "C" void DestroyInstance(ICooperate *instance)
+{
+    if (instance != nullptr) {
+        delete instance;
+    }
+}
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

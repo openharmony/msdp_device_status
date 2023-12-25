@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef DISTRIBUTED_INPUT_ADAPTER_H
-#define DISTRIBUTED_INPUT_ADAPTER_H
+#ifndef DINPUT_ADAPTER_H
+#define DINPUT_ADAPTER_H
 
 #include <functional>
 #include <map>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -27,7 +27,6 @@
 #include "nocopyable.h"
 #include "prepare_d_input_call_back_stub.h"
 #include "simulation_event_listener_stub.h"
-#include "singleton.h"
 #include "start_d_input_call_back_stub.h"
 #include "start_stop_d_inputs_call_back_stub.h"
 #include "start_stop_result_call_back_stub.h"
@@ -35,31 +34,35 @@
 #include "unprepare_d_input_call_back_stub.h"
 #include "register_session_state_callback_stub.h"
 
+#include "i_context.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class DistributedInputAdapter final {
-    DECLARE_DELAYED_SINGLETON(DistributedInputAdapter);
+namespace Cooperate {
+class DInputAdapter final : public std::enable_shared_from_this<DInputAdapter> {
 public:
     using DInputCallback = std::function<void(bool)>;
-    using SimulateEventCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
-    DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
+
+    DInputAdapter(IContext *env);
+    ~DInputAdapter() = default;
+    DISALLOW_COPY_AND_MOVE(DInputAdapter);
 
     bool IsNeedFilterOut(const std::string &networkId,
-                         const DistributedHardware::DistributedInput::BusinessEvent &event);
+        const DistributedHardware::DistributedInput::BusinessEvent &event);
 
     int32_t StartRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-                             const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
     int32_t StopRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-                            const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
 
     int32_t StopRemoteInput(const std::string &originNetworkId,
-                            const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
 
-    int32_t PrepareRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-                               DInputCallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-                                 DInputCallback callback);
+    int32_t PrepareRemoteInput(const std::string &remoteNetworkId,
+        const std::string &originNetworkId, DInputCallback callback);
+    int32_t UnPrepareRemoteInput(const std::string &remoteNetworkId,
+        const std::string &originNetworkId, DInputCallback callback);
 
     int32_t PrepareRemoteInput(const std::string &networkId, DInputCallback callback);
     int32_t UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback);
@@ -68,14 +71,11 @@ public:
 
 private:
     enum class CallbackType {
-        StartDInputCallback,
-        StartDInputCallbackDHIds,
         StartDInputCallbackSink,
-        StopDInputCallback,
-        StopDInputCallbackDHIds,
         StopDInputCallbackSink,
-        PrepareStartDInputCallback,
-        UnPrepareStopDInputCallback,
+        StopDInputCallbackDHIds,
+        PrepareDInputCallback,
+        UnprepareDInputCallback,
         PrepareStartDInputCallbackSink,
         UnPrepareStopDInputCallbackSink
     };
@@ -85,62 +85,95 @@ private:
         int32_t timerId { 0 };
     };
 
-    class StartDInputCallback final : public DistributedHardware::DistributedInput::StartDInputCallbackStub {
-    public:
-        void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
-    };
-
-    class StopDInputCallback final : public DistributedHardware::DistributedInput::StopDInputCallbackStub {
-    public:
-        void OnResult(const std::string &devId, const uint32_t &inputTypes, const int32_t &status) override;
-    };
-
-    class StartDInputCallbackDHIds final :
-        public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
-    public:
-        void OnResultDhids(const std::string &devId, const int32_t &status) override;
-    };
-
     class StopDInputCallbackDHIds final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
+        StopDInputCallbackDHIds(std::shared_ptr<DInputAdapter> dinput);
+        ~StopDInputCallbackDHIds() = default;
+        DISALLOW_COPY_AND_MOVE(StopDInputCallbackDHIds);
+
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
     class StartDInputCallbackSink final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
+        StartDInputCallbackSink(std::shared_ptr<DInputAdapter> dinput);
+        ~StartDInputCallbackSink() = default;
+        DISALLOW_COPY_AND_MOVE(StartDInputCallbackSink);
+
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
     class StopDInputCallbackSink final :
         public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
+        StopDInputCallbackSink(std::shared_ptr<DInputAdapter> dinput);
+        ~StopDInputCallbackSink() = default;
+        DISALLOW_COPY_AND_MOVE(StopDInputCallbackSink);
+
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
-    class PrepareStartDInputCallback final :
+    class PrepareDInputCallback final :
         public DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
     public:
+        PrepareDInputCallback(std::shared_ptr<DInputAdapter> dinput);
+        ~PrepareDInputCallback() = default;
+        DISALLOW_COPY_AND_MOVE(PrepareDInputCallback);
+
         void OnResult(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
-    class UnPrepareStopDInputCallback final :
+    class UnprepareDInputCallback final :
         public DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
     public:
+        UnprepareDInputCallback(std::shared_ptr<DInputAdapter> dinput);
+        ~UnprepareDInputCallback() = default;
+        DISALLOW_COPY_AND_MOVE(UnprepareDInputCallback);
+
         void OnResult(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
     class PrepareStartDInputCallbackSink final :
         public DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
     public:
+        PrepareStartDInputCallbackSink(std::shared_ptr<DInputAdapter> dinput);
+        ~PrepareStartDInputCallbackSink() = default;
+        DISALLOW_COPY_AND_MOVE(PrepareStartDInputCallbackSink);
+
         void OnResult(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
     class UnPrepareStopDInputCallbackSink final :
         public DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
     public:
+        UnPrepareStopDInputCallbackSink(std::shared_ptr<DInputAdapter> dinput);
+        ~UnPrepareStopDInputCallbackSink() = default;
+        DISALLOW_COPY_AND_MOVE(UnPrepareStopDInputCallbackSink);
+
         void OnResult(const std::string &devId, const int32_t &status) override;
+
+    private:
+        std::weak_ptr<DInputAdapter> dinput_;
     };
 
     class SessionStateCallback final :
@@ -150,6 +183,7 @@ private:
         ~SessionStateCallback() = default;
         SessionStateCallback(std::function<void(uint32_t)> callback) : callback_(callback) {}
         void OnResult(const std::string &devId, const uint32_t status) override;
+
     private:
         std::function<void(uint32_t)> callback_;
     };
@@ -158,14 +192,14 @@ private:
     void AddTimer(const CallbackType &type);
     void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
+
+    IContext *env_ { nullptr };
     std::map<CallbackType, TimerInfo> watchings_;
     std::map<CallbackType, DInputCallback> callbacks_;
     std::mutex adapterLock_;
 };
-
-#define D_INPUT_ADAPTER OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-
-#endif // DISTRIBUTED_INPUT_ADAPTER_H
+#endif // DINPUT_ADAPTER_H

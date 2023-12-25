@@ -15,9 +15,15 @@
 
 #include "i_cooperate_state.h"
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICooperateState" };
+} // namespace
 
 ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::shared_ptr<ICooperateStep> prev)
     : parent_(parent), prev_(prev)
@@ -25,50 +31,40 @@ ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::sh
 
 void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 {
-    if (step == nullptr) {
-        FI_HILOGE("In ICooperateState::Switch, step is null");
-        return;
-    }
+    CHKPV(step);
     current_ = step;
 }
 
 void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> next)
 {
-     if (next == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::SetNext, next is nullptr");
-        return;
+    if (next != nullptr) {
+        next_ = next;
+    } else if (next_ != nullptr) {
+        next_->SetNext(nullptr);
+        next_ = nullptr;
     }
-    next_ = next;
 }
 
 void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> step)
 {
-    if (step == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Switch, step is nullptr");
-        return;
-    }
+    CHKPV(step);
     parent_.Switch(step);
 }
 
-void ICooperateState::ICooperateStep::Proceed(Context &context, CooperateEvent &event)
+void ICooperateState::ICooperateStep::Proceed(Context &context, const CooperateEvent &event)
 {
-    if (next_ == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Proceed, next_ is nullptr");
-        return;
-    }
+    CHKPV(next_);
     Switch(next_);
     next_->OnProgress(context, event);
 }
 
-void ICooperateState::ICooperateStep::Reset(Context &context, CooperateEvent &event)
+void ICooperateState::ICooperateStep::Reset(Context &context, const CooperateEvent &event)
 {
-    if (prev_ == nullptr) {
-        FI_HILOGE("In ICooperateState::ICooperateStep::Reset, prev_ is nullptr");
-        return;
-    }
+    CHKPV(prev_);
     Switch(prev_);
     prev_->OnReset(context, event);
 }
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

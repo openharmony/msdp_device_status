@@ -16,17 +16,15 @@
 #ifndef COOPERATE_IN_H
 #define COOPERATE_IN_H
 
-#include <array>
-#include <memory>
-
 #include "i_cooperate_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class CooperateIn : public ICooperateState {
+namespace Cooperate {
+class CooperateIn final : public ICooperateState {
 public:
-    CooperateIn();
+    CooperateIn(IContext *env);
     ~CooperateIn() = default;
 
     void OnEvent(Context &context, const CooperateEvent &event) override;
@@ -57,7 +55,10 @@ private:
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
     };
+
+    IContext *env_ { nullptr };
 };
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

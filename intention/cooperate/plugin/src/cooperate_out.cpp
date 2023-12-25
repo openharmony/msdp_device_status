@@ -15,20 +15,25 @@
 
 #include "cooperate_out.h"
 
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateOut" };
 } // namespace
-CooperateOut::CooperateOut()
+
+CooperateOut::CooperateOut(IContext *env)
+    : env_(env)
 {
     auto initial = std::make_shared<Initial>(*this);
     Initial::BuildChains(initial, *this);
     current_ = initial;
 }
 
-void CooperateOut::OnEvent(Context &context, CooperateEvent &event)
+void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     if (current_ != nullptr) {
@@ -38,12 +43,12 @@ void CooperateOut::OnEvent(Context &context, CooperateEvent &event)
     }
 }
 
-void CooperateOut::OnEnterState(Context & context)
+void CooperateOut::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
 }
 
-void CooperateOut::OnLeaveState(Context & context)
+void CooperateOut::OnLeaveState(Context &context)
 {
     CALL_DEBUG_ENTER;
 }
@@ -51,31 +56,13 @@ void CooperateOut::OnLeaveState(Context & context)
 CooperateOut::Initial::Initial(CooperateOut &parent) : ICooperateStep(parent, nullptr)
 {}
 
-void CooperateOut::Initial::OnEvent(Context &context, CooperateEvent &event)
-{
-    switch (event.type) {
-        case CooperateEventType::POINTER_MOVE : {
-            PointerMoveEvent e = std::get<PointerMoveEvent>(event.event);
-            if (context.startDeviceId_ != context.devMgr_.GetDhid(e.deviceId)) {
-                // 当前谁被上连接的鼠标发生移动，需要重置穿越状态。
-                FI_HILOGD("Pointer moved, reset cooperate");
-                if (stop_ != nullptr) {
-                    Switch (stop_);
-                    stop_->OnProgress(context, event);
-                }
-            }
-            break;
-        }
-        default : {
-            break;
-        }
-    }
-}
-
-void CooperateOut::Initial::OnProgress(Context &context, CooperateEvent &event)
+void CooperateOut::Initial::OnEvent(Context &context, const CooperateEvent &event)
 {}
 
-void CooperateOut::Initial::OnReset(Context &context, CooperateEvent &event)
+void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event)
+{}
+
+void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &event)
 {}
 
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
@@ -91,18 +78,17 @@ CooperateOut::StopRemoteInput::StopRemoteInput(CooperateOut &parent, std::shared
     : ICooperateStep(parent, prev)
 {}
 
-void CooperateOut::StopRemoteInput::OnEvent(Context &context, CooperateEvent &event)
+void CooperateOut::StopRemoteInput::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
 }
 
-void CooperateOut::StopRemoteInput::OnProgress(Context &context, CooperateEvent &event)
+void CooperateOut::StopRemoteInput::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    Proceed(context, event);
 }
 
-void CooperateOut::StopRemoteInput::OnReset(Context &context, CooperateEvent &event)
+void CooperateOut::StopRemoteInput::OnReset(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
 }
@@ -111,25 +97,21 @@ CooperateOut::UnprepareRemoteInput::UnprepareRemoteInput(CooperateOut &parent, s
     : ICooperateStep(parent, prev)
 {}
 
-void CooperateOut::UnprepareRemoteInput::OnEvent(Context &context, CooperateEvent &event)
+void CooperateOut::UnprepareRemoteInput::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
 }
 
-void CooperateOut::UnprepareRemoteInput::OnProgress(Context &context, CooperateEvent &event)
+void CooperateOut::UnprepareRemoteInput::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("Unprepare remote input remote: %{public}s", context.cooperated_.c_str());
-    context.sender.Send(CooperateEvent(CooperateEventType::UPDATE_STATE, UpdateStateEvent {
-        .current = 0,
-    }));
-    Proceed(context, event);
 }
 
-void CooperateOut::UnprepareRemoteInput::OnReset(Context &context, CooperateEvent &event)
+void CooperateOut::UnprepareRemoteInput::OnReset(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
 }
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
