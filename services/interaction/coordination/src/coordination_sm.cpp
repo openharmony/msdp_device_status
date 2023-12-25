@@ -652,6 +652,7 @@ bool CoordinationSM::UnchainCoordination(const std::string &localNetworkId, cons
     }
     CloseP2PConnection(localNetworkId);
     preparedNetworkId_ = std::make_pair("", "");
+    sinkNetworkId_ = "";
     return true;
 }
 
@@ -1212,6 +1213,7 @@ void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, b
     isUnchained_ = false;
     isStopping_ = false;
     preparedNetworkId_ = std::make_pair("", "");
+    sinkNetworkId_ = "";
     COOR_SOFTBUS_ADAPTER->CloseInputSoftbus(remoteNetworkId);
 }
 
