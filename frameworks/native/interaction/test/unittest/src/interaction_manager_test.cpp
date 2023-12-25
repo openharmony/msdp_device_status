@@ -2127,6 +2127,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_003, TestSize.Level1)
         ASSERT_TRUE(dragData);
         ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
+        ASSERT_EQ(ret, RET_OK);
         ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::MOVE);
         ASSERT_EQ(ret, RET_OK);
         DragAction dragAction { DragAction::INVALID };
