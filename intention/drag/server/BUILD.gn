@@ -44,7 +44,6 @@ ohos_shared_library("intention_drag") {
   ]
 
   external_deps = [
-    "c_utils:utils",
     "hilog:libhilog",
     "input:libmmi-client",
     "ipc:ipc_single",
