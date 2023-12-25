@@ -481,7 +481,7 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         isUnchained_ = false;
     }
     isStopping_ = false;
-    CHKPV(notifyDragCancelCallback_, ERROR_NULL_POINTER);
+    CHKPV(notifyDragCancelCallback_);
     notifyDragCancelCallback_();
 }
 
