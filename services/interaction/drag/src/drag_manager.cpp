@@ -175,7 +175,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
-    dragState_ = DragState::START;
+    SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
     return RET_OK;
@@ -199,7 +199,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
-    dragState_ = DragState::STOP;
+    SetDragState(DragState::STOP);
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.windowId > 0) {
         Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.windowId);
         if (result != Rosen::WMError::WM_OK) {
@@ -673,6 +673,7 @@ int32_t DragManager::OnStartDrag()
     CALL_INFO_TRACE;
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
         Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
         if (foldMode == Rosen::FoldDisplayMode::MAIN) {
@@ -796,6 +797,7 @@ void DragManager::GetAllowDragState(bool &isAllowDrag)
 
 void DragManager::SetDragState(DragState state)
 {
+    FI_HILOGI("SetDragState:%{public}d to %{public}d", static_cast<int32_t>(dragState_), static_cast<int32_t>(state));
     dragState_ = state;
 }
 
