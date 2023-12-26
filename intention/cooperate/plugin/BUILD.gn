@@ -41,8 +41,8 @@ ohos_shared_library("intention_cooperate") {
     "src/dinput_adapter.cpp",
     "src/dsoftbus_adapter.cpp",
     "src/event_manager.cpp",
-    "src/state_machine.cpp",
     "src/i_cooperate_state.cpp",
+    "src/state_machine.cpp",
   ]
 
   public_configs = [ ":intention_cooperate_public_config" ]
