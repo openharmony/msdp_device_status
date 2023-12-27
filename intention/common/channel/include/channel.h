@@ -134,13 +134,12 @@ public:
         std::shared_ptr<Channel<Event>> channel_ { nullptr };
     };
 
+    Channel() = default;
     ~Channel() = default;
 
     static std::pair<Sender, Receiver> OpenChannel();
 
 private:
-    Channel() = default;
-
     void Send(const Event &event);
     Event Peek();
     void Pop();
@@ -157,7 +156,7 @@ private:
 template<typename Event>
 std::pair<typename Channel<Event>::Sender, typename Channel<Event>::Receiver> Channel<Event>::OpenChannel()
 {
-    std::shared_ptr<Channel<Event>> channel(new Channel<Event>());
+    std::shared_ptr<Channel<Event>> channel = std::make_shared<Channel<Event>>();
     return std::make_pair(Channel<Event>::Sender(channel), Channel<Event>::Receiver(channel));
 }
 
