@@ -176,7 +176,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         return RET_ERR;
     }
     CHKPR(notifyPUllUpCallback_, RET_ERR);
-    notifyPUllUpCallback_(true);
+    notifyPUllUpCallback_(false);
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
