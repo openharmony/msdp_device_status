@@ -673,6 +673,7 @@ int32_t DragManager::OnStartDrag()
     CALL_INFO_TRACE;
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
+    dragDrawing_.SetScreenId(dragData.displayId);
     if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
         Rosen::FoldDisplayMode foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
         if (foldMode == Rosen::FoldDisplayMode::MAIN) {
@@ -796,7 +797,7 @@ void DragManager::GetAllowDragState(bool &isAllowDrag)
 
 void DragManager::SetDragState(DragState state)
 {
-    FI_HILOGI("SetDragState:%{public}d -> %{public}d", static_cast<int32_t>(dragState_), static_cast<int32_t>(state));
+    FI_HILOGI("SetDragState:%{public}d to %{public}d", static_cast<int32_t>(dragState_), static_cast<int32_t>(state));
     dragState_ = state;
 }
 
