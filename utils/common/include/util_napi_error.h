@@ -23,31 +23,20 @@
 #include "napi/native_node_api.h"
 #include "securec.h"
 
+#include "devicestatus_errors.h"
 #include "util_napi.h"
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 const std::string ERR_CODE { "code" };
-struct NapiError {
-    int32_t errorCode { 0 };
-    std::string msg;
-};
 
-enum NapiErrorCode : int32_t {
-    OTHER_ERROR = -1,
-    COMMON_PERMISSION_CHECK_ERROR = 201,
-    COMMON_PARAMETER_ERROR = 401,
-    COMMON_NOT_ALLOWED_DISTRIBUTED = 40101,
-    COOPERATOR_FAIL = 20900001
-};
-
-const std::map<int32_t, NapiError> NAPI_ERRORS = {
-    {COMMON_PERMISSION_CHECK_ERROR,
-        {COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
-    {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
-    {COMMON_NOT_ALLOWED_DISTRIBUTED,
-        {COMMON_NOT_ALLOWED_DISTRIBUTED, "Cross-device dragging is not allowed"}},
-    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed."}}
+const std::map<int32_t, std::string> NAPI_ERRORS = {
+    { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." },
+    { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." },
+    { COMMON_NOT_ALLOWED_DISTRIBUTED, "Cross-device dragging is not allowed." },
+    { COOPERATOR_FAIL, "Input device operation failed." },
+    { COMMON_NOT_SYSTEM_APP, "Non system applications." }
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \
@@ -60,26 +49,30 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         napi_create_error(env, nullptr, errorMsg, &businessError); \
         napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
         napi_throw(env, businessError); \
-        FI_HILOGE("Raising exceptions, errorCode:%{public}s, errorMsg:%{public}s", \
-            (#code), std::string(msg).c_str()); \
+        FI_HILOGE("Raising exceptions, errorCode:%{public}d, errorMsg:%{public}s", \
+            static_cast<int32_t>(code), std::string(msg).c_str()); \
     } while (0)
 
 #define THROWERR(env, code, param1, param2) \
     do { \
-        NapiError codeMsg; \
-        if (UtilNapiError::GetApiError(code, codeMsg)) { \
-            char buf[300]; \
-            int32_t ret = sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2); \
+        std::string codeMsg; \
+        if (UtilNapiError::GetErrorMsg(code, codeMsg)) { \
+            char buf[300] = { 0 }; \
+            int32_t ret = sprintf_s(buf, sizeof(buf), codeMsg.c_str(), param1, param2); \
             if (ret > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \
-                FI_HILOGE("Failed to convert string type to char type, error code:%{public}s", (#code)); \
+                FI_HILOGE("Failed to convert string type to char type, error code:%{public}d", \
+                    static_cast<int32_t>(code)); \
             } \
         } \
     } while (0)
+
 namespace UtilNapiError {
-bool GetApiError(int32_t code, NapiError &codeMsg);
+bool GetErrorMsg(int32_t code, std::string &codeMsg);
+void HandleExecuteResult(napi_env env, int32_t errCode, std::string param1 = "", std::string param2 = "");
 } // namespace UtilNapiError
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
 #endif // UTIL_NAPI_ERROR_H

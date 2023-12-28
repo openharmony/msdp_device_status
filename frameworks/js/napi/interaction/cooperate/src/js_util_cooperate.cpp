@@ -70,15 +70,15 @@ napi_value JsUtilCooperate::GetResult(napi_env env, bool result, int32_t errorCo
         napi_get_undefined(env, &object);
         return object;
     }
-    NapiError napiError;
-    if (!UtilNapiError::GetApiError(errorCode, napiError)) {
+    std::string errMsg;
+    if (!UtilNapiError::GetErrorMsg(errorCode, errMsg)) {
         FI_HILOGE("This errCode could not be found");
         return nullptr;
     }
     napi_value resultCode = nullptr;
     CHKRP(napi_create_int32(env, errorCode, &resultCode), CREATE_INT32);
     napi_value resultMessage = nullptr;
-    CHKRP(napi_create_string_utf8(env, napiError.msg.data(), NAPI_AUTO_LENGTH, &resultMessage),
+    CHKRP(napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &resultMessage),
         CREATE_STRING_UTF8);
     CHKRP(napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
     CHKRP(napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);

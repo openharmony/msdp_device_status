@@ -17,7 +17,7 @@
 
 #include "devicestatus_define.h"
 #include "interaction_manager.h"
-#include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -35,9 +35,9 @@ napi_value JsCoordinationManager::Prepare(napi_env env, bool isCompatible, napi_
     auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = INTERACTION_MGR->PrepareCoordination(callback, isCompatible);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "prepare", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -50,9 +50,9 @@ napi_value JsCoordinationManager::Unprepare(napi_env env, bool isCompatible, nap
     auto callback = std::bind(EmitJsPrepare, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = INTERACTION_MGR->UnprepareCoordination(callback, isCompatible);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "unprepare", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -67,9 +67,9 @@ napi_value JsCoordinationManager::Activate(napi_env env, const std::string &remo
     int32_t errCode = INTERACTION_MGR->ActivateCoordination(
         remoteNetworkId, startDeviceId, callback, isCompatible);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "activate", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -83,9 +83,9 @@ napi_value JsCoordinationManager::Deactivate(napi_env env,
     auto callback = std::bind(EmitJsDeactivate, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = INTERACTION_MGR->DeactivateCoordination(isUnchained, callback, isCompatible);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "deactivate", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -99,9 +99,9 @@ napi_value JsCoordinationManager::GetCrossingSwitchState(napi_env env,
     auto callback = std::bind(EmitJsGetCrossingSwitchState, cb, std::placeholders::_1);
     int32_t errCode = INTERACTION_MGR->GetCoordinationState(networkId, callback, isCompatible);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "getCrossingSwitchState", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 

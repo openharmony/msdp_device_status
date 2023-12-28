@@ -374,7 +374,7 @@ int32_t DeviceStatusSrvProxy::GetDragData(DragData &dragData)
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    READINT32(reply, ret, IPC_STUB_WRITE_PARCEL_ERR);
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     if (ret != RET_OK) {
         FI_HILOGE("Get DragData failed");
         return ret;

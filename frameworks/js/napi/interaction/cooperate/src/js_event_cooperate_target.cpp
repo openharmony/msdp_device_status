@@ -621,18 +621,6 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         napi_close_handle_scope(item->env, scope);
     }
 }
-
-void JsEventCooperateTarget::HandleExecuteResult(napi_env env, int32_t errCode)
-{
-    if (errCode != OTHER_ERROR && errCode != RET_OK) {
-        NapiError napiError;
-        if (!UtilNapiError::GetApiError(errCode, napiError)) {
-            FI_HILOGE("Failed to find the error code");
-            return;
-        }
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, napiError.msg.c_str());
-    }
-}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

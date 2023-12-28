@@ -185,8 +185,13 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     monitor->data.type = type;
     iter->second.push_back(monitor);
     if (!isListeningProcess_) {
-        isListeningProcess_ = true;
-        INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCompatible);
+        int32_t errCode = INTERACTION_MGR->RegisterCoordinationListener(shared_from_this(), isCompatible);
+        if (errCode != RET_OK) {
+            UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
+            RELEASE_CALLBACKINFO(env, ref);
+        } else {
+            isListeningProcess_ = true;
+        }
     }
 }
 
@@ -219,8 +224,12 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 
 MONITOR_LABEL:
     if (iter->second.empty() && isListeningProcess_) {
-        isListeningProcess_ = false;
-        INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this(), isCompatible);
+        int32_t errCode = INTERACTION_MGR->UnregisterCoordinationListener(shared_from_this(), isCompatible);
+        if (errCode == RET_OK) {
+            isListeningProcess_ = false;
+        } else {
+            UtilNapiError::HandleExecuteResult(env, errCode, "off", COOPERATE_PERMISSION);
+        }
     }
 }
 
@@ -627,18 +636,6 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_value ret = nullptr;
         CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
         napi_close_handle_scope(item->env, scope);
-    }
-}
-
-void JsEventTarget::HandleExecuteResult(napi_env env, int32_t errCode)
-{
-    if (errCode != OTHER_ERROR && errCode != RET_OK) {
-        NapiError napiError;
-        if (!UtilNapiError::GetApiError(errCode, napiError)) {
-            FI_HILOGE("GetApiError failed");
-            return;
-        }
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, napiError.msg.c_str());
     }
 }
 } // namespace DeviceStatus
