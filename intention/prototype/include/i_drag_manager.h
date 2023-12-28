@@ -41,7 +41,7 @@ public:
     virtual DragResult GetDragResult() const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
-    virtual void RegisterNotifyPullUp(std::function<void(void)> callback) = 0;
+    virtual void RegisterNotifyPullUp(std::function<void(bool)> callback) = 0;
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;

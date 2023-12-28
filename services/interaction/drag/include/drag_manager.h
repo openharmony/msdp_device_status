@@ -65,7 +65,7 @@ public:
     int32_t OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
-    void RegisterNotifyPullUp(std::function<void(void)> callback) override;
+    void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
     void SetPointerEventFilterTime(int64_t filterTime) override;
     void MoveTo(int32_t x, int32_t y) override;
     DragResult GetDragResult() const override;
@@ -142,7 +142,7 @@ private:
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
-    std::function<void(void)> notifyPUllUpCallback_ { nullptr };
+    std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
 };
