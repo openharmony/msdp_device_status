@@ -175,6 +175,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
+    CHKPR(notifyPUllUpCallback_, RET_ERR);
+    notifyPUllUpCallback_(true);
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
@@ -400,7 +402,7 @@ void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         this->StopDrag(dropResult);
     });
     CHKPV(notifyPUllUpCallback_);
-    notifyPUllUpCallback_();
+    notifyPUllUpCallback_(true);
 }
 
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -760,7 +762,7 @@ void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
     stateChangedCallback_ = callback;
 }
 
-void DragManager::RegisterNotifyPullUp(std::function<void(void)> callback)
+void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 {
     CALL_INFO_TRACE;
     CHKPV(callback);
