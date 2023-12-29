@@ -175,8 +175,10 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
         FI_HILOGE("Failed to execute OnStartDrag");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
     CHKPR(notifyPUllUpCallback_, RET_ERR);
     notifyPUllUpCallback_(false);
+#endif
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
