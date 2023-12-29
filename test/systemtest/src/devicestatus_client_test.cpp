@@ -123,7 +123,8 @@ HWTEST_F(DeviceStatusClientTest, GetDeviceStatusDataTest001, TestSize.Level0)
     data = stationaryMgr->GetDeviceStatusData(type);
     EXPECT_TRUE(data.type == type && data.value >= invalidValue && data.value <= exitValue);
 
-    data = stationaryMgr->GetDeviceStatusData(static_cast<Type>(10));
+    type = static_cast<Type>(10);
+    data = stationaryMgr->GetDeviceStatusData(type);
     EXPECT_TRUE(data.type == type && data.value >= invalidValue && data.value <= exitValue);
 }
 } // namespace DeviceStatus
