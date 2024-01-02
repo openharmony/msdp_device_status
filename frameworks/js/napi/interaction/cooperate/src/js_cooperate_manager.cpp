@@ -40,9 +40,9 @@ napi_value JsCooperateManager::Enable(napi_env env, bool enable, napi_value hand
         errCode = INTERACTION_MGR->UnprepareCoordination(callback);
     }
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "enable", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -56,9 +56,9 @@ napi_value JsCooperateManager::Start(napi_env env, const std::string &remoteNetw
     auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
     int32_t errCode = INTERACTION_MGR->ActivateCoordination(remoteNetworkDescriptor, startDeviceId, callback);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "start", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -72,9 +72,9 @@ napi_value JsCooperateManager::Stop(napi_env env, napi_value handle)
     bool isUnchained = false;
     int32_t errCode = INTERACTION_MGR->DeactivateCoordination(isUnchained, callback);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "stop", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 
@@ -87,9 +87,9 @@ napi_value JsCooperateManager::GetState(napi_env env, const std::string &deviceD
     auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
     int32_t errCode = INTERACTION_MGR->GetCoordinationState(deviceDescriptor, callback);
     if (errCode != RET_OK) {
+        UtilNapiError::HandleExecuteResult(env, errCode, "getState", COOPERATE_PERMISSION);
         RELEASE_CALLBACKINFO(cb->env, cb->ref);
     }
-    HandleExecuteResult(env, errCode);
     return result;
 }
 

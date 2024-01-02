@@ -38,17 +38,17 @@ int32_t CoordinationStateIn::ActivateCoordination(const std::string &remoteNetwo
     CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         FI_HILOGE("remoteNetworkId is empty");
-        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
+        return COMMON_PARAMETER_ERROR;
     }
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         FI_HILOGE("Input Parameters error");
-        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
+        return COMMON_PARAMETER_ERROR;
     }
     int32_t ret = COOR_SOFTBUS_ADAPTER->StartRemoteCoordination(localNetworkId, remoteNetworkId, false);
     if (ret != RET_OK) {
         FI_HILOGE("Start coordination failed");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+        return COOPERATOR_FAIL;
     }
     std::string taskName = "process_start_task";
     std::function<void()> handleProcessStartFunc =

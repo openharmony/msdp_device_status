@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 #define FI_PKG_NAME "ohos.msdp.fusioninteraction"
-constexpr int32_t PERMISSION_CHECK_ERROR = 201;
+#define COOPERATE_PERMISSION "ohos.permission.COOPERATE_MANAGER"
 
 #ifndef RET_OK
     #define RET_OK (0)

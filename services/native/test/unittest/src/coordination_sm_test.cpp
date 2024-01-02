@@ -181,7 +181,7 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t ret = COOR_SM->GetCoordinationState("");
-    EXPECT_TRUE(ret == static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR));
+    EXPECT_TRUE(ret == COMMON_PARAMETER_ERROR);
     ClearCoordiantionSM();
     ClearCoordinationSoftbusAdapter();
 }

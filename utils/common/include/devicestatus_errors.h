@@ -71,6 +71,15 @@ enum {
     INIT_SUCCESS = 0,
     INIT_CANCEL = 1
 };
+
+enum ErrorCode : int32_t {
+    OTHER_ERROR = -1,
+    COMMON_PERMISSION_CHECK_ERROR = 201,
+    COMMON_NOT_SYSTEM_APP = 202,
+    COMMON_PARAMETER_ERROR = 401,
+    COMMON_NOT_ALLOWED_DISTRIBUTED = 40101,
+    COOPERATOR_FAIL = 20900001
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

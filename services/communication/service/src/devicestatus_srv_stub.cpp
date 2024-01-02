@@ -148,9 +148,8 @@ bool DeviceStatusSrvStub::CheckCooperatePermission()
 {
     CALL_DEBUG_ENTER;
     Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    const std::string permissionName = "ohos.permission.COOPERATE_MANAGER";
     int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken,
-        permissionName);
+        COOPERATE_PERMISSION);
     return result == Security::AccessToken::PERMISSION_GRANTED;
 }
 
@@ -339,11 +338,11 @@ int32_t DeviceStatusSrvStub::RegisterCooperateMonitorStub(MessageParcel &data,
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t ret = RegisterCoordinationListener();
     if (ret != RET_OK) {
@@ -358,11 +357,11 @@ int32_t DeviceStatusSrvStub::UnregisterCooperateMonitorStub(MessageParcel &data,
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t ret = UnregisterCoordinationListener();
     if (ret != RET_OK) {
@@ -376,11 +375,11 @@ int32_t DeviceStatusSrvStub::PrepareCooperateStub(MessageParcel &data, MessagePa
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -396,11 +395,11 @@ int32_t DeviceStatusSrvStub::UnPrepareCooperateStub(MessageParcel &data, Message
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -416,11 +415,11 @@ int32_t DeviceStatusSrvStub::ActivateCooperateStub(MessageParcel &data, MessageP
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -440,11 +439,11 @@ int32_t DeviceStatusSrvStub::DeactivateCooperateStub(MessageParcel &data, Messag
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -462,11 +461,11 @@ int32_t DeviceStatusSrvStub::GetCooperateStateStub(MessageParcel &data, MessageP
     CALL_DEBUG_ENTER;
     if (!IsSystemCalling()) {
         FI_HILOGE("The caller is not system hap");
-        return RET_ERR;
+        return COMMON_NOT_SYSTEM_APP;
     }
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -716,7 +715,7 @@ int32_t DeviceStatusSrvStub::AddHotAreaListenerStub(MessageParcel &data, Message
     CALL_DEBUG_ENTER;
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t ret = AddHotAreaListener();
     if (ret != RET_OK) {
@@ -743,7 +742,7 @@ int32_t DeviceStatusSrvStub::RemoveHotAreaListenerStub(MessageParcel &data, Mess
     CALL_DEBUG_ENTER;
     if (!CheckCooperatePermission()) {
         FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
-        return RET_ERR;
+        return COMMON_PERMISSION_CHECK_ERROR;
     }
     int32_t ret = RemoveHotAreaListener();
     if (ret != RET_OK) {

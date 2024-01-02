@@ -26,10 +26,7 @@ enum class CoordinationMessage {
     ACTIVATE_FAIL = 4,
     DEACTIVATE_SUCCESS = 5,
     DEACTIVATE_FAIL = 6,
-    SESSION_CLOSED = 7,
-    PARAMETER_ERROR = 401,
-    DRAG_DISALLOWED_ERROR = 40101,
-    COORDINATION_FAIL = 20900001
+    SESSION_CLOSED = 7
 };
 
 enum class HotAreaType {

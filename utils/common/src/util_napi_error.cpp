@@ -17,11 +17,12 @@
 
 namespace OHOS {
 namespace Msdp {
+namespace DeviceStatus {
 namespace UtilNapiError {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UtilNapiError" };
 } // namespace
-bool GetApiError(int32_t code, NapiError &codeMsg)
+bool GetErrorMsg(int32_t code, std::string &codeMsg)
 {
     auto iter = NAPI_ERRORS.find(code);
     if (iter == NAPI_ERRORS.end()) {
@@ -31,6 +32,34 @@ bool GetApiError(int32_t code, NapiError &codeMsg)
     codeMsg = iter->second;
     return true;
 }
+
+void HandleExecuteResult(napi_env env, int32_t errCode, std::string param1, std::string param2)
+{
+    switch (errCode) {
+        case COMMON_PERMISSION_CHECK_ERROR: {
+            THROWERR(env, errCode, param1.c_str(), param2.c_str());
+            break;
+        }
+        case COMMON_PARAMETER_ERROR: {
+            THROWERR_CUSTOM(env, errCode, "param is invalid");
+            break;
+        }
+        case COMMON_NOT_SYSTEM_APP: {
+            std::string errMsg;
+            if (!UtilNapiError::GetErrorMsg(errCode, errMsg)) {
+                FI_HILOGE("GetErrorMsg failed");
+                return;
+            }
+            THROWERR_CUSTOM(env, errCode, errMsg.c_str());
+            break;
+        }
+        default: {
+            FI_HILOGW("This error code does not require a synchronous exception throw");
+            break;
+        }
+    }
+}
 } // namespace UtilNapiError
+} // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

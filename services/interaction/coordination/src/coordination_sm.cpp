@@ -200,7 +200,7 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
     CALL_INFO_TRACE;
     if (networkId.empty()) {
         FI_HILOGE("Transfer network id is empty");
-        return static_cast<int32_t>(CoordinationMessage::PARAMETER_ERROR);
+        return COMMON_PARAMETER_ERROR;
     }
     bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
@@ -278,20 +278,20 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         FI_HILOGE("In transition state, not process");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+        return COOPERATOR_FAIL;
     }
     if (notifyDragAllowedCallback_ != nullptr) {
         bool isAllowDrag { true };
         notifyDragAllowedCallback_(isAllowDrag);
         if (!isAllowDrag) {
             FI_HILOGE("Current resource disallowed to dragged across devices");
-            return static_cast<int32_t>(CoordinationMessage::DRAG_DISALLOWED_ERROR);
+            return COMMON_NOT_ALLOWED_DISTRIBUTED;
         }
     }
     UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed");
-        return static_cast<int32_t>(CoordinationMessage::COORDINATION_FAIL);
+        return COOPERATOR_FAIL;
     }
 
     isStarting_ = true;
@@ -617,7 +617,7 @@ void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &r
     CALL_DEBUG_ENTER;
     COOR_SOFTBUS_ADAPTER->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
-        COOR_EVENT_MGR->OnStop(CoordinationMessage::COORDINATION_FAIL);
+        COOR_EVENT_MGR->OnStop(CoordinationMessage::DEACTIVATE_FAIL);
     } else {
         COOR_EVENT_MGR->OnStop(CoordinationMessage::DEACTIVATE_SUCCESS);
     }
