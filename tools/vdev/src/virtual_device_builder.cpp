@@ -403,6 +403,11 @@ int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
         return RET_ERR;
     }
     model = nlohmann::json::parse(stream, nullptr, false);
+    if (model.is_discarded()) {
+        FI_HILOGE("model parse failed");
+        stream.close();
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
