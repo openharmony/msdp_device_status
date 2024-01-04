@@ -61,7 +61,8 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
-    CALL_INFO_TRACE;
+    std::string stateStr = state ? "true" : "false";
+    FI_HILOGI("Crossing switch state: %{public}d", stateStr.c_str());
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceType(SERVICE_TYPE);
@@ -83,7 +84,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &networkId) {
                       syncOptions.AddDevice(networkId);
-                      FI_HILOGD("Add device success");
+                      FI_HILOGD("Add device success, networkId: %{public}s",
+                          networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
@@ -96,7 +98,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
-    CALL_INFO_TRACE;
+    std::string stateStr = state ? "true" : "false";
+    FI_HILOGI("Crossing switch state: %{public}d", stateStr.c_str());
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
@@ -147,7 +150,8 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
         return RET_OK;
     }
     callbacks_[networkId] = callback;
-    FI_HILOGI("Register crossing state listener success");
+    FI_HILOGI("Register crossing state listener success, networkId: %{public}s",
+        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     int32_t ret = RegisterProfileListener(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
@@ -157,11 +161,12 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
     if (networkId.empty()) {
         FI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
+    FI_HILOGI("Unregister crossing state listener, networkId: %{public}s",
+        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(networkId);
     if (it != profileEventCallbacks_.end()) {
