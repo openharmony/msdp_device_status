@@ -816,7 +816,7 @@ bool CoordinationSM::InitDeviceManager()
 void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 {
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    FI_HILOGI("Online device networkId: %{public}s, localNetworkId: : %{public}s",
+    FI_HILOGI("Online device networkId: %{public}s, localNetworkId: %{public}s",
         networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
         localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     std::lock_guard<std::mutex> guard(mutex_);
