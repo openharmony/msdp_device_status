@@ -655,13 +655,10 @@ int32_t CoordinationSoftbusAdapter::SendData(const std::string &networkId, Messa
         free(dataPacket);
         return RET_ERR;
     }
-    CoordinationState curState = COOR_SM->GetCurrentCoordinationState();
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     int32_t result = SendBytes(sessionDevs_[networkId], dataPacket, sizeof(DataPacket) + dataLen);
     free(dataPacket);
     if (result != RET_OK) {
-        CoordinationDFX::WriteCooperateDragResult(networkId, curState,
-            OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         FI_HILOGE("Send bytes failed");
         return RET_ERR;
     }
