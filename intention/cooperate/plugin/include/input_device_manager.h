@@ -29,7 +29,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-class DeviceManager final : public std::enable_shared_from_this<DeviceManager> {
+class InputDeviceManager final : public std::enable_shared_from_this<InputDeviceManager> {
 public:
     class Device {
     public:
@@ -57,15 +57,15 @@ public:
         std::string networkId_;
     };
 
-    DeviceManager(IContext *env);
-    ~DeviceManager();
-    DISALLOW_COPY_AND_MOVE(DeviceManager);
+    InputDeviceManager(IContext *env);
+    ~InputDeviceManager();
+    DISALLOW_COPY_AND_MOVE(InputDeviceManager);
 
     void AttachSender(Channel<CooperateEvent>::Sender sender);
-    bool Start();
-    void Stop();
+    bool Enable();
+    void Disable();
 
-    std::shared_ptr<DeviceManager::Device> GetDevice(int32_t id) const;
+    std::shared_ptr<InputDeviceManager::Device> GetDevice(int32_t id) const;
     bool IsRemote(int32_t id);
     std::vector<std::string> GetCooperateDhids(int32_t deviceId) const;
     std::vector<std::string> GetCooperateDhids(const std::string &dhid, bool isRemote) const;
@@ -77,14 +77,14 @@ public:
 private:
     class DeviceObserver final : public IDeviceObserver {
     public:
-        explicit DeviceObserver(std::shared_ptr<DeviceManager> devMgr);
+        explicit DeviceObserver(std::shared_ptr<InputDeviceManager> devMgr);
         ~DeviceObserver() = default;
 
         void OnDeviceAdded(std::shared_ptr<IDevice> device) override;
         void OnDeviceRemoved(std::shared_ptr<IDevice> device) override;
 
     private:
-        std::weak_ptr<DeviceManager> devMgr_;
+        std::weak_ptr<InputDeviceManager> devMgr_;
     };
 
     void OnDeviceAdded(std::shared_ptr<IDevice> device);

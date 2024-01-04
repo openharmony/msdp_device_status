@@ -16,31 +16,35 @@
 #include "dinput_adapter.h"
 
 #include <algorithm>
-#include <map>
-#include <mutex>
+
+#include "distributed_input_kit.h"
 
 #include "devicestatus_define.h"
-#include "event_manager.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace Cooperate {
-using namespace DistributedHardware::DistributedInput;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DInputAdapter" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DInputAdapter" };
 constexpr int32_t DEFAULT_DELAY_TIME { 4000 };
 constexpr int32_t RETRY_TIME { 2 };
 } // namespace
+
+using namespace DistributedHardware::DistributedInput;
 
 DInputAdapter::DInputAdapter(IContext *env)
     : env_(env)
 {}
 
-bool DInputAdapter::IsNeedFilterOut(const std::string &networkId, const BusinessEvent &event)
+bool DInputAdapter::IsNeedFilterOut(const std::string &networkId, BusinessEvent &&event)
 {
     CALL_DEBUG_ENTER;
-    return DistributedInputKit::IsNeedFilterOut(networkId, event);
+    DistributedHardware::DistributedInput::BusinessEvent ev {
+        .pressedKeys = std::move(event.pressedKeys),
+        .keyCode = event.keyCode,
+        .keyAction = event.keyAction,
+    };
+    return DistributedInputKit::IsNeedFilterOut(networkId, ev);
 }
 
 int32_t DInputAdapter::StartRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
@@ -259,12 +263,14 @@ void DInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const std::string 
     dinput->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
+DInputAdapter::SessionStateCallback::SessionStateCallback(std::function<void(uint32_t)> callback)
+    : callback_(callback) {}
+
 void DInputAdapter::SessionStateCallback::OnResult(const std::string &devId, const uint32_t status)
 {
     CHKPV(callback_);
     callback_(status);
 }
-} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

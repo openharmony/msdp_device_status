@@ -16,58 +16,43 @@
 #ifndef DINPUT_ADAPTER_H
 #define DINPUT_ADAPTER_H
 
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "distributed_input_kit.h"
-#include "i_start_stop_d_inputs_call_back.h"
 #include "nocopyable.h"
 #include "prepare_d_input_call_back_stub.h"
-#include "simulation_event_listener_stub.h"
-#include "start_d_input_call_back_stub.h"
-#include "start_stop_d_inputs_call_back_stub.h"
-#include "start_stop_result_call_back_stub.h"
-#include "stop_d_input_call_back_stub.h"
-#include "unprepare_d_input_call_back_stub.h"
 #include "register_session_state_callback_stub.h"
+#include "start_stop_d_inputs_call_back_stub.h"
+#include "unprepare_d_input_call_back_stub.h"
 
 #include "i_context.h"
+#include "i_dinput_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace Cooperate {
-class DInputAdapter final : public std::enable_shared_from_this<DInputAdapter> {
+class DInputAdapter final : public IDInputAdapter, public std::enable_shared_from_this<DInputAdapter> {
 public:
-    using DInputCallback = std::function<void(bool)>;
-
     DInputAdapter(IContext *env);
     ~DInputAdapter() = default;
     DISALLOW_COPY_AND_MOVE(DInputAdapter);
 
-    bool IsNeedFilterOut(const std::string &networkId,
-        const DistributedHardware::DistributedInput::BusinessEvent &event);
+    bool IsNeedFilterOut(const std::string &networkId, BusinessEvent &&event) override;
 
     int32_t StartRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback) override;
     int32_t StopRemoteInput(const std::string &remoteNetworkId, const std::string &originNetworkId,
-        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback) override;
 
     int32_t StopRemoteInput(const std::string &originNetworkId,
-        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback);
+        const std::vector<std::string> &inputDeviceDhids, DInputCallback callback) override;
 
     int32_t PrepareRemoteInput(const std::string &remoteNetworkId,
-        const std::string &originNetworkId, DInputCallback callback);
+        const std::string &originNetworkId, DInputCallback callback) override;
     int32_t UnPrepareRemoteInput(const std::string &remoteNetworkId,
-        const std::string &originNetworkId, DInputCallback callback);
+        const std::string &originNetworkId, DInputCallback callback) override;
 
-    int32_t PrepareRemoteInput(const std::string &networkId, DInputCallback callback);
-    int32_t UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback);
-    int32_t RegisterSessionStateCb(std::function<void(uint32_t)> callback);
-    int32_t UnregisterSessionStateCb();
+    int32_t PrepareRemoteInput(const std::string &networkId, DInputCallback callback) override;
+    int32_t UnPrepareRemoteInput(const std::string &networkId, DInputCallback callback) override;
+    int32_t RegisterSessionStateCb(std::function<void(uint32_t)> callback) override;
+    int32_t UnregisterSessionStateCb() override;
 
 private:
     enum class CallbackType {
@@ -179,9 +164,10 @@ private:
     class SessionStateCallback final :
         public DistributedHardware::DistributedInput::RegisterSessionStateCallbackStub {
     public:
-        SessionStateCallback() = default;
+        SessionStateCallback(std::function<void(uint32_t)> callback);
         ~SessionStateCallback() = default;
-        SessionStateCallback(std::function<void(uint32_t)> callback) : callback_(callback) {}
+        DISALLOW_COPY_AND_MOVE(SessionStateCallback);
+
         void OnResult(const std::string &devId, const uint32_t status) override;
 
     private:
@@ -198,7 +184,6 @@ private:
     std::map<CallbackType, DInputCallback> callbacks_;
     std::mutex adapterLock_;
 };
-} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

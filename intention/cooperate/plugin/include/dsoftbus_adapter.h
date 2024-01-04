@@ -22,47 +22,50 @@
 #include "nocopyable.h"
 #include "socket.h"
 
+#include "channel.h"
+#include "cooperate_events.h"
 #include "net_packet.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-class DSoftbusAdapter final {
+class DSoftbusAdapter final : public std::enable_shared_from_this<DSoftbusAdapter> {
 public:
     DSoftbusAdapter() = default;
-    ~DSoftbusAdapter() = default;
+    ~DSoftbusAdapter();
     DISALLOW_COPY_AND_MOVE(DSoftbusAdapter);
 
+    void AttachSender(Channel<CooperateEvent>::Sender sender);
     int32_t Enable();
     void Disable();
 
-    int32_t OpenSession(const std::string &networkId,
-        std::function<void(const std::string &, const NetPacket &)> recv);
+    int32_t OpenSession(const std::string &networkId);
     void CloseSession(const std::string &networkId);
 
-    int32_t SendPacket(const std::string &networkId, const NetPacket &packet);
+    int32_t StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event);
+    int32_t StartCooperateResponse(const std::string &networkId, const DSoftbusStartCooperateResponse &event);
+    int32_t StartCooperateFinish(const std::string &networkId, const DSoftbusStartCooperateFinished &event);
 
     void OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
     void OnBytes(int32_t socket, const void *data, uint32_t dataLen);
 
     static std::string GetLocalNetworkId();
-    static std::shared_ptr<DSoftbusAdapter> GetInstance();
-    static void DestroyInstance();
 
 private:
     int32_t InitSocket(SocketInfo info, int32_t socketType, int32_t &socket);
     int32_t SetupServer();
     void ShutdownServer();
+    int32_t OpenSessionLocked(const std::string &networkId);
+    void ConfigTcpAlive(int32_t socket);
+    int32_t SendPacket(const std::string &networkId, const NetPacket &packet);
 
     std::mutex lock_;
     int32_t socketFd_ { -1 };
+    Channel<CooperateEvent>::Sender sender_;
     std::string localSessionName_;
     std::map<std::string, int32_t> sessions_;
-
-    static std::shared_ptr<DSoftbusAdapter> instance_;
-    static std::mutex mutex_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
