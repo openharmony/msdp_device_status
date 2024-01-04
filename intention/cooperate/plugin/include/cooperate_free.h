@@ -49,18 +49,26 @@ private:
 
     private:
         void OnStart(Context &context, const CooperateEvent &event);
+        void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         std::shared_ptr<ICooperateStep> start_ { nullptr };
+        std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
     };
 
-    class OpenSession final : public ICooperateStep {
+    class ContactRemote final : public ICooperateStep {
     public:
-        OpenSession(CooperateFree &parent, std::shared_ptr<ICooperateStep> prev);
-        ~OpenSession() = default;
+        ContactRemote(CooperateFree &parent, std::shared_ptr<ICooperateStep> prev);
+        ~ContactRemote() = default;
 
         void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnResponse(Context &context, const CooperateEvent &event);
+
+        CooperateFree &parent_;
+        int32_t timerId_ { -1 };
     };
 
     class PrepareRemoteInput final : public ICooperateStep {
@@ -85,7 +93,33 @@ private:
         void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnStartFinished(Context &context, const CooperateEvent &event);
+        void OnSuccess(Context &context, const DInputStartResult &event);
+
+        CooperateFree &parent_;
+        int32_t timerId_ { -1 };
     };
+
+    class RemoteStart final : public ICooperateStep {
+    public:
+        RemoteStart(CooperateFree &parent, std::shared_ptr<ICooperateStep> prev);
+        ~RemoteStart() = default;
+
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnRemoteStartFinished(Context &context, const CooperateEvent &event);
+        void OnSuccess(Context &context, const DSoftbusStartCooperateFinished &event);
+
+        CooperateFree &parent_;
+        int32_t timerId_ { -1 };
+    };
+
+    void RegisterDInputSessionCb(Context &context);
 
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };

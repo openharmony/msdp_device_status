@@ -22,7 +22,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateOut" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateOut" };
 } // namespace
 
 CooperateOut::CooperateOut(IContext *env)
@@ -36,21 +36,23 @@ CooperateOut::CooperateOut(IContext *env)
 void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    if (current_ != nullptr) {
-        current_->OnEvent(context, event);
-    } else {
-        FI_HILOGE("current_ step is null");
-    }
+    current_->OnEvent(context, event);
 }
 
 void CooperateOut::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
+    MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    interceptorId_ = env_->GetInput().AddInterceptor(
+        [sender = context.Sender()](std::shared_ptr<MMI::PointerEvent> pointerEvent) {},
+        [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
 }
 
 void CooperateOut::OnLeaveState(Context &context)
 {
     CALL_DEBUG_ENTER;
+    env_->GetInput().RemoveInterceptor(interceptorId_);
+    interceptorId_ = -1;
 }
 
 CooperateOut::Initial::Initial(CooperateOut &parent) : ICooperateStep(parent, nullptr)

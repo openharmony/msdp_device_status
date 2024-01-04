@@ -57,8 +57,13 @@ const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSpSingleton<DeviceStatusService>::GetInstance().GetRefPtr());
 } // namespace
 
-DeviceStatusService::DeviceStatusService() : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
-{}
+DeviceStatusService::DeviceStatusService()
+    : SystemAbility(MSDP_DEVICESTATUS_SERVICE_ID, true)
+{
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    dinput_ = std::make_shared<DInputAdapter>(this);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+}
 
 DeviceStatusService::~DeviceStatusService()
 {}
@@ -142,6 +147,16 @@ ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
 IPluginManager& DeviceStatusService::GetPluginManager()
 {
     return pluginMgr_;
+}
+
+IInputAdapter& DeviceStatusService::GetInput()
+{
+    return input_;
+}
+
+IDInputAdapter& DeviceStatusService::GetDInput()
+{
+    return *dinput_;
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 

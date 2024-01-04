@@ -20,6 +20,8 @@
 #include "i_device_manager.h"
 #include "i_drag_manager.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "i_dinput_adapter.h"
+#include "i_input_adapter.h"
 #include "i_socket_session_manager.h"
 #include "i_plugin_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -46,6 +48,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     virtual ISocketSessionManager& GetSocketSessionManager() = 0;
     virtual IPluginManager& GetPluginManager() = 0;
+    virtual IInputAdapter& GetInput() = 0;
+    virtual IDInputAdapter& GetDInput() = 0;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };
 } // namespace DeviceStatus

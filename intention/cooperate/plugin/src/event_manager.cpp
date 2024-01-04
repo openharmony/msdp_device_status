@@ -29,6 +29,31 @@ EventManager::EventManager(IContext *env)
     : env_(env)
 {}
 
+void EventManager::StartCooperate(const StartCooperateEvent &event)
+{
+    std::shared_ptr<EventInfo> evInfo = std::make_shared<EventInfo>();
+    evInfo->type = EventType::START;
+    evInfo->msgId = MessageId::COORDINATION_MESSAGE;
+    evInfo->pid = event.pid;
+    evInfo->userData = event.userData;
+    evInfo->networkId = event.remoteNetworkId;
+    calls_[EventType::START] = evInfo;
+}
+
+void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event)
+{}
+
+void EventManager::RemoteStart(const DSoftbusStartCooperate &event)
+{}
+
+void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event)
+{
+    CoordinationMessage msg { event.success ?
+                              CoordinationMessage::ACTIVATE_SUCCESS :
+                              CoordinationMessage::ACTIVATE_FAIL };
+    OnCooperateMessage(msg, event.networkId);
+}
+
 void EventManager::AddCooperateEvent(std::shared_ptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
@@ -66,10 +91,6 @@ int32_t EventManager::OnCooperateMessage(CoordinationMessage msg, const std::str
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
-    if (listeners_.empty()) {
-        FI_HILOGW("The current listener is empty, unable to invoke the listening interface");
-        return RET_ERR;
-    }
     for (auto it = listeners_.begin(); it != listeners_.end(); ++it) {
         std::shared_ptr<EventInfo> listener = *it;
         CHKPC(listener);

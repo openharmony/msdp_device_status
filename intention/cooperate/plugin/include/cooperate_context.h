@@ -18,35 +18,115 @@
 
 #include <memory>
 
+#include "nocopyable.h"
+
 #include "cooperate_events.h"
-#include "device_manager.h"
-#include "dinput_adapter.h"
+#include "dsoftbus_adapter.h"
 #include "event_manager.h"
+#include "input_device_manager.h"
 #include "i_context.h"
+#include "i_ddm_adapter.h"
+#include "i_ddp_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-struct Context {
-    IContext *env_ { nullptr };
-    std::string remoteNetworkId_;
-    int32_t startDeviceId_;
-    bool isUnchain_ { false };
-    Channel<CooperateEvent>::Sender sender_;
-
-    std::shared_ptr<DeviceManager> devMgr_;
-    std::shared_ptr<DInputAdapter> dinput_;
-    EventManager evMgr_;
-
+class Context final {
+public:
     Context(IContext *env);
+    ~Context() = default;
+    DISALLOW_COPY_AND_MOVE(Context);
+
+    void AttachSender(Channel<CooperateEvent>::Sender sender);
     void Enable();
     void Disable();
+
+    Channel<CooperateEvent>::Sender Sender() const;
+    std::string Origin() const;
+    std::string Peer() const;
+    std::string StartDeviceDhid() const;
+    int32_t StartDeviceId() const;
+    std::vector<std::string> CooperateDhids() const;
+    Coordinate CursorPosition() const;
+
+    bool IsPeer(const std::string &networkId) const;
+
+    void StartCooperate(const StartCooperateEvent &event);
+    void RemoteStart(const DSoftbusStartCooperate &event);
+    void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
+
+    std::shared_ptr<InputDeviceManager> devMgr_;
+    std::shared_ptr<IDDMAdapter> ddm_;
+    std::shared_ptr<IDDPAdapter> ddp_;
+    std::shared_ptr<DSoftbusAdapter> dsoftbus_;
+    EventManager eventMgr_;
+
+private:
     int32_t EnableDevMgr();
     void DisableDevMgr();
     int32_t EnableDSoftbus();
     void DisableDSoftbus();
+    int32_t EnableDDM();
+    void DisableDDM();
+    int32_t EnableDDP();
+    void DisableDDP();
+    void SetCursorPosition(const DSoftbusStartCooperateFinished &event);
+
+    Channel<CooperateEvent>::Sender sender_;
+    std::string originNetworkId_;
+    std::string remoteNetworkId_;
+    std::string startDeviceDhid_;
+    int32_t startDeviceId_ { -1 };
+    Coordinate cursorPos_ {};
+    std::shared_ptr<IBoardObserver> boardObserver_;
+    std::shared_ptr<IDeviceProfileObserver> dpObserver_;
 };
+
+inline void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
+{
+    sender_ = sender;
+}
+
+inline Channel<CooperateEvent>::Sender Context::Sender() const
+{
+    return sender_;
+}
+
+inline std::string Context::Origin() const
+{
+    return originNetworkId_;
+}
+
+inline std::string Context::Peer() const
+{
+    return remoteNetworkId_;
+}
+
+inline std::string Context::StartDeviceDhid() const
+{
+    return startDeviceDhid_;
+}
+
+inline int32_t Context::StartDeviceId() const
+{
+    return startDeviceId_;
+}
+
+inline std::vector<std::string> Context::CooperateDhids() const
+{
+    return devMgr_->GetCooperateDhids(startDeviceId_);
+}
+
+inline Coordinate Context::CursorPosition() const
+{
+    return cursorPos_;
+}
+
+inline bool Context::IsPeer(const std::string &networkId) const
+{
+    return (networkId == remoteNetworkId_);
+}
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
