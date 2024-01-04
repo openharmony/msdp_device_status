@@ -33,6 +33,7 @@ using namespace OHOS::DeviceProfile;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID { "deviceStatus" };
+constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -62,7 +63,7 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
     std::string stateStr = state ? "true" : "false";
-    FI_HILOGI("Crossing switch state: %{public}d", stateStr.c_str());
+    FI_HILOGI("Crossing switch state: %{public}s", stateStr.c_str());
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceType(SERVICE_TYPE);
@@ -85,7 +86,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
                   [&syncOptions](auto &networkId) {
                       syncOptions.AddDevice(networkId);
                       FI_HILOGD("Add device success, networkId: %{public}s",
-                          networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+                        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
@@ -99,7 +100,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
     std::string stateStr = state ? "true" : "false";
-    FI_HILOGI("Crossing switch state: %{public}d", stateStr.c_str());
+    FI_HILOGI("Crossing switch state: %{public}s", stateStr.c_str());
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
