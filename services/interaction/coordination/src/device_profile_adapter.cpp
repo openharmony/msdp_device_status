@@ -87,7 +87,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
                   [&syncOptions](auto &networkId) {
                       syncOptions.AddDevice(networkId);
                       FI_HILOGD("Add device success, networkId: %{public}s",
-                        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+                          networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
                   });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
