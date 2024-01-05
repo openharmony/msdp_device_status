@@ -33,6 +33,7 @@ using namespace OHOS::DeviceProfile;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID { "deviceStatus" };
+constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -61,7 +62,9 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
-    CALL_INFO_TRACE;
+    std::string stateStr = state ? "true" : "false";
+    FI_HILOGI("Crossing switch state: %{public}s, device size:%{public}d", stateStr.c_str(),
+        static_cast<int32_t>(deviceIds.size()));
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceType(SERVICE_TYPE);
@@ -81,10 +84,11 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
-                  [&syncOptions](auto &networkId) {
-                      syncOptions.AddDevice(networkId);
-                      FI_HILOGD("Add device success");
-                  });
+        [&syncOptions](auto &networkId) {
+            syncOptions.AddDevice(networkId);
+            FI_HILOGD("Add device success, networkId: %{public}s",
+                networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+        });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
@@ -96,7 +100,8 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
-    CALL_INFO_TRACE;
+    std::string stateStr = state ? "true" : "false";
+    FI_HILOGI("Crossing switch state: %{public}s", stateStr.c_str());
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
@@ -147,7 +152,8 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
         return RET_OK;
     }
     callbacks_[networkId] = callback;
-    FI_HILOGI("Register crossing state listener success");
+    FI_HILOGI("Register crossing state listener success, networkId: %{public}s",
+        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     int32_t ret = RegisterProfileListener(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
@@ -157,11 +163,12 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
     if (networkId.empty()) {
         FI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
+    FI_HILOGI("Unregister crossing state listener, networkId: %{public}s",
+        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(networkId);
     if (it != profileEventCallbacks_.end()) {

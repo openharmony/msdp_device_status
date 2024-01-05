@@ -135,14 +135,17 @@ void CoordinationStateIn::StopRemoteInput(const std::string &originNetworkId,
 void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGD("In, remoteNetworkId: %{public}s, startDeviceId: %{public}d",
+        remoteNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(), startDeviceId);
     if (COOR_SM->IsStarting()) {
+        FI_HILOGD("Is starting in");
         std::string taskName = "start_finish_task";
         std::function<void()> handleStartFinishFunc = std::bind(&CoordinationSM::OnStartFinish,
             COOR_SM, isSuccess, remoteNetworkId, startDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
     } else if (COOR_SM->IsStopping()) {
+        FI_HILOGD("Is stopping in");
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&CoordinationSM::OnStopFinish, COOR_SM, isSuccess, remoteNetworkId);
