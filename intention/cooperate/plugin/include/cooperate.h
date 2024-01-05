@@ -16,6 +16,8 @@
 #ifndef COOPERATE_H
 #define COOPERATE_H
 
+#include <mutex>
+
 #include "nocopyable.h"
 
 #include "i_context.h"
@@ -48,10 +50,12 @@ public:
 
 private:
     void Loop();
+    void StartWorker();
+    void StopWorker();
 
-    IContext *env_ { nullptr };
     Context context_;
     StateMachine sm_;
+    std::mutex lock_;
     std::thread worker_;
     std::atomic_bool running_ { false };
     Channel<CooperateEvent>::Sender sender_;

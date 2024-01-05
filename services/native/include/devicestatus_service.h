@@ -31,7 +31,9 @@
 #include "drag_manager.h"
 #include "i_context.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "dinput_adapter.h"
 #include "plugin_manager.h"
+#include "input_adapter.h"
 #include "intention_service.h"
 #include "socket_session_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -64,6 +66,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     IPluginManager& GetPluginManager() override;
     ISocketSessionManager& GetSocketSessionManager() override;
+    IInputAdapter& GetInput() override;
+    IDInputAdapter& GetDInput() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
@@ -155,6 +159,8 @@ private:
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
     PluginManager pluginMgr_;
+    InputAdapter input_;
+    std::shared_ptr<DInputAdapter> dinput_;
     sptr<IntentionService> intention_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };

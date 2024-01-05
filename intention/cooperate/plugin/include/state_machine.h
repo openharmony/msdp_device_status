@@ -16,6 +16,8 @@
 #ifndef COOPERATE_STATE_MACHINE_H
 #define COOPERATE_STATE_MACHINE_H
 
+#include "nocopyable.h"
+
 #include "cooperate_context.h"
 #include "i_cooperate_state.h"
 
@@ -23,19 +25,24 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-class StateMachine {
+class StateMachine final {
 public:
     StateMachine(IContext *env);
     ~StateMachine() = default;
+    DISALLOW_COPY_AND_MOVE(StateMachine);
 
     void OnEvent(Context &context, const CooperateEvent &event);
 
 private:
-    void UpdateState(Context &context, const UpdateStateEvent &event);
+    void UpdateState(Context &context, const CooperateEvent &event);
+    void EnableCooperate(Context &context, const CooperateEvent &event);
+    void DisableCooperate(Context &context, const CooperateEvent &event);
+    void OnBoardOnline(Context &context, const CooperateEvent &event);
+    void OnBoardOffline(Context &context, const CooperateEvent &event);
 
-    IContext *env_ { nullptr };
     size_t current_ { COOPERATE_STATE_FREE };
-    std::array<std::shared_ptr<ICooperateState>, NUM_COOPERATE_STATES> states_;
+    std::array<std::shared_ptr<ICooperateState>, N_COOPERATE_STATES> states_;
+    std::set<std::string> onlineBoards_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

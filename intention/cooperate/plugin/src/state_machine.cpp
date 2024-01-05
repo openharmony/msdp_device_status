@@ -26,11 +26,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateMachine" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateMachine" };
 } // namespace
 
 StateMachine::StateMachine(IContext *env)
-    : env_(env)
 {
     states_[COOPERATE_STATE_FREE] = std::make_shared<CooperateFree>(env);
     states_[COOPERATE_STATE_OUT] = std::make_shared<CooperateOut>(env);
@@ -39,34 +38,77 @@ StateMachine::StateMachine(IContext *env)
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
 {
-    CHKPV(env_);
     switch (event.type) {
-        case CooperateEventType::UPDATE_STATE : {
-            UpdateState(context, std::get<UpdateStateEvent>(event.event));
+        case CooperateEventType::UPDATE_STATE: {
+            UpdateState(context, event);
             break;
         }
-        case CooperateEventType::ENABLE : {
+        case CooperateEventType::ENABLE: {
+            EnableCooperate(context, event);
             break;
         }
-        case CooperateEventType::DISABLE : {
+        case CooperateEventType::DISABLE: {
+            DisableCooperate(context, event);
             break;
         }
-        default : {
+        case CooperateEventType::DDM_BOARD_ONLINE: {
+            OnBoardOnline(context, event);
+            break;
+        }
+        case CooperateEventType::DDM_BOARD_OFFLINE: {
+            OnBoardOffline(context, event);
+            break;
+        }
+        default: {
             states_[current_]->OnEvent(context, event);
             break;
         }
     }
 }
 
-void StateMachine::UpdateState(Context &context, const UpdateStateEvent &event)
+void StateMachine::UpdateState(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    if ((event.current >= COOPERATE_STATE_FREE) &&
-        (event.current < NUM_COOPERATE_STATES) &&
-        (event.current != current_)) {
+    UpdateStateEvent updateEvent = std::get<UpdateStateEvent>(event.event);
+
+    if ((updateEvent.current >= COOPERATE_STATE_FREE) &&
+        (updateEvent.current < N_COOPERATE_STATES) &&
+        (updateEvent.current != current_)) {
         states_[current_]->OnLeaveState(context);
-        current_ = event.current;
+        current_ = updateEvent.current;
         states_[current_]->OnEnterState(context);
+    }
+}
+
+void StateMachine::EnableCooperate(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+}
+
+void StateMachine::DisableCooperate(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+}
+
+void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DDMBoardOnlineEvent onlineEvent = std::get<DDMBoardOnlineEvent>(event.event);
+
+    auto ret = onlineBoards_.insert(onlineEvent.networkId);
+    if (ret.second) {
+        context.ddp_->AddWatch(onlineEvent.networkId);
+    }
+}
+
+void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DDMBoardOfflineEvent offlineEvent = std::get<DDMBoardOfflineEvent>(event.event);
+
+    if (auto iter = onlineBoards_.find(offlineEvent.networkId); iter != onlineBoards_.end()) {
+        onlineBoards_.erase(iter);
+        context.ddp_->RemoveWatch(offlineEvent.networkId);
     }
 }
 } // namespace Cooperate

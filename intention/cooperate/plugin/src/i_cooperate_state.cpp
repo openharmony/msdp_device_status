@@ -15,15 +15,10 @@
 
 #include "i_cooperate_state.h"
 
-#include "devicestatus_define.h"
-
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICooperateState" };
-} // namespace
 
 ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::shared_ptr<ICooperateStep> prev)
     : parent_(parent), prev_(prev)
@@ -31,8 +26,9 @@ ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::sh
 
 void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 {
-    CHKPV(step);
-    current_ = step;
+    if (step != nullptr) {
+        current_ = step;
+    }
 }
 
 void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> next)
@@ -47,22 +43,23 @@ void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> ne
 
 void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> step)
 {
-    CHKPV(step);
     parent_.Switch(step);
 }
 
 void ICooperateState::ICooperateStep::Proceed(Context &context, const CooperateEvent &event)
 {
-    CHKPV(next_);
-    Switch(next_);
-    next_->OnProgress(context, event);
+    if (next_ != nullptr) {
+        Switch(next_);
+        next_->OnProgress(context, event);
+    }
 }
 
 void ICooperateState::ICooperateStep::Reset(Context &context, const CooperateEvent &event)
 {
-    CHKPV(prev_);
-    Switch(prev_);
-    prev_->OnReset(context, event);
+    if (prev_ != nullptr) {
+        Switch(prev_);
+        prev_->OnReset(context, event);
+    }
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

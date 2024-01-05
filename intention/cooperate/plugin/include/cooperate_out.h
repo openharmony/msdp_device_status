@@ -28,8 +28,8 @@ public:
     ~CooperateOut() = default;
 
     void OnEvent(Context &context, const CooperateEvent &event) override;
-    void OnEnterState(Context &event) override;
-    void OnLeaveState(Context &event) override;
+    void OnEnterState(Context &context) override;
+    void OnLeaveState(Context &context) override;
 
 private:
     class Initial final : public ICooperateStep {
@@ -70,6 +70,7 @@ private:
     };
 
     IContext *env_ { nullptr };
+    int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

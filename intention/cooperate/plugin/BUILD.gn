@@ -37,11 +37,10 @@ ohos_shared_library("intention_cooperate") {
     "src/cooperate_free.cpp",
     "src/cooperate_in.cpp",
     "src/cooperate_out.cpp",
-    "src/device_manager.cpp",
-    "src/dinput_adapter.cpp",
     "src/dsoftbus_adapter.cpp",
     "src/event_manager.cpp",
     "src/i_cooperate_state.cpp",
+    "src/input_device_manager.cpp",
     "src/state_machine.cpp",
   ]
 
@@ -50,6 +49,8 @@ ohos_shared_library("intention_cooperate") {
   defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/adapters/ddm_adapter:intention_ddm_adapter",
+    "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
     "${device_status_root_path}/intention/common/channel:intention_channel",
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",
@@ -59,12 +60,12 @@ ohos_shared_library("intention_cooperate") {
 
   external_deps = [
     "c_utils:utils",
-    "distributed_input:libdinput_sdk",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "window_manager:libdm",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

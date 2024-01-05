@@ -22,6 +22,7 @@
 
 #include "nocopyable.h"
 
+#include "cooperate_events.h"
 #include "coordination_message.h"
 #include "i_context.h"
 
@@ -45,6 +46,11 @@ public:
     EventManager(IContext *env);
     ~EventManager() = default;
     DISALLOW_COPY_AND_MOVE(EventManager);
+
+    void StartCooperate(const StartCooperateEvent &event);
+    void StartCooperateFinish(const DSoftbusStartCooperateFinished &event);
+    void RemoteStart(const DSoftbusStartCooperate &event);
+    void RemoteStartFinish(const DSoftbusStartCooperateFinished &event);
 
     void AddCooperateEvent(std::shared_ptr<EventInfo> event);
     void RemoveCooperateEvent(std::shared_ptr<EventInfo> event);

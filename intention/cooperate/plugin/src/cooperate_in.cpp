@@ -22,7 +22,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateIn" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateIn" };
 } // namespace
 
 CooperateIn::CooperateIn(IContext *env)
@@ -32,17 +32,22 @@ CooperateIn::CooperateIn(IContext *env)
 void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(env_);
 }
 
-void CooperateIn::OnEnterState(Context & context)
+void CooperateIn::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
+    MMI::InputManager::GetInstance()->SetPointerVisible(true);
+    MMI::InputManager::GetInstance()->EnableInputDevice(true);
+    interceptorId_ = env_->GetInput().AddInterceptor(
+        [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
 }
 
 void CooperateIn::OnLeaveState(Context & context)
 {
     CALL_DEBUG_ENTER;
+    env_->GetInput().RemoveInterceptor(interceptorId_);
+    interceptorId_ = -1;
 }
 
 void CooperateIn::Initial::OnEvent(Context &context, const CooperateEvent &event)

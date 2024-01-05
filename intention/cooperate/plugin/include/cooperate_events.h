@@ -27,60 +27,126 @@ enum CooperateState : size_t {
     COOPERATE_STATE_FREE = 0,
     COOPERATE_STATE_OUT,
     COOPERATE_STATE_IN,
-    NUM_COOPERATE_STATES,
+    N_COOPERATE_STATES,
 };
 
 enum class CooperateEventType {
     NOOP,
     QUIT,
     UPDATE_STATE,
+    REGISTER_LISTENER,
+    UNREGISTER_LISTENER,
+    REGISTER_HOTAREA_LISTENER,
+    UNREGISTER_HOTAREA_LISTENER,
     ENABLE,
     DISABLE,
     START,
     STOP,
+    GET_COOPERATE_STATE,
+    DUMP,
     APP_CLOSED,
-    PLUG_KEYBOARD,
-    UNPLUG_KEYBOARD,
-    UNPLUG_POINTER,
-    POINTER_MOVE,
-    PREPARE_DINPUT_RESULT,
-    START_DINPUT_RESULT,
-    DINPUT_CLOSED,
-    DSOFTBUS_CLOSED,
-    INTERCEPTOR,
-    SESSION_OPEND,
+    DDM_BOARD_ONLINE,
+    DDM_BOARD_OFFLINE,
+    DDP_COOPERATE_SWITCH_CHANGED,
+    INPUT_PLUG_KEYBOARD,
+    INPUT_UNPLUG_KEYBOARD,
+    INPUT_UNPLUG_POINTER,
+    INPUT_POINTER_MOVE,
+    DINPUT_PREPARE_RESULT,
+    DINPUT_START_RESULT,
+    DINPUT_SESSION_CLOSED,
+    DSOFTBUS_SESSION_OPEND,
+    DSOFTBUS_SESSION_CLOSED,
+    DSOFTBUS_START_COOPERATE,
+    DSOFTBUS_START_COOPERATE_RESPONSE,
+    DSOFTBUS_START_COOPERATE_FINISHED,
 };
 
 struct UpdateStateEvent {
     CooperateState current;
 };
 
+struct RegisterListenerEvent {
+    int32_t pid;
+};
+
+using UnregisterListenerEvent = RegisterListenerEvent;
+using RegisterHotareaListenerEvent = RegisterListenerEvent;
+using UnregisterHotareaListenerEvent = RegisterListenerEvent;
+using EnableCooperateEvent = RegisterListenerEvent;
+using DisableCooperateEvent = RegisterListenerEvent;
+
 struct StartCooperateEvent {
+    int32_t pid;
     int32_t userData;
     std::string remoteNetworkId;
     int32_t startDeviceId;
 };
 
-struct PrepareRemoteInputResult {
+struct StopCooperateEvent {
+    int32_t pid;
+    int32_t userData;
+    bool isUnchained;
+};
+
+struct GetCooperateStateEvent {
+    int32_t pid;
+    int32_t userData;
+    std::string networkId;
+};
+
+struct DumpEvent {
+    int32_t fd;
+};
+
+struct DDMBoardOnlineEvent {
+    std::string networkId;
+};
+
+using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
+
+struct DDPCooperateSwitchChanged {
+    std::string networkId;
+    bool status;
+};
+
+struct InputHotplugEvent {
+    std::string dhid;
+};
+
+struct DInputPrepareResult {
     std::string remoteNetworkId;
     std::string originNetworkId;
     int32_t startDeviceId;
     bool success;
 };
 
-using StartRemoteInputResult = PrepareRemoteInputResult;
+using DInputStartResult = DInputPrepareResult;
 
-struct HotplugEvent {
-    std::string dhid;
-};
-
-struct PointerMoveEvent {
-    int32_t deviceId;
-};
-
-struct SessionOpened {
+struct DSoftbusSessionOpened {
     int32_t sessionId;
     int32_t result;
+};
+
+struct DSoftbusStartCooperate {
+    std::string networkId;
+};
+
+struct DSoftbusStartCooperateResponse {
+    std::string networkId;
+    bool normal;
+};
+
+struct Coordinate {
+    int32_t x;
+    int32_t y;
+};
+
+struct DSoftbusStartCooperateFinished {
+    std::string networkId;
+    std::string startDeviceDhid;
+    bool success;
+    Coordinate cursorPos;
 };
 
 struct CooperateEvent {
@@ -94,10 +160,18 @@ struct CooperateEvent {
     CooperateEventType type;
     std::variant<
         UpdateStateEvent,
+        RegisterListenerEvent,
         StartCooperateEvent,
-        PrepareRemoteInputResult,
-        HotplugEvent,
-        PointerMoveEvent
+        StopCooperateEvent,
+        GetCooperateStateEvent,
+        DumpEvent,
+        DDMBoardOnlineEvent,
+        DDPCooperateSwitchChanged,
+        DInputPrepareResult,
+        InputHotplugEvent,
+        DSoftbusStartCooperate,
+        DSoftbusStartCooperateResponse,
+        DSoftbusStartCooperateFinished
     > event;
 };
 } // namespace Cooperate

@@ -20,7 +20,6 @@
 
 #include "cooperate_context.h"
 #include "cooperate_events.h"
-#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
