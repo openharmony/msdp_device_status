@@ -17,7 +17,7 @@
 
 #include "devicestatus_define.h"
 #include "interaction_manager.h"
-#include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace Msdp {
