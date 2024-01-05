@@ -296,7 +296,7 @@ int32_t DragManager::GetDragData(DragData &dragData)
 
 int32_t DragManager::GetDragState(DragState &dragState)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     dragState = GetDragState();
     if (dragState == DragState::ERROR) {
         FI_HILOGE("dragState_ is error");
