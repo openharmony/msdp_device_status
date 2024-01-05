@@ -830,24 +830,28 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    FI_HILOGI("Local device networkId: %{public}s", localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
-    FI_HILOGI("Remote device networkId: %{public}s", sinkNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str());
-    FI_HILOGI("Offline device networkId: %{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGI("Local device networkId: %{public}s, remote device networkId: %{public}s,"
+        "offline device networkId: %{public}s",
+        localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
+        sinkNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
+        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    {
+        DP_ADAPTER->UnregisterCrossingStateListener(networkId);
+        std::lock_guard<std::mutex> guard(mutex_);
+        if (!onlineDevice_.empty()) {
+            auto it = std::find(onlineDevice_.begin(), onlineDevice_.end(), networkId);
+            if (it != onlineDevice_.end()) {
+                onlineDevice_.erase(it);
+            }
+        }
+    }
     if ((networkId != sinkNetworkId_ && networkId != localNetworkId) ||
         (currentState_ == CoordinationState::STATE_FREE)) {
         FI_HILOGI("Other device offline");
         return;
     }
-    DP_ADAPTER->UnregisterCrossingStateListener(networkId);
     Reset(networkId);
     preparedNetworkId_ = std::make_pair("", "");
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (!onlineDevice_.empty()) {
-        auto it = std::find(onlineDevice_.begin(), onlineDevice_.end(), networkId);
-        if (it != onlineDevice_.end()) {
-            onlineDevice_.erase(it);
-        }
-    }
     if ((currentState_ == CoordinationState::STATE_IN) && (sinkNetworkId_ == networkId)) {
         COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::SESSION_CLOSED);
     }
@@ -964,8 +968,7 @@ void CoordinationSM::DeviceInitCallBack::OnRemoteDied()
 
 void CoordinationSM::DmDeviceStateCallback::OnDeviceOnline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    std::string networkId = deviceInfo.networkId;
-    FI_HILOGD("Online device networkId: %{public}s", networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    CALL_INFO_TRACE;
     COOR_SM->OnDeviceOnline(deviceInfo.networkId);
 }
 

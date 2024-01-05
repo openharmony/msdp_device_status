@@ -63,7 +63,8 @@ void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
     std::string stateStr = state ? "true" : "false";
-    FI_HILOGI("Crossing switch state: %{public}s", stateStr.c_str());
+    FI_HILOGI("Crossing switch state: %{public}s, device size:%{public}d", stateStr.c_str(),
+        static_cast<int32_t>(deviceIds.size()));
     const std::string SERVICE_TYPE = "deviceStatus";
     ServiceCharacteristicProfile profile;
     profile.SetServiceType(SERVICE_TYPE);
