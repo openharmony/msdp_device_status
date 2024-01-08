@@ -15,95 +15,136 @@
 
 #include "input_adapter.h"
 
+#include "input_manager.h"
+#include "i_input_event_consumer.h"
+#include "i_input_event_filter.h"
+
+#include "devicestatus_define.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InputAdapter" };
+} // namespace
 
-bool InputAdapter::PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
-{
-    CHKPV(pointerEvent);
-    pointerCallback_(pointerEvent);
-}
+class PointerFilter : public MMI::IInputEventFilter {
+public:
+    explicit PointerFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter)
+        : filter_(filter) {}
 
-void InputAdapter::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const
-{
-    CHKPV(keyEvent);
-    keyCallback_(keyEvent);
-}
+    bool OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        return (filter_ != nullptr ? filter_(pointerEvent) : false);
+    }
 
-void InputAdapter::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
-{
-    CHKPV(pointerEvent);
-    pointerCallback_(pointerEvent);
-}
+    bool OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
+        return false;
+    }
 
-void InputAdapter::InterceptorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
+private:
+    std::function<bool(std::shared_ptr<MMI::PointerEvent>)> filter_;
+};
 
-void InputAdapter::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const {}
+class InterceptorConsumer : public MMI::IInputEventConsumer {
+public:
+    InterceptorConsumer(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+                        std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+        : pointerCb_(pointerCb), keyCb_(keyCb) {}
 
-void InputAdapter::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
-{
-    CHKPV(pointerEvent);
-    callback_(pointerEvent);
-}
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override
+    {
+        if (keyCb_ != nullptr) {
+            keyCb_(keyEvent);
+        }
+    }
 
-void InputAdapter::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent>) const {}
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override
+    {
+        if (pointerCb_ != nullptr) {
+            pointerCb_(pointerEvent);
+        }
+    }
+
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {}
+
+private:
+    std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb_;
+    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb_;
+};
 
 int32_t InputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback)
 {
-    auto monitor = std::make_shared<MonitorConsumer>(callback);
-    monitorId_ = MMI::InputManager::GetInstance()->AddMonitor(monitor);
-    if (monitorId_ <= 0) {
-        FI_HILOGE("Failed to add monitor, error code:%{public}d", monitorId_);
-        monitorId_ = -1;
-        return RET_ERR;
+    int32_t monitorId = MMI::InputManager::GetInstance()->AddMonitor(callback);
+    if (monitorId < 0) {
+        FI_HILOGE("AddMonitor fail");
     }
-    return RET_OK;
+    return monitorId;
 }
 
-int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCallback,
-    std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCallback, uint32_t deviceTags)
+int32_t InputAdapter::AddMonitor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> callback)
 {
-    auto interceptor = std::make_shared<InterceptorConsumer>(pointerCallback, keyCallback);
-    interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY, deviceTags);
-    if (interceptorId_ <= 0) {
-        FI_HILOGE("Failed to add interceptor, error code:%{public}d", interceptorId_);
-        DeactivateCoordination(isUnchained_);
-        return RET_ERR;
+    int32_t monitorId = MMI::InputManager::GetInstance()->AddMonitor(callback);
+    if (monitorId < 0) {
+        FI_HILOGE("AddMonitor fail");
     }
-    return RET_OK;
+    return monitorId;
 }
 
-int32_t InputAdapter::AddFilter(std::function<void(std::shared_ptr<MMI::PointerEvent>)> callback)
+void InputAdapter::RemoveMonitor(int32_t monitorId)
 {
-    int32_t POINTER_DEFAULT_PRIORITY = 220;
+    MMI::InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb)
+{
+    return AddInterceptor(pointerCb, nullptr);
+}
+
+int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+{
+    return AddInterceptor(nullptr, keyCb);
+}
+
+int32_t InputAdapter::AddInterceptor(std::function<void(std::shared_ptr<MMI::PointerEvent>)> pointerCb,
+                                     std::function<void(std::shared_ptr<MMI::KeyEvent>)> keyCb)
+{
+    uint32_t tags { 0u };
+    if (pointerCb != nullptr) {
+        tags |= MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
+    }
+    if (keyCb != nullptr) {
+        tags |= MMI::CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD);
+    }
+    if (tags == 0u) {
+        FI_HILOGE("Both interceptors are null");
+        return -1;
+    }
+    auto interceptor = std::make_shared<InterceptorConsumer>(pointerCb, keyCb);
+    constexpr int32_t DEFAULT_PRIORITY { 499 };
+    int32_t interceptorId = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, DEFAULT_PRIORITY, tags);
+    if (interceptorId < 0) {
+        FI_HILOGE("AddInterceptor fail");
+    }
+    return interceptorId;
+}
+
+void InputAdapter::RemoveInterceptor(int32_t interceptorId)
+{
+    MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+}
+
+int32_t InputAdapter::AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback)
+{
+    constexpr int32_t DEFAULT_PRIORITY { 220 };
     auto filter = std::make_shared<PointerFilter>(callback);
-    uint32_t touchTags = CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
-    if (filterId_ >= 0) {
-        RemoveFilter(filterId_);
+    uint32_t tags = CapabilityToTags(MMI::INPUT_DEV_CAP_POINTER);
+    int32_t filterId = MMI::InputManager::GetInstance()->AddInputEventFilter(filter, DEFAULT_PRIORITY, tags);
+    if (filterId < 0) {
+        FI_HILOGE("AddInputEventFilter fail");
     }
-    filterId_ =
-        MMI::InputManager::GetInstance()->AddInputEventFilter(filter, POINTER_DEFAULT_PRIORITY, touchTags);
-    if (filterId_ < 0) {
-        return;
-    }
-    filter->UpdateCurrentFilterId(filterId_);
-}
-
-void InputAdapter::RemoveMonitor()
-{
-    if ((monitorId_ >= MIN_HANDLER_ID) && (monitorId_ < std::numeric_limits<int32_t>::max())) {
-        MMI::InputManager::GetInstance()->RemoveMonitor(monitorId_);
-        monitorId_ = -1;
-    }
-}
-
-void InputAdapter::RemoveInterceptor()
-{
-    if ((interceptorId_ >= MIN_HANDLER_ID) && (interceptorId_ < std::numeric_limits<int32_t>::max())) {
-        MMI::InputManager::GetInstance()->RemoveInterceptor(interceptorId_);
-        interceptorId_ = -1;
-    }
+    return filterId;
 }
 
 void InputAdapter::RemoveFilter(int32_t filterId)
