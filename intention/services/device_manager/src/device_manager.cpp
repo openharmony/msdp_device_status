@@ -165,7 +165,7 @@ int32_t DeviceManager::ParseDeviceId(const std::string &devNode)
 
 std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     const std::string SYS_INPUT_PATH { "/sys/class/input/" };
     const std::string devPath { DEV_INPUT_PATH + devNode };
     struct stat statbuf;
@@ -346,7 +346,7 @@ int32_t DeviceManager::OnRetriggerHotplug(std::weak_ptr<IDeviceObserver> observe
 
 int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
     int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
         std::bind(&DeviceManager::OnAddDeviceObserver, this, observer));
