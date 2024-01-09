@@ -16,13 +16,11 @@
 #include "cooperate_context.h"
 
 #include <algorithm>
-#include <string_view>
 
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
 #include "devicestatus_define.h"
 #include "display_manager.h"
-#include "dsoftbus_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -101,7 +99,14 @@ Context::Context(IContext *env)
     devMgr_ = std::make_shared<InputDeviceManager>(env);
     ddm_ = std::make_shared<DDMAdapter>();
     ddp_ = std::make_shared<DDPAdapter>();
-    dsoftbus_ = std::make_shared<DSoftbusAdapter>();
+    dsoftbus_ = std::make_shared<DSoftbusHandler>();
+}
+
+void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
+{
+    sender_ = sender;
+    devMgr_->AttachSender(sender);
+    dsoftbus_->AttachSender(sender);
 }
 
 void Context::Enable()
@@ -124,7 +129,6 @@ void Context::Disable()
 
 int32_t Context::EnableDevMgr()
 {
-    devMgr_->AttachSender(sender_);
     devMgr_->Enable();
     return RET_OK;
 }
@@ -136,7 +140,6 @@ void Context::DisableDevMgr()
 
 int32_t Context::EnableDSoftbus()
 {
-    dsoftbus_->AttachSender(sender_);
     return dsoftbus_->Enable();
 }
 

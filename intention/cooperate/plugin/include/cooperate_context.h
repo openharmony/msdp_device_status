@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 
 #include "cooperate_events.h"
-#include "dsoftbus_adapter.h"
+#include "dsoftbus_handler.h"
 #include "event_manager.h"
 #include "input_device_manager.h"
 #include "i_context.h"
@@ -59,7 +59,7 @@ public:
     std::shared_ptr<InputDeviceManager> devMgr_;
     std::shared_ptr<IDDMAdapter> ddm_;
     std::shared_ptr<IDDPAdapter> ddp_;
-    std::shared_ptr<DSoftbusAdapter> dsoftbus_;
+    std::shared_ptr<DSoftbusHandler> dsoftbus_;
     EventManager eventMgr_;
 
 private:
@@ -82,11 +82,6 @@ private:
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceProfileObserver> dpObserver_;
 };
-
-inline void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
-{
-    sender_ = sender;
-}
 
 inline Channel<CooperateEvent>::Sender Context::Sender() const
 {
