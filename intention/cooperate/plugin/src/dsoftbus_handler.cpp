@@ -30,11 +30,13 @@ DSoftbusHandler::DSoftbusHandler()
 {
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     observer_ = std::make_shared<DSoftbusObserver>(*this);
+    CHKPL(dsoftbus_);
     dsoftbus_->AddObserver(observer_);
 }
 
 DSoftbusHandler::~DSoftbusHandler()
 {
+    CHKPL(dsoftbus_);
     dsoftbus_->RemoveObserver(observer_);
 }
 
@@ -48,24 +50,28 @@ void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
 int32_t DSoftbusHandler::Enable()
 {
     CALL_DEBUG_ENTER;
+    CHKPR(dsoftbus_, RET_ERR);
     return dsoftbus_->Enable();
 }
 
 void DSoftbusHandler::Disable()
 {
     CALL_DEBUG_ENTER;
+    CHKPV(dsoftbus_);
     dsoftbus_->Disable();
 }
 
 int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(dsoftbus_, RET_ERR);
     return dsoftbus_->OpenSession(networkId);
 }
 
 void DSoftbusHandler::CloseSession(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(dsoftbus_);
     dsoftbus_->CloseSession(networkId);
 }
 
@@ -77,6 +83,7 @@ int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSof
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
+    CHKPR(dsoftbus_, RET_ERR);
     return dsoftbus_->SendPacket(networkId, packet);
 }
 
