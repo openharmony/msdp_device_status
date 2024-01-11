@@ -30,14 +30,14 @@ DSoftbusHandler::DSoftbusHandler()
 {
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     observer_ = std::make_shared<DSoftbusObserver>(*this);
-    CHKPL(dsoftbus_);
     dsoftbus_->AddObserver(observer_);
 }
 
 DSoftbusHandler::~DSoftbusHandler()
 {
-    CHKPL(dsoftbus_);
-    dsoftbus_->RemoveObserver(observer_);
+    if (dsoftbus_ != nullptr) {
+        dsoftbus_->RemoveObserver(observer_);
+    }
 }
 
 void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
