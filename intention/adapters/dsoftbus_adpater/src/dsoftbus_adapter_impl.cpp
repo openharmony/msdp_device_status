@@ -41,23 +41,12 @@ constexpr int32_t SOCKET_CLIENT { 1 };
 }
 
 std::mutex DSoftbusAdapterImpl::mutex_;
-std::shared_ptr<DSoftbusAdapterImpl> DSoftbusAdapterImpl::instance_;
 
-std::shared_ptr<DSoftbusAdapterImpl> DSoftbusAdapterImpl::GetInstance()
-{
-    if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = std::make_shared<DSoftbusAdapterImpl>();
-        }
-    }
-    return instance_;
-}
-
-void DSoftbusAdapterImpl::DestroyInstance()
+DSoftbusAdapterImpl& DSoftbusAdapterImpl::GetInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    instance_.reset();
+    static DSoftbusAdapterImpl instance;
+    return instance;
 }
 
 DSoftbusAdapterImpl::~DSoftbusAdapterImpl()
