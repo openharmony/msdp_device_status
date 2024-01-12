@@ -59,11 +59,9 @@ constexpr int32_t EIGHT_SIZE { 8 };
 constexpr int32_t TWELVE_SIZE { 12 };
 constexpr int64_t START_TIME { 181154000809 };
 constexpr int64_t INTERVAL_TIME { 16666667 };
-constexpr int32_t FRAMERATE { 30 };
 constexpr int32_t SVG_WIDTH { 40 };
 constexpr float SCALE_THRESHOLD_EIGHT { 1.0F * INT32_MAX / (SVG_WIDTH + EIGHT_SIZE) };
 constexpr float SCALE_THRESHOLD_TWELVE { 1.0F * INT32_MAX / (SVG_WIDTH + TWELVE_SIZE) };
-constexpr int32_t SIXTEEN { 16 };
 constexpr int32_t SUCCESS_ANIMATION_DURATION { 300 };
 constexpr int32_t VIEW_BOX_POS { 2 };
 constexpr int32_t BACKGROUND_FILTER_INDEX { 0 };
@@ -76,7 +74,6 @@ constexpr int32_t FIRST_PIXELMAP_INDEX { 0 };
 constexpr int32_t SECOND_PIXELMAP_INDEX { 1 };
 constexpr size_t TOUCH_NODE_MIN_COUNT { 3 };
 constexpr size_t MOUSE_NODE_MIN_COUNT { 4 };
-constexpr double ONETHOUSAND { 1000.0 };
 constexpr float DEFAULT_SCALING { 1.0f };
 constexpr float BEGIN_ALPHA { 1.0f };
 constexpr float END_ALPHA { 0.0f };
@@ -681,10 +678,9 @@ int32_t DragDrawing::StartVsync()
         .userData_ = this,
         .callback_ = std::bind(&DragDrawing::OnVsync, this)
     };
-    int32_t changeFreq = static_cast<int32_t>((ONETHOUSAND / FRAMERATE) / SIXTEEN);
-    ret = receiver_->SetVSyncRate(fcb, changeFreq);
+    ret = receiver_->RequestNextVSync(fcb);
     if (ret != RET_OK) {
-        FI_HILOGE("Set vsync rate failed");
+        FI_HILOGE("Request next vsync failed");
     }
     return ret;
 }
@@ -712,6 +708,14 @@ void DragDrawing::OnVsync()
             g_drawingInfo.isRunning = false;
         }
         return;
+    }
+    Rosen::VSyncReceiver::FrameCallback fcb = {
+        .userData_ = this,
+        .callback_ = std::bind(&DragDrawing::OnVsync, this)
+    };
+    int32_t ret = receiver_->RequestNextVSync(fcb);
+    if (ret != RET_OK) {
+        FI_HILOGE("Request next vsync failed");
     }
     rsUiDirector_->SendMessages();
     startNum_ += INTERVAL_TIME;
