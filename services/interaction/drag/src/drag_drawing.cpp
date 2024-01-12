@@ -96,6 +96,7 @@ constexpr float NEGATIVE_ANGLE { -8.0f };
 constexpr float DEFAULT_ALPHA { 1.0f };
 constexpr float FIRST_PIXELMAP_ALPHA { 0.6f };
 constexpr float SECOND_PIXELMAP_ALPHA { 0.3f };
+constexpr float HALF_RATIO { 0.5f };
 constexpr uint32_t TRANSPARENT_COLOR_ARGB { 0x00000000 };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
@@ -1248,11 +1249,6 @@ void DragDrawing::ProcessFilter()
     }
 }
 
-void DragDrawing::SetTextEditorAreaFlag(bool textEditorAreaFlag)
-{
-    textEditorAreaFlag_ = textEditorAreaFlag;
-}
-
 int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
 {
     CALL_DEBUG_ENTER;
@@ -1272,47 +1268,28 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
     return RET_OK;
 }
 
+
 int32_t DragDrawing::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    DragData dragData = DRAG_DATA_MGR.GetDragData();
-    if (dragData.hasCoordinateCorrected) {
-        return RET_ERR;
+    if (enable) {
+        DRAG_DATA_MGR.SetInitialPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
+        g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+        g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
+    } else {
+        auto initialPixelMapLocation = DRAG_DATA_MGR.GetInitialPixelMapLocation();
+        g_drawingInfo.pixelMapX = initialPixelMapLocation.first;
+        g_drawingInfo.pixelMapY = initialPixelMapLocation.second;
     }
-    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
-    if (!textEditorAreaFlag_) {
-        resetPixelMapX_ = g_drawingInfo.pixelMapX;
-        resetPixelMapY_ = g_drawingInfo.pixelMapY;
-    }
-    int32_t adjustSize = EIGHT_SIZE * GetScaling();
-    g_drawingInfo.pixelMapX = -(g_drawingInfo.pixelMap->GetWidth() / 2);
-    g_drawingInfo.pixelMapY = -adjustSize;
-    adjustSize = TWELVE_SIZE * GetScaling();
+    DRAG_DATA_MGR.SetPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
     int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
-    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-    if (textEditorAreaFlag_ && !enable) {
-        g_drawingInfo.pixelMapX = resetPixelMapX_;
-        g_drawingInfo.pixelMapY = resetPixelMapY_;
-        positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
-        positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-        if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) == RET_OK) {
-            FI_HILOGD("RunAnimation successfully");
-            return RET_OK;
-        }
-        FI_HILOGE("RunAnimation failed");
-        return RET_ERR;
-    }
-
-    if (!enable || textEditorAreaFlag_) {
-        FI_HILOGD("enable is false or textEditorAreaFlag_ is true");
-        return RET_ERR;
-    }
+    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - TWELVE_SIZE * GetScaling();
     if (RunAnimation(std::bind(&DragDrawing::SetNodesLocation, this, positionX, positionY)) != RET_OK) {
-        FI_HILOGE("RunAnimation failed");
+        FI_HILOGE("RunAnimation to SetNodesLocation failed");
         return RET_ERR;
     }
-    FI_HILOGD("RunAnimation successfully");
-    textEditorAreaFlag_ = true;
+    DRAG_DATA_MGR.SetTextEditorAreaFlag(enable);
+    FI_HILOGI("EnterTextEditorArea %{public}s successfully", (enable ? "true" : "false"));
     return RET_OK;
 }
 

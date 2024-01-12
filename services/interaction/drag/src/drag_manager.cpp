@@ -217,7 +217,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
-    dragDrawing_.SetTextEditorAreaFlag(false);
     return ret;
 }
 
@@ -990,6 +989,18 @@ int32_t DragManager::GetDragAction(DragAction& dragAction) const
 int32_t DragManager::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
+    if (dragState_ != DragState::START) {
+        FI_HILOGE("No drag instance running");
+        return RET_ERR;
+    }
+    if (DRAG_DATA_MGR.GetTextEditorAreaFlag() == enable) {
+        FI_HILOGE("Set textEditorArea:%{public}s already", (enable ? "true" : "false"));
+        return RET_ERR;
+    }
+    if (DRAG_DATA_MGR.GetCoordinateCorrected()) {
+        FI_HILOGE("GetCoordinateCorrected failed");
+        return RET_ERR;
+    }
     return dragDrawing_.EnterTextEditorArea(enable);
 }
 
