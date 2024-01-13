@@ -226,14 +226,14 @@ private:
     void ClearMutilSelectedData();
     bool ParserRadius(float &radius);
     void OnStartStyleAnimation();
-    void OnStopAnimationSucess();
-    void OnStopAnimatioFail();
+    void OnStopAnimationSuccess();
+    void OnStopAnimationFail();
     void OnDragStyleAnimation();
     void ChangeStyleAnimation();
     void CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
-    void RemoveStyleAnimation(flaot startScale, float endScale, int32_t duration);
-    void StartStyleAnimation(flaot startScale, float endScale, int32_t duration);
-    void update(Rosen::RSAniamtionTimingProtocol protocol);
+    void RemoveStyleNodeModifier(std::shared_pt<Rosen::RSCanvasNode> styleNode)
+    void StartStyleAnimation(float startScale, float endScale, int32_t duration);
+    void update(Rosen::RSAnimationTimingProtocol protocol);
 
 private:
     int64_t startNum_ { -1 };
@@ -243,9 +243,9 @@ private:
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
     std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_ { nullptr };
-    std::shared_ptr<Rosen::DrawDragStopModifier> drawDragStopModifier_ { nullptr };
-    std::shared_ptr<Rosen::DrawStyleChangeModifier> drawStyleChangeModifier_ { nullptr };
-    std::shared_ptr<Rosen::DrawStyleScaleModifier> drawStyleChangeScaleModifier_ { nullptr };
+    std::shared_ptr<DrawDragStopModifier> drawDragStopModifier_ { nullptr };
+    std::shared_ptr<DrawStyleChangeModifier> drawStyleChangeModifier_ { nullptr };
+    std::shared_ptr<DrawStyleScaleModifier> drawStyleChangeScaleModifier_ { nullptr };
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
