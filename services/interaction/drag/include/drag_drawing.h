@@ -231,7 +231,7 @@ private:
     void OnDragStyleAnimation();
     void ChangeStyleAnimation();
     void CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
-    void RemoveStyleNodeModifier(std::shared_pt<Rosen::RSCanvasNode> styleNode)
+    void RemoveStyleNodeModifier(std::shared_pt<Rosen::RSCanvasNode> styleNode);
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
     void update(Rosen::RSAnimationTimingProtocol protocol);
 

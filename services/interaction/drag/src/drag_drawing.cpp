@@ -522,7 +522,7 @@ void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> st
     styleNode->RemoveAllAnimations();
 }
 
-void DragDrawing::RemoveStyleNodeModifier(std::shared_pt<Rosen::RSCanvasNode> styleNode)
+void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     CALL_DEBUG_ENTER;
     if (drawStyleChangeModifier_ != nullptr) {
@@ -560,7 +560,7 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
 {
     FI_HILOGI("StartStyleAnimation, startScale is %{public}lf", startScale);
     if (!CheckNodesValid() || needBreakStyleScaleAnimation_ || hasRunningStopAnimation_) {
-        FI_HILOGE("needBreakStyleScaleAnimation_ or hasRunningAnimation_, return");
+        FI_HILOGE("needBreakStyleScaleAnimation_ or hasRunningStopAnimation_, return");
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -2140,7 +2140,6 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
     CALL_DEBUG_ENTER;
     CHKPV(alpha_);
     CHKPV(scale_);
-    CALL_DEBUG_ENTER;
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -2191,7 +2190,7 @@ void DrawDragStopModifier::SetStyleAlpha(float scale)
 {
     CALL_DEBUG_ENTER;
     if (styleAlpha_ == nullptr) {
-        styleAlpha_ = std::make_shared<Rosen::RSAniamatableProperty<float>>(scale);
+        styleAlpha_ = std::make_shared<Rosen::RSAnimatableProperty<float>>(scale);
         Rosen::RSModifier::AttachProperty(styleAlpha_);
     } else {
         styleAlpha_->Set(scale);
