@@ -487,17 +487,6 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
     g_drawingInfo.isCurrentDefaultStyle = true;
-    // if (dragExtHandle_ == nullptr) {
-    //     FI_HILOGE("Failed to open drag extension library");
-    //     return;
-    // }
-    // auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStartDragExt"));
-    // if (animationExtFunc == nullptr) {
-    //     FI_HILOGE("Failed to get drag extension func");
-    //     dlclose(dragExtHandle_);
-    //     dragExtHandle_ = nullptr;
-    //     return;
-    // }
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
