@@ -231,7 +231,7 @@ private:
     void OnDragStyleAnimation();
     void ChangeStyleAnimation();
     void CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
-    void RemoveStyleNodeModifier(std::shared_pt<Rosen::RSCanvasNode> styleNode);
+    void RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
     void update(Rosen::RSAnimationTimingProtocol protocol);
 
@@ -245,7 +245,7 @@ private:
     std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_ { nullptr };
     std::shared_ptr<DrawDragStopModifier> drawDragStopModifier_ { nullptr };
     std::shared_ptr<DrawStyleChangeModifier> drawStyleChangeModifier_ { nullptr };
-    std::shared_ptr<DrawStyleScaleModifier> drawStyleChangeScaleModifier_ { nullptr };
+    std::shared_ptr<DrawStyleScaleModifier> drawStyleScaleModifier_ { nullptr };
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
