@@ -118,7 +118,7 @@ constexpr float BEZIER_067 { 0.67f };
 constexpr float BEZIER_100 { 1.00f };
 constexpr float START_SCALE { 1.0f };
 constexpr float START_STYLE_SCALE { 1.0f };
-constexpr float STYLE_SRART_SCALE { 1.0f };
+constexpr float STYLE_START_SCALE { 1.0f };
 constexpr float STYLE_CHANGE_SCALE { 1.1f };
 constexpr float STYLE_MAX_SCALE { 1.2f };
 constexpr float STYLE_END_SCALE { 1.0f };
@@ -137,7 +137,6 @@ constexpr int32_t TIME_STOP { 0 };
 constexpr int64_t TIME_STEP { 16666667 };
 constexpr int64_t TIME_SLEEP { 30000 };
 constexpr int32_t INTERRUPT_SCALE { 15 };
-
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
@@ -516,7 +515,7 @@ void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> st
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
     }
-    if (drawStyleChangeScaleModifier_ != nullptr && hasRunningScaleAnimation_) {
+    if (drawStyleScaleModifier_ != nullptr && hasRunningScaleAnimation_) {
         needBreakStyleScaleAnimation_ = true;
     }
     styleNode->RemoveAllAnimations();
@@ -529,9 +528,9 @@ void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> s
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
     }
-    if (drawStyleChangeScaleModifier_ != nullptr) {
-        styleNode->RemoveModifier(drawStyleChangeScaleModifier_);
-        drawStyleChangeScaleModifier_ = nullptr;
+    if (drawStyleScaleModifier_ != nullptr) {
+        styleNode->RemoveModifier(drawStyleScaleModifier_);
+        drawStyleScaleModifier_ = nullptr;
     }
 }
 
@@ -566,18 +565,18 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     RemoveStyleNodeModifier(dragStyleNode);
-    drawStyleChangeScaleModifier_ = std::make_shared<DrawStyleScaleModifier>();
-    dragStyleNode->AddModifier(drawStyleChangeScaleModifier_);
-    CHKPV(drawStyleChangeScaleModifier_);
-    drawStyleChangeScaleModifier_->SetScale(startScale);
+    drawStyleScaleModifier_ = std::make_shared<DrawStyleScaleModifier>();
+    dragStyleNode->AddModifier(drawStyleScaleModifier_);
+    CHKPV(drawStyleScaleModifier_);
+    drawStyleScaleModifier_->SetScale(startScale);
     Rosen::RSAnimationTimingProtocol protocol;
     protocol.SetDuration(duration);
     auto springCurveStyle = endScale == STYLE_END_SCALE
         ? Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_030, BEZIER_000, BEZIER_040, BEZIER_100)
         : Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_020, BEZIER_000, BEZIER_060, BEZIER_100);
-    CHKPV(drawStyleChangeScaleModifier_);
+    CHKPV(drawStyleScaleModifier_);
     Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
-        drawStyleChangeScaleModifier_->SetScale(endScale);
+        drawStyleScaleModifier_->SetScale(endScale);
     });
     update(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
@@ -585,16 +584,16 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
             dragStyleNode->RemoveModifier(drawStyleChangeModifier_);
             drawStyleChangeModifier_ = nullptr;
         }
-        if (drawStyleChangeScaleModifier_ != nullptr) {
-            dragStyleNode->RemoveModifier(drawStyleChangeScaleModifier_);
-            drawStyleChangeScaleModifier_ = nullptr;
+        if (drawStyleScaleModifier_ != nullptr) {
+            dragStyleNode->RemoveModifier(drawStyleScaleModifier_);
+            drawStyleScaleModifier_ = nullptr;
         }
         drawStyleChangeModifier_ = std::make_shared<DrawStyleChangeModifier>(g_drawingInfo.stylePixelMap);
         dragStyleNode->AddModifier(drawStyleChangeModifier_);
     }
-    if (endScale == STYLE_END_SCALE && drawStyleChangeScaleModifier_ != nullptr) {
-        dragStyleNode->RemoveModifier(drawStyleChangeScaleModifier_);
-        drawStyleChangeScaleModifier_ = nullptr;
+    if (endScale == STYLE_END_SCALE && drawStyleScaleModifier_ != nullptr) {
+        dragStyleNode->RemoveModifier(drawStyleScaleModifier_);
+        drawStyleScaleModifier_ = nullptr;
     }
 }
 
@@ -602,7 +601,7 @@ void DragDrawing::ChangeStyleAnimation()
 {
     CALL_DEBUG_ENTER;
     hasRunningScaleAnimation_ = true;
-    StartStyleAnimation(STYLE_SRART_SCALE, STYLE_CHANGE_SCALE, TIME_DRAG_CHANGE_STYLE);
+    StartStyleAnimation(STYLE_START_SCALE, STYLE_CHANGE_SCALE, TIME_DRAG_CHANGE_STYLE);
     StartStyleAnimation(STYLE_CHANGE_SCALE, STYLE_MAX_SCALE, TIME_DRAG_CHANGE_STYLE);
     StartStyleAnimation(STYLE_MAX_SCALE, STYLE_END_SCALE, TIME_DRAG_STYLE);
     needBreakStyleScaleAnimation_ = false;
@@ -644,19 +643,6 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
     CALL_DEBUG_ENTER;
     CHKPV(dragStyleNode);
     CHKPV(stylePixelMap);
-    // if (dragExtHandle_ == nullptr) {
-    //     FI_HILOGE("Failed to open drag extension library");
-    //     DrawStyle(dragStyleNode, stylePixelMap);
-    //     return;
-    // }
-    // auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnDragStyleExt"));
-    // if (animationExtFunc == nullptr) {
-    //     FI_HILOGE("Failed to get drag extension func");
-    //     DrawStyle(dragStyleNode, stylePixelMap);
-    //     dlclose(dragExtHandle_);
-    //     dragExtHandle_ = nullptr;
-    //     return;
-    // }
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -680,10 +666,10 @@ void DragDrawing::OnStopAnimationSuccess()
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    if (dragStyleNode != nullptr && drawStyleChangeScaleModifier_ != nullptr) {
-        dragStyleNode->RemoveModifier(drawStyleChangeScaleModifier_);
+    if (dragStyleNode != nullptr && drawStyleScaleModifier_ != nullptr) {
+        dragStyleNode->RemoveModifier(drawStyleScaleModifier_);
         dragStyleNode->RemoveAllAnimations();
-        drawStyleChangeScaleModifier_ = nullptr;
+        drawStyleScaleModifier_ = nullptr;
         needBreakStyleScaleAnimation_ = true;
     }
     CHKPV(g_drawingInfo.rootNode);
@@ -721,19 +707,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
 {
     CALL_DEBUG_ENTER;
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
-    // if (dragExtHandle_ == nullptr) {
-    //     FI_HILOGE("Failed to open drag extension library");
-    //     RunAnimation(animateCb);
-    //     return;
-    // }
-    // auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragSuccessExt"));
-    // if (animationExtFunc == nullptr) {
-    //     FI_HILOGE("Failed to get drag extension func");
-    //     RunAnimation(animateCb);
-    //     dlclose(dragExtHandle_);
-    //     dragExtHandle_ = nullptr;
-    //     return;
-    // }
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -757,10 +730,10 @@ void DragDrawing::OnStopAnimationFail()
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
-    if (dragStyleNode != nullptr && drawStyleChangeScaleModifier_ != nullptr) {
-        dragStyleNode->RemoveModifier(drawStyleChangeScaleModifier_);
+    if (dragStyleNode != nullptr && drawStyleScaleModifier_ != nullptr) {
+        dragStyleNode->RemoveModifier(drawStyleScaleModifier_);
         dragStyleNode->RemoveAllAnimations();
-        drawStyleChangeScaleModifier_ = nullptr;
+        drawStyleScaleModifier_ = nullptr;
         needBreakStyleScaleAnimation_ = true;
     }
     if (drawDragStopModifier_ != nullptr) {
@@ -792,19 +765,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
 {
     CALL_DEBUG_ENTER;
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
-    // if (dragExtHandle_ == nullptr) {
-    //     FI_HILOGE("Failed to open drag extension library");
-    //     RunAnimation(animateCb);
-    //     return;
-    // }
-    // auto animationExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandle_, "OnStopDragFailExt"));
-    // if (animationExtFunc == nullptr) {
-    //     FI_HILOGE("Failed to get drag extension func");
-    //     RunAnimation(animateCb);
-    //     dlclose(dragExtHandle_);
-    //     dragExtHandle_ = nullptr;
-    //     return;
-    // }
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -2186,14 +2146,14 @@ void DrawDragStopModifier::SetStyleScale(float scale)
     }
 }
 
-void DrawDragStopModifier::SetStyleAlpha(float scale)
+void DrawDragStopModifier::SetStyleAlpha(float alpha)
 {
     CALL_DEBUG_ENTER;
     if (styleAlpha_ == nullptr) {
-        styleAlpha_ = std::make_shared<Rosen::RSAnimatableProperty<float>>(scale);
+        styleAlpha_ = std::make_shared<Rosen::RSAnimatableProperty<float>>(alpha);
         Rosen::RSModifier::AttachProperty(styleAlpha_);
     } else {
-        styleAlpha_->Set(scale);
+        styleAlpha_->Set(alpha);
     }
 }
 
