@@ -180,9 +180,9 @@ private:
     int32_t CreateEventRunner(int32_t positionX, int32_t positionY);
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
-    void MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
-    void InitmultiSelectedNodes();
-    void ClearMutilSelectedData();
+    void MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
+    void InitMultiSelectedNodes();
+    void ClearMultiSelectedData();
     bool ParserRadius(float &radius);
 
 private:

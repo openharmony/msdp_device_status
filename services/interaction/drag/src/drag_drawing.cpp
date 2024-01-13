@@ -276,7 +276,7 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
         DoDrawMouse();
     }
     if (!g_drawingInfo.multiSelectedNodes.empty() && !g_drawingInfo.multiSelectedPixelMaps.empty()) {
-        MutilSelectedAnimation(positionX, positionY, adjustSize);
+        MultiSelectedAnimation(positionX, positionY, adjustSize);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -392,7 +392,7 @@ void DragDrawing::DestroyDragWindow()
     g_drawingInfo.filterInfo.clear();
     g_drawingInfo.extraInfo.clear();
     RemoveModifier();
-    ClearMutilSelectedData();
+    ClearMultiSelectedData();
     if (!g_drawingInfo.nodes.empty()) {
         g_drawingInfo.nodes.clear();
         g_drawingInfo.nodes.shrink_to_fit();
@@ -822,7 +822,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     g_drawingInfo.parentNode->AddChild(filterNode);
     g_drawingInfo.parentNode->AddChild(pixelMapNode);
     if (!g_drawingInfo.multiSelectedPixelMaps.empty()) {
-        InitmultiSelectedNodes();
+        InitMultiSelectedNodes();
         if (!g_drawingInfo.multiSelectedNodes.empty()) {
             size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
             for (size_t i = 0; i < multiSelectedNodesSize; ++i) {
@@ -1525,13 +1525,13 @@ int32_t DragDrawing::ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &pr
     return RET_OK;
 }
 
-void DragDrawing::MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize)
+void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize)
 {
     size_t multiSelectedNodesSize = g_drawingInfo.multiSelectedNodes.size();
     size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
     for (size_t i = 0; (i < multiSelectedNodesSize) && (i < multiSelectedPixelMapsSize); ++i) {
-        std::shared_ptr<Rosen::RSCanvasNode> mutilSelectedNode = g_drawingInfo.multiSelectedNodes[i];
-        std::shared_ptr<Media::PixelMap> mutilSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
+        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = g_drawingInfo.multiSelectedNodes[i];
+        std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
         Rosen::RSAnimationTimingProtocol protocol;
         if (i == FIRST_PIXELMAP_INDEX) {
             protocol.SetDuration(SHORT_DURATION);
@@ -1539,30 +1539,30 @@ void DragDrawing::MutilSelectedAnimation(int32_t positionX, int32_t positionY, i
             protocol.SetDuration(LONG_DURATION);
         }
         Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-            mutilSelectedNode->SetBounds(positionX, positionY + adjustSize, mutilSelectedPixelMap->GetWidth(),
-                mutilSelectedPixelMap->GetHeight());
-            mutilSelectedNode->SetFrame(positionX, positionY + adjustSize, mutilSelectedPixelMap->GetWidth(),
-                mutilSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetBounds(positionX, positionY + adjustSize, multiSelectedPixelMap->GetWidth(),
+                multiSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetFrame(positionX, positionY + adjustSize, multiSelectedPixelMap->GetWidth(),
+                multiSelectedPixelMap->GetHeight());
         });
     }
 }
 
-void DragDrawing::InitmultiSelectedNodes()
+void DragDrawing::InitMultiSelectedNodes()
 {
     CALL_DEBUG_ENTER;
     size_t multiSelectedPixelMapsSize = g_drawingInfo.multiSelectedPixelMaps.size();
     for (size_t i = 0; i < multiSelectedPixelMapsSize; ++i) {
-        std::shared_ptr<Media::PixelMap> mutilSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
-        std::shared_ptr<Rosen::RSCanvasNode> mutilSelectedNode = Rosen::RSCanvasNode::Create();
-        mutilSelectedNode->SetBgImageWidth(mutilSelectedPixelMap->GetWidth());
-        mutilSelectedNode->SetBgImageHeight(mutilSelectedPixelMap->GetHeight());
-        mutilSelectedNode->SetBgImagePositionX(0);
-        mutilSelectedNode->SetBgImagePositionY(0);
-        mutilSelectedNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
+        std::shared_ptr<Media::PixelMap> multiSelectedPixelMap = g_drawingInfo.multiSelectedPixelMaps[i];
+        std::shared_ptr<Rosen::RSCanvasNode> multiSelectedNode = Rosen::RSCanvasNode::Create();
+        multiSelectedNode->SetBgImageWidth(multiSelectedPixelMap->GetWidth());
+        multiSelectedNode->SetBgImageHeight(multiSelectedPixelMap->GetHeight());
+        multiSelectedNode->SetBgImagePositionX(0);
+        multiSelectedNode->SetBgImagePositionY(0);
+        multiSelectedNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
         auto rosenImage = std::make_shared<Rosen::RSImage>();
-        rosenImage->SetPixelMap(mutilSelectedPixelMap);
+        rosenImage->SetPixelMap(multiSelectedPixelMap);
         rosenImage->SetImageRepeat(0);
-        mutilSelectedNode->SetBgImage(rosenImage);
+        multiSelectedNode->SetBgImage(rosenImage);
         float alpha = DEFAULT_ALPHA;
         float degrees = DEFAULT_ANGLE;
         if (i == FIRST_PIXELMAP_INDEX) {
@@ -1572,13 +1572,13 @@ void DragDrawing::InitmultiSelectedNodes()
             alpha = SECOND_PIXELMAP_ALPHA;
             degrees = NEGATIVE_ANGLE;
         }
-        mutilSelectedNode->SetRotation(degrees);
-        mutilSelectedNode->SetAlpha(alpha);
-        g_drawingInfo.multiSelectedNodes.emplace_back(mutilSelectedNode);
+        multiSelectedNode->SetRotation(degrees);
+        multiSelectedNode->SetAlpha(alpha);
+        g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }
 }
 
-void DragDrawing::ClearMutilSelectedData()
+void DragDrawing::ClearMultiSelectedData()
 {
     CALL_DEBUG_ENTER;
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
