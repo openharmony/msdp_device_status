@@ -222,8 +222,9 @@ void Client::OnDisconnected()
     FI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     hasConnected_ = false;
     isListening_ = false;
-    if (funDisconnected_) {
-        funDisconnected_(*this);
+    if (funDisconnected_ != nullptr) {
+        FI_HILOGI("Execute funDisconnected");
+        funDisconnected_();
     }
     if (!DelFdListener(fd_)) {
         FI_HILOGW("Delete fd listener failed");
@@ -242,7 +243,8 @@ void Client::OnConnected()
     FI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     hasConnected_ = true;
     if (funConnected_ != nullptr) {
-        funConnected_(*this);
+        FI_HILOGI("Execute funConnected");
+        funConnected_();
     }
     if (hasClient_ && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {

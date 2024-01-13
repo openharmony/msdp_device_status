@@ -39,6 +39,9 @@ bool InteractionManagerImpl::InitClient()
     }
     client_ = std::make_shared<Client>();
     InitMsgHandler();
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    client_->RegisterConnectedFunction(std::bind(&CoordinationManagerImpl::OnConnected, &coordinationManagerImpl_));
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     if (!(client_->Start())) {
         client_.reset();
         client_ = nullptr;
@@ -74,7 +77,7 @@ void InteractionManagerImpl::InitMsgHandler()
     CHKPV(client_);
     for (auto &it : funs) {
         if (!client_->RegisterEvent(it)) {
-            FI_HILOGI("RegistER event handler msg:%{publid}d already exists", it.id);
+            FI_HILOGI("RegisterEvent msg:%{publid}d already exists", it.id);
         }
     }
 }

@@ -73,7 +73,6 @@ public:
 
 private:
     void InitMsgHandler();
-
 private:
     std::mutex mutex_;
     IClientPtr client_ { nullptr };
