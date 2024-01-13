@@ -80,7 +80,7 @@ struct DrawingInfo {
     std::atomic_bool isPreviousDefaultStyle { false };
     std::atomic_bool isCurrentDefaultStyle { false };
     bool isInitUiDirector { true };
-    bool isExistScalingVallue { false };
+    bool isExistScalingValue { false };
     int32_t sourceType { -1 };
     int32_t currentDragNum { -1 };
     DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
@@ -95,8 +95,8 @@ struct DrawingInfo {
     int32_t rootNodeHeight { -1 };
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
-    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> mutilSelectedNodes;
-    std::vector<std::shared_ptr<Media::PixelMap>> mutilSelectedPixelMaps;
+    std::vector<std::shared_ptr<Rosen::RSCanvasNode>> multiSelectedNodes;
+    std::vector<std::shared_ptr<Media::PixelMap>> multiSelectedPixelMaps;
     std::shared_ptr<Rosen::RSNode> rootNode { nullptr };
     std::shared_ptr<Rosen::RSNode> parentNode { nullptr };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
@@ -181,7 +181,7 @@ private:
     int32_t ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> node, const PreviewStyle &previewStyle);
     int32_t ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles);
     void MutilSelectedAnimation(int32_t positionX, int32_t positionY, int32_t adjustSize);
-    void InitMutilSelectedNodes();
+    void InitmultiSelectedNodes();
     void ClearMutilSelectedData();
     bool ParserRadius(float &radius);
 
