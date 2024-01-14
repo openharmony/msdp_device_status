@@ -50,6 +50,12 @@ public:
     void ResetDragData();
     DragData GetDragData() const;
     void SetMotionDrag(bool isMotionDrag);
+    bool GetCoordinateCorrected();
+    void SetPixelMapLocation(const std::pair<int32_t, int32_t> &location);
+    void SetTextEditorAreaFlag(bool enable);
+    bool GetTextEditorAreaFlag();
+    void SetInitialPixelMapLocation(const std::pair<int32_t, int32_t> &location);
+    std::pair<int32_t, int32_t> GetInitialPixelMapLocation();
 private:
     bool isMotionDrag_ { false };
     bool visible_ { false };
@@ -59,6 +65,8 @@ private:
     std::u16string dragMessage_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     DragData dragData_;
+    bool textEditorAreaFlag_ { false };
+    std::pair<int32_t, int32_t> initialPixelMapLocation_;
 };
 
 #define DRAG_DATA_MGR OHOS::Singleton<DragDataManager>::GetInstance()

@@ -120,6 +120,42 @@ void DragDataManager::ResetDragData()
     targetTid_ = -1;
     targetPid_ = -1;
     isMotionDrag_ = false;
+    textEditorAreaFlag_ = false;
+}
+
+void DragDataManager::SetPixelMapLocation(const std::pair<int32_t, int32_t> &location)
+{
+    if (dragData_.shadowInfos.empty()) {
+        FI_HILOGE("ShadowInfos is empty");
+        return;
+    }
+    dragData_.shadowInfos[0].x = location.first;
+    dragData_.shadowInfos[0].y = location.second;
+}
+
+bool DragDataManager::GetCoordinateCorrected()
+{
+    return dragData_.hasCoordinateCorrected;
+}
+
+void DragDataManager::SetTextEditorAreaFlag(bool enable)
+{
+    textEditorAreaFlag_ = enable;
+}
+
+bool DragDataManager::GetTextEditorAreaFlag()
+{
+    return textEditorAreaFlag_;
+}
+
+void DragDataManager::SetInitialPixelMapLocation(const std::pair<int32_t, int32_t> &location)
+{
+    initialPixelMapLocation_ = location;
+}
+
+std::pair<int32_t, int32_t> DragDataManager::GetInitialPixelMapLocation()
+{
+    return initialPixelMapLocation_;
 }
 
 void DragDataManager::SetMotionDrag(bool isMotionDrag)
