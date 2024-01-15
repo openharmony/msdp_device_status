@@ -148,7 +148,7 @@ int32_t CoordinationSoftbusAdapter::InitSocket(SocketInfo info, int32_t socketTy
         .OnShutdown = ShutdownLink,
         .OnBytes = BytesReceived
     };
-    FI_HILOGI("The socketType: %{public}d, name: %{public}s, peerName: %{public}s, peerNetworkId: %{public}s",
+    FI_HILOGI("The socketType:%{public}d, name:%{public}s, peerName:%{public}s, peerNetworkId:%{public}s",
         socketType, info.name, info.peerName, info.peerNetworkId);
     if (socketType == SOCKET_SERVER) {
         return Listen(socket, socketQos, QOS_LEN, &listener);

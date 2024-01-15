@@ -74,7 +74,7 @@ int32_t PreviewAnimationPacker::UnMarshalling(Parcel &data, PreviewAnimation &pr
         FI_HILOGW("Duration:%{public}d too long, use default value", previewAnimation.duration);
         previewAnimation.duration = MAX_ANIMATION_DURATION_MS;
     }
-    READSTRING(data,  previewAnimation.curveName, ERR_INVALID_VALUE);
+    READSTRING(data, previewAnimation.curveName, ERR_INVALID_VALUE);
     READFLOATVECTOR(data, previewAnimation.curve, ERR_INVALID_VALUE);
     return RET_OK;
 }
