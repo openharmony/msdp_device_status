@@ -66,11 +66,10 @@ public:
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
     int32_t OnHotAreaListener(const StreamClient &client, NetPacket &pkt);
     int32_t RemoveHotAreaListener(HotAreaListenerPtr listener = nullptr);
-
+    void OnConnected();
 private:
     const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
     const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
-
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
@@ -80,6 +79,8 @@ private:
     std::atomic_bool isListeningProcess_ { false };
     bool isHotAreaListener_ { false };
     IClientPtr client_ { nullptr };
+    std::function<void(std::string, CoordinationMessage)> prepareCooCallback_ { nullptr };
+    bool isPrepareCooIsCompatible_ { false };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

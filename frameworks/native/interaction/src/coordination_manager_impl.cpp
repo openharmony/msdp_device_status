@@ -78,6 +78,8 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    prepareCooCallback_ = callback;
+    isPrepareCooIsCompatible_ = isCompatible;
     CoordinationEvent event;
     event.msg = callback;
     if (userData_ == std::numeric_limits<int32_t>::max()) {
@@ -354,6 +356,16 @@ int32_t CoordinationManagerImpl::RemoveHotAreaListener(HotAreaListenerPtr listen
     }
     return RET_OK;
 }
+
+void CoordinationManagerImpl::OnConnected()
+{
+    CALL_INFO_TRACE;
+    CHKPV(prepareCooCallback_);
+    if (PrepareCoordination(prepareCooCallback_, isPrepareCooIsCompatible_) != RET_OK) {
+        FI_HILOGE("PrepareCoordination failed");
+    }
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -946,11 +946,6 @@ int32_t DeviceStatusService::OnPrepareCoordination(int32_t pid, int32_t userData
         FI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
     }
-#ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
-    if (motionDrag_ != nullptr) {
-        motionDrag_->RegisterCallback();
-    }
-#endif // OHOS_BUILD_ENABLE_MOTION_DRAG
     return RET_OK;
 }
 

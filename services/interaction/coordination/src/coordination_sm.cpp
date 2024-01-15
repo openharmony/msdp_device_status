@@ -674,11 +674,11 @@ void CoordinationSM::UpdateState(CoordinationState state)
         }
         case CoordinationState::STATE_IN: {
             MMI::InputManager::GetInstance()->SetPointerVisible(false);
-            auto interceptor = std::make_shared<InterceptorConsumer>();
             MMI::InputManager::GetInstance()->EnableInputDevice(true);
             auto state = GetCurrentState();
             CHKPV(state);
             state->SetStartDeviceDhid(startDeviceDhid_);
+            auto interceptor = std::make_shared<InterceptorConsumer>();
             interceptorId_ = MMI::InputManager::GetInstance()->AddInterceptor(interceptor, COORDINATION_PRIORITY,
                 CapabilityToTags(MMI::INPUT_DEV_CAP_KEYBOARD));
             if (interceptorId_ <= 0) {
