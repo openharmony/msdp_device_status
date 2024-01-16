@@ -79,8 +79,6 @@ private:
         int32_t timerId_ { -1 };
     };
 
-    
-
     IContext *env_ { nullptr };
     int32_t interceptorId_ { -1 };
 };
