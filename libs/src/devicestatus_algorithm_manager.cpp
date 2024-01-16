@@ -104,7 +104,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
     SensorInfo *pt = sensorInfo + count;
     for (SensorInfo *ps = sensorInfo; ps < pt; ++ps) {
         if (ps->sensorTypeId == sensorTypeId) {
-            FI_HILOGI("Get sensor sensorTypeId: %{public}d", sensorTypeId);
+            FI_HILOGI("Get sensor sensorTypeId:%{public}d", sensorTypeId);
             return true;
         }
     }
@@ -114,7 +114,7 @@ bool AlgoMgr::CheckSensorTypeId(int32_t sensorTypeId)
 
 int32_t AlgoMgr::GetSensorTypeId(Type type)
 {
-    FI_HILOGI("Get sensor type: %{public}d", type);
+    FI_HILOGI("Get sensor type:%{public}d", type);
     switch (type) {
         case Type::TYPE_ABSOLUTE_STILL: {
             return SensorTypeId::SENSOR_TYPE_ID_ACCELEROMETER;

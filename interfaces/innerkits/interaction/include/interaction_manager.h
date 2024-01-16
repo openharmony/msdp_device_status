@@ -168,16 +168,16 @@ public:
     int32_t RemoveDraglistener(std::shared_ptr<IDragListener> listener = nullptr);
 
     /**
-     * @brief 注册一个用于拖拽角标样式更改的监听器.
-     * @param listener 用于拖拽角标样式更改的侦听器.
+     * @brief Register a listener for dragging corner style changes.
+     * @param listener Indicates the listener for dragging corner style changes.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
     int32_t AddSubscriptListener(std::shared_ptr<ISubscriptListener> listener);
 
     /**
-     * @brief 取消注册一个用于拖拽角标样式更改的监听器.
-     * @param listener 用于拖拽角标样式更改的侦听器.
+     * @brief Unregisters a listener for dragging corner style changes.
+     * @param listener Indicates the listener for dragging corner style changes.
      * If no value is passed, all listeners are canceled.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
@@ -214,8 +214,8 @@ public:
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
 
     /**
-     * @brief 获取所有与拖拽相关的数据。
-     * @param dragData 保存拖拽相关的数据。
+     * @brief Obtains the dragging data.
+     * @param dragData Indicates the dragging data.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
@@ -230,8 +230,9 @@ public:
     int32_t GetDragAction(DragAction &dragAction);
 
     /**
-     * @brief 获取拖拽数据中的 'extraInfo' 字段。
-     * @param extraInfo 拖拽数据中的 'extraInfo' 字段, 主要用于保存是否允许跨设备拖拽的"drag_allow_distributed"字段。
+     * @brief Obtains the 'extraInfo' field in the drag data.
+     * @param extraInfo Indicates the 'extraInfo' field in the drag data, mainly to save whether to allow drag across
+     * the device "drag_allow_distributed" field.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 10
      */
@@ -279,8 +280,8 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
 
     /**
-     * @brief 获取拖拽对象的数据摘要。
-     * @param summarys 保存拖拽对象的数据摘要。
+     * @brief Obtains data summary of the drag object.
+     * @param summarys Indicates data summary of the drag object.
      * @return Returns <b>0</b> if the operation is successful; returns other values if the operation fails.
      * @since 11
      */
