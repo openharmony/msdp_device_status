@@ -46,6 +46,7 @@ void CooperateOut::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
     MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    CHKPV(env_);
     interceptorId_ = env_->GetInput().AddInterceptor(
         [sender = context.Sender()](std::shared_ptr<MMI::PointerEvent> pointerEvent) {},
         [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
@@ -54,6 +55,7 @@ void CooperateOut::OnEnterState(Context &context)
 void CooperateOut::OnLeaveState(Context &context)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(env_);
     env_->GetInput().RemoveInterceptor(interceptorId_);
     interceptorId_ = -1;
 }
@@ -61,6 +63,7 @@ void CooperateOut::OnLeaveState(Context &context)
 void CooperateOut::RegisterDInputSessionCb(Context &context)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(env_);
     env_->GetDInput().RegisterSessionStateCb(
         [sender = context.Sender()](uint32_t status) mutable {
             if (status == P2P_SESSION_CLOSED) {
@@ -168,6 +171,7 @@ void CooperateOut::RemoteStart::OnRemoteStartFinished(Context &context, const Co
     if (!context.IsPeer(ev.networkId)) {
         return;
     }
+    CHKPV(parent_.env_);
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (ev.success) {
         OnSuccess(context, ev);
@@ -199,12 +203,14 @@ void CooperateOut::RemoteStart::OnProgress(Context &context, const CooperateEven
         .networkId = DSoftbusAdapter::GetLocalNetworkId(),
         .normal = true,
     };
+    CHKPV(context.dsoftbus_);
     int32_t ret = context.dsoftbus_->StartCooperateResponse(req.networkId, resp);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to answer \'%{public}s\'", req.networkId.c_str());
         OnReset(context, event);
         return;
     }
+    CHKPV(parent_.env_);
     timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
         [sender = context.Sender(), remoteNetworkId = req.networkId]() mutable {
             sender.Send(CooperateEvent(

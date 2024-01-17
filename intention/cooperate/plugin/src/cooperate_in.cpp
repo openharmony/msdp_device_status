@@ -41,6 +41,7 @@ void CooperateIn::OnEnterState(Context &context)
     CALL_DEBUG_ENTER;
     MMI::InputManager::GetInstance()->SetPointerVisible(true);
     MMI::InputManager::GetInstance()->EnableInputDevice(true);
+    CHKPV(env_);
     interceptorId_ = env_->GetInput().AddInterceptor(
         [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
 }
@@ -48,6 +49,7 @@ void CooperateIn::OnEnterState(Context &context)
 void CooperateIn::OnLeaveState(Context & context)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(env_);
     env_->GetInput().RemoveInterceptor(interceptorId_);
     interceptorId_ = -1;
 }
@@ -80,6 +82,7 @@ void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &ev
     DSoftbusStartCooperate request {
         .networkId = DSoftbusAdapter::GetLocalNetworkId(),
     };
+    CHKPV(context.dsoftbus_);
     int32_t ret = context.dsoftbus_->StartCooperate(context.Peer(), request);
     if (ret != RET_OK) {
         FI_HILOGE("Start cooperate failed");
@@ -154,12 +157,14 @@ void CooperateIn::StopRemoteInput::ComeBack(Context &context, const CooperateEve
 {
     CALL_DEBUG_ENTER;
     int32_t startDeviceId = context.StartDeviceId();
+    CHKPV(context.devMgr_);
     std::vector<std::string> inputDeviceDhids = context.devMgr_->GetCooperateDhids(startDeviceId);
     if (inputDeviceDhids.empty()) {
         OnStartFinished(context, event);
         return;
     }
 
+    CHKPV(parent_.env_);
     int32_t ret = parent_.env_->GetDInput().StopRemoteInput(context.Origin(), inputDeviceDhids,
         [sender = context.Sender(), originNetworkId = context.Origin(),
          startDeviceId = context.StartDeviceId()](bool isSuccess) mutable {
@@ -197,6 +202,7 @@ void CooperateIn::StopRemoteInput::OnStartFinished(Context &context, const Coope
     if (!context.IsPeer(ev.remoteNetworkId)) {
         return;
     }
+    CHKPV(parent_.env_);
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (ev.success) {
         OnSuccess(context, ev);
@@ -216,6 +222,7 @@ void CooperateIn::StopRemoteInput::OnSuccess(Context &context, const DInputStart
         .cursorPos = context.CursorPosition(),
     };
     SetPointerVisible(context);
+    CHKPV(context.dsoftbus_);
     context.dsoftbus_->StartCooperateFinish(context.Peer(), ev);
     context.eventMgr_.StartCooperateFinish(ev);
     context.Sender().Send(CooperateEvent(
@@ -228,6 +235,7 @@ void CooperateIn::StopRemoteInput::OnSuccess(Context &context, const DInputStart
 void CooperateIn::StopRemoteInput::SetPointerVisible(Context &context)
 {
     CALL_INFO_TRACE;
+    CHKPV(context.devMgr_);
     bool hasPointer = context.devMgr_->HasLocalPointerDevice();
     FI_HILOGI("hasPointer:%{public}s", hasPointer ? "true" : "false");
     MMI::InputManager::GetInstance()->SetPointerVisible(hasPointer);
