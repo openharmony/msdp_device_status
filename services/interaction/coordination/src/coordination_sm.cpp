@@ -1098,6 +1098,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!COOR_DEV_MGR->IsRemote(deviceId)) {
+            FI_HILOGI("Remote device id:%{public}d", deviceId);
             DeactivateCoordination(isUnchained_);
         }
     }
@@ -1246,11 +1247,13 @@ void CoordinationSM::SetPointerVisible()
 
 std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
 {
+    CALL_INFO_TRACE;
     auto it = coordinationStates_.find(currentState_);
     if (it == coordinationStates_.end()) {
         FI_HILOGE("currentState_ not found");
         return nullptr;
     }
+    FI_HILOGI("Current state:%{public}d", it->second);
     return it->second;
 }
 
