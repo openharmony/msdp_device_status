@@ -91,6 +91,7 @@ private:
     void RegisterDInputSessionCb(Context &context);
 
     IContext *env_ { nullptr };
+    std::shared_ptr<Initial> initial_ { nullptr };
     int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate

@@ -34,11 +34,15 @@ public:
 private:
     class Initial final : public ICooperateStep {
     public:
+        Initial(CooperateIn &parent);
+        ~Initial() = default;
+
         void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
 
         static void BuildChains(std::shared_ptr<Initial> self, CooperateIn &parent);
+        static void RemoveChains(std::shared_ptr<Initial> self);
     private:
         std::shared_ptr<ICooperateStep> start_ { nullptr };
     };
@@ -80,6 +84,7 @@ private:
     };
 
     IContext *env_ { nullptr };
+    std::shared_ptr<Initial> initial_ { nullptr };
     int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate

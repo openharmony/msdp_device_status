@@ -31,14 +31,15 @@ constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateOut"
 CooperateOut::CooperateOut(IContext *env)
     : env_(env)
 {
-    auto initial = std::make_shared<Initial>(*this);
-    Initial::BuildChains(initial, *this);
-    current_ = initial;
+    initial_ = std::make_shared<Initial>(*this);
+    Initial::BuildChains(initial_, *this);
+    current_ = initial_;
 }
 
 void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(current_);
     current_->OnEvent(context, event);
 }
 

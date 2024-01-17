@@ -29,11 +29,17 @@ constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateIn" 
 
 CooperateIn::CooperateIn(IContext *env)
     : env_(env)
-{}
+{
+    initial_ = std::make_shared<Initial>(*this);
+    Initial::BuildChains(initial_, *this);
+    current_ = initial_;
+}
 
 void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(current_);
+    current_->OnEvent(context, event);
 }
 
 void CooperateIn::OnEnterState(Context &context)
@@ -54,6 +60,10 @@ void CooperateIn::OnLeaveState(Context & context)
     interceptorId_ = -1;
 }
 
+CooperateIn::Initial::Initial(CooperateIn &parent)
+    : ICooperateStep(parent, nullptr)
+{}
+
 void CooperateIn::Initial::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
@@ -66,6 +76,7 @@ void CooperateIn::Initial::OnEvent(Context &context, const CooperateEvent &event
                 FI_HILOGE("start failed");
                 return;
             }
+            CHKPV(start_);
             start_->OnProgress(context, event);
             break;
         }
@@ -99,6 +110,14 @@ void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateI
     auto s1 = std::make_shared<StopRemoteInput>(parent, self);
     self->start_ = s1;
     s1->SetNext(self);
+}
+
+void CooperateIn::Initial::RemoveChains(std::shared_ptr<Initial> self)
+{
+    if (self->start_ != nullptr) {
+        self->start_->SetNext(nullptr);
+        self->start_ = nullptr;
+    }
 }
 
 void CooperateIn::PrepareRemoteInput::OnEvent(Context &context, const CooperateEvent &event)
