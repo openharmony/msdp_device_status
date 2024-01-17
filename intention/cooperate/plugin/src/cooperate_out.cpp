@@ -77,7 +77,18 @@ CooperateOut::Initial::Initial(CooperateOut &parent) : ICooperateStep(parent, nu
 {}
 
 void CooperateOut::Initial::OnEvent(Context &context, const CooperateEvent &event)
-{}
+{
+    CALL_DEBUG_ENTER;
+    switch (event.type) {
+        case CooperateEventType::DSOFTBUS_START_COOPERATE: {
+            OnRemoteStart(context, event);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
 
 void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event)
 {}
@@ -107,6 +118,15 @@ void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self)
     if (self->remoteStart_ != nullptr) {
         self->remoteStart_->SetNext(nullptr);
         self->remoteStart_ = nullptr;
+    }
+}
+
+void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    if (remoteStart_ != nullptr) {
+        Switch(remoteStart_);
+        remoteStart_->OnProgress(context, event);
     }
 }
 

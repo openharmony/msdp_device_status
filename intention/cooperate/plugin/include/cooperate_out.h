@@ -46,6 +46,7 @@ private:
 
     private:
         void OnStart(Context &context, const CooperateEvent &event);
+        void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         std::shared_ptr<ICooperateStep> stop_ { nullptr };
         std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
