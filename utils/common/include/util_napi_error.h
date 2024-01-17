@@ -34,7 +34,7 @@ const std::string ERR_CODE { "code" };
 const std::map<int32_t, std::string> NAPI_ERRORS = {
     { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." },
     { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." },
-    { COMMON_NOT_ALLOWED_DISTRIBUTED, "Cross-device dragging is not allowed." },
+    { COMMON_NOT_ALLOWED_DISTRIBUTED, "Cross-device dragging is not allowed" },
     { COOPERATOR_FAIL, "Input device operation failed." },
     { COMMON_NOT_SYSTEM_APP, "Non system applications." }
 };

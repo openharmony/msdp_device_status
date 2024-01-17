@@ -53,6 +53,15 @@ void HandleExecuteResult(napi_env env, int32_t errCode, std::string param1, std:
             THROWERR_CUSTOM(env, errCode, errMsg.c_str());
             break;
         }
+        case COMMON_NOT_ALLOWED_DISTRIBUTED: {
+            std::string errMsg;
+            if (!UtilNapiError::GetErrorMsg(errCode, errMsg)) {
+                FI_HILOGE("GetErrorMsg failed");
+                return;
+            }
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, errMsg.c_str());
+            break;
+        }
         default: {
             FI_HILOGW("This error code does not require a synchronous exception throw");
             break;
