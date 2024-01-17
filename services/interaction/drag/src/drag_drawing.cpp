@@ -77,9 +77,15 @@ constexpr size_t MOUSE_NODE_MIN_COUNT { 4 };
 constexpr float DEFAULT_SCALING { 1.0f };
 constexpr float BEGIN_ALPHA { 1.0f };
 constexpr float END_ALPHA { 0.0f };
+constexpr float START_STYLE_ALPHA { 1.0f };
+constexpr float END_STYLE_ALPHA { 0.0f };
 constexpr float BEGIN_SCALE { 1.0f };
 constexpr float END_SCALE_FAIL { 1.2f };
 constexpr float END_SCALE_SUCCESS { 0.1f };
+constexpr float START_STYLE_SCALE { 1.0f };
+constexpr float STYLE_CHANGE_SCALE { 1.1f };
+constexpr float STYLE_MAX_SCALE { 1.2f };
+constexpr float STYLE_END_SCALE { 1.0f };
 constexpr float PIVOT_X { 0.5f };
 constexpr float PIVOT_Y { 0.5f };
 constexpr float SVG_ORIGINAL_SIZE { 40.0f };
@@ -116,25 +122,12 @@ constexpr float BEZIER_040 { 0.40f };
 constexpr float BEZIER_060 { 0.60f };
 constexpr float BEZIER_067 { 0.67f };
 constexpr float BEZIER_100 { 1.00f };
-constexpr float START_SCALE { 1.0f };
-constexpr float START_STYLE_SCALE { 1.0f };
-constexpr float STYLE_START_SCALE { 1.0f };
-constexpr float STYLE_CHANGE_SCALE { 1.1f };
-constexpr float STYLE_MAX_SCALE { 1.2f };
-constexpr float STYLE_END_SCALE { 1.0f };
 constexpr int32_t TIME_DRAG_CHANGE_STYLE { 50 };
 constexpr int32_t TIME_DRAG_STYLE { 100 };
-constexpr float START_ALPHA { 1.0f };
-constexpr float START_STYLE_ALPHA { 1.0f };
-constexpr float END_SUCCESS_SCALE { 0.0f };
-constexpr float END_FAIL_SCALE { 1.2f };
-constexpr float END_STYLE_ALPHA { 0.0f };
 constexpr int32_t TIME_STOP_FAIL_WINDOW { 125 };
 constexpr int32_t TIME_STOP_SUCCESS_WINDOW { 250 };
 constexpr int32_t TIME_STOP_SUCCESS_STYLE { 150 };
-constexpr int64_t START_NUM { 181154000809 };
 constexpr int32_t TIME_STOP { 0 };
-constexpr int64_t TIME_STEP { 16666667 };
 constexpr int64_t TIME_SLEEP { 30000 };
 constexpr int32_t INTERRUPT_SCALE { 15 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
@@ -228,10 +221,6 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CHKPR(shadowNode, INIT_FAIL);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
-    dragExtHandle_ = dlopen(DRAG_ANIMATION_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
-    if (dragExtHandle_ == nullptr) {
-        FI_HILOGE("Failed to open drag extension library");
-    }
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     if (!g_drawingInfo.mutilSelectedNodes.empty()) {
         g_drawingInfo.isCurrentDefaultStyle = true;
@@ -487,6 +476,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
     g_drawingInfo.isCurrentDefaultStyle = true;
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -495,6 +485,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStartStyleAnimation, this))) {
         FI_HILOGE("Start style animation failed");
     }
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -526,8 +517,8 @@ void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> s
 void DragDrawing::update(Rosen::RSAnimationTimingProtocol protocol)
 {
     CALL_DEBUG_ENTER;
-    startNum_ = START_NUM;
-    interruptNum_ = START_NUM * INTERRUPT_SCALE;
+    startNum_ = START_TIME;
+    interruptNum_ = START_TIME * INTERRUPT_SCALE;
     hasRunningAnimation_ = true;
     bool stopSignal = true;
     CHKPV(rsUiDirector_);
@@ -539,7 +530,7 @@ void DragDrawing::update(Rosen::RSAnimationTimingProtocol protocol)
             protocol.SetDuration(TIME_STOP);
             stopSignal = false;
         }
-        startNum_ += TIME_STEP;
+        startNum_ += INTERVAL_TIME;
         usleep(TIME_SLEEP);
     }
 }
@@ -590,7 +581,7 @@ void DragDrawing::ChangeStyleAnimation()
 {
     CALL_DEBUG_ENTER;
     hasRunningScaleAnimation_ = true;
-    StartStyleAnimation(STYLE_START_SCALE, STYLE_CHANGE_SCALE, TIME_DRAG_CHANGE_STYLE);
+    StartStyleAnimation(START_STYLE_SCALE, STYLE_CHANGE_SCALE, TIME_DRAG_CHANGE_STYLE);
     StartStyleAnimation(STYLE_CHANGE_SCALE, STYLE_MAX_SCALE, TIME_DRAG_CHANGE_STYLE);
     StartStyleAnimation(STYLE_MAX_SCALE, STYLE_END_SCALE, TIME_DRAG_STYLE);
     needBreakStyleScaleAnimation_ = false;
@@ -632,6 +623,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
     CALL_DEBUG_ENTER;
     CHKPV(dragStyleNode);
     CHKPV(stylePixelMap);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -645,6 +637,9 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         FI_HILOGE("Drag style animation failed");
         DrawStyle(dragStyleNode, stylePixelMap);
     }
+#else // OHOS_DRAG_ENABLE_ANIMATION
+    DrawStyle(dragStyleNode, stylePixelMap);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::OnStopAnimationSuccess()
@@ -669,8 +664,8 @@ void DragDrawing::OnStopAnimationSuccess()
     }
     drawDragStopModifier_ = std::make_shared<DrawDragStopModifier>();
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
-    drawDragStopModifier_->SetAlpha(START_ALPHA);
-    drawDragStopModifier_->SetScale(START_SCALE);
+    drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
+    drawDragStopModifier_->SetScale(BEGIN_SCALE);
     drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
     drawDragStopModifier_->SetStyleAlpha(START_STYLE_ALPHA);
     Rosen::RSAnimationTimingProtocol windowProtocol;
@@ -682,8 +677,8 @@ void DragDrawing::OnStopAnimationSuccess()
     auto springCurveSuccessStyle = Rosen::RSAnimationTimingCurve::CreateCubicCurve(BEZIER_000, BEZIER_000,
         BEZIER_100, BEZIER_100);
     Rosen::RSNode::Animate(windowProtocol, springCurveSuccessWindow, [&]() {
-        drawDragStopModifier_->SetAlpha(START_ALPHA);
-        drawDragStopModifier_->SetScale(END_SUCCESS_SCALE);
+        drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
+        drawDragStopModifier_->SetScale(END_SCALE_SUCCESS);
         Rosen::RSNode::Animate(styleProtocol, springCurveSuccessStyle, [&]() {
             drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
@@ -696,6 +691,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
 {
     CALL_DEBUG_ENTER;
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -709,6 +705,9 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         needDestroyDragWindow_ = true;
         StartVsync();
     }
+#else // OHOS_DRAG_ENABLE_ANIMATION
+    RunAnimation(animateCb);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::OnStopAnimationFail()
@@ -733,8 +732,8 @@ void DragDrawing::OnStopAnimationFail()
     CHKPV(g_drawingInfo.rootNode);
     hasRunningStopAnimation_ = true;
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
-    drawDragStopModifier_->SetAlpha(START_ALPHA);
-    drawDragStopModifier_->SetScale(START_SCALE);
+    drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
+    drawDragStopModifier_->SetScale(BEGIN_SCALE);
     drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
     drawDragStopModifier_->SetStyleAlpha(START_STYLE_ALPHA);
     Rosen::RSAnimationTimingProtocol protocol;
@@ -743,7 +742,7 @@ void DragDrawing::OnStopAnimationFail()
         BEZIER_067, BEZIER_100);
     Rosen::RSNode::Animate(protocol, springCurveFail, [&]() {
         drawDragStopModifier_->SetAlpha(END_ALPHA);
-        drawDragStopModifier_->SetScale(END_FAIL_SCALE);
+        drawDragStopModifier_->SetScale(END_SCALE_FAIL);
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
     });
@@ -754,6 +753,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
 {
     CALL_DEBUG_ENTER;
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
@@ -767,6 +767,9 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         needDestroyDragWindow_ = true;
         StartVsync();
     }
+#else // OHOS_DRAG_ENABLE_ANIMATION
+    RunAnimation(animateCb);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::OnStopAnimation()
@@ -1831,14 +1834,6 @@ bool DragDrawing::ParserRadius(float &radius)
     }
     radius = cornerRadius->valuedouble * dipScale->valuedouble;
     return true;
-}
-
-DragDrawing::~DragDrawing()
-{
-    if (dragExtHandle_ != nullptr) {
-        dlclose(dragExtHandle_);
-        dragExtHandle_ = nullptr;
-    }
 }
 
 void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
