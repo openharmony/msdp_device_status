@@ -1247,13 +1247,12 @@ void CoordinationSM::SetPointerVisible()
 
 std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
 {
-    CALL_INFO_TRACE;
+    FI_HILOGI("Current state:%{public}d", static_cast<int32_t>(currentState_));
     auto it = coordinationStates_.find(currentState_);
     if (it == coordinationStates_.end()) {
         FI_HILOGE("currentState_ not found");
         return nullptr;
     }
-    FI_HILOGI("Current state:%{public}d", it->second);
     return it->second;
 }
 
