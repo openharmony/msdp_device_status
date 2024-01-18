@@ -85,6 +85,7 @@ void CooperateOut::Initial::OnEvent(Context &context, const CooperateEvent &even
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
@@ -96,28 +97,30 @@ void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &e
 void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &event)
 {}
 
-void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
+void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateOut &parent)
 {
-    auto s1 = std::make_shared<StopRemoteInput>(parent, self);
-    self->stop_ = s1;
-    auto s2 = std::make_shared<UnprepareRemoteInput>(parent, self);
+    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
+    CHKPV(initial);
+    initial->stop_ = s1;
+    auto s2 = std::make_shared<UnprepareRemoteInput>(parent, initial);
     s1->SetNext(s2);
-    s2->SetNext(self);
+    s2->SetNext(initial);
 
-    auto s21 = std::make_shared<RemoteStart>(parent, self);
-    self->remoteStart_ = s21;
-    s21->SetNext(self);
+    auto s21 = std::make_shared<RemoteStart>(parent, initial);
+    initial->remoteStart_ = s21;
+    s21->SetNext(initial);
 }
 
-void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self)
+void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> initial)
 {
-    if (self->stop_ != nullptr) {
-        self->stop_->SetNext(nullptr);
-        self->stop_ = nullptr;
+    CHKPV(initial);
+    if (initial->stop_ != nullptr) {
+        initial->stop_->SetNext(nullptr);
+        initial->stop_ = nullptr;
     }
-    if (self->remoteStart_ != nullptr) {
-        self->remoteStart_->SetNext(nullptr);
-        self->remoteStart_ = nullptr;
+    if (initial->remoteStart_ != nullptr) {
+        initial->remoteStart_->SetNext(nullptr);
+        initial->remoteStart_ = nullptr;
     }
 }
 
@@ -180,6 +183,7 @@ void CooperateOut::RemoteStart::OnEvent(Context &context, const CooperateEvent &
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }

@@ -85,6 +85,7 @@ void CooperateFree::Initial::OnEvent(Context &context, const CooperateEvent &eve
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
@@ -96,31 +97,33 @@ void CooperateFree::Initial::OnProgress(Context &context, const CooperateEvent &
 void CooperateFree::Initial::OnReset(Context &context, const CooperateEvent &event)
 {}
 
-void CooperateFree::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateFree &parent)
+void CooperateFree::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateFree &parent)
 {
     CALL_DEBUG_ENTER;
-    auto s11 = std::make_shared<ContactRemote>(parent, self);
-    self->start_ = s11;
+    CHKPV(initial);
+    auto s11 = std::make_shared<ContactRemote>(parent, initial);
+    initial->start_ = s11;
     auto s12 = std::make_shared<PrepareRemoteInput>(parent, s11);
     s11->SetNext(s12);
     auto s13 = std::make_shared<StartRemoteInput>(parent, s12);
     s12->SetNext(s13);
-    s13->SetNext(self);
+    s13->SetNext(initial);
 
-    auto s21 = std::make_shared<RemoteStart>(parent, self);
-    self->remoteStart_ = s21;
-    s21->SetNext(self);
+    auto s21 = std::make_shared<RemoteStart>(parent, initial);
+    initial->remoteStart_ = s21;
+    s21->SetNext(initial);
 }
 
-void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> self)
+void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> initial)
 {
-    if (self->start_ != nullptr) {
-        self->start_->SetNext(nullptr);
-        self->start_ = nullptr;
+    CHKPV(initial);
+    if (initial->start_ != nullptr) {
+        initial->start_->SetNext(nullptr);
+        initial->start_ = nullptr;
     }
-    if (self->remoteStart_ != nullptr) {
-        self->remoteStart_->SetNext(nullptr);
-        self->remoteStart_ = nullptr;
+    if (initial->remoteStart_ != nullptr) {
+        initial->remoteStart_->SetNext(nullptr);
+        initial->remoteStart_ = nullptr;
     }
 }
 
@@ -235,6 +238,7 @@ void CooperateFree::PrepareRemoteInput::OnEvent(Context &context, const Cooperat
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
@@ -299,6 +303,7 @@ void CooperateFree::StartRemoteInput::OnEvent(Context &context, const CooperateE
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
@@ -395,6 +400,7 @@ void CooperateFree::RemoteStart::OnEvent(Context &context, const CooperateEvent 
             break;
         }
         default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }

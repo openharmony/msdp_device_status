@@ -80,7 +80,8 @@ void CooperateIn::Initial::OnEvent(Context &context, const CooperateEvent &event
             start_->OnProgress(context, event);
             break;
         }
-        default : {
+        default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
@@ -105,18 +106,20 @@ void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &ev
 void CooperateIn::Initial::OnReset(Context &context, const CooperateEvent &event)
 {}
 
-void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateIn &parent)
+void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateIn &parent)
 {
-    auto s1 = std::make_shared<StopRemoteInput>(parent, self);
-    self->start_ = s1;
-    s1->SetNext(self);
+    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
+    CHKPV(initial);
+    initial->start_ = s1;
+    s1->SetNext(initial);
 }
 
-void CooperateIn::Initial::RemoveChains(std::shared_ptr<Initial> self)
+void CooperateIn::Initial::RemoveChains(std::shared_ptr<Initial> initial)
 {
-    if (self->start_ != nullptr) {
-        self->start_->SetNext(nullptr);
-        self->start_ = nullptr;
+    CHKPV(initial);
+    if (initial->start_ != nullptr) {
+        initial->start_->SetNext(nullptr);
+        initial->start_ = nullptr;
     }
 }
 
@@ -152,7 +155,8 @@ void CooperateIn::StopRemoteInput::OnEvent(Context &context, const CooperateEven
             OnStartFinished(context, event);
             break;
         }
-        default : {
+        default: {
+            FI_HILOGW("cooperate event type is: %{public}d", event.type);
             break;
         }
     }
