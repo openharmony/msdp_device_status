@@ -2140,7 +2140,6 @@ void DrawDragStopModifier::SetStyleAlpha(float alpha)
         styleAlpha_->Set(alpha);
     }
 }
-
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
