@@ -90,11 +90,10 @@ void CooperateIn::Initial::OnEvent(Context &context, const CooperateEvent &event
 void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGD("CooperateIn::Initial::StartRemoteCoordination");
+    CHKPV(context.dsoftbus_);
     DSoftbusStartCooperate request {
         .networkId = DSoftbusAdapter::GetLocalNetworkId(),
     };
-    CHKPV(context.dsoftbus_);
     int32_t ret = context.dsoftbus_->StartCooperate(context.Peer(), request);
     if (ret != RET_OK) {
         FI_HILOGE("Start cooperate failed");
@@ -179,15 +178,15 @@ void CooperateIn::StopRemoteInput::OnReset(Context &context, const CooperateEven
 void CooperateIn::StopRemoteInput::ComeBack(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    int32_t startDeviceId = context.StartDeviceId();
     CHKPV(context.devMgr_);
+    CHKPV(parent_.env_);
+    int32_t startDeviceId = context.StartDeviceId();
     std::vector<std::string> inputDeviceDhids = context.devMgr_->GetCooperateDhids(startDeviceId);
     if (inputDeviceDhids.empty()) {
         OnStartFinished(context, event);
         return;
     }
 
-    CHKPV(parent_.env_);
     int32_t ret = parent_.env_->GetDInput().StopRemoteInput(context.Origin(), inputDeviceDhids,
         [sender = context.Sender(), originNetworkId = context.Origin(),
          startDeviceId = context.StartDeviceId()](bool isSuccess) mutable {
@@ -221,11 +220,11 @@ void CooperateIn::StopRemoteInput::ComeBack(Context &context, const CooperateEve
 void CooperateIn::StopRemoteInput::OnStartFinished(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
+    CHKPV(parent_.env_);
     DInputStartResult ev = std::get<DInputStartResult>(event.event);
     if (!context.IsPeer(ev.remoteNetworkId)) {
         return;
     }
-    CHKPV(parent_.env_);
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (ev.success) {
         OnSuccess(context, ev);
@@ -238,6 +237,7 @@ void CooperateIn::StopRemoteInput::OnStartFinished(Context &context, const Coope
 void CooperateIn::StopRemoteInput::OnSuccess(Context &context, const DInputStartResult &event)
 {
     CALL_INFO_TRACE;
+    CHKPV(context.dsoftbus_);
     DSoftbusStartCooperateFinished ev {
         .networkId = context.Origin(),
         .startDeviceDhid = context.StartDeviceDhid(),
@@ -245,7 +245,6 @@ void CooperateIn::StopRemoteInput::OnSuccess(Context &context, const DInputStart
         .cursorPos = context.CursorPosition(),
     };
     SetPointerVisible(context);
-    CHKPV(context.dsoftbus_);
     context.dsoftbus_->StartCooperateFinish(context.Peer(), ev);
     context.eventMgr_.StartCooperateFinish(ev);
     context.Sender().Send(CooperateEvent(

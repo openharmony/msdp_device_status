@@ -46,8 +46,8 @@ void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateOut::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
-    MMI::InputManager::GetInstance()->SetPointerVisible(false);
     CHKPV(env_);
+    MMI::InputManager::GetInstance()->SetPointerVisible(false);
     interceptorId_ = env_->GetInput().AddInterceptor(
         [sender = context.Sender()](std::shared_ptr<MMI::PointerEvent> pointerEvent) {},
         [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
@@ -192,11 +192,11 @@ void CooperateOut::RemoteStart::OnEvent(Context &context, const CooperateEvent &
 void CooperateOut::RemoteStart::OnRemoteStartFinished(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     DSoftbusStartCooperateFinished ev = std::get<DSoftbusStartCooperateFinished>(event.event);
     if (!context.IsPeer(ev.networkId)) {
         return;
     }
-    CHKPV(parent_.env_);
     parent_.env_->GetTimerManager().RemoveTimer(timerId_);
     if (ev.success) {
         OnSuccess(context, ev);
@@ -221,6 +221,8 @@ void CooperateOut::RemoteStart::OnSuccess(Context &context, const DSoftbusStartC
 void CooperateOut::RemoteStart::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(context.dsoftbus_);
+    CHKPV(parent_.env_);
     DSoftbusStartCooperate req = std::get<DSoftbusStartCooperate>(event.event);
     context.RemoteStart(req);
 
@@ -228,14 +230,12 @@ void CooperateOut::RemoteStart::OnProgress(Context &context, const CooperateEven
         .networkId = DSoftbusAdapter::GetLocalNetworkId(),
         .normal = true,
     };
-    CHKPV(context.dsoftbus_);
     int32_t ret = context.dsoftbus_->StartCooperateResponse(req.networkId, resp);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to answer \'%{public}s\'", req.networkId.c_str());
         OnReset(context, event);
         return;
     }
-    CHKPV(parent_.env_);
     timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
         [sender = context.Sender(), remoteNetworkId = req.networkId]() mutable {
             sender.Send(CooperateEvent(

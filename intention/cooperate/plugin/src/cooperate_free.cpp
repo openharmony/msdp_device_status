@@ -167,6 +167,8 @@ void CooperateFree::ContactRemote::OnEvent(Context &context, const CooperateEven
 
 void CooperateFree::ContactRemote::OnResponse(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     DSoftbusStartCooperateResponse resp = std::get<DSoftbusStartCooperateResponse>(event.event);
     if (!context.IsPeer(resp.networkId)) {
         return;
@@ -181,8 +183,10 @@ void CooperateFree::ContactRemote::OnResponse(Context &context, const CooperateE
 
 void CooperateFree::ContactRemote::OnProgress(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(context.dsoftbus_);
+    CHKPV(parent_.env_);
     const std::string remoteNetworkId = context.Peer();
-
     int32_t ret = context.dsoftbus_->OpenSession(remoteNetworkId);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to connect to \'%{public}s\'", remoteNetworkId.c_str());
@@ -226,6 +230,7 @@ CooperateFree::PrepareRemoteInput::PrepareRemoteInput(CooperateFree &parent, std
 void CooperateFree::PrepareRemoteInput::OnEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     switch (event.type) {
         case CooperateEventType::DINPUT_PREPARE_RESULT: {
             parent_.env_->GetTimerManager().RemoveTimer(timerId_);
@@ -247,6 +252,7 @@ void CooperateFree::PrepareRemoteInput::OnEvent(Context &context, const Cooperat
 void CooperateFree::PrepareRemoteInput::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     int32_t ret = parent_.env_->GetDInput().PrepareRemoteInput(context.Peer(), context.Origin(),
         [sender = context.Sender(), remoteNetworkId = context.Peer(),
          originNetworkId = context.Origin(),
@@ -282,6 +288,8 @@ void CooperateFree::PrepareRemoteInput::OnProgress(Context &context, const Coope
 
 void CooperateFree::PrepareRemoteInput::OnReset(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(context.dsoftbus_);
     DSoftbusStartCooperateFinished ev {
         .networkId = context.Origin(),
         .success = false,
@@ -311,6 +319,8 @@ void CooperateFree::StartRemoteInput::OnEvent(Context &context, const CooperateE
 
 void CooperateFree::StartRemoteInput::OnStartFinished(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     DInputStartResult ev = std::get<DInputStartResult>(event.event);
     if (!context.IsPeer(ev.remoteNetworkId)) {
         return;
@@ -326,6 +336,8 @@ void CooperateFree::StartRemoteInput::OnStartFinished(Context &context, const Co
 
 void CooperateFree::StartRemoteInput::OnSuccess(Context &context, const DInputStartResult &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(context.dsoftbus_);
     parent_.RegisterDInputSessionCb(context);
     DSoftbusStartCooperateFinished ev {
         .networkId = context.Origin(),
@@ -344,6 +356,8 @@ void CooperateFree::StartRemoteInput::OnSuccess(Context &context, const DInputSt
 
 void CooperateFree::StartRemoteInput::OnProgress(Context &context, const CooperateEvent &event)
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     std::vector<std::string> dhids = context.CooperateDhids();
     if (dhids.empty()) {
         FI_HILOGE("No input device for cooperation");
@@ -409,6 +423,7 @@ void CooperateFree::RemoteStart::OnEvent(Context &context, const CooperateEvent 
 void CooperateFree::RemoteStart::OnRemoteStartFinished(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(parent_.env_);
     DSoftbusStartCooperateFinished ev = std::get<DSoftbusStartCooperateFinished>(event.event);
     if (!context.IsPeer(ev.networkId)) {
         return;
@@ -437,6 +452,8 @@ void CooperateFree::RemoteStart::OnSuccess(Context &context, const DSoftbusStart
 void CooperateFree::RemoteStart::OnProgress(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(context.dsoftbus_);
+    CHKPV(parent_.env_);
     DSoftbusStartCooperate req = std::get<DSoftbusStartCooperate>(event.event);
     context.RemoteStart(req);
 
