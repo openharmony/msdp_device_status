@@ -610,6 +610,7 @@ void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId
     COOR_SOFTBUS_ADAPTER->StartRemoteCoordinationResult(remoteNetworkId, true, startDeviceDhid, mouseLocation_.first,
         mouseLocation_.second);
     COOR_EVENT_MGR->OnStart(CoordinationMessage::ACTIVATE_SUCCESS);
+    COOR_EVENT_MGR->OnCoordinationMessage(CoordinationMessage::COORDINATION_SUCCESS);
 }
 
 void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId)
