@@ -41,12 +41,15 @@ private:
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
 
-        static void BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent);
+        static void BuildChains(std::shared_ptr<Initial> initial, CooperateOut &parent);
+        static void RemoveChains(std::shared_ptr<Initial> initial);
 
     private:
         void OnStart(Context &context, const CooperateEvent &event);
+        void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         std::shared_ptr<ICooperateStep> stop_ { nullptr };
+        std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
     };
 
     class StopRemoteInput : public ICooperateStep {
@@ -69,7 +72,27 @@ private:
         void OnReset(Context &context, const CooperateEvent &event) override;
     };
 
+    class RemoteStart final : public ICooperateStep {
+    public:
+        RemoteStart(CooperateOut &parent, std::shared_ptr<ICooperateStep> prev);
+        ~RemoteStart() = default;
+
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnRemoteStartFinished(Context &context, const CooperateEvent &event);
+        void OnSuccess(Context &context, const DSoftbusStartCooperateFinished &event);
+
+        CooperateOut &parent_;
+        int32_t timerId_ { -1 };
+    };
+
+    void RegisterDInputSessionCb(Context &context);
+
     IContext *env_ { nullptr };
+    std::shared_ptr<Initial> initial_ { nullptr };
     int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate

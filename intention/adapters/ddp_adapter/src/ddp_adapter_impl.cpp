@@ -271,7 +271,7 @@ int32_t DDPAdapterImpl::PutProfile()
         parser1.json = nullptr;
     }
 
-    std::string cProfile = cJSON_Print(parser.json);
+    char *cProfile = cJSON_Print(parser.json);
     CHKPR(cProfile, RET_ERR);
     std::string sProfile(cProfile);
     cJSON_free(cProfile);

@@ -55,6 +55,7 @@ enum class CooperateEventType {
     DINPUT_PREPARE_RESULT,
     DINPUT_START_RESULT,
     DINPUT_SESSION_CLOSED,
+    DINPUT_STOP_RESULT,
     DSOFTBUS_SESSION_OPEND,
     DSOFTBUS_SESSION_CLOSED,
     DSOFTBUS_START_COOPERATE,
@@ -121,6 +122,12 @@ struct DInputPrepareResult {
     bool success;
 };
 
+struct DInputStopResult {
+    std::string originNetworkId;
+    int32_t startDeviceId;
+    bool success;
+};
+
 using DInputStartResult = DInputPrepareResult;
 
 struct DSoftbusSessionOpened {
@@ -168,6 +175,7 @@ struct CooperateEvent {
         DDMBoardOnlineEvent,
         DDPCooperateSwitchChanged,
         DInputPrepareResult,
+        DInputStopResult,
         InputHotplugEvent,
         DSoftbusStartCooperate,
         DSoftbusStartCooperateResponse,

@@ -34,9 +34,17 @@ public:
 private:
     class Initial final : public ICooperateStep {
     public:
+        Initial(CooperateIn &parent);
+        ~Initial() = default;
+
         void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
+
+        static void BuildChains(std::shared_ptr<Initial> initial, CooperateIn &parent);
+        static void RemoveChains(std::shared_ptr<Initial> initial);
+    private:
+        std::shared_ptr<ICooperateStep> start_ { nullptr };
     };
 
     class PrepareRemoteInput final : public ICooperateStep {
@@ -56,7 +64,27 @@ private:
         void OnReset(Context &context, const CooperateEvent &event) override;
     };
 
+    class StopRemoteInput : public ICooperateStep {
+    public:
+        StopRemoteInput(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
+        ~StopRemoteInput() = default;
+
+        void OnEvent(Context &context, const CooperateEvent &event) override;
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
+    private:
+        void ComeBack(Context &context, const CooperateEvent &event);
+        void RelayComeBack(Context &context, const CooperateEvent &event);
+        void OnStartFinished(Context &context, const CooperateEvent &event);
+        void OnSuccess(Context &context, const DInputStartResult &event);
+        void SetPointerVisible(Context &context);
+    private:
+        CooperateIn &parent_;
+        int32_t timerId_ { -1 };
+    };
+
     IContext *env_ { nullptr };
+    std::shared_ptr<Initial> initial_ { nullptr };
     int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate
