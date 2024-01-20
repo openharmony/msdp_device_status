@@ -522,7 +522,7 @@ void DeviceStatusService::OnTimeout(const struct epoll_event &ev)
 
 void DeviceStatusService::OnDeviceMgr(const struct epoll_event &ev)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         devMgr_.Dispatch(ev);
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
