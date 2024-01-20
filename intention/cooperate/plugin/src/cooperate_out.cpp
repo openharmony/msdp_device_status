@@ -99,8 +99,8 @@ void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &even
 
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateOut &parent)
 {
-    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
     CHKPV(initial);
+    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
     initial->stop_ = s1;
     auto s2 = std::make_shared<UnprepareRemoteInput>(parent, initial);
     s1->SetNext(s2);
