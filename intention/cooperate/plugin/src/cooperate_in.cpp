@@ -45,9 +45,9 @@ void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateIn::OnEnterState(Context &context)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(env_);
     MMI::InputManager::GetInstance()->SetPointerVisible(true);
     MMI::InputManager::GetInstance()->EnableInputDevice(true);
-    CHKPV(env_);
     interceptorId_ = env_->GetInput().AddInterceptor(
         [sender = context.Sender()](std::shared_ptr<MMI::KeyEvent> keyEvent) {});
 }
@@ -107,8 +107,8 @@ void CooperateIn::Initial::OnReset(Context &context, const CooperateEvent &event
 
 void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> initial, CooperateIn &parent)
 {
-    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
     CHKPV(initial);
+    auto s1 = std::make_shared<StopRemoteInput>(parent, initial);
     initial->start_ = s1;
     s1->SetNext(initial);
 }
