@@ -130,14 +130,11 @@ struct DInputStopResult {
 
 using DInputStartResult = DInputPrepareResult;
 
-struct DSoftbusSessionOpened {
-    int32_t sessionId;
-    int32_t result;
-};
-
-struct DSoftbusStartCooperate {
+struct DSoftbusSessionClosed {
     std::string networkId;
 };
+
+using DSoftbusStartCooperate = DSoftbusSessionClosed;
 
 struct DSoftbusStartCooperateResponse {
     std::string networkId;
@@ -177,7 +174,7 @@ struct CooperateEvent {
         DInputPrepareResult,
         DInputStopResult,
         InputHotplugEvent,
-        DSoftbusStartCooperate,
+        DSoftbusSessionClosed,
         DSoftbusStartCooperateResponse,
         DSoftbusStartCooperateFinished
     > event;

@@ -13,28 +13,48 @@
  * limitations under the License.
  */
 
-#ifndef DSOFTBUS_ADAPTER_H
-#define DSOFTBUS_ADAPTER_H
-
-#include <functional>
-#include <map>
+#ifndef DSOFTBUS_HANDLER_H
+#define DSOFTBUS_HANDLER_H
 
 #include "nocopyable.h"
-#include "socket.h"
 
 #include "channel.h"
 #include "cooperate_events.h"
-#include "net_packet.h"
+#include "i_dsoftbus_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-class DSoftbusAdapter final : public std::enable_shared_from_this<DSoftbusAdapter> {
+class DSoftbusHandler final {
+    class DSoftbusObserver final : public IDSoftbusObserver {
+    public:
+        DSoftbusObserver(DSoftbusHandler &parent) : parent_(parent) {}
+        ~DSoftbusObserver() = default;
+
+        void OnBind(const std::string &networkId) override
+        {
+            parent_.OnBind(networkId);
+        }
+
+        void OnShutdown(const std::string &networkId) override
+        {
+            parent_.OnShutdown(networkId);
+        }
+
+        void OnPacket(const std::string &networkId, NetPacket &packet) override
+        {
+            parent_.OnPacket(networkId, packet);
+        }
+
+    private:
+        DSoftbusHandler &parent_;
+    };
+
 public:
-    DSoftbusAdapter() = default;
-    ~DSoftbusAdapter();
-    DISALLOW_COPY_AND_MOVE(DSoftbusAdapter);
+    DSoftbusHandler();
+    ~DSoftbusHandler();
+    DISALLOW_COPY_AND_MOVE(DSoftbusHandler);
 
     void AttachSender(Channel<CooperateEvent>::Sender sender);
     int32_t Enable();
@@ -47,28 +67,22 @@ public:
     int32_t StartCooperateResponse(const std::string &networkId, const DSoftbusStartCooperateResponse &event);
     int32_t StartCooperateFinish(const std::string &networkId, const DSoftbusStartCooperateFinished &event);
 
-    void OnBind(int32_t socket, PeerSocketInfo info);
-    void OnShutdown(int32_t socket, ShutdownReason reason);
-    void OnBytes(int32_t socket, const void *data, uint32_t dataLen);
-
     static std::string GetLocalNetworkId();
 
 private:
-    int32_t InitSocket(SocketInfo info, int32_t socketType, int32_t &socket);
-    int32_t SetupServer();
-    void ShutdownServer();
-    int32_t OpenSessionLocked(const std::string &networkId);
-    void ConfigTcpAlive(int32_t socket);
-    int32_t SendPacket(const std::string &networkId, const NetPacket &packet);
+    void OnBind(const std::string &networkId);
+    void OnShutdown(const std::string &networkId);
+    void OnPacket(const std::string &networkId, NetPacket &packet);
+    void SendEvent(const CooperateEvent &event);
+    void OnStartCooperate(NetPacket &packet);
 
     std::mutex lock_;
-    int32_t socketFd_ { -1 };
     Channel<CooperateEvent>::Sender sender_;
-    std::string localSessionName_;
-    std::map<std::string, int32_t> sessions_;
+    std::shared_ptr<DSoftbusObserver> observer_;
+    std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // DSOFTBUS_ADAPTER_H
+#endif // DSOFTBUS_HANDLER_H
