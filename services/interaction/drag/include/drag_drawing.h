@@ -232,7 +232,7 @@ private:
     void CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
     void RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
-    void update(Rosen::RSAnimationTimingProtocol protocol);
+    void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
 
 private:
     int64_t startNum_ { -1 };
@@ -248,10 +248,10 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
-    std::atomic_bool hasRunningStopAnimation_ {false};
-    std::atomic_bool hasRunningScaleAnimation_ {false};
-    std::atomic_bool needBreakStyleScaleAnimation_ {false};
-    std::atomic_bool hasRunningAnimation_ {false};
+    std::atomic_bool hasRunningStopAnimation_ { false };
+    std::atomic_bool hasRunningScaleAnimation_ { false };
+    std::atomic_bool needBreakStyleScaleAnimation_ { false };
+    std::atomic_bool hasRunningAnimation_ { false };
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
     uint64_t screenId_ { 0 };

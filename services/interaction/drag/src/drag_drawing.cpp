@@ -515,7 +515,7 @@ void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> s
     }
 }
 
-void DragDrawing::update(Rosen::RSAnimationTimingProtocol protocol)
+void DragDrawing::UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol)
 {
     CALL_DEBUG_ENTER;
     startNum_ = START_TIME;
@@ -559,7 +559,7 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
     Rosen::RSNode::Animate(protocol, springCurveStyle, [&]() {
         drawStyleScaleModifier_->SetScale(endScale);
     });
-    update(protocol);
+    UpdateAnimationProtocol(protocol);
     if (endScale == STYLE_CHANGE_SCALE) {
         if (drawStyleChangeModifier_ != nullptr) {
             dragStyleNode->RemoveModifier(drawStyleChangeModifier_);
@@ -610,6 +610,7 @@ void DragDrawing::OnDragStyleAnimation()
     CHKPV(rsUiDirector_);
     rsUiDirector_->Init();
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
+    RunAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
