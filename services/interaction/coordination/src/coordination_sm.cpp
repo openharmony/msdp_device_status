@@ -1080,6 +1080,8 @@ void CoordinationSM::OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerE
     if (state == CoordinationState::STATE_OUT) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         std::string dhid = COOR_DEV_MGR->GetDhid(deviceId);
+        FI_HILOGI("Start coordination device dhid:\"%{public}s\", Now device dhid:\"%{public}s\"",
+                  startDeviceDhid_.c_str(), dhid.c_str());
         if (startDeviceDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
             DeactivateCoordination(isUnchained_);
@@ -1099,6 +1101,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!COOR_DEV_MGR->IsRemote(deviceId)) {
+            FI_HILOGI("Remote device id:%{public}d", deviceId);
             DeactivateCoordination(isUnchained_);
         }
     }
@@ -1247,6 +1250,7 @@ void CoordinationSM::SetPointerVisible()
 
 std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
 {
+    FI_HILOGI("Current state:%{public}d", static_cast<int32_t>(currentState_));
     auto it = coordinationStates_.find(currentState_);
     if (it == coordinationStates_.end()) {
         FI_HILOGE("currentState_ not found");
