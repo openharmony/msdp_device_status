@@ -30,7 +30,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateOut" };
 } // namespace
 
-CoordinationStateOut::CoordinationStateOut(const std::string& startDeviceDhid)
+CoordinationStateOut::CoordinationStateOut(const std::string &startDeviceDhid)
     : startDeviceDhid_(startDeviceDhid)
 {}
 
@@ -55,7 +55,7 @@ int32_t CoordinationStateOut::DeactivateCoordination(const std::string &remoteNe
     return RET_OK;
 }
 
-void CoordinationStateOut::ProcessStop(const std::string& remoteNetworkId)
+void CoordinationStateOut::ProcessStop(const std::string &remoteNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();

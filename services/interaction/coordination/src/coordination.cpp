@@ -39,7 +39,7 @@ void Coordination::UnprepareCoordination()
 }
 
 int32_t Coordination::ActivateCoordination(SessionPtr sess, int32_t userData,
-    const std::string& remoteNetworkId, int32_t startDeviceId)
+    const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     sptr<CoordinationEventManager::EventInfo> event = new (std::nothrow) CoordinationEventManager::EventInfo();
     CHKPR(event, RET_ERR);

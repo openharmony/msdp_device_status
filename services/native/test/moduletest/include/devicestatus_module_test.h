@@ -31,7 +31,7 @@ public:
     public:
         DeviceStatusModuleTestCallback() {};
         virtual ~DeviceStatusModuleTestCallback() {};
-        virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
+        virtual void OnDeviceStatusChanged(const Data &devicestatusData) override;
     };
     static Type g_moduleTest;
 };

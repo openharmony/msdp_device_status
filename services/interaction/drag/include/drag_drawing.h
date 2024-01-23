@@ -39,7 +39,7 @@ class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
     ~DrawSVGModifier() = default;
-    void Draw(Rosen::RSDrawingContext& context) const override;
+    void Draw(Rosen::RSDrawingContext &context) const override;
 
 private:
     std::shared_ptr<Media::PixelMap> stylePixelMap_ { nullptr };
