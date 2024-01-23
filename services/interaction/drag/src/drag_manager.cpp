@@ -240,6 +240,18 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
 
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
 {
+    FI_HILOGD("DragStyle from ark is dragStyle%{public}s", GetDragStyleName(style).c_str());
+    auto lastTargetPid = DRAG_DATA_MGR.GetTargetPid();
+    DRAG_DATA_MGR.SetTargetPid(targetPid);
+    DRAG_DATA_MGR.SetTargetTid(targetTid);
+    if (style == DRAG_DATA_MGR.GetDragStyle()) {
+        FI_HILOGD("Not need update drag style");
+        if (targetPid != lastTargetPid) {
+            stateNotify_.StyleChangedNotify(GetRealDragStyle(style));
+        }
+        return RET_OK;
+    }
+    DRAG_DATA_MGR.SetDragStyle(style);
     if (dragState_ != DragState::START) {
         FI_HILOGE("No drag instance running, can not update drag style");
         return RET_ERR;
@@ -249,26 +261,11 @@ int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, i
         FI_HILOGE("Invalid style:%{public}d", style);
         return RET_ERR;
     }
-    DRAG_DATA_MGR.SetTargetPid(targetPid);
-    DRAG_DATA_MGR.SetTargetTid(targetTid);
-    if (style == DRAG_DATA_MGR.GetDragStyle()) {
-        FI_HILOGD("Not need update drag style");
-        return RET_OK;
+    if (OnUpdateDragStyle(style) != RET_OK) {
+        FI_HILOGE("OnUpdateDragStyle dragStyle%{public}s failed", GetDragStyleName(style).c_str());
+        return RET_ERR;
     }
-    FI_HILOGI("Update drag style successfully");
-    DRAG_DATA_MGR.SetDragStyle(style);
-    DragCursorStyle updateStyle = DragCursorStyle::DEFAULT;
-    if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
-        updateStyle = DragCursorStyle::COPY;
-    } else {
-        updateStyle = style;
-    }
-    stateNotify_.StyleChangedNotify(updateStyle);
-    int32_t ret = dragDrawing_.UpdateDragStyle(updateStyle);
-    if (ret != RET_OK) {
-        DragDFX::WriteUpdateDragStyle(style, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-    }
-    return ret;
+    return RET_OK;
 }
 
 int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -802,6 +799,9 @@ void DragManager::SetDragState(DragState state)
 {
     FI_HILOGI("SetDragState:%{public}d to %{public}d", static_cast<int32_t>(dragState_), static_cast<int32_t>(state));
     dragState_ = state;
+    if (state == DragState::START) {
+        UpdateDragStyleCross();
+    }
 }
 
 DragResult DragManager::GetDragResult() const
@@ -811,19 +811,10 @@ DragResult DragManager::GetDragResult() const
 
 int32_t DragManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
 {
-    if (GetDragState() != DragState::START) {
-        FI_HILOGE("No drag instance running");
-        return RET_ERR;
-    }
-    DragData dragData;
-    if (GetDragData(dragData) != RET_OK) {
-        FI_HILOGE("GetDragData failed");
-        return RET_ERR;
-    }
+    DragData dragData = DRAG_DATA_MGR.GetDragData();
     summarys = dragData.summarys;
     if (summarys.empty()) {
-        FI_HILOGE("Summarys is empty");
-        return RET_ERR;
+        FI_HILOGW("Summarys is empty");
     }
     return RET_OK;
 }
@@ -958,6 +949,58 @@ void DragManager::HandleCtrlKeyEvent(DragCursorStyle style, DragAction action)
     if (ret != RET_OK) {
         FI_HILOGE("Post async task failed");
     }
+}
+
+int32_t DragManager::OnUpdateDragStyle(DragCursorStyle style)
+{
+    CALL_DEBUG_ENTER;
+    DragCursorStyle updateStyle = GetRealDragStyle(style);
+    stateNotify_.StyleChangedNotify(updateStyle);
+    if (dragDrawing_.UpdateDragStyle(updateStyle) != RET_OK) {
+        DragDFX::WriteUpdateDragStyle(updateStyle, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        return RET_ERR;
+    }
+    FI_HILOGD("Update dragStyle:%{public}s successfully", GetDragStyleName(updateStyle).c_str());
+    return RET_OK;
+}
+
+void DragManager::UpdateDragStyleCross()
+{
+    CALL_DEBUG_ENTER;
+    auto dragStyle = DRAG_DATA_MGR.GetDragStyle();
+    FI_HILOGI("OnUpdateDragStyle dragStyle:%{public}s", GetDragStyleName(dragStyle).c_str());
+    if (OnUpdateDragStyle(DRAG_DATA_MGR.GetDragStyle()) != RET_OK) {
+        FI_HILOGE("OnUpdateDragStyle failed");
+    }
+}
+
+std::string DragManager::GetDragStyleName(DragCursorStyle style)
+{
+    switch (style) {
+        case DragCursorStyle::DEFAULT : {
+            return "DEFAULT";
+        }
+        case DragCursorStyle::FORBIDDEN : {
+            return "FORBIDDEN";
+        }
+        case DragCursorStyle::COPY : {
+            return "COPY";
+        }
+        case DragCursorStyle::MOVE : {
+            return "MOVE";
+        }
+        default:
+            break;
+    }
+    return "UNKNOW";
+}
+
+DragCursorStyle DragManager::GetRealDragStyle(DragCursorStyle style)
+{
+    if ((dragAction_ == DragAction::COPY) && (style == DragCursorStyle::MOVE)) {
+        return DragCursorStyle::COPY;
+    }
+    return style;
 }
 
 void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action)
