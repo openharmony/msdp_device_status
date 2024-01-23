@@ -225,7 +225,7 @@ void CoordinationSM::PrepareCoordination()
             return;
         }
     }
-    int32_t ret = DP_ADAPTER->UpdateCrossingSwitchState(true, onlineDevice_);
+    int32_t ret = DP_ADAPTER->UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
         CoordinationDFX::WritePrepare(monitorId_, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
@@ -234,7 +234,7 @@ void CoordinationSM::PrepareCoordination()
 void CoordinationSM::UnprepareCoordination()
 {
     CALL_INFO_TRACE;
-    int32_t ret = DP_ADAPTER->UpdateCrossingSwitchState(false, onlineDevice_);
+    int32_t ret = DP_ADAPTER->UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
         CoordinationDFX::WriteUnprepare(OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
