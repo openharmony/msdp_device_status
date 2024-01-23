@@ -75,6 +75,47 @@ private:
     std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
+class DrawDragStopModifier : public Rosen::RSContentStyleModifier {
+public:
+    DrawDragStopModifier() = default;
+    ~DrawDragStopModifier() = default;
+    void Draw(Rosen::RSDrawingContext &context) const override;
+    void SetAlpha(float alpha);
+    void SetScale(float scale);
+    void SetStyleScale(float scale);
+    void SetStyleAlpha(float alpha);
+
+private:
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> alpha_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> styleScale_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> styleAlpha_ { nullptr };
+};
+
+class DrawStyleChangeModifier : public Rosen::RSContentStyleModifier {
+public:
+    DrawStyleChangeModifier() = default;
+    explicit DrawStyleChangeModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
+    ~DrawStyleChangeModifier() = default;
+    void Draw(Rosen::RSDrawingContext &context) const override;
+    void SetScale(float scale);
+
+private:
+    std::shared_ptr<Media::PixelMap> stylePixelMap_ { nullptr };
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
+};
+
+class DrawStyleScaleModifier : public Rosen::RSContentStyleModifier {
+public:
+    DrawStyleScaleModifier() = default;
+    ~DrawStyleScaleModifier() = default;
+    void Draw(Rosen::RSDrawingContext &context) const override;
+    void SetScale(float scale);
+
+private:
+    std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
+};
+
 struct DrawingInfo {
     std::atomic_bool isRunning { false };
     std::atomic_bool isPreviousDefaultStyle { false };
@@ -117,7 +158,7 @@ class DragDrawing : public IDragAnimation {
 public:
     DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
-    ~DragDrawing();
+    ~DragDrawing() = default;
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
@@ -183,17 +224,34 @@ private:
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
     bool ParserRadius(float &radius);
+    void OnStartStyleAnimation();
+    void OnStopAnimationSuccess();
+    void OnStopAnimationFail();
+    void OnDragStyleAnimation();
+    void ChangeStyleAnimation();
+    void CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
+    void RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
+    void StartStyleAnimation(float startScale, float endScale, int32_t duration);
+    void update(Rosen::RSAnimationTimingProtocol protocol);
 
 private:
     int64_t startNum_ { -1 };
+    int64_t interruptNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
     std::shared_ptr<DrawPixelMapModifier> drawPixelMapModifier_ { nullptr };
     std::shared_ptr<DrawMouseIconModifier> drawMouseIconModifier_ { nullptr };
     std::shared_ptr<DrawDynamicEffectModifier> drawDynamicEffectModifier_ { nullptr };
+    std::shared_ptr<DrawDragStopModifier> drawDragStopModifier_ { nullptr };
+    std::shared_ptr<DrawStyleChangeModifier> drawStyleChangeModifier_ { nullptr };
+    std::shared_ptr<DrawStyleScaleModifier> drawStyleScaleModifier_ { nullptr };
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::atomic_bool hasRunningStopAnimation_ {false};
+    std::atomic_bool hasRunningScaleAnimation_ {false};
+    std::atomic_bool needBreakStyleScaleAnimation_ {false};
+    std::atomic_bool hasRunningAnimation_ {false};
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
     uint64_t screenId_ { 0 };
