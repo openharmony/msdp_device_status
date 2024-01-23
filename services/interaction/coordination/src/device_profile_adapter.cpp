@@ -224,8 +224,11 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
     if (it->second != nullptr) {
         auto state = GetCrossingSwitchState(networkId);
         it->second(networkId, state);
+        std::string stateStr = state ? "true" : "false";
+        FI_HILOGI("Crossing switch state:%{public}s", state.c_str());
     } else {
         callbacks_.erase(it);
+        FI_HILOGW("Remove device networkId:%{public}s", networkId.c_str());
     }
 }
 } // namespace DeviceStatus
