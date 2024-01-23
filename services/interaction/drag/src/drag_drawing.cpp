@@ -610,7 +610,6 @@ void DragDrawing::OnDragStyleAnimation()
     CHKPV(rsUiDirector_);
     rsUiDirector_->Init();
     rsUiDirector_->SetRSSurfaceNode(g_drawingInfo.surfaceNode);
-    RunAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
