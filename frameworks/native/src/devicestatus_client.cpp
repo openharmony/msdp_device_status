@@ -127,7 +127,7 @@ int32_t DeviceStatusClient::SubscribeCallback(Type type, ActivityEvent event, Re
 int32_t DeviceStatusClient::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
 {
     CALL_DEBUG_ENTER;
-    FI_HILOGI("UNevent:%{public}d", event);
+    FI_HILOGI("event:%{public}d", event);
     typeMap_.erase(type);
     FI_HILOGD("typeMap_ %{public}d", typeMap_[type]);
     CHKPR(callback, RET_ERR);

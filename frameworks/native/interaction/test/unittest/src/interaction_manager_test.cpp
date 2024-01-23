@@ -546,15 +546,18 @@ void InteractionManagerTest::SimulateUpKeyEvent(int32_t key)
 void InteractionManagerTest::PrintDragAction(DragAction dragAction)
 {
     switch (dragAction) {
-        case DragAction::MOVE:
+        case DragAction::MOVE:{
             FI_HILOGD("drag action: MOVE");
             break;
-        case DragAction::COPY:
+        }
+        case DragAction::COPY:{
             FI_HILOGD("drag action: COPY");
             break;
-        default:
+        }
+        default:{
             FI_HILOGD("drag action: UNKNOWN");
             break;
+        }
     }
 }
 
