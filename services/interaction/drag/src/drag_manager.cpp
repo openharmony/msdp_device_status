@@ -751,7 +751,7 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     return RET_OK;
 }
 
-int32_t DragManager::OnGetShadowOffset(int32_t& offsetX, int32_t& offsetY, int32_t& width, int32_t& height)
+int32_t DragManager::OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
 {
     return DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
 }
@@ -975,7 +975,7 @@ void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction ac
     }
 }
 
-int32_t DragManager::GetDragAction(DragAction& dragAction) const
+int32_t DragManager::GetDragAction(DragAction &dragAction) const
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {

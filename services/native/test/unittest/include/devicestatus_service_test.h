@@ -36,7 +36,7 @@ public:
     public:
         DeviceStatusServiceTestCallback() {};
         virtual ~DeviceStatusServiceTestCallback() {};
-        virtual void OnDeviceStatusChanged(const Data& devicestatusData) override;
+        virtual void OnDeviceStatusChanged(const Data &devicestatusData) override;
     };
 
     static inline sptr<IRemoteDevStaCallback> devCallback_ = nullptr;

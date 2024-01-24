@@ -160,7 +160,7 @@ IDInputAdapter& DeviceStatusService::GetDInput()
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
-int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string>& args)
+int32_t DeviceStatusService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_DEBUG_ENTER;
     if (fd < 0) {
