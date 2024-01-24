@@ -222,7 +222,7 @@ int32_t DeviceStatusSrvStub::UnsubscribeStub(MessageParcel &data, MessageParcel 
     READINT32(data, type, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t event = -1;
     READINT32(data, event, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    FI_HILOGE("UNevent:%{public}d", event);
+    FI_HILOGE("event:%{public}d", event);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     CHKPR(obj, E_DEVICESTATUS_READ_PARCEL_ERROR);
     sptr<IRemoteDevStaCallback> callback = iface_cast<IRemoteDevStaCallback>(obj);
