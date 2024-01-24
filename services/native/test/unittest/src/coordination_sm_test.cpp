@@ -82,7 +82,7 @@ void ClearCoordinationSoftbusAdapter()
 {
     COOR_SOFTBUS_ADAPTER->socketFd_ = -1;
     COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
-    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
+    COOR_SOFTBUS_ADAPTER->onRecvDataCallback_ = nullptr;
     COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
 }
 

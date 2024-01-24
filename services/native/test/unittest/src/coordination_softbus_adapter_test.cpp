@@ -14,6 +14,7 @@
  */
 
 #define private public
+#include "parcel.h"
 #include "coordination_softbus_adapter_test.h"
 
 namespace OHOS {
@@ -31,14 +32,13 @@ const std::string REMOTE_NETWORKID { "testRemoteNetworkId" };
 const std::string ORIGIN_NETWORKID { "testOriginNetworkId" };
 const std::string DEVICE_ID { "testDeviceId" };
 constexpr int32_t SOCKET { 1 };
-constexpr uint32_t TRUNCATE_STRING_LENGTH { 20 };
 } // namespace
 
 void ClearCoordinationSoftbusAdapter()
 {
     COOR_SOFTBUS_ADAPTER->socketFd_ = -1;
     COOR_SOFTBUS_ADAPTER->localSessionName_ = "";
-    COOR_SOFTBUS_ADAPTER->registerRecvs_.clear();
+    COOR_SOFTBUS_ADAPTER->onRecvDataCallback_ = nullptr;
     COOR_SOFTBUS_ADAPTER->sessionDevs_.clear();
 }
 
@@ -312,9 +312,12 @@ HWTEST_F(CoordinationSoftbusAdapterTest, CoordinationSoftbusAdapterTest015, Test
     CALL_TEST_DEBUG;
     ASSERT_NE(g_adapter, nullptr);
     std::string data = "TestSendData";
+    Parcel parcel;
+    if (!parcel.WriteBuffer(reinterpreter_cast<void *> (const_cast<void *> (data.c_str())), data.size())) {
+        EXPECT_EQ(RET_ERR, RET_ERR);
+    }
     g_adapter->sessionDevs_[DEVICE_ID] = SOCKET;
-    int32_t ret = g_adapter->SendData(DEVICE_ID, CoordinationSoftbusAdapter::MIN_ID, const_cast<char *>(data.c_str()),
-        TRUNCATE_STRING_LENGTH);
+    int32_t ret = g_adapter->SendData(DEVICE_ID, parcel);
     EXPECT_EQ(ret, RET_ERR);
     ClearCoordinationSoftbusAdapter();
 }

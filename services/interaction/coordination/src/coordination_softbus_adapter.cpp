@@ -539,27 +539,8 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::st
     parser.json = cJSON_Parse(message.c_str());
     if (!cJSON_IsObject(parser.json)) {
         FI_HILOGI("Handle session data, parser json is not object");
-        if (message.size() < sizeof(DataPacket)) {
-            FI_HILOGE("Handle session data, data packet is incomplete");
-            return;
-        }
-        DataPacket* dataPacket = reinterpret_cast<DataPacket *>(const_cast<char*>(message.c_str()));
-        if ((message.size() - sizeof(DataPacket)) < dataPacket->dataLen) {
-            FI_HILOGE("Handle session data, data is corrupt");
-            return;
-        }
-        if (registerRecvs_.find(dataPacket->messageId) == registerRecvs_.end()) {
-            FI_HILOGW("Handle session data, message:%{public}d does not register", dataPacket->messageId);
-            return;
-        }
-        FI_HILOGI("Handle session data, message:%{public}d", dataPacket->messageId);
-        if ((dataPacket->messageId == DRAGGING_DATA) ||
-            (dataPacket->messageId == STOPDRAG_DATA) ||
-            (dataPacket->messageId == IS_PULL_UP) ||
-            (dataPacket->messageId == DRAG_CANCEL)) {
-            CHKPV(registerRecvs_[dataPacket->messageId]);
-            registerRecvs_[dataPacket->messageId](dataPacket->data, dataPacket->dataLen);
-        }
+        CHKPV(onRecvDataCallback_);
+        onRecvDataCallback_(reinterpret_cast<void *> (const_cast<char *> (message.c_str())), message.size());
         return;
     }
     HandleCoordinationSessionData(socket, parser);
@@ -630,35 +611,19 @@ void CoordinationSoftbusAdapter::OnShutdown(int32_t socket, ShutdownReason reaso
     socketFd_ = -1;
 }
 
-void CoordinationSoftbusAdapter::RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback)
+void CoordinationSoftbusAdapter::RegisterRecvFunc(std::function<void(void*, uint32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (messageId <= MIN_ID || messageId >= MAX_ID) {
-        FI_HILOGE("Message id is invalid, messageId:%{public}d", messageId);
-        return;
-    }
     CHKPV(callback);
-    registerRecvs_[messageId] = callback;
+    onRecvDataCallback_ = callback;
 }
 
-int32_t CoordinationSoftbusAdapter::SendData(const std::string &networkId, MessageId messageId,
-    void* data, uint32_t dataLen)
+int32_t CoordinationSoftbusAdapter::SendData(const std::string &networkId, Parcel &parcel)
 {
     CALL_DEBUG_ENTER;
-    DataPacket* dataPacket = (DataPacket*)malloc(sizeof(DataPacket) + dataLen);
-    CHKPR(dataPacket, RET_ERR);
-    dataPacket->dataLen = dataLen;
-    dataPacket->messageId = messageId;
-    errno_t ret = memcpy_s(dataPacket->data, dataPacket->dataLen, data, dataPacket->dataLen);
-    if (ret != EOK) {
-        FI_HILOGE("Memory copy data packet failed");
-        free(dataPacket);
-        return RET_ERR;
-    }
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
-    int32_t result = SendBytes(sessionDevs_[networkId], dataPacket, sizeof(DataPacket) + dataLen);
-    free(dataPacket);
-    if (result != RET_OK) {
+    if (SendBytes(sessionDevs_[networkId], reinterpret_cast<void *> (parcel.GetData()),
+        parcel.GetDataSize()) != RET_OK) {
         FI_HILOGE("Send bytes failed");
         return RET_ERR;
     }
