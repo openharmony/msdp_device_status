@@ -70,7 +70,7 @@ const std::map<int32_t, std::string> NAPI_ERRORS = {
 
 namespace UtilNapiError {
 bool GetErrorMsg(int32_t code, std::string &codeMsg);
-void HandleExecuteResult(napi_env env, int32_t errCode, std::string param1 = "", std::string param2 = "");
+void HandleExecuteResult(napi_env env, int32_t errCode, const std::string param1 = "", const std::string param2 = "");
 } // namespace UtilNapiError
 } // namespace DeviceStatus
 } // namespace Msdp
