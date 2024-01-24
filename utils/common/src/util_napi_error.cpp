@@ -33,7 +33,7 @@ bool GetErrorMsg(int32_t code, std::string &codeMsg)
     return true;
 }
 
-void HandleExecuteResult(napi_env env, int32_t errCode, std::string param1, std::string param2)
+void HandleExecuteResult(napi_env env, int32_t errCode, const std::string param1, const std::string param2)
 {
     switch (errCode) {
         case COMMON_PERMISSION_CHECK_ERROR: {
