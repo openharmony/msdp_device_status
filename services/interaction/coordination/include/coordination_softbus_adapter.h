@@ -23,6 +23,7 @@
 #include <string>
 
 #include "nocopyable.h"
+#include "parcel.h"
 #include "socket.h"
 
 #include "coordination_util.h"
@@ -34,20 +35,6 @@ namespace DeviceStatus {
 class CoordinationSoftbusAdapter {
 public:
     virtual ~CoordinationSoftbusAdapter();
-
-    enum MessageId {
-        MIN_ID = 0,
-        DRAGGING_DATA = 1,
-        STOPDRAG_DATA = 2,
-        IS_PULL_UP = 3,
-        DRAG_CANCEL = 4,
-        MAX_ID = 50
-    };
-    struct DataPacket {
-        MessageId messageId;
-        uint32_t dataLen { 0 };
-        uint8_t data[0];
-    };
 
     int32_t StartRemoteCoordination(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool checkButtonDown);
@@ -63,8 +50,8 @@ public:
     int32_t OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
     void OnBytes(int32_t socket, const void* data, uint32_t dataLen);
-    void RegisterRecvFunc(MessageId messageId, std::function<void(void*, uint32_t)> callback);
-    int32_t SendData(const std::string &networkId, MessageId messageId, void* data, uint32_t dataLen);
+    void RegisterRecvFunc(std::function<void(void*, uint32_t)> callback);
+    int32_t SendData(const std::string &networkId, Parcel &parcel);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
         const std::string &remoteNetworkId, bool isSuccess);
@@ -88,7 +75,7 @@ private:
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
-    std::map<MessageId, std::function<void(void*, uint32_t)>> registerRecvs_;
+    std::function<void(void*, uint32_t)> onRecvDataCallback_;
     int32_t socketFd_ { -1 };
 };
 } // namespace DeviceStatus
