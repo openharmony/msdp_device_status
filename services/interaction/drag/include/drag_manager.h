@@ -125,6 +125,11 @@ private:
     void CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action);
     int32_t HandleDragResult(DragResult result, bool hasCustomAnimation);
     void HandleCtrlKeyEvent(DragCursorStyle style, DragAction action);
+    int32_t OnUpdateDragStyle(DragCursorStyle style);
+    void UpdateDragStyleCross();
+    inline std::string GetDragStyleName(DragCursorStyle style);
+    DragCursorStyle GetRealDragStyle(DragCursorStyle style);
+
 private:
     int32_t timerId_ { -1 };
     StateChangeNotify stateNotify_;
