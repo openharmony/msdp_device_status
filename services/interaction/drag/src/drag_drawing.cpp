@@ -1618,7 +1618,7 @@ DragDrawing::~DragDrawing()
     }
 }
 
-void DrawSVGModifier::Draw(Rosen::RSDrawingContext &context) const
+void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
 {
     CALL_DEBUG_ENTER;
     CHKPV(stylePixelMap_);
