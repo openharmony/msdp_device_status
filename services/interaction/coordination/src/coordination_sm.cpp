@@ -372,8 +372,8 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("Posting async task failed");
     }
     isStarting_ = true;
+    MMI::InputManager::GetInstance()->EnableInputDevice(true);
     if (buttonIsPressed) {
-        MMI::InputManager::GetInstance()->EnableInputDevice(true);
         StartPointerEventFilter();
         COOR_SOFTBUS_ADAPTER->NotifyFilterAdded(sinkNetworkId_);
     }
