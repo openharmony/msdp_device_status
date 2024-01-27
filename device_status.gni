@@ -19,6 +19,7 @@ declare_args() {
   fusion_interaction_coordination = false
   fusion_drag_enable_monitor = true
   fusion_drag_enable_interceptor = false
+  fusion_drag_enable_animation = false
   device_status_sensor_enable = true
   if (defined(global_parts_info)) {
     if (!defined(global_parts_info.sensors_sensor)) {
@@ -69,4 +70,8 @@ if (fusion_drag_enable_monitor) {
 
 if (fusion_drag_enable_interceptor) {
   device_status_default_defines += [ "OHOS_DRAG_ENABLE_INTERCEPTOR" ]
+}
+
+if (fusion_drag_enable_animation) {
+  device_status_default_defines += [ "OHOS_DRAG_ENABLE_ANIMATION" ]
 }
