@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <functional>
 
+#include <display_manager.h>
 #include <input_manager.h>
 
 #include "drag_data.h"
@@ -48,6 +49,7 @@ public:
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) = 0;
     virtual void GetAllowDragState(bool &isAllowDrag) = 0;
+    virtual int32_t RotateDragWindow(Rosen::Rotation rotation) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

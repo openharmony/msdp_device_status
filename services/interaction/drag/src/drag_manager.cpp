@@ -72,7 +72,14 @@ int32_t DragManager::Init(IContext* context)
             return;
         }
         int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusListener_);
-        FI_HILOGI("SubscribeSystemAbility result:%{public}d", ret);
+        FI_HILOGI("SubscribeSystemAbility COMMON_EVENT_SERVICE_ID result:%{public}d", ret);
+        displayAbilityStatusChange_ = new (std::nothrow) DisplayAbilityStatusChange(context_);
+        if (displayAbilityStatusChange_ == nullptr) {
+            FI_HILOGE("displayAbilityStatusChange is nullptr");
+            return;
+        }
+        ret = samgrProxy->SubscribeSystemAbility(DISPLAY_MANAGER_SERVICE_SA_ID, displayAbilityStatusChange_);
+        FI_HILOGI("SubscribeSystemAbility DISPLAY_MANAGER_SERVICE_SA_ID result:%{public}d", ret);
     });
     return RET_OK;
 }
@@ -1070,6 +1077,17 @@ int32_t DragManager::AddPrivilege(int32_t tokenId)
     FI_HILOGD("Target window drag tid:%{public}d", tokenId);
     SendDragData(tokenId, dragData.udKey);
     return RET_OK;
+}
+
+int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
+{
+    CALL_DEBUG_ENTER;
+    dragDrawing_.SetRotation(rotation);
+    if (dragState_ != DragState::START && dragState_ != DragState::MOTION_DRAGGING) {
+        FI_HILOGD("Drag instance not running");
+        return RET_OK;
+    }
+    return dragDrawing_.RotateDragWindow(rotation);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

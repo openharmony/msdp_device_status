@@ -24,6 +24,7 @@
 #include "input_manager.h"
 #include "pixel_map.h"
 
+#include "display_change_event_listener.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
 #include "drag_drawing.h"
@@ -80,6 +81,7 @@ public:
     int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
     int32_t AddPrivilege(int32_t tokenId);
+    int32_t RotateDragWindow(Rosen::Rotation rotation) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
     public:
@@ -150,6 +152,7 @@ private:
     std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
+    sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
