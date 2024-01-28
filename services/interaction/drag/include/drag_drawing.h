@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "libxml/tree.h"
@@ -161,7 +162,7 @@ public:
     ~DragDrawing() = default;
 
     int32_t Init(const DragData &dragData);
-    void Draw(int32_t displayId, int32_t displayX, int32_t displayY);
+    void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
@@ -185,12 +186,14 @@ public:
     int32_t EnterTextEditorArea(bool enable);
     bool GetAllowDragState();
     void SetScreenId(uint64_t screenId);
+    int32_t RotateDragWindow(Rosen::Rotation rotation);
+    void SetRotation(Rosen::Rotation rotation);
 
 private:
     int32_t CheckDragData(const DragData &dragData);
     int32_t InitLayer();
     void InitCanvas(int32_t width, int32_t height);
-    void CreateWindow(int32_t displayX, int32_t displayY);
+    void CreateWindow();
     int32_t DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode);
     int32_t DrawMouseIcon();
     int32_t DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -233,6 +236,8 @@ private:
     void RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode);
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
     void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
+    void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
+    int32_t DoRotateDragWindow(float rotation);
 
 private:
     int64_t startNum_ { -1 };
@@ -255,6 +260,7 @@ private:
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
     uint64_t screenId_ { 0 };
+    Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp
