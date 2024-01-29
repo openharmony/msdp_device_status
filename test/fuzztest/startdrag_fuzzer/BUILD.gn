@@ -29,6 +29,7 @@ deps_ex = [
   "input:libmmi-client",
   "image_framework:image_native",
   "window_manager:libwm",
+  "window_manager:libdm",
 ]
 
 ###############################fuzztest#################################
