@@ -121,9 +121,9 @@ int32_t InteractionManager::RemoveSubscriptListener(SubscriptListenerPtr listene
     return INTER_MGR_IMPL.RemoveSubscriptListener(listener);
 }
 
-int32_t InteractionManager::SetDragWindowVisible(bool visible)
+int32_t InteractionManager::SetDragWindowVisible(bool visible, bool isForce)
 {
-    return INTER_MGR_IMPL.SetDragWindowVisible(visible);
+    return INTER_MGR_IMPL.SetDragWindowVisible(visible, isForce);
 }
 
 int32_t InteractionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)

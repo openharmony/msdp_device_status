@@ -252,10 +252,10 @@ int32_t IntentionManager::RemoveSubscriptListener(SubscriptListenerPtr listener)
     return drag_.RemoveSubscriptListener(*tunnel_, listener);
 }
 
-int32_t IntentionManager::SetDragWindowVisible(bool visible)
+int32_t IntentionManager::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
-    return drag_.SetDragWindowVisible(*tunnel_, visible);
+    return drag_.SetDragWindowVisible(*tunnel_, visible, isForce);
 }
 
 int32_t IntentionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)

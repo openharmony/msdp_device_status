@@ -238,10 +238,10 @@ int32_t DragManagerImpl::RemoveSubscriptListener(SubscriptListenerPtr listener)
     return RET_OK;
 }
 
-int32_t DragManagerImpl::SetDragWindowVisible(bool visible)
+int32_t DragManagerImpl::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible);
+    return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible, isForce);
 }
 
 int32_t DragManagerImpl::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
