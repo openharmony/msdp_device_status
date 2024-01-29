@@ -737,6 +737,7 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
         FI_HILOGW("No drag instance running, can not set drag window visible");
         return RET_ERR;
     }
+    DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
@@ -744,7 +745,6 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
         FI_HILOGI("Set the pointer cursor invisible");
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
     }
-    DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
