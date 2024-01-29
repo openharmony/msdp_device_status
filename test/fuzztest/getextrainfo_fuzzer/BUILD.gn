@@ -27,6 +27,7 @@ deps_ex = [
   "hitrace:hitrace_meter",
   "hilog:libhilog",
   "input:libmmi-client",
+  "window_manager:libdm",
 ]
 
 ###############################fuzztest#################################

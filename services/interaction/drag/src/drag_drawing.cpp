@@ -23,7 +23,6 @@
 
 #include <dlfcn.h>
 
-#include "display_manager.h"
 #include "include/core/SkTextBlob.h"
 #include "image_source.h"
 #include "image_type.h"
@@ -81,13 +80,12 @@ constexpr float START_STYLE_ALPHA { 1.0f };
 constexpr float END_STYLE_ALPHA { 0.0f };
 constexpr float BEGIN_SCALE { 1.0f };
 constexpr float END_SCALE_FAIL { 1.2f };
-constexpr float END_SCALE_SUCCESS { 0.1f };
+constexpr float END_SCALE_SUCCESS { 0.0f };
 constexpr float START_STYLE_SCALE { 1.0f };
 constexpr float STYLE_CHANGE_SCALE { 1.1f };
 constexpr float STYLE_MAX_SCALE { 1.2f };
 constexpr float STYLE_END_SCALE { 1.0f };
-constexpr float PIVOT_X { 0.5f };
-constexpr float PIVOT_Y { 0.5f };
+constexpr float DEFAULT_PIVOT { 0.0f };
 constexpr float SVG_ORIGINAL_SIZE { 40.0f };
 constexpr float DEFAULT_POSITION_X { 0.0f };
 constexpr float BLUR_SIGMA_SCALE { 0.57735f };
@@ -103,6 +101,10 @@ constexpr float DEFAULT_ALPHA { 1.0f };
 constexpr float FIRST_PIXELMAP_ALPHA { 0.6f };
 constexpr float SECOND_PIXELMAP_ALPHA { 0.3f };
 constexpr float HALF_RATIO { 0.5f };
+constexpr float ROTATION_DEFAULT { 0.0f };
+constexpr float ROTATION_FIRST_ORDER { -90.0f };
+constexpr float ROTATION_SECOND_ORDER { -180.0f };
+constexpr float ROTATION_THIRD_ORDER { -270.0f };
 constexpr uint32_t TRANSPARENT_COLOR_ARGB { 0x00000000 };
 constexpr int32_t DEFAULT_MOUSE_SIZE { 1 };
 constexpr int32_t DEFAULT_COLOR_VALUE { 0 };
@@ -170,7 +172,6 @@ bool CheckNodesValid()
 float GetScaling()
 {
     if (g_drawingInfo.isExistScalingValue) {
-        FI_HILOGD("deviceDpi:%{public}f", g_drawingInfo.scalingValue);
         return g_drawingInfo.scalingValue;
     }
     sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
@@ -203,7 +204,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return checkDragDataResult;
     }
     InitDrawingInfo(dragData);
-    CreateWindow(dragData.displayX, dragData.displayY);
+    CreateWindow();
     CHKPR(g_drawingInfo.surfaceNode, INIT_FAIL);
     if (InitLayer() != RET_OK) {
         FI_HILOGE("Init layer failed");
@@ -263,11 +264,14 @@ int32_t DragDrawing::CheckDragData(const DragData &dragData)
     return INIT_SUCCESS;
 }
 
-void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
+void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY)
 {
     if (displayId < 0) {
         FI_HILOGE("Invalid displayId:%{public}d", displayId);
         return;
+    }
+    if (isNeedAdjustDisplayXY) {
+        RotateDisplayXY(displayX, displayY);
     }
     g_drawingInfo.displayId = displayId;
     g_drawingInfo.displayX = displayX;
@@ -283,18 +287,10 @@ void DragDrawing::Draw(int32_t displayId, int32_t displayX, int32_t displayY)
     int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
     CHKPV(g_drawingInfo.parentNode);
     CHKPV(g_drawingInfo.pixelMap);
-    if ((g_drawingInfo.currentStyle == DragCursorStyle::DEFAULT) ||
-        ((g_drawingInfo.currentStyle == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE))) {
-        g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-    } else {
-        g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
-            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-        g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
-            g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-    }
+    g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
     if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         DoDrawMouse();
     }
@@ -342,7 +338,8 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         DrawMouseIcon();
     }
     ProcessFilter();
-    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX, g_drawingInfo.displayY);
+    Draw(g_drawingInfo.displayId, g_drawingInfo.displayX, g_drawingInfo.displayY, false);
+    RotateDragWindow(rotation_);
     Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
@@ -859,7 +856,6 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetScale(endScale);
     });
     CHKPR(g_drawingInfo.parentNode, RET_ERR);
-    g_drawingInfo.parentNode->SetPivot(PIVOT_X, PIVOT_Y);
     Rosen::RSTransaction::FlushImplicitTransaction();
     startNum_ = START_TIME;
     needDestroyDragWindow_ = true;
@@ -944,6 +940,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.displayId = dragData.displayId;
     g_drawingInfo.displayX = dragData.displayX;
     g_drawingInfo.displayY = dragData.displayY;
+    RotateDisplayXY(g_drawingInfo.displayX, g_drawingInfo.displayY);
     g_drawingInfo.extraInfo = dragData.extraInfo;
     g_drawingInfo.filterInfo = dragData.filterInfo;
 }
@@ -992,6 +989,9 @@ int32_t DragDrawing::InitLayer()
     }
     int32_t rootNodeSize = std::max(display->GetWidth(), display->GetHeight());
     InitCanvas(rootNodeSize, rootNodeSize);
+    if (rotation_ != Rosen::Rotation::ROTATION_0) {
+        RotateDragWindow(rotation_);
+    }
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
@@ -1047,7 +1047,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     rsUiDirector_->SetRoot(g_drawingInfo.rootNode->GetId());
 }
 
-void DragDrawing::CreateWindow(int32_t displayX, int32_t displayY)
+void DragDrawing::CreateWindow()
 {
     FI_HILOGD("Parameter screen number:%{public}llu", static_cast<unsigned long long>(screenId_));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -1421,6 +1421,34 @@ void DragDrawing::SetScreenId(uint64_t screenId)
     screenId_ = screenId;
 }
 
+int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation)
+{
+    switch (rotation) {
+        case Rosen::Rotation::ROTATION_0: {
+            return DoRotateDragWindow(ROTATION_DEFAULT);
+        }
+        case Rosen::Rotation::ROTATION_90: {
+            return DoRotateDragWindow(ROTATION_FIRST_ORDER);
+        }
+        case Rosen::Rotation::ROTATION_180: {
+            return DoRotateDragWindow(ROTATION_SECOND_ORDER);
+        }
+        case Rosen::Rotation::ROTATION_270: {
+            return DoRotateDragWindow(ROTATION_THIRD_ORDER);
+        }
+        default: {
+            FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation));
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
+void DragDrawing::SetRotation(Rosen::Rotation rotation)
+{
+    rotation_ = rotation;
+}
+
 void DragDrawing::ProcessFilter()
 {
     CALL_DEBUG_ENTER;
@@ -1771,6 +1799,78 @@ void DragDrawing::ClearMultiSelectedData()
     }
 }
 
+void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
+{
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        CHKPV(display);
+    }
+    switch (rotation_) {
+        case Rosen::Rotation::ROTATION_0: {
+            break;
+        }
+        case Rosen::Rotation::ROTATION_90: {
+            int32_t temp = displayY;
+            displayY = display->GetWidth() - displayX;
+            displayX = temp;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_180: {
+            displayX = display->GetWidth() - displayX;
+            displayY = display->GetHeight() - displayY;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_270: {
+            int32_t temp = displayX;
+            displayX = display->GetHeight() - displayY;
+            displayY = temp;
+            break;
+        }
+        default: {
+            FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
+            break;
+        }
+    }
+}
+
+int32_t DragDrawing::DoRotateDragWindow(float rotation)
+{
+    FI_HILOGD("rotation:%{public}f", rotation);
+    CHKPR(g_drawingInfo.parentNode, RET_ERR);
+    CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+    if ((g_drawingInfo.pixelMap->GetWidth() <= 0) || (g_drawingInfo.pixelMap->GetHeight() <= 0)) {
+        FI_HILOGE("Invalid parameter pixelmap");
+        return RET_ERR;
+    }
+    float pivotX = 0.0f;
+    float pivotY = 0.0f;
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    if ((g_drawingInfo.currentStyle == DragCursorStyle::DEFAULT) ||
+        ((g_drawingInfo.currentStyle == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE))) {
+        pivotX = -g_drawingInfo.pixelMapX * 1.0 / g_drawingInfo.pixelMap->GetWidth();
+        pivotY = (-g_drawingInfo.pixelMapY + adjustSize) * 1.0 / g_drawingInfo.pixelMap->GetHeight();
+    } else {
+        pivotX = -g_drawingInfo.pixelMapX * 1.0 / (g_drawingInfo.pixelMap->GetWidth() + adjustSize);
+        pivotY = (-g_drawingInfo.pixelMapY + adjustSize) * 1.0 / (g_drawingInfo.pixelMap->GetHeight() + adjustSize);
+    }
+    g_drawingInfo.parentNode->SetPivot(pivotX, pivotY);
+    g_drawingInfo.parentNode->SetRotation(rotation);
+    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (!CheckNodesValid()) {
+            FI_HILOGE("Check nodes valid failed");
+            return RET_ERR;
+        }
+        std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
+        CHKPR(mouseIconNode, RET_ERR);
+        mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
+        mouseIconNode->SetRotation(rotation);
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    return RET_OK;
+}
+
 bool DragDrawing::ParserRadius(float &radius)
 {
     FI_HILOGD("ExtraInfo size:%{public}zu, extraInfo:%{public}s, filterInfo size:%{public}zu, filterInfo:%{public}s",
@@ -1834,9 +1934,10 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
-    dragStyleNode->SetBounds(svgTouchPositionX, (TWELVE_SIZE - EIGHT_SIZE) * scalingValue, stylePixelMap_->GetWidth(),
+    adjustSize = (TWELVE_SIZE - EIGHT_SIZE) * scalingValue;
+    dragStyleNode->SetBounds(svgTouchPositionX, adjustSize, stylePixelMap_->GetWidth() + adjustSize,
         stylePixelMap_->GetHeight());
-    dragStyleNode->SetFrame(svgTouchPositionX, (TWELVE_SIZE - EIGHT_SIZE) * scalingValue, stylePixelMap_->GetWidth(),
+    dragStyleNode->SetFrame(svgTouchPositionX, adjustSize, stylePixelMap_->GetWidth() + adjustSize,
         stylePixelMap_->GetHeight());
     dragStyleNode->SetBgImageWidth(stylePixelMap_->GetWidth());
     dragStyleNode->SetBgImageHeight(stylePixelMap_->GetHeight());
@@ -1846,14 +1947,6 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     rosenImage->SetPixelMap(stylePixelMap_);
     rosenImage->SetImageRepeat(0);
     dragStyleNode->SetBgImage(rosenImage);
-    adjustSize = TWELVE_SIZE * scalingValue;
-    int32_t positionX = g_drawingInfo.displayX + g_drawingInfo.pixelMapX;
-    int32_t positionY = g_drawingInfo.displayY + g_drawingInfo.pixelMapY - adjustSize;
-    CHKPV(g_drawingInfo.parentNode);
-    g_drawingInfo.parentNode->SetBounds(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
-        g_drawingInfo.pixelMap->GetHeight() + adjustSize);
-    g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
-        g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
