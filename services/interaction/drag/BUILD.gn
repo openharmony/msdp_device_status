@@ -41,6 +41,7 @@ ohos_shared_library("interaction_drag") {
   ]
 
   sources = [
+    "src/display_change_event_listener.cpp",
     "src/drag_data_manager.cpp",
     "src/drag_drawing.cpp",
     "src/drag_hisysevent.cpp",
