@@ -188,10 +188,14 @@ public:
      * @brief Displays or hides the dragging window.
      * @param visible Specifies whether to display the dragging window.
      * The value <b>true</b> means to display the dragging window, and <b>false</b> means to hide the window.
+     * @param isForce Specifies Enforce the visibility of the drag window, which is applied to this drag.
+     * For example, if you set the drag window to Hidden and isForce to true during a drag, the setting does not
+     * take effect when the drag window is displayed and isForce is false, and the setting becomes invalid at the
+     * end of the current drag.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t SetDragWindowVisible(bool visible);
+    int32_t SetDragWindowVisible(bool visible, bool isForce = false);
 
     /**
      * @brief Obtains the position of the touch point or mouse pointer relative to

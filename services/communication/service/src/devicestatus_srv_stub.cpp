@@ -646,7 +646,9 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel &data, Messa
 {
     bool visible = false;
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = SetDragWindowVisible(visible);
+    bool isForce = false;
+    READBOOL(data, isForce, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t ret = SetDragWindowVisible(visible, isForce);
     if (ret != RET_OK) {
         FI_HILOGE("Call SetDragWindowVisible failed, ret:%{public}d", ret);
     }
