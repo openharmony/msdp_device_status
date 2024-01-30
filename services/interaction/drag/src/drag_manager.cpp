@@ -224,6 +224,9 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    if (isControlMultiScreenVisible_) {
+        isControlMultiScreenVisible_ = false;
+    }
     return ret;
 }
 
@@ -678,6 +681,9 @@ int32_t DragManager::RemoveKeyEventMointor()
 int32_t DragManager::OnStartDrag()
 {
     CALL_INFO_TRACE;
+    if (isControlMultiScreenVisible_) {
+        isControlMultiScreenVisible_ = false;
+    }
     auto extraData = CreateExtraData(true);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     dragDrawing_.SetScreenId(dragData.displayId);
@@ -733,7 +739,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     return HandleDragResult(result, hasCustomAnimation);
 }
 
-int32_t DragManager::OnSetDragWindowVisible(bool visible)
+int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
 {
     FI_HILOGI("Set drag window visibleion:%{public}s", visible ? "true" : "false");
     if (dragState_ == DragState::MOTION_DRAGGING) {
@@ -744,6 +750,11 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
         FI_HILOGW("No drag instance running, can not set drag window visible");
         return RET_ERR;
     }
+    if (!isForce && isControlMultiScreenVisible_) {
+        FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination,"
+            "can not set drag window visible:%{public}d", visible);
+        return RET_OK;
+    }
     DragDFX::WriteDragWindowVisible(dragState_, visible, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     DRAG_DATA_MGR.SetDragWindowVisible(visible);
     dragDrawing_.UpdateDragWindowState(visible);
@@ -751,6 +762,10 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible)
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE && visible) {
         FI_HILOGI("Set the pointer cursor invisible");
         MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    }
+    if (isForce) {
+        isControlMultiScreenVisible_ = isForce;
+        FI_HILOGW("The drag-and-drop window is controlled by multi-screen coordination");
     }
     return RET_OK;
 }

@@ -402,11 +402,11 @@ int32_t DeviceStatusClient::RemoveSubscriptListener()
     return devicestatusProxy_->RemoveSubscriptListener();
 }
 
-int32_t DeviceStatusClient::SetDragWindowVisible(bool visible)
+int32_t DeviceStatusClient::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->SetDragWindowVisible(visible);
+    return devicestatusProxy_->SetDragWindowVisible(visible, isForce);
 }
 
 int32_t DeviceStatusClient::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
