@@ -48,7 +48,7 @@ public:
     int32_t RemoveDraglistener(DragListenerPtr listener);
     int32_t AddSubscriptListener(SubscriptListenerPtr listener);
     int32_t RemoveSubscriptListener(SubscriptListenerPtr listener);
-    int32_t SetDragWindowVisible(bool visible);
+    int32_t SetDragWindowVisible(bool visible, bool isForce = false);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t GetDragTargetPid();

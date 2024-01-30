@@ -779,11 +779,11 @@ int32_t DeviceStatusService::StopDrag(const DragDropResult &dropResult)
     return ret;
 }
 
-int32_t DeviceStatusService::SetDragWindowVisible(bool visible)
+int32_t DeviceStatusService::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::OnSetDragWindowVisible, &dragMgr_, visible));
+        std::bind(&DragManager::OnSetDragWindowVisible, &dragMgr_, visible, isForce));
     if (ret != RET_OK) {
         FI_HILOGE("On set drag window visible failed, ret:%{public}d", ret);
     }

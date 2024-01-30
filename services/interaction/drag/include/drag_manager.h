@@ -61,7 +61,7 @@ public:
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    int32_t OnSetDragWindowVisible(bool visible) override;
+    int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
     int32_t OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
     void Dump(int32_t fd) const override;
@@ -152,6 +152,7 @@ private:
     std::function<void(bool)> notifyPUllUpCallback_ { nullptr };
     std::shared_ptr<EventHub> eventHub_ { nullptr };
     sptr<ISystemAbilityStatusChange> statusListener_ { nullptr };
+    bool isControlMultiScreenVisible_ = false;
     sptr<ISystemAbilityStatusChange> displayAbilityStatusChange_ { nullptr };
 };
 } // namespace DeviceStatus

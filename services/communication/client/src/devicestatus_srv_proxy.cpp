@@ -603,7 +603,7 @@ int32_t DeviceStatusSrvProxy::RemoveSubscriptListener()
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
+int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible, bool isForce)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -612,6 +612,7 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible)
         return ERR_INVALID_VALUE;
     }
     WRITEBOOL(data, visible, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isForce, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageParcel reply;
