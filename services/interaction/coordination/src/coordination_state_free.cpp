@@ -99,6 +99,7 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
         FI_HILOGE("Failed to stop the process");
         return ret;
     }
+    COOR_SM->StopRemoteCoordination(isUnchained);
     return RET_OK;
 }
 } // namespace DeviceStatus
