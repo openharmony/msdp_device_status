@@ -81,6 +81,7 @@ public:
 private:
     void OnDeviceAdded(std::shared_ptr<IDevice> device);
     void OnDeviceRemoved(std::shared_ptr<IDevice> device);
+    int32_t SyncCrossingSwitchState();
 
     std::unordered_map<int32_t, std::shared_ptr<Device>> devices_;
     std::shared_ptr<DeviceObserver> devObserver_ { nullptr };

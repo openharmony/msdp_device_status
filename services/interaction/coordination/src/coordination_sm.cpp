@@ -207,6 +207,18 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
     return RET_OK;
 }
 
+int32_t CoordinationSM::SyncCrossingSwitchState()
+{
+    CALL_INFO_TRACE;
+    bool state = DP_ADAPTER->GetCrossingSwitchState(COORDINATION::GetLocalNetworkId());
+    COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
+    if (DP_ADAPTER->UpdateCrossingSwitchState(state) != RET_OK) {
+        FI_HILOGE("UpdateCrossingSwitchState failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void CoordinationSM::PrepareCoordination()
 {
     CALL_INFO_TRACE;
