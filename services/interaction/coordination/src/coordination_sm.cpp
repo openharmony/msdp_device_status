@@ -373,6 +373,9 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     }
     isStarting_ = true;
     MMI::InputManager::GetInstance()->EnableInputDevice(true);
+    if (!COOR_DEV_MGR->HasLocalPointerDevice()) {
+        MMI::InputManager::GetInstance()->SetPointerVisible(false);
+    }
     if (buttonIsPressed) {
         StartPointerEventFilter();
         COOR_SOFTBUS_ADAPTER->NotifyFilterAdded(sinkNetworkId_);
