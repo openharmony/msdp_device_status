@@ -327,9 +327,6 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
         "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
         dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
-    if (SyncCrossingSwitchState() != RET_OK) {
-        FI_HILOGE("SyncCrossingSwitchState failed");
-    }
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
@@ -352,16 +349,6 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
             COOR_SM->OnKeyboardOffline(dev->GetDhid());
         }
     }
-}
-
-int32_t CoordinationDeviceManager::SyncCrossingSwitchState()
-{
-    CALL_DEBUG_ENTER;
-    if (COOR_SM->SyncCrossingSwitchState() != RET_OK) {
-        FI_HILOGE("SyncCrossingSwitchState failed");
-        return RET_ERR;
-    }
-    return RET_OK;
 }
 
 CoordinationDeviceManager::DeviceObserver::DeviceObserver(CoordinationDeviceManager &cooDevMgr)
