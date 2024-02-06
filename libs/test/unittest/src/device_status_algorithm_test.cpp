@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifdef DEVICE_STATUS_SENSOR_ENABLE
 #include <memory>
 #include <dlfcn.h>
 
@@ -174,11 +175,11 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     bool result = g_manager->StartSensor(Type::TYPE_INVALID);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     int32_t ret = g_manager->Enable(Type::TYPE_INVALID);
     ASSERT_EQ(ret, RET_ERR);
     result = g_manager->UnregisterSensor(Type::TYPE_INVALID);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
     ret = g_manager->Disable(Type::TYPE_INVALID);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -575,7 +576,7 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest028, TestSize.Level
     CALL_TEST_DEBUG;
     SENSOR_DATA_CB.user_.callback = nullptr;
     bool result = g_manager->UnregisterSensor(Type::TYPE_ABSOLUTE_STILL);
-    EXPECT_TRUE(!result);
+    EXPECT_FALSE(result);
 }
 
 /**
@@ -658,3 +659,4 @@ HWTEST_F(DeviceStatusAlgorithmTest, DeviceStatusAlgorithmTest032, TestSize.Level
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
+#endif // DEVICE_STATUS_SENSOR_ENABLE
