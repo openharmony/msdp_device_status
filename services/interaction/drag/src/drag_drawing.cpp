@@ -489,6 +489,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(styleNode);
     if (drawStyleChangeModifier_ != nullptr) {
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
@@ -502,6 +503,7 @@ void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> st
 void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(styleNode);
     if (drawStyleChangeModifier_ != nullptr) {
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
@@ -722,12 +724,12 @@ void DragDrawing::OnStopAnimationFail()
         drawStyleScaleModifier_ = nullptr;
         needBreakStyleScaleAnimation_ = true;
     }
+    CHKPV(g_drawingInfo.rootNode);
     if (drawDragStopModifier_ != nullptr) {
         g_drawingInfo.rootNode->RemoveModifier(drawDragStopModifier_);
         drawDragStopModifier_ = nullptr;
     }
     drawDragStopModifier_ = std::make_shared<DrawDragStopModifier>();
-    CHKPV(g_drawingInfo.rootNode);
     hasRunningStopAnimation_ = true;
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
     drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
