@@ -9,7 +9,11 @@
   "component": {
     "name": "device_status",
     "subsystem": "msdp",
-    "syscap": ["SystemCapability.Msdp.DeviceStatus.Stationary"],
+    "syscap": [
+      "SystemCapability.Msdp.DeviceStatus.Drag",
+      "SystemCapability.Msdp.DeviceStatus.Cooperate",
+      "SystemCapability.Msdp.DeviceStatus.Stationary"
+    ],
     "hisysevent_config": ["//base/msdp/device_status/hisysevent.yaml"],
     "features": [],
     "adapted_system_type": [ "standard" ],
