@@ -489,6 +489,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(styleNode);
     if (drawStyleChangeModifier_ != nullptr) {
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
@@ -502,6 +503,7 @@ void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> st
 void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(styleNode);
     if (drawStyleChangeModifier_ != nullptr) {
         styleNode->RemoveModifier(drawStyleChangeModifier_);
         drawStyleChangeModifier_ = nullptr;
