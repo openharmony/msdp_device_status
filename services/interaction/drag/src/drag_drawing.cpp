@@ -112,6 +112,7 @@ constexpr int32_t INVALID_COLOR_VALUE { -1 };
 constexpr int32_t GLOBAL_WINDOW_ID { -1 };
 constexpr int32_t MOUSE_DRAG_CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t CURSOR_CIRCLE_MIDDLE { 2 };
+constexpr int32_t TWICE_SIZE { 2 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
 constexpr int32_t HEX_FF { 0xFF };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
@@ -322,6 +323,8 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     g_drawingInfo.pixelMap = shadowInfo.pixelMap;
     g_drawingInfo.pixelMapX = shadowInfo.x;
     g_drawingInfo.pixelMapY = shadowInfo.y;
+    g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
+    g_drawingInfo.lastPixelMapY = g_drawingInfo.pixelMapY;
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
@@ -392,25 +395,7 @@ void DragDrawing::EraseMouseIcon()
 void DragDrawing::DestroyDragWindow()
 {
     CALL_DEBUG_ENTER;
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = false;
-    g_drawingInfo.sourceType = -1;
-    g_drawingInfo.currentDragNum = -1;
-    g_drawingInfo.pixelMapX = -1;
-    g_drawingInfo.pixelMapY = -1;
-    g_drawingInfo.displayX = -1;
-    g_drawingInfo.displayY = -1;
-    g_drawingInfo.mouseWidth = 0;
-    g_drawingInfo.mouseHeight = 0;
-    g_drawingInfo.rootNodeWidth = -1;
-    g_drawingInfo.rootNodeHeight = -1;
-    g_drawingInfo.pixelMap = nullptr;
-    g_drawingInfo.stylePixelMap = nullptr;
-    g_drawingInfo.isPreviousDefaultStyle = false;
-    g_drawingInfo.isCurrentDefaultStyle = false;
-    g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
-    g_drawingInfo.filterInfo.clear();
-    g_drawingInfo.extraInfo.clear();
+    ResetParameter();
     RemoveModifier();
     ClearMultiSelectedData();
     if (!g_drawingInfo.nodes.empty()) {
@@ -937,6 +922,8 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
+    g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
+    g_drawingInfo.lastPixelMapY = g_drawingInfo.pixelMapY;
     g_drawingInfo.currentDragNum = dragData.dragNum;
     g_drawingInfo.sourceType = dragData.sourceType;
     g_drawingInfo.displayId = dragData.displayId;
@@ -1425,6 +1412,11 @@ void DragDrawing::SetScreenId(uint64_t screenId)
 
 int32_t DragDrawing::RotateDragWindow(Rosen::Rotation rotation)
 {
+    if (needRotatePixelMapXY_) {
+        CHKPR(g_drawingInfo.pixelMap, RET_ERR);
+        g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+        g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
+    }
     switch (rotation) {
         case Rosen::Rotation::ROTATION_0: {
             return DoRotateDragWindow(ROTATION_DEFAULT);
@@ -1507,9 +1499,10 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     CALL_DEBUG_ENTER;
     if (enable) {
         DRAG_DATA_MGR.SetInitialPixelMapLocation({ g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY });
-        g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
-        g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
+        needRotatePixelMapXY_ = true;
+        RotatePixelMapXY(g_drawingInfo.pixelMapX, g_drawingInfo.pixelMapY);
     } else {
+        needRotatePixelMapXY_ = false;
         auto initialPixelMapLocation = DRAG_DATA_MGR.GetInitialPixelMapLocation();
         g_drawingInfo.pixelMapX = initialPixelMapLocation.first;
         g_drawingInfo.pixelMapY = initialPixelMapLocation.second;
@@ -1835,6 +1828,66 @@ void DragDrawing::RotateDisplayXY(int32_t &displayX, int32_t &displayY)
             break;
         }
     }
+}
+
+void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
+{
+    FI_HILOGI("rotation:%{public}d", static_cast<int32_t>(rotation_));
+    CHKPV(g_drawingInfo.pixelMap);
+    switch (rotation_) {
+        case Rosen::Rotation::ROTATION_0: {
+            g_drawingInfo.pixelMapX = -(HALF_RATIO * g_drawingInfo.pixelMap->GetWidth());
+            g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
+            break;
+        }
+        case Rosen::Rotation::ROTATION_90: {
+            g_drawingInfo.pixelMapX = EIGHT_SIZE * GetScaling() + g_drawingInfo.lastPixelMapX;
+            g_drawingInfo.pixelMapY = HALF_RATIO * g_drawingInfo.pixelMap->GetWidth() + g_drawingInfo.lastPixelMapX;
+            break;
+        }
+        case Rosen::Rotation::ROTATION_180: {
+            g_drawingInfo.pixelMapX = HALF_RATIO * g_drawingInfo.pixelMap->GetWidth() +
+                TWICE_SIZE * g_drawingInfo.lastPixelMapX;
+            g_drawingInfo.pixelMapY = -(EIGHT_SIZE * GetScaling());
+            break;
+        }
+        case Rosen::Rotation::ROTATION_270: {
+            g_drawingInfo.pixelMapX = -EIGHT_SIZE * GetScaling() + g_drawingInfo.lastPixelMapX;
+            g_drawingInfo.pixelMapY = -HALF_RATIO * g_drawingInfo.pixelMap->GetWidth() - g_drawingInfo.lastPixelMapX;
+            break;
+        }
+        default: {
+            FI_HILOGE("Invalid parameter, rotation:%{public}d", static_cast<int32_t>(rotation_));
+            break;
+        }
+    }
+}
+
+void  DragDrawing::ResetParameter()
+{
+    CALL_INFO_TRACE;
+    startNum_ = START_TIME;
+    needDestroyDragWindow_ = false;
+    needRotatePixelMapXY_ = false;
+    g_drawingInfo.sourceType = -1;
+    g_drawingInfo.currentDragNum = -1;
+    g_drawingInfo.pixelMapX = -1;
+    g_drawingInfo.pixelMapY = -1;
+    g_drawingInfo.lastPixelMapX = -1;
+    g_drawingInfo.lastPixelMapY = -1;
+    g_drawingInfo.displayX = -1;
+    g_drawingInfo.displayY = -1;
+    g_drawingInfo.mouseWidth = 0;
+    g_drawingInfo.mouseHeight = 0;
+    g_drawingInfo.rootNodeWidth = -1;
+    g_drawingInfo.rootNodeHeight = -1;
+    g_drawingInfo.pixelMap = nullptr;
+    g_drawingInfo.stylePixelMap = nullptr;
+    g_drawingInfo.isPreviousDefaultStyle = false;
+    g_drawingInfo.isCurrentDefaultStyle = false;
+    g_drawingInfo.currentStyle = DragCursorStyle::DEFAULT;
+    g_drawingInfo.filterInfo.clear();
+    g_drawingInfo.extraInfo.clear();
 }
 
 int32_t DragDrawing::DoRotateDragWindow(float rotation)

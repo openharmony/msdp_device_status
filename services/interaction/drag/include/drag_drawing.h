@@ -129,6 +129,8 @@ struct DrawingInfo {
     int32_t displayId { -1 };
     int32_t pixelMapX { -1 };
     int32_t pixelMapY { -1 };
+    int32_t lastPixelMapX { -1 };
+    int32_t lastPixelMapY { -1 };
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     int32_t mouseWidth { 0 };
@@ -237,6 +239,8 @@ private:
     void StartStyleAnimation(float startScale, float endScale, int32_t duration);
     void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
+    void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
+    void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
 
 private:
@@ -259,6 +263,7 @@ private:
     std::atomic_bool hasRunningAnimation_ { false };
     void* dragExtHandle_ { nullptr };
     bool needDestroyDragWindow_ { false };
+    bool needRotatePixelMapXY_ { false };
     uint64_t screenId_ { 0 };
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };
 };
