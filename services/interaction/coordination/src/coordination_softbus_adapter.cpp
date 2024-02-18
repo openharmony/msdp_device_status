@@ -67,6 +67,7 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser &
         FI_HILOGE("The data type of CJSON is incorrect");
         return;
     }
+    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", x->valueint, y->valueint);
     COOR_SM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
 }
 
@@ -117,6 +118,34 @@ void ResponseStartCoordinationOtherResult(int32_t sessionId, const JsonParser &p
     }
     COOR_SM->StartCoordinationOtherResult(networkId->valuestring);
 }
+
+void OnFetchCrossingSwitch(int32_t sessionId, const JsonParser &parser)
+{
+    CALL_INFO_TRACE;
+    cJSON* networkId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
+    if (!cJSON_IsString(networkId)) {
+        FI_HILOGE("The data type of networkId is not string");
+        return;
+    }
+    COOR_SM->SendCrossingSwitchToRemote(networkId->valuestring);
+}
+
+void OnReplyCrossingSwitch(int32_t sessionId, const JsonParser &parser)
+{
+    CALL_INFO_TRACE;
+    cJSON* networkId = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_KEY_OTHER_DEVICE_ID);
+    if (!cJSON_IsString(networkId)) {
+        FI_HILOGE("The data type of networkId is not string");
+        return;
+    }
+    cJSON* remoteCrossingSwitch = cJSON_GetObjectItemCaseSensitive(parser.json, FI_SOFTBUS_CROSSING_SWITCH);
+    if (!cJSON_IsBool(remoteCrossingSwitch)) {
+        FI_HILOGE("The data type of remoteCrossingSwitch is not bool");
+        return;
+    }
+    COOR_SM->SetRemoteCrossingSwitch(networkId->valuestring, cJSON_IsTrue(remoteCrossingSwitch));
+}
+
 } // namespace
 
 static void BindLink(int32_t socket, PeerSocketInfo info)
@@ -257,7 +286,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", anonyNetworkId(remoteNetworkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
@@ -380,6 +409,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
+    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", xPercent, yPercent);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDeviceDhid.c_str()));
@@ -529,6 +559,57 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     return RET_OK;
 }
 
+int32_t CoordinationSoftbusAdapter::FetchRemoteCrossingSwitch(const std::string &localNetworkId,
+    const std::string &remoteNetworkId)
+{
+    CALL_DEBUG_ENTER;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
+        FI_HILOGE("Failed to discover remoteNetworkId:%{public}s", anonyNetworkId(remoteNetworkId).c_str());
+        return RET_ERR;
+    }
+    int32_t sessionId = sessionDevs_[remoteNetworkId];
+    cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(FETCH_CROSSING_SWITCH));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_OTHER_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
+    char *sendMsg = cJSON_Print(jsonStr);
+    cJSON_Delete(jsonStr);
+    int32_t ret = SendMsg(sessionId, sendMsg);
+    cJSON_free(sendMsg);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t CoordinationSoftbusAdapter::SendCrossingSwitchToRemote(const std::string &localNetworkId,
+    const std::string &remoteNetworkId, bool state)
+{
+    CALL_DEBUG_ENTER;
+    std::unique_lock<std::mutex> sessionLock(operationMutex_);
+    if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
+        FI_HILOGE("Failed to discover remoteNetworkId:%{public}s", anonyNetworkId(remoteNetworkId).c_str());
+        return RET_ERR;
+    }
+    int32_t sessionId = sessionDevs_[remoteNetworkId];
+    cJSON *jsonStr = cJSON_CreateObject();
+    CHKPR(jsonStr, RET_ERR);
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REPLY_CROSSING_SWITCH));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_OTHER_DEVICE_ID, cJSON_CreateString(localNetworkId.c_str()));
+    cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_CROSSING_SWITCH, cJSON_CreateBool(state));
+    char *sendMsg = cJSON_Print(jsonStr);
+    cJSON_Delete(jsonStr);
+    int32_t ret = SendMsg(sessionId, sendMsg);
+    cJSON_free(sendMsg);
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to send the sendMsg, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::string &message)
 {
     if (message.empty()) {
@@ -608,6 +689,7 @@ void CoordinationSoftbusAdapter::OnShutdown(int32_t socket, ShutdownReason reaso
         sessionDevs_.erase(networkId);
     }
     COOR_SM->OnSoftbusSessionClosed(networkId);
+    COOR_SM->ClearRemoteCrossingSwitch(networkId);
     socketFd_ = -1;
 }
 
@@ -672,6 +754,14 @@ void CoordinationSoftbusAdapter::HandleCoordinationSessionData(int32_t sessionId
         }
         case NOTIFY_FILTER_ADDED: {
             ResponseNotifyFilterAdded();
+            break;
+        }
+        case FETCH_CROSSING_SWITCH: {
+            OnFetchCrossingSwitch(sessionId, parser);
+            break;
+        }
+        case REPLY_CROSSING_SWITCH: {
+            OnReplyCrossingSwitch(sessionId, parser);
             break;
         }
         default: {

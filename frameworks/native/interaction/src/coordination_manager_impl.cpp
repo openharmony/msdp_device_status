@@ -24,6 +24,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
+static constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
+auto anonyNetworkId = [](const std::string &networkId) -> std::string {
+    return networkId.substr(0, SUBSTR_NETWORKID_LEN);
+};
 } // namespace
 
 int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCompatible)
@@ -80,39 +84,27 @@ int32_t CoordinationManagerImpl::PrepareCoordination(FuncCoordinationMessage cal
     std::lock_guard<std::mutex> guard(mtx_);
     prepareCooCallback_ = callback;
     isPrepareCooIsCompatible_ = isCompatible;
-    CoordinationEvent event;
-    event.msg = callback;
-    if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
-    }
-    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData_, isCompatible);
+    SetMessageCallback(CallbackMessageId::PREPARE, callback);
+    int32_t userData = static_cast<int32_t> (CallbackMessageId::PREPARE);
+    int32_t ret = DeviceStatusClient::GetInstance().PrepareCoordination(userData, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Prepare coordination failed");
         return ret;
     }
-    devCoordinationEvent_[userData_] = event;
-    userData_++;
     return RET_OK;
 }
 
 int32_t CoordinationManagerImpl::UnprepareCoordination(FuncCoordinationMessage callback, bool isCompatible)
 {
     CALL_DEBUG_ENTER;
-    CoordinationEvent event;
-    event.msg = callback;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
-    }
-    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData_, isCompatible);
+    SetMessageCallback(CallbackMessageId::UNPREPARE, callback);
+    int32_t userData = static_cast<int32_t> (CallbackMessageId::UNPREPARE);
+    int32_t ret = DeviceStatusClient::GetInstance().UnprepareCoordination(userData, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Unprepare coordination failed");
         return ret;
     }
-    devCoordinationEvent_[userData_] = event;
-    userData_++;
     return RET_OK;
 }
 
@@ -121,20 +113,14 @@ int32_t CoordinationManagerImpl::ActivateCoordination(const std::string &remoteN
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    CoordinationEvent event;
-    event.msg = callback;
-    if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
-    }
+    SetMessageCallback(CallbackMessageId::ACTIVATE, callback);
+    int32_t userData = static_cast<int32_t> (CallbackMessageId::ACTIVATE);
     int32_t ret = DeviceStatusClient::GetInstance().ActivateCoordination(
-        userData_, remoteNetworkId, startDeviceId, isCompatible);
+        userData, remoteNetworkId, startDeviceId, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Activate coordination failed");
         return ret;
     }
-    devCoordinationEvent_[userData_] = event;
-    userData_++;
     return RET_OK;
 }
 
@@ -143,19 +129,13 @@ int32_t CoordinationManagerImpl::DeactivateCoordination(bool isUnchained, FuncCo
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    CoordinationEvent event;
-    event.msg = callback;
-    if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
-    }
-    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData_, isUnchained, isCompatible);
+    SetMessageCallback(CallbackMessageId::DEACTIVATE, callback);
+    int32_t userData = static_cast<int32_t> (CallbackMessageId::DEACTIVATE);
+    int32_t ret = DeviceStatusClient::GetInstance().DeactivateCoordination(userData, isUnchained, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Deactivate coordination failed");
         return ret;
     }
-    devCoordinationEvent_[userData_] = event;
-    userData_++;
     return RET_OK;
 }
 
@@ -164,19 +144,13 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    CoordinationEvent event;
-    event.state = callback;
-    if (userData_ == std::numeric_limits<int32_t>::max()) {
-        FI_HILOGE("userData exceeds the maximum");
-        return RET_ERR;
-    }
-    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData_, networkId, isCompatible);
+    SetStateCallback(CallbackMessageId::GET_COORDINATION, callback);
+    int32_t userData = static_cast<int32_t> (CallbackMessageId::GET_COORDINATION);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData, networkId, isCompatible);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed");
         return ret;
     }
-    devCoordinationEvent_[userData_] = event;
-    userData_++;
     return RET_OK;
 }
 
@@ -195,14 +169,15 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devCoordinationEvent_.find(userData);
-    if (iter == devCoordinationEvent_.end()) {
+    if (devCoordinationEvent_.find(userData) == devCoordinationEvent_.end()) {
+        FI_HILOGE("No callback for CallbackMessageId:%{public}d", userData);
         return;
     }
-    CoordinationMsg event = iter->second.msg;
+    CoordinationMsg event = devCoordinationEvent_[userData].msg;
     CHKPV(event);
     event(networkId, msg);
-    devCoordinationEvent_.erase(iter);
+    FI_HILOGD("Coordination msg event callback, userData:%{public}d, networkId:%{public}s",
+        userData, anonyNetworkId(networkId).c_str());
 }
 
 void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool state)
@@ -210,35 +185,30 @@ void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool st
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = devCoordinationEvent_.find(userData);
-    if (iter == devCoordinationEvent_.end()) {
+    if (devCoordinationEvent_.find(userData) == devCoordinationEvent_.end()) {
+        FI_HILOGE("No callback for CallbackMessageId:%{public}d", userData);
         return;
     }
-    CoordinationState event = iter->second.state;
+    CoordinationState event = devCoordinationEvent_[userData].state;
     CHKPV(event);
     event(state);
-    devCoordinationEvent_.erase(iter);
-    FI_HILOGD("Coordination state event callback, userData:%{public}d, state:(%{public}d)", userData, state);
+    FI_HILOGD("Coordination state event callback, userData:%{public}d", userData);
 }
 
-int32_t CoordinationManagerImpl::GetUserData() const
+void CoordinationManagerImpl::SetMessageCallback(CallbackMessageId id, FuncCoordinationMessage callback)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
-    return userData_;
+    CoordinationEvent event;
+    event.msg = callback;
+    devCoordinationEvent_[static_cast<int32_t>(id)] = event;
+    FI_HILOGD("SetMessageCallback for CallbackMessageId:%{public}d", id);
 }
 
-const CoordinationManagerImpl::CoordinationMsg *CoordinationManagerImpl::GetCoordinationMessageEvent(
-    int32_t userData) const
+void CoordinationManagerImpl::SetStateCallback(CallbackMessageId id, FuncCoordinationState callback)
 {
-    auto iter = devCoordinationEvent_.find(userData);
-    return iter == devCoordinationEvent_.end() ? nullptr : &iter->second.msg;
-}
-
-const CoordinationManagerImpl::CoordinationState *CoordinationManagerImpl::GetCoordinationStateEvent(
-    int32_t userData) const
-{
-    auto iter = devCoordinationEvent_.find(userData);
-    return iter == devCoordinationEvent_.end() ? nullptr : &iter->second.state;
+    CoordinationEvent event;
+    event.state = callback;
+    devCoordinationEvent_[static_cast<int32_t>(id)] = event;
+    FI_HILOGD("SetStateCallback for CallbackMessageId:%{public}d", id);
 }
 
 int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient &client, NetPacket &pkt)

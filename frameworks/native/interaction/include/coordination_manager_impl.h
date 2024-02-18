@@ -42,6 +42,14 @@ public:
         CoordinationState state;
     };
 
+    enum class CallbackMessageId {
+        PREPARE,
+        UNPREPARE,
+        ACTIVATE,
+        DEACTIVATE,
+        GET_COORDINATION
+    };
+
     CoordinationManagerImpl() = default;
     ~CoordinationManagerImpl() = default;
 
@@ -57,7 +65,6 @@ public:
     void OnDevCoordinationListener(const std::string networkId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string networkId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);
-    int32_t GetUserData() const;
     int32_t OnCoordinationListener(const StreamClient &client, NetPacket &pkt);
     int32_t OnCoordinationMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnCoordinationState(const StreamClient &client, NetPacket &pkt);
@@ -68,14 +75,13 @@ public:
     int32_t RemoveHotAreaListener(HotAreaListenerPtr listener = nullptr);
     void OnConnected();
 private:
-    const CoordinationMsg *GetCoordinationMessageEvent(int32_t userData) const;
-    const CoordinationState *GetCoordinationStateEvent(int32_t userData) const;
+    void SetMessageCallback(CallbackMessageId id, FuncCoordinationMessage callback);
+    void SetStateCallback(CallbackMessageId id, FuncCoordinationState callback);
 private:
     std::list<CoordinationListenerPtr> devCoordinationListener_;
     std::map<int32_t, CoordinationEvent> devCoordinationEvent_;
     std::list<HotAreaListenerPtr> devHotAreaListener_;
     mutable std::mutex mtx_;
-    int32_t userData_ { 0 };
     std::atomic_bool isListeningProcess_ { false };
     bool isHotAreaListener_ { false };
     IClientPtr client_ { nullptr };

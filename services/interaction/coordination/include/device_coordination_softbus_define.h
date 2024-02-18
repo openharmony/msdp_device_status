@@ -43,6 +43,7 @@ constexpr int32_t ENCRYPT_TAG_LEN { 32 };
 #define FI_SOFTBUS_KEY_SESSION_ID "fi_softbus_key_session_id"
 #define FI_SOFTBUS_KEY_OTHER_DEVICE_ID "fi_softbus_key_other_device_id"
 #define FI_SOFTBUS_POINTER_BUTTON_IS_PRESS "fi_softbus_pointer_button_is_press"
+#define FI_SOFTBUS_CROSSING_SWITCH "fi_softbus_crossing_switch"
 
 enum {
     REMOTE_COORDINATION_START = 1,
@@ -51,7 +52,9 @@ enum {
     REMOTE_COORDINATION_STOP_RES = 4,
     REMOTE_COORDINATION_STOP_OTHER_RES = 5,
     NOTIFY_UNCHAINED_RES = 6,
-    NOTIFY_FILTER_ADDED = 7
+    NOTIFY_FILTER_ADDED = 7,
+    FETCH_CROSSING_SWITCH = 8,
+    REPLY_CROSSING_SWITCH = 9
 };
 } // namespace DeviceStatus
 } // namespace Msdp

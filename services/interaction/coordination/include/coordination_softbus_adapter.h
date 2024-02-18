@@ -43,6 +43,9 @@ public:
     int32_t StopRemoteCoordination(const std::string &remoteNetworkId, bool isUnchained);
     int32_t StopRemoteCoordinationResult(const std::string &remoteNetworkId, bool isSuccess);
     int32_t StartCoordinationOtherResult(const std::string &originNetworkId, const std::string &remoteNetworkId);
+    int32_t FetchRemoteCrossingSwitch(const std::string &localNetworkId, const std::string &remoteNetworkId);
+    int32_t SendCrossingSwitchToRemote(const std::string &localNetworkId, const std::string &remoteNetworkId,
+        bool state);
     int32_t Init();
     void Release();
     int32_t OpenInputSoftbus(const std::string &remoteNetworkId);
