@@ -539,12 +539,12 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_Too_Much_Shadow,
 }
 
 /**
- * @tc.name: EnterTextEditorArea001
+ * @tc.name: EnableUpperCenterMode001
  * @tc.desc: normal test for pixelMap 8dp bit movement effect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
+HWTEST_F(InteractionDragDrawingTest, EnableUpperCenterMode001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
@@ -560,10 +560,10 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    ret = InteractionManager::GetInstance()->EnableUpperCenterMode(true);
     EXPECT_EQ(ret, RET_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_ANIMATION_END));
-    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    ret = InteractionManager::GetInstance()->EnableUpperCenterMode(false);
     EXPECT_EQ(ret, RET_OK);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -572,12 +572,12 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea001, TestSize.Level1)
 }
 
 /**
- * @tc.name: EnterTextEditorArea002
+ * @tc.name: EnableUpperCenterMode002
  * @tc.desc: abnormal test for pixelMap 8dp bit movement effect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
+HWTEST_F(InteractionDragDrawingTest, EnableUpperCenterMode002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
@@ -593,7 +593,7 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
-    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    ret = InteractionManager::GetInstance()->EnableUpperCenterMode(false);
     EXPECT_EQ(ret, RET_ERR);
     DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
@@ -602,18 +602,18 @@ HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea002, TestSize.Level1)
 }
 
 /**
- * @tc.name: EnterTextEditorArea003
+ * @tc.name: EnableUpperCenterMode003
  * @tc.desc: abnormal test for pixelMap 8dp bit movement effect
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InteractionDragDrawingTest, EnterTextEditorArea003, TestSize.Level1)
+HWTEST_F(InteractionDragDrawingTest, EnableUpperCenterMode003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, true, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    int32_t ret = InteractionManager::GetInstance()->EnableUpperCenterMode(true);
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace DeviceStatus

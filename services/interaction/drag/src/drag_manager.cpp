@@ -1051,7 +1051,7 @@ int32_t DragManager::GetDragAction(DragAction &dragAction) const
     return RET_OK;
 }
 
-int32_t DragManager::EnterTextEditorArea(bool enable)
+int32_t DragManager::EnableUpperCenterMode(bool enable)
 {
     CALL_DEBUG_ENTER;
     if (dragState_ != DragState::START) {
@@ -1066,7 +1066,7 @@ int32_t DragManager::EnterTextEditorArea(bool enable)
         FI_HILOGE("GetCoordinateCorrected failed");
         return RET_ERR;
     }
-    return dragDrawing_.EnterTextEditorArea(enable);
+    return dragDrawing_.EnableUpperCenterMode(enable);
 }
 
 int32_t DragManager::GetExtraInfo(std::string &extraInfo) const

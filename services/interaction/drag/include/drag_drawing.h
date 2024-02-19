@@ -185,7 +185,7 @@ public:
     void OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
         std::shared_ptr<Rosen::RSNode> rootNode) override;
     void OnStopAnimation() override;
-    int32_t EnterTextEditorArea(bool enable);
+    int32_t EnableUpperCenterMode(bool enable);
     bool GetAllowDragState();
     void SetScreenId(uint64_t screenId);
     int32_t RotateDragWindow(Rosen::Rotation rotation);

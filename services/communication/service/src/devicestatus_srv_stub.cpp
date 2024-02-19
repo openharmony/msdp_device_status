@@ -819,9 +819,9 @@ int32_t DeviceStatusSrvStub::EnterTextEditorAreaStub(MessageParcel &data, Messag
     CALL_DEBUG_ENTER;
     bool enable = false;
     READBOOL(data, enable, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t ret = EnterTextEditorArea(enable);
+    int32_t ret = EnableUpperCenterMode(enable);
     if (ret != RET_OK) {
-        FI_HILOGE("Call EnterTextEditorArea failed, ret:%{public}d", ret);
+        FI_HILOGE("Call EnableUpperCenterMode failed, ret:%{public}d", ret);
     }
     return ret;
 }

@@ -79,7 +79,8 @@ struct DragData {
                filterInfo == other.filterInfo && extraInfo == other.extraInfo && sourceType == other.sourceType &&
                dragNum == other.dragNum && pointerId == other.pointerId && displayX == other.displayX &&
                displayY == other.displayY && displayId == other.displayId &&
-               hasCanceledAnimation == other.hasCanceledAnimation && summarys == other.summarys;
+               hasCanceledAnimation == other.hasCanceledAnimation &&
+               hasCoordinateCorrected == other.hasCoordinateCorrected && summarys == other.summarys;
     }
 
     bool operator != (const DragData &other) const

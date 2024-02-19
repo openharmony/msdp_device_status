@@ -59,7 +59,7 @@ public:
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     int32_t GetDragState(DragState &dragState);
-    int32_t EnterTextEditorArea(bool enable);
+    int32_t EnableUpperCenterMode(bool enable);
     int32_t GetDragAction(DragAction &dragAction);
     int32_t GetExtraInfo(std::string &extraInfo);
     int32_t AddPrivilege();

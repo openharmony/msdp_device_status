@@ -77,7 +77,7 @@ public:
         const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
-    int32_t EnterTextEditorArea(bool enable);
+    int32_t EnableUpperCenterMode(bool enable);
     int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
     int32_t AddPrivilege(int32_t tokenId);
