@@ -144,7 +144,25 @@ struct PreviewStyle {
                radius == other.radius && fabsf(scale - other.scale) < EPSILON;
     }
 
-    bool operator!=(const PreviewStyle &other) const
+    bool operator != (const PreviewStyle &other) const
+    {
+        return !(*this == other);
+    }
+};
+
+struct ShadowOffset {
+    int32_t offsetX { -1 };
+    int32_t offsetY { -1 };
+    int32_t width { -1 };
+    int32_t height { -1 };
+
+    bool operator == (const ShadowOffset &other) const
+    {
+        return offsetX == other.offsetX && offsetY == other.offsetY &&
+               width == other.width && height == other.height;
+    }
+
+    bool operator != (const ShadowOffset &other) const
     {
         return !(*this == other);
     }
