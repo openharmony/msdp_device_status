@@ -45,7 +45,7 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool
     WRITEINT32(data, dragData.displayY, ERR_INVALID_VALUE);
     WRITEINT32(data, dragData.displayId, ERR_INVALID_VALUE);
     WRITEBOOL(data, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
-    WRITEBOOL(data, dragData.hasCoordinateCorrected,ERR_INVALID_VALUE);
+    WRITEBOOL(data, dragData.hasCoordinateCorrected, ERR_INVALID_VALUE);
     if (SummaryPacker::Marshalling(dragData.summarys, data) != RET_OK) {
         FI_HILOGE("Marshalling summary failed");
         return RET_ERR;
