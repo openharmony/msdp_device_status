@@ -1979,10 +1979,7 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
         return;
     }
     int32_t adjustSize = EIGHT_SIZE * scalingValue;
-    int32_t svgTouchPositionX = 0;
-    if ((g_drawingInfo.pixelMap->GetWidth() + adjustSize) > stylePixelMap_->GetWidth()) {
-        svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
-    }
+    int32_t svgTouchPositionX = g_drawingInfo.pixelMap->GetWidth() + adjustSize - stylePixelMap_->GetWidth();
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -2150,10 +2147,7 @@ void DrawStyleChangeModifier::Draw(Rosen::RSDrawingContext &context) const
         return;
     }
     int32_t adjustSize = EIGHT_SIZE * scalingValue;
-    int32_t svgTouchPositionX = 0;
-    if ((pixelMapWidth + adjustSize) > stylePixelMap_->GetWidth()) {
-        svgTouchPositionX = pixelMapWidth + adjustSize - stylePixelMap_->GetWidth();
-    }
+    int32_t svgTouchPositionX = pixelMapWidth + adjustSize - stylePixelMap_->GetWidth();
     dragStyleNode->SetBounds(svgTouchPositionX, (TWELVE_SIZE-EIGHT_SIZE)*scalingValue, stylePixelMap_->GetWidth(),
         stylePixelMap_->GetHeight());
     dragStyleNode->SetFrame(svgTouchPositionX, (TWELVE_SIZE-EIGHT_SIZE)*scalingValue, stylePixelMap_->GetWidth(),
