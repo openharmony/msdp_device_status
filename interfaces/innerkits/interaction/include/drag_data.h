@@ -151,24 +151,6 @@ struct PreviewStyle {
     }
 };
 
-struct ShadowOffset {
-    int32_t offsetX { -1 };
-    int32_t offsetY { -1 };
-    int32_t width { -1 };
-    int32_t height { -1 };
-
-    bool operator == (const ShadowOffset &other) const
-    {
-        return offsetX == other.offsetX && offsetY == other.offsetY &&
-               width == other.width && height == other.height;
-    }
-
-    bool operator != (const ShadowOffset &other) const
-    {
-        return !(*this == other);
-    }
-};
-
 struct PreviewAnimation {
     int32_t duration { -1 };
     std::string curveName;
