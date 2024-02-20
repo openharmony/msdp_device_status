@@ -16,7 +16,6 @@
 #ifndef COORDINATION_SM_H
 #define COORDINATION_SM_H
 
-#include <condition_variable>
 #include <functional>
 
 #include "singleton.h"
@@ -34,10 +33,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 static constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
-auto anonyNetworkId = [](const std::string &networkId) -> std::string {
-    return networkId.substr(0, SUBSTR_NETWORKID_LEN);
-};
-
 enum class CoordinationState {
     STATE_FREE = 0,
     STATE_IN = 1,
@@ -111,11 +106,6 @@ class CoordinationSM final {
         std::function<void (std::shared_ptr<MMI::PointerEvent>)> callback_ { nullptr };
     };
 
-    struct SwitchState {
-        bool isUpdated { false };
-        bool state { false };
-    };
-
 public:
     void SetAbsolutionLocation(double xPercent, double yPercent);
     DISALLOW_COPY_AND_MOVE(CoordinationSM);
@@ -135,12 +125,6 @@ public:
     void StartCoordinationOtherResult(const std::string &remoteNetworkId);
     void UpdateState(CoordinationState state);
     void UpdatePreparedDevices(const std::string &remoteNetworkId, const std::string &originNetworkId);
-    int32_t FetchRemoteCrossingSwitch(const std::string &remoteNetworkId);
-    void SetRemoteCrossingSwitch(const std::string &remoteNetworkId, bool state);
-    bool GetRemoteCrossingSwitch(const std::string &remoteNetworkId);
-    void SendCrossingSwitchToRemote(const std::string &remoteNetworkId);
-    bool GetCrossingSwitchFromDP(const std::string &networkId);
-    void ClearRemoteCrossingSwitch(const std::string &remoteNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
     CoordinationState GetCurrentCoordinationState() const;
     void OnCoordinationChanged(const std::string &networkId, bool isOpen);
@@ -177,11 +161,11 @@ public:
     void OnInterceptorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnSoftbusSessionClosed(const std::string &networkId);
-    void NotifyRemoteStartFail(const std::string &remoteNetworkId);
 
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     void OnCloseCoordination(const std::string &networkId, bool isLocal);
+    void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDeviceDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
@@ -213,9 +197,6 @@ private:
     mutable std::mutex mutex_;
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
-    std::mutex remoteCrossingSwitchMutex_;
-    std::condition_variable remoteCrossingSwitchCV_;
-    std::unordered_map<std::string, SwitchState> remoteCrossingSwitch_;
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
     std::shared_ptr<MMI::PointerEvent> lastPointerEvent_ { nullptr };
     int32_t displayX_ { -1 };
