@@ -248,12 +248,12 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
     return RET_OK;
 }
 
-int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
+int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTokenId)
 {
     FI_HILOGD("DragStyle from ark is dragStyle%{public}s", GetDragStyleName(style).c_str());
     auto lastTargetPid = DRAG_DATA_MGR.GetTargetPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);
-    DRAG_DATA_MGR.SetTargetTid(targetTid);
+    DRAG_DATA_MGR.SetTargetTokenId(targetTokenId);
     if (style == DRAG_DATA_MGR.GetDragStyle()) {
         FI_HILOGD("Not need update drag style");
         if (targetPid != lastTargetPid) {
@@ -379,13 +379,13 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
 }
 
-void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
+void DragManager::SendDragData(int32_t targetTokenId, const std::string &udKey)
 {
     CALL_INFO_TRACE;
     UDMF::QueryOption option;
     option.key = udKey;
     UDMF::Privilege privilege;
-    privilege.tokenId = static_cast<uint32_t>(targetTid);
+    privilege.tokenId = static_cast<uint32_t>(targetTokenId);
     int32_t ret = UDMF::UdmfClient::GetInstance().AddPrivilege(option, privilege);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to send pid to Udmf client");
@@ -472,20 +472,20 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> 
 void DragManager::Dump(int32_t fd) const
 {
     DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
-    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
+    int32_t targetTokenId = DRAG_DATA_MGR.GetTargetTokenId();
     dprintf(fd, "Drag information:\n");
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
+            "dragState:%s | dragResult:%s | interceptorId:%d | dragTargetPid:%d | dragtargetTokenId:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
-            GetDragResult(dragResult_).c_str(), pointerEventInterceptorId_, GetDragTargetPid(), targetTid,
+            GetDragResult(dragResult_).c_str(), pointerEventInterceptorId_, GetDragTargetPid(), targetTokenId,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     dprintf(fd,
-            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragTargetTid:%d | "
+            "dragState:%s | dragResult:%s | monitorId:%d | dragTargetPid:%d | dragtargetTokenId:%d | "
             "cursorStyle:%s | isWindowVisble:%s\n", GetDragState(dragState_).c_str(),
-            GetDragResult(dragResult_).c_str(), pointerEventMonitorId_, GetDragTargetPid(), targetTid,
+            GetDragResult(dragResult_).c_str(), pointerEventMonitorId_, GetDragTargetPid(), targetTokenId,
             GetDragCursorStyle(style).c_str(), DRAG_DATA_MGR.GetDragWindowVisible() ? "true" : "false");
 #endif // OHOS_DRAG_ENABLE_MONITOR
     DragData dragData = DRAG_DATA_MGR.GetDragData();

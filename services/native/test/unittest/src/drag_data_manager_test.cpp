@@ -168,9 +168,9 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest002, TestSize.Level0)
 HWTEST_F(DragDataManagerTest, DragDataManagerTest003, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    int32_t targetTid = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
-    DRAG_DATA_MGR.SetTargetTid(targetTid);
-    EXPECT_TRUE(targetTid == DRAG_DATA_MGR.GetTargetTid());
+    int32_t targetTokenId = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    DRAG_DATA_MGR.SetTargetTokenId(targetTokenId);
+    EXPECT_TRUE(targetTokenId == DRAG_DATA_MGR.GetTargetTokenId());
 
     int32_t targetPid = IPCSkeleton::GetCallingPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);
@@ -185,9 +185,9 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest003, TestSize.Level0)
 HWTEST_F(DragDataManagerTest, DragDataManagerTest004, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    int32_t targetTid = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
-    DRAG_DATA_MGR.SetTargetTid(targetTid);
-    EXPECT_FALSE(targetTid != DRAG_DATA_MGR.GetTargetTid());
+    int32_t targetTokenId = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    DRAG_DATA_MGR.SetTargetTokenId(targetTokenId);
+    EXPECT_FALSE(targetTokenId != DRAG_DATA_MGR.GetTargetTokenId());
 
     int32_t targetPid = IPCSkeleton::GetCallingPid();
     DRAG_DATA_MGR.SetTargetPid(targetPid);

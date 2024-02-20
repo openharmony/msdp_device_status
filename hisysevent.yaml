@@ -164,7 +164,7 @@ UPDATE_DRAG_STYLE_FAILED:
 SEND_TOKENID:
   __BASE: {type: FAULT, level: MINOR, tag: deviceStatus, desc: Send Drag Data}
   MSG: {type: STRING, desc: Send Token Id Failed}
-  TARGETID: {type: INT32, desc: targetTid}
+  TARGETID: {type: INT32, desc: targetTokenId}
   UDKEY: {type: STRING, desc: udkey}
 
 STOP_DRAG_SUCCESS:
