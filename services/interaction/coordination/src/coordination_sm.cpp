@@ -49,6 +49,7 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
 constexpr uint32_t P2P_SESSION_CLOSED { 1 };
+constexpr int32_t TIME_WAIT_FOR_REMOTE_SWITCH { 2000 };
 const std::string THREAD_NAME { "coordination_sm" };
 } // namespace
 
@@ -247,8 +248,7 @@ void CoordinationSM::UnprepareCoordination()
 void CoordinationSM::OpenP2PConnection(const std::string &remoteNetworkId)
 {
     DistributedHardware::DmDeviceInfo remoteDeviceInfo;
-    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
-                 remoteNetworkId.c_str()) != EOK) {
+    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId), remoteNetworkId.c_str()) != EOK) {
         FI_HILOGW("Invalid networkid");
     }
     int32_t status =
@@ -261,8 +261,7 @@ void CoordinationSM::OpenP2PConnection(const std::string &remoteNetworkId)
 void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
 {
     DistributedHardware::DmDeviceInfo remoteDeviceInfo;
-    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId),
-                 remoteNetworkId.c_str()) != EOK) {
+    if (strcpy_s(remoteDeviceInfo.networkId, sizeof(remoteDeviceInfo.networkId), remoteNetworkId.c_str()) != EOK) {
         FI_HILOGW("Invalid networkid");
     }
     int32_t status =
@@ -293,7 +292,15 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         FI_HILOGE("Open input softbus failed");
         return COOPERATOR_FAIL;
     }
-
+    if (FetchRemoteCrossingSwitch(remoteNetworkId) != RET_OK) {
+        FI_HILOGE("FetchRemoteCrossingSwitch of %{public}s failed", anonyNetworkId(remoteNetworkId).c_str());
+        return COOPERATOR_FAIL;
+    }
+    if (bool state = GetRemoteCrossingSwitch(remoteNetworkId); !state) {
+        auto transfer = [](bool boolen) -> std::string { return boolen ? "true" : "false"; };
+        FI_HILOGE("Remote crossing switch:%{public}s, interrupt this coordination", transfer(state).c_str());
+        return COOPERATOR_FAIL;
+    }
     isStarting_ = true;
     SetSinkNetworkId(remoteNetworkId);
     auto state = GetCurrentState();
@@ -329,8 +336,7 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
         stopNetworkId = sinkNetworkId_;
     }
     isUnchained_ = isUnchained;
-    FI_HILOGD("isUnchained_:%{public}d, stopNetworkId:%{public}s",
-        isUnchained_, stopNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGD("IsUnchained_:%{public}d, stopNetworkId:%{public}s", isUnchained_, anonyNetworkId(stopNetworkId).c_str());
     auto state = GetCurrentState();
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->DeactivateCoordination(stopNetworkId, isUnchained, preparedNetworkId_);
@@ -365,7 +371,7 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     COOR_SM->SetSinkNetworkId(remoteNetworkId);
-    FI_HILOGD("The remoteNetworkId:%{public}s", remoteNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGD("The remoteNetworkId:%{public}s", anonyNetworkId(remoteNetworkId).c_str());
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(std::bind(&CoordinationEventManager::OnCoordinationMessage,
         COOR_EVENT_MGR, CoordinationMessage::ACTIVATE, remoteNetworkId));
     if (ret != RET_OK) {
@@ -476,7 +482,7 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-            FI_HILOGD("localNetworkId:%{public}s", localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+            FI_HILOGD("LocalNetworkId:%{public}s", anonyNetworkId(localNetworkId).c_str());
             COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, sinkNetworkId_, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
@@ -486,6 +492,100 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     isStopping_ = false;
     CHKPV(notifyDragCancelCallback_);
     notifyDragCancelCallback_();
+}
+
+int32_t CoordinationSM::FetchRemoteCrossingSwitch(const std::string &remoteNetworkId)
+{
+    CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> remoteCrossingSwitchLock(remoteCrossingSwitchMutex_);
+    if (remoteCrossingSwitch_.find(remoteNetworkId) != remoteCrossingSwitch_.end()) {
+        remoteCrossingSwitch_[remoteNetworkId].isUpdated = false;
+    }
+    auto localNetworkId = COORDINATION::GetLocalNetworkId();
+    if (COOR_SOFTBUS_ADAPTER->FetchRemoteCrossingSwitch(localNetworkId, remoteNetworkId) != RET_OK) {
+        FI_HILOGE("FetchRemoteCrossingSwitch from device:%{public}s failed", anonyNetworkId(remoteNetworkId).c_str());
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void CoordinationSM::SetRemoteCrossingSwitch(const std::string &remoteNetworkId, bool state)
+{
+    CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> remoteCrossingSwitchLock(remoteCrossingSwitchMutex_);
+    auto transfer = [](bool state) -> std::string { return state ? "true" : "false"; };
+    bool originState { false };
+    if (remoteCrossingSwitch_.find(remoteNetworkId) != remoteCrossingSwitch_.end()) {
+        originState = remoteCrossingSwitch_[remoteNetworkId].state;
+    }
+    remoteCrossingSwitch_[remoteNetworkId].state = state;
+    remoteCrossingSwitch_[remoteNetworkId].isUpdated = true;
+    FI_HILOGI("SetRemoteCrossingSwitch for remoteNetworkId%{public}s, %{public}s -> %{public}s",
+        anonyNetworkId(remoteNetworkId).c_str(), transfer(originState).c_str(), transfer(state).c_str());
+    remoteCrossingSwitchCV_.notify_one();
+}
+
+bool CoordinationSM::GetRemoteCrossingSwitch(const std::string &remoteNetworkId)
+{
+    CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> remoteCrossingSwitchLock(remoteCrossingSwitchMutex_);
+    auto callback = [this, &remoteNetworkId]() -> bool {
+        if (remoteCrossingSwitch_.find(remoteNetworkId) == remoteCrossingSwitch_.end()) {
+            FI_HILOGE("No crossing switch state storage for remoteNetworkId:%{public}s",
+                anonyNetworkId(remoteNetworkId).c_str());
+            return false;
+        }
+        return remoteCrossingSwitch_[remoteNetworkId].isUpdated;
+    };
+    if (!remoteCrossingSwitchCV_.wait_for(remoteCrossingSwitchLock,
+        std::chrono::milliseconds(TIME_WAIT_FOR_REMOTE_SWITCH), callback)) {
+        FI_HILOGE("Timeout:%{public}d ms, wait for remoteNetworkId:%{public}s's crossingSwitch failed",
+            TIME_WAIT_FOR_REMOTE_SWITCH, anonyNetworkId(remoteNetworkId).c_str());
+        return false;
+    }
+    if (remoteCrossingSwitch_.find(remoteNetworkId) == remoteCrossingSwitch_.end()) {
+        FI_HILOGE("No crossing switch state storage for remoteNetworkId:%{public}s",
+            anonyNetworkId(remoteNetworkId).c_str());
+        return false;
+    }
+    if (!remoteCrossingSwitch_[remoteNetworkId].isUpdated) {
+        FI_HILOGE("Crossing switch state for remoteNetworkId:%{public}s is not updated",
+            anonyNetworkId(remoteNetworkId).c_str());
+        return false;
+    }
+    return remoteCrossingSwitch_[remoteNetworkId].state;
+}
+
+void CoordinationSM::SendCrossingSwitchToRemote(const std::string &remoteNetworkId)
+{
+    CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> remoteCrossingSwitchLock(remoteCrossingSwitchMutex_);
+    auto localNetworkId = COORDINATION::GetLocalNetworkId();
+    bool localSwitchState = GetCrossingSwitchFromDP(localNetworkId);
+    auto transfer = [](bool state) -> std::string { return state ? "true" : "false"; };
+    FI_HILOGI("LocalSwitchState:%{public}s of networkId:%{public}s",
+        transfer(localSwitchState).c_str(), anonyNetworkId(remoteNetworkId).c_str());
+    if (!remoteNetworkId.empty()) {
+        COOR_SOFTBUS_ADAPTER->SendCrossingSwitchToRemote(localNetworkId, remoteNetworkId, localSwitchState);
+    }
+}
+
+bool CoordinationSM::GetCrossingSwitchFromDP(const std::string &networkId)
+{
+    CALL_INFO_TRACE;
+    return DP_ADAPTER->GetCrossingSwitchState(networkId);
+}
+
+void CoordinationSM::ClearRemoteCrossingSwitch(const std::string &remoteNetworkId)
+{
+    CALL_INFO_TRACE;
+    std::unique_lock<std::mutex> remoteCrossingSwitchLock(remoteCrossingSwitchMutex_);
+    if (remoteCrossingSwitch_.find(remoteNetworkId) == remoteCrossingSwitch_.end()) {
+        FI_HILOGE("Crossing switch state for remoteNetworkId:%{public}s is not updated",
+            anonyNetworkId(remoteNetworkId).c_str());
+        return;
+    }
+    remoteCrossingSwitch_.erase(remoteNetworkId);
 }
 
 void CoordinationSM::StartCoordinationOtherResult(const std::string &remoteNetworkId)
@@ -544,7 +644,6 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
         FI_HILOGE("Not in starting");
         return;
     }
-
     if (!isSuccess) {
         CoordinationDFX::WriteActivateResult(remoteNetworkId, isSuccess);
         FI_HILOGE("Start distributed failed, startDevice:%{public}d", startDeviceId);
@@ -586,7 +685,7 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-            FI_HILOGD("localNetworkId:%{public}s", localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+            FI_HILOGD("LocalNetworkId:%{public}s", anonyNetworkId(localNetworkId).c_str());
             COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
@@ -821,8 +920,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 {
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Online device networkId:%{public}s, localNetworkId:%{public}s",
-        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
-        localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+        anonyNetworkId(networkId).c_str(), anonyNetworkId(localNetworkId).c_str());
     std::lock_guard<std::mutex> guard(mutex_);
     onlineDevice_.push_back(networkId);
     DP_ADAPTER->RegisterCrossingStateListener(networkId,
@@ -835,10 +933,8 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     CALL_INFO_TRACE;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Local device networkId:%{public}s, remote device networkId:%{public}s,"
-        "offline device networkId:%{public}s",
-        localNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
-        sinkNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str(),
-        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+        "offline device networkId:%{public}s", anonyNetworkId(localNetworkId).c_str(),
+        anonyNetworkId(sinkNetworkId_).c_str(), anonyNetworkId(networkId).c_str());
     {
         DP_ADAPTER->UnregisterCrossingStateListener(networkId);
         std::lock_guard<std::mutex> guard(mutex_);
@@ -898,7 +994,7 @@ void CoordinationSM::Dump(int32_t fd)
         "coordinationState:%s | startDeviceDhid:%s | remoteNetworkId:%s | isStarting:%s | isStopping:%s\n"
         "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d | interceptorId:%d | monitorId:%d | filterId:%d\n",
         GetDeviceCoordinationState(currentState_).c_str(), startDeviceDhid_.c_str(),
-        remoteNetworkId_.substr(0, SUBSTR_NETWORKID_LEN).c_str(), isStarting_ ? "true" : "false",
+        anonyNetworkId(remoteNetworkId_).c_str(), isStarting_ ? "true" : "false",
         isStopping_ ? "true" : "false", mouseLocation_.first, mouseLocation_.second, displayX_,
         displayY_, interceptorId_, monitorId_, filterId_);
     if (onlineDevice_.empty()) {
@@ -1126,6 +1222,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::KeyEvent
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         FI_HILOGD("Not mouse event, skip");

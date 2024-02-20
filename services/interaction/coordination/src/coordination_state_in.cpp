@@ -136,7 +136,7 @@ void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     FI_HILOGD("In, remoteNetworkId:%{public}s, startDeviceId:%{public}d",
-        remoteNetworkId.substr(0, SUBSTR_NETWORKID_LEN).c_str(), startDeviceId);
+        anonyNetworkId(remoteNetworkId).c_str(), startDeviceId);
     if (COOR_SM->IsStarting()) {
         FI_HILOGD("Is starting in");
         std::string taskName = "start_finish_task";
