@@ -195,7 +195,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 int32_t DragManager::StopDrag(const DragDropResult &dropResult)
 {
     CALL_INFO_TRACE;
-    FI_HILOGI("windowId:%{public}d", dropResult.windowId);
+    FI_HILOGI("mainWindow:%{public}d", dropResult.mainWindow);
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
@@ -211,14 +211,16 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         ret = RET_ERR;
     }
     SetDragState(DragState::STOP);
-    if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.windowId > 0) {
-        Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.windowId);
+    if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
+        Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
         if (result != Rosen::WMError::WM_OK) {
-            FI_HILOGE("Raise window to top failed, windowId:%{public}d", dropResult.windowId);
+            FI_HILOGE("Raise window to top failed, mainWindow:%{public}d", dropResult.mainWindow);
         }
     }
     stateNotify_.StateChangedNotify(DragState::STOP);
-    if (NotifyDragResult(dropResult.result) != RET_OK) {
+    DragBehavior dragBehavior = dropResult.dragBehavior;
+    GetDragBehavior(dropResult, dragBehavior);
+    if (NotifyDragResult(dropResult.result, dragBehavior) != RET_OK) {
         FI_HILOGE("Notify drag result failed");
     }
     DRAG_DATA_MGR.ResetDragData();
@@ -311,7 +313,7 @@ int32_t DragManager::GetDragState(DragState &dragState)
     return RET_OK;
 }
 
-int32_t DragManager::NotifyDragResult(DragResult result)
+int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavior)
 {
     CALL_INFO_TRACE;
     DragData dragData = DRAG_DATA_MGR.GetDragData();
@@ -322,7 +324,8 @@ int32_t DragManager::NotifyDragResult(DragResult result)
         FI_HILOGE("The invalid result:%{public}d", static_cast<int32_t>(result));
         return RET_ERR;
     }
-    pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid;
+    pkt << dragData.displayX << dragData.displayY << static_cast<int32_t>(result) << targetPid <<
+        static_cast<int32_t>(dragBehavior);
     if (pkt.ChkRWError()) {
         FI_HILOGE("Failed to packet write data");
         return RET_ERR;
@@ -1023,6 +1026,27 @@ DragCursorStyle DragManager::GetRealDragStyle(DragCursorStyle style)
         return DragCursorStyle::COPY;
     }
     return style;
+}
+
+void DragManager::GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior)
+{
+    CALL_DEBUG_ENTER;
+    if (dragBehavior == DragBehavior::UNKNOW) {
+        if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
+            dragBehavior = DragBehavior::COPY;
+            return;
+        }
+        if (dragAction_.load()== DragAction::COPY) {
+            dragBehavior = DragBehavior::COPY;
+            return;
+        }
+        DragData dragData = DRAG_DATA_MGR.GetDragData();
+        if (dropResult.mainWindow == dragData.mainWindow) {
+            dragBehavior = DragBehavior::MOVE;
+        } else {
+            dragBehavior = DragBehavior::COPY;
+        }
+    }
 }
 
 void DragManager::CtrlKeyStyleChangedNotify(DragCursorStyle style, DragAction action)

@@ -57,8 +57,9 @@ bool StopDragParam::Marshalling(MessageParcel &parcel) const
 {
     return (
         parcel.WriteInt32(static_cast<int32_t>(dropResult_.result)) &&
-        parcel.WriteInt32(dropResult_.windowId) &&
-        parcel.WriteBool(dropResult_.hasCustomAnimation)
+        parcel.WriteInt32(dropResult_.mainWindow) &&
+        parcel.WriteBool(dropResult_.hasCustomAnimation) &&
+        parcel.WriteInt32(static_cast<int32_t>(dropResult_.dragBehavior))
     );
 }
 
@@ -71,10 +72,16 @@ bool StopDragParam::Unmarshalling(MessageParcel &parcel)
         return false;
     }
     dropResult_.result = static_cast<DragResult>(result);
-    return (
-        parcel.ReadInt32(dropResult_.windowId) &&
-        parcel.ReadBool(dropResult_.hasCustomAnimation)
-    );
+    if (!parcel.ReadInt32(dropResult_.mainWindow) || !parcel.ReadBool(dropResult_.hasCustomAnimation)) {
+        return false;
+    }
+    int32_t dragBehavior { -1 };
+    if (!parcel.ReadInt32(dragBehavior) ||
+        (dragBehavior < static_cast<int32_t>(DragBehavior::UNKNOW)) ||
+        (dragBehavior > static_cast<int32_t>(DragBehavior::MOVE))) {
+        return false;
+    }
+    return true;
 }
 
 SetDragWindowVisibleParam::SetDragWindowVisibleParam(bool visible)

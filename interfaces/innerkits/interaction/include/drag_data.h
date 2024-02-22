@@ -69,6 +69,7 @@ struct DragData {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
     int32_t displayId { -1 };
+    int32_t mainWindow { -1 };
     bool hasCanceledAnimation { false };
     bool hasCoordinateCorrected { false };
     std::map<std::string, int64_t> summarys;
@@ -104,10 +105,17 @@ enum class DragResult {
     DRAG_EXCEPTION = 3
 };
 
+enum class DragBehavior {
+    UNKNOW = -1,
+    COPY = 0,
+    MOVE = 1
+};
+
 struct DragDropResult {
     DragResult result { DragResult::DRAG_FAIL };
     bool hasCustomAnimation { false };
-    int32_t windowId { -1 };
+    int32_t mainWindow { -1 };
+    DragBehavior dragBehavior { DragBehavior::UNKNOW };
 };
 
 struct DragAnimationData {
@@ -123,6 +131,7 @@ struct DragNotifyMsg {
     int32_t displayY { -1 };
     int32_t targetPid { -1 };
     DragResult result { DragResult::DRAG_FAIL };
+    DragBehavior dragBehavior { DragBehavior::UNKNOW };
 };
 
 enum class PreviewType {
