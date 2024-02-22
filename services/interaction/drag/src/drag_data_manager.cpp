@@ -45,7 +45,7 @@ void DragDataManager::Init(const DragData &dragData)
         FI_HILOGW("Correct the value of displayId(%{public}d) to 0", dragData.displayId);
     }
     targetPid_ = -1;
-    targetTid_ = -1;
+    targetTokenId_ = -1;
 }
 
 void DragDataManager::SetShadowInfos(const std::vector<ShadowInfo> &shadowInfos)
@@ -73,14 +73,14 @@ bool DragDataManager::GetDragWindowVisible() const
     return visible_;
 }
 
-void DragDataManager::SetTargetTid(int32_t targetTid)
+void DragDataManager::SetTargetTokenId(int32_t targetTokenId)
 {
-    targetTid_ = targetTid;
+    targetTokenId_ = targetTokenId;
 }
 
-int32_t DragDataManager::GetTargetTid() const
+int32_t DragDataManager::GetTargetTokenId() const
 {
-    return targetTid_;
+    return targetTokenId_;
 }
 
 void DragDataManager::SetTargetPid(int32_t pid)
@@ -117,7 +117,7 @@ void DragDataManager::ResetDragData()
     previewStyle_ = { };
     dragStyle_ = DragCursorStyle::DEFAULT;
     visible_ = false;
-    targetTid_ = -1;
+    targetTokenId_ = -1;
     targetPid_ = -1;
     isMotionDrag_ = false;
     textEditorAreaFlag_ = false;

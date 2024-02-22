@@ -485,11 +485,11 @@ int32_t DeviceStatusClient::GetDragSummary(std::map<std::string, int64_t> &summa
     return devicestatusProxy_->GetDragSummary(summarys);
 }
 
-int32_t DeviceStatusClient::EnterTextEditorArea(bool enable)
+int32_t DeviceStatusClient::EnableUpperCenterMode(bool enable)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->EnterTextEditorArea(enable);
+    return devicestatusProxy_->EnableUpperCenterMode(enable);
 }
 
 int32_t DeviceStatusClient::AddPrivilege()

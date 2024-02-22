@@ -1494,7 +1494,7 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
 }
 
 
-int32_t DragDrawing::EnterTextEditorArea(bool enable)
+int32_t DragDrawing::EnableUpperCenterMode(bool enable)
 {
     CALL_DEBUG_ENTER;
     if (enable) {
@@ -1515,7 +1515,7 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
         return RET_ERR;
     }
     DRAG_DATA_MGR.SetTextEditorAreaFlag(enable);
-    FI_HILOGI("EnterTextEditorArea %{public}s successfully", (enable ? "true" : "false"));
+    FI_HILOGI("EnableUpperCenterMode %{public}s successfully", (enable ? "true" : "false"));
     return RET_OK;
 }
 

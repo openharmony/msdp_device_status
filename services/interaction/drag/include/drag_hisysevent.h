@@ -47,7 +47,7 @@ public:
     static int32_t WriteDragWindowVisible(const DragState &dragState, bool visible,
         OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteUpdateDragStyle(const DragCursorStyle &style, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static int32_t WriteSendTokenid(int32_t targetTid, const std::string &udKey);
+    static int32_t WriteSendTokenid(int32_t targetTokenId, const std::string &udKey);
     static int32_t WriteStopDrag(const DragState &dragState, const DragDropResult &dropResult,
         OHOS::HiviewDFX::HiSysEvent::EventType type);
     static int32_t WriteNotifyDragResult(const DragResult &result, OHOS::HiviewDFX::HiSysEvent::EventType type);

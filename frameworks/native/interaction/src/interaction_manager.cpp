@@ -179,7 +179,7 @@ int32_t InteractionManager::GetDragAction(DragAction &dragAction)
 
 int32_t InteractionManager::EnterTextEditorArea(bool enable)
 {
-    return INTER_MGR_IMPL.EnterTextEditorArea(enable);
+    return INTER_MGR_IMPL.EnableUpperCenterMode(enable);
 }
 
 int32_t InteractionManager::GetExtraInfo(std::string &extraInfo)

@@ -790,11 +790,11 @@ int32_t DeviceStatusService::SetDragWindowVisible(bool visible, bool isForce)
     return ret;
 }
 
-int32_t DeviceStatusService::EnterTextEditorArea(bool enable)
+int32_t DeviceStatusService::EnableUpperCenterMode(bool enable)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DragManager::EnterTextEditorArea, &dragMgr_, enable));
+        std::bind(&DragManager::EnableUpperCenterMode, &dragMgr_, enable));
     if (ret != RET_OK) {
         FI_HILOGE("Enter Text Editor Area failed, ret:%{public}d", ret);
     }
