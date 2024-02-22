@@ -1032,7 +1032,7 @@ void DragManager::GetDragBehavior(const DragDropResult &dropResult, DragBehavior
 {
     CALL_DEBUG_ENTER;
     if (dropResult.result != DragResult::DRAG_SUCCESS) {
-        dragBehavior == DragBehavior::UNKNOW;
+        dragBehavior = DragBehavior::UNKNOW;
         return;
     }
     if (dragBehavior == DragBehavior::UNKNOW) {
