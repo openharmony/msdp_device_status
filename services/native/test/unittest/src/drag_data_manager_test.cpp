@@ -202,6 +202,12 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest004, TestSize.Level0)
 HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
+    ShadowOffset defaultShadowOffset = {
+        .offsetX = SHADOWINFO_X,
+        .offsetY = SHADOWINFO_Y,
+        .width = PIXEL_MAP_WIDTH,
+        .height = PIXEL_MAP_HEIGHT
+    };
     std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
     EXPECT_FALSE(pixelMap == nullptr);
     DragData dragData;
@@ -212,15 +218,9 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest005, TestSize.Level0)
     DragData dragDataFirst = DRAG_DATA_MGR.GetDragData();
     EXPECT_TRUE(dragDataFirst.displayX == DISPLAY_X);
     EXPECT_TRUE(dragDataFirst.displayY == DISPLAY_Y);
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    int32_t width = 0;
-    int32_t height = 0;
-    DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
-    EXPECT_TRUE(offsetX == SHADOWINFO_X);
-    EXPECT_TRUE(offsetY == SHADOWINFO_Y);
-    EXPECT_TRUE(width == PIXEL_MAP_WIDTH);
-    EXPECT_TRUE(height == PIXEL_MAP_HEIGHT);
+    ShadowOffset shadowOffset;
+    DRAG_DATA_MGR.GetShadowOffset(shadowOffset);
+    EXPECT_EQ(defaultShadowOffset, shadowOffset);
     DRAG_DATA_MGR.ResetDragData();
     DragData dragDataSecond = DRAG_DATA_MGR.GetDragData();
     EXPECT_TRUE(dragDataSecond.displayX == -1);
@@ -240,11 +240,8 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest006, TestSize.Level0)
     dragData.displayX = DISPLAY_X;
     dragData.displayY = DISPLAY_Y;
     DRAG_DATA_MGR.Init(dragData);
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    int32_t width = 0;
-    int32_t height = 0;
-    auto ret = DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
+    ShadowOffset shadowOffset;
+    auto ret = DRAG_DATA_MGR.GetShadowOffset(shadowOffset);
     EXPECT_TRUE(ret == -1);
 }
 

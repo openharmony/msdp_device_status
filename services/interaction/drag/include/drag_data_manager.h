@@ -39,7 +39,7 @@ public:
     DragCursorStyle GetDragStyle() const;
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;
-    int32_t GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height) const;
+    int32_t GetShadowOffset(ShadowOffset &shadowOffset) const;
     void SetTargetTokenId(int32_t tokenId);
     int32_t GetTargetTokenId() const;
     void SetTargetPid(int32_t pid);

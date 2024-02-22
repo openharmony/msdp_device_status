@@ -558,19 +558,8 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel &data, MessageParcel &r
         FI_HILOGE("UnMarshalling dragData failed");
         return E_DEVICESTATUS_READ_PARCEL_ERROR;
     }
-    for (const auto& shadowInfo : dragData.shadowInfos) {
-        CHKPR(shadowInfo.pixelMap, RET_ERR);
-        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
-            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d", shadowInfo.x, shadowInfo.y);
-            return RET_ERR;
-        }
-    }
-    if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
-        (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Start drag invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d",
-            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
+    if (DragDataPacker::CheckDragData(dragData) != RET_OK) {
+        FI_HILOGE("CheckDragData failed");
         return RET_ERR;
     }
     int32_t ret = StartDrag(dragData);
@@ -657,19 +646,16 @@ int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel &data, Messa
 
 int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    int32_t width = 0;
-    int32_t height = 0;
-    int32_t ret = GetShadowOffset(offsetX, offsetY, width, height);
-    if (ret != RET_OK) {
-        FI_HILOGE("Call GetShadowOffsetStub failed, ret:%{public}d", ret);
+    ShadowOffset shadowOffset;
+    if (GetShadowOffset(shadowOffset) != RET_OK) {
+        FI_HILOGE("GetShadowOffset failed");
+        return RET_ERR;
     }
-    WRITEINT32(reply, offsetX, IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(reply, offsetY, IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(reply, width, IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEINT32(reply, height, IPC_STUB_WRITE_PARCEL_ERR);
-    return ret;
+    if (ShadowOffsetPacker::Marshalling(shadowOffset, reply) != RET_OK) {
+        FI_HILOGE("Marshalling shadowOffset failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel &data, MessageParcel &reply)
@@ -677,15 +663,12 @@ int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel &data, MessagePar
     auto pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     ShadowInfo shadowInfo;
-    shadowInfo.pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(pixelMap);
-    READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    CHKPR(shadowInfo.pixelMap, RET_ERR);
-    if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
-        (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
-        (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            shadowInfo.x, shadowInfo.y);
+    if (ShadowPacker::UnPackShadowInfo(data, shadowInfo) != RET_OK) {
+        FI_HILOGE("UnPackShadowInfo failed");
+        return RET_ERR;
+    }
+    if (ShadowPacker::CheckShadowInfo(shadowInfo) != RET_OK) {
+        FI_HILOGE("CheckShadowInfo failed");
         return RET_ERR;
     }
     int32_t ret = UpdateShadowPic(shadowInfo);
