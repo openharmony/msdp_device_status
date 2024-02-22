@@ -1031,6 +1031,10 @@ DragCursorStyle DragManager::GetRealDragStyle(DragCursorStyle style)
 void DragManager::GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior)
 {
     CALL_DEBUG_ENTER;
+    if (dropResult.result != DragResult::DRAG_SUCCESS) {
+        dragBehavior == DragBehavior::UNKNOW;
+        return;
+    }
     if (dragBehavior == DragBehavior::UNKNOW) {
         if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
             dragBehavior = DragBehavior::COPY;
