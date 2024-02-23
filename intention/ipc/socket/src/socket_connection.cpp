@@ -55,6 +55,7 @@ std::shared_ptr<SocketConnection> SocketConnection::Connect(std::function<int32_
 
 void SocketConnection::OnReadable(int32_t fd)
 {
+    CALL_DEBUG_ENTER;
     char buf[MAX_PACKET_BUF_SIZE] {};
     ssize_t numRead;
 

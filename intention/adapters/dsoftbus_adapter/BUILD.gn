@@ -34,7 +34,6 @@ ohos_source_set("intention_dsoftbus_adapter") {
   sources = [
     "src/dsoftbus_adapter.cpp",
     "src/dsoftbus_adapter_impl.cpp",
-    "src/i_dsoftbus_adapter.cpp",
   ]
 
   public_configs = [ ":intention_dsoftbus_adapter_public_config" ]

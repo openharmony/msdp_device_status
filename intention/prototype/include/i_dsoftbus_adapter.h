@@ -31,7 +31,7 @@ public:
 
     virtual void OnBind(const std::string &networkId) = 0;
     virtual void OnShutdown(const std::string &networkId) = 0;
-    virtual void OnPacket(const std::string &networkId, NetPacket &packet) = 0;
+    virtual bool OnPacket(const std::string &networkId, NetPacket &packet) = 0;
 };
 
 class IDSoftbusAdapter {

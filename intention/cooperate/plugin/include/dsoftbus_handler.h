@@ -20,7 +20,7 @@
 
 #include "channel.h"
 #include "cooperate_events.h"
-#include "i_dsoftbus_adapter.h"
+#include "i_context.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -42,9 +42,9 @@ class DSoftbusHandler final {
             parent_.OnShutdown(networkId);
         }
 
-        void OnPacket(const std::string &networkId, NetPacket &packet) override
+        bool OnPacket(const std::string &networkId, NetPacket &packet) override
         {
-            parent_.OnPacket(networkId, packet);
+            return parent_.OnPacket(networkId, packet);
         }
 
     private:
@@ -52,34 +52,40 @@ class DSoftbusHandler final {
     };
 
 public:
-    DSoftbusHandler();
+    DSoftbusHandler(IContext *env);
     ~DSoftbusHandler();
     DISALLOW_COPY_AND_MOVE(DSoftbusHandler);
 
     void AttachSender(Channel<CooperateEvent>::Sender sender);
-    int32_t Enable();
-    void Disable();
-
     int32_t OpenSession(const std::string &networkId);
     void CloseSession(const std::string &networkId);
 
     int32_t StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event);
     int32_t StartCooperateResponse(const std::string &networkId, const DSoftbusStartCooperateResponse &event);
     int32_t StartCooperateFinish(const std::string &networkId, const DSoftbusStartCooperateFinished &event);
+    int32_t StopCooperate(const std::string &networkId, const DSoftbusStopCooperate &event);
+    int32_t ComeBack(const std::string &networkId, const DSoftbusComeBack &event);
+    int32_t RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event);
 
     static std::string GetLocalNetworkId();
 
 private:
     void OnBind(const std::string &networkId);
     void OnShutdown(const std::string &networkId);
-    void OnPacket(const std::string &networkId, NetPacket &packet);
+    bool OnPacket(const std::string &networkId, NetPacket &packet);
     void SendEvent(const CooperateEvent &event);
-    void OnStartCooperate(NetPacket &packet);
+    void OnCommunicationFailure(const std::string &networkId);
+    void OnStartCooperate(const std::string &networkId, NetPacket &packet);
+    void OnStartCooperateResponse(const std::string &networkId, NetPacket &packet);
+    void OnStartCooperateFinish(const std::string &networkId, NetPacket &packet);
+    void OnStopCooperate(const std::string &networkId, NetPacket &packet);
+    void OnComeBack(const std::string &networkId, NetPacket &packet);
+    void OnRelayCooperate(const std::string &networkId, NetPacket &packet);
 
+    IContext *env_ { nullptr };
     std::mutex lock_;
     Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
-    std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

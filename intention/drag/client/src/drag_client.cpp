@@ -140,7 +140,7 @@ int32_t DragClient::RemoveSubscriptListener(ITunnelClient &tunnel, SubscriptList
     return RET_ERR;
 }
 
-int32_t DragClient::SetDragWindowVisible(ITunnelClient &tunnel, bool visible)
+int32_t DragClient::SetDragWindowVisible(ITunnelClient &tunnel, bool visible, bool isForce)
 {
     return RET_ERR;
 }

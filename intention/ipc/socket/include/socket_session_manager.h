@@ -38,6 +38,7 @@ public:
     int32_t Init();
 
     void AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback) override;
+    void RemoveSessionDeletedCallback(int32_t pid) override;
     int32_t AllocSocketFd(const std::string& programName, int32_t moduleType, int32_t tokenType,
                           int32_t uid, int32_t pid, int32_t& clientFd) override;
     SocketSessionPtr FindSessionByPid(int32_t pid) const override;

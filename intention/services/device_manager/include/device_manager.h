@@ -49,6 +49,7 @@ public:
     int32_t AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer) override;
     void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) override;
     void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) override;
+    bool AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred) override;
 
 private:
     class HotplugHandler final : public IDeviceMgr {

@@ -42,6 +42,13 @@ public:
 
     virtual int32_t AddFilter(std::function<bool(std::shared_ptr<MMI::PointerEvent>)> callback) = 0;
     virtual void RemoveFilter(int32_t filterId) = 0;
+
+    virtual int32_t SetPointerVisibility(bool visible) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t EnableInputDevice(bool enable) = 0;
+
+    virtual void SimulateInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) = 0;
+    virtual void SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

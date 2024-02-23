@@ -17,6 +17,7 @@
 
 #include "devicestatus_define.h"
 #include "dsoftbus_adapter.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -26,18 +27,16 @@ namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DSoftbusHandler" };
 }
 
-DSoftbusHandler::DSoftbusHandler()
+DSoftbusHandler::DSoftbusHandler(IContext *env)
+    : env_(env)
 {
-    dsoftbus_ = std::make_unique<DSoftbusAdapter>();
     observer_ = std::make_shared<DSoftbusObserver>(*this);
-    dsoftbus_->AddObserver(observer_);
+    env_->GetDSoftbus().AddObserver(observer_);
 }
 
 DSoftbusHandler::~DSoftbusHandler()
 {
-    if (dsoftbus_ != nullptr) {
-        dsoftbus_->RemoveObserver(observer_);
-    }
+    env_->GetDSoftbus().RemoveObserver(observer_);
 }
 
 void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
@@ -47,56 +46,105 @@ void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
     sender_ = sender;
 }
 
-int32_t DSoftbusHandler::Enable()
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(dsoftbus_, RET_ERR);
-    return dsoftbus_->Enable();
-}
-
-void DSoftbusHandler::Disable()
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(dsoftbus_);
-    dsoftbus_->Disable();
-}
-
 int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
-    CHKPR(dsoftbus_, RET_ERR);
-    return dsoftbus_->OpenSession(networkId);
+    CALL_INFO_TRACE;
+    return env_->GetDSoftbus().OpenSession(networkId);
 }
 
 void DSoftbusHandler::CloseSession(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
-    CHKPV(dsoftbus_);
-    dsoftbus_->CloseSession(networkId);
+    CALL_INFO_TRACE;
+    env_->GetDSoftbus().CloseSession(networkId);
 }
 
 int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event)
 {
-    NetPacket packet(MessageId::START_REMOTE_COOPERATE);
-    packet << event.networkId;
-    if (packet.ChkRWError()) {
-        FI_HILOGE("Failed to write data packet");
-        return RET_ERR;
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
     }
-    CHKPR(dsoftbus_, RET_ERR);
-    return dsoftbus_->SendPacket(networkId, packet);
+    return ret;
 }
 
 int32_t DSoftbusHandler::StartCooperateResponse(const std::string &networkId,
     const DSoftbusStartCooperateResponse &event)
 {
-    return RET_ERR;
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE_RESPONSE);
+    packet << event.normal;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to write data packet");
+        return RET_ERR;
+    }
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
+    }
+    return ret;
 }
 
 int32_t DSoftbusHandler::StartCooperateFinish(const std::string &networkId,
     const DSoftbusStartCooperateFinished &event)
 {
-    return RET_ERR;
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE_FINISHED);
+    packet << event.originNetworkId << event.cursorPos.x
+        << event.cursorPos.y << event.success;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to write data packet");
+        return RET_ERR;
+    }
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
+    }
+    return ret;
+}
+
+int32_t DSoftbusHandler::StopCooperate(const std::string &networkId, const DSoftbusStopCooperate &event)
+{
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_STOP_COOPERATE);
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
+    }
+    return ret;
+}
+
+int32_t DSoftbusHandler::ComeBack(const std::string &networkId, const DSoftbusComeBack &event)
+{
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_COME_BACK);
+    packet << event.originNetworkId << event.cursorPos.x << event.cursorPos.y;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to write data packet");
+        return RET_ERR;
+    }
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
+    }
+    return ret;
+}
+
+int32_t DSoftbusHandler::RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event)
+{
+    CALL_INFO_TRACE;
+    NetPacket packet(MessageId::DSOFTBUS_RELAY_COOPERATE);
+    packet << event.targetNetworkId;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to write data packet");
+        return RET_ERR;
+    }
+    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
+    if (ret != RET_OK) {
+        OnCommunicationFailure(networkId);
+    }
+    return ret;
 }
 
 std::string DSoftbusHandler::GetLocalNetworkId()
@@ -105,10 +153,18 @@ std::string DSoftbusHandler::GetLocalNetworkId()
 }
 
 void DSoftbusHandler::OnBind(const std::string &networkId)
-{}
+{
+    FI_HILOGI("Bind to \'%{public}s\'", Utility::Anonymize(networkId));
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_SESSION_OPEND,
+        DSoftbusSessionOpened {
+            .networkId = networkId
+        }));
+}
 
 void DSoftbusHandler::OnShutdown(const std::string &networkId)
 {
+    FI_HILOGI("Connection with \'%{public}s\' shutdown", Utility::Anonymize(networkId));
     SendEvent(CooperateEvent(
         CooperateEventType::DSOFTBUS_SESSION_CLOSED,
         DSoftbusSessionClosed {
@@ -116,17 +172,39 @@ void DSoftbusHandler::OnShutdown(const std::string &networkId)
         }));
 }
 
-void DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
+bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
 {
+    CALL_DEBUG_ENTER;
     switch (packet.GetMsgId()) {
-        case MessageId::START_REMOTE_COOPERATE: {
-            OnStartCooperate(packet);
+        case MessageId::DSOFTBUS_START_COOPERATE: {
+            OnStartCooperate(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_START_COOPERATE_RESPONSE: {
+            OnStartCooperateResponse(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_START_COOPERATE_FINISHED: {
+            OnStartCooperateFinish(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_STOP_COOPERATE: {
+            OnStopCooperate(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_COME_BACK: {
+            OnComeBack(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_RELAY_COOPERATE: {
+            OnRelayCooperate(networkId, packet);
             break;
         }
         default: {
-            break;
+            return false;
         }
     }
+    return true;
 }
 
 void DSoftbusHandler::SendEvent(const CooperateEvent &event)
@@ -135,16 +213,105 @@ void DSoftbusHandler::SendEvent(const CooperateEvent &event)
     sender_.Send(event);
 }
 
-void DSoftbusHandler::OnStartCooperate(NetPacket &packet)
+void DSoftbusHandler::OnCommunicationFailure(const std::string &networkId)
 {
-    DSoftbusStartCooperate event;
-    packet >> event.networkId;
+    env_->GetDSoftbus().CloseSession(networkId);
+    FI_HILOGI("Notify communication failure with peer(%{public}s)", Utility::Anonymize(networkId));
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        DSoftbusSessionClosed {
+            .networkId = networkId
+        }));
+}
+
+void DSoftbusHandler::OnStartCooperate(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusStartCooperate event {
+        .networkId = networkId,
+        .normal = true,
+    };
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        event));
+}
+
+void DSoftbusHandler::OnStartCooperateResponse(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusStartCooperateResponse event {
+        .networkId = networkId,
+    };
+    packet >> event.normal;
     if (packet.ChkRWError()) {
-        FI_HILOGE("Failed to read from data packet");
+        FI_HILOGE("Failed to read data packet");
         return;
     }
     SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_START_COOPERATE,
+        CooperateEventType::DSOFTBUS_START_COOPERATE_RESPONSE,
+        event));
+}
+
+void DSoftbusHandler::OnStartCooperateFinish(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusStartCooperateFinished event {
+        .networkId = networkId,
+    };
+    packet >> event.originNetworkId >> event.cursorPos.x
+        >> event.cursorPos.y >> event.success;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_START_COOPERATE_FINISHED,
+        event));
+}
+
+void DSoftbusHandler::OnStopCooperate(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusStopCooperate event {
+        .networkId = networkId,
+        .normal = true,
+    };
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_STOP_COOPERATE,
+        event));
+}
+
+void DSoftbusHandler::OnComeBack(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusComeBack event {
+        .networkId = networkId,
+        .success = true,
+    };
+    packet >> event.originNetworkId >> event.cursorPos.x >> event.cursorPos.y;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_COME_BACK,
+        event));
+}
+
+void DSoftbusHandler::OnRelayCooperate(const std::string &networkId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusRelayCooperate event {
+        .networkId = networkId,
+        .normal = true,
+    };
+    packet >> event.targetNetworkId;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_RELAY_COOPERATE,
         event));
 }
 } // namespace Cooperate
