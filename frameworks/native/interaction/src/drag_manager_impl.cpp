@@ -18,6 +18,7 @@
 #include "devicestatus_client.h"
 #include "devicestatus_define.h"
 #include "drag_data.h"
+#include "drag_data_packer.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -41,22 +42,9 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<ISt
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
-    for (const auto& shadowInfo : dragData.shadowInfos) {
-        CHKPR(shadowInfo.pixelMap, RET_ERR);
-        if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
-            (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
-            (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-            FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-                shadowInfo.x, shadowInfo.y);
-            return RET_ERR;
-        }
-    }
-    if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
-        (dragData.displayX < 0) || (dragData.displayY < 0)) {
-        FI_HILOGE("Start drag, invalid argument, dragNum:%{public}d, bufferSize:%{public}zu, "
-            "displayX:%{public}d, displayY:%{public}d",
-            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
-        return RET_ERR;
+    if (DragDataPacker::CheckDragData(dragData) != RET_OK) {
+        FI_HILOGE("CheckDragData failed");
+        return ERR_INVALID_VALUE;
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
@@ -244,22 +232,18 @@ int32_t DragManagerImpl::SetDragWindowVisible(bool visible, bool isForce)
     return DeviceStatusClient::GetInstance().SetDragWindowVisible(visible, isForce);
 }
 
-int32_t DragManagerImpl::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t DragManagerImpl::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
-    return DeviceStatusClient::GetInstance().GetShadowOffset(offsetX, offsetY, width, height);
+    return DeviceStatusClient::GetInstance().GetShadowOffset(shadowOffset);
 }
 
 int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(shadowInfo.pixelMap, RET_ERR);
-    if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
-        (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) ||
-        (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
-        FI_HILOGE("Invalid parameter, shadowInfox:%{public}d, shadowInfoy:%{public}d",
-            shadowInfo.x, shadowInfo.y);
-        return RET_ERR;
+    if (ShadowPacker::CheckShadowInfo(shadowInfo) != RET_OK) {
+        FI_HILOGE("CheckShadowInfo failed");
+        return ERR_INVALID_VALUE;
     }
     return DeviceStatusClient::GetInstance().UpdateShadowPic(shadowInfo);
 }
