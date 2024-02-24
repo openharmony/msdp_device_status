@@ -34,19 +34,19 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool
         FI_HILOGE("Marshalling shadowInfos failed");
         return RET_ERR;
     }
-    WRITEUINT8VECTOR(data, dragData.buffer, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.udKey, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.extraInfo, ERR_INVALID_VALUE);
-    WRITESTRING(data, dragData.filterInfo, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.sourceType, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.dragNum, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.pointerId, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayX, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayY, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.displayId, ERR_INVALID_VALUE);
-    WRITEINT32(data, dragData.mainWindow, ERR_INVALID_VALUE);
-    WRITEBOOL(data, dragData.hasCanceledAnimation, ERR_INVALID_VALUE);
-    WRITEBOOL(data, dragData.hasCoordinateCorrected, ERR_INVALID_VALUE);
+    WRITEUINT8VECTOR(data, dragData.buffer, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITESTRING(data, dragData.udKey, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITESTRING(data, dragData.extraInfo, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITESTRING(data, dragData.filterInfo, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.sourceType, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.dragNum, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.pointerId, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.displayX, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.displayY, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.displayId, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.mainWindow, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEBOOL(data, dragData.hasCoordinateCorrected, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     if (SummaryPacker::Marshalling(dragData.summarys, data) != RET_OK) {
         FI_HILOGE("Marshalling summary failed");
         return RET_ERR;
@@ -76,6 +76,24 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData, bool isC
     READBOOL(data, dragData.hasCoordinateCorrected, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (SummaryPacker::UnMarshalling(data, dragData.summarys) != RET_OK) {
         FI_HILOGE("Unmarshalling summary failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragDataPacker::CheckDragData(const DragData &dragData)
+{
+    for (const auto& shadowInfo : dragData.shadowInfos) {
+        if (ShadowPacker::CheckShadowInfo(shadowInfo) != RET_OK) {
+            FI_HILOGE("CheckShadowInfo failed");
+            return RET_ERR;
+        }
+    }
+    if ((dragData.dragNum <= 0) || (dragData.buffer.size() > MAX_BUFFER_SIZE) ||
+        (dragData.displayX < 0) || (dragData.displayY < 0)) {
+        FI_HILOGE("Start drag invalid parameter, dragNum:%{public}d, bufferSize:%{public}zu, "
+            "displayX:%{public}d, displayY:%{public}d",
+            dragData.dragNum, dragData.buffer.size(), dragData.displayX, dragData.displayY);
         return RET_ERR;
     }
     return RET_OK;
@@ -135,7 +153,7 @@ int32_t ShadowPacker::PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &dat
             FI_HILOGE("EncodeTlv pixelMap failed");
             return ERR_INVALID_VALUE;
         }
-        WRITEUINT8VECTOR(data, pixelBuffer, ERR_INVALID_VALUE);
+        WRITEUINT8VECTOR(data, pixelBuffer, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     } else {
         FI_HILOGD("By Marshalling");
         if (!shadowInfo.pixelMap->Marshalling(data)) {
@@ -143,8 +161,8 @@ int32_t ShadowPacker::PackUpShadowInfo(const ShadowInfo &shadowInfo, Parcel &dat
             return ERR_INVALID_VALUE;
         }
     }
-    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
+    WRITEINT32(data, shadowInfo.x, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, shadowInfo.y, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     return RET_OK;
 }
 
@@ -166,6 +184,17 @@ int32_t ShadowPacker::UnPackShadowInfo(Parcel &data, ShadowInfo &shadowInfo, boo
     CHKPR(shadowInfo.pixelMap, RET_ERR);
     READINT32(data, shadowInfo.x, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, shadowInfo.y, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    return RET_OK;
+}
+
+int32_t ShadowPacker::CheckShadowInfo(const ShadowInfo &shadowInfo)
+{
+    CHKPR(shadowInfo.pixelMap, RET_ERR);
+    if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
+        (shadowInfo.x < -shadowInfo.pixelMap->GetWidth()) || (shadowInfo.y < -shadowInfo.pixelMap->GetHeight())) {
+        FI_HILOGE("Invalid parameter, shadowInfoX:%{public}d, shadowInfoY:%{public}d", shadowInfo.x, shadowInfo.y);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -193,6 +222,24 @@ int32_t SummaryPacker::UnMarshalling(Parcel &parcel, SummaryMap &val)
         READSTRING(parcel, key, E_DEVICESTATUS_READ_PARCEL_ERROR);
         READINT64(parcel, val[key], E_DEVICESTATUS_READ_PARCEL_ERROR);
     }
+    return RET_OK;
+}
+
+int32_t ShadowOffsetPacker::Marshalling(const ShadowOffset&shadowOffset, Parcel &parcel)
+{
+    WRITEINT32(parcel, shadowOffset.offsetX, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(parcel, shadowOffset.offsetY, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(parcel, shadowOffset.width, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(parcel, shadowOffset.height, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    return RET_OK;
+}
+
+int32_t ShadowOffsetPacker::UnMarshalling(Parcel &parcel, ShadowOffset&shadowOffset)
+{
+    READINT32(parcel, shadowOffset.offsetX, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(parcel, shadowOffset.offsetY, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(parcel, shadowOffset.width, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(parcel, shadowOffset.height, E_DEVICESTATUS_READ_PARCEL_ERROR);
     return RET_OK;
 }
 } // namespace DeviceStatus

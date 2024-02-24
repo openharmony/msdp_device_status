@@ -773,9 +773,9 @@ int32_t DragManager::OnSetDragWindowVisible(bool visible, bool isForce)
     return RET_OK;
 }
 
-int32_t DragManager::OnGetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t DragManager::OnGetShadowOffset(ShadowOffset &shadowOffset)
 {
-    return DRAG_DATA_MGR.GetShadowOffset(offsetX, offsetY, width, height);
+    return DRAG_DATA_MGR.GetShadowOffset(shadowOffset);
 }
 
 void DragManager::RegisterStateChange(std::function<void(DragState)> callback)
@@ -1032,10 +1032,10 @@ void DragManager::GetDragBehavior(const DragDropResult &dropResult, DragBehavior
 {
     CALL_DEBUG_ENTER;
     if (dropResult.result != DragResult::DRAG_SUCCESS) {
-        dragBehavior = DragBehavior::UNKNOW;
+        dragBehavior = DragBehavior::UNKNOWN;
         return;
     }
-    if (dragBehavior == DragBehavior::UNKNOW) {
+    if (dragBehavior == DragBehavior::UNKNOWN) {
         if (DRAG_DATA_MGR.GetDragStyle() == DragCursorStyle::COPY) {
             dragBehavior = DragBehavior::COPY;
             return;

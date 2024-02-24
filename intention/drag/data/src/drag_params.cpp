@@ -77,7 +77,7 @@ bool StopDragParam::Unmarshalling(MessageParcel &parcel)
     }
     int32_t dragBehavior { -1 };
     if (!parcel.ReadInt32(dragBehavior) ||
-        (dragBehavior < static_cast<int32_t>(DragBehavior::UNKNOW)) ||
+        (dragBehavior < static_cast<int32_t>(DragBehavior::UNKNOWN)) ||
         (dragBehavior > static_cast<int32_t>(DragBehavior::MOVE))) {
         return false;
     }

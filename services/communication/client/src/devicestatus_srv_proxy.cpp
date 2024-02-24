@@ -626,7 +626,7 @@ int32_t DeviceStatusSrvProxy::SetDragWindowVisible(bool visible, bool isForce)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t DeviceStatusSrvProxy::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -643,12 +643,10 @@ int32_t DeviceStatusSrvProxy::GetShadowOffset(int32_t &offsetX, int32_t &offsetY
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
-    READINT32(reply, offsetX, IPC_PROXY_DEAD_OBJECT_ERR);
-    READINT32(reply, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
-    READINT32(reply, width, IPC_PROXY_DEAD_OBJECT_ERR);
-    READINT32(reply, height, IPC_PROXY_DEAD_OBJECT_ERR);
-    FI_HILOGD("offsetX:%{public}d, offsetY:%{public}d, width:%{public}d, height:%{public}d",
-        offsetX, offsetY, width, height);
+    if (ShadowOffsetPacker::UnMarshalling(reply, shadowOffset) != RET_OK) {
+        FI_HILOGE("UnMarshalling offset failed");
+        return RET_ERR;
+    }
     return ret;
 }
 
@@ -660,13 +658,10 @@ int32_t DeviceStatusSrvProxy::UpdateShadowPic(const ShadowInfo &shadowInfo)
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    CHKPR(shadowInfo.pixelMap, RET_ERR);
-    if (!shadowInfo.pixelMap->Marshalling(data)) {
-        FI_HILOGE("Failed to marshalling pixelMap");
+    if (ShadowPacker::PackUpShadowInfo(shadowInfo, data) != RET_OK) {
+        FI_HILOGE("PackUpShadowInfo failed");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, shadowInfo.x, ERR_INVALID_VALUE);
-    WRITEINT32(data, shadowInfo.y, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageParcel reply;

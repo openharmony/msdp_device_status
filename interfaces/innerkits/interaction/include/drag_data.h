@@ -106,7 +106,7 @@ enum class DragResult {
 };
 
 enum class DragBehavior {
-    UNKNOW = -1,
+    UNKNOWN = -1,
     COPY = 0,
     MOVE = 1
 };
@@ -115,7 +115,7 @@ struct DragDropResult {
     DragResult result { DragResult::DRAG_FAIL };
     bool hasCustomAnimation { false };
     int32_t mainWindow { -1 };
-    DragBehavior dragBehavior { DragBehavior::UNKNOW };
+    DragBehavior dragBehavior { DragBehavior::UNKNOWN };
 };
 
 struct DragAnimationData {
@@ -131,7 +131,7 @@ struct DragNotifyMsg {
     int32_t displayY { -1 };
     int32_t targetPid { -1 };
     DragResult result { DragResult::DRAG_FAIL };
-    DragBehavior dragBehavior { DragBehavior::UNKNOW };
+    DragBehavior dragBehavior { DragBehavior::UNKNOWN };
 };
 
 enum class PreviewType {
