@@ -34,6 +34,7 @@ public:
     virtual int32_t AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
     virtual void RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer) = 0;
     virtual void RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer) = 0;
+    virtual bool AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -80,8 +80,13 @@ public:
 
 private:
     int32_t GenerateRequestID();
+    void OnDevCooperateListener(const std::string &networkId, CoordinationMessage msg);
+    void OnCooperateMessageEvent(int32_t userData, const std::string &networkId, CoordinationMessage msg);
+    void OnCooperateStateEvent(int32_t userData, bool state);
+    void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
 
     std::list<CooperateListenerPtr> devCooperateListener_;
+    std::list<HotAreaListenerPtr> devHotAreaListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;
     std::atomic_bool isListeningProcess_ { false };

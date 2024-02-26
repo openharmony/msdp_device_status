@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
 #include <limits>
 #include <map>
 #include <regex>
@@ -39,6 +40,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
+constexpr size_t ANONYMIZED_ID_SIZE { 32 };
+constexpr size_t ID_PART_SIZE { 4 };
+constexpr size_t FULL_MASKED_ID_SIZE { 12 };
+constexpr size_t MASK_SIZE { 6 };
 } // namespace
 
 size_t Utility::CopyNulstr(char *dest, size_t size, const char *src)
@@ -105,6 +110,51 @@ bool Utility::IsInteger(const std::string &target)
 {
     std::regex pattern("^\\s*-?(0|([1-9]\\d*))\\s*$");
     return std::regex_match(target, pattern);
+}
+
+const char* Utility::Anonymize(const char *id) noexcept
+{
+    static char idBuf[ANONYMIZED_ID_SIZE] {};
+    char *pBuf = idBuf;
+    size_t bufSize = sizeof(idBuf);
+    size_t idLen;
+    errno_t err;
+
+    if (id == nullptr) {
+        goto FULL_MASK;
+    }
+    idLen = std::strlen(id);
+    if (idLen < FULL_MASKED_ID_SIZE) {
+        goto FULL_MASK;
+    }
+    err = ::memcpy_s(pBuf, bufSize, id, ID_PART_SIZE);
+    if (err != EOK) {
+        goto FULL_MASK;
+    }
+    pBuf += ID_PART_SIZE;
+    bufSize -= ID_PART_SIZE;
+
+    err = ::memset_s(pBuf, bufSize, '*', MASK_SIZE);
+    if (err != EOK) {
+        goto FULL_MASK;
+    }
+    pBuf += MASK_SIZE;
+    bufSize -= MASK_SIZE;
+
+    err = ::strcpy_s(pBuf, bufSize, &id[idLen - ID_PART_SIZE]);
+    if (err != EOK) {
+        goto FULL_MASK;
+    }
+    return idBuf;
+
+FULL_MASK:
+    char *tp = idBuf + MASK_SIZE;
+
+    for (pBuf = idBuf; pBuf < tp; ++pBuf) {
+        *pBuf = '*';
+    }
+    *pBuf = '\0';
+    return idBuf;
 }
 
 bool Utility::DoesFileExist(const char *path)
@@ -214,6 +264,12 @@ void Utility::ShowUserAndGroup()
             FI_HILOGD("%{public}20s:%{public}10u%{public}20s", "SUPPLEMENTARY GROUP", groups[i], grp.gr_name);
         }
     }
+}
+
+int64_t Utility::GetSysClockTime()
+{
+    return std::chrono::time_point_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now()).time_since_epoch().count();
 }
 } // namespace DeviceStatus
 } // namespace Msdp

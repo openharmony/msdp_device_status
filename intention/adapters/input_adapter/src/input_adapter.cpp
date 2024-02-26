@@ -151,6 +151,31 @@ void InputAdapter::RemoveFilter(int32_t filterId)
 {
     MMI::InputManager::GetInstance()->RemoveInputEventFilter(filterId);
 }
+
+int32_t InputAdapter::SetPointerVisibility(bool visible)
+{
+    return MMI::InputManager::GetInstance()->SetPointerVisible(visible);
+}
+
+int32_t InputAdapter::SetPointerLocation(int32_t x, int32_t y)
+{
+    return MMI::InputManager::GetInstance()->SetPointerLocation(x, y);
+}
+
+int32_t InputAdapter::EnableInputDevice(bool enable)
+{
+    return MMI::InputManager::GetInstance()->EnableInputDevice(enable);
+}
+
+void InputAdapter::SimulateInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+    MMI::InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+void InputAdapter::SimulateInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent)
+{
+    MMI::InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

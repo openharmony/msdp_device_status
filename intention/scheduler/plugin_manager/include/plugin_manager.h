@@ -17,6 +17,7 @@
 #define PLUGIN_MANAGER_H
 
 #include <memory>
+#include <mutex>
 
 #include <dlfcn.h>
 
@@ -54,11 +55,9 @@ class PluginManager final : public IPluginManager {
     using DestroyPlugin = void (*)(IPlugin *);
 
 public:
-    PluginManager() = default;
+    PluginManager(IContext *context) : context_(context) {}
     ~PluginManager() = default;
     DISALLOW_COPY_AND_MOVE(PluginManager);
-
-    void Init(IContext *context);
 
     ICooperate* LoadCooperate() override;
     void UnloadCooperate() override;
@@ -68,6 +67,7 @@ private:
     std::unique_ptr<Plugin<IPlugin>> LoadLibrary(IContext *context, const char *libPath);
 
 private:
+    std::mutex lock_;
     IContext *context_ { nullptr };
     std::unique_ptr<Plugin<ICooperate>> cooperate_ { nullptr };
 };

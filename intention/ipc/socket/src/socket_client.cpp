@@ -95,6 +95,7 @@ int32_t SocketClient::Socket()
 
 void SocketClient::OnPacket(NetPacket &pkt)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     OnMsgHandler(*this, pkt);
 }

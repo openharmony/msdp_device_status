@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "devicestatus_define.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -35,6 +36,7 @@ DDMAdapterImpl::~DDMAdapterImpl()
 
 int32_t DDMAdapterImpl::Enable()
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     std::string pkgName(FI_PKG_NAME);
     std::string extra;
@@ -68,6 +70,7 @@ INIT_FAIL:
 
 void DDMAdapterImpl::Disable()
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     std::string pkgName(FI_PKG_NAME);
 
@@ -89,6 +92,7 @@ void DDMAdapterImpl::Disable()
 
 void DDMAdapterImpl::AddBoardObserver(std::shared_ptr<IBoardObserver> observer)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     CHKPV(observer);
     observers_.erase(Observer());
@@ -97,6 +101,7 @@ void DDMAdapterImpl::AddBoardObserver(std::shared_ptr<IBoardObserver> observer)
 
 void DDMAdapterImpl::RemoveBoardObserver(std::shared_ptr<IBoardObserver> observer)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     CHKPV(observer);
     observers_.erase(Observer());
@@ -107,7 +112,9 @@ void DDMAdapterImpl::RemoveBoardObserver(std::shared_ptr<IBoardObserver> observe
 
 void DDMAdapterImpl::OnBoardOnline(const std::string &networkId)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
+    FI_HILOGI("Board \'%{public}s\' is online", Utility::Anonymize(networkId));
     std::for_each(observers_.cbegin(), observers_.cend(),
         [&networkId](const auto &item) {
             if (auto observer = item.Lock(); observer != nullptr) {
@@ -118,7 +125,9 @@ void DDMAdapterImpl::OnBoardOnline(const std::string &networkId)
 
 void DDMAdapterImpl::OnBoardOffline(const std::string &networkId)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
+    FI_HILOGI("Board \'%{public}s\' is offline", Utility::Anonymize(networkId));
     std::for_each(observers_.cbegin(), observers_.cend(),
         [&networkId](const auto &item) {
             if (auto observer = item.Lock(); observer != nullptr) {
