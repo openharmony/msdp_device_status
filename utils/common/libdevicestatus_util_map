@@ -37,6 +37,7 @@
             "OHOS::Msdp::DeviceStatus::StringSplit(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>>&)";
             "OHOS::Msdp::DeviceStatus::StringPrintf(char const*, ...)";
             "OHOS::Msdp::DeviceStatus::GetAnonyString(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+            "OHOS::Msdp::DeviceStatus::AnonyNetworkId(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::DragDataPacker::Marshalling(OHOS::Msdp::DeviceStatus::DragData const&, OHOS::Parcel&, bool)";
             "OHOS::Msdp::DeviceStatus::DragDataPacker::UnMarshalling(OHOS::Parcel&, OHOS::Msdp::DeviceStatus::DragData&, bool)";
             "OHOS::Msdp::DeviceStatus::DragDataPacker::CheckDragData(OHOS::Msdp::DeviceStatus::DragData const&)";

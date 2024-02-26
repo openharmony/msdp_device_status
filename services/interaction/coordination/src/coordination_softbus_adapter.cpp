@@ -67,6 +67,7 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser &
         FI_HILOGE("The data type of CJSON is incorrect");
         return;
     }
+    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", x->valueint, y->valueint);
     COOR_SM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
 }
 
@@ -257,7 +258,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", remoteNetworkId.c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(remoteNetworkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
@@ -380,6 +381,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
+    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", xPercent, yPercent);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDeviceDhid.c_str()));

@@ -115,7 +115,7 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
 {
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
-        FI_HILOGE("Node \'%{public}s\' is not connected", networkId.c_str());
+        FI_HILOGE("Node \'%{public}s\' is not connected", AnonyNetworkId(networkId).c_str());
         return RET_ERR;
     }
     StreamBuffer buffer;
@@ -313,7 +313,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     if (strcpy_s(peerNetworkId, sizeof(peerNetworkId), networkId.c_str()) != EOK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", networkId.c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(networkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
@@ -328,7 +328,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 
     int32_t ret = InitSocket(info, SOCKET_CLIENT, socket);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to bind %{public}s", networkId.c_str());
+        FI_HILOGE("Failed to bind %{public}s", AnonyNetworkId(networkId).c_str());
         return ret;
     }
     ConfigTcpAlive(socket);

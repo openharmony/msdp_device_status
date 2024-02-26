@@ -24,10 +24,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
-static constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
-auto anonyNetworkId = [](const std::string &networkId) -> std::string {
-    return networkId.substr(0, SUBSTR_NETWORKID_LEN);
-};
 } // namespace
 
 int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCompatible)
@@ -177,7 +173,7 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CHKPV(event);
     event(networkId, msg);
     FI_HILOGD("Coordination msg event callback, userData:%{public}d, networkId:%{public}s",
-        userData, anonyNetworkId(networkId).c_str());
+        userData, AnonyNetworkId(networkId).c_str());
 }
 
 void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool state)
