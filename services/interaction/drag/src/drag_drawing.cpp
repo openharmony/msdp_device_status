@@ -32,6 +32,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "render/rs_filter.h"
+#include "screen_manager.h"
 #include "string_ex.h"
 #include "transaction/rs_interfaces.h"
 #include "ui/rs_surface_extractor.h"
@@ -1055,12 +1056,20 @@ void DragDrawing::CreateWindow()
             return;
         }
     }
+    uint64_t rsScreenId = screenId_;
+    sptr<Rosen::Screen> screen = Rosen::ScreenManager::GetInstance().GetScreenById(screenId_);
+    if ((screen != nullptr) && (!screen->IsReal())) {
+        if (!Rosen::DisplayManager::GetInstance().ConvertScreenIdToRsScreenId(screenId_, rsScreenId)) {
+            FI_HILOGE("ConvertScreenIdToRsScreenId failed");
+            return;
+        }
+    }
     int32_t surfaceNodeSize = std::max(display->GetWidth(), display->GetHeight());
     g_drawingInfo.surfaceNode->SetBounds(0, 0, surfaceNodeSize, surfaceNodeSize);
     g_drawingInfo.surfaceNode->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     g_drawingInfo.surfaceNode->SetPositionZ(DRAG_WINDOW_POSITION_Z);
     g_drawingInfo.surfaceNode->SetBackgroundColor(SK_ColorTRANSPARENT);
-    g_drawingInfo.surfaceNode->AttachToDisplay(screenId_);
+    g_drawingInfo.surfaceNode->AttachToDisplay(rsScreenId);
     g_drawingInfo.surfaceNode->SetVisible(false);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

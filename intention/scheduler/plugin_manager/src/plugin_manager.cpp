@@ -15,26 +15,30 @@
 
 #include "plugin_manager.h"
 
+#include <string_view>
+
 #include "devicestatus_define.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PluginManager" };
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PluginManager" };
 }
 
-void PluginManager::Init(IContext *context)
-{
-    context_ = context;
-}
+#if (defined(__aarch64__) || defined(__x86_64__))
+constexpr std::string_view LIB_COOPERATE_PATH { "/system/lib64/libintention_cooperate.z.so" };
+#else
+constexpr std::string_view LIB_COOPERATE_PATH { "/system/lib/libintention_cooperate.z.so" };
+#endif // defined(__x86_64__)
 
 ICooperate* PluginManager::LoadCooperate()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
     CHKPP(context_);
     if (cooperate_ == nullptr) {
-        cooperate_ = LoadLibrary<ICooperate>(context_, "/system/lib/libintention_cooperate.z.so");
+        cooperate_ = LoadLibrary<ICooperate>(context_, LIB_COOPERATE_PATH.data());
     }
     return (cooperate_ != nullptr ? cooperate_->GetInstance() : nullptr);
 }
@@ -42,6 +46,7 @@ ICooperate* PluginManager::LoadCooperate()
 void PluginManager::UnloadCooperate()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
     cooperate_.reset();
 }
 } // namespace DeviceStatus

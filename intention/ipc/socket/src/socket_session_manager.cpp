@@ -179,15 +179,21 @@ bool SocketSessionManager::AddSession(std::shared_ptr<SocketSession> session)
 
 void SocketSessionManager::AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback)
 {
-    CALL_DEBUG_ENTER;
     if (callback == nullptr) {
         FI_HILOGE("Callback is none");
         return;
     }
     auto [_, inserted] = callbacks_.emplace(pid, callback);
     if (!inserted) {
-        FI_HILOGW("Duplicate addtion of session-lost callback for (%{public}d)", pid);
+        FI_HILOGW("Duplication of session-lost callback for (%{public}d)", pid);
     }
+    FI_HILOGI("Start watching socket-session(%{public}d)", pid);
+}
+
+void SocketSessionManager::RemoveSessionDeletedCallback(int32_t pid)
+{
+    FI_HILOGI("Stop watching socket-session(%{public}d)", pid);
+    callbacks_.erase(pid);
 }
 
 void SocketSessionManager::NotifySessionDeleted(std::shared_ptr<SocketSession> session)

@@ -24,14 +24,16 @@
 #include "softbus_error_code.h"
 
 #include "devicestatus_define.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DSoftbusAdapterImpl" };
-constexpr size_t BIND_STRING_LENGTH { 10 };
-constexpr size_t INTERCEPT_STRING_LENGTH { 20 };
+#define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
+const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
+constexpr size_t BIND_STRING_LENGTH { 15 };
 constexpr size_t DEVICE_NAME_SIZE_MAX { 256 };
 constexpr size_t PKG_NAME_SIZE_MAX { 65 };
 constexpr int32_t MIN_BW { 80 * 1024 * 1024 };
@@ -41,12 +43,23 @@ constexpr int32_t SOCKET_CLIENT { 1 };
 }
 
 std::mutex DSoftbusAdapterImpl::mutex_;
+std::shared_ptr<DSoftbusAdapterImpl> DSoftbusAdapterImpl::instance_;
 
-DSoftbusAdapterImpl& DSoftbusAdapterImpl::GetInstance()
+std::shared_ptr<DSoftbusAdapterImpl> DSoftbusAdapterImpl::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<DSoftbusAdapterImpl>();
+        }
+    }
+    return instance_;
+}
+
+void DSoftbusAdapterImpl::DestroyInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    static DSoftbusAdapterImpl instance;
-    return instance;
+    instance_.reset();
 }
 
 DSoftbusAdapterImpl::~DSoftbusAdapterImpl()
@@ -106,6 +119,7 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
 
 int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     auto iter = sessions_.find(networkId);
     return (iter != sessions_.end() ? iter->second.socket_ : -1);
@@ -113,9 +127,10 @@ int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
 
 int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket &packet)
 {
+    CALL_DEBUG_ENTER;
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
-        FI_HILOGE("Node \'%{public}s\' is not connected", AnonyNetworkId(networkId).c_str());
+        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
         return RET_ERR;
     }
     StreamBuffer buffer;
@@ -149,10 +164,13 @@ static void OnBytesAvailable(int32_t socket, const void *data, uint32_t dataLen)
 
 void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     std::string networkId = info.networkId;
+    FI_HILOGD("Bind session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
 
     if (auto iter = sessions_.find(networkId); iter != sessions_.cend()) {
+        FI_HILOGD("(%{public}d, %{public}s) has bound", iter->second.socket_, Utility::Anonymize(networkId));
         return;
     }
     ConfigTcpAlive(socket);
@@ -161,6 +179,7 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if (observer != nullptr) {
+            FI_HILOGD("Notify binding (%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
             observer->OnBind(networkId);
         }
     }
@@ -168,20 +187,24 @@ void DSoftbusAdapterImpl::OnBind(int32_t socket, PeerSocketInfo info)
 
 void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     auto iter = std::find_if(sessions_.cbegin(), sessions_.cend(),
         [socket](const auto &item) {
             return (item.second.socket_ == socket);
         });
     if (iter == sessions_.cend()) {
+        FI_HILOGD("Session(%{public}d) is not bound", socket);
         return;
     }
     std::string networkId = iter->first;
     sessions_.erase(iter);
+    FI_HILOGD("Shutdown session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
 
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if (observer != nullptr) {
+            FI_HILOGD("Notify shutdown of session(%{public}d, %{public}s)", socket, Utility::Anonymize(networkId));
             observer->OnShutdown(networkId);
         }
     }
@@ -189,6 +212,7 @@ void DSoftbusAdapterImpl::OnShutdown(int32_t socket, ShutdownReason reason)
 
 void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dataLen)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     auto iter = std::find_if(sessions_.begin(), sessions_.end(),
         [socket](const auto &item) {
@@ -209,6 +233,7 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
 
 int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
 {
+    CALL_DEBUG_ENTER;
     socket = ::Socket(info);
     if (socket < 0) {
         FI_HILOGE("DSOFTBUS::Socket failed");
@@ -247,25 +272,14 @@ int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int
 
 int32_t DSoftbusAdapterImpl::SetupServer()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (socketFd_ > 0) {
         return RET_OK;
     }
-    const std::string SESS_NAME { "ohos.msdp.device_status." };
-    std::string localNetworkId = GetLocalNetworkId();
-    if (localNetworkId.empty()) {
-        FI_HILOGE("Local network id is empty");
-        return RET_ERR;
-    }
-    localSessionName_ = SESS_NAME + localNetworkId.substr(0, BIND_STRING_LENGTH);
-    std::string sessionName { SESS_NAME + localNetworkId.substr(0, INTERCEPT_STRING_LENGTH) };
-    char name[DEVICE_NAME_SIZE_MAX] {};
-    if (strcpy_s(name, sizeof(name), sessionName.c_str()) != EOK) {
-        FI_HILOGE("Invalid name:%{public}s", sessionName.c_str());
-        return RET_ERR;
-    }
+    char name[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
-
+    FI_HILOGI("Server session name: \'%{public}s\'", name);
+    FI_HILOGI("Package name: \'%{public}s\'", pkgName);
     SocketInfo info {
         .name = name,
         .pkgName = pkgName,
@@ -281,42 +295,41 @@ int32_t DSoftbusAdapterImpl::SetupServer()
 
 void DSoftbusAdapterImpl::ShutdownServer()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
-        Shutdown(item.second.socket_);
+        ::Shutdown(item.second.socket_);
     });
     sessions_.clear();
     if (socketFd_ > 0) {
-        Shutdown(socketFd_);
+        ::Shutdown(socketFd_);
         socketFd_ = -1;
     }
 }
 
 int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (sessions_.find(networkId) != sessions_.end()) {
         FI_HILOGD("InputSoftbus session has already opened");
         return RET_OK;
     }
+    std::string sessionName = CLIENT_SESSION_NAME + networkId.substr(0, BIND_STRING_LENGTH);
     char name[DEVICE_NAME_SIZE_MAX] {};
-    if (strcpy_s(name, sizeof(name), localSessionName_.c_str()) != EOK) {
-        FI_HILOGE("Invalid name:%{public}s", localSessionName_.c_str());
+    if (strcpy_s(name, sizeof(name), sessionName.c_str()) != EOK) {
+        FI_HILOGE("Invalid name:%{public}s", sessionName.c_str());
         return RET_ERR;
     }
-    const std::string SESSION_NAME { "ohos.msdp.device_status." };
-    std::string peerSessionName { SESSION_NAME + networkId.substr(0, INTERCEPT_STRING_LENGTH) };
-    char peerName[DEVICE_NAME_SIZE_MAX] {};
-    if (strcpy_s(peerName, sizeof(peerName), peerSessionName.c_str()) != EOK) {
-        FI_HILOGE("Invalid peerSessionName:%{public}s", peerSessionName.c_str());
-        return RET_ERR;
-    }
+    char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     if (strcpy_s(peerNetworkId, sizeof(peerNetworkId), networkId.c_str()) != EOK) {
         FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(networkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
+    FI_HILOGI("Client session name: \'%{public}s\'", name);
+    FI_HILOGI("Peer name: \'%{public}s\'", peerName);
+    FI_HILOGI("Peer network id: \'%{public}s\'", peerNetworkId);
+    FI_HILOGI("Package name: \'%{public}s\'", pkgName);
     SocketInfo info {
         .name = name,
         .peerName = peerName,
@@ -328,7 +341,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 
     int32_t ret = InitSocket(info, SOCKET_CLIENT, socket);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to bind %{public}s", AnonyNetworkId(networkId).c_str());
+        FI_HILOGE("Failed to bind %{public}s", Utility::Anonymize(networkId));
         return ret;
     }
     ConfigTcpAlive(socket);
@@ -378,6 +391,7 @@ void DSoftbusAdapterImpl::ConfigTcpAlive(int32_t socket)
 
 void DSoftbusAdapterImpl::HandleSessionData(const std::string &networkId, CircleStreamBuffer &circleBuffer)
 {
+    CALL_DEBUG_ENTER;
     while (circleBuffer.ResidualSize() >= static_cast<int32_t>(sizeof(PackHead))) {
         const char *buf = circleBuffer.ReadBuf();
         const PackHead *head = reinterpret_cast<const PackHead *>(buf);
@@ -402,10 +416,11 @@ void DSoftbusAdapterImpl::HandleSessionData(const std::string &networkId, Circle
 
 void DSoftbusAdapterImpl::HandlePacket(const std::string &networkId, NetPacket &packet)
 {
+    CALL_DEBUG_ENTER;
     for (const auto &item : observers_) {
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
-        if (observer != nullptr) {
-            observer->OnPacket(networkId, packet);
+        if ((observer != nullptr) &&
+            observer->OnPacket(networkId, packet)) {
             return;
         }
     }

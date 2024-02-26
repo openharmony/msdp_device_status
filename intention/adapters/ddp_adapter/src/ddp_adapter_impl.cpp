@@ -17,14 +17,15 @@
 
 #include "devicestatus_define.h"
 #include "json_parser.h"
+#include "utility.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
 constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DDPAdapterImpl" };
-const std::string SERVICE_ID { FI_PKG_NAME };
-const std::string SERVICE_TYPE { FI_PKG_NAME };
+const std::string SERVICE_ID { "deviceStatus" };
+const std::string SERVICE_TYPE { "deviceStatus" };
 } // namespace
 
 #define DDP_CLIENT  DeviceProfile::DistributedDeviceProfileClient::GetInstance()
@@ -38,9 +39,10 @@ void DDPAdapterImpl::ProfileEventCallback::OnProfileChanged(
     const DeviceProfile::ProfileChangeNotification &changeNotification)
 {
     CALL_DEBUG_ENTER;
+    std::string networkId = changeNotification.GetDeviceId();
+    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
     std::shared_ptr<DDPAdapterImpl> ddp = ddp_.lock();
     if (ddp != nullptr) {
-        std::string networkId = changeNotification.GetDeviceId();
         ddp->OnProfileChanged(networkId);
     }
 }
@@ -48,9 +50,11 @@ void DDPAdapterImpl::ProfileEventCallback::OnProfileChanged(
 void DDPAdapterImpl::OnProfileChanged(const std::string &networkId)
 {
     std::lock_guard guard(mutex_);
+    FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
     for (const auto &item : observers_) {
         std::shared_ptr<IDeviceProfileObserver> observer = item.Lock();
         if (observer != nullptr) {
+            FI_HILOGD("Notify profile change: \'%{public}s\'", Utility::Anonymize(networkId));
             observer->OnProfileChanged(networkId);
         }
     }
@@ -79,6 +83,7 @@ void DDPAdapterImpl::AddWatch(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mutex_);
+    FI_HILOGD("Add watch \'%{public}s\'", Utility::Anonymize(networkId));
     RegisterProfileListener(networkId);
     siblings_.insert(networkId);
 }
@@ -87,6 +92,7 @@ void DDPAdapterImpl::RemoveWatch(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mutex_);
+    FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(networkId));
     siblings_.erase(networkId);
     UnregisterProfileListener(networkId);
 }
@@ -94,7 +100,9 @@ void DDPAdapterImpl::RemoveWatch(const std::string &networkId)
 int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGD("Register profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
     if (auto iter = profileEventCbs_.find(networkId); iter != profileEventCbs_.end()) {
+        FI_HILOGD("Profile listener has been registered for \'%{public}s\'", Utility::Anonymize(networkId));
         return RET_OK;
     }
     std::list<std::string> serviceIds;
@@ -119,7 +127,7 @@ int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
         [](DeviceProfile::ProfileEvent event) {
             return (event == DeviceProfile::ProfileEvent::EVENT_PROFILE_CHANGED);
         })) {
-        FI_HILOGE("SubscribeProfileEvents failed");
+        FI_HILOGE("SubscribeProfileEvents(%{public}s) failed", Utility::Anonymize(networkId));
         return RET_ERR;
     }
     profileEventCbs_.emplace(networkId, profileEventCb);
@@ -129,8 +137,10 @@ int32_t DDPAdapterImpl::RegisterProfileListener(const std::string &networkId)
 void DDPAdapterImpl::UnregisterProfileListener(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
+    FI_HILOGD("Unregister profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
     auto iter = profileEventCbs_.find(networkId);
     if (iter == profileEventCbs_.end()) {
+        FI_HILOGD("No profile listener for \'%{public}s\'", Utility::Anonymize(networkId));
         return;
     }
     std::shared_ptr<ProfileEventCallback> profileEventCb = iter->second;
@@ -146,12 +156,16 @@ void DDPAdapterImpl::UnregisterProfileListener(const std::string &networkId)
 int32_t DDPAdapterImpl::GetProperty(const std::string &networkId, const std::string &name, bool &value)
 {
     CALL_DEBUG_ENTER;
-    return GetProperty(networkId, name, [&value](cJSON *json) {
-        if (!cJSON_IsBool(json)) {
+    return GetProperty(networkId, name, [&name, &value](cJSON *json) {
+        FI_HILOGD("Get bool property: %{public}s", name.c_str());
+        if (cJSON_IsBool(json)) {
+            value = cJSON_IsTrue(json);
+        } else if (cJSON_IsNumber(json)) {
+            value = (static_cast<int32_t>(json->valuedouble) != 0);
+        } else {
             FI_HILOGE("Unexpected data type");
             return RET_ERR;
         }
-        value = (json->valueint != 0);
         return RET_OK;
     });
 }
@@ -159,7 +173,8 @@ int32_t DDPAdapterImpl::GetProperty(const std::string &networkId, const std::str
 int32_t DDPAdapterImpl::GetProperty(const std::string &networkId, const std::string &name, int32_t &value)
 {
     CALL_DEBUG_ENTER;
-    return GetProperty(networkId, name, [&value](cJSON *json) {
+    return GetProperty(networkId, name, [&name, &value](cJSON *json) {
+        FI_HILOGD("Get integer property: %{public}s", name.c_str());
         if (!cJSON_IsNumber(json)) {
             FI_HILOGE("Unexpected data type");
             return RET_ERR;
@@ -171,7 +186,9 @@ int32_t DDPAdapterImpl::GetProperty(const std::string &networkId, const std::str
 
 int32_t DDPAdapterImpl::GetProperty(const std::string &networkId, const std::string &name, std::string &value)
 {
-    return GetProperty(networkId, name, [&value](cJSON *json) {
+    CALL_DEBUG_ENTER;
+    return GetProperty(networkId, name, [&name, &value](cJSON *json) {
+        FI_HILOGD("Get string property: %{public}s", name.c_str());
         if (!cJSON_IsString(json) && !cJSON_IsRaw(json)) {
             FI_HILOGE("Unexpected data type");
             return RET_ERR;
@@ -227,6 +244,7 @@ int32_t DDPAdapterImpl::SetProperty(const std::string &name, const std::string &
 
 int32_t DDPAdapterImpl::SetProperty(const std::string &name, const DPValue &value)
 {
+    CALL_DEBUG_ENTER;
     if (auto iter = properties_.find(name); iter != properties_.end()) {
         if (iter->second == value) {
             return RET_OK;
@@ -243,6 +261,7 @@ int32_t DDPAdapterImpl::SetProperty(const std::string &name, const DPValue &valu
 
 int32_t DDPAdapterImpl::PutProfile()
 {
+    CALL_DEBUG_ENTER;
     JsonParser parser;
     parser.json = cJSON_CreateObject();
     CHKPR(parser.json, RET_ERR);
@@ -255,7 +274,7 @@ int32_t DDPAdapterImpl::PutProfile()
                 using T = std::decay_t<decltype(arg)>;
 
                 if constexpr(std::is_same_v<T, bool>) {
-                    parser1.json = cJSON_CreateBool(arg);
+                    parser1.json = cJSON_CreateNumber(arg);
                 } else if constexpr(std::is_same_v<T, int32_t>) {
                     parser1.json = cJSON_CreateNumber(arg);
                 } else if constexpr(std::is_same_v<T, std::string>) {
@@ -290,6 +309,7 @@ int32_t DDPAdapterImpl::PutProfile()
 
 int32_t DDPAdapterImpl::SyncProfile()
 {
+    CALL_DEBUG_ENTER;
     DeviceProfile::SyncOptions syncOptions;
     std::for_each(siblings_.cbegin(), siblings_.cend(),
         [&syncOptions](auto &networkId) {

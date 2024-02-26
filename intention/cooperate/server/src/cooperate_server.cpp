@@ -16,6 +16,7 @@
 #include "cooperate_server.h"
 
 #include "cooperate_params.h"
+#include "default_params.h"
 #include "devicestatus_define.h"
 
 namespace OHOS {
@@ -32,21 +33,30 @@ CooperateServer::CooperateServer(IContext *context)
 int32_t CooperateServer::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    DefaultParam param;
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("DefaultParam::Unmarshalling fail");
+        return RET_ERR;
+    }
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
-    cooperate->Enable(context.pid);
+    cooperate->Enable(context.pid, param.userData);
     return RET_OK;
 }
 
 int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    DefaultParam param;
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("DefaultParam::Unmarshalling fail");
+        return RET_ERR;
+    }
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
-    cooperate->Disable(context.pid);
-    context_->GetPluginManager().UnloadCooperate();
+    cooperate->Disable(context.pid, param.userData);
     return RET_OK;
 }
 

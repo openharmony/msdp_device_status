@@ -54,6 +54,7 @@ bool SocketSession::SendMsg(NetPacket &pkt) const
 
 bool SocketSession::SendMsg(const char *buf, size_t size) const
 {
+    CALL_DEBUG_ENTER;
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
         FI_HILOGE("buf size:%{public}zu", size);
@@ -70,6 +71,7 @@ bool SocketSession::SendMsg(const char *buf, size_t size) const
     int32_t remSize = bufSize;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
+        FI_HILOGD("Send message to client (%{public}d, %{public}d)", fd_, pid_);
         ssize_t count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {

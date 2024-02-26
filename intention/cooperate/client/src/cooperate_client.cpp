@@ -194,22 +194,114 @@ int32_t CooperateClient::GenerateRequestID()
 
 int32_t CooperateClient::OnCoordinationListener(const StreamClient &client, NetPacket &pkt)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    std::string networkId;
+    int32_t nType = 0;
+    pkt >> userData >> networkId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    OnDevCooperateListener(networkId, CoordinationMessage(nType));
+    return RET_OK;
+}
+
+void CooperateClient::OnDevCooperateListener(const std::string &networkId, CoordinationMessage msg)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &item : devCooperateListener_) {
+        item->OnCoordinationMessage(networkId, msg);
+    }
 }
 
 int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPacket &pkt)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    std::string networkId;
+    int32_t nType = 0;
+    pkt >> userData >> networkId >> nType;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
+    return RET_OK;
+}
+
+void CooperateClient::OnCooperateMessageEvent(int32_t userData,
+    const std::string &networkId, CoordinationMessage msg)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto iter = devCooperateEvent_.find(userData);
+    if (iter == devCooperateEvent_.end()) {
+        return;
+    }
+    CooperateMessageCallback callback = iter->second.msgCb;
+    CHKPV(callback);
+    callback(networkId, msg);
+    devCooperateEvent_.erase(iter);
 }
 
 int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPacket &pkt)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    bool state = false;
+
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read coordination msg failed");
+        return RET_ERR;
+    }
+    OnCooperateStateEvent(userData, state);
+    return RET_OK;
+}
+
+void CooperateClient::OnCooperateStateEvent(int32_t userData, bool state)
+{
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto iter = devCooperateEvent_.find(userData);
+    if (iter == devCooperateEvent_.end()) {
+        return;
+    }
+    CooperateStateCallback event = iter->second.stateCb;
+    CHKPV(event);
+    event(state);
+    devCooperateEvent_.erase(iter);
+    FI_HILOGD("Coordination state event callback, userData:%{public}d, state:(%{public}d)", userData, state);
 }
 
 int32_t CooperateClient::OnHotAreaListener(const StreamClient &client, NetPacket &pkt)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    int32_t positionX = 0;
+    int32_t positionY = 0;
+    int32_t type = 0;
+    bool isEdge = false;
+    pkt >> positionX >> positionY >> type >> isEdge;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    OnDevHotAreaListener(positionX, positionY, HotAreaType(type), isEdge);
+    return RET_OK;
+}
+
+void CooperateClient::OnDevHotAreaListener(int32_t displayX,
+    int32_t displayY, HotAreaType type, bool isEdge)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    for (const auto &item : devHotAreaListener_) {
+        item->OnHotAreaMessage(displayX, displayY, type, isEdge);
+    }
 }
 } // namespace DeviceStatus
 } // namespace Msdp

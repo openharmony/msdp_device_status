@@ -322,7 +322,7 @@ void DeviceManager::RetriggerHotplug(std::weak_ptr<IDeviceObserver> observer)
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnRetriggerHotplug, this, observer));
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
@@ -348,7 +348,7 @@ int32_t DeviceManager::AddDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 {
     CALL_DEBUG_ENTER;
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnAddDeviceObserver, this, observer));
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
@@ -371,7 +371,7 @@ void DeviceManager::RemoveDeviceObserver(std::weak_ptr<IDeviceObserver> observer
 {
     CALL_INFO_TRACE;
     CHKPV(context_);
-    int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask(
         std::bind(&DeviceManager::OnRemoveDeviceObserver, this, observer));
     if (ret != RET_OK) {
         FI_HILOGE("Post task failed");
@@ -384,6 +384,13 @@ int32_t DeviceManager::OnRemoveDeviceObserver(std::weak_ptr<IDeviceObserver> obs
     CHKPR(observer, RET_ERR);
     observers_.erase(observer);
     return RET_OK;
+}
+
+bool DeviceManager::AnyOf(std::function<bool(std::shared_ptr<IDevice>)> pred)
+{
+    return std::any_of(devices_.cbegin(), devices_.cend(), [pred](const auto &item) {
+        return (pred != nullptr ? pred(item.second) : false);
+    });
 }
 } // namespace DeviceStatus
 } // namespace Msdp

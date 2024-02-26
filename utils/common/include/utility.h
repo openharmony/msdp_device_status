@@ -42,8 +42,8 @@ public:
 
     static void RemoveTrailingChars(char c, char *path);
     static void RemoveTrailingChars(const std::string &toRemoved, std::string &path);
-    static bool IsEmpty(const char *str);
-    static bool IsEqual(const char *s1, const char *s2);
+    static bool IsEmpty(const char *str) noexcept;
+    static bool IsEqual(const char *s1, const char *s2) noexcept;
 
     template <typename... Args,
               typename = std::enable_if_t<(IsStreamable<Args>::value && ...), std::string>>
@@ -56,27 +56,39 @@ public:
 
     static void RemoveSpace(std::string &str);
     static bool IsInteger(const std::string &target);
+
+    /* 'Anonymize' is multi-thread unsafe, use carefully. */
+    static const char* Anonymize(const std::string &id) noexcept;
+    static const char* Anonymize(const char *id) noexcept;
+
     static bool DoesFileExist(const char *path);
     static ssize_t GetFileSize(const char *path);
     static ssize_t GetFileSize(const std::string &filePath);
 
     static void ShowFileAttributes(const char *path);
     static void ShowUserAndGroup();
+
+    static int64_t GetSysClockTime();
 };
 
-inline bool Utility::IsEmpty(const char *str)
+inline bool Utility::IsEmpty(const char *str) noexcept
 {
     return ((str == nullptr) || (str[0] == '\0'));
 }
 
-inline bool Utility::IsEqual(const char *s1, const char *s2)
+inline bool Utility::IsEqual(const char *s1, const char *s2) noexcept
 {
     if (IsEmpty(s1)) {
         return IsEmpty(s2);
     } else if (IsEmpty(s2)) {
         return false;
     }
-    return (strcmp(s1, s2) == 0);
+    return (std::strcmp(s1, s2) == 0);
+}
+
+inline const char* Utility::Anonymize(const std::string &id) noexcept
+{
+    return Anonymize(id.c_str());
 }
 } // namespace DeviceStatus
 } // namespace Msdp

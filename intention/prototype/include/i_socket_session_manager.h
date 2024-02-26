@@ -27,6 +27,7 @@ public:
     virtual ~ISocketSessionManager() = default;
 
     virtual void AddSessionDeletedCallback(int32_t pid, std::function<void(SocketSessionPtr)> callback) = 0;
+    virtual void RemoveSessionDeletedCallback(int32_t pid) = 0;
     virtual int32_t AllocSocketFd(const std::string& programName, int32_t moduleType, int32_t tokenType,
                           int32_t uid, int32_t pid, int32_t& clientFd) = 0;
     virtual SocketSessionPtr FindSessionByPid(int32_t pid) const = 0;
