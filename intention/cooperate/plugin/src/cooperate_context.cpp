@@ -82,7 +82,7 @@ void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
 
     int32_t ret = ddp->GetProperty(networkId, COOPERATE_SWITCH, switchStatus);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to query switch status of \'%{public}s\'", networkId.c_str());
+        FI_HILOGE("Failed to query switch status of \'%{public}s\'", AnonyNetworkId(networkId).c_str());
         return;
     }
     sender_.Send(CooperateEvent(

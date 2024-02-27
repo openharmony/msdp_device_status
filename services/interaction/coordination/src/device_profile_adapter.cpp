@@ -33,7 +33,6 @@ using namespace OHOS::DeviceProfile;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID { "deviceStatus" };
-constexpr int32_t SUBSTR_NETWORKID_LEN = 6;
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -86,8 +85,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     std::for_each(deviceIds.begin(), deviceIds.end(),
         [&syncOptions](auto &networkId) {
             syncOptions.AddDevice(networkId);
-            FI_HILOGD("Add device success, networkId:%{public}s",
-                networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+            FI_HILOGD("Add device success, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
         });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
@@ -152,8 +150,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
         return RET_OK;
     }
     callbacks_[networkId] = callback;
-    FI_HILOGI("Register crossing state listener success, networkId:%{public}s",
-        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGI("Register crossing state listener success, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
     int32_t ret = RegisterProfileListener(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
@@ -167,8 +164,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         FI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
-    FI_HILOGI("Unregister crossing state listener, networkId:%{public}s",
-        networkId.substr(0, SUBSTR_NETWORKID_LEN).c_str());
+    FI_HILOGI("Unregister crossing state listener, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(networkId);
     if (it != profileEventCallbacks_.end()) {
@@ -228,7 +224,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
         FI_HILOGI("Crossing switch state:%{public}s", stateStr.c_str());
     } else {
         callbacks_.erase(it);
-        FI_HILOGW("Remove networkId:%{public}s profile changed callback", networkId.c_str());
+        FI_HILOGW("Remove networkId:%{public}s profile changed callback", AnonyNetworkId(networkId).c_str());
     }
 }
 } // namespace DeviceStatus
