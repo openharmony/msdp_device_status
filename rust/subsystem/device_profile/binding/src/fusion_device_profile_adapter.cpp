@@ -36,7 +36,6 @@ public:
     explicit ProfileEventCallback(CICrossStateListener* listener);
     ~ProfileEventCallback();
 
-    void OnSyncCompleted(const SyncResult &syncResults) override;
     void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
     bool SupportProfileEvent(const ProfileEvent &event) const;
     void AddProfileEvent(const ProfileEvent &event);
@@ -86,13 +85,6 @@ ProfileEventCallback::~ProfileEventCallback()
     if ((listener_ != nullptr) && (listener_->destruct != nullptr)) {
         listener_->destruct(listener_);
     }
-}
-
-void ProfileEventCallback::OnSyncCompleted(const SyncResult &syncResults)
-{
-    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        FI_HILOGD("Sync result:%{public}d", syncResult.second);
-    });
 }
 
 void ProfileEventCallback::OnProfileChanged(const ProfileChangeNotification &changeNotification)
@@ -171,17 +163,6 @@ int32_t FusionDeviceProfileAdapter::SyncCrossSwitchState(bool switchState, const
     if (ret != 0) {
         FI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
-    }
-    SyncOptions syncOptions;
-    std::for_each(deviceIds.begin(), deviceIds.end(),
-                  [&syncOptions](auto &deviceId) {
-                      syncOptions.AddDevice(deviceId);
-                      FI_HILOGD("Add device success");
-                  });
-    auto syncCallback = std::make_shared<ProfileEventCallback>(nullptr);
-    ret = DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
-    if (ret != 0) {
-        FI_HILOGE("Sync device profile failed");
     }
     return ret;
 }

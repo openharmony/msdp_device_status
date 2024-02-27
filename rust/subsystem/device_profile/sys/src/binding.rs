@@ -125,8 +125,6 @@ pub struct CProfileChangeNotification {
 pub type CIProfileEventCbClone = extern "C" fn (profile_events: *mut CIProfileEventCb) -> *mut CIProfileEventCb;
 /// Type definition for the destruct function of a CIProfileEventCb.
 pub type CIProfileEventCbDestruct = extern "C" fn (profile_events: *mut CIProfileEventCb);
-/// Type definition for the callback function when synchronization is completed.
-pub type OnSyncCompleted = extern "C" fn (cb: *mut CIProfileEventCb, device_id: *const c_char, sync_result: c_int);
 /// Type definition for the callback function when the profile changes.
 pub type OnProfileChanged = extern "C" fn (cb: *mut CIProfileEventCb, notification: *const CProfileChangeNotification);
 
@@ -137,8 +135,6 @@ pub struct CIProfileEventCb {
     pub clone: Option<CIProfileEventCbClone>,
     /// The destruct function for the callback.
     pub destruct: Option<CIProfileEventCbDestruct>,
-    /// The callback function to be executed when synchronization is completed.
-    pub on_sync_completed: Option<OnSyncCompleted>,
     /// The callback function to be executed when the profile changes.
     pub on_profile_changed: Option<OnProfileChanged>,
 }
@@ -183,8 +179,6 @@ extern "C" {
     pub fn UnsubscribeProfileEvents(profile_events: *const CIProfileEvents,
                                     event_cb: *mut CIProfileEventCb,
                                     failed_events: *mut *mut CIProfileEvents) -> i32;
-    /// Synchronizes the device profile using the specified synchronization options and callback function.
-    pub fn SyncDeviceProfile(sync_options: *const CSyncOptions, sync_cb: *const CIProfileEventCb) -> i32;
 }
 
 type CIStringVectorClone = extern "C" fn (*mut CIStringVector) -> *mut CIStringVector;

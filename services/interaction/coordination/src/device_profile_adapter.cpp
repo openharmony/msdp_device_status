@@ -44,13 +44,6 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
     callbacks_.clear();
 }
 
-void DeviceProfileAdapter::ProfileEventCallbackImpl::OnSyncCompleted(const DeviceProfile::SyncResult &syncResults)
-{
-    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        FI_HILOGD("Synchronized result:%{public}d", syncResult.second);
-    });
-}
-
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     const ProfileChangeNotification &changeNotification)
 {
@@ -80,18 +73,6 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     if (ret != 0) {
         FI_HILOGE("Failed to put the device profile, ret:%{public}d", ret);
         return ret;
-    }
-    SyncOptions syncOptions;
-    std::for_each(deviceIds.begin(), deviceIds.end(),
-        [&syncOptions](auto &networkId) {
-            syncOptions.AddDevice(networkId);
-            FI_HILOGD("Add device success, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
-        });
-    auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
-    ret =
-        DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
-    if (ret != 0) {
-        FI_HILOGE("Failed to synchronize the device profile");
     }
     return ret;
 }
