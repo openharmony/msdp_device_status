@@ -114,7 +114,7 @@ private:
     int32_t AddKeyEventMointor();
     int32_t RemoveKeyEventMointor();
     int32_t RemovePointerEventHandler();
-    int32_t NotifyDragResult(DragResult result);
+    int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
     int32_t NotifyHideIcon();
     int32_t InitDataManager(const DragData &dragData) const;
     int32_t OnStartDrag();
@@ -131,6 +131,7 @@ private:
     void UpdateDragStyleCross();
     inline std::string GetDragStyleName(DragCursorStyle style);
     DragCursorStyle GetRealDragStyle(DragCursorStyle style);
+    void GetDragBehavior(const DragDropResult &dropResult, DragBehavior &dragBehavior);
 
 private:
     int32_t timerId_ { -1 };

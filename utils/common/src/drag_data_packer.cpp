@@ -44,6 +44,7 @@ int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool
     WRITEINT32(data, dragData.displayX, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(data, dragData.displayY, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEINT32(data, dragData.displayId, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
+    WRITEINT32(data, dragData.mainWindow, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     WRITEBOOL(data, dragData.hasCoordinateCorrected, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     if (SummaryPacker::Marshalling(dragData.summarys, data) != RET_OK) {
@@ -70,6 +71,7 @@ int32_t DragDataPacker::UnMarshalling(Parcel &data, DragData &dragData, bool isC
     READINT32(data, dragData.displayX, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayY, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READINT32(data, dragData.displayId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    READINT32(data, dragData.mainWindow, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCanceledAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     READBOOL(data, dragData.hasCoordinateCorrected, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if (SummaryPacker::UnMarshalling(data, dragData.summarys) != RET_OK) {

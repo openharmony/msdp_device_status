@@ -581,12 +581,20 @@ int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel &data, MessageParcel &re
     }
     bool hasCustomAnimation = false;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t windowId = -1;
-    READINT32(data, windowId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t mainWindow = -1;
+    READINT32(data, mainWindow, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    int32_t dragBehavior = -1;
+    READINT32(data, dragBehavior, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if ((dragBehavior < static_cast<int32_t>(DragBehavior::UNKNOWN)) ||
+        (dragBehavior > static_cast<int32_t>(DragBehavior::MOVE))) {
+        FI_HILOGE("Invalid dragBehavior:%{public}d", dragBehavior);
+        return RET_ERR;
+    }
     DragDropResult dropResult;
     dropResult.result = static_cast<DragResult>(result);
     dropResult.hasCustomAnimation = hasCustomAnimation;
-    dropResult.windowId = windowId;
+    dropResult.mainWindow = mainWindow;
+    dropResult.dragBehavior = static_cast<DragBehavior>(dragBehavior);
     int32_t ret = StopDrag(dropResult);
     if (ret != RET_OK) {
         FI_HILOGE("Call StopDrag failed, ret:%{public}d", ret);

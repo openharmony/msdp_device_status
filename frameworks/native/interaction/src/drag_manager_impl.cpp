@@ -76,7 +76,8 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient &client, NetPacket &p
     CALL_DEBUG_ENTER;
     DragNotifyMsg notifyMsg;
     int32_t result = 0;
-    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid;
+    int32_t dragBehavior = -1;
+    pkt >> notifyMsg.displayX >> notifyMsg.displayY >> result >> notifyMsg.targetPid >> dragBehavior;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read drag msg failed");
         return RET_ERR;
@@ -87,6 +88,12 @@ int32_t DragManagerImpl::OnNotifyResult(const StreamClient &client, NetPacket &p
         return RET_ERR;
     }
     notifyMsg.result = static_cast<DragResult>(result);
+    if ((dragBehavior < static_cast<int32_t>(DragBehavior::UNKNOWN)) ||
+        (dragBehavior > static_cast<int32_t>(DragBehavior::MOVE))) {
+        FI_HILOGE("Invalid dragBehavior:%{public}d", dragBehavior);
+        return RET_ERR;
+    }
+    notifyMsg.dragBehavior = static_cast<DragBehavior>(dragBehavior);
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(startDragListener_, RET_ERR);
     startDragListener_->OnDragEndMessage(notifyMsg);

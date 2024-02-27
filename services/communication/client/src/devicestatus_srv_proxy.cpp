@@ -478,7 +478,8 @@ int32_t DeviceStatusSrvProxy::StopDrag(const DragDropResult &dropResult)
     }
     WRITEINT32(data, static_cast<int32_t>(dropResult.result), ERR_INVALID_VALUE);
     WRITEBOOL(data, dropResult.hasCustomAnimation, ERR_INVALID_VALUE);
-    WRITEINT32(data, dropResult.windowId, ERR_INVALID_VALUE);
+    WRITEINT32(data, dropResult.mainWindow, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int32_t>(dropResult.dragBehavior), ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageParcel reply;
