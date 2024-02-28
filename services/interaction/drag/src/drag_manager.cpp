@@ -732,10 +732,12 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragAction_.store(DragAction::MOVE);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
-        FI_HILOGI("Set the pointer cursor visible");
-        MMI::InputManager::GetInstance()->SetPointerVisible(true);
+        if (dragState_ != DragState::MOTION_DRAGGING) {
+            FI_HILOGI("Set the pointer cursor visible");
+            MMI::InputManager::GetInstance()->SetPointerVisible(true);
+        }
     }
     FI_HILOGI("Stop drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
@@ -795,7 +797,7 @@ void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 void DragManager::StateChangedNotify(DragState state)
 {
     CALL_INFO_TRACE;
-    if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
+    if ((stateChangedCallback_ != nullptr) && (dragState_ != DragState::MOTION_DRAGGING)) {
         stateChangedCallback_(state);
     }
 }
