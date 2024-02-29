@@ -72,7 +72,7 @@ ohos_unittest("InteractionDragDrawingTest") {
 
 group("unittest") {
   testonly = true
-  deps = [:InteractionDragDrawingTest ]
+  deps = [ ":InteractionDragDrawingTest" ]
   if (build_variant == "root" && root_perf_main != "root_main") {
     deps += [ ":InteractionManagerTest" ]
   }
