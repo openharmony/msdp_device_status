@@ -173,7 +173,7 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CHKPV(event);
     event(networkId, msg);
     FI_HILOGD("Coordination msg event callback, userData:%{public}d, networkId:%{public}s",
-        userData, AnonyNetworkId(networkId).c_str());
+        userData, GetAnonyString(networkId).c_str());
 }
 
 void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool state)

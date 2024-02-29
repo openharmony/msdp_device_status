@@ -36,12 +36,12 @@ public:
     static int32_t NetPacketToSwitchEvent(NetPacket &pkt, std::shared_ptr<MMI::SwitchEvent> key);
     static int32_t Marshalling(std::shared_ptr<MMI::PointerEvent> event, NetPacket &pkt);
     static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event);
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_SECURITY_PART
     static int32_t MarshallingEnhanceData(std::shared_ptr<MMI::PointerEvent> event, NetPacket &pkt);
     static int32_t UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event);
     static int32_t MarshallingEnhanceData(std::shared_ptr<MMI::KeyEvent> event, NetPacket &pkt);
     static int32_t UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<MMI::KeyEvent> event);
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#endif // OHOS_BUILD_ENABLE_SECURITY_PART
 private:
     static int32_t SerializeInputEvent(std::shared_ptr<MMI::InputEvent> event, NetPacket &pkt);
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<MMI::InputEvent> event);
@@ -61,14 +61,14 @@ private:
     static int32_t DeserializeBuffer(NetPacket &pkt, std::shared_ptr<MMI::PointerEvent> event);
     static void ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<MMI::KeyEvent> key);
 
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_SECURITY_PART
     static constexpr uint32_t MAX_HMAC_SIZE = 64;
     struct SecCompPointEvent {
         double touchX;
         double touchY;
         uint64_t timeStamp;
     };
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#endif // OHOS_BUILD_ENABLE_SECURITY_PART
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

@@ -79,14 +79,14 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
 
     if (!preparedNetworkId.first.empty() && !preparedNetworkId.second.empty()) {
         FI_HILOGI("preparedNetworkId is not empty, first:%{public}s, second:%{public}s, networkId:%{public}s",
-            AnonyNetworkId(preparedNetworkId.first).c_str(), AnonyNetworkId(preparedNetworkId.second).c_str(),
-            AnonyNetworkId(networkId).c_str());
+            GetAnonyString(preparedNetworkId.first).c_str(), GetAnonyString(preparedNetworkId.second).c_str(),
+            GetAnonyString(networkId).c_str());
         if (networkId == preparedNetworkId.first || networkId == preparedNetworkId.second) {
             bool ret = COOR_SM->UnchainCoordination(preparedNetworkId.first, preparedNetworkId.second);
             if (ret) {
                 COOR_SM->NotifyChainRemoved();
                 std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-                FI_HILOGD("localNetworkId:%{public}s", AnonyNetworkId(localNetworkId).c_str());
+                FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
                 COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, networkId, ret);
             } else {
                 FI_HILOGE("Failed to unchain coordination");

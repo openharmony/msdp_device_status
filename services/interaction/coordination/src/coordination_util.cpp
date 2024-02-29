@@ -37,7 +37,7 @@ std::string GetLocalNetworkId()
         return {};
     }
     std::string networkId(localNode->networkId, sizeof(localNode->networkId));
-    FI_HILOGD("Get local node device info, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
+    FI_HILOGD("Get local node device info, networkId:%{public}s", GetAnonyString(networkId).c_str());
     return localNode->networkId;
 }
 } // namespace COORDINATION

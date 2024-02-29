@@ -258,7 +258,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(remoteNetworkId).c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;

@@ -322,7 +322,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     if (strcpy_s(peerNetworkId, sizeof(peerNetworkId), networkId.c_str()) != EOK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(networkId).c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", GetAnonyString(networkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };

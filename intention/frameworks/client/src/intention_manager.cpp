@@ -258,10 +258,10 @@ int32_t IntentionManager::SetDragWindowVisible(bool visible, bool isForce)
     return drag_.SetDragWindowVisible(*tunnel_, visible, isForce);
 }
 
-int32_t IntentionManager::GetShadowOffset(int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t IntentionManager::GetShadowOffset(ShadowOffset &shadowOffset)
 {
     CALL_DEBUG_ENTER;
-    return drag_.GetShadowOffset(*tunnel_, offsetX, offsetY, width, height);
+    return drag_.GetShadowOffset(*tunnel_, shadowOffset);
 }
 
 int32_t IntentionManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
@@ -340,7 +340,7 @@ int32_t IntentionManager::GetDragSummary(std::map<std::string, int64_t> &summary
     return drag_.GetDragSummary(*tunnel_, summarys);
 }
 
-int32_t IntentionManager::EnterTextEditorArea(bool enable)
+int32_t IntentionManager::EnableUpperCenterMode(bool enable)
 {
     CALL_DEBUG_ENTER;
     return drag_.EnableUpperCenterMode(*tunnel_, enable);

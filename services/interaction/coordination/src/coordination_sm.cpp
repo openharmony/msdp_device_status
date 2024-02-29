@@ -327,13 +327,12 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
         stopNetworkId = sinkNetworkId_;
     }
     isUnchained_ = isUnchained;
-    FI_HILOGD("IsUnchained_:%{public}d, stopNetworkId:%{public}s", isUnchained_, AnonyNetworkId(stopNetworkId).c_str());
+    FI_HILOGD("IsUnchained_:%{public}d, stopNetworkId:%{public}s", isUnchained_, GetAnonyString(stopNetworkId).c_str());
     auto state = GetCurrentState();
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->DeactivateCoordination(stopNetworkId, isUnchained, preparedNetworkId_);
     if (ret != RET_OK) {
-        FI_HILOGE("DeactivateCoordination failed, stopNetworkId:%{public}s, preparedNetworkId:%{public}s",
-            AnonyNetworkId(stopNetworkId).c_str(), AnonyNetworkId(preparedNetworkId_).c_str());
+        FI_HILOGE("DeactivateCoordination failed, stopNetworkId:%{public}s", GetAnonyString(stopNetworkId).c_str());
         isStopping_ = false;
         isUnchained_ = false;
     }
@@ -363,7 +362,7 @@ void CoordinationSM::StartRemoteCoordination(const std::string &remoteNetworkId,
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     COOR_SM->SetSinkNetworkId(remoteNetworkId);
-    FI_HILOGD("The remoteNetworkId:%{public}s", AnonyNetworkId(remoteNetworkId).c_str());
+    FI_HILOGD("The remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(std::bind(&CoordinationEventManager::OnCoordinationMessage,
         COOR_EVENT_MGR, CoordinationMessage::ACTIVATE, remoteNetworkId));
     if (ret != RET_OK) {
@@ -470,12 +469,12 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     }
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The sink preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
-            AnonyNetworkId(preparedNetworkId_.first).c_str(), AnonyNetworkId(preparedNetworkId_.second).c_str());
+            GetAnonyString(preparedNetworkId_.first).c_str(), GetAnonyString(preparedNetworkId_.second).c_str());
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-            FI_HILOGD("localNetworkId:%{public}s", AnonyNetworkId(localNetworkId).c_str());
+            FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
             COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, sinkNetworkId_, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
@@ -580,12 +579,12 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
     }
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The local preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
-            AnonyNetworkId(preparedNetworkId_.first).c_str(), AnonyNetworkId(preparedNetworkId_.second).c_str());
+            GetAnonyString(preparedNetworkId_.first).c_str(), GetAnonyString(preparedNetworkId_.second).c_str());
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-            FI_HILOGD("localNetworkId:%{public}s", AnonyNetworkId(localNetworkId).c_str());
+            FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
             COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
@@ -819,7 +818,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 {
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Online device networkId:%{public}s, localNetworkId:%{public}s",
-        AnonyNetworkId(networkId).c_str(), AnonyNetworkId(localNetworkId).c_str());
+        GetAnonyString(networkId).c_str(), GetAnonyString(localNetworkId).c_str());
     std::lock_guard<std::mutex> guard(mutex_);
     onlineDevice_.push_back(networkId);
     DP_ADAPTER->RegisterCrossingStateListener(networkId,
@@ -832,8 +831,8 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     CALL_INFO_TRACE;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Local device networkId:%{public}s, remote device networkId:%{public}s,"
-        "offline device networkId:%{public}s", AnonyNetworkId(localNetworkId).c_str(),
-        AnonyNetworkId(sinkNetworkId_).c_str(), AnonyNetworkId(networkId).c_str());
+        "offline device networkId:%{public}s", GetAnonyString(localNetworkId).c_str(),
+        GetAnonyString(sinkNetworkId_).c_str(), GetAnonyString(networkId).c_str());
     {
         DP_ADAPTER->UnregisterCrossingStateListener(networkId);
         std::lock_guard<std::mutex> guard(mutex_);
@@ -893,7 +892,7 @@ void CoordinationSM::Dump(int32_t fd)
         "coordinationState:%s | startDeviceDhid:%s | remoteNetworkId:%s | isStarting:%s | isStopping:%s\n"
         "physicalX:%d | physicalY:%d | displayX:%d | displayY:%d | interceptorId:%d | monitorId:%d | filterId:%d\n",
         GetDeviceCoordinationState(currentState_).c_str(), startDeviceDhid_.c_str(),
-        AnonyNetworkId(remoteNetworkId_).c_str(), isStarting_ ? "true" : "false",
+        GetAnonyString(remoteNetworkId_).c_str(), isStarting_ ? "true" : "false",
         isStopping_ ? "true" : "false", mouseLocation_.first, mouseLocation_.second, displayX_,
         displayY_, interceptorId_, monitorId_, filterId_);
     if (onlineDevice_.empty()) {

@@ -35,6 +35,12 @@
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "dinput_adapter.h"
+#include "dsoftbus_adapter.h"
+#include "input_adapter.h"
+#include "plugin_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #ifdef OHOS_BUILD_ENABLE_MOTION_DRAG
 #include "motion_drag.h"
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
@@ -62,6 +68,9 @@ DeviceStatusService::DeviceStatusService()
 {
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     dinput_ = std::make_shared<DInputAdapter>(this);
+    input_ = std::make_unique<InputAdapter>();
+    pluginMgr_ = std::make_unique<PluginManager>(this);
+    dsoftbus_ = std::make_unique<DSoftbusAdapter>();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
@@ -87,6 +96,7 @@ void DeviceStatusService::OnStart()
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    EnableDSoftbus();
     intention_ = sptr<IntentionService>::MakeSptr(this);
     if (!Publish(intention_)) {
 #else
@@ -146,17 +156,38 @@ ISocketSessionManager& DeviceStatusService::GetSocketSessionManager()
 
 IPluginManager& DeviceStatusService::GetPluginManager()
 {
-    return pluginMgr_;
+    return *pluginMgr_;
 }
 
 IInputAdapter& DeviceStatusService::GetInput()
 {
-    return input_;
+    return *input_;
 }
 
 IDInputAdapter& DeviceStatusService::GetDInput()
 {
     return *dinput_;
+}
+
+IDSoftbusAdapter& DeviceStatusService::GetDSoftbus()
+{
+    return *dsoftbus_;
+}
+
+void DeviceStatusService::EnableDSoftbus()
+{
+    CALL_INFO_TRACE;
+    int32_t ret = dsoftbus_->Enable();
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to enable dsoftbus, try again later");
+        int32_t timerId = timerMgr_.AddTimer(DEFAULT_WAIT_TIME_MS, WAIT_FOR_ONCE,
+            std::bind(&DeviceStatusService::EnableDSoftbus, this));
+        if (timerId < 0) {
+            FI_HILOGE("AddTimer failed, Failed to enable dsoftbus");
+        }
+    } else {
+        FI_HILOGI("Enable dsoftbus successfully");
+    }
 }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
@@ -229,14 +260,12 @@ bool DeviceStatusService::Init()
         FI_HILOGE("Dump init failed");
         goto INIT_FAIL;
     }
-#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#if defined(OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK)
     if (socketSessionMgr_.Init() != RET_OK) {
         FI_HILOGE("Failed to initialize socket session manager");
         goto INIT_FAIL;
     }
-    pluginMgr_.Init(this);
-#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-#ifdef OHOS_BUILD_ENABLE_COORDINATION
+#elif defined(OHOS_BUILD_ENABLE_COORDINATION)
     COOR_EVENT_MGR->SetIContext(this);
     COOR_SM->Init();
 #endif // OHOS_BUILD_ENABLE_COORDINATION

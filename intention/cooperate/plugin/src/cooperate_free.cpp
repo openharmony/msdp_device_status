@@ -189,7 +189,7 @@ void CooperateFree::ContactRemote::OnProgress(Context &context, const CooperateE
     const std::string remoteNetworkId = context.Peer();
     int32_t ret = context.dsoftbus_->OpenSession(remoteNetworkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to connect to \'%{public}s\'", AnonyNetworkId(remoteNetworkId).c_str());
+        FI_HILOGE("Failed to connect to \'%{public}s\'", GetAnonyString(remoteNetworkId).c_str());
         OnReset(context, event);
         return;
     }
@@ -198,7 +198,7 @@ void CooperateFree::ContactRemote::OnProgress(Context &context, const CooperateE
     };
     ret = context.dsoftbus_->StartCooperate(remoteNetworkId, request);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to contact with \'%{public}s\'", AnonyNetworkId(remoteNetworkId).c_str());
+        FI_HILOGE("Failed to contact with \'%{public}s\'", GetAnonyString(remoteNetworkId).c_str());
         OnReset(context, event);
         return;
     }
@@ -463,7 +463,7 @@ void CooperateFree::RemoteStart::OnProgress(Context &context, const CooperateEve
     };
     int32_t ret = context.dsoftbus_->StartCooperateResponse(req.networkId, resp);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to answer \'%{public}s\'", AnonyNetworkId(req.networkId).c_str());
+        FI_HILOGE("Failed to answer \'%{public}s\'", GetAnonyString(req.networkId).c_str());
         OnReset(context, event);
         return;
     }

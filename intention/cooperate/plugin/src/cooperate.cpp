@@ -34,10 +34,16 @@ Cooperate::Cooperate(IContext *env)
     context_.Enable();
 }
 
+Cooperate::~Cooperate()
+{
+    StopWorker();
+    context_.Disable();
+}
+
 int32_t Cooperate::RegisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::REGISTER_LISTENER,
         RegisterListenerEvent {
             .pid = pid
@@ -48,7 +54,7 @@ int32_t Cooperate::RegisterListener(int32_t pid)
 int32_t Cooperate::UnregisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::UNREGISTER_LISTENER,
         UnregisterListenerEvent {
             .pid = pid
@@ -59,7 +65,7 @@ int32_t Cooperate::UnregisterListener(int32_t pid)
 int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::REGISTER_HOTAREA_LISTENER,
         RegisterHotareaListenerEvent {
             .pid = pid
@@ -70,7 +76,7 @@ int32_t Cooperate::RegisterHotAreaListener(int32_t pid)
 int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::UNREGISTER_HOTAREA_LISTENER,
         UnregisterHotareaListenerEvent {
             .pid = pid
@@ -78,25 +84,27 @@ int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t Cooperate::Enable(int32_t pid)
+int32_t Cooperate::Enable(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
     StartWorker();
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::ENABLE,
         EnableCooperateEvent {
-            .pid = pid
+            .pid = pid,
+            .userData = userData,
         }));
     return RET_OK;
 }
 
-int32_t Cooperate::Disable(int32_t pid)
+int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::DISABLE,
         DisableCooperateEvent {
-            .pid = pid
+            .pid = pid,
+            .userData = userData,
         }));
     StopWorker();
     return RET_OK;
@@ -105,7 +113,7 @@ int32_t Cooperate::Disable(int32_t pid)
 int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::START,
         StartCooperateEvent {
             .pid = pid,
@@ -119,7 +127,7 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
 int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::STOP,
         StopCooperateEvent {
             .pid = pid,
@@ -132,7 +140,7 @@ int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
 int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::GET_COOPERATE_STATE,
         GetCooperateStateEvent {
             .pid = pid,
@@ -145,7 +153,7 @@ int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::s
 void Cooperate::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    sender_.Send(CooperateEvent(
+    context_.Sender().Send(CooperateEvent(
         CooperateEventType::DUMP,
         DumpEvent {
             .fd = fd
@@ -154,18 +162,21 @@ void Cooperate::Dump(int32_t fd)
 
 void Cooperate::Loop()
 {
-    running_.store(true);
-    while (running_.load()) {
+    CALL_DEBUG_ENTER;
+    bool running = true;
+
+    while (running) {
         CooperateEvent event = receiver_.Receive();
         switch (event.type) {
-            case CooperateEventType::NOOP : {
+            case CooperateEventType::NOOP: {
                 break;
             }
-            case CooperateEventType::QUIT : {
-                running_.store(false);
+            case CooperateEventType::QUIT: {
+                FI_HILOGI("Skip out of loop");
+                running = false;
                 break;
             }
-            default : {
+            default: {
                 sm_.OnEvent(context_, event);
                 break;
             }
@@ -175,16 +186,24 @@ void Cooperate::Loop()
 
 void Cooperate::StartWorker()
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    worker_ = std::thread(std::bind(&Cooperate::Loop, this));
+    if (!workerStarted_) {
+        workerStarted_ = true;
+        worker_ = std::thread(std::bind(&Cooperate::Loop, this));
+    }
 }
 
 void Cooperate::StopWorker()
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
-    sender_.Send(CooperateEvent(CooperateEventType::QUIT));
-    if (worker_.joinable()) {
-        worker_.join();
+    if (workerStarted_) {
+        context_.Sender().Send(CooperateEvent(CooperateEventType::QUIT));
+        if (worker_.joinable()) {
+            worker_.join();
+        }
+        workerStarted_ = false;
     }
 }
 

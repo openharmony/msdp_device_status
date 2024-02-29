@@ -250,7 +250,7 @@ void FusionDeviceProfileAdapter::SaveSubscribeInfos(const std::string &deviceId,
         if (callback == nullptr) {
             subscribeInfos.clear();
             FI_HILOGE("Find callback for device %{public}s failed, and the given callback is nullptr",
-                AnonyNetworkId(deviceId).c_str());
+                GetAnonyString(deviceId).c_str());
             return;
         }
         callbacks_.insert_or_assign(deviceId, callback);

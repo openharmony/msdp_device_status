@@ -232,7 +232,7 @@ void CooperateOut::RemoteStart::OnProgress(Context &context, const CooperateEven
     };
     int32_t ret = context.dsoftbus_->StartCooperateResponse(req.networkId, resp);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to answer \'%{public}s\'", AnonyNetworkId(req.networkId).c_str());
+        FI_HILOGE("Failed to answer \'%{public}s\'", GetAnonyString(req.networkId).c_str());
         OnReset(context, event);
         return;
     }
