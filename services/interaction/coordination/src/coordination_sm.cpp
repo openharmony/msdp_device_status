@@ -408,6 +408,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
+    FI_HILOGI("isSuccess: %{public}s", isSuccess);
     CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
@@ -418,6 +419,7 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
     }
 
     if (!isSuccess || (currentState_ == CoordinationState::STATE_IN)) {
+        FI_HILOGI("isSuccess is false or state is in");
         isStarting_ = false;
         return;
     }

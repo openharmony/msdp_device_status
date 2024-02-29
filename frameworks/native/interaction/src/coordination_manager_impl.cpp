@@ -218,6 +218,7 @@ int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient &clie
         FI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
+    FI_HILOGI("pkt message: userData:%{public}d, networkId:%{public}s, nType:%{public}d", userData, networkId, nType);
     OnDevCoordinationListener(networkId, CoordinationMessage(nType));
     return RET_OK;
 }
@@ -233,6 +234,7 @@ int32_t CoordinationManagerImpl::OnCoordinationMessage(const StreamClient &clien
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+    FI_HILOGI("pkt message: userData:%{public}d, networkId:%{public}s, nType:%{public}d", userData, networkId, nType);
     OnCoordinationMessageEvent(userData, networkId, CoordinationMessage(nType));
     return RET_OK;
 }
