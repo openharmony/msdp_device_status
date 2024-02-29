@@ -117,8 +117,6 @@ pub struct ProfileChangeNotification {
 
 /// Trait defining the callback methods for profile events.
 pub trait IProfileEventCallback {
-    /// This method is called when a sync operation has completed.
-    fn on_sync_completed(&self, sync_results: &SyncResult);
     /// This method is called when a profile change notification is received.
     fn on_profile_changed(&self, change_notification: &ProfileChangeNotification);
 }
@@ -160,7 +158,6 @@ impl ProfileEventCallback {
                 interface: CIProfileEventCb {
                     clone: Some(Self::clone),
                     destruct: Some(Self::destruct),
-                    on_sync_completed: Some(Self::on_sync_completed),
                     on_profile_changed: Some(Self::on_profile_changed),
                 },
                 instance: callback_mut.instance.clone(),
@@ -188,12 +185,6 @@ impl ProfileEventCallback {
         }
     }
 
-    /// This callback function is invoked when a sync operation is completed.
-    extern "C" fn on_sync_completed(_cb: *mut CIProfileEventCb, _device_id: *const c_char, _sync_result: c_int)
-    {
-        todo!()
-    }
-
     /// This callback function is invoked when a profile change notification occurs.
     extern "C" fn on_profile_changed(_cb: *mut CIProfileEventCb, _notification: *const CProfileChangeNotification)
     {
@@ -207,7 +198,6 @@ impl From<Arc<dyn IProfileEventCallback>> for ProfileEventCallback {
             interface: CIProfileEventCb {
                 clone: Some(Self::clone),
                 destruct: None,
-                on_sync_completed: Some(Self::on_sync_completed),
                 on_profile_changed: Some(Self::on_profile_changed),
             },
             instance: value,

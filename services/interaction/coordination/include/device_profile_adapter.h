@@ -32,7 +32,6 @@ class DeviceProfileAdapter final {
     class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
-        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
     };
 public:
     using DPCallback = std::function<void(const std::string &, bool)>;

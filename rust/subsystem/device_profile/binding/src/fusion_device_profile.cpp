@@ -33,7 +33,6 @@ public:
     explicit ProfileEventCallbackImpl(CIProfileEventCb* eventCb);
     ~ProfileEventCallbackImpl();
 
-    void OnSyncCompleted(const SyncResult &syncResults) override;
     void OnProfileChanged(const ProfileChangeNotification &changeNotification) override;
 
 private:
@@ -52,13 +51,6 @@ ProfileEventCallbackImpl::~ProfileEventCallbackImpl()
     if (eventCb_ != nullptr && eventCb_->destruct != nullptr) {
         eventCb_->destruct(eventCb_);
     }
-}
-
-void ProfileEventCallbackImpl::OnSyncCompleted(const SyncResult &syncResults)
-{
-    std::for_each(syncResults.begin(), syncResults.end(), [](const auto &syncResult) {
-        FI_HILOGD("Sync result:%{public}d", syncResult.second);
-    });
 }
 
 void ProfileEventCallbackImpl::OnProfileChanged(const ProfileChangeNotification &changeNotification)
@@ -190,8 +182,3 @@ int32_t UnsubscribeProfileEvents(const CIProfileEvents* profileEvents,
     return ret;
 }
 
-int32_t SyncDeviceProfile(const CSyncOptions* syncOptions, CIProfileEventCb* syncCb)
-{
-    CALL_DEBUG_ENTER;
-    return RET_ERR;
-}

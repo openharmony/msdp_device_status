@@ -37,7 +37,6 @@ class DDPAdapterImpl final : public IDDPAdapter, public std::enable_shared_from_
         ~ProfileEventCallback() = default;
         DISALLOW_COPY_AND_MOVE(ProfileEventCallback);
 
-        void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
 
     private:
@@ -98,7 +97,6 @@ private:
         std::function<int32_t(cJSON *)> parse);
     int32_t SetProperty(const std::string &name, const DPValue &value);
     int32_t PutProfile();
-    int32_t SyncProfile();
 
     std::mutex mutex_;
     std::set<Observer> observers_;
