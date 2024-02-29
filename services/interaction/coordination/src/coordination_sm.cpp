@@ -288,7 +288,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     }
     UpdateMouseLocation();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
-        FI_HILOGE("Open input softbus failed");
+        FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return COOPERATOR_FAIL;
     }
 
@@ -298,7 +298,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->ActivateCoordination(remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
-        FI_HILOGE("Start remote input failed");
+        FI_HILOGE("Start remote input failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         isStarting_ = false;
         return ret;
     }
@@ -332,7 +332,8 @@ int32_t CoordinationSM::DeactivateCoordination(bool isUnchained)
     CHKPR(state, ERROR_NULL_POINTER);
     int32_t ret = state->DeactivateCoordination(stopNetworkId, isUnchained, preparedNetworkId_);
     if (ret != RET_OK) {
-        FI_HILOGE("Stop input device coordination failed");
+        FI_HILOGE("DeactivateCoordination failed, stopNetworkId:%{public}s, preparedNetworkId:%{public}s",
+            AnonyNetworkId(stopNetworkId).c_str(), AnonyNetworkId(preparedNetworkId_).c_str());
         isStopping_ = false;
         isUnchained_ = false;
     }
@@ -408,8 +409,8 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
         return;
     }
     startDeviceDhid_ = startDeviceDhid;
-    FI_HILOGI("isSuccess: %{public}s", isSuccess);
     CoordinationMessage msg = isSuccess ? CoordinationMessage::ACTIVATE_SUCCESS : CoordinationMessage::ACTIVATE_FAIL;
+    FI_HILOGI("Msg:%{public}s", isSuccess ? "ACTIVATE_SUCCESS" : "ACTIVATE_FAIL");
     auto *context = COOR_EVENT_MGR->GetIContext();
     CHKPV(context);
     int32_t ret = context->GetDelegateTasks().PostAsyncTask(
@@ -419,7 +420,6 @@ void CoordinationSM::StartRemoteCoordinationResult(bool isSuccess, const std::st
     }
 
     if (!isSuccess || (currentState_ == CoordinationState::STATE_IN)) {
-        FI_HILOGI("isSuccess is false or state is in");
         isStarting_ = false;
         return;
     }
@@ -601,14 +601,14 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
 
 void CoordinationSM::NotifyRemoteStartFail(const std::string &remoteNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     COOR_SOFTBUS_ADAPTER->StartRemoteCoordinationResult(remoteNetworkId, false, "", 0, 0);
     COOR_EVENT_MGR->OnStart(CoordinationMessage::ACTIVATE_FAIL);
 }
 
 void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDeviceDhid)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     COOR_SOFTBUS_ADAPTER->StartRemoteCoordinationResult(remoteNetworkId, true, startDeviceDhid, mouseLocation_.first,
         mouseLocation_.second);
     COOR_EVENT_MGR->OnStart(CoordinationMessage::ACTIVATE_SUCCESS);
@@ -617,7 +617,7 @@ void CoordinationSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId
 
 void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     COOR_SOFTBUS_ADAPTER->StopRemoteCoordinationResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
         COOR_EVENT_MGR->OnStop(CoordinationMessage::DEACTIVATE_FAIL);

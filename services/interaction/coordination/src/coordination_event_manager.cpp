@@ -144,6 +144,8 @@ void CoordinationEventManager::NotifyCoordinationMessage(
     CHKPV(sess);
     NetPacket pkt(msgId);
     pkt << userData << networkId << static_cast<int32_t>(msg);
+    FI_HILOGI("UserData:%{public}d, networkId:%{public}s, msg:%{public}d",
+        userData, GetAnonyString(networkId).c_str(), static_cast<int32_t>(msg));
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet write data failed");
         return;
@@ -160,6 +162,7 @@ void CoordinationEventManager::NotifyCoordinationState(SessionPtr sess, MessageI
     CHKPV(sess);
     NetPacket pkt(msgId);
     pkt << userData << state;
+    FI_HILOGI("UserData:%{public}d, state:%{public}s", userData, (state ? "true" : "false"));
     if (pkt.ChkRWError()) {
         FI_HILOGE("Coordination state, packet write data failed");
         return;

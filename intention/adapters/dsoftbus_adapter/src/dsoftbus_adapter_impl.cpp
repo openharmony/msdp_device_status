@@ -366,25 +366,25 @@ void DSoftbusAdapterImpl::ConfigTcpAlive(int32_t socket)
     int32_t keepAliveTimeout { 10 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPIDLE, &keepAliveTimeout, sizeof(keepAliveTimeout));
     if (result != RET_OK) {
-        FI_HILOGE("Config tcp alive, setsockopt set idle falied, result:%{public}d", result);
+        FI_HILOGE("Config tcp alive, setsockopt set idle failed, result:%{public}d", result);
         return;
     }
     int32_t keepAliveCount { 5 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPCNT, &keepAliveCount, sizeof(keepAliveCount));
     if (result != RET_OK) {
-        FI_HILOGE("Config tcp alive, setsockopt set cnt falied");
+        FI_HILOGE("Config tcp alive, setsockopt set cnt failed");
         return;
     }
     int32_t interval { 1 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
     if (result != RET_OK) {
-        FI_HILOGE("Config tcp alive, setsockopt set intvl falied");
+        FI_HILOGE("Config tcp alive, setsockopt set intvl failed");
         return;
     }
     int32_t enable { 1 };
     result = setsockopt(handle, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
     if (result != RET_OK) {
-        FI_HILOGE("Config tcp alive, setsockopt enable alive falied");
+        FI_HILOGE("Config tcp alive, setsockopt enable alive failed");
         return;
     }
 }
