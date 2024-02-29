@@ -33,7 +33,6 @@ enum CooperateState : size_t {
 enum class CooperateEventType {
     NOOP,
     QUIT,
-    UPDATE_STATE,
     REGISTER_LISTENER,
     UNREGISTER_LISTENER,
     REGISTER_HOTAREA_LISTENER,
@@ -48,19 +47,32 @@ enum class CooperateEventType {
     DDM_BOARD_ONLINE,
     DDM_BOARD_OFFLINE,
     DDP_COOPERATE_SWITCH_CHANGED,
-    INPUT_PLUG_KEYBOARD,
-    INPUT_UNPLUG_KEYBOARD,
-    INPUT_UNPLUG_POINTER,
-    INPUT_POINTER_MOVE,
-    DINPUT_PREPARE_RESULT,
-    DINPUT_START_RESULT,
-    DINPUT_SESSION_CLOSED,
-    DINPUT_STOP_RESULT,
+    INPUT_HOTPLUG_EVENT,
+    INPUT_POINTER_EVENT,
     DSOFTBUS_SESSION_OPEND,
     DSOFTBUS_SESSION_CLOSED,
     DSOFTBUS_START_COOPERATE,
     DSOFTBUS_START_COOPERATE_RESPONSE,
     DSOFTBUS_START_COOPERATE_FINISHED,
+    DSOFTBUS_COME_BACK,
+    DSOFTBUS_STOP_COOPERATE,
+    DSOFTBUS_STOP_COOPERATE_FINISHED,
+    DSOFTBUS_RELAY_COOPERATE,
+    DSOFTBUS_RELAY_COOPERATE_RESPONSE,
+    DSOFTBUS_RELAY_COOPERATE_FINISHED,
+};
+
+struct Coordinate {
+    int32_t x;
+    int32_t y;
+};
+using NormalizedCoordinate = Coordinate;
+
+struct Rectangle {
+    int32_t width;
+    int32_t height;
+    int32_t x;
+    int32_t y;
 };
 
 struct UpdateStateEvent {
@@ -69,6 +81,7 @@ struct UpdateStateEvent {
 
 struct RegisterListenerEvent {
     int32_t pid;
+    int32_t userData;
 };
 
 using UnregisterListenerEvent = RegisterListenerEvent;
@@ -102,55 +115,49 @@ struct DumpEvent {
 
 struct DDMBoardOnlineEvent {
     std::string networkId;
-};
-
-using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
-
-struct DDPCooperateSwitchChanged {
-    std::string networkId;
-    bool status;
-};
-
-struct InputHotplugEvent {
-    std::string dhid;
-};
-
-struct DInputPrepareResult {
-    std::string remoteNetworkId;
-    std::string originNetworkId;
-    int32_t startDeviceId;
-    bool success;
-};
-
-struct DInputStopResult {
-    std::string originNetworkId;
-    int32_t startDeviceId;
-    bool success;
-};
-
-using DInputStartResult = DInputPrepareResult;
-
-struct DSoftbusSessionClosed {
-    std::string networkId;
-};
-
-using DSoftbusStartCooperate = DSoftbusSessionClosed;
-
-struct DSoftbusStartCooperateResponse {
-    std::string networkId;
     bool normal;
 };
 
-struct Coordinate {
-    int32_t x;
-    int32_t y;
+using DDMBoardOfflineEvent = DDMBoardOnlineEvent;
+using DDPCooperateSwitchChanged = DDMBoardOnlineEvent;
+
+enum class InputHotplugType {
+    PLUG,
+    UNPLUG,
 };
+
+struct InputHotplugEvent {
+    int32_t deviceId;
+    InputHotplugType type;
+};
+
+struct InputPointerEvent {
+    int32_t deviceId;
+    int32_t pointerAction;
+    int32_t sourceType;
+    Coordinate position;
+};
+
+using DSoftbusSessionOpened = DDMBoardOnlineEvent;
+using DSoftbusSessionClosed = DDMBoardOnlineEvent;
+using DSoftbusStartCooperate = DDMBoardOnlineEvent;
+using DSoftbusStartCooperateResponse = DDMBoardOnlineEvent;
 
 struct DSoftbusStartCooperateFinished {
     std::string networkId;
-    std::string startDeviceDhid;
+    std::string originNetworkId;
     bool success;
-    Coordinate cursorPos;
+    NormalizedCoordinate cursorPos;
+};
+
+using DSoftbusComeBack = DSoftbusStartCooperateFinished;
+using DSoftbusStopCooperate = DDMBoardOnlineEvent;
+using DSoftbusStopCooperateFinished = DDMBoardOnlineEvent;
+
+struct DSoftbusRelayCooperate {
+    std::string networkId;
+    std::string targetNetworkId;
+    bool normal;
 };
 
 struct CooperateEvent {
@@ -170,15 +177,16 @@ struct CooperateEvent {
         GetCooperateStateEvent,
         DumpEvent,
         DDMBoardOnlineEvent,
-        DDPCooperateSwitchChanged,
-        DInputPrepareResult,
-        DInputStopResult,
         InputHotplugEvent,
-        DSoftbusSessionClosed,
-        DSoftbusStartCooperateResponse,
-        DSoftbusStartCooperateFinished
+        InputPointerEvent,
+        DSoftbusStartCooperateFinished,
+        DSoftbusRelayCooperate
     > event;
 };
+
+inline constexpr int32_t DEFAULT_TIMEOUT { 3000 };
+inline constexpr int32_t REPEAT_ONCE { 1 };
+inline constexpr int32_t DEFAULT_COOLING_TIME { 100 };
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -16,17 +16,17 @@
 #ifndef COOPERATE_CONTEXT_H
 #define COOPERATE_CONTEXT_H
 
-#include <memory>
-
 #include "nocopyable.h"
 
 #include "cooperate_events.h"
+#include "ddm_adapter.h"
+#include "ddp_adapter.h"
 #include "dsoftbus_handler.h"
 #include "event_manager.h"
-#include "input_device_manager.h"
+#include "hot_area.h"
+#include "input_event_transmission/input_event_builder.h"
+#include "input_event_transmission/input_event_interceptor.h"
 #include "i_context.h"
-#include "i_ddm_adapter.h"
-#include "i_ddp_adapter.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -43,44 +43,48 @@ public:
     void Disable();
 
     Channel<CooperateEvent>::Sender Sender() const;
-    std::string Origin() const;
+    std::string Local() const;
     std::string Peer() const;
-    std::string StartDeviceDhid() const;
     int32_t StartDeviceId() const;
-    std::vector<std::string> CooperateDhids() const;
     Coordinate CursorPosition() const;
+    NormalizedCoordinate NormalizedCursorPosition() const;
 
+    bool IsLocal(const std::string &networkId) const;
     bool IsPeer(const std::string &networkId) const;
 
+    void EnableCooperate(const EnableCooperateEvent &event);
+    void DisableCooperate(const DisableCooperateEvent &event);
     void StartCooperate(const StartCooperateEvent &event);
-    void RemoteStart(const DSoftbusStartCooperate &event);
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
+    void RelayCooperate(const DSoftbusRelayCooperate &event);
+    void OnPointerEvent(const InputPointerEvent &event);
 
-    std::shared_ptr<InputDeviceManager> devMgr_;
-    std::shared_ptr<IDDMAdapter> ddm_;
-    std::shared_ptr<IDDPAdapter> ddp_;
-    std::shared_ptr<DSoftbusHandler> dsoftbus_;
+    DDMAdapter ddm_;
+    DDPAdapter ddp_;
+    DSoftbusHandler dsoftbus_;
     EventManager eventMgr_;
+    HotArea hotArea_;
+    InputEventBuilder inputEventBuilder_;
+    InputEventInterceptor inputEventInterceptor_;
 
 private:
-    int32_t EnableDevMgr();
-    void DisableDevMgr();
-    int32_t EnableDSoftbus();
-    void DisableDSoftbus();
     int32_t EnableDDM();
     void DisableDDM();
     int32_t EnableDDP();
     void DisableDDP();
-    void SetCursorPosition(const DSoftbusStartCooperateFinished &event);
+    int32_t EnableDevMgr();
+    void DisableDevMgr();
+    void SetCursorPosition(const Coordinate &cursorPos);
+    void ResetCursorPosition();
 
+    IContext *env_ { nullptr };
     Channel<CooperateEvent>::Sender sender_;
-    std::string originNetworkId_;
     std::string remoteNetworkId_;
-    std::string startDeviceDhid_;
     int32_t startDeviceId_ { -1 };
     Coordinate cursorPos_ {};
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceProfileObserver> dpObserver_;
+    std::shared_ptr<IDeviceObserver> hotplugObserver_;
 };
 
 inline Channel<CooperateEvent>::Sender Context::Sender() const
@@ -88,9 +92,9 @@ inline Channel<CooperateEvent>::Sender Context::Sender() const
     return sender_;
 }
 
-inline std::string Context::Origin() const
+inline std::string Context::Local() const
 {
-    return originNetworkId_;
+    return DSoftbusHandler::GetLocalNetworkId();
 }
 
 inline std::string Context::Peer() const
@@ -98,24 +102,19 @@ inline std::string Context::Peer() const
     return remoteNetworkId_;
 }
 
-inline std::string Context::StartDeviceDhid() const
-{
-    return startDeviceDhid_;
-}
-
 inline int32_t Context::StartDeviceId() const
 {
     return startDeviceId_;
 }
 
-inline std::vector<std::string> Context::CooperateDhids() const
-{
-    return devMgr_->GetCooperateDhids(startDeviceId_);
-}
-
 inline Coordinate Context::CursorPosition() const
 {
     return cursorPos_;
+}
+
+inline bool Context::IsLocal(const std::string &networkId) const
+{
+    return (networkId == DSoftbusHandler::GetLocalNetworkId());
 }
 
 inline bool Context::IsPeer(const std::string &networkId) const

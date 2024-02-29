@@ -18,7 +18,6 @@
 
 #include <list>
 #include <mutex>
-#include <string>
 
 #include "nocopyable.h"
 
@@ -32,7 +31,14 @@ namespace DeviceStatus {
 namespace Cooperate {
 class EventManager final {
 public:
-    enum EventType { LISTENER, ENABLE, START, STOP, STATE };
+    enum EventType {
+        LISTENER,
+        ENABLE,
+        START,
+        STOP,
+        STATE,
+    };
+
     struct EventInfo {
         EventType type { LISTENER };
         MessageId msgId { MessageId::INVALID };
@@ -47,28 +53,29 @@ public:
     ~EventManager() = default;
     DISALLOW_COPY_AND_MOVE(EventManager);
 
+    void RegisterListener(const RegisterListenerEvent &event);
+    void UnregisterListener(const UnregisterListenerEvent &event);
+    void EnableCooperate(const EnableCooperateEvent &event);
+    void DisableCooperate(const DisableCooperateEvent &event);
     void StartCooperate(const StartCooperateEvent &event);
     void StartCooperateFinish(const DSoftbusStartCooperateFinished &event);
     void RemoteStart(const DSoftbusStartCooperate &event);
     void RemoteStartFinish(const DSoftbusStartCooperateFinished &event);
-
-    void AddCooperateEvent(std::shared_ptr<EventInfo> event);
-    void RemoveCooperateEvent(std::shared_ptr<EventInfo> event);
-    int32_t OnCooperateMessage(CoordinationMessage msg, const std::string &networkId = "");
-    void OnEnable(CoordinationMessage msg, const std::string &networkId = "");
-    void OnStart(CoordinationMessage msg, const std::string &networkId = "");
-    void OnStop(CoordinationMessage msg, const std::string &networkId = "");
-    void OnGetCrossingSwitchState(bool state);
-    void OnErrorMessage(EventType type, CoordinationMessage msg);
+    void StopCooperate(const StopCooperateEvent &event);
+    void StopCooperateFinish(const DSoftbusStopCooperateFinished &event);
+    void RemoteStop(const DSoftbusStopCooperate &event);
+    void RemoteStopFinish(const DSoftbusStopCooperateFinished &event);
+    void OnProfileChanged(const DDPCooperateSwitchChanged &event);
+    void OnSoftbusSessionClosed(const DSoftbusSessionClosed &event);
 
 private:
+    void OnCooperateMessage(CoordinationMessage msg, const std::string &networkId);
     void NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t userData,
         const std::string &networkId, CoordinationMessage msg);
     void NotifyCooperateState(int32_t pid, MessageId msgId, int32_t userData, bool state);
 
 private:
     IContext *env_ { nullptr };
-    std::mutex lock_;
     std::list<std::shared_ptr<EventInfo>> listeners_;
     std::map<EventType, std::shared_ptr<EventInfo>> calls_ {
         { EventType::ENABLE, nullptr },

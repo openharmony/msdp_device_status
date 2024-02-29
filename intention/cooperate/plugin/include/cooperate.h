@@ -31,7 +31,7 @@ namespace Cooperate {
 class Cooperate final : public ICooperate {
 public:
     Cooperate(IContext *env);
-    ~Cooperate() = default;
+    ~Cooperate();
     DISALLOW_COPY_AND_MOVE(Cooperate);
 
     int32_t RegisterListener(int32_t pid) override;
@@ -39,8 +39,8 @@ public:
     int32_t RegisterHotAreaListener(int32_t pid) override;
     int32_t UnregisterHotAreaListener(int32_t pid) override;
 
-    int32_t Enable(int32_t pid) override;
-    int32_t Disable(int32_t pid) override;
+    int32_t Enable(int32_t pid, int32_t userData) override;
+    int32_t Disable(int32_t pid, int32_t userData) override;
     int32_t Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
     int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) override;
 
@@ -56,9 +56,8 @@ private:
     Context context_;
     StateMachine sm_;
     std::mutex lock_;
+    bool workerStarted_ { false };
     std::thread worker_;
-    std::atomic_bool running_ { false };
-    Channel<CooperateEvent>::Sender sender_;
     Channel<CooperateEvent>::Receiver receiver_;
 };
 } // namespace Cooperate

@@ -31,10 +31,10 @@
 #include "drag_manager.h"
 #include "i_context.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-#include "dinput_adapter.h"
-#include "plugin_manager.h"
-#include "input_adapter.h"
 #include "intention_service.h"
+#include "i_dinput_adapter.h"
+#include "i_input_adapter.h"
+#include "i_plugin_manager.h"
 #include "socket_session_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stationary_callback.h"
@@ -68,6 +68,7 @@ public:
     ISocketSessionManager& GetSocketSessionManager() override;
     IInputAdapter& GetInput() override;
     IDInputAdapter& GetDInput() override;
+    IDSoftbusAdapter& GetDSoftbus() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
@@ -132,6 +133,9 @@ private:
     void DisableDevMgr();
     int32_t OnAddHotAreaListener(int32_t pid);
     int32_t OnRemoveHotAreaListener(int32_t pid);
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    void EnableDSoftbus();
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t OnRegisterCoordinationListener(int32_t pid);
@@ -158,9 +162,10 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     SocketSessionManager socketSessionMgr_;
-    PluginManager pluginMgr_;
-    InputAdapter input_;
-    std::shared_ptr<DInputAdapter> dinput_;
+    std::shared_ptr<IDInputAdapter> dinput_;
+    std::unique_ptr<IInputAdapter> input_;
+    std::unique_ptr<IPluginManager> pluginMgr_;
+    std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
     sptr<IntentionService> intention_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };

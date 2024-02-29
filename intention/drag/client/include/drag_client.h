@@ -46,15 +46,14 @@ public:
     int32_t UpdateShadowPic(ITunnelClient &tunnel, const ShadowInfo &shadowInfo);
     int32_t GetDragTargetPid(ITunnelClient &tunnel);
     int32_t GetUdKey(ITunnelClient &tunnel, std::string &udKey);
-    int32_t GetShadowOffset(ITunnelClient &tunnel,
-        int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height);
+    int32_t GetShadowOffset(ITunnelClient &tunnel, ShadowOffset &shadowOffset);
     int32_t GetDragData(ITunnelClient &tunnel, DragData &dragData);
     int32_t UpdatePreviewStyle(ITunnelClient &tunnel, const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(ITunnelClient &tunnel,
         const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summarys);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
-    int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
+    int32_t EnableUpperCenterMode(ITunnelClient &tunnel, bool enable);
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
     int32_t GetExtraInfo(ITunnelClient &tunnel, std::string &extraInfo);
     int32_t AddPrivilege(ITunnelClient &tunnel);
