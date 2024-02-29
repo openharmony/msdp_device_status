@@ -181,8 +181,7 @@ int32_t DragClient::GetUdKey(ITunnelClient &tunnel, std::string &udKey)
     return RET_ERR;
 }
 
-int32_t DragClient::GetShadowOffset(ITunnelClient &tunnel,
-    int32_t &offsetX, int32_t &offsetY, int32_t &width, int32_t &height)
+int32_t DragClient::GetShadowOffset(ITunnelClient &tunnel, ShadowOffset &shadowOffset)
 {
     return RET_ERR;
 }
@@ -221,7 +220,7 @@ int32_t DragClient::GetDragState(ITunnelClient &tunnel, DragState &dragState)
     return RET_ERR;
 }
 
-int32_t DragClient::EnterTextEditorArea(ITunnelClient &tunnel, bool enable)
+int32_t DragClient::EnableUpperCenterMode(ITunnelClient &tunnel, bool enable)
 {
     return RET_ERR;
 }

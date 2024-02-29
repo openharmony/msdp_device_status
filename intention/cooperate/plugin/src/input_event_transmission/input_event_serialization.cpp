@@ -16,9 +16,9 @@
 #include "input_event_transmission/input_event_serialization.h"
 
 #include "extra_data.h"
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_SECURITY_PART
 #include "sec_comp_enhance_kit.h"
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#endif // OHOS_BUILD_ENABLE_SECURITY_PART
 
 #include "devicestatus_define.h"
 
@@ -529,7 +529,7 @@ int32_t InputEventSerialization::Unmarshalling(NetPacket &pkt, std::shared_ptr<M
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_SECURITY_PART
 int32_t InputEventSerialization::MarshallingEnhanceData(std::shared_ptr<MMI::PointerEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -651,7 +651,7 @@ int32_t InputEventSerialization::UnmarshallingEnhanceData(NetPacket &pkt, std::s
     event->SetEnhanceData(enhanceData);
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#endif // OHOS_BUILD_ENABLE_SECURITY_PART
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

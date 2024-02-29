@@ -18,14 +18,13 @@
 
 #include "nocopyable.h"
 
-#include "cooperate_context.h"
 #include "i_cooperate_state.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-class StateMachine final {
+class StateMachine final : public IStateMachine {
 public:
     StateMachine(IContext *env);
     ~StateMachine() = default;
@@ -34,15 +33,34 @@ public:
     void OnEvent(Context &context, const CooperateEvent &event);
 
 private:
-    void UpdateState(Context &context, const CooperateEvent &event);
+    void TransiteTo(Context &context, CooperateState state) override;
+    void AddHandler(CooperateEventType event, void (StateMachine::*handler)(Context&, const CooperateEvent&));
+    void OnQuit(Context &context);
+    void RegisterListener(Context &context, const CooperateEvent &event);
+    void UnregisterListener(Context &context, const CooperateEvent &event);
+    void RegisterHotAreaListener(Context &context, const CooperateEvent &event);
+    void UnregisterHotAreaListener(Context &context, const CooperateEvent &event);
     void EnableCooperate(Context &context, const CooperateEvent &event);
     void DisableCooperate(Context &context, const CooperateEvent &event);
+    void GetCooperateState(Context &context, const CooperateEvent &event);
     void OnBoardOnline(Context &context, const CooperateEvent &event);
     void OnBoardOffline(Context &context, const CooperateEvent &event);
+    void OnProfileChanged(Context &context, const CooperateEvent &event);
+    void OnPointerEvent(Context &context, const CooperateEvent &event);
+    void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+    void Transfer(Context &context, const CooperateEvent &event);
+    void AddSessionObserver(Context &context, const EnableCooperateEvent &event);
+    void RemoveSessionObserver(Context &context, const DisableCooperateEvent &event);
+    void AddMonitor(Context &context);
+    void RemoveMonitor(Context &context);
+    void RemoveWatches(Context &context);
 
+    IContext *env_ { nullptr };
+    std::map<CooperateEventType, std::function<void(Context&, const CooperateEvent&)>> handlers_;
     size_t current_ { COOPERATE_STATE_FREE };
     std::array<std::shared_ptr<ICooperateState>, N_COOPERATE_STATES> states_;
     std::set<std::string> onlineBoards_;
+    int32_t monitorId_ { -1 };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
