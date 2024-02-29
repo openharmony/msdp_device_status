@@ -210,7 +210,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
-    SetDragState(DragState::STOP);
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
         Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
         if (result != Rosen::WMError::WM_OK) {
@@ -226,6 +225,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    SetDragState(DragState::STOP);
     if (isControlMultiScreenVisible_) {
         isControlMultiScreenVisible_ = false;
     }
@@ -732,10 +732,12 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
     }
     dragAction_.store(DragAction::MOVE);
     DragData dragData = DRAG_DATA_MGR.GetDragData();
-    if ((dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) && !DRAG_DATA_MGR.IsMotionDrag()) {
+    if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
-        FI_HILOGI("Set the pointer cursor visible");
-        MMI::InputManager::GetInstance()->SetPointerVisible(true);
+        if (dragState_ != DragState::MOTION_DRAGGING) {
+            FI_HILOGI("Set the pointer cursor visible");
+            MMI::InputManager::GetInstance()->SetPointerVisible(true);
+        }
     }
     FI_HILOGI("Stop drag, appened extra data");
     MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
@@ -795,7 +797,7 @@ void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 void DragManager::StateChangedNotify(DragState state)
 {
     CALL_INFO_TRACE;
-    if ((stateChangedCallback_ != nullptr) && (!DRAG_DATA_MGR.IsMotionDrag())) {
+    if ((stateChangedCallback_ != nullptr) && (dragState_ != DragState::MOTION_DRAGGING)) {
         stateChangedCallback_(state);
     }
 }
