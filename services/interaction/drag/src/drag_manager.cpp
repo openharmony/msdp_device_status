@@ -210,7 +210,6 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
         FI_HILOGE("On stop drag failed");
         ret = RET_ERR;
     }
-    SetDragState(DragState::STOP);
     if (dropResult.result == DragResult::DRAG_SUCCESS && dropResult.mainWindow > 0) {
         Rosen::WMError result = Rosen::WindowManager::GetInstance().RaiseWindowToTop(dropResult.mainWindow);
         if (result != Rosen::WMError::WM_OK) {
@@ -226,6 +225,7 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     DRAG_DATA_MGR.ResetDragData();
     dragResult_ = static_cast<DragResult>(dropResult.result);
     StateChangedNotify(DragState::STOP);
+    SetDragState(DragState::STOP);
     if (isControlMultiScreenVisible_) {
         isControlMultiScreenVisible_ = false;
     }
