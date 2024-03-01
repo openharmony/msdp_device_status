@@ -173,7 +173,7 @@ void CoordinationManagerImpl::OnCoordinationMessageEvent(int32_t userData,
     CHKPV(event);
     event(networkId, msg);
     FI_HILOGD("Coordination msg event callback, userData:%{public}d, networkId:%{public}s",
-        userData, AnonyNetworkId(networkId).c_str());
+        userData, GetAnonyString(networkId).c_str());
 }
 
 void CoordinationManagerImpl::OnCoordinationStateEvent(int32_t userData, bool state)
@@ -218,6 +218,8 @@ int32_t CoordinationManagerImpl::OnCoordinationListener(const StreamClient &clie
         FI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
+    FI_HILOGI("UserData:%{public}d, networkId:%{public}s, nType:%{public}d",
+        userData, GetAnonyString(networkId).c_str(), nType);
     OnDevCoordinationListener(networkId, CoordinationMessage(nType));
     return RET_OK;
 }
@@ -233,6 +235,8 @@ int32_t CoordinationManagerImpl::OnCoordinationMessage(const StreamClient &clien
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+    FI_HILOGI("UserData:%{public}d, networkId:%{public}s, nType:%{public}d",
+        userData, GetAnonyString(networkId).c_str(), nType);
     OnCoordinationMessageEvent(userData, networkId, CoordinationMessage(nType));
     return RET_OK;
 }
@@ -242,12 +246,12 @@ int32_t CoordinationManagerImpl::OnCoordinationState(const StreamClient &client,
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     bool state = false;
-
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+    FI_HILOGI("UserData:%{public}d, state:%{public}s", userData, (state ? "true" : "false"));
     OnCoordinationStateEvent(userData, state);
     return RET_OK;
 }

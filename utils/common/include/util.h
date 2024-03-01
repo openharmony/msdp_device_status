@@ -101,11 +101,6 @@ inline bool MultiplyInt64(int64_t op1, int64_t op2, int64_t& res)
     return MultiplyInt(op1, op2, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max(), res);
 }
 
-inline std::string AnonyNetworkId(const std::string &networkId)
-{
-    return networkId.substr(0, SUBSTR_NETWORK_ID_LEN);
-}
-
 size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);
 std::string GetAnonyString(const std::string &value);
 std::string StringPrintf(const char *format, ...);

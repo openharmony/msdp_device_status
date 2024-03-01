@@ -131,7 +131,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &n
         return RET_OK;
     }
     callbacks_[networkId] = callback;
-    FI_HILOGI("Register crossing state listener success, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
+    FI_HILOGI("Register crossing state listener success, networkId:%{public}s", GetAnonyString(networkId).c_str());
     int32_t ret = RegisterProfileListener(networkId);
     if (ret != RET_OK) {
         FI_HILOGE("Register profile listener failed");
@@ -145,7 +145,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         FI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
-    FI_HILOGI("Unregister crossing state listener, networkId:%{public}s", AnonyNetworkId(networkId).c_str());
+    FI_HILOGI("Unregister crossing state listener, networkId:%{public}s", GetAnonyString(networkId).c_str());
     std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(networkId);
     if (it != profileEventCallbacks_.end()) {
@@ -205,7 +205,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
         FI_HILOGI("Crossing switch state:%{public}s", stateStr.c_str());
     } else {
         callbacks_.erase(it);
-        FI_HILOGW("Remove networkId:%{public}s profile changed callback", AnonyNetworkId(networkId).c_str());
+        FI_HILOGW("Remove networkId:%{public}s profile changed callback", GetAnonyString(networkId).c_str());
     }
 }
 } // namespace DeviceStatus

@@ -258,7 +258,7 @@ int32_t CoordinationSoftbusAdapter::OpenInputSoftbus(const std::string &remoteNe
     }
     char peerNetworkId[PKG_NAME_SIZE_MAX] = { 0 };
     if (ChkAndCpyStr(peerNetworkId, PKG_NAME_SIZE_MAX, remoteNetworkId.c_str()) != RET_OK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", AnonyNetworkId(remoteNetworkId).c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] = FI_PKG_NAME;
@@ -325,7 +325,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -375,7 +375,7 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -405,7 +405,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -432,7 +432,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -459,7 +459,7 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -486,7 +486,7 @@ int32_t CoordinationSoftbusAdapter::NotifyFilterAdded(const std::string &remoteN
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the remote device");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -511,7 +511,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
     CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(originNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Failed to discover the original device");
+        FI_HILOGE("Failed to discover the originNetworkId:%{public}s", GetAnonyString(originNetworkId).c_str());
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[originNetworkId];
@@ -699,31 +699,31 @@ void CoordinationSoftbusAdapter::ConfigTcpAlive(int32_t socket)
     int32_t keepAliveTimeout { 10 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPIDLE, &keepAliveTimeout, sizeof(keepAliveTimeout));
     if (result != RET_OK) {
-        FI_HILOGE("Falied to enable setsockopt for ailve-timeout, %{public}d", result);
+        FI_HILOGE("Failed to enable setsockopt for ailve-timeout, %{public}d", result);
         return;
     }
     int32_t keepAliveCount { 5 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPCNT, &keepAliveCount, sizeof(keepAliveCount));
     if (result != RET_OK) {
-        FI_HILOGE("Falied to enable setsockopt for ailve-count, %{public}d", result);
+        FI_HILOGE("Failed to enable setsockopt for ailve-count, %{public}d", result);
         return;
     }
     int32_t interval { 1 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
     if (result != RET_OK) {
-        FI_HILOGE("Falied to enable setsockopt for interval, %{public}d", result);
+        FI_HILOGE("Failed to enable setsockopt for interval, %{public}d", result);
         return;
     }
     int32_t enable { 1 };
     result = setsockopt(handle, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
     if (result != RET_OK) {
-        FI_HILOGE("Falied to enable setsockopt for keep-alive, %{public}d", result);
+        FI_HILOGE("Failed to enable setsockopt for keep-alive, %{public}d", result);
         return;
     }
     int32_t TimeoutMs { 15000 };
     result = setsockopt(handle, IPPROTO_TCP, TCP_USER_TIMEOUT, &TimeoutMs, sizeof(TimeoutMs));
     if (result != RET_OK) {
-        FI_HILOGE("Falied to enable setsockopt for timeout, %{public}d", result);
+        FI_HILOGE("Failed to enable setsockopt for timeout, %{public}d", result);
         return;
     }
 }
