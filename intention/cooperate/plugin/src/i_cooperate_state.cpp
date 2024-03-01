@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,15 +19,32 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+namespace {
+constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICooperateState" };
+} // namespace
 
 ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::shared_ptr<ICooperateStep> prev)
     : parent_(parent), prev_(prev)
 {}
 
+void ICooperateState::TransiteTo(Context &context, CooperateState state)
+{
+    parent_.TransiteTo(context, state);
+}
+
 void ICooperateState::Switch(std::shared_ptr<ICooperateStep> step)
 {
     if (step != nullptr) {
         current_ = step;
+    }
+}
+
+void ICooperateState::ICooperateStep::OnEvent(Context &context, const CooperateEvent &event)
+{
+    if (auto iter = handlers_.find(event.type); iter != handlers_.end()) {
+        iter->second(context, event);
+    } else {
+        FI_HILOGD("Unhandled event(%{public}d)", event.type);
     }
 }
 
@@ -39,6 +56,11 @@ void ICooperateState::ICooperateStep::SetNext(std::shared_ptr<ICooperateStep> ne
         next_->SetNext(nullptr);
         next_ = nullptr;
     }
+}
+
+void ICooperateState::ICooperateStep::TransiteTo(Context &context, CooperateState state)
+{
+    parent_.TransiteTo(context, state);
 }
 
 void ICooperateState::ICooperateStep::Switch(std::shared_ptr<ICooperateStep> step)
@@ -60,6 +82,37 @@ void ICooperateState::ICooperateStep::Reset(Context &context, const CooperateEve
         Switch(prev_);
         prev_->OnReset(context, event);
     }
+}
+
+std::string ICooperateState::Process::Peer() const
+{
+    return remoteNetworkId_;
+}
+
+int32_t ICooperateState::Process::StartDeviceId() const
+{
+    return startDeviceId_;
+}
+
+bool ICooperateState::Process::IsPeer(const std::string &networkId) const
+{
+    return (networkId == remoteNetworkId_);
+}
+
+void ICooperateState::Process::StartCooperate(Context &context, const StartCooperateEvent &event)
+{
+    remoteNetworkId_ = event.remoteNetworkId;
+    startDeviceId_ = event.startDeviceId;
+}
+
+void ICooperateState::Process::RemoteStart(Context &context, const DSoftbusStartCooperate &event)
+{
+    remoteNetworkId_ = event.networkId;
+}
+
+void ICooperateState::Process::RelayCooperate(Context &context, const DSoftbusRelayCooperate &event)
+{
+    remoteNetworkId_ = event.targetNetworkId;
 }
 } // namespace Cooperate
 } // namespace DeviceStatus
