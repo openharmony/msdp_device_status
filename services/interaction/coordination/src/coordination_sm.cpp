@@ -1078,7 +1078,7 @@ void CoordinationSM::OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerE
         int32_t deviceId = pointerEvent->GetDeviceId();
         std::string dhid = COOR_DEV_MGR->GetDhid(deviceId);
         FI_HILOGI("Start coordination device dhid:\"%{public}s\", Now device dhid:\"%{public}s\"",
-                  startDeviceDhid_.c_str(), dhid.c_str());
+                  GetAnonyString(startDeviceDhid_).c_str(), GetAnonyString(dhid).c_str());
         if (startDeviceDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
             DeactivateCoordination(isUnchained_);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,8 @@ namespace DeviceStatus {
 namespace Cooperate {
 class CooperateIn final : public ICooperateState {
 public:
-    CooperateIn(IContext *env);
-    ~CooperateIn() = default;
+    CooperateIn(IStateMachine &parent, IContext *env);
+    ~CooperateIn();
 
     void OnEvent(Context &context, const CooperateEvent &event) override;
     void OnEnterState(Context &context) override;
@@ -37,55 +37,81 @@ private:
         Initial(CooperateIn &parent);
         ~Initial() = default;
 
-        void OnEvent(Context &context, const CooperateEvent &event) override;
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
 
-        static void BuildChains(std::shared_ptr<Initial> initial, CooperateIn &parent);
-        static void RemoveChains(std::shared_ptr<Initial> initial);
+        static void BuildChains(std::shared_ptr<Initial> self, CooperateIn &parent);
+        static void RemoveChains(std::shared_ptr<Initial> self);
+
     private:
-        std::shared_ptr<ICooperateStep> start_ { nullptr };
+        void OnDisable(Context &context, const CooperateEvent &event);
+        void OnStart(Context &context, const CooperateEvent &event);
+        void OnComeBack(Context &context, const CooperateEvent &event);
+        void OnRelay(Context &context, const CooperateEvent &event);
+        void OnStop(Context &context, const CooperateEvent &event);
+        void OnRemoteStart(Context &context, const CooperateEvent &event);
+        void OnRemoteStop(Context &context, const CooperateEvent &event);
+        void OnAppClosed(Context &context, const CooperateEvent &event);
+        void OnPointerEvent(Context &context, const CooperateEvent &event);
+        void OnBoardOffline(Context &context, const CooperateEvent &event);
+        void OnSwitchChanged(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+
+        CooperateIn &parent_;
+        std::shared_ptr<ICooperateStep> relay_ { nullptr };
+        std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
     };
 
-    class PrepareRemoteInput final : public ICooperateStep {
+    class RelayCooperate : public ICooperateStep {
     public:
-        void OnEvent(Context &context, const CooperateEvent &event) override;
+        RelayCooperate(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
+        ~RelayCooperate() = default;
+
         void OnProgress(Context &context, const CooperateEvent &event) override;
         void OnReset(Context &context, const CooperateEvent &event) override;
 
     private:
-        std::pair<std::string, std::string> prepared_;
-    };
+        void OnDisable(Context &context, const CooperateEvent &event);
+        void OnStop(Context &context, const CooperateEvent &event);
+        void OnResponse(Context &context, const CooperateEvent &event);
+        void OnNormal(Context &context, const CooperateEvent &event);
+        void OnAppClosed(Context &context, const CooperateEvent &event);
+        void OnPointerEvent(Context &context, const CooperateEvent &event);
+        void OnBoardOffline(Context &context, const CooperateEvent &event);
+        void OnSwitchChanged(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
 
-    class StartRemoteInput final : public ICooperateStep {
-    public:
-        void OnEvent(Context &context, const CooperateEvent &event) override;
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-    };
-
-    class StopRemoteInput : public ICooperateStep {
-    public:
-        StopRemoteInput(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
-        ~StopRemoteInput() = default;
-
-        void OnEvent(Context &context, const CooperateEvent &event) override;
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-    private:
-        void ComeBack(Context &context, const CooperateEvent &event);
-        void RelayComeBack(Context &context, const CooperateEvent &event);
-        void OnStartFinished(Context &context, const CooperateEvent &event);
-        void OnSuccess(Context &context, const DInputStartResult &event);
-        void SetPointerVisible(Context &context);
-    private:
         CooperateIn &parent_;
         int32_t timerId_ { -1 };
     };
 
+    class RemoteStart : public ICooperateStep {
+    public:
+        RemoteStart(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
+        ~RemoteStart() = default;
+
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnDisable(Context &context, const CooperateEvent &event);
+        void OnStop(Context &context, const CooperateEvent &event);
+        void OnRemoteStartFinished(Context &context, const CooperateEvent &event);
+        void OnSuccess(Context &context, const DSoftbusStartCooperateFinished &notice);
+        void OnAppClosed(Context &context, const CooperateEvent &event);
+        void OnPointerEvent(Context &context, const CooperateEvent &event);
+        void OnBoardOffline(Context &context, const CooperateEvent &event);
+        void OnSwitchChanged(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+
+        CooperateIn &parent_;
+        int32_t timerId_ { -1 };
+    };
+
+    void StopCooperate(Context &context, const CooperateEvent &event);
+
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };
-    int32_t interceptorId_ { -1 };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
