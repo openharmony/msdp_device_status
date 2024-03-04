@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ namespace Msdp {
 namespace DeviceStatus {
 struct DrawingInfo;
 class DragDrawing;
-using DragExtFunc = void (*)(DragDrawing *drawingObj, DrawingInfo *drawingInfo);
+using DragExtFunc = void (*)(DragData *dragData);
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
@@ -161,7 +161,7 @@ class DragDrawing : public IDragAnimation {
 public:
     DragDrawing() = default;
     DISALLOW_COPY_AND_MOVE(DragDrawing);
-    ~DragDrawing() = default;
+    ~DragDrawing();
 
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);

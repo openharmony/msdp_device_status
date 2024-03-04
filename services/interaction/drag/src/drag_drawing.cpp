@@ -144,12 +144,13 @@ const std::string MOUSE_DRAG_DEFAULT_PATH { "/system/etc/device_status/drag_icon
 const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Cursor_Circle.png" };
 const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
 #ifdef __aarch64__
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
+const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
 #else
-const std::string DRAG_ANIMATION_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so" };
+const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so" };
 #endif
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
+struct DragData g_dragData;
 
 bool CheckNodesValid()
 {
@@ -206,6 +207,7 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return checkDragDataResult;
     }
     InitDrawingInfo(dragData);
+    g_dragData = dragData;
     CreateWindow();
     CHKPR(g_drawingInfo.surfaceNode, INIT_FAIL);
     if (InitLayer() != RET_OK) {
