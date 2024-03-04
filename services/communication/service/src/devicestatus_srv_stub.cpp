@@ -668,8 +668,6 @@ int32_t DeviceStatusSrvStub::GetShadowOffsetStub(MessageParcel &data, MessagePar
 
 int32_t DeviceStatusSrvStub::UpdateShadowPicStub(MessageParcel &data, MessageParcel &reply)
 {
-    auto pixelMap = Media::PixelMap::Unmarshalling(data);
-    CHKPR(pixelMap, RET_ERR);
     ShadowInfo shadowInfo;
     if (ShadowPacker::UnPackShadowInfo(data, shadowInfo) != RET_OK) {
         FI_HILOGE("UnPackShadowInfo failed");
