@@ -227,6 +227,10 @@ int32_t DragDrawing::Init(const DragData &dragData)
     CHKPR(shadowNode, INIT_FAIL);
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPR(dragStyleNode, INIT_FAIL);
+    dragExtHandler_ = dlopen(DRAG_DROP_EXTENSION_SO_PATH.c_str(), RTLD_LAZY);
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+    }
     OnStartDrag(dragAnimationData, shadowNode, dragStyleNode);
     if (!g_drawingInfo.multiSelectedNodes.empty()) {
         g_drawingInfo.isCurrentDefaultStyle = true;
@@ -464,13 +468,23 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
     g_drawingInfo.isCurrentDefaultStyle = true;
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+    }
+    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(&DragDrawing::OnStartStyleAnimation, this))) {
+    if (!handler_->PostTask(std::bind(dragDropExtFunc, &g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -1979,6 +1993,14 @@ bool DragDrawing::ParserRadius(float &radius)
     }
     radius = cornerRadius->valuedouble * dipScale->valuedouble;
     return true;
+}
+
+DragDrawing::~DragDrawing()
+{
+    if (dragExtHandler_ != nullptr) {
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+    }
 }
 
 void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
