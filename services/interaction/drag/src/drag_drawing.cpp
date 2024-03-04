@@ -470,6 +470,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     g_drawingInfo.isCurrentDefaultStyle = true;
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
+        return;
     }
     auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
     if (dragDropExtFunc == nullptr) {
