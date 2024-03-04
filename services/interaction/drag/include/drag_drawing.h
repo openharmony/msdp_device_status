@@ -261,7 +261,7 @@ private:
     std::atomic_bool hasRunningScaleAnimation_ { false };
     std::atomic_bool needBreakStyleScaleAnimation_ { false };
     std::atomic_bool hasRunningAnimation_ { false };
-    void* dragExtHandle_ { nullptr };
+    void* dragExtHandler_ { nullptr };
     bool needDestroyDragWindow_ { false };
     bool needRotatePixelMapXY_ { false };
     uint64_t screenId_ { 0 };
