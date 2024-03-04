@@ -44,7 +44,7 @@ int32_t DragManagerImpl::StartDrag(const DragData &dragData, std::shared_ptr<ISt
     CHKPR(listener, RET_ERR);
     if (DragDataPacker::CheckDragData(dragData) != RET_OK) {
         FI_HILOGE("CheckDragData failed");
-        return ERR_INVALID_VALUE;
+        return RET_ERR;
     }
     {
         std::lock_guard<std::mutex> guard(mtx_);
@@ -250,7 +250,7 @@ int32_t DragManagerImpl::UpdateShadowPic(const ShadowInfo &shadowInfo)
     CALL_DEBUG_ENTER;
     if (ShadowPacker::CheckShadowInfo(shadowInfo) != RET_OK) {
         FI_HILOGE("CheckShadowInfo failed");
-        return ERR_INVALID_VALUE;
+        return RET_ERR;
     }
     return DeviceStatusClient::GetInstance().UpdateShadowPic(shadowInfo);
 }
