@@ -475,7 +475,7 @@ void DragManager::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> 
 void DragManager::Dump(int32_t fd) const
 {
     DragCursorStyle style = DRAG_DATA_MGR.GetDragStyle();
-    int32_t targetTid = DRAG_DATA_MGR.GettargetTid();
+    int32_t targetTid = DRAG_DATA_MGR.GetTargetTid();
     dprintf(fd, "Drag information:\n");
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     dprintf(fd,
