@@ -470,12 +470,13 @@ void CoordinationSM::StopRemoteCoordinationResult(bool isSuccess)
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty() && isUnchained_) {
         FI_HILOGI("The sink preparedNetworkId isn't empty, first:%{public}s, second:%{public}s",
             GetAnonyString(preparedNetworkId_.first).c_str(), GetAnonyString(preparedNetworkId_.second).c_str());
+        std::string remoteNetworkId = sinkNetworkId_;
         bool ret = UnchainCoordination(preparedNetworkId_.first, preparedNetworkId_.second);
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
             FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
-            COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, sinkNetworkId_, ret);
+            COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
         }
@@ -627,7 +628,7 @@ void CoordinationSM::NotifyRemoteStopFinish(bool isSuccess, const std::string &r
 
 bool CoordinationSM::UpdateMouseLocation()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
     CHKPF(display);
     int32_t width = display->GetWidth();
@@ -798,7 +799,7 @@ void CoordinationSM::OnKeyboardOffline(const std::string &dhid)
 
 bool CoordinationSM::InitDeviceManager()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     initCallback_ = std::make_shared<DeviceInitCallBack>();
     int32_t ret = DIS_HARDWARE.InitDeviceManager(FI_PKG_NAME, initCallback_);
     if (ret != 0) {
@@ -1077,7 +1078,7 @@ void CoordinationSM::OnPostInterceptorPointerEvent(std::shared_ptr<MMI::PointerE
     if (state == CoordinationState::STATE_OUT) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         std::string dhid = COOR_DEV_MGR->GetDhid(deviceId);
-        FI_HILOGI("Start coordination device dhid:\"%{public}s\", Now device dhid:\"%{public}s\"",
+        FI_HILOGD("Start coordination device dhid:\"%{public}s\", Now device dhid:\"%{public}s\"",
                   GetAnonyString(startDeviceDhid_).c_str(), GetAnonyString(dhid).c_str());
         if (startDeviceDhid_ != dhid) {
             FI_HILOGI("Move other mouse, stop input device coordination");
@@ -1094,6 +1095,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     displayX_ = pointerItem.GetDisplayX();
     displayY_ = pointerItem.GetDisplayY();
+    FI_HILOGD("Mouse location displayX:%{public}d, displayY:%{public}d", displayX_, displayY_);
     CoordinationState state = GetCurrentCoordinationState();
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
@@ -1221,7 +1223,7 @@ void CoordinationSM::NotifyChainRemoved()
 void CoordinationSM::NotifyUnchainedResult(const std::string &remoteNetworkId, bool isSuccess)
 {
     CALL_INFO_TRACE;
-    FI_HILOGD("Notify unchained result, isSuccess:%{public}d", isSuccess);
+    FI_HILOGI("Notify unchained result, isSuccess:%{public}d", isSuccess);
     if (isSuccess) {
         COOR_SM->NotifyChainRemoved();
     }
@@ -1272,7 +1274,7 @@ void CoordinationSM::RegisterSessionCallback()
 
 bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const
 {
-    FI_HILOGD("PointerFilter OnInputEvent enter");
+    CALL_DEBUG_ENTER;
     CHKPF(pointerEvent);
     if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         FI_HILOGI("Current event is down");
