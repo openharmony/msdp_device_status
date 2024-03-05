@@ -98,7 +98,7 @@ public:
     int32_t AddSubscriptListener() override;
     int32_t RemoveSubscriptListener() override;
     int32_t SetDragWindowVisible(bool visible, bool isForce = false) override;
-    int32_t EnableUpperCenterMode(bool enable) override;
+    int32_t EnterTextEditorArea(bool enable) override;
     int32_t GetShadowOffset(ShadowOffset &shadowOffset) override;
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
     int32_t GetDragData(DragData &dragData) override;

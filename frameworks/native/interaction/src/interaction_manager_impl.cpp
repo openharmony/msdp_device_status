@@ -374,10 +374,10 @@ int32_t InteractionManagerImpl::GetDragSummary(std::map<std::string, int64_t> &s
     return dragManagerImpl_.GetDragSummary(summarys);
 }
 
-int32_t InteractionManagerImpl::EnableUpperCenterMode(bool enable)
+int32_t InteractionManagerImpl::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
-    return dragManagerImpl_.EnableUpperCenterMode(enable);
+    return dragManagerImpl_.EnterTextEditorArea(enable);
 }
 
 int32_t InteractionManagerImpl::AddPrivilege()
