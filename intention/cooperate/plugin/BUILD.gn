@@ -54,7 +54,6 @@ ohos_shared_library("intention_cooperate") {
   deps = [
     "${device_status_root_path}/intention/adapters/ddm_adapter:intention_ddm_adapter",
     "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
-    "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
     "${device_status_root_path}/intention/common/channel:intention_channel",
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",

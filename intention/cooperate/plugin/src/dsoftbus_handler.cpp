@@ -16,7 +16,6 @@
 #include "dsoftbus_handler.h"
 
 #include "devicestatus_define.h"
-#include "dsoftbus_adapter.h"
 #include "utility.h"
 
 namespace OHOS {

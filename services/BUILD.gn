@@ -17,7 +17,6 @@ config("devicestatus_services_private_config") {
   include_dirs = [
     "delegate_task/include",
     "native/include",
-    "timer_manager/include",
     "${device_status_utils_path}/include",
     "${device_status_interfaces_path}/innerkits/include",
     "${device_status_interfaces_path}/innerkits/interaction/include",
@@ -47,7 +46,6 @@ config("devicestatus_services_public_config") {
   include_dirs = [
     "delegate_task/include",
     "native/include",
-    "timer_manager/include",
     "interaction/drag/include",
   ]
 
@@ -69,7 +67,6 @@ sources_set = [
   "native/src/devicestatus_msdp_client_impl.cpp",
   "native/src/devicestatus_service.cpp",
   "native/src/stream_server.cpp",
-  "timer_manager/src/timer_manager.cpp",
 ]
 
 external_deps_set = [
@@ -132,6 +129,7 @@ ohos_shared_library("devicestatus_service") {
   public_deps = [
     "${device_status_root_path}/intention/common/epoll:intention_epoll",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/scheduler/timer_manager:intention_timer_manager",
     "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
   ]
 
@@ -201,6 +199,7 @@ ohos_static_library("devicestatus_static_service") {
   public_deps = [
     "${device_status_root_path}/intention/common/epoll:intention_epoll",
     "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/scheduler/timer_manager:intention_timer_manager",
     "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
   ]
 

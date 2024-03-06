@@ -32,9 +32,6 @@
 #include "i_context.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "intention_service.h"
-#include "i_dinput_adapter.h"
-#include "i_input_adapter.h"
-#include "i_plugin_manager.h"
 #include "socket_session_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stationary_callback.h"
