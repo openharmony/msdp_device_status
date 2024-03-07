@@ -40,8 +40,8 @@ public:
     void SetDragWindowVisible(bool visible);
     bool GetDragWindowVisible() const;
     int32_t GetShadowOffset(ShadowOffset &shadowOffset) const;
-    void SetTargetTokenId(int32_t tokenId);
-    int32_t GetTargetTokenId() const;
+    void SetTargetTid(int32_t tokenId);
+    int32_t GetTargetTid() const;
     void SetTargetPid(int32_t pid);
     int32_t GetTargetPid() const;
     bool IsMotionDrag() const;
@@ -61,7 +61,7 @@ private:
     bool visible_ { false };
     int32_t targetPid_ { -1 };
     PreviewStyle previewStyle_;
-    int32_t targetTokenId_ { -1 };
+    int32_t targetTid_ { -1 };
     std::u16string dragMessage_;
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     DragData dragData_;

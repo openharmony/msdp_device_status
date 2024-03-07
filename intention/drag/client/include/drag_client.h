@@ -53,7 +53,7 @@ public:
         const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summarys);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
-    int32_t EnableUpperCenterMode(ITunnelClient &tunnel, bool enable);
+    int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
     int32_t GetExtraInfo(ITunnelClient &tunnel, std::string &extraInfo);
     int32_t AddPrivilege(ITunnelClient &tunnel);

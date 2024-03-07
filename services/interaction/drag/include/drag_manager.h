@@ -52,8 +52,8 @@ public:
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t GetDragTargetPid() const;
     int32_t GetUdKey(std::string &udKey) const;
-    void SendDragData(int32_t targetTokenId, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTokenId);
+    void SendDragData(int32_t targetTid, const std::string &udKey);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t GetDragData(DragData &dragData);
     int32_t GetDragState(DragState &dragState);
@@ -77,7 +77,7 @@ public:
         const PreviewAnimation &animation) override;
     int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
-    int32_t EnableUpperCenterMode(bool enable);
+    int32_t EnterTextEditorArea(bool enable);
     int32_t GetDragAction(DragAction &dragAction) const;
     int32_t GetExtraInfo(std::string &extraInfo) const;
     int32_t AddPrivilege(int32_t tokenId);

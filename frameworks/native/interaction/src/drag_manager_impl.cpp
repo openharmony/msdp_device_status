@@ -289,9 +289,9 @@ int32_t DragManagerImpl::GetDragAction(DragAction &dragAction)
     return DeviceStatusClient::GetInstance().GetDragAction(dragAction);
 }
 
-int32_t DragManagerImpl::EnableUpperCenterMode(bool enable)
+int32_t DragManagerImpl::EnterTextEditorArea(bool enable)
 {
-    return DeviceStatusClient::GetInstance().EnableUpperCenterMode(enable);
+    return DeviceStatusClient::GetInstance().EnterTextEditorArea(enable);
 }
 
 int32_t DragManagerImpl::GetExtraInfo(std::string &extraInfo)

@@ -816,7 +816,7 @@ int32_t DeviceStatusSrvProxy::GetDragAction(DragAction &dragAction)
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::EnableUpperCenterMode(bool enable)
+int32_t DeviceStatusSrvProxy::EnterTextEditorArea(bool enable)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

@@ -123,9 +123,9 @@ int32_t DragDFX::WriteUpdateDragStyle(const DragCursorStyle &style, OHOS::Hiview
     return WriteModel(DragType::UPDATE_DRAG_STYLE_FAIL, "dragStyle", dragStyle);
 }
 
-int32_t DragDFX::WriteSendTokenid(int32_t targetTokenId, const std::string &udKey)
+int32_t DragDFX::WriteSendTokenid(int32_t targetTid, const std::string &udKey)
 {
-    return WriteModel(DragType::SEND_TOKENID, "targetTokenId", targetTokenId, "udKey", udKey);
+    return WriteModel(DragType::SEND_TOKENID, "targetTid", targetTid, "udKey", udKey);
 }
 
 int32_t DragDFX::WriteStopDrag(const DragState &dragState, const DragDropResult &dropResult,
