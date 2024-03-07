@@ -17,12 +17,12 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StateChangeNotify"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateChangeNotify" };
-} // namespace
 template void StateChangeNotify::OnDragInfoNotify<DragState>(SessionPtr session, MessageId msgId, DragState state);
 template void StateChangeNotify::OnDragInfoNotify<DragCursorStyle>(SessionPtr session, MessageId msgId,
     DragCursorStyle style);

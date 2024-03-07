@@ -20,8 +20,10 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "fusion_image_framework"
+
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_image_framework" };
 static const int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 static const int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 

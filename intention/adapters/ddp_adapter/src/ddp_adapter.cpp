@@ -18,12 +18,12 @@
 #include "ddp_adapter_impl.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DDPAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DDPAdapter" };
-} // namespace
 
 DDPAdapter::DDPAdapter()
 {

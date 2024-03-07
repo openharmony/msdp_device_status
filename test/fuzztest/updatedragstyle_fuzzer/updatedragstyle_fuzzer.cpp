@@ -22,9 +22,10 @@
 #include "devicestatus_service.h"
 #include "message_parcel.h"
 
+#undef LOG_TAG
+#define LOG_TAG "UpdateDragStyleFuzzTest"
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "UpdateDragStyleFuzzTest" };
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 bool UpdateDragStyleFuzzTest(const uint8_t* data, size_t size)

@@ -17,12 +17,12 @@
 
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationHiSysEvent"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationHiSysEvent" };
-} // namespace
 
 std::map<CoordinationState, std::string> CoordinationDFX::coordinationState_ = {
     { CoordinationState::STATE_FREE, "STATE_FREE" },

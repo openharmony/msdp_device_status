@@ -34,12 +34,12 @@
 #include "include/util.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusSrvStub"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
-} // namespace
 
 DeviceStatusSrvStub::DeviceStatusSrvStub()
 {

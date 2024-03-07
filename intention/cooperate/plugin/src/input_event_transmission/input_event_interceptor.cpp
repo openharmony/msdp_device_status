@@ -20,12 +20,14 @@
 #include "display_manager.h"
 #include "input_event_transmission/input_event_serialization.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InputEventInterceptor"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InputEventInterceptor" };
 constexpr float HALF_RATIO { 0.5 };
 } // namespace
 

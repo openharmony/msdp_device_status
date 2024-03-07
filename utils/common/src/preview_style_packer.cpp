@@ -19,12 +19,11 @@
 #include "devicestatus_errors.h"
 #include "preview_style_packer.h"
 
+#undef LOG_TAG
+#define LOG_TAG "PreviewStylePacker"
+
 namespace OHOS {
 namespace Msdp {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PreviewStylePacker" };
-} // namespace
-
 namespace DeviceStatus {
 
 int32_t PreviewStylePacker::Marshalling(const PreviewStyle &previewStyle, Parcel &data)

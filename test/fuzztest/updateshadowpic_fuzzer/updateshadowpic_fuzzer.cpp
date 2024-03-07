@@ -22,10 +22,11 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
+#undef LOG_TAG
+#define LOG_TAG "UpdateShadowPicFuzzTest"
 using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "UpdateShadowPicFuzzTest" };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t PIXEL_MAP_WIDTH { 40 };

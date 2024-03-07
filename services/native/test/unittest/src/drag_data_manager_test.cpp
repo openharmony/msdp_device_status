@@ -24,12 +24,14 @@
 #define private public
 #include "drag_drawing.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragDataManagerTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDataManagerTest" };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t PIXEL_MAP_WIDTH { 300 };

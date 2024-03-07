@@ -23,11 +23,13 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualDevice"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualDevice" };
 constexpr size_t DEFAULT_BUF_SIZE { 1024 };
 constexpr int32_t MINIMUM_INTERVAL_ALLOWED { 1 };
 constexpr int32_t MAXIMUM_INTERVAL_ALLOWED { 100 };

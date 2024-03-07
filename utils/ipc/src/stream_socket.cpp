@@ -17,12 +17,12 @@
 
 #include <cinttypes>
 
+#undef LOG_TAG
+#define LOG_TAG "StreamSocket"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamSocket" };
-} // namespace
 
 StreamSocket::StreamSocket() {}
 

@@ -21,12 +21,12 @@
 #include "devicestatus_define.h"
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "SocketConnection"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SocketConnection" };
-} // namespace
 
 SocketConnection::SocketConnection(int32_t socketFd,
                                    std::function<void(NetPacket&)> recv,

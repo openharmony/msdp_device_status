@@ -20,12 +20,12 @@
 #include "stream_buffer.h"
 #include "stream_socket.h"
 
+#undef LOG_TAG
+#define LOG_TAG "FdListener"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "FdListener" };
-} // namespace
 
 using namespace AppExecFwk;
 FdListener::FdListener(IClientPtr client) : iClient_(client) {}

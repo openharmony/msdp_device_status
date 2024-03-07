@@ -29,11 +29,13 @@
 #include "utility.h"
 #include "virtual_mouse.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualMouseBuilder"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualMouseBuilder" };
 constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
 constexpr uint32_t IO_FLAG_WIDTH { 6 };
 const std::unordered_map<std::string, int32_t> mouseBtns {

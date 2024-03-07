@@ -33,12 +33,12 @@
 #include "fusion_frameworks_binding.h"
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusClient"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusClient" };
-} // namespace
 
 DeviceStatusClient::DeviceStatusClient() {}
 DeviceStatusClient::~DeviceStatusClient()

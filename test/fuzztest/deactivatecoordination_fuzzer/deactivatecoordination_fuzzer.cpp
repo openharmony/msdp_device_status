@@ -22,9 +22,10 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeactivateCoordinationFuzzTest"
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "DeactivateCoordinationFuzzTest" };
 const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
 
 bool DeactivateCoordinationFuzzTest(const uint8_t* data, size_t size)

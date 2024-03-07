@@ -25,11 +25,13 @@
 #include "fi_log.h"
 #include "virtual_keyboard_builder.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualKeyboard"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualKeyboard" };
 constexpr int32_t MINIMUM_INTERVAL { 8 };
 } // namespace
 

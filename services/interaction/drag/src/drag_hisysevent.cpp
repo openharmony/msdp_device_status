@@ -17,12 +17,12 @@
 
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragHiSysEvent"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragHiSysEvent" };
-} // namespace
 
 std::map<DragState, std::string> DragDFX::dragState_ = {
     { DragState::ERROR, "ERROR" },

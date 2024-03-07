@@ -22,12 +22,12 @@
 
 #include "proto.h"
 
+#undef LOG_TAG
+#define LOG_TAG "SocketSession"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SocketSession" };
-} // namespace
 
 SocketSession::SocketSession(const std::string &programName, int32_t moduleType,
                              int32_t tokenType, int32_t fd, int32_t uid, int32_t pid)

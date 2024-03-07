@@ -17,6 +17,9 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "AnimationCurve"
+
 constexpr int32_t CUBIC_PARAM_LIMIT { 4 };
 constexpr int32_t SPRING_PARAM_LIMIT { 4 };
 constexpr int32_t INTERPOLATING_SPRING_PARAM_LIMIT { 4 };
@@ -32,7 +35,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "AnimationCurve" };
 static const RosenCurveType EASE_CURVE = Rosen::RSAnimationTimingCurve::EASE;
 } // namespace
 

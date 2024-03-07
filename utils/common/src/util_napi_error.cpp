@@ -15,13 +15,14 @@
 
 #include "util_napi_error.h"
 
+#undef LOG_TAG
+#define LOG_TAG "UtilNapiError"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace UtilNapiError {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "UtilNapiError" };
-} // namespace
+
 bool GetErrorMsg(int32_t code, std::string &codeMsg)
 {
     auto iter = NAPI_ERRORS.find(code);

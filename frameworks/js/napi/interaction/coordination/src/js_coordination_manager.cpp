@@ -19,12 +19,12 @@
 #include "interaction_manager.h"
 #include "util_napi_error.h"
 
+#undef LOG_TAG
+#define LOG_TAG "JsCoordinationManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsCoordinationManager" };
-} // namespace
 
 napi_value JsCoordinationManager::Prepare(napi_env env, bool isCompatible, napi_value handle)
 {

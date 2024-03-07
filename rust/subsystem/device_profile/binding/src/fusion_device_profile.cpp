@@ -23,8 +23,10 @@
 
 using namespace OHOS::DeviceProfile;
 
+#undef LOG_TAG
+#define LOG_TAG "FusionDeviceProfile"
+
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "FusionDeviceProfile" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 

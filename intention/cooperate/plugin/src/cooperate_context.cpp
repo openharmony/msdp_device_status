@@ -25,12 +25,14 @@
 #include "dsoftbus_handler.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CooperateContext"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateContext" };
 const std::string COOPERATE_SWITCH { "currentStatus" };
 constexpr double PERCENT { 100.0 };
 } // namespace

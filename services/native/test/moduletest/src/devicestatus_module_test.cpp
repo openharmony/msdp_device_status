@@ -27,13 +27,13 @@
 #include "fi_log.h"
 #include "stationary_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusModuleTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusModuleTest" };
-} // namespace
 
 Type DeviceStatusModuleTest::g_moduleTest = Type::TYPE_INVALID;
 

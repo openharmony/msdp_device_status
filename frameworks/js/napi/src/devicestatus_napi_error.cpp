@@ -19,12 +19,12 @@
 
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusNapiError"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapiError" };
-} // namespace
 
 napi_value CreateNapiError(const napi_env &env, int32_t errCode, const std::string &errMessage)
 {

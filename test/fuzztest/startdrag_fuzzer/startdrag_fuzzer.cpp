@@ -22,10 +22,11 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StartDragFuzzTest"
 using namespace OHOS::Msdp::DeviceStatus;
 
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "StartDragFuzzTest" };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
 constexpr int32_t PIXEL_MAP_WIDTH { 40 };
 constexpr int32_t PIXEL_MAP_HEIGHT { 40 };

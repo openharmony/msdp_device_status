@@ -29,13 +29,15 @@
 #include "devicestatus_msdp_client_impl.h"
 #include "sensor_data_callback.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusMsdpMocKTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 std::shared_ptr<DeviceStatusMsdpMock> g_testMock;
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusMsdpMocKTest" };
 #ifdef __aarch64__
 const std::string DEVICESTATUS_MOCK_LIB_PATH { "/system/lib64/libdevicestatus_mock.z.so" };
 #else

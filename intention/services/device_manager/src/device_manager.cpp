@@ -31,11 +31,13 @@
 #include "fi_log.h"
 #include "napi_constants.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceManager" };
 constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
 constexpr size_t EXPECTED_SUBMATCH { 1 };
 } // namespace

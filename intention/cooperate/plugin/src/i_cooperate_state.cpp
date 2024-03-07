@@ -15,13 +15,13 @@
 
 #include "i_cooperate_state.h"
 
+#undef LOG_TAG
+#define LOG_TAG "ICooperateState"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ICooperateState" };
-} // namespace
 
 ICooperateState::ICooperateStep::ICooperateStep(ICooperateState &parent, std::shared_ptr<ICooperateStep> prev)
     : parent_(parent), prev_(prev)

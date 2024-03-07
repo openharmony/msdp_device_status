@@ -27,12 +27,14 @@
 #include "fi_log.h"
 #include "stationary_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusServiceTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusServiceTest" };
 constexpr int32_t SLEEP_TIME { 2000 };
 Type g_type { Type::TYPE_INVALID };
 auto g_client = StationaryManager::GetInstance();

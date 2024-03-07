@@ -21,10 +21,10 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
+#undef LOG_TAG
+#define LOG_TAG "EnterTextEditorAreaFuzzTest"
 using namespace OHOS::Msdp::DeviceStatus;
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "EnterTextEditorAreaFuzzTest" };
-
 bool EnterTextEditorAreaFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string formmgrDeviceToken { u"ohos.msdp.Idevicestatus" };

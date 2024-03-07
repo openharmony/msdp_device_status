@@ -24,11 +24,13 @@
 #include "devicestatus_define.h"
 #include "napi_constants.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationDeviceManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
 constexpr size_t NETWORK_ID_NUMS { 3 };
 constexpr size_t DESCRIPTOR_INDEX { 2 };
 } // namespace

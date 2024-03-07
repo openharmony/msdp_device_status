@@ -21,13 +21,13 @@
 #include "channel.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "ChannelTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "ChannelTest" };
-} // namespace
 
 class ChannelTest : public testing::Test {
 public:
