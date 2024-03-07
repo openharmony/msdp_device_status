@@ -452,12 +452,6 @@ void DragDrawing::UpdateDragWindowState(bool visible)
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void DragDrawing::OnStartStyleAnimation()
-{
-    CALL_DEBUG_ENTER;
-    hasRunningStopAnimation_ = false;
-}
-
 void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode, std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode)
 {
@@ -900,11 +894,6 @@ void DragDrawing::OnVsync()
     rsUiDirector_->FlushModifier();
     if (!hasRunningAnimation) {
         FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
-        CHKPV(handler_);
-        handler_->RemoveAllEvents();
-        handler_->RemoveAllFileDescriptorListeners();
-        handler_ = nullptr;
-        receiver_ = nullptr;
         if (needDestroyDragWindow_) {
             CHKPV(g_drawingInfo.rootNode);
             if (drawDynamicEffectModifier_ != nullptr) {
@@ -914,6 +903,11 @@ void DragDrawing::OnVsync()
             DestroyDragWindow();
             g_drawingInfo.isRunning = false;
         }
+        CHKPV(handler_);
+        handler_->RemoveAllEvents();
+        handler_->RemoveAllFileDescriptorListeners();
+        handler_ = nullptr;
+        receiver_ = nullptr;
         return;
     }
     Rosen::VSyncReceiver::FrameCallback fcb = {
@@ -1897,6 +1891,7 @@ void  DragDrawing::ResetParameter()
     startNum_ = START_TIME;
     needDestroyDragWindow_ = false;
     needRotatePixelMapXY_ = false;
+    hasRunningStopAnimation_ = false;
     g_drawingInfo.sourceType = -1;
     g_drawingInfo.currentDragNum = -1;
     g_drawingInfo.pixelMapX = -1;
