@@ -30,6 +30,7 @@
 #include "stationary_manager.h"
 
 #define FUZZ_PROJECT_NAME "devicestatusclient_fuzzer"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

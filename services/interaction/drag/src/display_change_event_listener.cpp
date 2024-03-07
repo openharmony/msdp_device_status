@@ -16,7 +16,7 @@
 #include "display_change_event_listener.h"
 
 #undef LOG_TAG
-#define LOG_TAG "ICoordinationState"
+#define LOG_TAG "DisplayChangeEventListener"
 
 namespace OHOS {
 namespace Msdp {

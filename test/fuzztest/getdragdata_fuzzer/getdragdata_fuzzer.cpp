@@ -23,6 +23,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "GetDragDataFuzzTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

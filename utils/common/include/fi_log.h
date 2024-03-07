@@ -79,6 +79,7 @@ public:
 private:
     const char* func_ { nullptr };
 };
+
 class InnerFunctionInfoTracer {
 public:
     InnerFunctionInfoTracer(const char* func)

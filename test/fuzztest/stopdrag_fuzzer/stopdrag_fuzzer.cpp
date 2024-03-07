@@ -24,6 +24,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "StopDragFuzzTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

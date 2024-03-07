@@ -24,6 +24,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "GetCoordinationStateFuzzTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

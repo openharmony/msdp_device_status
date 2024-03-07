@@ -24,7 +24,7 @@
 #include "json_parser.h"
 
 #undef LOG_TAG
-#define LOG_TAG "FusionDeviceProfile"
+#define LOG_TAG "FusionDeviceProfileAdapter"
 
 using namespace OHOS;
 using namespace OHOS::DeviceProfile;

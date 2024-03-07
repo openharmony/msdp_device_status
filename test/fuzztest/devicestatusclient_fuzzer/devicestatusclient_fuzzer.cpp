@@ -24,8 +24,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "DeviceStatusClientFuzzTest"
-using namespace std;
-using namespace OHOS;
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {

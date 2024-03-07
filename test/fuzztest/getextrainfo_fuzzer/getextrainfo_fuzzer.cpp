@@ -23,6 +23,7 @@
 
 #undef LOG_TAG
 #define LOG_TAG "GetExtraInfoFuzzTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
