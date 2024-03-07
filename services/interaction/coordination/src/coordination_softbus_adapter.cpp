@@ -53,6 +53,8 @@ void ResponseStartRemoteCoordination(int32_t sessionId, const JsonParser &parser
         FI_HILOGE("The data type of CJSON is incorrect");
         return;
     }
+    FI_HILOGI("NetworkId:%{public}s, buttonIsPressed:%{public}s",
+        GetAnonyString(networkId->valuestring).c_str(), cJSON_IsTrue(buttonIsPressed) ? "true" : "false");
     COOR_SM->StartRemoteCoordination(networkId->valuestring, cJSON_IsTrue(buttonIsPressed));
 }
 
@@ -67,7 +69,8 @@ void ResponseStartRemoteCoordinationResult(int32_t sessionId, const JsonParser &
         FI_HILOGE("The data type of CJSON is incorrect");
         return;
     }
-    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", x->valueint, y->valueint);
+    FI_HILOGI("Result:%{public}s, dhid:%{public}s, xPercent:%{public}d, yPercent:%{public}d",
+        cJSON_IsTrue(result) ? "true" : "false", GetAnonyString(dhid->valuestring).c_str(), x->valueint, y->valueint);
     COOR_SM->StartRemoteCoordinationResult(cJSON_IsTrue(result), dhid->valuestring, x->valueint, y->valueint);
 }
 
@@ -218,7 +221,7 @@ bool CoordinationSoftbusAdapter::CheckDeviceSessionState(const std::string &remo
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGE("Check session state error");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return false;
     }
     return true;
@@ -301,7 +304,7 @@ void CoordinationSoftbusAdapter::CloseInputSoftbus(const std::string &remoteNetw
     CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
     if (sessionDevs_.find(remoteNetworkId) == sessionDevs_.end()) {
-        FI_HILOGI("SessionDevIdMap is not found");
+        FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
@@ -339,7 +342,8 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordination(const std::string &l
             }
         }
     }
-    FI_HILOGD("isPointerButtonPressed:%{public}d", isPointerButtonPressed);
+    FI_HILOGI("LocalNetworkId:%{public}s, buttonIsPressed:%{public}s",
+        GetAnonyString(localNetworkId).c_str(), isPointerButtonPressed ? "true" : "false");
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START));
@@ -381,7 +385,8 @@ int32_t CoordinationSoftbusAdapter::StartRemoteCoordinationResult(const std::str
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
-    FI_HILOGI("MouseLocation xPercent:%{public}d, yPercent:%{public}d", xPercent, yPercent);
+    FI_HILOGI("IsSuccess:%{public}s, startDeviceDhid:%{public}s, xPercent:%{public}d, yPercent:%{public}d",
+        isSuccess ? "true" : "false", GetAnonyString(startDeviceDhid).c_str(), xPercent, yPercent);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_START_RES));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_RESULT, cJSON_CreateBool(isSuccess));
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_START_DHID, cJSON_CreateString(startDeviceDhid.c_str()));
@@ -408,6 +413,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordination(const std::string &re
         FI_HILOGE("Failed to discover the remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return RET_ERR;
     }
+    FI_HILOGI("IsUnchained:%{public}s", isUnchained ? "true" : "false");
     int32_t sessionId = sessionDevs_[remoteNetworkId];
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
@@ -436,6 +442,7 @@ int32_t CoordinationSoftbusAdapter::StopRemoteCoordinationResult(const std::stri
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
+    FI_HILOGI("IsSuccess:%{public}s", isSuccess ? "true" : "false");
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_STOP_RES));
@@ -463,6 +470,8 @@ int32_t CoordinationSoftbusAdapter::NotifyUnchainedResult(const std::string &loc
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[remoteNetworkId];
+    FI_HILOGI("LocalNetworkId:%{public}s, result:%{public}s",
+        GetAnonyString(localNetworkId).c_str(), result ? "true" : "false");
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(NOTIFY_UNCHAINED_RES));
@@ -515,6 +524,7 @@ int32_t CoordinationSoftbusAdapter::StartCoordinationOtherResult(const std::stri
         return RET_ERR;
     }
     int32_t sessionId = sessionDevs_[originNetworkId];
+    FI_HILOGI("RemoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
     cJSON *jsonStr = cJSON_CreateObject();
     CHKPR(jsonStr, RET_ERR);
     cJSON_AddItemToObject(jsonStr, FI_SOFTBUS_KEY_CMD_TYPE, cJSON_CreateNumber(REMOTE_COORDINATION_STOP_OTHER_RES));
