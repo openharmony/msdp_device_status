@@ -24,7 +24,9 @@
 
 #undef LOG_TAG
 #define LOG_TAG "UpdateShadowPicFuzzTest"
-using namespace OHOS::Msdp::DeviceStatus;
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 
 namespace OHOS {
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
@@ -106,3 +108,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::UpdateShadowPicFuzzTest(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -21,7 +21,9 @@
 #define LOG_TAG "DeviceStatusAgentFuzzTest"
 using namespace std;
 using namespace OHOS;
-using namespace OHOS::Msdp::DeviceStatus;
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
 constexpr int32_t WAIT_TIME { 1000 };
 } // namespace
@@ -125,3 +127,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Msdp::DeviceStatus::DevicestatusAgentFuzzer::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

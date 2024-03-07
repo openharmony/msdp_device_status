@@ -24,7 +24,9 @@
 
 #undef LOG_TAG
 #define LOG_TAG "GetUdKeyFuzzTest"
-using namespace OHOS::Msdp::DeviceStatus;
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace OHOS {
 bool GetUdKeyFuzzTest(const uint8_t* data, size_t size)
 {
@@ -52,3 +54,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::GetUdKeyFuzzTest(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

@@ -24,7 +24,9 @@
 
 #undef LOG_TAG
 #define LOG_TAG "StopDragFuzzTest"
-using namespace OHOS::Msdp::DeviceStatus;
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 
 namespace OHOS {
 bool StopDragFuzzTest(const uint8_t* data, size_t size)
@@ -54,3 +56,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::StopDragFuzzTest(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
