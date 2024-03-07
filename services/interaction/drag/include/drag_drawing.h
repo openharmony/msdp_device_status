@@ -229,7 +229,6 @@ private:
     void InitMultiSelectedNodes();
     void ClearMultiSelectedData();
     bool ParserRadius(float &radius);
-    void OnStartStyleAnimation();
     void OnStopAnimationSuccess();
     void OnStopAnimationFail();
     void OnDragStyleAnimation();

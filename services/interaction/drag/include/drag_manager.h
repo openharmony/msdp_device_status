@@ -59,7 +59,7 @@ public:
     int32_t GetDragState(DragState &dragState);
     void GetAllowDragState(bool &isAllowDrag) override;
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
+    int32_t OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;

@@ -364,7 +364,12 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         return;
     }
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
-        OnDragUp(pointerEvent);
+        CHKPV(context_);
+        int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
+            std::bind(&DragManager::OnDragUp, this, pointerEvent));
+        if (ret != RET_OK) {
+            FI_HILOGE("Post async task failed");
+        }
         return;
     }
     FI_HILOGW("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
@@ -395,25 +400,30 @@ void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
     }
 }
 
-void DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;
-    CHKPV(pointerEvent);
+    CHKPR(pointerEvent, RET_ERR);
+    CHKPR(notifyPUllUpCallback_, RET_ERR);
+    notifyPUllUpCallback_(true);
+    if (dragState_ != DragState::START) {
+        FI_HILOGW("No drag instance running");
+        return RET_ERR;
+    }
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
         FI_HILOGI("Set the pointer cursor visible");
         MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
-    CHKPV(context_);
+    CHKPR(context_, RET_ERR);
     int32_t repeatCount = 1;
     timerId_ = context_->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
         DragDropResult dropResult { DragResult::DRAG_EXCEPTION, false, -1 };
         FI_HILOGW("Timeout, automatically stop dragging");
         this->StopDrag(dropResult);
     });
-    CHKPV(notifyPUllUpCallback_);
-    notifyPUllUpCallback_(true);
+    return RET_OK;
 }
 
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
