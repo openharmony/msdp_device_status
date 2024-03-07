@@ -73,6 +73,8 @@ constexpr int32_t MOVE_STEP { 10 };
 constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
 constexpr int32_t ANIMATION_DURATION { 500 };
+constexpr int32_t SRC_MAIN_WINDOW { 0 };
+constexpr int32_t TARGET_MAIN_WINDOW { 0 };
 constexpr int64_t DOWN_TIME { 1 };
 const std::string UD_KEY { "Unified data key" };
 const std::string SYSTEM_CORE { "system_core" };
@@ -366,6 +368,7 @@ std::optional<DragData> InteractionManagerTest::CreateDragData(const std::pair<i
     dragData.hasCanceledAnimation = HAS_CANCELED_ANIMATION;
     dragData.extraInfo = EXTRA_INFO;
     dragData.filterInfo = FILTER_INFO;
+    dragData.mainWindow = SRC_MAIN_WINDOW;
     return dragData;
 }
 
@@ -2257,6 +2260,185 @@ HWTEST_F(InteractionManagerTest, GetDragAction_005, TestSize.Level1)
         std::future_status::timeout);
     ret = InteractionManager::GetInstance()->RemoveSubscriptListener(listener);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_001
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::COPY);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION,
+        TARGET_MAIN_WINDOW, DragBehavior::COPY };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_002
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::MOVE);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION,
+        TARGET_MAIN_WINDOW, DragBehavior::MOVE };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_003
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::COPY);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UpdateDragStyle(DragCursorStyle::COPY);
+    ASSERT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_004
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::MOVE);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_005
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::COPY);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    int32_t targetMainWindow = 1;
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, targetMainWindow };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
+}
+
+/**
+ * @tc.name: InteractionManagerTest_CheckDragBehavior_006
+ * @tc.desc: Check drag behavior
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, CheckDragBehavior_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg& notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, dragBehavior:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.dragBehavior);
+        ASSERT_EQ(notifyMessage.dragBehavior, DragBehavior::UNKNOWN);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData({ TEST_PIXEL_MAP_WIDTH, TEST_PIXEL_MAP_HEIGHT },
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, TOUCH_POINTER_ID, DISPLAY_ID, { DRAG_SRC_X, DRAG_SRC_Y });
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<UnitTestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    DragDropResult dropResult { DragResult::DRAG_FAIL, HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
