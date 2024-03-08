@@ -24,6 +24,11 @@ namespace DeviceStatus {
 
 namespace COORDINATION {
 std::string GetLocalNetworkId();
+std::string GetCurrentPackageName();
+std::string GetUdidByNetworkId(const std::string &networkId);
+std::string GetLocalUdid();
+
+#define DSTB_HARDWARE OHOS::DistributedHardware::DeviceManager::GetInstance()
 } // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp

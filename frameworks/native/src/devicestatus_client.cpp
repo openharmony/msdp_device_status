@@ -268,6 +268,13 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
     return devicestatusProxy_->GetCoordinationState(userData, networkId, isCompatible);
 }
 
+int32_t DeviceStatusClient::GetCoordinationState(const std::string &networkId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
+    return devicestatusProxy_->GetCoordinationState(networkId, state);
+}
+
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
 int32_t DeviceStatusClient::UpdateDragStyle(DragCursorStyle style)

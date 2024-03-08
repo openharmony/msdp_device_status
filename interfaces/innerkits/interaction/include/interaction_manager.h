@@ -105,6 +105,15 @@ public:
      */
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
         bool isCompatible = false);
+    
+    /**
+     * @brief Obtains the screen hopping status of a mouse pointer.
+     * @param networkId Indicates the descriptor of the input device.
+     * @param state Indicates the state of crossing switch.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 10
+     */
+    int32_t GetCoordinationState(const std::string &networkId, bool &state);
 
     /**
      * @brief Starts dragging.

@@ -47,6 +47,7 @@ public:
         bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
         bool isCompatible = false);
+    int32_t GetCoordinationState(const std::string &networkId, bool &state);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);

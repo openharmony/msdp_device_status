@@ -76,6 +76,11 @@ int32_t InteractionManager::GetCoordinationState(
     return INTER_MGR_IMPL.GetCoordinationState(networkId, callback, isCompatible);
 }
 
+int32_t InteractionManager::GetCoordinationState(const std::string &networkId, bool &state)
+{
+    return INTER_MGR_IMPL.GetCoordinationState(networkId, state);
+}
+
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 {
     return INTER_MGR_IMPL.UpdateDragStyle(style);

@@ -71,6 +71,8 @@ void DeviceStatusSrvStub::InitCoordination()
             &DeviceStatusSrvStub::DeactivateCoordinationStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE),
             &DeviceStatusSrvStub::GetCoordinationStateStub },
+        { static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE_SYNC),
+            &DeviceStatusSrvStub::GetCoordinationStateSyncStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::ADD_HOT_AREA_MONITOR),
             &DeviceStatusSrvStub::AddHotAreaListenerStub },
         { static_cast<uint32_t>(DeviceInterfaceCode::REMOVE_HOT_AREA_MONITOR),
@@ -327,8 +329,22 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel &data, Messa
     READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = GetCoordinationState(userData, networkId);
     if (ret != RET_OK) {
-        FI_HILOGE("Call RegisterCoordinationEvent failed, ret:%{public}d", ret);
+        FI_HILOGE("GetCoordinationStateStub failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t DeviceStatusSrvStub::GetCoordinationStateSyncStub(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    std::string networkId;
+    READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    bool state { false };
+    int32_t ret = GetCoordinationState(networkId, state);
+    if (ret != RET_OK) {
+        FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
+    }
+    WRITEBOOL(reply, state, E_DEVICESTATUS_WRITE_PARCEL_ERROR);
     return ret;
 }
 

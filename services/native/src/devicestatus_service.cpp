@@ -712,11 +712,28 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DeviceStatusService::OnGetCoordinationState, this, pid, userData, networkId));
     if (ret != RET_OK) {
-        FI_HILOGE("On get coordination state failed, ret:%{public}d", ret);
+        FI_HILOGE("OnGetCoordinationState failed, ret:%{public}d", ret);
         return ret;
     }
 #else
     (void)(userData);
+    (void)(networkId);
+    FI_HILOGW("Get coordination state does not support");
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    return RET_OK;
+}
+
+int32_t DeviceStatusService::GetCoordinationState(const std::string &networkId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&DeviceStatusService::OnGetCoordinationStateSync, this, networkId, state));
+    if (ret != RET_OK) {
+        FI_HILOGE("OnGetCoordinationStateSync failed, ret:%{public}d", ret);
+        return ret;
+    }
+#else
     (void)(networkId);
     FI_HILOGW("Get coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
@@ -1073,6 +1090,16 @@ int32_t DeviceStatusService::OnGetCoordinationState(
         FI_HILOGE("Get coordination state failed");
     }
     return ret;
+}
+
+int32_t DeviceStatusService::OnGetCoordinationStateSync(const std::string &networkId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    if (int32_t ret = COOR_SM->GetCoordinationState(networkId, state) != RET_OK) {
+        FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 
 int32_t DeviceStatusService::OnAddHotAreaListener(int32_t pid)

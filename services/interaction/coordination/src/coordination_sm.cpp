@@ -199,11 +199,24 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     if (networkId.empty()) {
-        FI_HILOGE("Transfer network id is empty");
+        FI_HILOGE("NetworkId is empty");
         return COMMON_PARAMETER_ERROR;
     }
     bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);
+    FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
+    return RET_OK;
+}
+
+int32_t CoordinationSM::GetCoordinationState(const std::string &networkId, bool &state)
+{
+    CALL_INFO_TRACE;
+    if (networkId.empty()) {
+        FI_HILOGE("NetworkId is empty");
+        return COMMON_PARAMETER_ERROR;
+    }
+    state = DP_ADAPTER->GetCrossingSwitchState(networkId);
+    FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
 

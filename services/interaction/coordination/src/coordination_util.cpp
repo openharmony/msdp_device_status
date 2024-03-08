@@ -25,7 +25,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace COORDINATION {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationUtil" };
+const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
 } // namespace
 std::string GetLocalNetworkId()
 {
@@ -39,6 +39,32 @@ std::string GetLocalNetworkId()
     std::string networkId(localNode->networkId, sizeof(localNode->networkId));
     FI_HILOGD("Get local node device info, networkId:%{public}s", GetAnonyString(networkId).c_str());
     return localNode->networkId;
+}
+
+std::string GetCurrentPackageName()
+{
+    return PKG_NAME_PREFIX + std::to_string(getpid());
+}
+
+std::string GetUdidByNetworkId(const std::string &networkId)
+{
+    std::string udid { "" };
+    if (DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udid) != RET_OK) {
+        FI_HILOGE("GetUdidByNetworkId failed, networkId:%{public}s, udid:%{public}s",
+            GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
+    }
+    return udid;
+}
+
+std::string GetLocalUdid()
+{
+    auto packageName = GetCurrentPackageName();
+    OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
+    if (int32_t errCode = RET_OK; (errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo)) != RET_OK) {
+        FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
+        return {};
+    }
+    return COORDINATION::GetUdidByNetworkId(dmDeviceInfo.networkId);
 }
 } // namespace COORDINATION
 } // namespace DeviceStatus
