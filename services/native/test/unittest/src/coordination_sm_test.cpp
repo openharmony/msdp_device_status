@@ -34,6 +34,9 @@
 #include "device.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationSMTest"
+
 using namespace ::OHOS;
 using namespace ::OHOS::Security::AccessToken;
 
@@ -42,7 +45,6 @@ namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSMTest" };
 const std::string REMOTE_NETWORKID { "Test_Remote_NetworkId" };
 const std::string ORIGIN_NETWORKID { "Test_Origin_NetworkId" };
 constexpr int32_t DEVICE_ID { 0 };

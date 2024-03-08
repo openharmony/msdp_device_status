@@ -19,11 +19,13 @@
 #include "json_parser.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DDPAdapterImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DDPAdapterImpl" };
 const std::string SERVICE_ID { "deviceStatus" };
 const std::string SERVICE_TYPE { "deviceStatus" };
 } // namespace

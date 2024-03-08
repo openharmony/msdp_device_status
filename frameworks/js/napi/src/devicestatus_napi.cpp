@@ -25,11 +25,13 @@
 #include "devicestatus_napi_error.h"
 #include "stationary_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusNapi"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusNapi" };
 constexpr size_t ARG_0 { 0 };
 constexpr size_t ARG_1 { 1 };
 constexpr size_t ARG_2 { 2 };

@@ -24,13 +24,13 @@
 #include "fi_log.h"
 #include "sensor_data_callback.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusDatahubTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDatahubTest" };
-} // namespace
 
 class DeviceStatusDatahubTest : public testing::Test {
 public:

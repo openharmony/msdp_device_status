@@ -17,12 +17,13 @@
 
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationEventHandler"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationEventHandler" };
-} // namespace
+
 CoordinationEventHandler::CoordinationEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner) {}

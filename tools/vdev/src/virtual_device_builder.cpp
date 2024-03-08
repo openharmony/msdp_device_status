@@ -40,11 +40,13 @@
 #include "virtual_mouse.h"
 #include "virtual_touchscreen.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualDeviceBuilder"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualDeviceBuilder" };
 constexpr int32_t MAXIMUM_WAIT_TIME_ALLOWED { 3000 };
 constexpr int32_t MINIMUM_WAIT_TIME_ALLOWED { 5 };
 constexpr ssize_t MAXIMUM_FILESIZE_ALLOWED { 0x100000 };

@@ -19,12 +19,12 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "PluginManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "PluginManager" };
-}
 
 #if (defined(__aarch64__) || defined(__x86_64__))
 constexpr std::string_view LIB_COOPERATE_PATH { "/system/lib64/libintention_cooperate.z.so" };

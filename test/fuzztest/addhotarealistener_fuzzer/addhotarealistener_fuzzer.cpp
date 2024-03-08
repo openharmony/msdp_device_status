@@ -22,11 +22,14 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
-using namespace OHOS::Msdp::DeviceStatus;
+#undef LOG_TAG
+#define LOG_TAG "AddHotAreaListenerFuzzTest"
 
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "AddHotAreaListenerFuzzTest" };
+namespace Msdp {
+namespace DeviceStatus {
 
+namespace OHOS {
 bool AddHotAreaListenerFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
@@ -53,4 +56,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::AddHotAreaListenerFuzzTest(data, size);
     return 0;
 }
-
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

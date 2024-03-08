@@ -22,12 +22,14 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InputEventSerialization"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InputEventSerialization" };
 constexpr int32_t MAX_KEY_SIZE { 395 };
 } // namespace
 

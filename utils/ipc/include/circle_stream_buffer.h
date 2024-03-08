@@ -18,10 +18,12 @@
 
 #include "stream_buffer.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CircleStreamBuffer"
+
 namespace OHOS {
 namespace Msdp {
 class CircleStreamBuffer : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CircleStreamBuffer" };
 public:
     CircleStreamBuffer() = default;
     DISALLOW_MOVE(CircleStreamBuffer);

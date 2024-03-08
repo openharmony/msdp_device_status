@@ -27,11 +27,13 @@
 #include "virtual_device_defines.h"
 #include "virtual_mouse_builder.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualMouse"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualMouse" };
 constexpr int32_t REL_WHEEL_VALUE { 1 };
 constexpr int32_t REL_WHEEL_HI_RES_VALUE { 120 };
 constexpr int32_t MAX_SCROLL_LENGTH { 10 };

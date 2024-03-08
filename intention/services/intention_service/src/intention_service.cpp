@@ -20,12 +20,12 @@
 #include "devicestatus_define.h"
 #include "i_plugin.h"
 
+#undef LOG_TAG
+#define LOG_TAG "IntentionService"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionService" };
-} // namespace
 
 IntentionService::IntentionService(IContext *context)
     : context_(context), socketServer_(context), cooperate_(context), drag_(context)

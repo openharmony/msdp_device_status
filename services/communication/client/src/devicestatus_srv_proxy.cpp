@@ -28,12 +28,12 @@
 #include "stationary_data.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusSrvProxy"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
-} // namespace
 
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)

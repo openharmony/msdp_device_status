@@ -19,6 +19,9 @@
 #include "proto.h"
 #include "stream_buffer.h"
 
+#undef LOG_TAG
+#define LOG_TAG "NetPacket"
+
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
     MessageId idMsg { MessageId::INVALID };
@@ -29,7 +32,6 @@ using PACKHEAD = struct PackHead {
 namespace OHOS {
 namespace Msdp {
 class NetPacket : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "NetPacket" };
 public:
     explicit NetPacket(MessageId msgId);
     NetPacket(const NetPacket &pkt);

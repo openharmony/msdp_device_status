@@ -29,13 +29,15 @@
 #include "devicestatus_dumper.h"
 #include "devicestatus_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusAlgorithmTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 std::shared_ptr<AlgoMgr> g_manager { nullptr };
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAlgorithmTest" };
 #ifdef __aarch64__
 const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib64/libdevicestatus_algo.z.so" };
 #else

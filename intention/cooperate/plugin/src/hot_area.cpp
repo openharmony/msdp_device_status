@@ -19,12 +19,14 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "HotArea"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "HotArea" };
 constexpr int32_t HOT_AREA_WIDTH { 100 };
 constexpr int32_t HOT_AREA_MARGIN { 200 };
 }; // namespace

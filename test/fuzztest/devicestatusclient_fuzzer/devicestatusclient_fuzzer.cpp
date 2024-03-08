@@ -22,11 +22,13 @@
 
 #include "fi_log.h"
 
-using namespace std;
-using namespace OHOS;
-using namespace OHOS::Msdp::DeviceStatus;
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusClientFuzzTest"
+
+namespace OHOS {
+namespace Msdp {
+namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientFuzzTest" };
 constexpr int32_t WAIT_TIME { 1000 };
 
 bool DeviceStatusClientFuzzTest(const uint8_t* data, size_t size)
@@ -89,3 +91,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     DeviceStatusClientFuzzTest(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

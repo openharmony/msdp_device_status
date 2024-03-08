@@ -22,10 +22,12 @@
 #include "drag_manager.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "EventHub"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "EventHub" };
 static std::map<std::string, EventId> g_actionMap = {
     { EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON, EventId::EVENT_SCREEN_ON },
     { EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF, EventId::EVENT_SCREEN_OFF },
