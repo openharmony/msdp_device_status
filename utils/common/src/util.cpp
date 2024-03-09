@@ -27,11 +27,13 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Util"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Util" };
 constexpr size_t BUF_TID_SIZE { 10 };
 constexpr size_t PROGRAM_NAME_SIZE { 256 };
 constexpr size_t BUF_CMD_SIZE { 512 };

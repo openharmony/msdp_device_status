@@ -30,11 +30,13 @@
 #include "utility.h"
 #include "virtual_touchscreen.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualTouchScreenBuilder"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreenBuilder" };
 constexpr int32_t MAXIMUM_LEVEL_ALLOWED { 3 };
 int32_t g_absMaxWidth { 720 };
 int32_t g_absMaxHeight { 1280 };

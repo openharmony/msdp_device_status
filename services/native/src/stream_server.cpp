@@ -23,12 +23,12 @@
 #include "devicestatus_service.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StreamServer"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamServer" };
-} // namespace
 
 StreamServer::~StreamServer()
 {

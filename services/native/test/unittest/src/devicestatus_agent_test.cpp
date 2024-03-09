@@ -17,12 +17,14 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusAgentTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAgentTest" };
 std::shared_ptr<DeviceStatusAgent> g_agent1;
 std::shared_ptr<DeviceStatusAgent> g_agent2;
 } // namespace

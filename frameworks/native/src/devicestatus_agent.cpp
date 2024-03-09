@@ -20,12 +20,12 @@
 #include "stationary_callback.h"
 #include "stationary_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusAgent"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusAgent" };
-} // namespace
 
 void DeviceStatusAgent::DeviceStatusAgentCallback::OnDeviceStatusChanged(
     const Data &devicestatusData)

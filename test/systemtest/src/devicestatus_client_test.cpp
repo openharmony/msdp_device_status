@@ -19,13 +19,13 @@
 #include "devicestatus_define.h"
 #include "stationary_manager.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusClientTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DeviceStatusClientTest" };
-} // namespace
 
 class DeviceStatusClientTest : public testing::Test {
 public:

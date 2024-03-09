@@ -17,12 +17,12 @@
 
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StreamClient"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamClient" };
-} // namespace
 
 StreamClient::StreamClient()
 {

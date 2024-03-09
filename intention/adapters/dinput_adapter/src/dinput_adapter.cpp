@@ -21,11 +21,13 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DInputAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DInputAdapter" };
 constexpr int32_t DEFAULT_DELAY_TIME { 4000 };
 constexpr int32_t RETRY_TIME { 2 };
 } // namespace

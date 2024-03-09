@@ -46,11 +46,13 @@
 #include "json_parser.h"
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragDrawing"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDrawing" };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t DEVICE_INDEPENDENT_PIXEL { 40 };
 constexpr int32_t DRAG_NUM_ONE { 1 };

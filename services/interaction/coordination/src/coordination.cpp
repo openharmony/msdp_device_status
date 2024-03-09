@@ -21,12 +21,12 @@
 #include "distributed_input_adapter.h"
 #include "proto.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Coordination"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Coordination" };
-} // namespace
 
 void Coordination::PrepareCoordination()
 {

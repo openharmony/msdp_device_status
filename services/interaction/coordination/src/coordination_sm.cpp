@@ -36,11 +36,13 @@
 #include "coordination_util.h"
 #include "device_profile_adapter.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationSM"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
 constexpr int32_t INTERVAL_MS { 2000 };
 constexpr double PERCENT_CONST { 100.0 };
 constexpr float MOUSE_ABS_LOCATION { 100 };

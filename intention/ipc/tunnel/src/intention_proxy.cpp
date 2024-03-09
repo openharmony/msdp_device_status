@@ -22,12 +22,12 @@
 #include "devicestatus_define.h"
 #include "intention_identity.h"
 
+#undef LOG_TAG
+#define LOG_TAG "IntentionProxy"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionProxy" };
-} // namespace
 
 IntentionProxy::IntentionProxy(const sptr<IRemoteObject>& impl)
     : IRemoteProxy<IIntention>(impl)

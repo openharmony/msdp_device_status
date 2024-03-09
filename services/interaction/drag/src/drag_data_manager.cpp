@@ -21,11 +21,13 @@
 #include "drag_data.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragDataManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDataManager" };
 constexpr int32_t DEFAULT_DISPLAY_ID { 0 };
 } // namespace
 

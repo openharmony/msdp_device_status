@@ -24,8 +24,10 @@
 #include "devicestatus_define.h"
 #include "dm_binding_internal.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DmBinding"
+
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "DmBinding" };
 #define DIS_HARDWARE OHOS::DistributedHardware::DeviceManager::GetInstance()
 } // namespace
 

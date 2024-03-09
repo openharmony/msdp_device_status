@@ -22,11 +22,14 @@
 #include "fi_log.h"
 #include "message_parcel.h"
 
-using namespace OHOS::Msdp::DeviceStatus;
+#undef LOG_TAG
+#define LOG_TAG "StopDragFuzzTest"
 
 namespace OHOS {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "StopDragFuzzTest" };
+namespace Msdp {
+namespace DeviceStatus {
 
+namespace OHOS {
 bool StopDragFuzzTest(const uint8_t* data, size_t size)
 {
     const std::u16string FORMMGR_DEVICE_TOKEN { u"ohos.msdp.Idevicestatus" };
@@ -54,3 +57,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::StopDragFuzzTest(data, size);
     return 0;
 }
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

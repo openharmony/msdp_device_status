@@ -27,12 +27,11 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "FusionSecurity"
+
 using namespace OHOS;
 using namespace OHOS::Security::AccessToken;
-
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, Msdp::MSDP_DOMAIN_ID, "FusionSecurity" };
-} // namespace
 
 static void SetAceessTokenPermission(const std::string &processName, const char** perms, size_t permCount)
 {

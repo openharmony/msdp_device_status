@@ -17,12 +17,14 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Cooperate"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Cooperate" };
 } // namespace
 
 Cooperate::Cooperate(IContext *env)

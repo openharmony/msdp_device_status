@@ -35,11 +35,13 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Utility"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Utility" };
 constexpr size_t ANONYMIZED_ID_SIZE { 32 };
 constexpr size_t ID_PART_SIZE { 4 };
 constexpr size_t FULL_MASKED_ID_SIZE { 12 };

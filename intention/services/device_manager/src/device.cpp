@@ -34,6 +34,9 @@
 #include "napi_constants.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "Device"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -43,7 +46,6 @@ struct Range {
 };
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "Device" };
 constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 constexpr ssize_t MAX_FILE_SIZE_ALLOWED { 0x5000 };
 

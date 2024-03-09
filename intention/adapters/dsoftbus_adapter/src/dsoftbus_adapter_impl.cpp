@@ -26,11 +26,13 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DSoftbusAdapterImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DSoftbusAdapterImpl" };
 #define SERVER_SESSION_NAME "ohos.msdp.device_status.intention.serversession"
 const std::string CLIENT_SESSION_NAME { "ohos.msdp.device_status.intention.clientsession." };
 constexpr size_t BIND_STRING_LENGTH { 15 };

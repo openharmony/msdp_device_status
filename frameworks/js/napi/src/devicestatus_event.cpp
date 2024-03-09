@@ -24,11 +24,13 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusEvent"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusEvent" };
 constexpr size_t EVENT_MAP_MAX { 20 };
 constexpr size_t EVENT_LIST_MAX { 30 };
 } // namespace

@@ -32,11 +32,13 @@
 #include "dfs_session.h"
 #include "json_parser.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationSoftbusAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapter" };
 std::shared_ptr<CoordinationSoftbusAdapter> g_instance = nullptr;
 constexpr uint32_t QOS_LEN { 3 };
 constexpr int32_t MIN_BW { 80 * 1024 * 1024 };

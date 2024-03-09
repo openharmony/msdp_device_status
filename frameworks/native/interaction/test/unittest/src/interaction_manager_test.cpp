@@ -37,12 +37,14 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InteractionManagerTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 80 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };

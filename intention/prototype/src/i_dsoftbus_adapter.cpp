@@ -19,12 +19,12 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "IDSoftbusAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IDSoftbusAdapter" };
-}
 
 std::string IDSoftbusAdapter::GetLocalNetworkId()
 {

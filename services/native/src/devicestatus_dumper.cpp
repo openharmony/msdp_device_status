@@ -35,11 +35,13 @@
 #include "drag_manager.h"
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusDumper"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDumper" };
 constexpr size_t MAX_DEVICE_STATUS_SIZE { 10 };
 } // namespace
 

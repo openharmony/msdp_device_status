@@ -18,11 +18,10 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 
-using namespace ::OHOS::Msdp::DeviceStatus;
+#undef LOG_TAG
+#define LOG_TAG "fusion_services_binding"
 
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_services_binding" };
-} // namespace
+using namespace ::OHOS::Msdp::DeviceStatus;
 
 struct NativeService {
     int32_t refCnt { 0 };

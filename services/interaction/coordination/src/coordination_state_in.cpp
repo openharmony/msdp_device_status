@@ -23,12 +23,12 @@
 #include "coordination_util.h"
 #include "distributed_input_adapter.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationStateIn"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateIn" };
-} // namespace
 
 CoordinationStateIn::CoordinationStateIn(const std::string &startDeviceDhid) : startDeviceDhid_(startDeviceDhid) {}
 

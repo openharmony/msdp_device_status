@@ -20,12 +20,12 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusCallbackStub"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusCallbackStub" };
-} // namespace
 
 int32_t DeviceStatusCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)

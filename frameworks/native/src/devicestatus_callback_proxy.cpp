@@ -24,12 +24,12 @@
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusCallbackProxy"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusCallbackProxy" };
-} // namespace
 
 void DeviceStatusCallbackProxy::OnDeviceStatusChanged(const Data& devicestatusData)
 {

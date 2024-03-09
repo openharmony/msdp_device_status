@@ -15,12 +15,12 @@
 
 #include "display_change_event_listener.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DisplayChangeEventListener"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DisplayChangeEventListener" };
-} // namespace
 
 DisplayChangeEventListener::DisplayChangeEventListener(IContext *context)
     : context_(context)

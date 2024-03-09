@@ -20,13 +20,14 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationUtil"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace COORDINATION {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationUtil" };
-} // namespace
+
 std::string GetLocalNetworkId()
 {
     CALL_DEBUG_ENTER;

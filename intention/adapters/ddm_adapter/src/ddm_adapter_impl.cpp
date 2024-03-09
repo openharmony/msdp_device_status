@@ -20,12 +20,12 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DDMAdapterImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DDMAdapterImpl" };
-}
 
 #define D_DEV_MGR   DistributedHardware::DeviceManager::GetInstance()
 

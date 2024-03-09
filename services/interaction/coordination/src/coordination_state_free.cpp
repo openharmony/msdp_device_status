@@ -19,12 +19,12 @@
 #include "coordination_sm.h"
 #include "coordination_util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationStateFree"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationStateFree" };
-} // namespace
 
 int32_t CoordinationStateFree::ActivateCoordination(
     const std::string &remoteNetworkId, int32_t startDeviceId)

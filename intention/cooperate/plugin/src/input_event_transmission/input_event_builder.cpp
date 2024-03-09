@@ -22,13 +22,13 @@
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InputEventBuilder"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InputEventBuilder" };
-} // namespace
 
 InputEventBuilder::InputEventBuilder(IContext *env)
     : env_(env)

@@ -19,12 +19,12 @@
 #include "default_params.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CooperateServer"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateServer" };
-} // namespace
 
 CooperateServer::CooperateServer(IContext *context)
     : context_(context)

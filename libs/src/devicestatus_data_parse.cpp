@@ -26,11 +26,13 @@
 #include "json_parser.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusDataParse"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusDataParse" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
 constexpr int32_t READ_DATA_BUFF_SIZE { 256 };
 const std::string MSDP_DATA_PATH { "/data/msdp/device_status_data.json" };

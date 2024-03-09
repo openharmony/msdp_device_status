@@ -23,11 +23,13 @@
 #include "devicestatus_dumper.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusMsdpClientImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusMsdpClientImpl" };
 #ifdef __aarch64__
 const std::string DEVICESTATUS_MOCK_LIB_PATH { "/system/lib64/libdevicestatus_mock.z.so" };
 const std::string DEVICESTATUS_ALGO_LIB_PATH { "/system/lib64/libdevicestatus_algo.z.so" };

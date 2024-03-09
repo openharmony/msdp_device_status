@@ -20,12 +20,12 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef LOG_TAG
+#define LOG_TAG "JsDragManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
-} // namespace
 
 void JsDragManager::ResetEnv()
 {

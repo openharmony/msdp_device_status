@@ -18,9 +18,8 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "fusion_data_binding" };
-} // namespace
+#undef LOG_TAG
+#define LOG_TAG "fusion_data_binding"
 
 struct CDragData* CDragDataFree(struct CDragData *cdrag)
 {

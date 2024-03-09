@@ -20,12 +20,12 @@
 
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusPermission"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusPermission" };
-} // namespace
 
 bool DeviceStatusPermission::CheckCallingPermission(const std::string &permissionName)
 {
