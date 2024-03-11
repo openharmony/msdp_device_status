@@ -325,8 +325,8 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
         COOR_SM->OnKeyboardOnline(dev->GetDhid());
     }
     FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
-        "local/remote:\"%{public}s\"", GetAnonyString(device->GetId()), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
-        dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
+        "local/remote:\"%{public}s\"", GetAnonyString(device->GetId()).c_str(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
+        GetAnonyString(dev->GetNetworkId()).c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
@@ -335,7 +335,7 @@ void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
     CHKPV(device);
     auto iter = devices_.find(device->GetId());
     if (iter == devices_.end()) {
-        FI_HILOGE("Failed to find the device, current id:%{public}d", GetAnonyString(device->GetId()));
+        FI_HILOGE("Failed to find the device, current id:%{public}d", GetAnonyString(device->GetId()).c_str());
         return;
     }
     std::shared_ptr<Device> dev = iter->second;
