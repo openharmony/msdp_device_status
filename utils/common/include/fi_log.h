@@ -85,7 +85,7 @@ public:
         }
     }
 private:
-    LogLevel level { LOG_LEVEL_MIN };
+    LogLevel level_ { LOG_LEVEL_MIN };
     const char* tag_ { nullptr };
     const char* func_ { nullptr };
 };
@@ -93,7 +93,7 @@ private:
 } // namespace OHOS
 
 #define CALL_DEBUG_ENTER InnerFunctionTracer __innerFuncTracer_Debug___ { LOG_DEBUG, LOG_TAG, __FUNCTION__ }
-#define CALL_INFO_TRACE InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_INFO, LOG_TAG,__FUNCTION__ }
+#define CALL_INFO_TRACE InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_INFO, LOG_TAG, __FUNCTION__ }
 #define CALL_TEST_DEBUG InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_DEBUG, LOG_TAG, \
     test_info_ == nullptr ? "TestBody" : test_info_->name() }
 #endif // FI_LOG_H
