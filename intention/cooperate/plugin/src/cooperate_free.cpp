@@ -41,7 +41,6 @@ CooperateFree::~CooperateFree()
 
 void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
     current_->OnEvent(context, event);
 }
 

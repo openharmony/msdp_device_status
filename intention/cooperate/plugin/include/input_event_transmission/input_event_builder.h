@@ -57,7 +57,7 @@ class InputEventBuilder final {
 
 public:
     InputEventBuilder(IContext *env);
-    ~InputEventBuilder() = default;
+    ~InputEventBuilder();
     DISALLOW_COPY_AND_MOVE(InputEventBuilder);
 
     void Enable(Context &context);
@@ -76,6 +76,7 @@ private:
     void ResetKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const;
 
     IContext *env_ { nullptr };
+    bool enable_ { false };
     CursorPosition cursorPos_ {};
     std::string remoteNetworkId_;
     std::shared_ptr<DSoftbusObserver> observer_;

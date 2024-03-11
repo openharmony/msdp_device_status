@@ -38,9 +38,17 @@ std::set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_POWER,
 };
 
+InputEventInterceptor::~InputEventInterceptor()
+{
+    Disable();
+}
+
 void InputEventInterceptor::Enable(Context &context)
 {
     CALL_INFO_TRACE;
+    if (interceptorId_ > 0) {
+        return;
+    }
     cursorPos_ = context.CursorPosition();
     remoteNetworkId_ = context.Peer();
     startDeviceId_ = context.StartDeviceId();
@@ -60,9 +68,6 @@ void InputEventInterceptor::Enable(Context &context)
 void InputEventInterceptor::Disable()
 {
     CALL_INFO_TRACE;
-    remoteNetworkId_.clear();
-    startDeviceId_ = -1;
-
     if (interceptorId_ > 0) {
         env_->GetInput().RemoveInterceptor(interceptorId_);
         interceptorId_ = -1;

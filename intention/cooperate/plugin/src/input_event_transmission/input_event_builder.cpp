@@ -38,9 +38,18 @@ InputEventBuilder::InputEventBuilder(IContext *env)
     keyEvent_ = MMI::KeyEvent::Create();
 }
 
+InputEventBuilder::~InputEventBuilder()
+{
+    Disable();
+}
+
 void InputEventBuilder::Enable(Context &context)
 {
     CALL_INFO_TRACE;
+    if (enable_) {
+        return;
+    }
+    enable_ = true;
     cursorPos_.pos = context.CursorPosition();
     remoteNetworkId_ = context.Peer();
     env_->GetDSoftbus().AddObserver(observer_);
@@ -50,8 +59,10 @@ void InputEventBuilder::Enable(Context &context)
 void InputEventBuilder::Disable()
 {
     CALL_INFO_TRACE;
-    env_->GetDSoftbus().RemoveObserver(observer_);
-    remoteNetworkId_.clear();
+    if (enable_) {
+        enable_ = false;
+        env_->GetDSoftbus().RemoveObserver(observer_);
+    }
 }
 
 void InputEventBuilder::Update(Context &context)

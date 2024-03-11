@@ -43,7 +43,7 @@ void ICooperateState::ICooperateStep::OnEvent(Context &context, const CooperateE
 {
     if (auto iter = handlers_.find(event.type); iter != handlers_.end()) {
         iter->second(context, event);
-    } else {
+    } else if (event.type != CooperateEventType::INPUT_POINTER_EVENT) {
         FI_HILOGD("Unhandled event(%{public}d)", event.type);
     }
 }

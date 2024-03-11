@@ -66,6 +66,7 @@ public:
     int32_t StopCooperate(const std::string &networkId, const DSoftbusStopCooperate &event);
     int32_t ComeBack(const std::string &networkId, const DSoftbusComeBack &event);
     int32_t RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event);
+    int32_t RelayCooperateFinish(const std::string &networkId, const DSoftbusRelayCooperateFinished &event);
 
     static std::string GetLocalNetworkId();
 
@@ -81,6 +82,7 @@ private:
     void OnStopCooperate(const std::string &networkId, NetPacket &packet);
     void OnComeBack(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperate(const std::string &networkId, NetPacket &packet);
+    void OnRelayCooperateFinish(const std::string &networkId, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;

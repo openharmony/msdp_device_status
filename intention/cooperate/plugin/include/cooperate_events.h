@@ -56,9 +56,7 @@ enum class CooperateEventType {
     DSOFTBUS_START_COOPERATE_FINISHED,
     DSOFTBUS_COME_BACK,
     DSOFTBUS_STOP_COOPERATE,
-    DSOFTBUS_STOP_COOPERATE_FINISHED,
     DSOFTBUS_RELAY_COOPERATE,
-    DSOFTBUS_RELAY_COOPERATE_RESPONSE,
     DSOFTBUS_RELAY_COOPERATE_FINISHED,
 };
 
@@ -159,6 +157,8 @@ struct DSoftbusRelayCooperate {
     std::string targetNetworkId;
     bool normal;
 };
+
+using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
 
 struct CooperateEvent {
     CooperateEvent() : type(CooperateEventType::QUIT) {}

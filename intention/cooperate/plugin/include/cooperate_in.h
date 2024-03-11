@@ -85,6 +85,29 @@ private:
         int32_t timerId_ { -1 };
     };
 
+    class RelayConfirmation : public ICooperateStep {
+    public:
+        RelayConfirmation(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
+        ~RelayConfirmation() = default;
+
+        void OnProgress(Context &context, const CooperateEvent &event) override;
+        void OnReset(Context &context, const CooperateEvent &event) override;
+
+    private:
+        void OnDisable(Context &context, const CooperateEvent &event);
+        void OnStop(Context &context, const CooperateEvent &event);
+        void OnResponse(Context &context, const CooperateEvent &event);
+        void OnNormal(Context &context, const CooperateEvent &event);
+        void OnAppClosed(Context &context, const CooperateEvent &event);
+        void OnPointerEvent(Context &context, const CooperateEvent &event);
+        void OnBoardOffline(Context &context, const CooperateEvent &event);
+        void OnSwitchChanged(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
+
+        CooperateIn &parent_;
+        int32_t timerId_ { -1 };
+    };
+
     class RemoteStart : public ICooperateStep {
     public:
         RemoteStart(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
