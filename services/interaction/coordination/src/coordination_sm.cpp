@@ -545,7 +545,7 @@ void CoordinationSM::OnStartFinish(bool isSuccess, const std::string &remoteNetw
 
     if (!isSuccess) {
         CoordinationDFX::WriteActivateResult(remoteNetworkId, isSuccess);
-        FI_HILOGE("Start distributed failed, startDevice:%{public}d", startDeviceId);
+        FI_HILOGE("Start distributed failed, startDevice:%{public}d", GetAnonyString(startDeviceId));
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         OnStartFinishSuccess(remoteNetworkId, startDeviceId);
@@ -1098,7 +1098,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!COOR_DEV_MGR->IsRemote(deviceId)) {
-            FI_HILOGI("Remote device id:%{public}d", deviceId);
+            FI_HILOGI("Remote device id:%{public}d, pointerEvent id:%{public}d", GetAnonyString(deviceId),pointerEvent->GetId() );
             DeactivateCoordination(isUnchained_);
         }
     }

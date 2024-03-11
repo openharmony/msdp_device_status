@@ -328,7 +328,7 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
     FI_HILOGI("Client session name: \'%{public}s\'", name);
     FI_HILOGI("Peer name: \'%{public}s\'", peerName);
-    FI_HILOGI("Peer network id: \'%{public}s\'", peerNetworkId);
+    FI_HILOGI("Peer network id: \'%{public}s\'", Utility::Anonymize(peerNetworkId));
     FI_HILOGI("Package name: \'%{public}s\'", pkgName);
     SocketInfo info {
         .name = name,

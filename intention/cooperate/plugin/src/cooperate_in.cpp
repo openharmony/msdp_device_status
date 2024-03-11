@@ -113,7 +113,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
         return;
     }
     FI_HILOGI("[start] start cooperation(%{public}s, %{public}d)",
-        Utility::Anonymize(startEvent.remoteNetworkId), startEvent.startDeviceId);
+        Utility::Anonymize(startEvent.remoteNetworkId), Utility::Anonymize(startEvent.startDeviceId));
     context.eventMgr_.StartCooperate(startEvent);
 
     if (context.IsPeer(startEvent.remoteNetworkId)) {
@@ -394,7 +394,7 @@ void CooperateIn::RelayCooperate::OnProgress(Context &context, const CooperateEv
         OnReset(context, event);
         return;
     }
-    FI_HILOGI("[relay cooperate] remote:%{public}s", remoteNetworkId.c_str());
+    FI_HILOGI("[relay cooperate] remote:%{public}s", Utility::Anonymize(remoteNetworkId).c_str());
     DSoftbusStartCooperate notice {};
 
     ret = context.dsoftbus_.StartCooperate(remoteNetworkId, notice);
