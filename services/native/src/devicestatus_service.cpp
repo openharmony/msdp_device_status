@@ -538,7 +538,7 @@ void DeviceStatusService::OnDelegateTask(const struct epoll_event &ev)
 
 void DeviceStatusService::OnTimeout(const struct epoll_event &ev)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         uint64_t expiration {};
         ssize_t ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));

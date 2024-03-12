@@ -136,7 +136,7 @@ int32_t TimerManager::OnProcessTimers()
 
 void TimerManager::ProcessTimers()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(context_);
     context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
 }

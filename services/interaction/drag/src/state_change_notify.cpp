@@ -59,7 +59,7 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
 {
     if (msgInfos_[MessageType::NOTIFY_STYLE].empty()) {
-        FI_HILOGW("No listener, send message failed");
+        FI_HILOGD("No listener, send message failed");
         return RET_ERR;
     }
     for (auto it = msgInfos_[MessageType::NOTIFY_STYLE].begin();

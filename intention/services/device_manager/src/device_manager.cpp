@@ -217,7 +217,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
 
 std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     const std::string devPath { DEV_INPUT_PATH + devNode };
 
     for (auto devIter = devices_.begin(); devIter != devices_.end(); ++devIter) {
@@ -238,16 +238,16 @@ std::shared_ptr<IDevice> DeviceManager::RemoveDevice(const std::string &devNode)
 void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
-    FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
+    FI_HILOGD("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
     FI_HILOGD("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
     FI_HILOGD("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGD("  vendor:        %{public}04x", dev->GetVendor());
     FI_HILOGD("  product:       %{public}04x", dev->GetProduct());
     FI_HILOGD("  version:       %{public}04x", dev->GetVersion());
-    FI_HILOGI("  name:          \"%{public}s\"", dev->GetName().c_str());
+    FI_HILOGD("  name:          \"%{public}s\"", dev->GetName().c_str());
     FI_HILOGD("  location:      \"%{public}s\"", dev->GetPhys().c_str());
     FI_HILOGD("  unique id:     \"%{public}s\"", dev->GetUniq().c_str());
-    FI_HILOGI("  is pointer:    %{public}s, is keyboard:%{public}s",
+    FI_HILOGD("  is pointer:    %{public}s, is keyboard:%{public}s",
         dev->IsPointerDevice() ? "True" : "False", dev->IsKeyboard() ? "True" : "False");
 
     for (const auto &observer : observers_) {

@@ -373,7 +373,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         }
         return;
     }
-    FI_HILOGW("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
@@ -807,7 +807,7 @@ void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 
 void DragManager::StateChangedNotify(DragState state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if ((stateChangedCallback_ != nullptr) && (dragState_ != DragState::MOTION_DRAGGING)) {
         stateChangedCallback_(state);
     }

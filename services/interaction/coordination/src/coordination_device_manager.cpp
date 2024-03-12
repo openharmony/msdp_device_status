@@ -210,7 +210,7 @@ bool CoordinationDeviceManager::IsRemote(int32_t id)
 
 std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t deviceId) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<std::string> inputDeviceDhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
