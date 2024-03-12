@@ -324,13 +324,13 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
     char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
     if (strcpy_s(peerNetworkId, sizeof(peerNetworkId), networkId.c_str()) != EOK) {
-        FI_HILOGE("Invalid peerNetworkId:%{public}s", GetAnonyString(networkId).c_str());
+        FI_HILOGE("Invalid peerNetworkId:%{public}s", Utility::Anonymize(networkId));
         return RET_ERR;
     }
     char pkgName[PKG_NAME_SIZE_MAX] { FI_PKG_NAME };
     FI_HILOGI("Client session name: \'%{public}s\'", name);
     FI_HILOGI("Peer name: \'%{public}s\'", peerName);
-    FI_HILOGI("Peer network id: \'%{public}s\'", peerNetworkId);
+    FI_HILOGI("Peer network id: \'%{public}s\'", Utility::Anonymize(peerNetworkId));
     FI_HILOGI("Package name: \'%{public}s\'", pkgName);
     SocketInfo info {
         .name = name,

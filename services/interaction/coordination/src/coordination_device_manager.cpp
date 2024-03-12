@@ -328,7 +328,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     }
     FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
         "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
-        dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
+        GetAnonyString(dev->GetNetworkId()).c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)
