@@ -212,7 +212,7 @@ std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t
     std::vector<std::string> inputDeviceDhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
-        FI_HILOGW("Failed to search for the pointer id, id:%{public}d", GetAnonyString(deviceId));
+        FI_HILOGW("Failed to search for the pointer id, id:%{public}d", GetAnonyString(deviceId).c_str());
         return inputDeviceDhids;
     }
     if (devIter->second == nullptr) {
