@@ -748,7 +748,7 @@ bool CoordinationSM::IsStopping() const
 
 void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto state = GetCurrentState();
     CHKPV(state);
@@ -757,7 +757,7 @@ void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
 
 void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (currentState_ == CoordinationState::STATE_FREE) {
         FI_HILOGI("Current state:free");
@@ -829,7 +829,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 
 void CoordinationSM::OnDeviceOffline(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Local device networkId:%{public}s, remote device networkId:%{public}s,"
         "offline device networkId:%{public}s", GetAnonyString(localNetworkId).c_str(),
@@ -1250,7 +1250,7 @@ void CoordinationSM::SetPointerVisible()
 
 std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
 {
-    FI_HILOGI("Current state:%{public}d", static_cast<int32_t>(currentState_));
+    FI_HILOGD("Current state:%{public}d", static_cast<int32_t>(currentState_));
     auto it = coordinationStates_.find(currentState_);
     if (it == coordinationStates_.end()) {
         FI_HILOGE("currentState_ not found");

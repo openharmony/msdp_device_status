@@ -110,7 +110,7 @@ int32_t Monitor::EnableReceiving()
 
 void Monitor::ReceiveDevice()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
     size_t bufSize { sizeof(struct inotify_event) };
     ssize_t numRead { 0 };
