@@ -72,7 +72,7 @@ public:
     {
         if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
             if (func_ != nullptr) {
-                HiLogPrint(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, enter", func_);
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, enter", func_);
             }
         }
     }
@@ -80,7 +80,7 @@ public:
     {
         if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
             if (func_ != nullptr) {
-                HiLogPrint(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, leave", func_);
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, leave", func_);
             }
         }
     }
