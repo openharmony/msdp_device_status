@@ -65,40 +65,35 @@
 
 namespace OHOS {
 namespace Msdp {
-class InnerFunctionDebugTracer {
+class InnerFunctionTracer {
 public:
-    InnerFunctionDebugTracer(const char* func)
-        : func_ { func }
+    InnerFunctionTracer(LogLevel level, const char* tag, const char* func)
+        : level_ { level }, tag_ { tag }, func_ { func }
     {
-        HILOG_DEBUG(LOG_CORE, "in %{public}s, enter", func_);
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
+            if (func_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, enter", func_);
+            }
+        }
     }
-    ~InnerFunctionDebugTracer()
+    ~InnerFunctionTracer()
     {
-        HILOG_DEBUG(LOG_CORE, "in %{public}s, leave", func_);
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
+            if (func_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, leave", func_);
+            }
+        }
     }
 private:
-    const char* func_ { nullptr };
-};
-
-class InnerFunctionInfoTracer {
-public:
-    InnerFunctionInfoTracer(const char* func)
-        : func_ { func }
-    {
-        HILOG_INFO(LOG_CORE, "in %{public}s, enter", func_);
-    }
-    ~InnerFunctionInfoTracer()
-    {
-        HILOG_INFO(LOG_CORE, "in %{public}s, leave", func_);
-    }
-private:
+    LogLevel level_ { LOG_LEVEL_MIN };
+    const char* tag_ { nullptr };
     const char* func_ { nullptr };
 };
 } // namespace Msdp
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER InnerFunctionDebugTracer __innerFuncTracer_Debug___ { __FUNCTION__ }
-#define CALL_INFO_TRACE InnerFunctionInfoTracer ___innerFuncTracer_Info___ { __FUNCTION__ }
-#define CALL_TEST_DEBUG InnerFunctionInfoTracer ___innerFuncTracer_Info___ \
-    { test_info_ == nullptr ? "TestBody" : test_info_->name() }
+#define CALL_DEBUG_ENTER InnerFunctionTracer __innerFuncTracer_Debug___ { LOG_DEBUG, LOG_TAG, __FUNCTION__ }
+#define CALL_INFO_TRACE InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_INFO, LOG_TAG, __FUNCTION__ }
+#define CALL_TEST_DEBUG InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_DEBUG, LOG_TAG, \
+    test_info_ == nullptr ? "TestBody" : test_info_->name() }
 #endif // FI_LOG_H
