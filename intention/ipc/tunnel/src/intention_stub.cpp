@@ -18,12 +18,12 @@
 #include "devicestatus_define.h"
 #include "intention_identity.h"
 
+#undef LOG_TAG
+#define LOG_TAG "IntentionStub"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "IntentionStub" };
-} // namespace
 
 int32_t IntentionStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {

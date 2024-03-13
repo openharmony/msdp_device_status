@@ -40,7 +40,7 @@ public:
 
     int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
     int32_t UpdateCrossingSwitchState(bool state);
-    bool GetCrossingSwitchState(const std::string &networkId);
+    bool GetCrossingSwitchState(const std::string &networkIdOrUdId);
     int32_t UnregisterCrossingStateListener(const std::string &networkId);
     int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
 

@@ -20,12 +20,12 @@
 #include "drag_data.h"
 #include "drag_manager_impl.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InteractionManagerImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerImpl" };
-} // namespace
 
 InteractionManagerImpl::InteractionManagerImpl() {}
 
@@ -214,7 +214,7 @@ int32_t InteractionManagerImpl::GetCoordinationState(
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t InteractionManagerImpl::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t InteractionManagerImpl::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -223,9 +223,9 @@ int32_t InteractionManagerImpl::GetCoordinationState(const std::string &networkI
         FI_HILOGE("Get client is nullptr");
         return RET_ERR;
     }
-    return coordinationManagerImpl_.GetCoordinationState(networkId, state);
+    return coordinationManagerImpl_.GetCoordinationState(udId, state);
 #else
-    (void)(networkId);
+    (void)(udId);
     (void)(state);
     FI_HILOGW("Coordination does not support");
     return ERROR_UNSUPPORT;

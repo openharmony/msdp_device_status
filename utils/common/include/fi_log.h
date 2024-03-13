@@ -24,11 +24,10 @@
 
 #include "hilog/log.h"
 
-namespace OHOS {
-namespace Msdp {
-inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
-} // namespace Msdp
-} // namespace OHOS
+#ifdef LOG_DOMAIN
+#undef LOG_DOMAIN
+#endif
+#define LOG_DOMAIN 0XD002220
 
 #ifndef FI_FUNC_FMT
 #define FI_FUNC_FMT "in %{public}s, "
@@ -47,62 +46,54 @@ inline constexpr uint32_t MSDP_DOMAIN_ID { 0xD002220 };
 #endif
 
 #define FI_HILOGD(fmt, ...) do { \
-    if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, LABEL.tag, LOG_DEBUG)) { \
-        OHOS::HiviewDFX::HiLog::Debug(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    if (HiLogIsLoggable(LOG_DOMAIN, LOG_TAG, LOG_DEBUG)) { \
+        HILOG_DEBUG(LOG_CORE, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
     } \
 } while (0)
 #define FI_HILOGI(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Info(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_INFO(LOG_CORE, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGW(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Warn(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_WARN(LOG_CORE, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGE(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Error(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_ERROR(LOG_CORE, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define FI_HILOGF(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Fatal(LABEL, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_FATAL(LOG_CORE, FI_FUNC_FMT fmt, FI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
 namespace OHOS {
 namespace Msdp {
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int32_t(const char *)>;
-
-public:
-    InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
-        : logfunc_ { logfn }, tag_ { tag }, level_ { level }
+    InnerFunctionTracer(LogLevel level, const char* tag, const char* func)
+        : level_ { level }, tag_ { tag }, func_ { func }
     {
-        if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, tag_, level_)) {
-            if (logfunc_ != nullptr) {
-                logfunc_("in %{public}s, enter");
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
+            if (func_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, enter", func_);
             }
         }
     }
     ~InnerFunctionTracer()
     {
-        if (HiLogIsLoggable(OHOS::Msdp::MSDP_DOMAIN_ID, tag_, level_)) {
-            if (logfunc_ != nullptr) {
-                logfunc_("in %{public}s, leave");
+        if (HiLogIsLoggable(LOG_DOMAIN, tag_, level_)) {
+            if (func_ != nullptr) {
+                HILOG_IMPL(LOG_CORE, level_, LOG_DOMAIN, tag_, "in %{public}s, leave", func_);
             }
         }
     }
 private:
-    HilogFunc logfunc_ { nullptr };
-    const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
+    const char* tag_ { nullptr };
+    const char* func_ { nullptr };
 };
 } // namespace Msdp
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Debug___ \
-    { std::bind(&OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
-
-#define CALL_INFO_TRACE OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___ \
-    { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
-
-#define CALL_TEST_DEBUG OHOS::Msdp::InnerFunctionTracer ___innerFuncTracer_Info___ \
-    { std::bind(&OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
-    (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
+#define CALL_DEBUG_ENTER InnerFunctionTracer __innerFuncTracer_Debug___ { LOG_DEBUG, LOG_TAG, __FUNCTION__ }
+#define CALL_INFO_TRACE InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_INFO, LOG_TAG, __FUNCTION__ }
+#define CALL_TEST_DEBUG InnerFunctionTracer ___innerFuncTracer_Info___ { LOG_DEBUG, LOG_TAG, \
+    test_info_ == nullptr ? "TestBody" : test_info_->name() }
 #endif // FI_LOG_H

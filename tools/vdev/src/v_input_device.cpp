@@ -33,6 +33,9 @@
 #include "utility.h"
 #include "virtual_device_defines.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VInputDevice"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -42,8 +45,6 @@ struct Range {
 };
 
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VInputDevice" };
-
 const struct Range KEY_BLOCKS[] { { KEY_ESC, BTN_MISC },
     { KEY_OK, BTN_DPAD_UP },
     { KEY_ALS_TOGGLE, BTN_TRIGGER_HAPPY } };

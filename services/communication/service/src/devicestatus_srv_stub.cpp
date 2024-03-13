@@ -34,12 +34,12 @@
 #include "include/util.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusSrvStub"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvStub" };
-} // namespace
 
 DeviceStatusSrvStub::DeviceStatusSrvStub()
 {
@@ -337,10 +337,18 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel &data, Messa
 int32_t DeviceStatusSrvStub::GetCoordinationStateSyncStub(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    std::string networkId;
-    READSTRING(data, networkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
+    if (!IsSystemCalling()) {
+        FI_HILOGE("The caller is not system hap");
+        return COMMON_NOT_SYSTEM_APP;
+    }
+    if (!CheckCooperatePermission()) {
+        FI_HILOGE("The caller has no COOPERATE_MANAGER permission");
+        return COMMON_PERMISSION_CHECK_ERROR;
+    }
+    std::string udId;
+    READSTRING(data, udId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     bool state { false };
-    int32_t ret = GetCoordinationState(networkId, state);
+    int32_t ret = GetCoordinationState(udId, state);
     if (ret != RET_OK) {
         FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
     }

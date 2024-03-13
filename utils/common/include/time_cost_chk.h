@@ -20,6 +20,9 @@
 
 #include "nocopyable.h"
 
+#undef LOG_TAG
+#define LOG_TAG "TimeCostChk"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -27,7 +30,6 @@ inline constexpr int64_t MAX_INPUT_EVENT_TIME { 1000 };
 inline constexpr int64_t MAX_OVER_TIME { 300 };
 template<class T>
 class TimeCostChk {
-    static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimeCostChk" };
 public:
     TimeCostChk(const std::string& strReason, const std::string& strOutputStr, int64_t tmChk, T llParam1,
                 int64_t llParam2 = 0)

@@ -21,12 +21,12 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InputAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InputAdapter" };
-} // namespace
 
 class PointerFilter : public MMI::IInputEventFilter {
 public:

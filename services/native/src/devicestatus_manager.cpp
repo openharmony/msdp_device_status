@@ -18,12 +18,12 @@
 #include "devicestatus_define.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusManager" };
-} // namespace
 
 void DeviceStatusManager::DeviceStatusCallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {

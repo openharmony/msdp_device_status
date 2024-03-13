@@ -17,12 +17,14 @@
 #include "parcel.h"
 #include "coordination_softbus_adapter_test.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationSoftbusAdapterTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSoftbusAdapterTest" };
 auto g_adapter = CoordinationSoftbusAdapter::GetInstance();
 bool g_sendable { false };
 bool g_init { false };

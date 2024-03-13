@@ -23,12 +23,14 @@
 #include "coordination_hisysevent.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DistributedInputAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace DistributedHardware::DistributedInput;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DistributedInputAdapter" };
 constexpr int32_t RETRY_TIME { 2 };
 constexpr int32_t DEFAULT_DELAY_TIME { 4000 };
 } // namespace

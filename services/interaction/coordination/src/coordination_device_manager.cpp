@@ -24,11 +24,13 @@
 #include "devicestatus_define.h"
 #include "napi_constants.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationDeviceManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationDeviceManager" };
 constexpr size_t NETWORK_ID_NUMS { 3 };
 constexpr size_t DESCRIPTOR_INDEX { 2 };
 } // namespace
@@ -208,7 +210,7 @@ bool CoordinationDeviceManager::IsRemote(int32_t id)
 
 std::vector<std::string> CoordinationDeviceManager::GetCoordinationDhids(int32_t deviceId) const
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::vector<std::string> inputDeviceDhids;
     auto devIter = devices_.find(deviceId);
     if (devIter == devices_.end()) {
@@ -326,7 +328,7 @@ void CoordinationDeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> device)
     }
     FI_HILOGD("Add device %{public}d:%{public}s, Dhid:\"%{public}s\", Network id:\"%{public}s\", "
         "local/remote:\"%{public}s\"", device->GetId(), device->GetDevPath().c_str(), dev->GetDhid().c_str(),
-        dev->GetNetworkId().c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
+        GetAnonyString(dev->GetNetworkId()).c_str(), dev->IsRemote() ? "Remote Device" : "Local Device");
 }
 
 void CoordinationDeviceManager::OnDeviceRemoved(std::shared_ptr<IDevice> device)

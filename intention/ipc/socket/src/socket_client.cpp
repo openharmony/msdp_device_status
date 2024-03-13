@@ -22,11 +22,13 @@
 #include "socket_params.h"
 #include "time_cost_chk.h"
 
+#undef LOG_TAG
+#define LOG_TAG "SocketClient"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "SocketClient" };
 const std::string THREAD_NAME { "os_ClientEventHandler" };
 }
 

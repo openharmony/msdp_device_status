@@ -62,7 +62,7 @@ public:
     int32_t DeactivateCoordination(bool isUnchained, FuncCoordinationMessage callback, bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &networkId,
         FuncCoordinationState callback, bool isCompatible = false);
-    int32_t GetCoordinationState(const std::string &networkId, bool &state);
+    int32_t GetCoordinationState(const std::string &udId, bool &state);
     void OnDevCoordinationListener(const std::string networkId, CoordinationMessage msg);
     void OnCoordinationMessageEvent(int32_t userData, const std::string networkId, CoordinationMessage msg);
     void OnCoordinationStateEvent(int32_t userData, bool state);

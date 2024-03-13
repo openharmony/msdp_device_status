@@ -19,12 +19,12 @@
 #include "devicestatus_define.h"
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationManagerImpl"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationManagerImpl" };
-} // namespace
 
 int32_t CoordinationManagerImpl::RegisterCoordinationListener(CoordinationListenerPtr listener, bool isCompatible)
 {
@@ -150,11 +150,11 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
     return RET_OK;
 }
 
-int32_t CoordinationManagerImpl::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t CoordinationManagerImpl::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(networkId, state);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(udId, state);
     if (ret != RET_OK) {
         FI_HILOGE("Get coordination state failed, ret:%{public}d", ret);
         return ret;

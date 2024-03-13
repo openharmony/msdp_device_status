@@ -36,11 +36,13 @@
 #include "coordination_util.h"
 #include "device_profile_adapter.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CoordinationSM"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CoordinationSM" };
 constexpr int32_t INTERVAL_MS { 2000 };
 constexpr double PERCENT_CONST { 100.0 };
 constexpr float MOUSE_ABS_LOCATION { 100 };
@@ -208,15 +210,15 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
     return RET_OK;
 }
 
-int32_t CoordinationSM::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t CoordinationSM::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_INFO_TRACE;
-    if (networkId.empty()) {
-        FI_HILOGE("NetworkId is empty");
+    if (udId.empty()) {
+        FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    state = DP_ADAPTER->GetCrossingSwitchState(networkId);
-    FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
+    state = DP_ADAPTER->GetCrossingSwitchState(udId);
+    FI_HILOGI("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
 
@@ -761,7 +763,7 @@ bool CoordinationSM::IsStopping() const
 
 void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto state = GetCurrentState();
     CHKPV(state);
@@ -770,7 +772,7 @@ void CoordinationSM::OnKeyboardOnline(const std::string &dhid)
 
 void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (currentState_ == CoordinationState::STATE_FREE) {
         FI_HILOGI("Current state:free");
@@ -842,7 +844,7 @@ void CoordinationSM::OnDeviceOnline(const std::string &networkId)
 
 void CoordinationSM::OnDeviceOffline(const std::string &networkId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
     FI_HILOGI("Local device networkId:%{public}s, remote device networkId:%{public}s,"
         "offline device networkId:%{public}s", GetAnonyString(localNetworkId).c_str(),
@@ -1113,7 +1115,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
     if (state == CoordinationState::STATE_IN) {
         int32_t deviceId = pointerEvent->GetDeviceId();
         if (!COOR_DEV_MGR->IsRemote(deviceId)) {
-            FI_HILOGI("Remote device id:%{public}d", deviceId);
+            FI_HILOGI("Remote device id:%{public}d, pointerEvent id:%{public}d", deviceId, pointerEvent->GetId());
             DeactivateCoordination(isUnchained_);
         }
     }
@@ -1263,7 +1265,7 @@ void CoordinationSM::SetPointerVisible()
 
 std::shared_ptr<ICoordinationState> CoordinationSM::GetCurrentState()
 {
-    FI_HILOGI("Current state:%{public}d", static_cast<int32_t>(currentState_));
+    FI_HILOGD("Current state:%{public}d", static_cast<int32_t>(currentState_));
     auto it = coordinationStates_.find(currentState_);
     if (it == coordinationStates_.end()) {
         FI_HILOGE("currentState_ not found");

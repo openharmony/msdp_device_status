@@ -37,12 +37,14 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InteractionManagerTest"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "InteractionManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 constexpr int32_t TIME_WAIT_FOR_INJECT_MS { 80 };
 constexpr int32_t TIME_WAIT_FOR_TOUCH_DOWN_MS { 1000 };
@@ -845,9 +847,9 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Syn
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
-    const std::string networkId("networkId");
+    const std::string udId("Default");
     bool state { false };
-    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(networkId, state);
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(udId, state);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     ASSERT_EQ(ret, RET_OK);
 #else

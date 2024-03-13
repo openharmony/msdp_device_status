@@ -20,12 +20,12 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef LOG_TAG
+#define LOG_TAG "JsDragManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "JsDragManager" };
-} // namespace
 
 void JsDragManager::ResetEnv()
 {
@@ -128,7 +128,7 @@ void JsDragManager::UnregisterListener(napi_env env, napi_value handle)
 
 void JsDragManager::OnDragMessage(DragState state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (listeners_.empty()) {
         FI_HILOGE("The listener list is empty");
@@ -155,7 +155,7 @@ void JsDragManager::OnDragMessage(DragState state)
 
 void JsDragManager::CallDragMsg(uv_work_t *work, int32_t status)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
         DeletePtr<uv_work_t*>(work);

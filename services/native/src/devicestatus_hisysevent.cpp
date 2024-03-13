@@ -17,12 +17,12 @@
 #include "hisysevent.h"
 #include "fi_log.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusHiSysEvent"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusHiSysEvent" };
-} // namespace
 
 template<typename... Types>
 static void WriteEvent(const std::string &packageName, Types ... args)

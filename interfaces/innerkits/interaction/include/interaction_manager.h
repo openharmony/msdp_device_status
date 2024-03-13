@@ -108,12 +108,12 @@ public:
     
     /**
      * @brief Obtains the screen hopping status of a mouse pointer.
-     * @param networkId Indicates the descriptor of the input device.
+     * @param udId Indicates the descriptor of the input device.
      * @param state Indicates the state of crossing switch.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-    int32_t GetCoordinationState(const std::string &networkId, bool &state);
+    int32_t GetCoordinationState(const std::string &udId, bool &state);
 
     /**
      * @brief Starts dragging.

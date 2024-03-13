@@ -15,10 +15,15 @@
 
 #include "coordination_util.h"
 
-#include "coordination_sm.h"
-#include "softbus_bus_center.h"
+#include "unistd.h"
+
+#include "device_manager.h"
+#include "dm_device_info.h"
 
 #include "devicestatus_define.h"
+
+#undef LOG_TAG
+#define LOG_TAG "CoordinationUtil"
 
 namespace OHOS {
 namespace Msdp {
@@ -26,46 +31,48 @@ namespace DeviceStatus {
 namespace COORDINATION {
 namespace {
 const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
+#define DSTB_HARDWARE DistributedHardware::DeviceManager::GetInstance()
 } // namespace
-std::string GetLocalNetworkId()
-{
-    CALL_DEBUG_ENTER;
-    auto localNode = std::make_unique<NodeBasicInfo>();
-    int32_t ret = GetLocalNodeDeviceInfo(FI_PKG_NAME, localNode.get());
-    if (ret != RET_OK) {
-        FI_HILOGE("Get local node device info, ret:%{public}d", ret);
-        return {};
-    }
-    std::string networkId(localNode->networkId, sizeof(localNode->networkId));
-    FI_HILOGD("Get local node device info, networkId:%{public}s", GetAnonyString(networkId).c_str());
-    return localNode->networkId;
-}
 
 std::string GetCurrentPackageName()
 {
     return PKG_NAME_PREFIX + std::to_string(getpid());
 }
 
-std::string GetUdidByNetworkId(const std::string &networkId)
-{
-    std::string udid { "" };
-    if (DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udid) != RET_OK) {
-        FI_HILOGE("GetUdidByNetworkId failed, networkId:%{public}s, udid:%{public}s",
-            GetAnonyString(networkId).c_str(), GetAnonyString(udid).c_str());
-    }
-    return udid;
-}
-
-std::string GetLocalUdid()
+std::string GetLocalNetworkId()
 {
     auto packageName = GetCurrentPackageName();
     OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
-    if (int32_t errCode = RET_OK; (errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo)) != RET_OK) {
+    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo) != RET_OK) {
         FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
         return {};
     }
-    return COORDINATION::GetUdidByNetworkId(dmDeviceInfo.networkId);
+    FI_HILOGD("LocalNetworkId:%{public}s", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    return dmDeviceInfo.networkId;
 }
+
+std::string GetLocalUdId()
+{
+    auto packageName = GetCurrentPackageName();
+    OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
+    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo) != RET_OK) {
+        FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
+        return {};
+    }
+    FI_HILOGD("LocalUdId:%{public}s", GetAnonyString(dmDeviceInfo.deviceId).c_str());
+    return dmDeviceInfo.deviceId;
+}
+
+std::string GetUdIdByNetworkId(const std::string &networkId)
+{
+    std::string udId { "Empty" };
+    if (int32_t errCode = DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udId) != RET_OK) {
+        FI_HILOGE("GetUdIdByNetworkId failed, errCode:%{public}d, networkId:%{public}s, udId:%{public}s", errCode,
+            GetAnonyString(networkId).c_str(), GetAnonyString(udId).c_str());
+    }
+    return udId;
+}
+
 } // namespace COORDINATION
 } // namespace DeviceStatus
 } // namespace Msdp

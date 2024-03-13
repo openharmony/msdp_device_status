@@ -22,8 +22,10 @@
 #include "devicestatus_define.h"
 #include "input_binding_internal.h"
 
+#undef LOG_TAG
+#define LOG_TAG "InputBinding"
+
 namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, ::OHOS::Msdp::MSDP_DOMAIN_ID, "InputBinding" };
 #define INPUT_MANAGER OHOS::MMI::InputManager::GetInstance()
 } // namespace
 

@@ -45,11 +45,13 @@
 #include "motion_drag.h"
 #endif // OHOS_BUILD_ENABLE_MOTION_DRAG
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusService"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusService" };
 constexpr int32_t DEFAULT_WAIT_TIME_MS { 1000 };
 constexpr int32_t WAIT_FOR_ONCE { 1 };
 constexpr int32_t MAX_N_RETRIES { 100 };
@@ -536,7 +538,7 @@ void DeviceStatusService::OnDelegateTask(const struct epoll_event &ev)
 
 void DeviceStatusService::OnTimeout(const struct epoll_event &ev)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if ((ev.events & EPOLLIN) == EPOLLIN) {
         uint64_t expiration {};
         ssize_t ret = read(timerMgr_.GetTimerFd(), &expiration, sizeof(expiration));
@@ -723,18 +725,18 @@ int32_t DeviceStatusService::GetCoordinationState(int32_t userData, const std::s
     return RET_OK;
 }
 
-int32_t DeviceStatusService::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&DeviceStatusService::OnGetCoordinationStateSync, this, networkId, state));
+        std::bind(&DeviceStatusService::OnGetCoordinationStateSync, this, udId, std::ref(state)));
     if (ret != RET_OK) {
         FI_HILOGE("OnGetCoordinationStateSync failed, ret:%{public}d", ret);
         return ret;
     }
 #else
-    (void)(networkId);
+    (void)(udId);
     FI_HILOGW("Get coordination state does not support");
 #endif // OHOS_BUILD_ENABLE_COORDINATION
     return RET_OK;
@@ -1092,10 +1094,10 @@ int32_t DeviceStatusService::OnGetCoordinationState(
     return ret;
 }
 
-int32_t DeviceStatusService::OnGetCoordinationStateSync(const std::string &networkId, bool &state)
+int32_t DeviceStatusService::OnGetCoordinationStateSync(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
-    if (int32_t ret = COOR_SM->GetCoordinationState(networkId, state) != RET_OK) {
+    if (int32_t ret = COOR_SM->GetCoordinationState(udId, state) != RET_OK) {
         FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
         return ret;
     }

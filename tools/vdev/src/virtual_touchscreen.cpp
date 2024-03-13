@@ -21,11 +21,13 @@
 #include "fi_log.h"
 #include "virtual_touchscreen_builder.h"
 
+#undef LOG_TAG
+#define LOG_TAG "VirtualTouchScreen"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "VirtualTouchScreen" };
 constexpr int32_t MINIMUM_INTERVAL { 18 };
 constexpr int32_t N_SLOTS_AVAILABLE { 10 };
 constexpr int32_t STEP_LENGTH { 10 };

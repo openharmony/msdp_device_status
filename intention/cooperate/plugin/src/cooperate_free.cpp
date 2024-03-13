@@ -18,13 +18,13 @@
 #include "devicestatus_define.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "CooperateFree"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "CooperateFree" };
-} // namespace
 
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
     : ICooperateState(parent), env_(env)
@@ -371,7 +371,7 @@ void CooperateFree::RemoteStart::OnSwitchChanged(Context &context, const Coopera
     DSoftbusStopCooperate stopNotice {};
     context.dsoftbus_.StopCooperate(parent_.process_.Peer(), stopNotice);
 
-    FI_HILOGI("[remote start] Peer(\'%{public}s\') switch off", notice.networkId.c_str());
+    FI_HILOGI("[remote start] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId));
     OnReset(context, event);
 }
 

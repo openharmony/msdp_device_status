@@ -26,12 +26,14 @@
 #include "devicestatus_define.h"
 #include "json_parser.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceProfileAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 using namespace OHOS::DeviceProfile;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceProfileAdapter" };
 const std::string SERVICE_ID { "deviceStatus" };
 } // namespace
 
@@ -96,16 +98,24 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }
 
-bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &networkId)
+bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &networkIdOrUdId)
 {
     CALL_INFO_TRACE;
+    auto transfer = [] (const std::string &networkIdOrUdId) -> std::string {
+        if (networkIdOrUdId == COORDINATION::GetLocalNetworkId() || networkIdOrUdId == COORDINATION::GetLocalUdId()) {
+            FI_HILOGD("NetworkIdOrUdId:%{public}s", GetAnonyString(networkIdOrUdId).c_str());
+            return "";
+        }
+        return networkIdOrUdId;
+    };
     ServiceCharacteristicProfile profile;
-    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(networkId, SERVICE_ID, profile);
+    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(transfer(networkIdOrUdId), SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
     JsonParser parser;
     parser.json = cJSON_Parse(jsonData.c_str());
     if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("The parser json is not an object");
+        FI_HILOGE("The parser json is not an object, networkIdOrUdId:%{public}s",
+            GetAnonyString(networkIdOrUdId).c_str());
         return false;
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());

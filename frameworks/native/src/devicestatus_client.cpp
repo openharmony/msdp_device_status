@@ -33,12 +33,12 @@
 #include "fusion_frameworks_binding.h"
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusClient"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusClient" };
-} // namespace
 
 DeviceStatusClient::DeviceStatusClient() {}
 DeviceStatusClient::~DeviceStatusClient()
@@ -268,11 +268,11 @@ int32_t DeviceStatusClient::GetCoordinationState(int32_t userData, const std::st
     return devicestatusProxy_->GetCoordinationState(userData, networkId, isCompatible);
 }
 
-int32_t DeviceStatusClient::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t DeviceStatusClient::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
     DEV_RET_IF_NULL_WITH_RET((Connect() != RET_OK), RET_ERR);
-    return devicestatusProxy_->GetCoordinationState(networkId, state);
+    return devicestatusProxy_->GetCoordinationState(udId, state);
 }
 
 #endif // OHOS_BUILD_ENABLE_RUST_IMPL

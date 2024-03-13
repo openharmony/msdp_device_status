@@ -116,7 +116,7 @@ public:
     int32_t ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId);
     int32_t DeactivateCoordination(bool isUnchained);
     int32_t GetCoordinationState(const std::string &networkId);
-    int32_t GetCoordinationState(const std::string &networkId, bool &state);
+    int32_t GetCoordinationState(const std::string &udId, bool &state);
     void StartRemoteCoordination(const std::string &remoteNetworkId, bool buttonIsPressed);
     void StartPointerEventFilter();
     void StartRemoteCoordinationResult(bool isSuccess,

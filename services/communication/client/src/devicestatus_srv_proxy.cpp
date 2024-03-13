@@ -28,12 +28,12 @@
 #include "stationary_data.h"
 #include "utility.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DeviceStatusSrvProxy"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DeviceStatusSrvProxy" };
-} // namespace
 
 void DeviceStatusSrvProxy::Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
     sptr<IRemoteDevStaCallback> callback)
@@ -439,7 +439,7 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
     return ret;
 }
 
-int32_t DeviceStatusSrvProxy::GetCoordinationState(const std::string &networkId, bool &state)
+int32_t DeviceStatusSrvProxy::GetCoordinationState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -447,13 +447,13 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(const std::string &networkId,
         FI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITESTRING(data, networkId, ERR_INVALID_VALUE);
+    WRITESTRING(data, udId, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     MessageParcel reply;
     MessageOption option;
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE_SYNC),
-            data, reply, option);
+        data, reply, option);
     if (ret != RET_OK) {
         FI_HILOGE("Send request failed, ret:%{public}d", ret);
     }

@@ -25,10 +25,12 @@
 #include "securec.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StreamBuffer"
+
 namespace OHOS {
 namespace Msdp {
 class StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StreamBuffer" };
 public:
     StreamBuffer() = default;
     DISALLOW_MOVE(StreamBuffer);

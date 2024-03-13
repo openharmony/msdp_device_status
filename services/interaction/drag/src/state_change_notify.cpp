@@ -17,12 +17,12 @@
 
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "StateChangeNotify"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "StateChangeNotify" };
-} // namespace
 template void StateChangeNotify::OnDragInfoNotify<DragState>(SessionPtr session, MessageId msgId, DragState state);
 template void StateChangeNotify::OnDragInfoNotify<DragCursorStyle>(SessionPtr session, MessageId msgId,
     DragCursorStyle style);
@@ -59,7 +59,7 @@ void StateChangeNotify::RemoveNotifyMsg(std::shared_ptr<MessageInfo> info)
 int32_t StateChangeNotify::StyleChangedNotify(DragCursorStyle style)
 {
     if (msgInfos_[MessageType::NOTIFY_STYLE].empty()) {
-        FI_HILOGW("No listener, send message failed");
+        FI_HILOGD("No listener, send message failed");
         return RET_ERR;
     }
     for (auto it = msgInfos_[MessageType::NOTIFY_STYLE].begin();

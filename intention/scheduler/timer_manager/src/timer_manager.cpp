@@ -23,11 +23,13 @@
 #include "fi_log.h"
 #include "include/util.h"
 
+#undef LOG_TAG
+#define LOG_TAG "TimerManager"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "TimerManager" };
 constexpr int32_t MIN_DELAY { -1 };
 constexpr int32_t NONEXISTENT_ID { -1 };
 constexpr int32_t MIN_INTERVAL { 50 };
@@ -134,7 +136,7 @@ int32_t TimerManager::OnProcessTimers()
 
 void TimerManager::ProcessTimers()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPV(context_);
     context_->GetDelegateTasks().PostAsyncTask(std::bind(&TimerManager::OnProcessTimers, this));
 }

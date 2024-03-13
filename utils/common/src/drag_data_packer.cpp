@@ -19,12 +19,11 @@
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DragDataPacker"
+
 namespace OHOS {
 namespace Msdp {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DragDataPacker" };
-} // namespace
-
 namespace DeviceStatus {
 
 int32_t DragDataPacker::Marshalling(const DragData &dragData, Parcel &data, bool isCross)

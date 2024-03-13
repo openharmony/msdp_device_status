@@ -18,12 +18,12 @@
 #include "ddm_adapter_impl.h"
 #include "devicestatus_define.h"
 
+#undef LOG_TAG
+#define LOG_TAG "DDMAdapter"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL { LOG_CORE, MSDP_DOMAIN_ID, "DDMAdapter" };
-}
 
 DDMAdapter::DDMAdapter()
 {
