@@ -119,8 +119,6 @@ constexpr int32_t TWICE_SIZE { 2 };
 constexpr size_t EXTRA_INFO_MAX_SIZE { 200 };
 constexpr int32_t HEX_FF { 0xFF };
 const Rosen::RSAnimationTimingCurve SPRING = Rosen::RSAnimationTimingCurve::CreateSpring(0.347f, 0.99f, 0.0f);
-const std::string DEVICE_TYPE_DEFAULT { "default" };
-const std::string DEVICE_TYPE_PHONE { "phone" };
 constexpr float BEZIER_000 { 0.00f };
 constexpr float BEZIER_020 { 0.20f };
 constexpr float BEZIER_030 { 0.30f };
@@ -1329,15 +1327,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
         return;
     }
     int32_t extendSvgWidth = (static_cast<int32_t>(strStyle.size()) - 1) * EIGHT_SIZE;
-    std::string deviceType = system::GetDeviceType();
     if ((g_drawingInfo.currentStyle == DragCursorStyle::COPY) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
-        decodeOpts.desiredSize = {
-            .width = DEVICE_INDEPENDENT_PIXEL * GetScaling(),
-            .height = DEVICE_INDEPENDENT_PIXEL * GetScaling()
-        };
-    } else if (((deviceType.compare(0, DEVICE_TYPE_DEFAULT.size(), DEVICE_TYPE_DEFAULT) == 0) ||
-        (deviceType.compare(0, DEVICE_TYPE_PHONE.size(), DEVICE_TYPE_PHONE) == 0)) &&
-        (g_drawingInfo.currentStyle == DragCursorStyle::MOVE) && (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         decodeOpts.desiredSize = {
             .width = DEVICE_INDEPENDENT_PIXEL * GetScaling(),
             .height = DEVICE_INDEPENDENT_PIXEL * GetScaling()
