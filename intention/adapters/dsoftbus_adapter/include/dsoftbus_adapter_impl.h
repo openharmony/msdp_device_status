@@ -77,6 +77,7 @@ public:
 
     int32_t OpenSession(const std::string &networkId) override;
     void CloseSession(const std::string &networkId) override;
+    void CloseAllSessions() override;
 
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
 
@@ -92,6 +93,7 @@ private:
     int32_t SetupServer();
     void ShutdownServer();
     int32_t OpenSessionLocked(const std::string &networkId);
+    void CloseAllSessionsLocked();
     void ConfigTcpAlive(int32_t socket);
     int32_t FindConnection(const std::string &networkId);
     void HandleSessionData(const std::string &networkId, CircleStreamBuffer &circleBuffer);

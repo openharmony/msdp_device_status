@@ -50,6 +50,11 @@ void DSoftbusAdapter::CloseSession(const std::string &networkId)
     DSoftbusAdapterImpl::GetInstance()->CloseSession(networkId);
 }
 
+void DSoftbusAdapter::CloseAllSessions()
+{
+    DSoftbusAdapterImpl::GetInstance()->CloseAllSessions();
+}
+
 int32_t DSoftbusAdapter::SendPacket(const std::string &networkId, NetPacket &packet)
 {
     return DSoftbusAdapterImpl::GetInstance()->SendPacket(networkId, packet);

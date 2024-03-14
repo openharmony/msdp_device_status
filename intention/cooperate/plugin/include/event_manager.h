@@ -61,6 +61,7 @@ public:
     void StartCooperateFinish(const DSoftbusStartCooperateFinished &event);
     void RemoteStart(const DSoftbusStartCooperate &event);
     void RemoteStartFinish(const DSoftbusStartCooperateFinished &event);
+    void OnUnchain(const StopCooperateEvent &event);
     void StopCooperate(const StopCooperateEvent &event);
     void StopCooperateFinish(const DSoftbusStopCooperateFinished &event);
     void RemoteStop(const DSoftbusStopCooperate &event);
