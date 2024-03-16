@@ -655,6 +655,8 @@ void DragDrawing::OnStopAnimationSuccess()
     }
     CHKPV(g_drawingInfo.rootNode);
     hasRunningStopAnimation_ = true;
+    startNum_ = START_TIME;
+    needDestroyDragWindow_ = true;
     if (drawDragStopModifier_ != nullptr) {
         g_drawingInfo.rootNode->RemoveModifier(drawDragStopModifier_);
         drawDragStopModifier_ = nullptr;
@@ -698,8 +700,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
     } else {
-        startNum_ = START_TIME;
-        needDestroyDragWindow_ = true;
         StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
@@ -728,6 +728,8 @@ void DragDrawing::OnStopAnimationFail()
     }
     drawDragStopModifier_ = std::make_shared<DrawDragStopModifier>();
     hasRunningStopAnimation_ = true;
+    startNum_ = START_TIME;
+    needDestroyDragWindow_ = true;
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
     drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
     drawDragStopModifier_->SetScale(BEGIN_SCALE);
@@ -760,8 +762,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
     } else {
-        startNum_ = START_TIME;
-        needDestroyDragWindow_ = true;
         StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
