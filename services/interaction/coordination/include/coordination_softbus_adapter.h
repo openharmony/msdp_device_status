@@ -26,7 +26,6 @@
 #include "parcel.h"
 #include "socket.h"
 
-#include "coordination_util.h"
 #include "json_parser.h"
 
 namespace OHOS {

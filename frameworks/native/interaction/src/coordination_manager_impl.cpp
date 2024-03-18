@@ -144,7 +144,19 @@ int32_t CoordinationManagerImpl::GetCoordinationState(
     int32_t userData = static_cast<int32_t> (CallbackMessageId::GET_COORDINATION);
     int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(userData, networkId, isCompatible);
     if (ret != RET_OK) {
-        FI_HILOGE("Get coordination state failed");
+        FI_HILOGE("Get coordination state failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t CoordinationManagerImpl::GetCoordinationState(const std::string &udId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = DeviceStatusClient::GetInstance().GetCoordinationState(udId, state);
+    if (ret != RET_OK) {
+        FI_HILOGE("Get coordination state failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

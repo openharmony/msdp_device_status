@@ -85,6 +85,7 @@ public:
     int32_t DeactivateCoordination(int32_t userData, bool isUnchained, bool isCompatible = false) override;
     int32_t GetCoordinationState(int32_t userData, const std::string &networkId,
         bool isCompatible = false) override;
+    int32_t GetCoordinationState(const std::string &udId, bool &state) override;
     int32_t StartDrag(const DragData &dragData) override;
     int32_t StopDrag(const DragDropResult &dropResult) override;
     int32_t UpdateDragStyle(DragCursorStyle style) override;
@@ -143,6 +144,7 @@ private:
         int32_t startDeviceId);
     int32_t OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &networkId);
+    int32_t OnGetCoordinationStateSync(const std::string &udId, bool &state);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:

@@ -27,6 +27,7 @@
 
 #include "coordination_hisysevent.h"
 #include "coordination_sm.h"
+#include "coordination_util.h"
 #include "device_coordination_softbus_define.h"
 #include "devicestatus_define.h"
 #include "dfs_session.h"

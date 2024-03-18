@@ -838,6 +838,27 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Nor
 }
 
 /**
+ * @tc.name: InteractionManagerTest_GetCoordinationState_Sync
+ * @tc.desc: Get coordination state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_GetCoordinationState_Sync, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    const std::string udId("Default");
+    bool state { false };
+    int32_t ret = InteractionManager::GetInstance()->GetCoordinationState(udId, state);
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
+}
+
+/**
  * @tc.name: InteractionManagerTest_Draglistener_Mouse
  * @tc.desc: Drag listener
  * @tc.type: FUNC

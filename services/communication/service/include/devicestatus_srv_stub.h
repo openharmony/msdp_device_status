@@ -50,6 +50,7 @@ private:
     int32_t ActivateCoordinationStub(MessageParcel &data, MessageParcel &reply);
     int32_t DeactivateCoordinationStub(MessageParcel &data, MessageParcel &reply);
     int32_t GetCoordinationStateStub(MessageParcel &data, MessageParcel &reply);
+    int32_t GetCoordinationStateSyncStub(MessageParcel &data, MessageParcel &reply);
     int32_t RegisterCooperateMonitorStub(MessageParcel &data, MessageParcel &reply);
     int32_t UnregisterCooperateMonitorStub(MessageParcel &data, MessageParcel &reply);
     int32_t PrepareCooperateStub(MessageParcel &data, MessageParcel &reply);

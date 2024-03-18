@@ -439,6 +439,28 @@ int32_t DeviceStatusSrvProxy::GetCoordinationState(int32_t userData,
     return ret;
 }
 
+int32_t DeviceStatusSrvProxy::GetCoordinationState(const std::string &udId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DeviceStatusSrvProxy::GetDescriptor())) {
+        FI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING(data, udId, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(DeviceInterfaceCode::GET_COORDINATION_STATE_SYNC),
+        data, reply, option);
+    if (ret != RET_OK) {
+        FI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    READBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
 int32_t DeviceStatusSrvProxy::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
