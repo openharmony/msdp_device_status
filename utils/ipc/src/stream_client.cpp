@@ -93,7 +93,10 @@ bool StreamClient::SendMsg(const NetPacket &pkt) const
         return false;
     }
     StreamBuffer buf;
-    pkt.MakeData(buf);
+    if (!pkt.MakeData(buf)) {
+        FI_HILOGE("Failed to buffer packet");
+        return false;
+    }
     return SendMsg(buf.Data(), buf.Size());
 }
 

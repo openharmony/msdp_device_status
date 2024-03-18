@@ -136,7 +136,10 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
         return RET_ERR;
     }
     StreamBuffer buffer;
-    packet.MakeData(buffer);
+    if (!packet.MakeData(buffer)) {
+        FI_HILOGE("Failed to buffer packet");
+        return RET_ERR;
+    }
     if (buffer.Size() > MAX_PACKET_BUF_SIZE) {
         FI_HILOGE("Packet is too large");
         return RET_ERR;
@@ -403,6 +406,8 @@ void DSoftbusAdapterImpl::HandleSessionData(const std::string &networkId, Circle
             break;
         }
         if ((head->size + static_cast<int32_t>(sizeof(PackHead))) > circleBuffer.ResidualSize()) {
+            FI_HILOGI("Incomplete package, package size:%{public}d, residual size:%{public}d",
+                (head->size + static_cast<int32_t>(sizeof(PackHead))), circleBuffer.ResidualSize());
             break;
         }
         NetPacket packet(head->idMsg);

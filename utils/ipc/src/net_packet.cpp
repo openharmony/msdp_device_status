@@ -25,16 +25,17 @@ NetPacket::NetPacket(const NetPacket &pkt) : NetPacket(pkt.GetMsgId())
 }
 NetPacket::~NetPacket() {}
 
-void NetPacket::MakeData(StreamBuffer &buf) const
+bool NetPacket::MakeData(StreamBuffer &buf) const
 {
     PACKHEAD head = {msgId_, wPos_};
     buf << head;
     if (wPos_ > 0) {
         if (!buf.Write(&szBuff_[0], wPos_)) {
             FI_HILOGE("Write data to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-            return;
+            return false;
         }
     }
+    return true;
 }
 } // namespace Msdp
 } // namespace OHOS
