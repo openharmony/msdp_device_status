@@ -1116,7 +1116,7 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
         pointerAction == MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
         pointerAction == MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW ||
         pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
-        pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW){
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
         FI_HILOGD("Current pointerAction:%{public}d, skip this pointerEvent", static_cast<int32_t>(pointerAction));
         return;
     }
