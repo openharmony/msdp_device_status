@@ -41,7 +41,6 @@ CooperateOut::~CooperateOut()
 
 void CooperateOut::OnEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
     current_->OnEvent(context, event);
 }
 
@@ -167,9 +166,24 @@ void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &even
     if (!context.IsPeer(notice.networkId)) {
         return;
     }
+    DSoftbusRelayCooperateFinished resp {
+        .targetNetworkId = notice.targetNetworkId,
+    };
+
+    int32_t ret = context.dsoftbus_.OpenSession(notice.targetNetworkId);
+    if (ret != RET_OK) {
+        FI_HILOGE("[relay cooperate] Failed to connect to \'%{public}s\'", Utility::Anonymize(notice.targetNetworkId));
+        resp.normal = false;
+        context.dsoftbus_.RelayCooperateFinish(notice.networkId, resp);
+        return;
+    }
+
+    resp.normal = true;
+    context.dsoftbus_.RelayCooperateFinish(notice.networkId, resp);
+
     context.RelayCooperate(notice);
     context.inputEventInterceptor_.Update(context);
-    FI_HILOGI("Relay cooperation to \'%{public}s\'", Utility::Anonymize(context.Peer()));
+    FI_HILOGI("[relay cooperate] Relay cooperation to \'%{public}s\'", Utility::Anonymize(context.Peer()));
 }
 
 void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &event)

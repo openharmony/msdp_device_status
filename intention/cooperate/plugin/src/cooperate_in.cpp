@@ -41,7 +41,6 @@ CooperateIn::~CooperateIn()
 
 void CooperateIn::OnEvent(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
     current_->OnEvent(context, event);
 }
 
@@ -60,7 +59,9 @@ void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateI
 {
     auto s11 = std::make_shared<RelayCooperate>(parent, self);
     self->relay_ = s11;
-    s11->SetNext(self);
+    auto s12 = std::make_shared<RelayConfirmation>(parent, s11);
+    s11->SetNext(s12);
+    s12->SetNext(self);
 
     auto s21 = std::make_shared<RemoteStart>(parent, self);
     self->remoteStart_ = s21;
@@ -113,7 +114,7 @@ void CooperateIn::Initial::OnStart(Context &context, const CooperateEvent &event
         return;
     }
     FI_HILOGI("[start] start cooperation(%{public}s, %{public}d)",
-        Utility::Anonymize(startEvent.remoteNetworkId), Utility::Anonymize(startEvent.startDeviceId));
+        Utility::Anonymize(startEvent.remoteNetworkId), startEvent.startDeviceId);
     context.eventMgr_.StartCooperate(startEvent);
 
     if (context.IsPeer(startEvent.remoteNetworkId)) {
@@ -301,23 +302,7 @@ void CooperateIn::RelayCooperate::OnResponse(Context &context, const CooperateEv
 
 void CooperateIn::RelayCooperate::OnNormal(Context &context, const CooperateEvent &event)
 {
-    FI_HILOGI("[relay cooperate] Cooperation with \'%{public}s\' established",
-        Utility::Anonymize(parent_.process_.Peer()));
-    context.inputEventBuilder_.Disable();
-    DSoftbusStartCooperateFinished notice {
-        .originNetworkId = context.Peer(),
-        .success = true,
-        .cursorPos = context.NormalizedCursorPosition(),
-    };
-    context.dsoftbus_.StartCooperateFinish(parent_.process_.Peer(), notice);
-
-    DSoftbusRelayCooperate notice1 {
-        .targetNetworkId = parent_.process_.Peer(),
-    };
-    context.dsoftbus_.RelayCooperate(context.Peer(), notice1);
-
-    context.eventMgr_.StartCooperateFinish(notice);
-    TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    FI_HILOGI("[relay cooperate] \'%{public}s\' is ready", Utility::Anonymize(parent_.process_.Peer()));
 }
 
 void CooperateIn::RelayCooperate::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -421,6 +406,162 @@ void CooperateIn::RelayCooperate::OnReset(Context &context, const CooperateEvent
         .success = false
     };
     context.eventMgr_.StartCooperateFinish(result);
+    Reset(context, event);
+}
+
+CooperateIn::RelayConfirmation::RelayConfirmation(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev)
+    : ICooperateStep(parent, prev), parent_(parent)
+{
+    AddHandler(CooperateEventType::DISABLE, &CooperateIn::RelayConfirmation::OnDisable, this);
+    AddHandler(CooperateEventType::STOP, &CooperateIn::RelayConfirmation::OnStop, this);
+    AddHandler(CooperateEventType::APP_CLOSED, &CooperateIn::RelayConfirmation::OnAppClosed, this);
+    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &CooperateIn::RelayConfirmation::OnPointerEvent, this);
+    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &CooperateIn::RelayConfirmation::OnBoardOffline, this);
+    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED,
+        &CooperateIn::RelayConfirmation::OnSwitchChanged, this);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED,
+        &CooperateIn::RelayConfirmation::OnSoftbusSessionClosed, this);
+    AddHandler(CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+        &CooperateIn::RelayConfirmation::OnResponse, this);
+}
+
+void CooperateIn::RelayConfirmation::OnDisable(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Disable cooperation");
+    parent_.StopCooperate(context, event);
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnStop(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Stop cooperation");
+    parent_.StopCooperate(context, event);
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnAppClosed(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Stop cooperation on app closed");
+    parent_.StopCooperate(context, event);
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnPointerEvent(Context &context, const CooperateEvent &event)
+{
+    InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
+
+    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
+        !InputEventBuilder::IsLocalEvent(notice)) {
+        return;
+    }
+    FI_HILOGI("[relay cooperate] Stop cooperation on operation of local pointer");
+    parent_.StopCooperate(context, event);
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnBoardOffline(Context &context, const CooperateEvent &event)
+{
+    DDMBoardOfflineEvent notice = std::get<DDMBoardOfflineEvent>(event.event);
+
+    if (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId));
+    if (context.IsPeer(notice.networkId)) {
+        parent_.StopCooperate(context, event);
+    }
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnSwitchChanged(Context &context, const CooperateEvent &event)
+{
+    DDPCooperateSwitchChanged notice = std::get<DDPCooperateSwitchChanged>(event.event);
+
+    if (notice.normal ||
+        (!context.IsPeer(notice.networkId) &&
+         !parent_.process_.IsPeer(notice.networkId))) {
+        return;
+    }
+    FI_HILOGI("[relay cooperate] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId.c_str()));
+    if (context.IsPeer(notice.networkId)) {
+        parent_.StopCooperate(context, event);
+    }
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)
+{
+    DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
+
+    if (!context.IsPeer(notice.networkId) && !parent_.process_.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[relay cooperate] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId.c_str()));
+    if (context.IsPeer(notice.networkId)) {
+        parent_.StopCooperate(context, event);
+    }
+    OnReset(context, event);
+}
+
+void CooperateIn::RelayConfirmation::OnResponse(Context &context, const CooperateEvent &event)
+{
+    DSoftbusRelayCooperateFinished notice = std::get<DSoftbusRelayCooperateFinished>(event.event);
+
+    if (!context.IsPeer(notice.networkId)) {
+        return;
+    }
+    FI_HILOGI("[relay cooperate] \'%{public}s\' respond", Utility::Anonymize(notice.networkId));
+    parent_.env_->GetTimerManager().RemoveTimer(timerId_);
+    if (notice.normal) {
+        OnNormal(context, event);
+        Proceed(context, event);
+    } else {
+        OnReset(context, event);
+    }
+}
+
+void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Cooperation with \'%{public}s\' established",
+        Utility::Anonymize(parent_.process_.Peer()));
+    context.inputEventBuilder_.Disable();
+
+    DSoftbusStartCooperateFinished notice {
+        .originNetworkId = context.Peer(),
+        .success = true,
+        .cursorPos = context.NormalizedCursorPosition(),
+    };
+    context.dsoftbus_.StartCooperateFinish(parent_.process_.Peer(), notice);
+
+    context.eventMgr_.StartCooperateFinish(notice);
+    TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+}
+
+void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[relay cooperate] Notify origin(\'%{public}s\')", Utility::Anonymize(context.Peer()));
+    DSoftbusRelayCooperate notice {
+        .targetNetworkId = parent_.process_.Peer(),
+    };
+    context.dsoftbus_.RelayCooperate(context.Peer(), notice);
+
+    timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
+        [sender = context.Sender(), remoteNetworkId = context.Peer()]() mutable {
+            sender.Send(CooperateEvent(
+                CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
+                DSoftbusRelayCooperateFinished {
+                    .networkId = remoteNetworkId,
+                    .normal = false,
+                }));
+        });
+}
+
+void CooperateIn::RelayConfirmation::OnReset(Context &context, const CooperateEvent &event)
+{
+    DSoftbusStartCooperateFinished notice {
+        .success = false,
+    };
+    context.dsoftbus_.StartCooperateFinish(parent_.process_.Peer(), notice);
     Reset(context, event);
 }
 

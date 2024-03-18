@@ -31,7 +31,7 @@ class Context;
 class InputEventInterceptor final {
 public:
     InputEventInterceptor(IContext *env) : env_(env) {}
-    ~InputEventInterceptor() = default;
+    ~InputEventInterceptor();
     DISALLOW_COPY_AND_MOVE(InputEventInterceptor);
 
     void Enable(Context &context);
