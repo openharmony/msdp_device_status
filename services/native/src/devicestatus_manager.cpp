@@ -132,9 +132,10 @@ int32_t DeviceStatusManager::NotifyDeviceStatusChange(const Data& devicestatusDa
     CALL_DEBUG_ENTER;
     FI_HILOGI("type:%{public}d, value:%{public}d", devicestatusData.type, devicestatusData.value);
     std::set<const sptr<IRemoteDevStaCallback>, classcomp> listeners;
+    std::lock_guard lock(mutex_);
     auto iter = listenerMap_.find(devicestatusData.type);
     if (iter == listenerMap_.end()) {
-        FI_HILOGI("type:%{public}d", devicestatusData.type);
+        FI_HILOGE("type:%{public}d is not exits", devicestatusData.type);
         return false;
     }
     listeners = (std::set<const sptr<IRemoteDevStaCallback>, classcomp>)(iter->second);
