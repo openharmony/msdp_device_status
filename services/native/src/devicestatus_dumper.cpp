@@ -148,6 +148,7 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
 void DeviceStatusDumper::DumpDeviceStatusSubscriber(int32_t fd)
 {
     CALL_DEBUG_ENTER;
+    std::unique_lock lock(mutex_);
     if (appInfoMap_.empty()) {
         FI_HILOGE("appInfoMap_ is empty");
         return;
@@ -277,6 +278,7 @@ void DeviceStatusDumper::SaveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CHKPV(appInfo);
     GetTimeStamp(appInfo->startTime);
     std::set<std::shared_ptr<AppInfo>> appInfos;
+    std::unique_lock lock(mutex_);
     auto iter = appInfoMap_.find(appInfo->type);
     if (iter == appInfoMap_.end()) {
         if (appInfos.insert(appInfo).second) {
@@ -298,10 +300,10 @@ void DeviceStatusDumper::RemoveAppInfo(std::shared_ptr<AppInfo> appInfo)
     CHKPV(appInfo);
     CHKPV(appInfo->callback);
     FI_HILOGI("appInfoMap size:%{public}zu", appInfoMap_.size());
-
+    std::unique_lock lock(mutex_);
     auto appInfoSetIter = appInfoMap_.find(appInfo->type);
     if (appInfoSetIter == appInfoMap_.end()) {
-        FI_HILOGE("not exist %{public}d type appInfo", appInfo->type);
+        FI_HILOGE("Not exist %{public}d type appInfo", appInfo->type);
         return;
     }
     FI_HILOGI("callbacklist type:%{public}d, size:%{public}zu",
