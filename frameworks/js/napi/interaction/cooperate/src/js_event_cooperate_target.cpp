@@ -59,7 +59,7 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork);
     } else {
@@ -87,7 +87,7 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStartPromiseWork);
     } else {
@@ -115,7 +115,7 @@ void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallStopPromiseWork);
     } else {
@@ -141,7 +141,7 @@ void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t result;
+    int32_t result = 0;
     if (cb->ref == nullptr) {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallGetStatePromiseWork);
     } else {

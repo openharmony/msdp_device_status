@@ -177,7 +177,7 @@ int32_t DeviceStatusSrvStub::UnregisterCoordinationMonitorStub(MessageParcel& da
 int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = PrepareCoordination(userData);
     if (ret != RET_OK) {
@@ -189,7 +189,7 @@ int32_t DeviceStatusSrvStub::PrepareCoordinationStub(MessageParcel& data, Messag
 int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UnprepareCoordination(userData);
     if (ret != RET_OK) {
@@ -201,11 +201,11 @@ int32_t DeviceStatusSrvStub::UnPrepareCoordinationStub(MessageParcel& data, Mess
 int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string remoteNetworkId;
     READSTRING(data, remoteNetworkId, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    int32_t startDeviceId;
+    int32_t startDeviceId = 0;
     READINT32(data, startDeviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = ActivateCoordination(userData, remoteNetworkId, startDeviceId);
     if (ret != RET_OK) {
@@ -217,9 +217,9 @@ int32_t DeviceStatusSrvStub::ActivateCoordinationStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
-    bool isUnchained;
+    bool isUnchained = false;
     READBOOL(data, isUnchained, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = DeactivateCoordination(userData, isUnchained);
     if (ret != RET_OK) {
@@ -231,7 +231,7 @@ int32_t DeviceStatusSrvStub::DeactivateCoordinationStub(MessageParcel& data, Mes
 int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData;
+    int32_t userData = 0;
     READINT32(data, userData, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string deviceId;
     READSTRING(data, deviceId, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -245,7 +245,7 @@ int32_t DeviceStatusSrvStub::GetCoordinationStateStub(MessageParcel& data, Messa
 int32_t DeviceStatusSrvStub::UpdateDragStyleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t style;
+    int32_t style = 0;
     READINT32(data, style, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = UpdateDragStyle(static_cast<DragCursorStyle>(style));
     if (ret != RET_OK) {
@@ -282,7 +282,7 @@ int32_t DeviceStatusSrvStub::HandleAllocSocketFdStub(MessageParcel& data, Messag
         FI_HILOGE("Service is not running, pid:%{public}d, go switch default", pid);
         return SERVICE_NOT_RUNNING;
     }
-    int32_t moduleId;
+    int32_t moduleId = 0;
     READINT32(data, moduleId, E_DEVICESTATUS_READ_PARCEL_ERROR);
     std::string clientName;
     READSTRING(data, clientName, E_DEVICESTATUS_READ_PARCEL_ERROR);
@@ -360,14 +360,14 @@ int32_t DeviceStatusSrvStub::StartDragStub(MessageParcel& data, MessageParcel& r
 int32_t DeviceStatusSrvStub::StopDragStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t result;
+    int32_t result = 0;
     READINT32(data, result, E_DEVICESTATUS_READ_PARCEL_ERROR);
     if ((result < static_cast<int32_t>(DragResult::DRAG_SUCCESS)) ||
         (result > static_cast<int32_t>(DragResult::DRAG_EXCEPTION))) {
         FI_HILOGE("Invalid result:%{public}d", result);
         return RET_ERR;
     }
-    bool hasCustomAnimation;
+    bool hasCustomAnimation = false;
     READBOOL(data, hasCustomAnimation, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = StopDrag(static_cast<DragResult>(result), hasCustomAnimation);
     if (ret != RET_OK) {
@@ -400,7 +400,7 @@ int32_t DeviceStatusSrvStub::RemoveDraglistenerStub(MessageParcel& data, Message
 int32_t DeviceStatusSrvStub::SetDragWindowVisibleStub(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    bool visible;
+    bool visible = false;
     READBOOL(data, visible, E_DEVICESTATUS_READ_PARCEL_ERROR);
     int32_t ret = SetDragWindowVisible(visible);
     if (ret != RET_OK) {

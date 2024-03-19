@@ -175,7 +175,7 @@ void DeviceStatusMsdpMock::CloseTimer()
 
 void DeviceStatusMsdpMock::TimerCallback()
 {
-    uint64_t timers;
+    uint64_t timers {};
     if (read(timerFd_, &timers, sizeof(timers)) == -1) {
         FI_HILOGE("Read timer fd failed");
         return;

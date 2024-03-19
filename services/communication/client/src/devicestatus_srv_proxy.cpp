@@ -296,7 +296,7 @@ int32_t DeviceStatusSrvProxy::GetDragTargetPid()
         FI_HILOGE("Send request fail, ret:%{public}d", ret);
         return RET_ERR;
     }
-    int32_t pid;
+    int32_t pid = 0;
     READINT32(reply, pid, IPC_PROXY_DEAD_OBJECT_ERR);
     return pid;
 }
