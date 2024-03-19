@@ -31,15 +31,15 @@ using PACKHEAD = struct PackHead {
 
 namespace OHOS {
 namespace Msdp {
-class NetPacket : public StreamBuffer {
+class NetPacket final : public StreamBuffer {
 public:
     explicit NetPacket(MessageId msgId);
     NetPacket(const NetPacket &pkt);
     NetPacket &operator = (const NetPacket &pkt);
     DISALLOW_MOVE(NetPacket);
-    virtual ~NetPacket();
+    ~NetPacket();
 
-    virtual void MakeData(StreamBuffer &buf) const;
+    bool MakeData(StreamBuffer &buf) const;
     int32_t GetPacketLength() const
     {
         return (static_cast<int32_t>(sizeof(PackHead)) + wPos_);
