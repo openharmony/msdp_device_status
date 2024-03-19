@@ -15,6 +15,7 @@
 
 #include "coordination_sm.h"
 
+#include <chrono>
 #include <cstdio>
 #include <unistd.h>
 
@@ -51,6 +52,7 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y { 50 };
 constexpr int32_t COORDINATION_PRIORITY { 499 };
 constexpr int32_t MIN_HANDLER_ID { 1 };
 constexpr uint32_t P2P_SESSION_CLOSED { 1 };
+constexpr uint32_t SOFT_BUS_TIMEOUT_MS { 3000 };
 const std::string THREAD_NAME { "coordination_sm" };
 } // namespace
 
@@ -285,6 +287,23 @@ void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
     }
 }
 
+int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
+{
+    CALL_INFO_TRACE;
+    auto enterStamp = std::chrono::high_resolution_clock::now();
+    if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
+        FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
+        return RET_ERR;
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - enterStamp);
+    if (duration > std::chrono::milliseconds(SOFT_BUS_TIMEOUT_MS)) {
+        FI_HILOGE("OpenInputSoftbus timeout, duration:%{public}lld ms", duration.count());
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_INFO_TRACE;
@@ -302,7 +321,7 @@ int32_t CoordinationSM::ActivateCoordination(const std::string &remoteNetworkId,
         }
     }
     UpdateMouseLocation();
-    if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
+    if (OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
         return COOPERATOR_FAIL;
     }
@@ -1106,6 +1125,14 @@ void CoordinationSM::OnPostMonitorInputEvent(std::shared_ptr<MMI::PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (auto pointerAction = pointerEvent->GetPointerAction();
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW ||
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
+        pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
+        FI_HILOGD("Current pointerAction:%{public}d, skip this pointerEvent", static_cast<int32_t>(pointerAction));
+        return;
+    }
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
     displayX_ = pointerItem.GetDisplayX();

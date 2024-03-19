@@ -183,6 +183,7 @@ private:
     void RegisterSessionCallback();
     void OpenP2PConnection(const std::string &remoteNetworkId);
     void CloseP2PConnection(const std::string &remoteNetworkId);
+    int32_t OpenInputSoftbus(const std::string &remoteNetworkId);
     void OnStartFinishSuccess(const std::string &remoteNetworkId, int32_t startDeviceId);
 
 private:
