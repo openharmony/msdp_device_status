@@ -698,6 +698,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
+    handler_->RemoveAllEvents();
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -760,6 +761,7 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
+    handler_->RemoveAllEvents();
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
