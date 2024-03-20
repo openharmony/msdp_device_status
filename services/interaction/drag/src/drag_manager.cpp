@@ -613,7 +613,7 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         FI_HILOGE("Failed to add pointer event handler");
         return RET_ERR;
     }
-    if (AddKeyEventMointor() != RET_OK) {
+    if (AddKeyEventMonitor() != RET_OK) {
         FI_HILOGE("Failed to add key event handler");
         return RET_ERR;
     }
@@ -645,7 +645,7 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
     return RET_OK;
 }
 
-int32_t DragManager::AddKeyEventMointor()
+int32_t DragManager::AddKeyEventMonitor()
 {
     CALL_INFO_TRACE;
     keyEventMonitorId_ = MMI::InputManager::GetInstance()->AddMonitor(
@@ -679,7 +679,7 @@ int32_t DragManager::RemovePointerEventHandler()
     return RET_OK;
 }
 
-int32_t DragManager::RemoveKeyEventMointor()
+int32_t DragManager::RemoveKeyEventMonitor()
 {
     CALL_INFO_TRACE;
     if (keyEventMonitorId_ <= 0) {
@@ -737,7 +737,7 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         FI_HILOGE("Failed to remove pointer event handler");
         return RET_ERR;
     }
-    if (RemoveKeyEventMointor() != RET_OK) {
+    if (RemoveKeyEventMonitor() != RET_OK) {
         FI_HILOGE("Failed to remove key event handler");
         return RET_ERR;
     }
