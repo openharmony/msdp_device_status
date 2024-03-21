@@ -123,6 +123,7 @@ void DragDataManager::ResetDragData()
     targetPid_ = -1;
     isMotionDrag_ = false;
     textEditorAreaFlag_ = false;
+    dragOriginDpi_ = 0.0f;
 }
 
 void DragDataManager::SetPixelMapLocation(const std::pair<int32_t, int32_t> &location)
@@ -133,6 +134,17 @@ void DragDataManager::SetPixelMapLocation(const std::pair<int32_t, int32_t> &loc
     }
     dragData_.shadowInfos[0].x = location.first;
     dragData_.shadowInfos[0].y = location.second;
+}
+
+void DragDataManager::SetDragOriginDpi(float dragOriginDpi)
+{
+    dragOriginDpi_ = dragOriginDpi;
+    FI_HILOGD("dragOriginDpi_:%{public}f", dragOriginDpi_);
+}
+
+float DragDataManager::GetDragOriginDpi() const
+{
+    return dragOriginDpi_;
 }
 
 bool DragDataManager::GetCoordinateCorrected()
