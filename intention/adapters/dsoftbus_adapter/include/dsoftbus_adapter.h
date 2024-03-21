@@ -37,6 +37,7 @@ public:
 
     int32_t OpenSession(const std::string &networkId) override;
     void CloseSession(const std::string &networkId) override;
+    void CloseAllSessions() override;
 
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
 };

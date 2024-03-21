@@ -113,6 +113,12 @@ void EventManager::RemoteStartFinish(const DSoftbusStartCooperateFinished &event
     OnCooperateMessage(msg, event.networkId);
 }
 
+void EventManager::OnUnchain(const StopCooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, std::string());
+}
+
 void EventManager::StopCooperate(const StopCooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
@@ -157,7 +163,8 @@ void EventManager::OnProfileChanged(const DDPCooperateSwitchChanged &event)
 
 void EventManager::OnSoftbusSessionClosed(const DSoftbusSessionClosed &event)
 {
-    CALL_DEBUG_ENTER;
+    FI_HILOGI("Connection with \'%{public}s\' is closed", Utility::Anonymize(event.networkId));
+    OnCooperateMessage(CoordinationMessage::SESSION_CLOSED, event.networkId);
 }
 
 void EventManager::OnCooperateMessage(CoordinationMessage msg, const std::string &networkId)
@@ -175,7 +182,6 @@ void EventManager::NotifyCooperateMessage(int32_t pid, MessageId msgId, int32_t 
     const std::string &networkId, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(env_);
     auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
     CHKPV(session);
     NetPacket pkt(msgId);

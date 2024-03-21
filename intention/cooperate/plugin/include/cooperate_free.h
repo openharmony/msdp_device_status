@@ -48,6 +48,8 @@ private:
 
     private:
         void OnStart(Context &context, const CooperateEvent &event);
+        void OnStop(Context &context, const CooperateEvent &event);
+        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
         void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         CooperateFree &parent_;
@@ -102,6 +104,7 @@ private:
 
     bool IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const;
     bool HasLocalPointerDevice() const;
+    void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };

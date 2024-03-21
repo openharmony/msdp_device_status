@@ -132,6 +132,7 @@ private:
     };
 
     void StopCooperate(Context &context, const CooperateEvent &event);
+    void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };
