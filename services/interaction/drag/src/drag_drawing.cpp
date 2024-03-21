@@ -932,6 +932,12 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         return;
     }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+    float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
+    float scalingValue = 0.0f;
+    if (dragOriginDpi > EPSILON) {
+        scalingValue = GetScaling() / dragOriginDpi;
+        g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
+    }
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
@@ -946,7 +952,12 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.filterInfo = dragData.filterInfo;
     size_t shadowInfosSize = dragData.shadowInfos.size();
     for (size_t i = 1; i < shadowInfosSize; ++i) {
-        g_drawingInfo.multiSelectedPixelMaps.emplace_back(dragData.shadowInfos[i].pixelMap);
+        std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfos[i].pixelMap;
+        if (dragOriginDpi > EPSILON) {
+            scalingValue = GetScaling() / dragOriginDpi;
+            pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
+        }
+        g_drawingInfo.multiSelectedPixelMaps.emplace_back(pixelMap);
     }
 }
 

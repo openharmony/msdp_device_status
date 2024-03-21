@@ -55,6 +55,8 @@ public:
     void SetTextEditorAreaFlag(bool enable);
     bool GetTextEditorAreaFlag();
     void SetInitialPixelMapLocation(const std::pair<int32_t, int32_t> &location);
+    void SetDragOriginDpi(float dragOriginDpi);
+    float GetDragOriginDpi() const;
     std::pair<int32_t, int32_t> GetInitialPixelMapLocation();
 private:
     bool isMotionDrag_ { false };
@@ -66,6 +68,7 @@ private:
     DragCursorStyle dragStyle_ { DragCursorStyle::DEFAULT };
     DragData dragData_;
     bool textEditorAreaFlag_ { false };
+    float dragOriginDpi_ { 0.0f };
     std::pair<int32_t, int32_t> initialPixelMapLocation_;
 };
 
