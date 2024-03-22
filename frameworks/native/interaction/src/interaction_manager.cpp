@@ -81,6 +81,19 @@ int32_t InteractionManager::GetCoordinationState(const std::string &udId, bool &
     return INTER_MGR_IMPL.GetCoordinationState(udId, state);
 }
 
+
+int32_t RegisterLocationListener(const std::string &networkId, std::shared_ptr<ILocationListener> listener)
+{
+    return INTER_MGR_IMPL.UnregisterLocationListener(networkId, listener);
+}
+
+
+int32_t UnregisterLocationListener(const std::string &networkId, std::shared_ptr<ILocationListener> listener)
+{
+    return INTER_MGR_IMPL.UnregisterLocationListener(networkId, listener);
+}
+
+
 int32_t InteractionManager::UpdateDragStyle(DragCursorStyle style)
 {
     return INTER_MGR_IMPL.UpdateDragStyle(style);

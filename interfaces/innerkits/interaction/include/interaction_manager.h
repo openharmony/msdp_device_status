@@ -25,8 +25,9 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
-#include "i_start_drag_listener.h"
 #include "i_hotarea_listener.h"
+#include "i_location_listener.h"
+#include "i_start_drag_listener.h"
 #include "i_subscript_listener.h"
 
 namespace OHOS {
@@ -122,6 +123,16 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
+
+    /**
+     * 该接口的networkId 不区分设备，也可以通过该接口监听多模事件, 如此，穿越动效只能由穿越管理控制了
+    */
+    int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
+
+
+    int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
+
+
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 
     /**
