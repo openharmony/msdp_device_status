@@ -192,6 +192,21 @@ int32_t IntentionManager::GetCoordinationState(
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
+int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitClient();
+    return cooperate_.GetCooperateState(*tunnel_, udId, state);
+#else
+    (void)(udId);
+    (void)(state);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
 int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;

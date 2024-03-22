@@ -114,9 +114,16 @@ void DSoftbusAdapterImpl::CloseSession(const std::string &networkId)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(lock_);
     if (auto iter = sessions_.find(networkId); iter != sessions_.end()) {
-        Shutdown(iter->second.socket_);
+        ::Shutdown(iter->second.socket_);
         sessions_.erase(iter);
     }
+}
+
+void DSoftbusAdapterImpl::CloseAllSessions()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
+    CloseAllSessionsLocked();
 }
 
 int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
@@ -301,10 +308,7 @@ int32_t DSoftbusAdapterImpl::SetupServer()
 void DSoftbusAdapterImpl::ShutdownServer()
 {
     CALL_INFO_TRACE;
-    std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
-        ::Shutdown(item.second.socket_);
-    });
-    sessions_.clear();
+    CloseAllSessionsLocked();
     if (socketFd_ > 0) {
         ::Shutdown(socketFd_);
         socketFd_ = -1;
@@ -353,6 +357,15 @@ int32_t DSoftbusAdapterImpl::OpenSessionLocked(const std::string &networkId)
 
     sessions_.emplace(networkId, Session(socket));
     return RET_OK;
+}
+
+void DSoftbusAdapterImpl::CloseAllSessionsLocked()
+{
+    std::for_each(sessions_.begin(), sessions_.end(), [](const auto &item) {
+        ::Shutdown(item.second.socket_);
+        FI_HILOGI("Shutdown connection with \'%{public}s\'", Utility::Anonymize(item.first));
+    });
+    sessions_.clear();
 }
 
 void DSoftbusAdapterImpl::ConfigTcpAlive(int32_t socket)

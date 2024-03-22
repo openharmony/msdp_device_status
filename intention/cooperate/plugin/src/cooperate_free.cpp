@@ -68,10 +68,21 @@ bool CooperateFree::HasLocalPointerDevice() const
     });
 }
 
+void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
+{
+    if (event.isUnchained) {
+        FI_HILOGI("Unchain all connections");
+        context.dsoftbus_.CloseAllSessions();
+        context.eventMgr_.OnUnchain(event);
+    }
+}
+
 CooperateFree::Initial::Initial(CooperateFree &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::START, &CooperateFree::Initial::OnStart, this);
+    AddHandler(CooperateEventType::STOP, &CooperateFree::Initial::OnStop, this);
+    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
 }
 
@@ -118,6 +129,20 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
     }
 }
 
+void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
+    parent_.UnchainConnections(context, notice);
+}
+
+void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
+}
+
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
 {
     CALL_INFO_TRACE;
@@ -157,6 +182,9 @@ void CooperateFree::ContactRemote::OnStop(Context &context, const CooperateEvent
 {
     FI_HILOGI("[contact remote] Stop cooperation");
     OnReset(context, event);
+
+    StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
+    parent_.UnchainConnections(context, notice);
 }
 
 void CooperateFree::ContactRemote::OnResponse(Context &context, const CooperateEvent &event)
@@ -233,11 +261,11 @@ void CooperateFree::ContactRemote::OnSoftbusSessionClosed(Context &context, cons
 {
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
 
-    if (!context.IsPeer(notice.networkId)) {
-        return;
+    if (context.IsPeer(notice.networkId)) {
+        FI_HILOGI("[contact remote] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
+        OnReset(context, event);
     }
-    FI_HILOGI("[contact remote] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
-    OnReset(context, event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
 
 void CooperateFree::ContactRemote::OnProgress(Context &context, const CooperateEvent &event)
@@ -311,6 +339,9 @@ void CooperateFree::RemoteStart::OnStop(Context &context, const CooperateEvent &
 
     FI_HILOGI("[remote start] Stop cooperation");
     OnReset(context, event);
+
+    StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
+    parent_.UnchainConnections(context, param);
 }
 
 void CooperateFree::RemoteStart::OnRemoteStartFinished(Context &context, const CooperateEvent &event)
@@ -378,11 +409,11 @@ void CooperateFree::RemoteStart::OnSoftbusSessionClosed(Context &context, const 
 {
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
 
-    if (!parent_.process_.IsPeer(notice.networkId)) {
-        return;
+    if (parent_.process_.IsPeer(notice.networkId)) {
+        FI_HILOGI("[remote start] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
+        OnReset(context, event);
     }
-    FI_HILOGI("[remote start] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
-    OnReset(context, event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
 
 void CooperateFree::RemoteStart::OnProgress(Context &context, const CooperateEvent &event)

@@ -59,6 +59,7 @@ public:
     void AttachSender(Channel<CooperateEvent>::Sender sender);
     int32_t OpenSession(const std::string &networkId);
     void CloseSession(const std::string &networkId);
+    void CloseAllSessions();
 
     int32_t StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event);
     int32_t StartCooperateResponse(const std::string &networkId, const DSoftbusStartCooperateResponse &event);

@@ -57,6 +57,12 @@ void DSoftbusHandler::CloseSession(const std::string &networkId)
     env_->GetDSoftbus().CloseSession(networkId);
 }
 
+void DSoftbusHandler::CloseAllSessions()
+{
+    CALL_INFO_TRACE;
+    env_->GetDSoftbus().CloseAllSessions();
+}
+
 int32_t DSoftbusHandler::StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event)
 {
     CALL_INFO_TRACE;

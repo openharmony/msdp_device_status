@@ -107,6 +107,8 @@ void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event
         .normal = true,
     };
     context.eventMgr_.StopCooperateFinish(notice);
+
+    parent_.UnchainConnections(context, param);
 }
 
 void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &event)
@@ -246,6 +248,7 @@ void CooperateOut::Initial::OnSoftbusSessionClosed(Context &context, const Coope
     }
     FI_HILOGI("[dsoftbus session closed] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
     parent_.StopCooperate(context, event);
+    context.eventMgr_.OnSoftbusSessionClosed(notice);
 }
 
 void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -287,6 +290,9 @@ void CooperateOut::RemoteStart::OnStop(Context &context, const CooperateEvent &e
     FI_HILOGI("[remote start] Stop cooperation");
     parent_.StopCooperate(context, event);
     OnReset(context, event);
+
+    StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
+    parent_.UnchainConnections(context, param);
 }
 
 void CooperateOut::RemoteStart::OnRemoteStartFinished(Context &context, const CooperateEvent &event)
@@ -453,6 +459,15 @@ void CooperateOut::StopCooperate(Context &context, const CooperateEvent &event)
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
 
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+}
+
+void CooperateOut::UnchainConnections(Context &context, const StopCooperateEvent &event) const
+{
+    if (event.isUnchained) {
+        FI_HILOGI("Unchain all connections");
+        context.dsoftbus_.CloseAllSessions();
+        context.eventMgr_.OnUnchain(event);
+    }
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

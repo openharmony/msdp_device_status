@@ -171,6 +171,11 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel,
     return RET_OK;
 }
 
+int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state)
+{
+    return RET_ERR;
+}
+
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
     return RET_ERR;
