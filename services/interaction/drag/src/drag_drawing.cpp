@@ -170,7 +170,6 @@ bool CheckNodesValid()
         return false;
     }
     return true;
-    FI_HILOGD("leave");
 }
 
 float GetScaling()
