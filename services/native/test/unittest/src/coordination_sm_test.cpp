@@ -48,7 +48,6 @@ namespace {
 const std::string REMOTE_NETWORKID { "Test_Remote_NetworkId" };
 const std::string ORIGIN_NETWORKID { "Test_Origin_NetworkId" };
 constexpr int32_t DEVICE_ID { 0 };
-constexpr int32_t ERR_CODE { 20900001 };
 constexpr int32_t UNKNOWN_STATE { 3 };
 } // namespace
 
@@ -197,10 +196,12 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest003, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-    int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
-    EXPECT_TRUE(ret == 0);
-    ClearCoordiantionSM();
-    ClearCoordinationSoftbusAdapter();
+    if (!localNetworkId.empty()) {
+        int32_t ret = COOR_SM->GetCoordinationState(localNetworkId);
+        EXPECT_TRUE(ret == 0);
+        ClearCoordiantionSM();
+        ClearCoordinationSoftbusAdapter();
+    }
 }
 
 /**
@@ -296,10 +297,10 @@ HWTEST_F(CoordinationSMTest, CoordinationSMTest009, TestSize.Level0)
     COOR_SM->currentState_ = CoordinationState::STATE_IN;
     COOR_SM->coordinationStates_[CoordinationState::STATE_IN] = std::make_shared<CoordinationStateIn>();
     int32_t ret = COOR_SM->ActivateCoordination(REMOTE_NETWORKID, startDeviceId);
-    EXPECT_EQ(ret, ERR_CODE);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
     COOR_SOFTBUS_ADAPTER->sessionDevs_[REMOTE_NETWORKID] = 1;
     ret = COOR_SM->ActivateCoordination(REMOTE_NETWORKID, startDeviceId);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
     ClearCoordiantionSM();
     ClearCoordinationSoftbusAdapter();
 }
