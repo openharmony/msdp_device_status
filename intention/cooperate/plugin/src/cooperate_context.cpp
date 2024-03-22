@@ -69,8 +69,8 @@ private:
 
 class DeviceProfileObserver final : public IDeviceProfileObserver {
 public:
-    DeviceProfileObserver(DDPAdapter &ddp, Channel<CooperateEvent>::Sender sender)
-        : ddp_(ddp), sender_(sender) {}
+    DeviceProfileObserver(IContext *env, Channel<CooperateEvent>::Sender sender)
+        : env_(env), sender_(sender) {}
 
     ~DeviceProfileObserver() = default;
     DISALLOW_COPY_AND_MOVE(DeviceProfileObserver);
@@ -78,7 +78,7 @@ public:
     void OnProfileChanged(const std::string &networkId) override;
 
 private:
-    DDPAdapter &ddp_;
+    IContext *env_ { nullptr };
     Channel<CooperateEvent>::Sender sender_;
 };
 
@@ -87,7 +87,7 @@ void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
     FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
     bool switchStatus = false;
 
-    int32_t ret = ddp_.GetProperty(networkId, COOPERATE_SWITCH, switchStatus);
+    int32_t ret = env_->GetDP().GetProperty(networkId, COOPERATE_SWITCH, switchStatus);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to query switch status of \'%{public}s\'", Utility::Anonymize(networkId));
         return;
@@ -178,14 +178,14 @@ void Context::DisableDDM()
 
 int32_t Context::EnableDDP()
 {
-    dpObserver_ = std::make_shared<DeviceProfileObserver>(ddp_, sender_);
-    ddp_.AddObserver(dpObserver_);
+    dpObserver_ = std::make_shared<DeviceProfileObserver>(env_, sender_);
+    env_->GetDP().AddObserver(dpObserver_);
     return RET_OK;
 }
 
 void Context::DisableDDP()
 {
-    ddp_.RemoveObserver(dpObserver_);
+    env_->GetDP().RemoveObserver(dpObserver_);
     dpObserver_.reset();
 }
 
@@ -225,7 +225,7 @@ NormalizedCoordinate Context::NormalizedCursorPosition() const
 
 void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
-    int32_t ret = ddp_.SetProperty(COOPERATE_SWITCH, true);
+    int32_t ret = env_->GetDP().SetProperty(COOPERATE_SWITCH, true);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to update switch status");
     }
@@ -233,7 +233,7 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 
 void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
-    int32_t ret = ddp_.SetProperty(COOPERATE_SWITCH, false);
+    int32_t ret = env_->GetDP().SetProperty(COOPERATE_SWITCH, false);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to update switch status");
     }

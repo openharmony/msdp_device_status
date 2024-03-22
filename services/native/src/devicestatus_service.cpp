@@ -36,6 +36,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "ddp_adapter.h"
 #include "dinput_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
@@ -73,6 +74,7 @@ DeviceStatusService::DeviceStatusService()
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
+    ddp_ = std::make_unique<DDPAdapter>();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
@@ -174,6 +176,11 @@ IDInputAdapter& DeviceStatusService::GetDInput()
 IDSoftbusAdapter& DeviceStatusService::GetDSoftbus()
 {
     return *dsoftbus_;
+}
+
+IDDPAdapter& DeviceStatusService::GetDP()
+{
+    return *ddp_;
 }
 
 void DeviceStatusService::EnableDSoftbus()
