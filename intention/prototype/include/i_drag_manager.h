@@ -35,21 +35,45 @@ public:
 
     virtual void Dump(int32_t fd) const = 0;
     virtual void RegisterStateChange(std::function<void(DragState)> callback) = 0;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    virtual int32_t AddListener(int32_t pid) = 0;
+    virtual int32_t RemoveListener(int32_t pid) = 0;
+    virtual int32_t AddSubscriptListener(int32_t pid) = 0;
+    virtual int32_t RemoveSubscriptListener(int32_t pid) = 0;
+    virtual int32_t StartDrag(const DragData &dragData, int32_t pid) = 0;
+#else
+    virtual int32_t AddListener(SessionPtr session) = 0;
+    virtual int32_t RemoveListener(SessionPtr session) = 0;
+    virtual int32_t AddSubscriptListener(SessionPtr session) = 0;
+    virtual int32_t RemoveSubscriptListener(SessionPtr session) = 0;
     virtual int32_t StartDrag(const DragData &dragData, SessionPtr sess) = 0;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     virtual int32_t StopDrag(const DragDropResult &dropResult) = 0;
+    virtual int32_t GetDragData(DragData &dragData) = 0;
+    virtual int32_t GetDragTargetPid() const = 0;
+    virtual int32_t GetUdKey(std::string &udKey) const = 0;
+    virtual int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) = 0;
     virtual DragState GetDragState() const = 0;
+    virtual int32_t GetDragState(DragState &dragState) = 0;
+    virtual int32_t GetExtraInfo(std::string &extraInfo) const = 0;
     virtual void SetDragState(DragState state) = 0;
     virtual DragResult GetDragResult() const = 0;
+    virtual int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) = 0;
+    virtual int32_t GetDragAction(DragAction &dragAction) const = 0;
     virtual int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) = 0;
     virtual OHOS::MMI::ExtraData GetExtraData(bool appended) const = 0;
     virtual void RegisterNotifyPullUp(std::function<void(bool)> callback) = 0;
     virtual void SetPointerEventFilterTime(int64_t filterTime) = 0;
     virtual void MoveTo(int32_t x, int32_t y) = 0;
+    virtual int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) = 0;
+    virtual int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) = 0;
     virtual int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) = 0;
     virtual int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) = 0;
     virtual void GetAllowDragState(bool &isAllowDrag) = 0;
     virtual int32_t RotateDragWindow(Rosen::Rotation rotation) = 0;
+    virtual int32_t EnterTextEditorArea(bool enable) = 0;
+    virtual int32_t AddPrivilege(int32_t tokenId) = 0;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
