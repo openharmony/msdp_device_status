@@ -133,8 +133,7 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest004, TestSize.Level0)
     CALL_TEST_DEBUG;
     g_moduleTest = Type::TYPE_STILL;
     Type type = g_moduleTest;
-    auto stationaryManager = StationaryManager::GetInstance();
-    Data data = stationaryManager->GetDeviceStatusData(type);
+    Data data = StationaryManager::GetInstance()->GetDeviceStatusData(type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
     EXPECT_EQ(true, data.type == g_moduleTest &&
