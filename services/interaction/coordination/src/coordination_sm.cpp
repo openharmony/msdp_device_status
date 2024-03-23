@@ -811,7 +811,7 @@ void CoordinationSM::OnPointerOffline(const std::string &dhid, const std::vector
         D_INPUT_ADAPTER->StopRemoteInput(remoteNetworkId, localNetworkId, keyboards,
             [this, remoteNetworkId](bool isSuccess) {});
         Reset(true);
-        SetPointerVisible();
+        MMI::InputManager::GetInstance()->SetPointerVisible(true);
     }
 }
 
