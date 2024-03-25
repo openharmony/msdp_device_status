@@ -90,7 +90,7 @@ int32_t CoordinationStateIn::DeactivateCoordination(const std::string &remoteNet
 
 int32_t CoordinationStateIn::ProcessStop()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::vector<std::string> inputDeviceDhids = COOR_DEV_MGR->GetCoordinationDhids(startDeviceDhid_, true);
     std::string originNetworkId = COOR_DEV_MGR->GetOriginNetworkId(startDeviceDhid_);
     int32_t ret = D_INPUT_ADAPTER->StopRemoteInput(
@@ -106,7 +106,7 @@ int32_t CoordinationStateIn::ProcessStop()
 
 void CoordinationStateIn::OnStartRemoteInput(bool isSuccess, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (!isSuccess) {
         ICoordinationState::OnStartRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
         return;
@@ -123,6 +123,7 @@ void CoordinationStateIn::OnStartRemoteInput(bool isSuccess, const std::string &
 void CoordinationStateIn::StopRemoteInput(const std::string &originNetworkId,
     const std::string &remoteNetworkId, const std::vector<std::string> &dhid, int32_t startDeviceId)
 {
+    CALL_INFO_TRACE;
     int32_t ret = D_INPUT_ADAPTER->StopRemoteInput(originNetworkId, dhid,
         [this, remoteNetworkId, startDeviceId](bool isSuccess) {
             this->OnStopRemoteInput(isSuccess, remoteNetworkId, startDeviceId);
@@ -135,8 +136,9 @@ void CoordinationStateIn::StopRemoteInput(const std::string &originNetworkId,
 void CoordinationStateIn::OnStopRemoteInput(bool isSuccess,
     const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    FI_HILOGD("In, remoteNetworkId:%{public}s, startDeviceId:%{public}d",
-        GetAnonyString(remoteNetworkId).c_str(), startDeviceId);
+    CALL_INFO_TRACE;
+    FI_HILOGI("IsSuccess:%{public}s, remoteNetworkId:%{public}s, startDeviceId:%{public}d",
+        isSuccess ? "true" : "false", GetAnonyString(remoteNetworkId).c_str(), startDeviceId);
     if (COOR_SM->IsStarting()) {
         FI_HILOGD("Is starting in");
         std::string taskName = "start_finish_task";
@@ -172,7 +174,7 @@ void CoordinationStateIn::ComeBack(const std::string &remoteNetworkId, int32_t s
 
 int32_t CoordinationStateIn::RelayComeBack(const std::string &remoteNetworkId, int32_t startDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     return PrepareAndStart(remoteNetworkId, startDeviceId);
 }
 
