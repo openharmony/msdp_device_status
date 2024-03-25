@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -206,7 +206,12 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
         FI_HILOGE("NetworkId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    bool state = DP_ADAPTER->GetCrossingSwitchState(networkId);
+    auto udId = COORDINATION::GetUdIdByNetworkId(networkId);
+    if (udId.empty()) {
+        FI_HILOGE("UdId is empty");
+        return COMMON_PARAMETER_ERROR;
+    }
+    bool state = DP_ADAPTER->GetCrossingSwitchState(udId);
     FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
     return RET_OK;
@@ -214,13 +219,13 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
 
 int32_t CoordinationSM::GetCoordinationState(const std::string &udId, bool &state)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (udId.empty()) {
         FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
     state = DP_ADAPTER->GetCrossingSwitchState(udId);
-    FI_HILOGI("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
+    FI_HILOGD("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
 
@@ -619,7 +624,8 @@ void CoordinationSM::OnStopFinish(bool isSuccess, const std::string &remoteNetwo
         if (ret) {
             COOR_SM->NotifyChainRemoved();
             std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-            FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
+            FI_HILOGI("LocalNetworkId:%{public}s, remoteNetworkId:%{public}s",
+                GetAnonyString(localNetworkId).c_str(), GetAnonyString(remoteNetworkId).c_str());
             COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, remoteNetworkId, ret);
         } else {
             FI_HILOGE("Failed to unchain coordination");
@@ -871,11 +877,8 @@ void CoordinationSM::OnDeviceOffline(const std::string &networkId)
     {
         DP_ADAPTER->UnregisterCrossingStateListener(networkId);
         std::lock_guard<std::mutex> guard(mutex_);
-        if (!onlineDevice_.empty()) {
-            auto it = std::find(onlineDevice_.begin(), onlineDevice_.end(), networkId);
-            if (it != onlineDevice_.end()) {
-                onlineDevice_.erase(it);
-            }
+        if (auto it = std::find(onlineDevice_.begin(), onlineDevice_.end(), networkId); it != onlineDevice_.end()) {
+            onlineDevice_.erase(it);
         }
     }
     if ((networkId != sinkNetworkId_ && networkId != localNetworkId) ||

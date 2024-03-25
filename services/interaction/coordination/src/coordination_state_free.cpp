@@ -86,7 +86,8 @@ int32_t CoordinationStateFree::DeactivateCoordination(const std::string &network
             if (ret) {
                 COOR_SM->NotifyChainRemoved();
                 std::string localNetworkId = COORDINATION::GetLocalNetworkId();
-                FI_HILOGD("localNetworkId:%{public}s", GetAnonyString(localNetworkId).c_str());
+                FI_HILOGI("LocalNetworkId:%{public}s, remoteNetworkId:%{public}s",
+                    GetAnonyString(localNetworkId).c_str(), GetAnonyString(networkId).c_str());
                 COOR_SOFTBUS_ADAPTER->NotifyUnchainedResult(localNetworkId, networkId, ret);
             } else {
                 FI_HILOGE("Failed to unchain coordination");
