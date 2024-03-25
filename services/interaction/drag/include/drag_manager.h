@@ -111,8 +111,8 @@ private:
     void PrintDragData(const DragData &dragData);
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t AddPointerEventHandler(uint32_t deviceTags);
-    int32_t AddKeyEventMointor();
-    int32_t RemoveKeyEventMointor();
+    int32_t AddKeyEventMonitor();
+    int32_t RemoveKeyEventMonitor();
     int32_t RemovePointerEventHandler();
     int32_t NotifyDragResult(DragResult result, DragBehavior dragBehavior);
     int32_t NotifyHideIcon();
