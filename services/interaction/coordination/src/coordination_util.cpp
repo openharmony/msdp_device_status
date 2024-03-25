@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "device_manager.h"
 #include "dm_device_info.h"
 
+#include "device_manager.h"
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -53,14 +54,11 @@ std::string GetLocalNetworkId()
 
 std::string GetLocalUdId()
 {
-    auto packageName = GetCurrentPackageName();
-    OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
-    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo) != RET_OK) {
-        FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
-        return {};
-    }
-    FI_HILOGD("LocalUdId:%{public}s", GetAnonyString(dmDeviceInfo.deviceId).c_str());
-    return dmDeviceInfo.deviceId;
+    auto localNetworkId = GetLocalNetworkId();
+    auto localUdId = GetUdIdByNetworkId(localNetworkId);
+    FI_HILOGD("LocalNetworkId:%{public}s, localUdId:%{public}s",
+        GetAnonyString(localNetworkId).c_str(), GetAnonyString(localUdId).c_str());
+    return localUdId;
 }
 
 std::string GetUdIdByNetworkId(const std::string &networkId)

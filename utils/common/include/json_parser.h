@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -36,6 +37,7 @@ struct JsonParser {
     }
     cJSON *json = nullptr;
 };
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

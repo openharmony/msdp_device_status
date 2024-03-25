@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,9 @@
 #include <algorithm>
 #include <mutex>
 
-#include "distributed_device_profile_client.h"
-#include "service_characteristic_profile.h"
-#include "sync_options.h"
-
 #include "coordination_util.h"
 #include "devicestatus_define.h"
+#include "distributed_device_profile_client.h"
 #include "json_parser.h"
 
 #undef LOG_TAG
@@ -32,192 +29,270 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-using namespace OHOS::DeviceProfile;
+using namespace OHOS::DistributedDeviceProfile;
 namespace {
 const std::string SERVICE_ID { "deviceStatus" };
+const std::string SERVICE_TYPE { "deviceStatus" };
+const std::string CROSSING_SWITCH_STATE { "crossingSwitchState" };
+const std::string CHARACTERISTIC_VALUE { "characteristicValue" };
+constexpr int32_t DEVICE_STATUS_SA_ID { 2902 };
+constexpr int32_t DP_ERROR_CODE_DATA_EXIST { 98566164 };
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
 
-DeviceProfileAdapter::~DeviceProfileAdapter()
-{
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    profileEventCallbacks_.clear();
-    callbacks_.clear();
-}
-
-void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
-    const ProfileChangeNotification &changeNotification)
-{
-    CALL_INFO_TRACE;
-    std::string networkId = changeNotification.GetDeviceId();
-    DP_ADAPTER->OnProfileChanged(networkId);
-}
-
-int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
-{
-    std::string stateStr = state ? "true" : "false";
-    FI_HILOGI("Crossing switch state:%{public}s, device size:%{public}d", stateStr.c_str(),
-        static_cast<int32_t>(deviceIds.size()));
-    const std::string SERVICE_TYPE = "deviceStatus";
-    ServiceCharacteristicProfile profile;
-    profile.SetServiceType(SERVICE_TYPE);
-    profile.SetServiceId(SERVICE_ID);
-    cJSON *data = cJSON_CreateObject();
-    CHKPR(data, RET_ERR);
-    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
-    char *smsg = cJSON_Print(data);
-    cJSON_Delete(data);
-    profile.SetCharacteristicProfileJson(smsg);
-    cJSON_free(smsg);
-
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
-    if (ret != 0) {
-        FI_HILOGE("Failed to put the device profile, ret:%{public}d", ret);
-        return ret;
-    }
-    return ret;
-}
+DeviceProfileAdapter::~DeviceProfileAdapter() {}
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
-    std::string stateStr = state ? "true" : "false";
-    FI_HILOGI("Crossing switch state:%{public}s", stateStr.c_str());
-    const std::string SERVICE_TYPE = "deviceStatus";
-    ServiceCharacteristicProfile profile;
-    profile.SetServiceId(SERVICE_ID);
-    profile.SetServiceType(SERVICE_TYPE);
-    cJSON *data = cJSON_CreateObject();
-    CHKPR(data, RET_ERR);
-    cJSON_AddItemToObject(data, characteristicsName_.c_str(), cJSON_CreateNumber(state));
-    char *smsg = cJSON_Print(data);
-    cJSON_Delete(data);
-    profile.SetCharacteristicProfileJson(smsg);
-    cJSON_free(smsg);
-
-    return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
+    CALL_INFO_TRACE;
+    if (!serviceProfileExist_) {
+        DistributedDeviceProfile::ServiceProfile serviceProfile;
+        serviceProfile.SetDeviceId(COORDINATION::GetLocalUdId());
+        serviceProfile.SetServiceName(SERVICE_ID);
+        serviceProfile.SetServiceType(SERVICE_TYPE);
+        int32_t ret = DP_CLIENT.PutServiceProfile(serviceProfile);
+        if (ret != RET_OK && ret != DP_ERROR_CODE_DATA_EXIST) {
+            FI_HILOGE("PutServiceProfile failed, ret:%{public}d", ret);
+            return RET_ERR;
+        }
+        FI_HILOGI("PutServiceProfile successfully, ret:%{public}d", ret);
+        serviceProfileExist_ = true;
+    }
+    DistributedDeviceProfile::CharacteristicProfile characteristicProfile;
+    characteristicProfile.SetDeviceId(COORDINATION::GetLocalUdId());
+    characteristicProfile.SetServiceName(SERVICE_ID);
+    characteristicProfile.SetCharacteristicKey(CROSSING_SWITCH_STATE);
+    characteristicProfile.SetCharacteristicValue((state ? "true" : "false"));
+    if (int32_t ret = DP_CLIENT.PutCharacteristicProfile(characteristicProfile) != RET_OK) {
+        FI_HILOGE("PutCharacteristicProfile failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    FI_HILOGI("UpdateCrossingSwitchState successfully, state:%{public}s", state ? "true" : "false");
+    return RET_OK;
 }
 
-bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &networkIdOrUdId)
+bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &udId)
 {
-    CALL_INFO_TRACE;
-    auto transfer = [] (const std::string &networkIdOrUdId) -> std::string {
-        if (networkIdOrUdId == COORDINATION::GetLocalNetworkId() || networkIdOrUdId == COORDINATION::GetLocalUdId()) {
-            FI_HILOGD("NetworkIdOrUdId:%{public}s", GetAnonyString(networkIdOrUdId).c_str());
-            return "";
-        }
-        return networkIdOrUdId;
-    };
-    ServiceCharacteristicProfile profile;
-    DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(transfer(networkIdOrUdId), SERVICE_ID, profile);
-    std::string jsonData = profile.GetCharacteristicProfileJson();
-    JsonParser parser;
-    parser.json = cJSON_Parse(jsonData.c_str());
-    if (!cJSON_IsObject(parser.json)) {
-        FI_HILOGE("The parser json is not an object, networkIdOrUdId:%{public}s",
-            GetAnonyString(networkIdOrUdId).c_str());
-        return false;
+    CALL_DEBUG_ENTER;
+    DistributedDeviceProfile::CharacteristicProfile profile;
+    if (int32_t ret = DP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile)
+        != RET_OK) {
+        FI_HILOGE("GetCharacteristicProfile failed, ret:%{public}d, udId:%{public}s",
+            ret, GetAnonyString(udId).c_str());
     }
-    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json, characteristicsName_.c_str());
-    if (!cJSON_IsNumber(state)) {
-        FI_HILOGE("The state is not a number type");
-        return false;
-    }
-    return (static_cast<bool>(state->valueint));
+    bool state = (profile.GetCharacteristicValue() == "true" ? true : false);
+    FI_HILOGD("GetCrossingSwitchState for udId:%{public}s successfully, state:%{public}s",
+        GetAnonyString(udId).c_str(),  state ? "true" : "false");
+    return state;
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &networkId, DPCallback callback)
 {
-    CHKPR(callback, RET_ERR);
-    if (networkId.empty()) {
-        FI_HILOGE("DeviceId is nullptr");
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    OnDeviceOnline(networkId);
+    if (RegisterProfileListener(networkId, callback) != RET_OK) {
+        FI_HILOGE("RegisterProfileListener failed, networkId:%{public}s", GetAnonyString(networkId).c_str());
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    auto callbackIter = callbacks_.find(networkId);
-    if (callbackIter != callbacks_.end()) {
-        callbackIter->second = callback;
-        FI_HILOGW("Callback is updated");
-        return RET_OK;
-    }
-    callbacks_[networkId] = callback;
-    FI_HILOGI("Register crossing state listener success, networkId:%{public}s", GetAnonyString(networkId).c_str());
-    int32_t ret = RegisterProfileListener(networkId);
-    if (ret != RET_OK) {
-        FI_HILOGE("Register profile listener failed");
-    }
-    return ret;
+    return RET_OK;
 }
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &networkId)
 {
-    if (networkId.empty()) {
-        FI_HILOGE("DeviceId is empty");
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    OnDeviceOffline(networkId);
+    if (UnregisterProfileListener(networkId) != RET_OK) {
+        FI_HILOGE("UnregisterProfileListener failed, networkId:%{public}s", GetAnonyString(networkId).c_str());
         return RET_ERR;
     }
-    FI_HILOGI("Unregister crossing state listener, networkId:%{public}s", GetAnonyString(networkId).c_str());
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    auto it = profileEventCallbacks_.find(networkId);
-    if (it != profileEventCallbacks_.end()) {
-        std::list<ProfileEvent> profileEvents;
-        profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
-        std::list<ProfileEvent> failedEvents;
-        DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
-            it->second, failedEvents);
-        profileEventCallbacks_.erase(it);
-    }
-    auto callbackIter = callbacks_.find(networkId);
-    if (callbackIter == callbacks_.end()) {
-        FI_HILOGW("This device has no callback");
-        return RET_OK;
-    }
-    callbacks_.erase(callbackIter);
     return RET_OK;
 }
 
-int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &networkId)
+void DeviceProfileAdapter::OnDeviceOnline(const std::string &networkId)
 {
     CALL_INFO_TRACE;
-    std::list<std::string> serviceIdList;
-    serviceIdList.emplace_back(SERVICE_ID);
-    ExtraInfo extraInfo;
-    extraInfo["deviceId"] = networkId;
-    extraInfo["serviceIds"] = serviceIdList;
-    SubscribeInfo changeEventInfo;
-    changeEventInfo.profileEvent = ProfileEvent::EVENT_PROFILE_CHANGED;
-    changeEventInfo.extraInfo = std::move(extraInfo);
-    std::list<SubscribeInfo> subscribeInfos;
-    subscribeInfos.emplace_back(changeEventInfo);
-    SubscribeInfo syncEventInfo;
-    syncEventInfo.profileEvent = ProfileEvent::EVENT_SYNC_COMPLETED;
-    subscribeInfos.emplace_back(syncEventInfo);
-    std::list<ProfileEvent> failedEvents;
-    auto it = profileEventCallbacks_.find(networkId);
-    if (it == profileEventCallbacks_.end() || it->second == nullptr) {
-        profileEventCallbacks_[networkId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
-    }
-    return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
-        subscribeInfos, profileEventCallbacks_[networkId], failedEvents);
+    auto udId = COORDINATION::GetUdIdByNetworkId(networkId);
+    FI_HILOGI("OnDeviceOnline, networkId:%{public}s, udId:%{public}s",
+        GetAnonyString(networkId).c_str(), GetAnonyString(udId).c_str());
+    onlineDevUdId2NetworkId_.emplace(udId, networkId);
 }
 
-void DeviceProfileAdapter::OnProfileChanged(const std::string &networkId)
+void DeviceProfileAdapter::OnDeviceOffline(const std::string &networkId)
 {
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    auto it = callbacks_.find(networkId);
-    if (it == callbacks_.end()) {
-        FI_HILOGW("The device has no callback");
-        return;
-    }
-    if (it->second != nullptr) {
-        auto state = GetCrossingSwitchState(networkId);
-        it->second(networkId, state);
-        std::string stateStr = state ? "true" : "false";
-        FI_HILOGI("Crossing switch state:%{public}s", stateStr.c_str());
-    } else {
-        callbacks_.erase(it);
-        FI_HILOGW("Remove networkId:%{public}s profile changed callback", GetAnonyString(networkId).c_str());
+    CALL_INFO_TRACE;
+    auto udId = COORDINATION::GetUdIdByNetworkId(networkId);
+    FI_HILOGI("OnDeviceOffline, networkId:%{public}s, udId:%{public}s",
+        GetAnonyString(networkId).c_str(), GetAnonyString(udId).c_str());
+    if (onlineDevUdId2NetworkId_.find(udId) != onlineDevUdId2NetworkId_.end()) {
+        onlineDevUdId2NetworkId_.erase(udId);
     }
 }
+
+int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &networkId, DPCallback callback)
+{
+    CALL_INFO_TRACE;
+    SubscribeInfo subscribeInfo;
+    subscribeInfo.SetSaId(DEVICE_STATUS_SA_ID);
+    std::string udId = COORDINATION::GetUdIdByNetworkId(networkId);
+    subscribeInfo.SetSubscribeKey(udId, SERVICE_ID, CROSSING_SWITCH_STATE, CHARACTERISTIC_VALUE);
+    subscribeInfo.AddProfileChangeType(ProfileChangeType::CHAR_PROFILE_ADD);
+    subscribeInfo.AddProfileChangeType(ProfileChangeType::CHAR_PROFILE_UPDATE);
+    subscribeInfo.AddProfileChangeType(ProfileChangeType::CHAR_PROFILE_DELETE);
+    sptr<IProfileChangeListener> subscribeDPChangeListener = new (std::nothrow) SubscribeDPChangeListener;
+    CHKPR(subscribeDPChangeListener, RET_ERR);
+    subscribeInfo.SetListener(subscribeDPChangeListener);
+    if (int32_t ret = DP_CLIENT.SubscribeDeviceProfile(subscribeInfo) != RET_OK) {
+        FI_HILOGE("SubscribeDeviceProfile failed, ret:%{public}d, udId:%{public}s", ret, GetAnonyString(udId).c_str());
+        return RET_ERR;
+    }
+    CrossingSwitchListener switchListener = {
+        .subscribeInfo = subscribeInfo,
+        .dpCallback = callback
+    };
+    crossingSwitchListener_.emplace(networkId, switchListener);
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::UnregisterProfileListener(const std::string &networkId)
+{
+    CALL_INFO_TRACE;
+    if (crossingSwitchListener_.find(networkId) == crossingSwitchListener_.end()) {
+        FI_HILOGE("NetworkId:%{public}s is not founded in crossingSwitchListener", GetAnonyString(networkId).c_str());
+        return RET_ERR;
+    }
+    auto switchListener = crossingSwitchListener_[networkId];
+    if (int32_t ret = DP_CLIENT.UnSubscribeDeviceProfile(switchListener.subscribeInfo) != RET_OK) {
+        FI_HILOGE("UnSubscribeDeviceProfile failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    crossingSwitchListener_.erase(networkId);
+    return RET_OK;
+}
+
+std::string DeviceProfileAdapter::GetNetworkIdByUdId(const std::string &udId)
+{
+    if (onlineDevUdId2NetworkId_.find(udId) == onlineDevUdId2NetworkId_.end()) {
+        FI_HILOGE("UdId:%{public}s is not founded in onlineDevUdId2NetworkId", GetAnonyString(udId).c_str());
+        return {};
+    }
+    return onlineDevUdId2NetworkId_[udId];
+}
+
+int32_t DeviceProfileAdapter::OnProfileChanged(const CharacteristicProfile &profile)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    std::string udId = profile.GetDeviceId();
+    std::string networkId = GetNetworkIdByUdId(udId);
+    if (networkId.empty()) {
+        FI_HILOGE("Invalid networkId");
+        return RET_ERR;
+    }
+    if (crossingSwitchListener_.find(networkId) == crossingSwitchListener_.end()) {
+        FI_HILOGE("NetworkId:%{public}s is not founded in crossingSwitchListener", GetAnonyString(networkId).c_str());
+        return RET_ERR;
+    }
+    auto switchListener = crossingSwitchListener_[networkId];
+    CHKPR(switchListener.dpCallback, RET_ERR);
+    bool state = (profile.GetCharacteristicValue() == "true" ? true : false);
+    FI_HILOGE("UdId:%{public}s, networkId:%{public}s, state:%{public}s",
+        GetAnonyString(udId).c_str(), GetAnonyString(networkId).c_str(), state ? "true" : "false");
+    switchListener.dpCallback(networkId, state);
+    return RET_OK;
+}
+
+DeviceProfileAdapter::SubscribeDPChangeListener::SubscribeDPChangeListener()
+{
+    FI_HILOGW("Constructor");
+}
+
+DeviceProfileAdapter::SubscribeDPChangeListener::~SubscribeDPChangeListener()
+{
+    FI_HILOGW("Destructor");
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnTrustDeviceProfileAdd(const TrustDeviceProfile &profile)
+{
+    FI_HILOGW("OnTrustDeviceProfileAdd");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnTrustDeviceProfileDelete(const TrustDeviceProfile &profile)
+{
+    FI_HILOGW("OnTrustDeviceProfileDelete");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnTrustDeviceProfileUpdate(
+    const TrustDeviceProfile &oldProfile, const TrustDeviceProfile &newProfile)
+{
+    FI_HILOGW("OnTrustDeviceProfileUpdate");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnDeviceProfileAdd(const DeviceProfile &profile)
+{
+    FI_HILOGW("OnDeviceProfileAdd deviceId:%{public}s", GetAnonyString(profile.GetDeviceId()).c_str());
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnDeviceProfileDelete(const DeviceProfile &profile)
+{
+    FI_HILOGW("OnDeviceProfileDelete, deviceId:%{public}s", GetAnonyString(profile.GetDeviceId()).c_str());
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnDeviceProfileUpdate(const DeviceProfile &oldProfile,
+    const DeviceProfile &newProfile)
+{
+    FI_HILOGW("OnDeviceProfileUpdate, oldDeviceId:%{public}s, newDeviceId:%{public}s",
+        GetAnonyString(oldProfile.GetDeviceId()).c_str(), GetAnonyString(newProfile.GetDeviceId()).c_str());
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnServiceProfileAdd(const ServiceProfile &profile)
+{
+    FI_HILOGW("OnServiceProfileAdd");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnServiceProfileDelete(const ServiceProfile &profile)
+{
+    FI_HILOGW("OnServiceProfileDelete");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnServiceProfileUpdate(const ServiceProfile &oldProfile,
+    const ServiceProfile& newProfile)
+{
+    FI_HILOGW("OnServiceProfileUpdate");
+    return RET_OK;
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnCharacteristicProfileAdd(
+    const CharacteristicProfile &profile)
+{
+    CALL_INFO_TRACE;
+    return DP_ADAPTER->OnProfileChanged(profile);
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnCharacteristicProfileDelete(
+    const CharacteristicProfile &profile)
+{
+    CALL_INFO_TRACE;
+    return DP_ADAPTER->OnProfileChanged(profile);
+}
+
+int32_t DeviceProfileAdapter::SubscribeDPChangeListener::OnCharacteristicProfileUpdate(
+    const CharacteristicProfile &oldProfile, const CharacteristicProfile &newProfile)
+{
+    CALL_INFO_TRACE;
+    return DP_ADAPTER->OnProfileChanged(newProfile);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
