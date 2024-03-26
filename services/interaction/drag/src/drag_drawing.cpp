@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -962,6 +962,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     float scalingValue = 0.0f;
     if (dragOriginDpi > EPSILON) {
         scalingValue = GetScaling() / dragOriginDpi;
+        CHKPV(g_drawingInfo.pixelMap);
         g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
     }
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
@@ -985,6 +986,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfos[i].pixelMap;
         if (dragOriginDpi > EPSILON) {
             scalingValue = GetScaling() / dragOriginDpi;
+            CHKPV(pixelMap);
             pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         }
         g_drawingInfo.multiSelectedPixelMaps.emplace_back(pixelMap);
@@ -1811,11 +1813,18 @@ void DragDrawing::MultiSelectedAnimation(int32_t positionX, int32_t positionY, i
         } else {
             protocol.SetDuration(LONG_DURATION);
         }
+        CHKPV(g_drawingInfo.pixelMap);
+        CHKPV(multiSelectedNode);
+        CHKPV(multiSelectedPixelMap);
+        int32_t multiSelectedPositionX = positionX + (g_drawingInfo.pixelMap->GetWidth() / TWICE_SIZE) -
+            (multiSelectedPixelMap->GetWidth() / TWICE_SIZE);
+        int32_t multiSelectedPositionY = positionY + (g_drawingInfo.pixelMap->GetHeight() / TWICE_SIZE) -
+            (multiSelectedPixelMap->GetHeight() / TWICE_SIZE);
         Rosen::RSNode::Animate(protocol, Rosen::RSAnimationTimingCurve::EASE_IN_OUT, [&]() {
-            multiSelectedNode->SetBounds(positionX, positionY + adjustSize, multiSelectedPixelMap->GetWidth(),
-                multiSelectedPixelMap->GetHeight());
-            multiSelectedNode->SetFrame(positionX, positionY + adjustSize, multiSelectedPixelMap->GetWidth(),
-                multiSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetBounds(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
+            multiSelectedNode->SetFrame(multiSelectedPositionX, multiSelectedPositionY + adjustSize,
+                multiSelectedPixelMap->GetWidth(), multiSelectedPixelMap->GetHeight());
         });
     }
 }
