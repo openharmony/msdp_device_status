@@ -126,7 +126,6 @@ constexpr float BEZIER_040 { 0.40f };
 constexpr float BEZIER_060 { 0.60f };
 constexpr float BEZIER_067 { 0.67f };
 constexpr float BEZIER_100 { 1.00f };
-constexpr float DEFAULT_OPACITY { 0.95f };
 constexpr float MAX_OPACITY { 1.0f };
 constexpr float MIN_OPACITY { 0.4f };
 constexpr int32_t TIME_DRAG_CHANGE_STYLE { 50 };
@@ -1450,12 +1449,11 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
-        extraInfo.opacity = DEFAULT_OPACITY;
-    }
-    if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) < MIN_OPACITY) {
-        FI_HILOGE("Parser opacity limits abnormal, ret:%{public}f", opacity->valuedouble);
-    } else {
-        extraInfo.opacity = static_cast<float>(opacity->valuedouble);
+        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) < MIN_OPACITY) {
+            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
+        } else {
+            extraInfo.opacity = static_cast<float>(opacity->valuedouble);
+        }
     }
     return true;
 }
