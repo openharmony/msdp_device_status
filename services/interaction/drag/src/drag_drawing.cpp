@@ -1449,13 +1449,14 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_opacity");
-    if (cJSON_IsNumber(opacity)) {
+    if (!cJSON_IsNumber(opacity)) {
         extraInfo.opacity = DEFAULT_OPACITY;
-    }
-    if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) < MIN_OPACITY) {
-        FI_HILOGE("Parser opacity limits abnormal, ret:%{public}f", opacity->valuedouble);
     } else {
-        extraInfo.opacity = static_cast<float>(opacity->valuedouble);
+        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) < MIN_OPACITY) {
+            FI_HILOGE("Parser opacity limits abnormal, ret:%{public}f", opacity->valuedouble);
+        } else {
+            extraInfo.opacity = static_cast<float>(opacity->valuedouble);
+        }
     }
     return true;
 }
