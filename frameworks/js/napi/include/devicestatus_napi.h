@@ -74,6 +74,7 @@ private:
     napi_ref callbackRef_ { nullptr };
     static napi_ref devicestatusValueRef_;
     napi_env env_ { nullptr };
+    inline static std::mutex mutex_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -68,7 +68,7 @@ int32_t DragDFX::WriteModel(const DragType &dragType, Types... paras)
         return RET_ERR;
     }
     auto &[label, dec] = serialStr_[dragType];
-    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<int32_t>(dragType) & 1) ?
+    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(dragType) & 1) ?
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT : OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,

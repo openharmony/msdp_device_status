@@ -38,6 +38,7 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto ret = coordinationListeners_.insert({ COOPERATE_NAME, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
@@ -580,6 +581,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     if (resultObj[1] == nullptr) {
         FI_HILOGE("The object is nullptr");
         napi_close_handle_scope(cb->env, scope);
+        return;
     }
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
@@ -614,7 +616,10 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     for (const auto &item : messageEvent->second) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        CHKPC(item->env);
+        if (item->env == nullptr) {
+            FI_HILOGW("item->env is nullptr, skip then continue");
+            continue
+        }
         if (item->ref != temp->ref) {
             continue;
         }
