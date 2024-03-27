@@ -72,19 +72,20 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     return RET_OK;
 }
 
-bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &udId)
+int32_t DeviceProfileAdapter::GetCrossingSwitchState(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
     DistributedDeviceProfile::CharacteristicProfile profile;
-    if (int32_t ret = DP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile)
-        != RET_OK) {
+    if (int32_t ret = DP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
+        ret != RET_OK) {
         FI_HILOGE("GetCharacteristicProfile failed, ret:%{public}d, udId:%{public}s",
             ret, GetAnonyString(udId).c_str());
+        return RET_ERR;
     }
-    bool state = (profile.GetCharacteristicValue() == "true" ? true : false);
+    state = (profile.GetCharacteristicValue() == "true" ? true : false);
     FI_HILOGD("GetCrossingSwitchState for udId:%{public}s successfully, state:%{public}s",
         GetAnonyString(udId).c_str(),  state ? "true" : "false");
-    return state;
+    return RET_OK;
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &networkId, DPCallback callback)
@@ -198,7 +199,7 @@ int32_t DeviceProfileAdapter::OnProfileChanged(const CharacteristicProfile &prof
     auto switchListener = crossingSwitchListener_[networkId];
     CHKPR(switchListener.dpCallback, RET_ERR);
     bool state = (profile.GetCharacteristicValue() == "true" ? true : false);
-    FI_HILOGE("UdId:%{public}s, networkId:%{public}s, state:%{public}s",
+    FI_HILOGI("UdId:%{public}s, networkId:%{public}s, state:%{public}s",
         GetAnonyString(udId).c_str(), GetAnonyString(networkId).c_str(), state ? "true" : "false");
     switchListener.dpCallback(networkId, state);
     return RET_OK;

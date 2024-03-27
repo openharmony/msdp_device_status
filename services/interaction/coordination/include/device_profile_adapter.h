@@ -37,7 +37,7 @@ public:
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
     int32_t UpdateCrossingSwitchState(bool state);
-    bool GetCrossingSwitchState(const std::string &udId);
+    int32_t GetCrossingSwitchState(const std::string &udId, bool &state);
     int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
     int32_t UnregisterCrossingStateListener(const std::string &networkId);
 
