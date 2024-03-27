@@ -64,7 +64,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     characteristicProfile.SetServiceName(SERVICE_ID);
     characteristicProfile.SetCharacteristicKey(CROSSING_SWITCH_STATE);
     characteristicProfile.SetCharacteristicValue((state ? "true" : "false"));
-    if (int32_t ret = DP_CLIENT.PutCharacteristicProfile(characteristicProfile) != RET_OK) {
+    if (int32_t ret = DP_CLIENT.PutCharacteristicProfile(characteristicProfile); ret != RET_OK) {
         FI_HILOGE("PutCharacteristicProfile failed, ret:%{public}d", ret);
         return RET_ERR;
     }
@@ -76,8 +76,8 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &udId)
 {
     CALL_DEBUG_ENTER;
     DistributedDeviceProfile::CharacteristicProfile profile;
-    if (int32_t ret = DP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile)
-        != RET_OK) {
+    if (int32_t ret = DP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
+        ret != RET_OK) {
         FI_HILOGE("GetCharacteristicProfile failed, ret:%{public}d, udId:%{public}s",
             ret, GetAnonyString(udId).c_str());
     }
@@ -144,7 +144,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &network
     sptr<IProfileChangeListener> subscribeDPChangeListener = new (std::nothrow) SubscribeDPChangeListener;
     CHKPR(subscribeDPChangeListener, RET_ERR);
     subscribeInfo.SetListener(subscribeDPChangeListener);
-    if (int32_t ret = DP_CLIENT.SubscribeDeviceProfile(subscribeInfo) != RET_OK) {
+    if (int32_t ret = DP_CLIENT.SubscribeDeviceProfile(subscribeInfo); ret != RET_OK) {
         FI_HILOGE("SubscribeDeviceProfile failed, ret:%{public}d, udId:%{public}s", ret, GetAnonyString(udId).c_str());
         return RET_ERR;
     }
@@ -164,7 +164,7 @@ int32_t DeviceProfileAdapter::UnregisterProfileListener(const std::string &netwo
         return RET_ERR;
     }
     auto switchListener = crossingSwitchListener_[networkId];
-    if (int32_t ret = DP_CLIENT.UnSubscribeDeviceProfile(switchListener.subscribeInfo) != RET_OK) {
+    if (int32_t ret = DP_CLIENT.UnSubscribeDeviceProfile(switchListener.subscribeInfo); ret != RET_OK) {
         FI_HILOGE("UnSubscribeDeviceProfile failed, ret:%{public}d", ret);
         return RET_ERR;
     }
