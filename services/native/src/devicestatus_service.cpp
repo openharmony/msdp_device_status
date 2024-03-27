@@ -1097,7 +1097,7 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 int32_t DeviceStatusService::OnGetCoordinationStateSync(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
-    if (int32_t ret = COOR_SM->GetCoordinationState(udId, state) != RET_OK) {
+    if (int32_t ret = COOR_SM->GetCoordinationState(udId, state); ret != RET_OK) {
         FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
         return ret;
     }

@@ -44,7 +44,7 @@ std::string GetLocalNetworkId()
 {
     auto packageName = GetCurrentPackageName();
     OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
-    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo) != RET_OK) {
+    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo); errCode != RET_OK) {
         FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
         return {};
     }
@@ -64,7 +64,8 @@ std::string GetLocalUdId()
 std::string GetUdIdByNetworkId(const std::string &networkId)
 {
     std::string udId { "Empty" };
-    if (int32_t errCode = DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udId) != RET_OK) {
+    if (int32_t errCode = DSTB_HARDWARE.GetUdidByNetworkId(GetCurrentPackageName(), networkId, udId);
+        errCode != RET_OK) {
         FI_HILOGE("GetUdIdByNetworkId failed, errCode:%{public}d, networkId:%{public}s, udId:%{public}s", errCode,
             GetAnonyString(networkId).c_str(), GetAnonyString(udId).c_str());
     }
