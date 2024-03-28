@@ -213,7 +213,7 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
     }
     bool state = { false };
     if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
-        FI_HILOGE("GetCrossingSwitchState failed");
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s"GetAnonyString(udId).c_str());
         return RET_ERR;
     }
     FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
@@ -229,7 +229,7 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &udId, bool &stat
         return COMMON_PARAMETER_ERROR;
     }
     if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
-        FI_HILOGE("GetCrossingSwitchState failed");
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s"GetAnonyString(udId).c_str());
         return RET_ERR;
     }
     FI_HILOGD("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
