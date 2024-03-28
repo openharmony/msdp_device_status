@@ -115,6 +115,7 @@ ohos_shared_library("devicestatus_service") {
 
   if (fusion_intention_framework) {
     deps += [
+      "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
       "${device_status_root_path}/intention/adapters/dinput_adapter:intention_dinput_adapter",
       "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
       "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
@@ -180,6 +181,7 @@ ohos_static_library("devicestatus_static_service") {
 
   if (fusion_intention_framework) {
     deps += [
+      "${device_status_root_path}/intention/adapters/ddp_adapter:intention_ddp_adapter",
       "${device_status_root_path}/intention/adapters/dinput_adapter:intention_dinput_adapter",
       "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
       "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
