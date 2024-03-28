@@ -84,18 +84,20 @@ bool StopDragParam::Unmarshalling(MessageParcel &parcel)
     return true;
 }
 
-SetDragWindowVisibleParam::SetDragWindowVisibleParam(bool visible)
-    : visible_(visible)
+SetDragWindowVisibleParam::SetDragWindowVisibleParam(bool visible, bool isForce)
+    : visible_(visible), isForce_(isForce)
 {}
 
 bool SetDragWindowVisibleParam::Marshalling(MessageParcel &parcel) const
 {
-    return parcel.WriteBool(visible_);
+    return (parcel.WriteBool(visible_) &&
+            parcel.WriteBool(isForce_));
 }
 
 bool SetDragWindowVisibleParam::Unmarshalling(MessageParcel &parcel)
 {
-    return parcel.ReadBool(visible_);
+    return (parcel.ReadBool(visible_) &&
+            parcel.ReadBool(isForce_));
 }
 
 UpdateDragStyleParam::UpdateDragStyleParam(DragCursorStyle style)
@@ -171,27 +173,27 @@ bool GetUdKeyReply::Unmarshalling(MessageParcel &parcel)
     return parcel.ReadString(udKey_);
 }
 
-GetShadowOffsetReply::GetShadowOffsetReply(int32_t offsetX, int32_t offsetY, int32_t width, int32_t height)
-    : offsetX_(offsetX), offsetY_(offsetY), width_(width), height_(height)
+GetShadowOffsetReply::GetShadowOffsetReply(const ShadowOffset &shadowOffset)
+    : shadowOffset_(shadowOffset)
 {}
 
 bool GetShadowOffsetReply::Marshalling(MessageParcel &parcel) const
 {
     return (
-        parcel.WriteInt32(offsetX_) &&
-        parcel.WriteInt32(offsetY_) &&
-        parcel.WriteInt32(width_) &&
-        parcel.WriteInt32(height_)
+        parcel.WriteInt32(shadowOffset_.offsetX) &&
+        parcel.WriteInt32(shadowOffset_.offsetY) &&
+        parcel.WriteInt32(shadowOffset_.width) &&
+        parcel.WriteInt32(shadowOffset_.height)
     );
 }
 
 bool GetShadowOffsetReply::Unmarshalling(MessageParcel &parcel)
 {
     return (
-        parcel.ReadInt32(offsetX_) &&
-        parcel.ReadInt32(offsetY_) &&
-        parcel.ReadInt32(width_) &&
-        parcel.ReadInt32(height_)
+        parcel.ReadInt32(shadowOffset_.offsetX) &&
+        parcel.ReadInt32(shadowOffset_.offsetY) &&
+        parcel.ReadInt32(shadowOffset_.width) &&
+        parcel.ReadInt32(shadowOffset_.height)
     );
 }
 
@@ -230,18 +232,18 @@ bool UpdatePreviewAnimationParam::Unmarshalling(MessageParcel &parcel)
     );
 }
 
-GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summaries)
-    : summaries_(std::move(summaries))
+GetDragSummaryReply::GetDragSummaryReply(std::map<std::string, int64_t> &&summary)
+    : summary_(std::move(summary))
 {}
 
 bool GetDragSummaryReply::Marshalling(MessageParcel &parcel) const
 {
-    return (SummaryPacker::Marshalling(summaries_, parcel) == RET_OK);
+    return (SummaryPacker::Marshalling(summary_, parcel) == RET_OK);
 }
 
 bool GetDragSummaryReply::Unmarshalling(MessageParcel &parcel)
 {
-    return (SummaryPacker::UnMarshalling(parcel, summaries_) == RET_OK);
+    return (SummaryPacker::UnMarshalling(parcel, summary_) == RET_OK);
 }
 
 GetDragStateReply::GetDragStateReply(DragState dragState)

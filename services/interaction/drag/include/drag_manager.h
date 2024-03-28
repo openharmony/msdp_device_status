@@ -31,39 +31,47 @@
 #include "event_hub.h"
 #include "i_context.h"
 #include "state_change_notify.h"
-#include "stream_session.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 class DragManager : public IDragManager {
 public:
-    DragManager() {}
+    DragManager() = default;
     DISALLOW_COPY_AND_MOVE(DragManager);
     ~DragManager();
 
     int32_t Init(IContext* context);
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    void OnSessionLost(SocketSessionPtr session);
+    int32_t AddListener(int32_t pid) override;
+    int32_t RemoveListener(int32_t pid) override;
+    int32_t AddSubscriptListener(int32_t pid) override;
+    int32_t RemoveSubscriptListener(int32_t pid) override;
+    int32_t StartDrag(const DragData &dragData, int32_t pid) override;
+#else
     void OnSessionLost(SessionPtr session);
-    int32_t AddListener(SessionPtr session);
-    int32_t RemoveListener(SessionPtr session);
-    int32_t AddSubscriptListener(SessionPtr session);
-    int32_t RemoveSubscriptListener(SessionPtr session);
+    int32_t AddListener(SessionPtr session) override;
+    int32_t RemoveListener(SessionPtr session) override;
+    int32_t AddSubscriptListener(SessionPtr session) override;
+    int32_t RemoveSubscriptListener(SessionPtr session) override;
     int32_t StartDrag(const DragData &dragData, SessionPtr sess) override;
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t StopDrag(const DragDropResult &dropResult) override;
-    int32_t GetDragTargetPid() const;
-    int32_t GetUdKey(std::string &udKey) const;
+    int32_t GetDragTargetPid() const override;
+    int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
-    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid);
-    int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
-    int32_t GetDragData(DragData &dragData);
-    int32_t GetDragState(DragState &dragState);
+    int32_t UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid) override;
+    int32_t UpdateShadowPic(const ShadowInfo &shadowInfo) override;
+    int32_t GetDragData(DragData &dragData) override;
+    int32_t GetDragState(DragState &dragState) override;
     void GetAllowDragState(bool &isAllowDrag) override;
     void DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     int32_t OnSetDragWindowVisible(bool visible, bool isForce = false) override;
     MMI::ExtraData GetExtraData(bool appended) const override;
-    int32_t OnGetShadowOffset(ShadowOffset &shadowOffset);
+    int32_t OnGetShadowOffset(ShadowOffset &shadowOffset) override;
     void Dump(int32_t fd) const override;
     void RegisterStateChange(std::function<void(DragState)> callback) override;
     void RegisterNotifyPullUp(std::function<void(bool)> callback) override;
@@ -75,12 +83,12 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle) override;
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
         const PreviewAnimation &animation) override;
-    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys);
+    int32_t GetDragSummary(std::map<std::string, int64_t> &summarys) override;
     void DragKeyEventCallback(std::shared_ptr<MMI::KeyEvent> keyEvent);
-    int32_t EnterTextEditorArea(bool enable);
-    int32_t GetDragAction(DragAction &dragAction) const;
-    int32_t GetExtraInfo(std::string &extraInfo) const;
-    int32_t AddPrivilege(int32_t tokenId);
+    int32_t EnterTextEditorArea(bool enable) override;
+    int32_t GetDragAction(DragAction &dragAction) const override;
+    int32_t GetExtraInfo(std::string &extraInfo) const override;
+    int32_t AddPrivilege(int32_t tokenId) override;
     int32_t RotateDragWindow(Rosen::Rotation rotation) override;
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
     class InterceptorConsumer : public MMI::IInputEventConsumer {
@@ -146,7 +154,11 @@ private:
 #ifdef OHOS_DRAG_ENABLE_MONITOR
     int32_t pointerEventMonitorId_ { -1 };
 #endif //OHOS_DRAG_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    SocketSessionPtr dragOutSession_ { nullptr };
+#else
     SessionPtr dragOutSession_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     DragDrawing dragDrawing_;
     IContext* context_ { nullptr };
     std::function<void(DragState)> stateChangedCallback_ { nullptr };
