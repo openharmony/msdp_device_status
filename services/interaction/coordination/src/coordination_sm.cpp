@@ -298,7 +298,10 @@ int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
     uint64_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
-    SetFirstCallerTokenID(tokenId);
+    int ret = SetFirstCallerTokenID(tokenId);
+    if (ret == RET_OK) {
+        FI_HILOGE("Succeed to SetFirstCallerTokenID");
+    }
     auto enterStamp = std::chrono::high_resolution_clock::now();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
