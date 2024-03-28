@@ -24,6 +24,8 @@
 #include "display_manager.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
+#include "ipc_skeleton.h"
+#include "token_setproc.h"
 #include "distributed_file_daemon_manager.h"
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
@@ -295,6 +297,8 @@ void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
 int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
+    uint64_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    SetFirstCallerTokenID(tokenId);
     auto enterStamp = std::chrono::high_resolution_clock::now();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());
