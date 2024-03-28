@@ -136,6 +136,13 @@ constexpr int32_t TIME_STOP_SUCCESS_STYLE { 150 };
 constexpr int32_t TIME_STOP { 0 };
 constexpr int64_t TIME_SLEEP { 30000 };
 constexpr int32_t INTERRUPT_SCALE { 15 };
+constexpr float MAX_SCREEN_WIDTH_SM { 320.0f };
+constexpr float MAX_SCREEN_WIDTH_MD { 600.0f };
+constexpr float MAX_SCREEN_WIDTH_LG { 840.0f };
+constexpr float MAX_SCREEN_WIDTH_XL { 1024.0f };
+constexpr float SCALE_SM { 3.0f / 4 };
+constexpr float SCALE_MD { 4.0f / 8 };
+constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
@@ -957,15 +964,22 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         return;
     }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
+    g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
+    g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
     float scalingValue = 0.0f;
     if (dragOriginDpi > EPSILON) {
         scalingValue = GetScaling() / dragOriginDpi;
         CHKPV(g_drawingInfo.pixelMap);
         g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
+        g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * scalingValue;
+        g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * scalingValue;
     }
-    g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
-    g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
+    float widthScale = CalculateWidthScale();
+    CHKPV(g_drawingInfo.pixelMap);
+    g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+    g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
+    g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
     g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
     g_drawingInfo.lastPixelMapY = g_drawingInfo.pixelMapY;
     g_drawingInfo.currentDragNum = dragData.dragNum;
@@ -2342,6 +2356,89 @@ void DrawDragStopModifier::SetStyleAlpha(float alpha)
         styleAlpha_->Set(alpha);
     }
     FI_HILOGD("leave");
+}
+
+float DragDrawing::CalculateWidthScale()
+{
+    sptr<Rosen::Display> display = Rosen::DisplayManager::GetInstance().GetDisplayById(g_drawingInfo.displayId);
+    if (display == nullptr) {
+        FI_HILOGD("Get display info failed, display:%{public}d", g_drawingInfo.displayId);
+        display = Rosen::DisplayManager::GetInstance().GetDisplayById(0);
+        if (display == nullptr) {
+            FI_HILOGE("Get display info failed, display is nullptr");
+            return DEFAULT_SCALING;
+        }
+    }
+    auto defaultDisplay = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    if (defaultDisplay == nullptr) {
+        FI_HILOGE("defaultDisplay is nullptr");
+        return DEFAULT_SCALING;
+    }
+    int32_t width = display->GetWidth();
+    float density = defaultDisplay->GetVirtualPixelRatio();
+    FI_HILOGD("density:%{public}f, width:%{public}d", density, width);
+    if (width < MAX_SCREEN_WIDTH_SM * density) {
+        currentScreenSize_ = ScreenSizeType::XS;
+    } else if (width < MAX_SCREEN_WIDTH_MD * density) {
+        currentScreenSize_ = ScreenSizeType::SM;
+    } else if (width < MAX_SCREEN_WIDTH_LG * density) {
+        currentScreenSize_ = ScreenSizeType::MD;
+    } else if (width < MAX_SCREEN_WIDTH_XL * density) {
+        currentScreenSize_ = ScreenSizeType::LG;
+    } else {
+        currentScreenSize_ = ScreenSizeType::XL;
+    }
+    float widthScale = GetMaxWidthScale(width);
+    return widthScale;
+}
+
+float DragDrawing::GetMaxWidthScale(int32_t width)
+{
+    float scale = 1.0;
+    float widthScale = 1.0;
+    if (g_drawingInfo.pixelMap == nullptr) {
+        FI_HILOGE("pixelMap is nullptr");
+        return DEFAULT_SCALING;
+    }
+    int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
+    if (pixelMapWidth == 0) {
+        FI_HILOGW("pixelMapWidth is 0");
+        return DEFAULT_SCALING;
+    }
+    switch (currentScreenSize_) {
+        case ScreenSizeType::XS: {
+            return widthScale;
+        }
+        case ScreenSizeType::SM: {
+            scale = width * SCALE_SM;
+            if (pixelMapWidth > scale) {
+                widthScale = scale / pixelMapWidth;
+                return widthScale;
+            }
+            return widthScale;
+        }
+        case ScreenSizeType::MD: {
+            scale = width * SCALE_MD;
+            if (pixelMapWidth > scale) {
+                widthScale = scale / pixelMapWidth;
+                return widthScale;
+            }
+            return widthScale;
+        }
+        case ScreenSizeType::LG: {
+            scale = width * SCALE_LG;
+            if (pixelMapWidth > scale) {
+                widthScale = scale / pixelMapWidth;
+                return widthScale;
+            }
+            return widthScale;
+        }
+        default: {
+            FI_HILOGI("Screen Size Type is XL");
+            break;
+        }
+    }
+    return widthScale;
 }
 } // namespace DeviceStatus
 } // namespace Msdp
