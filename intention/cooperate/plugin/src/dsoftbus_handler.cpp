@@ -51,7 +51,10 @@ int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
-    SetFirstCallerTokenID(tokenId);
+    int ret = SetFirstCallerTokenID(tokenId);
+    if (ret == RET_OK) {
+        FI_HILOGE("Succeed to SetFirstCallerTokenID");
+    }
     return env_->GetDSoftbus().OpenSession(networkId);
 }
 
