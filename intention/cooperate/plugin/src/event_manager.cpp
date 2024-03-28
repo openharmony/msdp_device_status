@@ -86,6 +86,36 @@ void EventManager::StartCooperate(const StartCooperateEvent &event)
     calls_[EventType::START] = eventInfo;
 }
 
+void EventManager::RegisterEventListener(const RegisterEventListenerEvent &event)
+{
+    // 参考其他注册接口的实现
+    std::shared_ptr<EventInfo> eventInfo = std::make_shared<EventInfo>();
+    eventInfo->type = EventType::LISTENER;
+    eventInfo->msgId = MessageId::COORDINATION_ADD_LISTENER;
+    eventInfo->pid = event.pid;
+
+    FI_HILOGI("Add cooperate listener (%{public}d)", eventInfo->pid);
+    auto iter = std::find_if(listeners_.begin(), listeners_.end(),
+        [eventInfo](const auto &item) {
+            return ((item != nullptr) && (item->pid == eventInfo->pid));
+        });
+    if (iter != listeners_.end()) {
+        *iter = eventInfo;
+    } else {
+        listeners_.emplace_back(eventInfo);
+    }
+}
+
+void EventManager::UnregisterEventListener(const UnregisterEventListenerEvent &event)
+{
+    // 参考其他注册接口的实现
+    FI_HILOGI("Remove cooperate listener (%{public}d)", event.pid);
+    listeners_.erase(std::remove_if(listeners_.begin(), listeners_.end(),
+        [pid = event.pid](const auto &item) {
+            return ((item == nullptr) || (item->pid == pid));
+        }), listeners_.end());
+}
+
 void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event)
 {
     CALL_DEBUG_ENTER;

@@ -112,7 +112,7 @@ public:
      * @param udId Indicates the descriptor of the input device.
      * @param state Indicates the state of crossing switch.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
-     * @since 10
+     * @since 12
      */
     int32_t GetCoordinationState(const std::string &udId, bool &state);
 

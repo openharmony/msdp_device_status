@@ -58,6 +58,8 @@ public:
     void EnableCooperate(const EnableCooperateEvent &event);
     void DisableCooperate(const DisableCooperateEvent &event);
     void StartCooperate(const StartCooperateEvent &event);
+    void RegisterEventListener(const RegisterEventListenerEvent &event);
+    void UnregisterEventListener(const UnregisterEventListenerEvent &event);
     void StartCooperateFinish(const DSoftbusStartCooperateFinished &event);
     void RemoteStart(const DSoftbusStartCooperate &event);
     void RemoteStartFinish(const DSoftbusStartCooperateFinished &event);

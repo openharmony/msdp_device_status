@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,50 @@
  * limitations under the License.
  */
 
-#ifndef COORDINATION_UTIL_H
-#define COORDINATION_UTIL_H
+#include "mouse_location.h"
 
-#include <string>
+#include "display_manager.h"
+
+#include "devicestatus_define.h"
+
+#undef LOG_TAG
+#define LOG_TAG "HotArea"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace Cooperate {
+namespace {
+constexpr int32_t HOT_AREA_WIDTH { 100 };
+constexpr int32_t HOT_AREA_MARGIN { 200 };
+}; // namespace
 
-namespace COORDINATION {
-std::string GetCurrentPackageName();
-std::string GetLocalNetworkId();
-std::string GetLocalUdId();
-std::string GetUdIdByNetworkId(const std::string &networkId);
+void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
+{
 
-} // namespace COORDINATION
+}
+
+void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
+{
+
+}
+
+void MouseLocation::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent)
+{
+
+}
+
+void MouseLocation::OnMouseLocationMessage()
+{
+
+}
+
+void MouseLocation::NotifySubscriber()
+{
+    
+}
+
+} // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
-#endif // COORDINATION_UTIL_H

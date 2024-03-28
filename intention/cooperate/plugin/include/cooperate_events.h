@@ -42,6 +42,8 @@ enum class CooperateEventType {
     START,
     STOP,
     GET_COOPERATE_STATE,
+    REGISTER_EVENT_LISTENER,
+    UNREGISTER_EVENT_LISTENER,
     DUMP,
     APP_CLOSED,
     DDM_BOARD_ONLINE,
@@ -87,6 +89,7 @@ using RegisterHotareaListenerEvent = RegisterListenerEvent;
 using UnregisterHotareaListenerEvent = RegisterListenerEvent;
 using EnableCooperateEvent = RegisterListenerEvent;
 using DisableCooperateEvent = RegisterListenerEvent;
+using UnregisterEventListenerEvent = RegisterEventListenerEvent;
 
 struct StartCooperateEvent {
     int32_t pid;
@@ -107,6 +110,11 @@ struct GetCooperateStateEvent {
     std::string networkId;
 };
 
+
+struct RegisterEventListenerEvent {
+    int32_t pid;
+    std::string networkId;
+};
 struct DumpEvent {
     int32_t fd;
 };
@@ -157,6 +165,20 @@ struct DSoftbusRelayCooperate {
     std::string targetNetworkId;
     bool normal;
 };
+
+struct DSoftbusSubscribeMouseLocation {
+
+};
+
+struct DSoftbusRelaySubscribeMouseLocation {
+
+};
+
+
+struct DSoftbusSyncMouseLocation {
+
+};
+
 
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
 

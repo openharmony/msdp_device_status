@@ -117,6 +117,18 @@ private:
     std::shared_ptr<Rosen::RSAnimatableProperty<float>> scale_ { nullptr };
 };
 
+struct FilterInfo {
+    float dipScale { 0.0f };
+};
+
+struct ExtraInfo {
+    std::string componentType;
+    int32_t blurStyle { -1 };
+    float cornerRadius { 0.0f };
+    bool allowDistributed { false };
+    float opacity { 0.95f };
+};
+
 struct DrawingInfo {
     std::atomic_bool isRunning { false };
     std::atomic_bool isPreviousDefaultStyle { false };
@@ -146,15 +158,8 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
-    std::string extraInfo;
-    std::string filterInfo;
-};
-
-struct FilterInfo {
-    std::string componentType;
-    int32_t blurStyle { -1 };
-    float cornerRadius { 0.0F };
-    float dipScale { 0.0F };
+    ExtraInfo extraInfo;
+    FilterInfo filterInfo;
 };
 
 class DragDrawing : public IDragAnimation {
@@ -215,8 +220,9 @@ private:
     int32_t GetFilePath(std::string &filePath);
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
-    bool ParserFilterInfo(FilterInfo &filterInfo);
+    bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ProcessFilter();
+    bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
     void DoDrawMouse();
     int32_t UpdateDefaultDragStyle(DragCursorStyle style);

@@ -28,6 +28,8 @@ enum CooperateRequestID : uint32_t {
     REGISTER_HOTAREA_LISTENER,
     UNREGISTER_HOTAREA_LISTENER,
     GET_COOPERATE_STATE,
+    REGISTER_EVENT_LISTENER,
+    UNREGISTER_EVENT_LISTENER,
 };
 
 struct StartCooperateParam final : public ParamBase {
@@ -64,6 +66,17 @@ struct GetCooperateStateParam final : public ParamBase {
     int32_t userData { -1 };
     bool checkPermission { false };
 };
+
+struct RegisterEventListenerParam final : public ParamBase {
+    RegisterEventListenerParam() = default;
+    RegisterEventListenerParam(const std::string &networkId);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+    std::string networkId;
+};
+
+using UnregisterEventListenerParam = RegisterEventListenerParam;
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

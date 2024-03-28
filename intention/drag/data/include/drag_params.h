@@ -40,6 +40,7 @@ enum DragRequestID : uint32_t {
     UPDATE_PREVIEW_STYLE_WITH_ANIMATION,
     GET_DRAG_SUMMARY,
     GET_DRAG_STATE,
+    ADD_PRIVILEGE,
     ENTER_TEXT_EDITOR_AREA,
     GET_DRAG_ACTION,
     GET_EXTRA_INFO,
@@ -47,7 +48,7 @@ enum DragRequestID : uint32_t {
 
 struct StartDragParam final : public ParamBase {
     StartDragParam(DragData &dragData);
-    StartDragParam(const DragData &dragData);
+    explicit StartDragParam(const DragData &dragData);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -63,7 +64,7 @@ struct StartDragParam final : public ParamBase {
 
 struct StopDragParam final : public ParamBase {
     StopDragParam() = default;
-    StopDragParam(const DragDropResult &dropResult);
+    explicit StopDragParam(const DragDropResult &dropResult);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -73,17 +74,18 @@ struct StopDragParam final : public ParamBase {
 
 struct SetDragWindowVisibleParam final : public ParamBase {
     SetDragWindowVisibleParam() = default;
-    SetDragWindowVisibleParam(bool visible);
+    SetDragWindowVisibleParam(bool visible, bool isForce);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 
     bool visible_ { false };
+    bool isForce_ { false };
 };
 
 struct UpdateDragStyleParam final : public ParamBase {
     UpdateDragStyleParam() = default;
-    UpdateDragStyleParam(DragCursorStyle style);
+    explicit UpdateDragStyleParam(DragCursorStyle style);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -93,7 +95,7 @@ struct UpdateDragStyleParam final : public ParamBase {
 
 struct UpdateShadowPicParam final : public ParamBase {
     UpdateShadowPicParam() = default;
-    UpdateShadowPicParam(const ShadowInfo &shadowInfo);
+    explicit UpdateShadowPicParam(const ShadowInfo &shadowInfo);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -103,7 +105,7 @@ struct UpdateShadowPicParam final : public ParamBase {
 
 struct GetDragTargetPidReply : public ParamBase {
     GetDragTargetPidReply() = default;
-    GetDragTargetPidReply(int32_t pid);
+    explicit GetDragTargetPidReply(int32_t pid);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -113,7 +115,7 @@ struct GetDragTargetPidReply : public ParamBase {
 
 struct GetUdKeyReply final : public ParamBase {
     GetUdKeyReply() = default;
-    GetUdKeyReply(std::string &&udKey);
+    explicit GetUdKeyReply(std::string &&udKey);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -123,22 +125,19 @@ struct GetUdKeyReply final : public ParamBase {
 
 struct GetShadowOffsetReply final : public ParamBase {
     GetShadowOffsetReply() = default;
-    GetShadowOffsetReply(int32_t offsetX, int32_t offsetY, int32_t width, int32_t height);
+    explicit GetShadowOffsetReply(const ShadowOffset &shadowOffset);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 
-    int32_t offsetX_ { -1 };
-    int32_t offsetY_ { -1 };
-    int32_t width_ { -1 };
-    int32_t height_ { -1 };
+    ShadowOffset shadowOffset_ {};
 };
 
 using GetDragDataReply = StartDragParam;
 
 struct UpdatePreviewStyleParam final : public ParamBase {
     UpdatePreviewStyleParam() = default;
-    UpdatePreviewStyleParam(const PreviewStyle &previewStyle);
+    explicit UpdatePreviewStyleParam(const PreviewStyle &previewStyle);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -159,17 +158,17 @@ struct UpdatePreviewAnimationParam final : public ParamBase {
 
 struct GetDragSummaryReply final : public ParamBase {
     GetDragSummaryReply() = default;
-    GetDragSummaryReply(std::map<std::string, int64_t> &&summaries);
+    explicit GetDragSummaryReply(std::map<std::string, int64_t> &&summary);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 
-    std::map<std::string, int64_t> summaries_;
+    std::map<std::string, int64_t> summary_;
 };
 
 struct GetDragStateReply final : public ParamBase {
     GetDragStateReply() = default;
-    GetDragStateReply(DragState dragState);
+    explicit GetDragStateReply(DragState dragState);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -179,7 +178,7 @@ struct GetDragStateReply final : public ParamBase {
 
 struct EnterTextEditorAreaParam final : public ParamBase {
     EnterTextEditorAreaParam() = default;
-    EnterTextEditorAreaParam(bool enable);
+    explicit EnterTextEditorAreaParam(bool enable);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -189,7 +188,7 @@ struct EnterTextEditorAreaParam final : public ParamBase {
 
 struct GetDragActionReply final : public ParamBase {
     GetDragActionReply() = default;
-    GetDragActionReply(DragAction dragAction);
+    explicit GetDragActionReply(DragAction dragAction);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
@@ -199,7 +198,7 @@ struct GetDragActionReply final : public ParamBase {
 
 struct GetExtraInfoReply final : public ParamBase {
     GetExtraInfoReply() = default;
-    GetExtraInfoReply(std::string &&extraInfo);
+    explicit GetExtraInfoReply(std::string &&extraInfo);
 
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;

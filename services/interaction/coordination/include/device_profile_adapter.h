@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,40 +20,67 @@
 #include <memory>
 #include <vector>
 
-#include "iprofile_event_callback.h"
+#include "coordination_util.h"
+#include "dp_subscribe_info.h"
 #include "nocopyable.h"
+#include "profile_change_listener_stub.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+using namespace OHOS::DistributedDeviceProfile;
 class DeviceProfileAdapter final {
     DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
-    class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
-    public:
-        void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
-    };
 public:
     using DPCallback = std::function<void(const std::string &, bool)>;
-    using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
-    int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
     int32_t UpdateCrossingSwitchState(bool state);
-    bool GetCrossingSwitchState(const std::string &networkIdOrUdId);
-    int32_t UnregisterCrossingStateListener(const std::string &networkId);
+    bool GetCrossingSwitchState(const std::string &udId);
     int32_t RegisterCrossingStateListener(const std::string &networkId, DPCallback callback);
+    int32_t UnregisterCrossingStateListener(const std::string &networkId);
 
 private:
-    void OnProfileChanged(const std::string &networkId);
-    int32_t RegisterProfileListener(const std::string &networkId);
-    std::mutex adapterLock_;
-    std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
-    std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
-    const std::string characteristicsName_ { "currentStatus" };
-};
+    void OnDeviceOnline(const std::string &networkId);
+    void OnDeviceOffline(const std::string &networkId);
+    int32_t RegisterProfileListener(const std::string &networkId, DPCallback callback);
+    int32_t UnregisterProfileListener(const std::string &networkId);
+    std::string GetNetworkIdByUdId(const std::string &udId);
+    int32_t OnProfileChanged(const CharacteristicProfile &profile);
 
+    struct CrossingSwitchListener {
+        SubscribeInfo subscribeInfo;
+        DPCallback dpCallback;
+    };
+
+private:
+    std::mutex adapterLock_;
+    std::unordered_map<std::string, CrossingSwitchListener> crossingSwitchListener_;
+    std::unordered_map<std::string, std::string> onlineDevUdId2NetworkId_;
+    bool serviceProfileExist_ { false };
+
+    class SubscribeDPChangeListener : public OHOS::DistributedDeviceProfile::ProfileChangeListenerStub {
+    public:
+        SubscribeDPChangeListener();
+        ~SubscribeDPChangeListener();
+        int32_t OnTrustDeviceProfileAdd(const TrustDeviceProfile &profile);
+        int32_t OnTrustDeviceProfileDelete(const TrustDeviceProfile &profile);
+        int32_t OnTrustDeviceProfileUpdate(const TrustDeviceProfile &oldProfile, const TrustDeviceProfile &newProfile);
+        int32_t OnDeviceProfileAdd(const DeviceProfile &profile);
+        int32_t OnDeviceProfileDelete(const DeviceProfile &profile);
+        int32_t OnDeviceProfileUpdate(const DeviceProfile &oldProfile, const DeviceProfile &newProfile);
+        int32_t OnServiceProfileAdd(const ServiceProfile &profile);
+        int32_t OnServiceProfileDelete(const ServiceProfile &profile);
+        int32_t OnServiceProfileUpdate(const ServiceProfile &oldProfile, const ServiceProfile &newProfile);
+        int32_t OnCharacteristicProfileAdd(const CharacteristicProfile &profile);
+        int32_t OnCharacteristicProfileDelete(const CharacteristicProfile &profile);
+        int32_t OnCharacteristicProfileUpdate(const CharacteristicProfile &oldProfile,
+        const CharacteristicProfile &newProfile);
+    };
+};
 #define DP_ADAPTER OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()
+#define DP_CLIENT DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance()
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -25,8 +25,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-DragServer::DragServer(IContext *context)
-    : context_(context)
+DragServer::DragServer(IContext *env)
+    : env_(env)
 {}
 
 int32_t DragServer::Enable(CallingContext &context, MessageParcel &data, MessageParcel &reply)
@@ -51,9 +51,7 @@ int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageP
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-    CHKPR(context_, RET_ERR);
-    FI_HILOGD("Start drag");
-    return RET_OK;
+    return env_->GetDragManager().StartDrag(dragData, context.pid);
 }
 
 int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessageParcel &reply)
@@ -65,9 +63,7 @@ int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessagePa
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-    CHKPR(context_, RET_ERR);
-    FI_HILOGD("Stop drag");
-    return RET_OK;
+    return env_->GetDragManager().StopDrag(param.dropResult_);
 }
 
 int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
@@ -75,12 +71,12 @@ int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel
     CALL_DEBUG_ENTER;
     switch (id) {
         case DragRequestID::ADD_DRAG_LISTENER: {
-            FI_HILOGD("Add drag listener");
-            return RET_OK;
+            FI_HILOGI("Add drag listener, from:%{public}d", context.pid);
+            return env_->GetDragManager().AddListener(context.pid);
         }
         case DragRequestID::ADD_SUBSCRIPT_LISTENER: {
-            FI_HILOGD("Add subscript listener");
-            return RET_OK;
+            FI_HILOGD("Add subscript listener, from:%{public}d", context.pid);
+            return env_->GetDragManager().AddSubscriptListener(context.pid);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -93,13 +89,13 @@ int32_t DragServer::RemoveWatch(CallingContext &context, uint32_t id, MessagePar
 {
     CALL_DEBUG_ENTER;
     switch (id) {
-        case DragRequestID::ADD_DRAG_LISTENER: {
-            FI_HILOGD("Remove drag listener");
-            return RET_OK;
+        case DragRequestID::REMOVE_DRAG_LISTENER: {
+            FI_HILOGD("Remove drag listener, from:%{public}d", context.pid);
+            return env_->GetDragManager().RemoveListener(context.pid);
         }
-        case DragRequestID::ADD_SUBSCRIPT_LISTENER: {
-            FI_HILOGD("Remove subscript listener");
-            return RET_OK;
+        case DragRequestID::REMOVE_SUBSCRIPT_LISTENER: {
+            FI_HILOGD("Remove subscript listener, from:%{public}d", context.pid);
+            return env_->GetDragManager().RemoveSubscriptListener(context.pid);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -112,15 +108,20 @@ int32_t DragServer::SetParam(CallingContext &context, uint32_t id, MessageParcel
 {
     CALL_DEBUG_ENTER;
     switch (id) {
+        case DragRequestID::SET_DRAG_WINDOW_VISIBLE: {
+            return SetDragWindowVisible(context, data, reply);
+        }
+        case DragRequestID::UPDATE_DRAG_STYLE: {
+            return UpdateDragStyle(context, data, reply);
+        }
         case DragRequestID::UPDATE_SHADOW_PIC: {
-            UpdateShadowPicParam param {};
-
-            if (!param.Unmarshalling(data)) {
-                FI_HILOGE("UpdateShadowPicParam::Unmarshalling fail");
-                return RET_ERR;
-            }
-            FI_HILOGD("Updata shadow pic");
-            return RET_OK;
+            return UpdateShadowPic(context, data, reply);
+        }
+        case DragRequestID::UPDATE_PREVIEW_STYLE: {
+            return UpdatePreviewStyle(context, data, reply);
+        }
+        case DragRequestID::UPDATE_PREVIEW_STYLE_WITH_ANIMATION: {
+            return UpdatePreviewAnimation(context, data, reply);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -133,16 +134,37 @@ int32_t DragServer::GetParam(CallingContext &context, uint32_t id, MessageParcel
 {
     CALL_DEBUG_ENTER;
     switch (id) {
+        case DragRequestID::GET_DRAG_TARGET_PID: {
+            FI_HILOGI("Get drag target pid, from:%{public}d", context.pid);
+            return GetDragTargetPid(context, data, reply);
+        }
+        case DragRequestID::GET_UDKEY: {
+            FI_HILOGI("Get udkey, from:%{public}d", context.pid);
+            return GetUdKey(context, data, reply);
+        }
+        case DragRequestID::GET_SHADOW_OFFSET: {
+            FI_HILOGI("Get shadow offset, from:%{public}d", context.pid);
+            return GetShadowOffset(context, data, reply);
+        }
         case DragRequestID::GET_DRAG_DATA: {
-            DragData dragData {};
-            FI_HILOGD("Get drag data");
-            GetDragDataReply dragDataReply { dragData };
-
-            if (!dragDataReply.Marshalling(reply)) {
-                FI_HILOGE("GetDragDataReply::Marshalling fail");
-                return RET_ERR;
-            }
-            return RET_OK;
+            FI_HILOGI("Get drag data, from:%{public}d", context.pid);
+            return GetDragData(context, data, reply);
+        }
+        case DragRequestID::GET_DRAG_STATE: {
+            FI_HILOGI("Get drag state, from:%{public}d", context.pid);
+            return GetDragState(context, data, reply);
+        }
+        case DragRequestID::GET_DRAG_SUMMARY: {
+            FI_HILOGI("Get drag summary, from:%{public}d", context.pid);
+            return GetDragSummary(context, data, reply);
+        }
+        case DragRequestID::GET_DRAG_ACTION: {
+            FI_HILOGI("Get drag action, from:%{public}d", context.pid);
+            return GetDragAction(context, data, reply);
+        }
+        case DragRequestID::GET_EXTRA_INFO: {
+            FI_HILOGI("Get extra info, from:%{public}d", context.pid);
+            return GetExtraInfo(context, data, reply);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -154,7 +176,227 @@ int32_t DragServer::GetParam(CallingContext &context, uint32_t id, MessageParcel
 int32_t DragServer::Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    switch (id) {
+        case DragRequestID::ADD_PRIVILEGE: {
+            FI_HILOGI("Add privilege, from:%{public}d", context.pid);
+            return env_->GetDragManager().AddPrivilege(context.tokenId);
+        }
+        case DragRequestID::ENTER_TEXT_EDITOR_AREA: {
+            FI_HILOGI("Enter text editor area, from:%{public}d", context.pid);
+            return EnterTextEditorArea(context, data, reply);
+        }
+        default: {
+            FI_HILOGE("Unexpected request ID (%{public}u)", id);
+            return RET_ERR;
+        }
+    }
+}
+
+int32_t DragServer::SetDragWindowVisible(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    SetDragWindowVisibleParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("SetDragWindowVisibleParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    FI_HILOGI("SetDragWindowVisible(%{public}d, %{public}d)", param.visible_, param.isForce_);
+    return env_->GetDragManager().OnSetDragWindowVisible(param.visible_, param.isForce_);
+}
+
+int32_t DragServer::UpdateDragStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    UpdateDragStyleParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("UpdateDragStyleParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    FI_HILOGI("UpdateDragStyle(%{public}d)", static_cast<int32_t>(param.cursorStyle_));
+    return env_->GetDragManager().UpdateDragStyle(param.cursorStyle_, context.pid, context.tokenId);
+}
+
+int32_t DragServer::UpdateShadowPic(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    UpdateShadowPicParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("UpdateShadowPicParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    FI_HILOGD("Updata shadow pic");
+    return env_->GetDragManager().UpdateShadowPic(param.shadowInfo_);
+}
+
+int32_t DragServer::UpdatePreviewStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    UpdatePreviewStyleParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("UpdatePreviewStyleParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return env_->GetDragManager().UpdatePreviewStyle(param.previewStyle_);
+}
+
+int32_t DragServer::UpdatePreviewAnimation(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    UpdatePreviewAnimationParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("UpdatePreviewAnimationParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return env_->GetDragManager().UpdatePreviewStyleWithAnimation(param.previewStyle_, param.previewAnimation_);
+}
+
+int32_t DragServer::GetDragTargetPid(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    int32_t targetPid = env_->GetDragManager().GetDragTargetPid();
+    GetDragTargetPidReply targetPidReply { targetPid };
+
+    if (!targetPidReply.Marshalling(reply)) {
+        FI_HILOGE("GetDragTargetPidReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetUdKey(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    std::string udKey;
+
+    int32_t ret = env_->GetDragManager().GetUdKey(udKey);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetUdKey fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetUdKeyReply udKeyReply { std::move(udKey) };
+
+    if (!udKeyReply.Marshalling(reply)) {
+        FI_HILOGE("GetUdKeyReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetShadowOffset(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    ShadowOffset shadowOffset {};
+
+    int32_t ret = env_->GetDragManager().OnGetShadowOffset(shadowOffset);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetShadowOffset fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetShadowOffsetReply shadowOffsetReply { shadowOffset };
+
+    if (!shadowOffsetReply.Marshalling(reply)) {
+        FI_HILOGE("GetShadowOffsetReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetDragData(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    DragData dragData {};
+
+    int32_t ret = env_->GetDragManager().GetDragData(dragData);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetDragData fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetDragDataReply dragDataReply { dragData };
+
+    if (!dragDataReply.Marshalling(reply)) {
+        FI_HILOGE("GetDragDataReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetDragState(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    DragState dragState {};
+
+    int32_t ret = env_->GetDragManager().GetDragState(dragState);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetDragState fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetDragStateReply dragStateReply { dragState };
+
+    if (!dragStateReply.Marshalling(reply)) {
+        FI_HILOGE("GetDragStateReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    std::map<std::string, int64_t> summaries;
+
+    int32_t ret = env_->GetDragManager().GetDragSummary(summaries);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetDragSummary fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetDragSummaryReply summaryReply { std::move(summaries) };
+
+    if (!summaryReply.Marshalling(reply)) {
+        FI_HILOGE("GetDragSummaryReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    DragAction dragAction {};
+
+    int32_t ret = env_->GetDragManager().GetDragAction(dragAction);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetDragSummary fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetDragActionReply dragActionReply { dragAction };
+
+    if (!dragActionReply.Marshalling(reply)) {
+        FI_HILOGE("GetDragActionReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    std::string extraInfo;
+
+    int32_t ret = env_->GetDragManager().GetExtraInfo(extraInfo);
+    if (ret != RET_OK) {
+        FI_HILOGE("IDragManager::GetExtraInfo fail, error:%{public}d", ret);
+        return ret;
+    }
+    GetExtraInfoReply extraInfoReply { std::move(extraInfo) };
+
+    if (!extraInfoReply.Marshalling(reply)) {
+        FI_HILOGE("GetExtraInfoReply::Marshalling fail");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t DragServer::EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply)
+{
+    EnterTextEditorAreaParam param {};
+
+    if (!param.Unmarshalling(data)) {
+        FI_HILOGE("EnterTextEditorAreaParam::Unmarshalling fail");
+        return RET_ERR;
+    }
+    return env_->GetDragManager().EnterTextEditorArea(param.enable_);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

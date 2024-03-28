@@ -66,6 +66,7 @@ public:
     IInputAdapter& GetInput() override;
     IDInputAdapter& GetDInput() override;
     IDSoftbusAdapter& GetDSoftbus() override;
+    IDDPAdapter& GetDP() override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
     void Subscribe(Type type, ActivityEvent event, ReportLatencyNs latency,
@@ -165,6 +166,7 @@ private:
     std::unique_ptr<IInputAdapter> input_;
     std::unique_ptr<IPluginManager> pluginMgr_;
     std::unique_ptr<IDSoftbusAdapter> dsoftbus_;
+    std::unique_ptr<IDDPAdapter> ddp_;
     sptr<IntentionService> intention_;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 };

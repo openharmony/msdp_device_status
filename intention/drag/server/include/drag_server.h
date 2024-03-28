@@ -26,7 +26,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DragServer final : public IPlugin {
 public:
-    DragServer(IContext *context);
+    DragServer(IContext *env);
     ~DragServer() = default;
     DISALLOW_COPY_AND_MOVE(DragServer);
 
@@ -41,7 +41,22 @@ public:
     int32_t Control(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply) override;
 
 private:
-    IContext *context_ { nullptr };
+    int32_t SetDragWindowVisible(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t UpdateDragStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t UpdateShadowPic(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t UpdatePreviewStyle(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t UpdatePreviewAnimation(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetDragTargetPid(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetUdKey(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetShadowOffset(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetDragData(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetDragState(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetDragSummary(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    int32_t EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+
+    IContext *env_ { nullptr };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

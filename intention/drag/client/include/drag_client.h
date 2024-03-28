@@ -18,7 +18,7 @@
 
 #include "nocopyable.h"
 
-#include <list>
+#include <set>
 
 #include "i_drag_listener.h"
 #include "i_subscript_listener.h"
@@ -51,7 +51,7 @@ public:
     int32_t UpdatePreviewStyle(ITunnelClient &tunnel, const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(ITunnelClient &tunnel,
         const PreviewStyle &previewStyle, const PreviewAnimation &animation);
-    int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summarys);
+    int32_t GetDragSummary(ITunnelClient &tunnel, std::map<std::string, int64_t> &summary);
     int32_t GetDragState(ITunnelClient &tunnel, DragState &dragState);
     int32_t EnterTextEditorArea(ITunnelClient &tunnel, bool enable);
     int32_t GetDragAction(ITunnelClient &tunnel, DragAction &dragAction);
@@ -65,9 +65,11 @@ public:
 
 private:
     mutable std::mutex mtx_;
-    std::weak_ptr<IStartDragListener> startDragListener_;
+    std::shared_ptr<IStartDragListener> startDragListener_ { nullptr };
     bool hasRegistered_ { false };
-    std::list<DragListenerPtr> dragListener_;
+    bool hasSubscriptRegistered_ { false };
+    std::set<DragListenerPtr> dragListeners_;
+    std::set<SubscriptListenerPtr> subscriptListeners_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

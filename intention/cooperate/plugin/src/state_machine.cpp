@@ -43,6 +43,8 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::ENABLE, &StateMachine::EnableCooperate);
     AddHandler(CooperateEventType::DISABLE, &StateMachine::DisableCooperate);
     AddHandler(CooperateEventType::GET_COOPERATE_STATE, &StateMachine::GetCooperateState);
+    AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER, &StateMachine::RegisterEventListener);
+    AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER, &StateMachine::UnregisterEventListener);
     AddHandler(CooperateEventType::DDM_BOARD_ONLINE, &StateMachine::OnBoardOnline);
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &StateMachine::OnBoardOffline);
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
@@ -133,6 +135,18 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
 {}
 
+void StateMachine::RegisterListener(Context &context, const CooperateEvent &event)
+{
+    RegisterEventListenerEvent notice = std::get<RegisterEventListenerEvent>(event.event);
+    context.eventMgr_.RegisterEventListener(notice);
+}
+
+void StateMachine::UnregisterListener(Context &context, const CooperateEvent &event)
+{
+    UnregisterEventListenerEvent notice = std::get<UnregisterEventListenerEvent>(event.event);
+    context.eventMgr_.UnregisterEventListener(notice);
+}
+
 void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
@@ -141,7 +155,7 @@ void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
     auto ret = onlineBoards_.insert(onlineEvent.networkId);
     if (ret.second) {
         FI_HILOGD("Watch \'%{public}s\'", Utility::Anonymize(onlineEvent.networkId));
-        context.ddp_.AddWatch(onlineEvent.networkId);
+        env_->GetDP().AddWatch(onlineEvent.networkId);
         Transfer(context, event);
     }
 }
@@ -154,7 +168,7 @@ void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
     if (auto iter = onlineBoards_.find(offlineEvent.networkId); iter != onlineBoards_.end()) {
         onlineBoards_.erase(iter);
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(offlineEvent.networkId));
-        context.ddp_.RemoveWatch(offlineEvent.networkId);
+        env_->GetDP().RemoveWatch(offlineEvent.networkId);
         Transfer(context, event);
     }
 }
@@ -211,9 +225,10 @@ void StateMachine::AddMonitor(Context &context)
         return;
     }
     monitorId_ = env_->GetInput().AddMonitor(
-        [sender = context.Sender(), &hotArea = context.hotArea_](
+        [sender = context.Sender(), &hotArea = context.hotArea_, &mouseLocation = context.mouseLocation_] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {
             hotArea.ProcessData(pointerEvent);
+            mouseLocation.OnMouseEvent();
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
@@ -253,7 +268,7 @@ void StateMachine::RemoveWatches(Context &context)
     for (auto iter = onlineBoards_.begin();
          iter != onlineBoards_.end(); iter = onlineBoards_.begin()) {
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(*iter));
-        context.ddp_.RemoveWatch(*iter);
+        env_->GetDP().RemoveWatch(*iter);
         onlineBoards_.erase(iter);
     }
 }

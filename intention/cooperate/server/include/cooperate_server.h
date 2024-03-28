@@ -42,6 +42,7 @@ public:
 
 private:
     IContext *context_ { nullptr };
+    int32_t unloadTimerId_ { -1 };
 };
 } // namespace DeviceStatus
 } // namespace Msdp

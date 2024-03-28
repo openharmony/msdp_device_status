@@ -176,6 +176,48 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
     return RET_ERR;
 }
 
+int32_t CooperateClient::RegisterEventListener(ITunnelClient &tunnel,
+    const std::string &networkId, std::shared_ptr<IEventListener> listener)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(listener, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) != eventListener_.end()) {
+        FI_HILOGE("The listener already exists");
+        return RET_ERR;
+    }
+    RegisterEventListenerParam param { networkId };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.AddWatch(Intention::COOPERATE, CooperateRequestID::REGISTER_EVENT_LISTENER, param, reply);
+        ret != RET_OK) {
+        FI_HILOGE("RegisterEventListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    eventListener_.emplace(networkId, listener);
+    FI_HILOGI("RegisterEventListener for networkId:%{public}s successfully", networkId);
+    return RET_OK;
+}
+
+int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
+    const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) == eventListener_.end()) {
+        FI_HILOGE("No listener registered");
+        return RET_ERR;
+    }
+    UnregisterEventListenerParam param { networkId };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
+        CooperateRequestID::UNREGISTER_EVENT_LISTENER, param, reply); ret != RET_OK) {
+        FI_HILOGE("UnregisterEventListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    eventListener_.erase(networkId);
+    return RET_OK;
+}
+
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
     return RET_ERR;

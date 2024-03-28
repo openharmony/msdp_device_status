@@ -88,6 +88,19 @@ bool GetCooperateStateParam::Unmarshalling(MessageParcel &parcel)
         parcel.ReadBool(checkPermission)
     );
 }
+
+RegisterEventListenerParam::RegisterEventListenerParam( const std::string &networkId) : networkId(networkId)
+{}
+
+bool RegisterEventListenerParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteString(networkId);
+}
+
+bool RegisterEventListenerParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadString(networkId);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

@@ -207,6 +207,37 @@ int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &st
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
+int32_t IntentionManager::RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitClient();
+    return cooperate_.RegisterEventListener(*tunnel_, networkId, listener);
+#else
+    (void)(networkId);
+    (void)(listener);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+int32_t IntentionManager::UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitClient();
+    return cooperate_.UnregisterEventListener(*tunnel_, networkId, listener);
+#else
+    (void)(networkId);
+    (void)(listener);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+    
+}
+
 int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style)
 {
     CALL_DEBUG_ENTER;

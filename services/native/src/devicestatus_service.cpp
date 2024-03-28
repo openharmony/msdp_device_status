@@ -36,6 +36,7 @@
 #include "devicestatus_common.h"
 #include "devicestatus_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+#include "ddp_adapter.h"
 #include "dinput_adapter.h"
 #include "dsoftbus_adapter.h"
 #include "input_adapter.h"
@@ -73,6 +74,7 @@ DeviceStatusService::DeviceStatusService()
     input_ = std::make_unique<InputAdapter>();
     pluginMgr_ = std::make_unique<PluginManager>(this);
     dsoftbus_ = std::make_unique<DSoftbusAdapter>();
+    ddp_ = std::make_unique<DDPAdapter>();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 
@@ -174,6 +176,11 @@ IDInputAdapter& DeviceStatusService::GetDInput()
 IDSoftbusAdapter& DeviceStatusService::GetDSoftbus()
 {
     return *dsoftbus_;
+}
+
+IDDPAdapter& DeviceStatusService::GetDP()
+{
+    return *ddp_;
 }
 
 void DeviceStatusService::EnableDSoftbus()
@@ -745,9 +752,13 @@ int32_t DeviceStatusService::GetCoordinationState(const std::string &udId, bool 
 int32_t DeviceStatusService::AddDraglistener()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t session = GetCallingPid();
+#else
     int32_t pid = GetCallingPid();
     SessionPtr session = GetSession(GetClientFd(pid));
     CHKPR(session, RET_ERR);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::AddListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -759,12 +770,16 @@ int32_t DeviceStatusService::AddDraglistener()
 int32_t DeviceStatusService::RemoveDraglistener()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t session = GetCallingPid();
+#else
     int32_t pid = GetCallingPid();
     SessionPtr session = GetSession(GetClientFd(pid));
     if (session == nullptr) {
         FI_HILOGW("Session is nullptr");
         return RET_OK;
     }
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -776,9 +791,13 @@ int32_t DeviceStatusService::RemoveDraglistener()
 int32_t DeviceStatusService::AddSubscriptListener()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t session = GetCallingPid();
+#else
     int32_t pid = GetCallingPid();
     SessionPtr session = GetSession(GetClientFd(pid));
     CHKPR(session, RET_ERR);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::AddSubscriptListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -790,9 +809,13 @@ int32_t DeviceStatusService::AddSubscriptListener()
 int32_t DeviceStatusService::RemoveSubscriptListener()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t session = GetCallingPid();
+#else
     int32_t pid = GetCallingPid();
     SessionPtr session = GetSession(GetClientFd(pid));
     CHKPR(session, RET_ERR);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::RemoveSubscriptListener, &dragMgr_, session));
     if (ret != RET_OK) {
@@ -804,10 +827,14 @@ int32_t DeviceStatusService::RemoveSubscriptListener()
 int32_t DeviceStatusService::StartDrag(const DragData &dragData)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t session = GetCallingPid();
+#else
     int32_t pid = GetCallingPid();
     AddSessionDeletedCallback(pid, std::bind(&DragManager::OnSessionLost, &dragMgr_, std::placeholders::_1));
     SessionPtr session = GetSession(GetClientFd(pid));
     CHKPR(session, RET_ERR);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&DragManager::StartDrag, &dragMgr_, std::cref(dragData), session));
     if (ret != RET_OK) {
@@ -1097,7 +1124,7 @@ int32_t DeviceStatusService::OnGetCoordinationState(
 int32_t DeviceStatusService::OnGetCoordinationStateSync(const std::string &udId, bool &state)
 {
     CALL_DEBUG_ENTER;
-    if (int32_t ret = COOR_SM->GetCoordinationState(udId, state) != RET_OK) {
+    if (int32_t ret = COOR_SM->GetCoordinationState(udId, state); ret != RET_OK) {
         FI_HILOGE("GetCoordinationState failed, ret:%{public}d", ret);
         return ret;
     }

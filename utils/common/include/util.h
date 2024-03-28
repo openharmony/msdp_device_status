@@ -25,9 +25,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-namespace {
-constexpr size_t SUBSTR_NETWORK_ID_LEN { 6 };
-}
 int32_t GetPid();
 const char* GetProgramName();
 int64_t GetMillisTime();

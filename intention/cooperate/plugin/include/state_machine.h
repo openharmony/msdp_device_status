@@ -43,6 +43,8 @@ private:
     void EnableCooperate(Context &context, const CooperateEvent &event);
     void DisableCooperate(Context &context, const CooperateEvent &event);
     void GetCooperateState(Context &context, const CooperateEvent &event);
+    void RegisterEventListener(const std::string &networkId);
+    void UnregisterEventListener(const std::string &networkId);
     void OnBoardOnline(Context &context, const CooperateEvent &event);
     void OnBoardOffline(Context &context, const CooperateEvent &event);
     void OnProfileChanged(Context &context, const CooperateEvent &event);

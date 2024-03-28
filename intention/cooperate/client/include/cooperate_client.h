@@ -26,6 +26,7 @@
 #include "coordination_message.h"
 #include "i_coordination_listener.h"
 #include "i_hotarea_listener.h"
+#include "i_event_listener.h"
 #include "i_tunnel_client.h"
 #include "net_packet.h"
 #include "socket_client.h"
@@ -71,6 +72,8 @@ public:
         const std::string &networkId, CooperateStateCallback callback,
         bool isCheckPermission = false);
     int32_t GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state);
+    int32_t RegisterEventListener(ITunnelClient &tunnel, const std::string &networkId, std::shared_ptr<IEventListener> listener);
+    int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
     int32_t AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener);
     int32_t RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener = nullptr);
 
@@ -87,6 +90,7 @@ private:
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
 
     std::list<CooperateListenerPtr> devCooperateListener_;
+    std::map<std::string, std::shared_ptr<IEventListener>> eventListener_;
     std::list<HotAreaListenerPtr> devHotAreaListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;

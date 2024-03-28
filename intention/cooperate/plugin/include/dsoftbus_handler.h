@@ -68,6 +68,9 @@ public:
     int32_t ComeBack(const std::string &networkId, const DSoftbusComeBack &event);
     int32_t RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event);
     int32_t RelayCooperateFinish(const std::string &networkId, const DSoftbusRelayCooperateFinished &event);
+    int32_t SubscribeMouseLocation(const std::string &networkId, const DSoftbusSubscribeMouseLocation &event);
+    int32_t RelaySubscribeMouseLocation(const std::string &networkId, const DSoftbusRelaySubscribeMouseLocation &event);
+    int32_t SyncMouseLocation(const std::string &networkId, const DSoftbusSyncMouseLocation &event);
 
     static std::string GetLocalNetworkId();
 
@@ -84,6 +87,9 @@ private:
     void OnComeBack(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperate(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperateFinish(const std::string &networkId, NetPacket &packet);
+    void OnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet);
+    void OnRelaySubscribeLocation(const std::string& networKId, NetPacket &packet);
+    void OnMouseLocation(const std::string& networKId, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;

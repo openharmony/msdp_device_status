@@ -122,6 +122,24 @@ HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest003, TestSize.Level0)
         data.value >= OnChangedValue::VALUE_INVALID &&
         data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
 }
+
+/**
+ * @tc.name: GetDeviceStatusDataTest
+ * @tc.desc: test get devicestatus data in proxy
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceStatusModuleTest, GetDeviceStatusDataTest004, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    g_moduleTest = Type::TYPE_STILL;
+    Type type = g_moduleTest;
+    Data data = StationaryManager::GetInstance()->GetDeviceStatusData(type);
+    GTEST_LOG_(INFO) << "type: " << data.type;
+    GTEST_LOG_(INFO) << "value: " << data.value;
+    EXPECT_EQ(true, data.type == g_moduleTest &&
+        data.value >= OnChangedValue::VALUE_INVALID &&
+        data.value <= OnChangedValue::VALUE_EXIT) << "GetDeviceStatusData failed";
+}
 } // namespace
 } // namespace DeviceStatus
 } // namespace Msdp

@@ -152,6 +152,32 @@ int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::s
     return RET_OK;
 }
 
+int32_t Cooperate::RegisterEventListener(int32_t pid, const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::REGISTER_EVENT_LISTENER,
+        RegisterEventListenerEvent {
+            .pid = pid,
+            .networkId = networkId,
+        }));
+    return RET_OK;
+
+}
+
+int32_t Cooperate::UnregisterEventListener(int32_t pid, const std::string &networkId)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::UNREGISTER_EVENT_LISTENER,
+        UnregisterEventListenerEvent {
+            .pid = pid,
+            .networkId = networkId,
+        }));
+    return RET_OK;
+
+}
+
 void Cooperate::Dump(int32_t fd)
 {
     CALL_DEBUG_ENTER;

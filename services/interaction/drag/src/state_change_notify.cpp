@@ -23,10 +23,6 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-template void StateChangeNotify::OnDragInfoNotify<DragState>(SessionPtr session, MessageId msgId, DragState state);
-template void StateChangeNotify::OnDragInfoNotify<DragCursorStyle>(SessionPtr session, MessageId msgId,
-    DragCursorStyle style);
-
 void StateChangeNotify::AddNotifyMsg(std::shared_ptr<MessageInfo> info)
 {
     CHKPV(info);
@@ -88,7 +84,11 @@ int32_t StateChangeNotify::StateChangedNotify(DragState state)
 }
 
 template <typename T>
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+void StateChangeNotify::OnDragInfoNotify(SocketSessionPtr session, MessageId msgId, T t)
+#else
 void StateChangeNotify::OnDragInfoNotify(SessionPtr session, MessageId msgId, T t)
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
