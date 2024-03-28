@@ -618,7 +618,7 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_open_handle_scope(item->env, &scope);
         if (item->env == nullptr) {
             FI_HILOGW("item->env is nullptr, skip then continue");
-            continue
+            continue;
         }
         if (item->ref != temp->ref) {
             continue;
