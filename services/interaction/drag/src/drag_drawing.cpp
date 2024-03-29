@@ -254,8 +254,8 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     rsUiDirector_->SendMessages();
-    return INIT_SUCCESS;
     FI_HILOGD("leave");
+    return INIT_SUCCESS;
 }
 
 int32_t DragDrawing::CheckDragData(const DragData &dragData)
@@ -364,8 +364,8 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     Rosen::RSTransaction::FlushImplicitTransaction();
     CHKPR(rsUiDirector_, RET_ERR);
     rsUiDirector_->SendMessages();
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 void DragDrawing::OnDragSuccess()
@@ -816,8 +816,8 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
     }
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
@@ -830,8 +830,8 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     shadowNode->AddModifier(drawPixelMapModifier_);
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawMouseIcon()
@@ -849,8 +849,8 @@ int32_t DragDrawing::DrawMouseIcon()
     }
     drawMouseIconModifier_ = std::make_shared<DrawMouseIconModifier>();
     mouseIconNode->AddModifier(drawMouseIconModifier_);
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode,
@@ -865,8 +865,8 @@ int32_t DragDrawing::DrawStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNod
     }
     drawSVGModifier_ = std::make_shared<DrawSVGModifier>(stylePixelMap);
     dragStyleNode->AddModifier(drawSVGModifier_);
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
@@ -892,8 +892,8 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
     Rosen::RSTransaction::FlushImplicitTransaction();
     startNum_ = START_TIME;
     needDestroyDragWindow_ = true;
-    return StartVsync();
     FI_HILOGD("leave");
+    return StartVsync();
 }
 
 int32_t DragDrawing::StartVsync()
@@ -1054,8 +1054,8 @@ int32_t DragDrawing::InitLayer()
         RotateDragWindow(rotation_);
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 void DragDrawing::InitCanvas(int32_t width, int32_t height)
@@ -1213,8 +1213,8 @@ int32_t DragDrawing::UpdateSvgNodeInfo(xmlNodePtr curNode, int32_t extendSvgWidt
     }
 
     xmlSetProp(curNode, BAD_CAST "viewBox", BAD_CAST tgtViewBox.c_str());
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 xmlNodePtr DragDrawing::GetRectNode(xmlNodePtr curNode)
@@ -1230,8 +1230,8 @@ xmlNodePtr DragDrawing::GetRectNode(xmlNodePtr curNode)
         }
         curNode = curNode->next;
     }
-    return curNode;
     FI_HILOGD("leave");
+    return curNode;
 }
 
 xmlNodePtr DragDrawing::UpdateRectNode(int32_t extendSvgWidth, xmlNodePtr curNode)
@@ -1256,7 +1256,6 @@ xmlNodePtr DragDrawing::UpdateRectNode(int32_t extendSvgWidth, xmlNodePtr curNod
     }
     FI_HILOGE("Empty node of XML");
     return nullptr;
-    FI_HILOGD("leave");
 }
 
 void DragDrawing::UpdateTspanNode(xmlNodePtr curNode)
@@ -1292,8 +1291,8 @@ int32_t DragDrawing::ParseAndAdjustSvgInfo(xmlNodePtr curNode)
     curNode = UpdateRectNode(extendSvgWidth, curNode);
     CHKPR(curNode, RET_ERR);
     UpdateTspanNode(curNode);
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 std::shared_ptr<Media::PixelMap> DragDrawing::DecodeSvgToPixelMap(
@@ -1327,8 +1326,8 @@ std::shared_ptr<Media::PixelMap> DragDrawing::DecodeSvgToPixelMap(
     Media::DecodeOptions decodeOpts;
     SetDecodeOptions(decodeOpts);
     std::shared_ptr<Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, errCode);
-    return pixelMap;
     FI_HILOGD("leave");
+    return pixelMap;
 }
 
 bool DragDrawing::NeedAdjustSvgInfo()
@@ -1349,8 +1348,8 @@ bool DragDrawing::NeedAdjustSvgInfo()
         (g_drawingInfo.currentDragNum == DRAG_NUM_ONE)) {
         return false;
     }
-    return true;
     FI_HILOGD("leave");
+    return true;
 }
 
 int32_t DragDrawing::GetFilePath(std::string &filePath)
@@ -1383,8 +1382,8 @@ int32_t DragDrawing::GetFilePath(std::string &filePath)
             break;
         }
     }
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
@@ -1569,8 +1568,8 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
     startNum_ = START_TIME;
     needDestroyDragWindow_ = false;
     StartVsync();
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 
@@ -1597,7 +1596,6 @@ int32_t DragDrawing::EnterTextEditorArea(bool enable)
     DRAG_DATA_MGR.SetTextEditorAreaFlag(enable);
     FI_HILOGI("EnterTextEditorArea %{public}s successfully", (enable ? "true" : "false"));
     return RET_OK;
-    FI_HILOGD("leave");
 }
 
 float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
@@ -1619,8 +1617,8 @@ int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
         return RET_ERR;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle,
@@ -1666,8 +1664,8 @@ int32_t DragDrawing::UpdatePreviewStyleWithAnimation(const PreviewStyle &preview
             FI_HILOGE("ModifyMultiPreviewStyle failed");
         }
     });
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 void DragDrawing::DoDrawMouse()
@@ -1792,8 +1790,8 @@ int32_t DragDrawing::ModifyPreviewStyle(std::shared_ptr<Rosen::RSCanvasNode> nod
             }
         }
     }
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragDrawing::ModifyMultiPreviewStyle(const std::vector<PreviewStyle> &previewStyles)

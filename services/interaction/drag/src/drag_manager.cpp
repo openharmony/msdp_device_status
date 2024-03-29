@@ -82,8 +82,8 @@ int32_t DragManager::Init(IContext* context)
         ret = samgrProxy->SubscribeSystemAbility(DISPLAY_MANAGER_SERVICE_SA_ID, displayAbilityStatusChange_);
         FI_HILOGI("SubscribeSystemAbility DISPLAY_MANAGER_SERVICE_SA_ID result:%{public}d", ret);
     });
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -120,8 +120,8 @@ int32_t DragManager::AddListener(SessionPtr session)
     info->msgId = MessageId::DRAG_STATE_LISTENER;
     info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.AddNotifyMsg(info);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -140,8 +140,8 @@ int32_t DragManager::RemoveListener(SessionPtr session)
     info->session = session;
     info->msgType = MessageType::NOTIFY_STATE;
     stateNotify_.RemoveNotifyMsg(info);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -161,8 +161,8 @@ int32_t DragManager::AddSubscriptListener(SessionPtr session)
     info->msgId = MessageId::DRAG_STYLE_LISTENER;
     info->msgType = MessageType::NOTIFY_STYLE;
     stateNotify_.AddNotifyMsg(info);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -208,7 +208,6 @@ void DragManager::PrintDragData(const DragData &dragData)
         dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
         dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
         GetAnonyString(dragData.udKey).c_str(), dragData.hasCoordinateCorrected, summarys.c_str());
-    FI_HILOGI("leave");
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -250,13 +249,12 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     SetDragState(DragState::START);
     stateNotify_.StateChangedNotify(DragState::START);
     StateChangedNotify(DragState::START);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult)
 {
-    FI_HILOGI("enter");
     FI_HILOGI("mainWindow:%{public}d", dropResult.mainWindow);
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
@@ -291,15 +289,14 @@ int32_t DragManager::StopDrag(const DragDropResult &dropResult)
     if (isControlMultiScreenVisible_) {
         isControlMultiScreenVisible_ = false;
     }
-    return ret;
     FI_HILOGI("leave");
+    return ret;
 }
 
 int32_t DragManager::GetDragTargetPid() const
 {
     FI_HILOGI("enter");
     return DRAG_DATA_MGR.GetTargetPid();
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::GetUdKey(std::string &udKey) const
@@ -311,8 +308,8 @@ int32_t DragManager::GetUdKey(std::string &udKey) const
         return RET_ERR;
     }
     udKey = dragData.udKey;
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::UpdateDragStyle(DragCursorStyle style, int32_t targetPid, int32_t targetTid)
@@ -353,8 +350,8 @@ int32_t DragManager::UpdateShadowPic(const ShadowInfo &shadowInfo)
         return RET_ERR;
     }
     DRAG_DATA_MGR.SetShadowInfos({ shadowInfo });
-    return dragDrawing_.UpdateShadowPic(shadowInfo);
     FI_HILOGI("leave");
+    return dragDrawing_.UpdateShadowPic(shadowInfo);
 }
 
 int32_t DragManager::GetDragData(DragData &dragData)
@@ -365,8 +362,8 @@ int32_t DragManager::GetDragData(DragData &dragData)
         return RET_ERR;
     }
     dragData = DRAG_DATA_MGR.GetDragData();
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::GetDragState(DragState &dragState)
@@ -377,8 +374,8 @@ int32_t DragManager::GetDragState(DragState &dragState)
         FI_HILOGE("dragState_ is error");
         return RET_ERR;
     }
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::NotifyDragResult(DragResult result, DragBehavior dragBehavior)
@@ -494,8 +491,8 @@ int32_t DragManager::OnDragUp(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         FI_HILOGW("Timeout, automatically stop dragging");
         this->StopDrag(dropResult);
     });
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -663,8 +660,8 @@ int32_t DragManager::InitDataManager(const DragData &dragData) const
 {
     FI_HILOGI("enter");
     DRAG_DATA_MGR.Init(dragData);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::AddDragEventHandler(int32_t sourceType)
@@ -690,8 +687,8 @@ int32_t DragManager::AddDragEventHandler(int32_t sourceType)
         FI_HILOGE("Failed to add key event handler");
         return RET_ERR;
     }
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
@@ -717,7 +714,6 @@ int32_t DragManager::AddPointerEventHandler(uint32_t deviceTags)
 #endif // OHOS_DRAG_ENABLE_MONITOR
     FI_HILOGI("Add drag poniter event handle successfully");
     return RET_OK;
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::AddKeyEventMonitor()
@@ -731,7 +727,6 @@ int32_t DragManager::AddKeyEventMonitor()
     }
     FI_HILOGI("Add drag key event monitor successfully");
     return RET_OK;
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::RemovePointerEventHandler()
@@ -753,7 +748,6 @@ int32_t DragManager::RemovePointerEventHandler()
 #endif // OHOS_DRAG_ENABLE_MONITOR
     FI_HILOGI("Remove drag pointer event handler successfully");
     return RET_OK;
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::RemoveKeyEventMonitor()
@@ -767,7 +761,6 @@ int32_t DragManager::RemoveKeyEventMonitor()
     keyEventMonitorId_ = -1;
     FI_HILOGI("Remove drag key event handle successfully");
     return RET_OK;
-    FI_HILOGI("leave");
 }
 
 int32_t DragManager::OnStartDrag()
@@ -805,8 +798,8 @@ int32_t DragManager::OnStartDrag()
         return RET_ERR;
     }
     dragAction_.store(DragAction::MOVE);
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
@@ -973,8 +966,8 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
             break;
         }
     }
-    return RET_OK;
     FI_HILOGI("leave");
+    return RET_OK;
 }
 
 void DragManager::SetPointerEventFilterTime(int64_t filterTime)
@@ -1086,7 +1079,6 @@ int32_t DragManager::OnUpdateDragStyle(DragCursorStyle style)
     }
     FI_HILOGD("Update dragStyle:%{public}s successfully", GetDragStyleName(updateStyle).c_str());
     return RET_OK;
-    FI_HILOGD("leave");
 }
 
 void DragManager::UpdateDragStyleCross()
@@ -1179,8 +1171,8 @@ int32_t DragManager::GetDragAction(DragAction &dragAction) const
         return RET_ERR;
     }
     dragAction = dragAction_.load();
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::EnterTextEditorArea(bool enable)
@@ -1198,8 +1190,8 @@ int32_t DragManager::EnterTextEditorArea(bool enable)
         FI_HILOGE("GetCoordinateCorrected failed");
         return RET_ERR;
     }
-    return dragDrawing_.EnterTextEditorArea(enable);
     FI_HILOGD("leave");
+    return dragDrawing_.EnterTextEditorArea(enable);
 }
 
 int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
@@ -1211,8 +1203,8 @@ int32_t DragManager::GetExtraInfo(std::string &extraInfo) const
         return RET_ERR;
     }
     extraInfo = dragData.extraInfo;
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::AddPrivilege(int32_t tokenId)
@@ -1225,8 +1217,8 @@ int32_t DragManager::AddPrivilege(int32_t tokenId)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     FI_HILOGD("Target window drag tid:%{public}d", tokenId);
     SendDragData(tokenId, dragData.udKey);
-    return RET_OK;
     FI_HILOGD("leave");
+    return RET_OK;
 }
 
 int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
@@ -1237,8 +1229,8 @@ int32_t DragManager::RotateDragWindow(Rosen::Rotation rotation)
         FI_HILOGD("Drag instance not running");
         return RET_OK;
     }
-    return dragDrawing_.RotateDragWindow(rotation);
     FI_HILOGD("leave");
+    return dragDrawing_.RotateDragWindow(rotation);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
