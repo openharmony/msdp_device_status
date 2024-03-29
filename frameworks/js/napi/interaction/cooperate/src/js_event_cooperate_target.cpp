@@ -40,7 +40,6 @@ std::mutex mutex_;
 JsEventCooperateTarget::JsEventCooperateTarget()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     auto ret = coordinationListeners_.insert({ COORDINATION,
         std::vector<sptr<JsUtilCooperate::CallbackInfo>>()});
     if (!ret.second) {
