@@ -211,7 +211,11 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
         FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    bool state = DP_ADAPTER->GetCrossingSwitchState(udId);
+    bool state = { false };
+    if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s", GetAnonyString(udId).c_str());
+        return RET_ERR;
+    }
     FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
     return RET_OK;
@@ -224,7 +228,10 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &udId, bool &stat
         FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    state = DP_ADAPTER->GetCrossingSwitchState(udId);
+    if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s", GetAnonyString(udId).c_str());
+        return RET_ERR;
+    }
     FI_HILOGD("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
