@@ -38,7 +38,6 @@ inline constexpr std::string_view REJECT_DEFERRED { "napi_reject_deferred" };
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     auto ret = coordinationListeners_.insert({ COOPERATE_NAME, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
         FI_HILOGW("Failed to insert, errCode:%{public}d", static_cast<int32_t>(DeviceStatus::VAL_NOT_EXP));
