@@ -716,12 +716,10 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     FI_HILOGD("enter");
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_SUCCESS);
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
-    handler_->RemoveAllEvents();
+    ResetAnimationParameter();
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPV(runner);
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -781,12 +779,10 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     FI_HILOGD("enter");
     auto animateCb = std::bind(&DragDrawing::InitVSync, this, END_ALPHA, END_SCALE_FAIL);
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
-    handler_->RemoveAllEvents();
+    ResetAnimationParameter();
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPV(runner);
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -807,11 +803,10 @@ void DragDrawing::OnStopAnimation()
 int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
 {
     FI_HILOGD("enter");
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPR(runner, RET_ERR);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
+    ResetAnimationParameter();
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPR(runner, RET_ERR);
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;
@@ -935,12 +930,8 @@ void DragDrawing::OnVsync()
             }
             DestroyDragWindow();
             g_drawingInfo.isRunning = false;
+            ResetAnimationParameter();
         }
-        CHKPV(handler_);
-        handler_->RemoveAllEvents();
-        handler_->RemoveAllFileDescriptorListeners();
-        handler_ = nullptr;
-        receiver_ = nullptr;
         return;
     }
     Rosen::VSyncReceiver::FrameCallback fcb = {
@@ -1954,7 +1945,18 @@ void DragDrawing::RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY)
     }
 }
 
-void  DragDrawing::ResetParameter()
+void DragDrawing::ResetAnimationParameter()
+{
+    FI_HILOGI("enter");
+    CHKPV(handler_);
+    handler_->RemoveAllEvents();
+    handler_->RemoveAllFileDescriptorListeners();
+    handler_ = nullptr;
+    CHKPV(receiver_);
+    receiver_ = nullptr;
+}
+
+void DragDrawing::ResetParameter()
 {
     FI_HILOGI("enter");
     startNum_ = START_TIME;
