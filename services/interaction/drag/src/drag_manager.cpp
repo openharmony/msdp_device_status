@@ -782,6 +782,7 @@ int32_t DragManager::OnStartDrag()
     if (ret == INIT_FAIL) {
         FI_HILOGE("Init drag drawing failed");
         dragDrawing_.DestroyDragWindow();
+        dragDrawing_.UpdateDrawingState();
         return RET_ERR;
     }
     if (ret == INIT_CANCEL) {
@@ -795,6 +796,7 @@ int32_t DragManager::OnStartDrag()
     if (ret != RET_OK) {
         FI_HILOGE("Failed to add drag event handler");
         dragDrawing_.DestroyDragWindow();
+        dragDrawing_.UpdateDrawingState();
         return RET_ERR;
     }
     dragAction_.store(DragAction::MOVE);
