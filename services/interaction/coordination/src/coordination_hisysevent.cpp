@@ -66,7 +66,7 @@ int32_t CoordinationDFX::WriteInputFunc(const CoorType &coorType, Types... paras
         return RET_ERR;
     }
     auto &[label, dec] = serialStr_[coorType];
-    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<int32_t>(coorType) & 1) ?
+    OHOS::HiviewDFX::HiSysEvent::EventType eventType = (static_cast<uint32_t>(coorType) & 1) ?
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT : OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MSDP,
