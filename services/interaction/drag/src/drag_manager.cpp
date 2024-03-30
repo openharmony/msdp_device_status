@@ -38,7 +38,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-constexpr int32_t TIMEOUT_MS { 2000 };
+constexpr int32_t TIMEOUT_MS { 3000 };
 constexpr int32_t INTERVAL_MS { 500 };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 std::atomic<int64_t> g_startFilterTime { -1 };
