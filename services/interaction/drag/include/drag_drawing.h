@@ -125,7 +125,7 @@ struct ExtraInfo {
     std::string componentType;
     int32_t blurStyle { -1 };
     float cornerRadius { 0.0f };
-    bool allowDistributed { false };
+    bool allowDistributed { true };
     float opacity { 0.95f };
 };
 
