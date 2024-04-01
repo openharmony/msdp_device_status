@@ -297,10 +297,10 @@ void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
 int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
-    uint64_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     int ret = SetFirstCallerTokenID(tokenId);
-    if (ret == RET_OK) {
-        FI_HILOGE("Succeed to SetFirstCallerTokenID");
+    if (ret != RET_OK) {
+        FI_HILOGE("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
     }
     auto enterStamp = std::chrono::high_resolution_clock::now();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
