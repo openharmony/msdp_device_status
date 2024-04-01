@@ -87,7 +87,6 @@ DeviceStatusNapi* DeviceStatusNapi::GetDeviceStatusNapi()
 DeviceStatusNapi::DeviceStatusNapi(napi_env env) : DeviceStatusEvent(env)
 {
     env_ = env;
-    callbackRef_ = nullptr;
     devicestatusValueRef_ = nullptr;
     DeviceStatusClient::GetInstance().RegisterDeathListener([this] {
         FI_HILOGI("Receive death notification");
@@ -98,9 +97,6 @@ DeviceStatusNapi::DeviceStatusNapi(napi_env env) : DeviceStatusEvent(env)
 
 DeviceStatusNapi::~DeviceStatusNapi()
 {
-    if (callbackRef_ != nullptr) {
-        napi_delete_reference(env_, callbackRef_);
-    }
     if (devicestatusValueRef_ != nullptr) {
         napi_delete_reference(env_, devicestatusValueRef_);
     }
@@ -348,7 +344,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
             DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
             delete devicestatus;
         },
-        nullptr, &g_obj->callbackRef_);
+        nullptr, nullptr);
     if (!g_obj->On(type, handler, false)) {
         FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
@@ -451,7 +447,7 @@ napi_value DeviceStatusNapi::GetDeviceStatus(napi_env env, napi_callback_info in
                 DeviceStatusNapi *devicestatus = static_cast<DeviceStatusNapi *>(data);
                 delete devicestatus;
             },
-            nullptr, &g_obj->callbackRef_);
+            nullptr, nullptr);
     }
     if (!g_obj->On(type, handler, true)) {
         FI_HILOGE("type:%{public}d already exists", type);
