@@ -34,6 +34,14 @@ struct DefaultReply final : public ParamBase {
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 };
+
+struct BoolenReply final : public ParamBase {
+    BoolenReply() = default;
+    BoolenReply(bool state);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+    bool state { false };
+};
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

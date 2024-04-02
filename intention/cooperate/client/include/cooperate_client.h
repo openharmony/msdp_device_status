@@ -20,6 +20,10 @@
 #include <list>
 #include <map>
 #include <mutex>
+#ifdef ENABLE_PERFORMANCE_CHECK
+#include <chrono>
+#include <vector>
+#endif // ENABLE_PERFORMANCE_CHECK
 
 #include "nocopyable.h"
 
@@ -85,12 +89,32 @@ private:
     void OnCooperateMessageEvent(int32_t userData, const std::string &networkId, CoordinationMessage msg);
     void OnCooperateStateEvent(int32_t userData, bool state);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
+#ifdef ENABLE_PERFORMANCE_CHECK
+    void StartTrace(int32_t userData);
+    void FinishTrance(int32_t userData);
+    void DumpPerformaceInfo();
+#endif // ENABLE_PERFORMANCE_CHECK
 
     std::list<CooperateListenerPtr> devCooperateListener_;
     std::list<HotAreaListenerPtr> devHotAreaListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;
     std::atomic_bool isListeningProcess_ { false };
+#ifdef ENABLE_PERFORMANCE_CHECK
+    struct PerformaceInfo {
+        std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;
+        int32_t activateNum { 0 };
+        int32_t successNum { 0 };
+        int32_t failNum { 0 };
+        int32_t successRate { 0 };
+        int32_t averageDuration { 0 };
+        int32_t maxDuration { std::numeric_limits<int32_t>::min() };
+        int32_t minDuration { std::numeric_limits<int32_t>::max() };
+        std::vector<int32_t> durationList;
+    };
+    std::mutex performaceLock_;
+    PerformaceInfo performaceInfo_;
+#endif // ENABLE_PERFORMANCE_CHECK
 };
 } // namespace DeviceStatus
 } // namespace Msdp

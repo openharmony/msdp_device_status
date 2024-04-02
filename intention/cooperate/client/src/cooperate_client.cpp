@@ -15,10 +15,16 @@
 
 #include "cooperate_client.h"
 
+#ifdef ENABLE_PERFORMANCE_CHECK
+#include <algorithm>
+#include <numeric>
+#endif // ENABLE_PERFORMANCE_CHECK
+
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
 #include "devicestatus_func_callback.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "CooperateClient"
@@ -114,6 +120,9 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
         return ret;
     }
     devCooperateEvent_.insert_or_assign(param.userData, event);
+#ifdef ENABLE_PERFORMANCE_CHECK
+    DumpPerformaceInfo();
+#endif // ENABLE_PERFORMANCE_CHECK
     return RET_OK;
 }
 
@@ -123,7 +132,11 @@ int32_t CooperateClient::Start(ITunnelClient &tunnel, const std::string &remoteN
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     CooperateEvent event { callback };
-    StartCooperateParam param { GenerateRequestID(), remoteNetworkId, startDeviceId, isCheckPermission };
+    auto userData = GenerateRequestID();
+#ifdef ENABLE_PERFORMANCE_CHECK
+    StartTrace(userData);
+#endif // ENABLE_PERFORMANCE_CHECK
+    StartCooperateParam param { userData, remoteNetworkId, startDeviceId, isCheckPermission };
     DefaultReply reply;
 
     int32_t ret = tunnel.Start(Intention::COOPERATE, param, reply);
@@ -173,7 +186,18 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel,
 
 int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    GetCooperateStateSyncParam param { udId };
+    BoolenReply reply;
+    if (tunnel.GetParam(Intention::COOPERATE, CooperateRequestID::GET_COOPERATE_STATE_SYNC, param, reply) != RET_OK) {
+        FI_HILOGE("Get cooperate state failed udId: %{public}s", Utility::Anonymize(udId));
+        return RET_ERR;
+    }
+    FI_HILOGI(" GetCooperateState for udId: %{public}s successfully,state: %{public}s",
+        Utility::Anonymize(udId), state ? "true" : "false");
+    state = reply.state;
+    return RET_OK;
 }
 
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
@@ -232,6 +256,11 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+#ifdef ENABLE_PERFORMANCE_CHECK
+    if (CoordinationMessage(nType) == CoordinationMessage::ACTIVATE_SUCCESS) {
+        FinishTrance(userData);
+    }
+#endif // ENABLE_PERFORMANCE_CHECK
     OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
     return RET_OK;
 }
@@ -308,6 +337,57 @@ void CooperateClient::OnDevHotAreaListener(int32_t displayX,
         item->OnHotAreaMessage(displayX, displayY, type, isEdge);
     }
 }
+#ifdef ENABLE_PERFORMANCE_CHECK
+void CooperateClient::StartTrace(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard { performaceLock_ };
+    performaceInfo_.traces_.emplace(userData, std::chrono::steady_clock::now());
+    performaceInfo_.activateNum += 1;
+    FI_HILOGI("[PERF] Start tracing \'%{public}d\'", userData);
+}
+
+void CooperateClient::FinishTrance(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard { performaceLock_ };
+    int32_t hundred = { 100 };
+    if (auto iter = performaceInfo_.traces_.find(userData); iter != performaceInfo_.traces_.end()) {
+        auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - iter->second).count();
+        FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
+        performaceInfo_.traces_.erase(iter);
+        performaceInfo_.successNum += 1;
+        performaceInfo_.failNum = performaceInfo_.traces_.size();
+        performaceInfo_.successRate = (performaceInfo_.successNum * hundred) / performaceInfo_.activateNum;
+        performaceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performaceInfo_.minDuration);
+        performaceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performaceInfo_.maxDuration);
+        performaceInfo_.durationList.push_back(curDuration);
+    } else {
+        FI_HILOGW("[PERF] Finish tracing with something wrong");
+    }
+}
+
+void CooperateClient::DumpPerformaceInfo()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard { performaceLock_ };
+    int32_t sumDuration = std::accumulate(
+        performaceInfo_.durationList.begin(), performaceInfo_.durationList.end(), 0);
+    performaceInfo_.averageDuration = sumDuration / performaceInfo_.durationList.size();
+    FI_HILOGI("[PERF] performaceInfo:"
+        "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}d "
+        "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d ",
+        performaceInfo_.activateNum, performaceInfo_.successNum, performaceInfo_.failNum,
+        performaceInfo_.successRate, performaceInfo_.averageDuration, performaceInfo_.maxDuration,
+        performaceInfo_.minDuration);
+    std::string durationStr;
+    for (const auto &duration : performaceInfo_.durationList) {
+        durationStr += std::to_string(duration) + ", ";
+    }
+    FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
+}
+#endif // ENABLE_PERFORMANCE_CHECK
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

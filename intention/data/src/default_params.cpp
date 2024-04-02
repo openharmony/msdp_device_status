@@ -41,6 +41,19 @@ bool DefaultReply::Unmarshalling(MessageParcel &parcel)
 {
     return true;
 }
+
+BoolenReply::BoolenReply(bool state) : state(state)
+{}
+
+bool BoolenReply::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteBool(state);
+}
+
+bool BoolenReply::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadBool(state);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
