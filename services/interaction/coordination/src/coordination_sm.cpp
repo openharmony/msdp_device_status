@@ -300,7 +300,7 @@ int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
     auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     int ret = SetFirstCallerTokenID(tokenId);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
+        FI_HILOGW("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
     }
     auto enterStamp = std::chrono::high_resolution_clock::now();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
