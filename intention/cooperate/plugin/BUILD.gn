@@ -62,11 +62,13 @@ ohos_shared_library("intention_cooperate") {
 
   external_deps = [
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
+    "ipc:ipc_single",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

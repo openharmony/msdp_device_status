@@ -18,6 +18,11 @@
 
 #include "nocopyable.h"
 
+#ifdef ENABLE_PERFORMANCE_CHECK
+#include <chrono>
+#include <mutex>
+#endif // ENABLE_PERFORMANCE_CHECK
+
 #include "cooperate_events.h"
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
@@ -43,6 +48,7 @@ public:
     void Disable();
 
     Channel<CooperateEvent>::Sender Sender() const;
+    IDDPAdapter& GetDP() const;
     std::string Local() const;
     std::string Peer() const;
     int32_t StartDeviceId() const;
@@ -58,6 +64,11 @@ public:
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
+
+#ifdef ENABLE_PERFORMANCE_CHECK
+    void StartTrace(const std::string &name);
+    void FinishTrace(const std::string &name);
+#endif // ENABLE_PERFORMANCE_CHECK
 
     DDMAdapter ddm_;
     DSoftbusHandler dsoftbus_;
@@ -84,6 +95,11 @@ private:
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceProfileObserver> dpObserver_;
     std::shared_ptr<IDeviceObserver> hotplugObserver_;
+
+#ifdef ENABLE_PERFORMANCE_CHECK
+    std::mutex lock_;
+    std::map<std::string, std::chrono::time_point<std::chrono::steady_clock>> traces_;
+#endif // ENABLE_PERFORMANCE_CHECK
 };
 
 inline Channel<CooperateEvent>::Sender Context::Sender() const

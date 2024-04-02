@@ -34,6 +34,7 @@ ohos_source_set("intention_ddp_adapter") {
   sources = [
     "src/ddp_adapter.cpp",
     "src/ddp_adapter_impl.cpp",
+    "src/dp_change_listener.cpp",
   ]
 
   public_configs = [ ":intention_ddp_adapter_public_config" ]
@@ -47,7 +48,9 @@ ohos_source_set("intention_ddp_adapter") {
   ]
 
   external_deps = [
-    "device_info_manager:distributed_device_profile_client",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "device_manager:devicemanagersdk",
     "hilog:libhilog",
   ]
 

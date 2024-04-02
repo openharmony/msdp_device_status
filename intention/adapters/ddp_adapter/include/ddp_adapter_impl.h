@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,11 @@
 #include <map>
 #include <mutex>
 #include <set>
+#include <unordered_map>
 #include <variant>
 
 #include "cJSON.h"
-#include "distributed_device_profile_client.h"
+#include "dp_subscribe_info.h"
 #include "nocopyable.h"
 
 #include "i_ddp_adapter.h"
@@ -30,19 +31,8 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+using namespace OHOS::DistributedDeviceProfile;
 class DDPAdapterImpl final : public IDDPAdapter, public std::enable_shared_from_this<DDPAdapterImpl> {
-    class ProfileEventCallback final : public DeviceProfile::IProfileEventCallback {
-    public:
-        explicit ProfileEventCallback(std::shared_ptr<DDPAdapterImpl> ddp) : ddp_(ddp) {}
-        ~ProfileEventCallback() = default;
-        DISALLOW_COPY_AND_MOVE(ProfileEventCallback);
-
-        void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
-
-    private:
-        std::weak_ptr<DDPAdapterImpl> ddp_;
-    };
-
     class Observer final {
     public:
         explicit Observer(std::shared_ptr<IDeviceProfileObserver> observer)
@@ -81,28 +71,40 @@ public:
     void RemoveObserver(std::shared_ptr<IDeviceProfileObserver> observer) override;
     void AddWatch(const std::string &networkId) override;
     void RemoveWatch(const std::string &networkId) override;
+    void OnProfileChanged(const std::string &networkId) override;
+    std::string GetNetworkIdByUdId(const std::string &udId) override;
+    std::string GetUdIdIdByNetworkId(const std::string &networkId) override;
+    int32_t UpdateCrossingSwitchState(bool state) override;
+    int32_t GetCrossingSwitchState(const std::string &udId, bool &state)override;
 
-    int32_t GetProperty(const std::string &networkId, const std::string &name, bool &value) override;
-    int32_t GetProperty(const std::string &networkId, const std::string &name, int32_t &value) override;
-    int32_t GetProperty(const std::string &networkId, const std::string &name, std::string &value) override;
+    int32_t GetProperty(const std::string &udId, const std::string &name, bool &value) override;
+    int32_t GetProperty(const std::string &udId, const std::string &name, int32_t &value) override;
+    int32_t GetProperty(const std::string &udId, const std::string &name, std::string &value) override;
     int32_t SetProperty(const std::string &name, bool value) override;
     int32_t SetProperty(const std::string &name, int32_t value) override;
     int32_t SetProperty(const std::string &name, const std::string &value) override;
 
 private:
-    void OnProfileChanged(const std::string &networkId);
     int32_t RegisterProfileListener(const std::string &networkId);
-    void UnregisterProfileListener(const std::string &networkId);
-    int32_t GetProperty(const std::string &networkId, const std::string &name,
+    int32_t UnregisterProfileListener(const std::string &networkId);
+    std::string GetCurrentPackageName();
+    std::string GetLocalNetworkId();
+    std::string GetLocalUdId();
+    int32_t GetProperty(const std::string &udId, const std::string &name,
         std::function<int32_t(cJSON *)> parse);
     int32_t SetProperty(const std::string &name, const DPValue &value);
+    int32_t GenerateProfileStr(std::string &profileStr);
+    int32_t PutServiceProfile();
+    int32_t PutCharacteristicProfile(const std::string &profileStr);
     int32_t PutProfile();
 
+private:
     std::mutex mutex_;
     std::set<Observer> observers_;
-    std::set<std::string> siblings_;
-    std::map<std::string, std::shared_ptr<ProfileEventCallback>> profileEventCbs_;
+    std::unordered_map<std::string, std::string> udId2NetworkId_;
     std::map<std::string, DPValue> properties_;
+    bool isServiceProfileExist_ { false };
+    std::unordered_map<std::string, SubscribeInfo> crossingSwitchSubscribeInfo_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
