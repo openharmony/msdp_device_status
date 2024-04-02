@@ -27,7 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace {
 const char* g_coordinationClass { "Coordination_class" };
-const char* g_coordination { "coordination" };
+const char* g_coordination { "Coordination" };
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
