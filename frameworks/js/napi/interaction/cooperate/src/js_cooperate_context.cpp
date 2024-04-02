@@ -26,8 +26,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-const char* g_coordinationClass { "g_coordinationClass" };
-const char* g_coordination { "g_coordination" };
+const char* g_coordinationClass { "Coordination_class" };
+const char* g_coordination { "coordination" };
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
@@ -330,7 +330,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     bool result = false;
     CHKRP(napi_has_named_property(env, global, g_coordination, &result), HAS_NAMED_PROPERTY);
     if (!result) {
-        FI_HILOGE("g_coordination was not found");
+        FI_HILOGE("Coordination was not found");
         return nullptr;
     }
 
