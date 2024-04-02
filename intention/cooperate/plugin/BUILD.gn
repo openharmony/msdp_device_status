@@ -70,6 +70,7 @@ ohos_shared_library("intention_cooperate") {
     "ipc:ipc_single",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
+    "ipc:ipc_single",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

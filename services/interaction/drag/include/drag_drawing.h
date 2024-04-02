@@ -125,7 +125,7 @@ struct ExtraInfo {
     std::string componentType;
     int32_t blurStyle { -1 };
     float cornerRadius { 0.0f };
-    bool allowDistributed { true };
+    bool allowDistributed { false };
     float opacity { 0.95f };
 };
 
@@ -262,7 +262,6 @@ private:
     void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
     void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
-    void ResetAnimationParameter();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
 
