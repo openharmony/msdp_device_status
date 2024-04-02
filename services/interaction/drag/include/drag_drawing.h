@@ -262,6 +262,7 @@ private:
     void UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol);
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
     void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
+    void ResetAnimationParameter();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
 
