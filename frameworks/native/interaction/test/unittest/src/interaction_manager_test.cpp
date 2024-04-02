@@ -1159,7 +1159,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Failed_Mouse, 
         dragData->shadowInfos = {};
         ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
-        ASSERT_EQ(ret, RET_ERR);
+        ASSERT_EQ(ret, ERR_INVALID_VALUE);
     }
 }
 

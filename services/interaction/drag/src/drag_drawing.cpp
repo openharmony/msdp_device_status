@@ -958,9 +958,8 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     }
     g_drawingInfo.pixelMap = dragData.shadowInfos.front().pixelMap;
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
-    float scalingValue = 0.0f;
     if (dragOriginDpi > EPSILON) {
-        scalingValue = GetScaling() / dragOriginDpi;
+        float scalingValue = GetScaling() / dragOriginDpi;
         CHKPV(g_drawingInfo.pixelMap);
         g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
     }
@@ -984,7 +983,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     for (size_t i = 1; i < shadowInfosSize; ++i) {
         std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfos[i].pixelMap;
         if (dragOriginDpi > EPSILON) {
-            scalingValue = GetScaling() / dragOriginDpi;
+            float scalingValue = GetScaling() / dragOriginDpi;
             CHKPV(pixelMap);
             pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         }
