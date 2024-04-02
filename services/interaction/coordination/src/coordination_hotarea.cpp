@@ -34,7 +34,9 @@ std::shared_ptr<CoordinationHotArea> CoordinationHotArea::GetInstance()
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {
-        g_instance.reset(new (std::nothrow) CoordinationHotArea());
+    CoordinationHotArea *cooContext = new (std::nothrow) CoordinationHotArea();
+    CHKPL(cooContext);
+    g_instance.reset(cooContext);
     });
     return g_instance;
 }
