@@ -53,7 +53,7 @@ int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
     auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     int ret = SetFirstCallerTokenID(tokenId);
     if (ret != RET_OK) {
-        FI_HILOGE("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
+        FI_HILOGW("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
     }
     return env_->GetDSoftbus().OpenSession(networkId);
 }
