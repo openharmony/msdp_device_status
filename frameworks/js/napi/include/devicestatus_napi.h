@@ -71,7 +71,6 @@ private:
     static std::tuple<bool, napi_value, int32_t> CheckGetParam(napi_env env, napi_callback_info info);
     static napi_value GetParameters(napi_env env, size_t argc, const napi_value* args);
 
-    napi_ref callbackRef_ { nullptr };
     static napi_ref devicestatusValueRef_;
     napi_env env_ { nullptr };
 };
