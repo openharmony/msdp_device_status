@@ -590,7 +590,9 @@ void InputEventCallbackTest::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
     ASSERT_TRUE(pointerEvent != nullptr);
     auto pointerAction = pointerEvent->GetPointerAction();
     ASSERT_TRUE(pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE ||
-                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP);
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP ||
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
     ASSERT_TRUE(!pointerEvent->GetBuffer().empty());
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
