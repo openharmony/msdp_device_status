@@ -26,8 +26,8 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace {
-const char* COORDINATION_CLASS { "Coordination_class" };
-const char* COORDINATION { "Coordination" };
+const char* g_coordinationClass { "g_coordinationClass" };
+const char* g_coordination { "g_coordination" };
 inline constexpr std::string_view GET_VALUE_BOOL { "napi_get_value_bool" };
 inline constexpr std::string_view GET_VALUE_INT32 { "napi_get_value_int32" };
 inline constexpr std::string_view GET_VALUE_STRING_UTF8 { "napi_get_value_string_utf8" };
@@ -274,12 +274,12 @@ napi_value JsCooperateContext::CreateInstance(napi_env env)
         JsCooperateContext::JsConstructor, nullptr, sizeof(desc) / sizeof(desc[ZERO_PARAM]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, COORDINATION_CLASS, jsClass);
+    status = napi_set_named_property(env, global, g_coordinationClass, jsClass);
     CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(napi_new_instance(env, jsClass, ZERO_PARAM, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(napi_set_named_property(env, global, COORDINATION, jsInstance),
+    CHKRP(napi_set_named_property(env, global, g_coordination, jsInstance),
         SET_NAMED_PROPERTY);
 
     JsCooperateContext *jsContext = nullptr;
@@ -328,9 +328,9 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, COORDINATION, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, g_coordination, &result), HAS_NAMED_PROPERTY);
     if (!result) {
-        FI_HILOGE("Coordination was not found");
+        FI_HILOGE("g_coordination was not found");
         return nullptr;
     }
 
@@ -338,7 +338,7 @@ JsCooperateContext *JsCooperateContext::GetInstance(napi_env env)
     napi_open_handle_scope(env, &scope);
     CHKPP(scope);
     napi_value object = nullptr;
-    CHKRP_SCOPE(env, napi_get_named_property(env, global, COORDINATION, &object), GET_NAMED_PROPERTY, scope);
+    CHKRP_SCOPE(env, napi_get_named_property(env, global, g_coordination, &object), GET_NAMED_PROPERTY, scope);
     if (object == nullptr) {
         napi_close_handle_scope(env, scope);
         FI_HILOGE("object is nullptr");
