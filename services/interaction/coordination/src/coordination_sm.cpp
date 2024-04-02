@@ -24,6 +24,8 @@
 #include "display_manager.h"
 #include "hitrace_meter.h"
 #include "input_manager.h"
+#include "ipc_skeleton.h"
+#include "token_setproc.h"
 #include "distributed_file_daemon_manager.h"
 #include "coordination_device_manager.h"
 #include "coordination_event_manager.h"
@@ -211,7 +213,11 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &networkId)
         FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    bool state = DP_ADAPTER->GetCrossingSwitchState(udId);
+    bool state = { false };
+    if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s", GetAnonyString(udId).c_str());
+        return RET_ERR;
+    }
     FI_HILOGI("NetworkId:%{public}s, state:%{public}s", GetAnonyString(networkId).c_str(), state ? "true" : "false");
     COOR_EVENT_MGR->OnGetCrossingSwitchState(state);
     return RET_OK;
@@ -224,7 +230,10 @@ int32_t CoordinationSM::GetCoordinationState(const std::string &udId, bool &stat
         FI_HILOGE("UdId is empty");
         return COMMON_PARAMETER_ERROR;
     }
-    state = DP_ADAPTER->GetCrossingSwitchState(udId);
+    if (DP_ADAPTER->GetCrossingSwitchState(udId, state) != RET_OK) {
+        FI_HILOGE("GetCrossingSwitchState failed, udId:%{public}s", GetAnonyString(udId).c_str());
+        return RET_ERR;
+    }
     FI_HILOGD("UdId:%{public}s, state:%{public}s", GetAnonyString(udId).c_str(), state ? "true" : "false");
     return RET_OK;
 }
@@ -295,6 +304,11 @@ void CoordinationSM::CloseP2PConnection(const std::string &remoteNetworkId)
 int32_t CoordinationSM::OpenInputSoftbus(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
+    auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    int ret = SetFirstCallerTokenID(tokenId);
+    if (ret != RET_OK) {
+        FI_HILOGW("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
+    }
     auto enterStamp = std::chrono::high_resolution_clock::now();
     if (COOR_SOFTBUS_ADAPTER->OpenInputSoftbus(remoteNetworkId) != RET_OK) {
         FI_HILOGE("Open input softbus failed, remoteNetworkId:%{public}s", GetAnonyString(remoteNetworkId).c_str());

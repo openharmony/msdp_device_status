@@ -320,7 +320,9 @@ std::shared_ptr<CoordinationSoftbusAdapter> CoordinationSoftbusAdapter::GetInsta
 {
     static std::once_flag flag;
     std::call_once(flag, [&]() {
-        g_instance.reset(new (std::nothrow) CoordinationSoftbusAdapter());
+        CoordinationSoftbusAdapter *cooContext = new (std::nothrow) CoordinationSoftbusAdapter();
+        CHKPL(cooContext);
+        g_instance.reset(cooContext);
     });
     return g_instance;
 }

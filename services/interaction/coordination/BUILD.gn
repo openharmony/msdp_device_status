@@ -70,6 +70,7 @@ ohos_shared_library("coordination") {
   ]
 
   external_deps = [
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

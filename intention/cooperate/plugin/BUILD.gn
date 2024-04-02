@@ -61,6 +61,7 @@ ohos_shared_library("intention_cooperate") {
   ]
 
   external_deps = [
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",

@@ -16,6 +16,8 @@
 #include "dsoftbus_handler.h"
 
 #include "devicestatus_define.h"
+#include "ipc_skeleton.h"
+#include "token_setproc.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -48,6 +50,11 @@ void DSoftbusHandler::AttachSender(Channel<CooperateEvent>::Sender sender)
 int32_t DSoftbusHandler::OpenSession(const std::string &networkId)
 {
     CALL_INFO_TRACE;
+    auto tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    int ret = SetFirstCallerTokenID(tokenId);
+    if (ret != RET_OK) {
+        FI_HILOGW("Failed to SetFirstCallerTokenID, ret:%{public}d", ret);
+    }
     return env_->GetDSoftbus().OpenSession(networkId);
 }
 
