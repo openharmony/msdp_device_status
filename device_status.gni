@@ -20,6 +20,7 @@ declare_args() {
   fusion_drag_enable_monitor = true
   fusion_drag_enable_interceptor = false
   fusion_drag_enable_animation = false
+  fusion_performance_check = false
   device_status_sensor_enable = true
   if (defined(global_parts_info)) {
     if (!defined(global_parts_info.sensors_sensor)) {
@@ -62,6 +63,10 @@ if (fusion_rust_enabled) {
 
 if (fusion_interaction_coordination) {
   device_status_default_defines += [ "OHOS_BUILD_ENABLE_COORDINATION" ]
+}
+
+if (fusion_performance_check) {
+  device_status_default_defines += [ "ENABLE_PERFORMANCE_CHECK" ]
 }
 
 if (fusion_drag_enable_monitor) {

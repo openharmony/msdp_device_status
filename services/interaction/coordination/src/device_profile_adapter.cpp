@@ -18,9 +18,10 @@
 #include <algorithm>
 #include <mutex>
 
+#include "distributed_device_profile_client.h"
+
 #include "coordination_util.h"
 #include "devicestatus_define.h"
-#include "distributed_device_profile_client.h"
 #include "json_parser.h"
 
 #undef LOG_TAG

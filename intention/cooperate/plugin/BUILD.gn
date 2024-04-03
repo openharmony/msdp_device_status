@@ -63,9 +63,12 @@ ohos_shared_library("intention_cooperate") {
   external_deps = [
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
+    "ipc:ipc_single",
+    "ipc:ipc_single",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
   ]

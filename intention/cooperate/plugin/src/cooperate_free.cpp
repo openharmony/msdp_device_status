@@ -216,6 +216,12 @@ void CooperateFree::ContactRemote::OnNormal(Context &context)
     context.dsoftbus_.StartCooperateFinish(context.Peer(), notice);
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_OUT);
+
+#ifdef ENABLE_PERFORMANCE_CHECK
+    std::ostringstream ss;
+    ss << "start_cooperation_with " << Utility::Anonymize(context.Peer());
+    context.FinishTrace(ss.str());
+#endif // ENABLE_PERFORMANCE_CHECK
 }
 
 void CooperateFree::ContactRemote::OnAppClosed(Context &context, const CooperateEvent &event)

@@ -28,6 +28,7 @@ enum CooperateRequestID : uint32_t {
     REGISTER_HOTAREA_LISTENER,
     UNREGISTER_HOTAREA_LISTENER,
     GET_COOPERATE_STATE,
+    GET_COOPERATE_STATE_SYNC,
 };
 
 struct StartCooperateParam final : public ParamBase {
@@ -64,6 +65,16 @@ struct GetCooperateStateParam final : public ParamBase {
     int32_t userData { -1 };
     bool checkPermission { false };
 };
+
+struct GetCooperateStateSyncParam final : public ParamBase {
+    GetCooperateStateSyncParam() = default;
+    GetCooperateStateSyncParam(const std::string &udId);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+
+    std::string udId;
+};
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
