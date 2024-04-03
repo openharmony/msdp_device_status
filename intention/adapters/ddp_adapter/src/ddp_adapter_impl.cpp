@@ -224,7 +224,7 @@ int32_t DDPAdapterImpl::GetProperty(const std::string &udId, const std::string &
     std::function<int32_t(cJSON *json)> parse)
 {
     CALL_DEBUG_ENTER;
-        FI_HILOGE("GetProperty for udId:%{public}s failed", Utility::Anonymize(udId));
+    FI_HILOGI("GetProperty for udId:%{public}s", Utility::Anonymize(udId));
     DistributedDeviceProfile::CharacteristicProfile profile;
     if (int32_t ret = DDP_CLIENT.GetCharacteristicProfile(udId, SERVICE_ID, CROSSING_SWITCH_STATE, profile);
         ret != RET_OK) {

@@ -30,9 +30,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-    const std::string COOPERATE_SWITCH { "currentStatus" };
-} // namespace
 
 Cooperate::Cooperate(IContext *env)
     : context_(env), sm_(env)

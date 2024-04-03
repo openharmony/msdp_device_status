@@ -291,7 +291,6 @@ void Context::ResetCursorPosition()
     SetCursorPosition(defaultCursorPos);
 }
 
-
 #ifdef ENABLE_PERFORMANCE_CHECK
 void Context::StartTrace(const std::string &name)
 {
