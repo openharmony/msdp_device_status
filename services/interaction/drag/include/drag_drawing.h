@@ -119,6 +119,10 @@ private:
 
 struct FilterInfo {
     float dipScale { 0.0f };
+    float offsetX { 0.0f };
+    float offsetY { 0.0f };
+    uint32_t argb { 0 };
+    std::string path;
 };
 
 struct ExtraInfo {

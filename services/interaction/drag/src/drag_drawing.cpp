@@ -1398,8 +1398,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        filterInfoStr.size(), filterInfoStr.c_str());
+    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s", filterInfoStr.size(), filterInfoStr.c_str());
     if (filterInfoStr.empty()) {
         FI_HILOGD("FilterInfo is empty");
         return false;
@@ -1413,6 +1412,26 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     cJSON *dipScale = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_scale");
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
+    }
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
+    if (cJSON_IsNumber(offsetX)) {
+        filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
+    }
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
+    if (cJSON_IsNumber(offsetY)) {
+        filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
+    }
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
+    if (cJSON_IsString(argb)) {
+        std::string str = argb->valuestring;
+        uint32_t argbValue = 0;
+        std::istringstream iss(str);
+        iss >> std::hex >> argbValue;
+        filterInfo.argb = argbValue;
+    }
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
+    if (cJSON_IsString(path)) {
+        filterInfo.path = path->valuestring;
     }
     return true;
 }
@@ -2084,6 +2103,17 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
+    if (!g_drawingInfo.filterInfo.path.empty()) {
+        FI_HILOGD("offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, radius:%{public}f, path:%{public}s",
+            g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY, g_drawingInfo.filterInfo.argb,
+            g_drawingInfo.extraInfo.cornerRadius, g_drawingInfo.filterInfo.path.c_str());
+        pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
+        pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+        pixelMapNode->SetShadowRadius(g_drawingInfo.extraInfo.cornerRadius);
+        pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
+    } else {
+        FI_HILOGD("path is empty");
+    }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
