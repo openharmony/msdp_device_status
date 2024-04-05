@@ -50,6 +50,11 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
+    AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusUnSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusRelaySubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusRelayUnSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -135,16 +140,16 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
 {}
 
-void StateMachine::RegisterListener(Context &context, const CooperateEvent &event)
+void StateMachine::RegisterEventListener(Context &context, const CooperateEvent &event)
 {
     RegisterEventListenerEvent notice = std::get<RegisterEventListenerEvent>(event.event);
-    context.eventMgr_.RegisterEventListener(notice);
+    context.mouseLocation_.AddListener(notice);
 }
 
-void StateMachine::UnregisterListener(Context &context, const CooperateEvent &event)
+void StateMachine::UnregisterEventListener(Context &context, const CooperateEvent &event)
 {
     UnregisterEventListenerEvent notice = std::get<UnregisterEventListenerEvent>(event.event);
-    context.eventMgr_.UnregisterEventListener(notice);
+    context.mouseLocation_.RemoveListener(notice);
 }
 
 void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
@@ -197,6 +202,41 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
     Transfer(context, event);
 }
 
+void StateMachine::OnSoftbusSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusSubscribeMouseLocation notice = std::get<DSoftbusSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusUnSubscribeMouseLocation notice = std::get<DSoftbusUnSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnUnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusRelaySubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusRelaySubscribeMouseLocation notice = std::get<DSoftbusRelaySubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnRelaySubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusRelayUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusRelayUnSubscribeMouseLocation notice = std::get<DSoftbusRelayUnSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnRelayUnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
+    context.mouseLocation_.OnRemoteMouseLocation(notice);
+}
+
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)
 {
     states_[current_]->OnEvent(context, event);
@@ -228,7 +268,7 @@ void StateMachine::AddMonitor(Context &context)
         [sender = context.Sender(), &hotArea = context.hotArea_, &mouseLocation = context.mouseLocation_] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {
             hotArea.ProcessData(pointerEvent);
-            mouseLocation.OnMouseEvent();
+            mouseLocation.ProcessData(pointerEvent);
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {

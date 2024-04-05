@@ -39,8 +39,9 @@ public:
 
     virtual int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) = 0;
 
-    virtual int32_t RegisterEventListener(const std::string &networkId);
-    virtual int32_t UnregisterEventListener(const std::string &networkId);
+    virtual int32_t RegisterEventListener(int32_t pid, const std::string &networkId) = 0;
+    virtual int32_t UnregisterEventListener(int32_t pid, const std::string &networkId) = 0;
+    virtual int32_t GetCooperateState(const std::string &udId, bool &state) = 0;
     virtual void Dump(int32_t fd) = 0;
 };
 } // namespace DeviceStatus

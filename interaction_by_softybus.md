@@ -24,6 +24,6 @@ MSDP_B -> MSDP_B : OnPointerEvent
 
 MSDP_B -> MSDP_A : SyncMouseLocation
 
-MSDP_A -> MSDP_A : OnMouseLocation
+MSDP_A -> MSDP_A : OnRemoteMouseLocation
 
 @enduml 

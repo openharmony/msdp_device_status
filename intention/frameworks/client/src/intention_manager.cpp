@@ -60,6 +60,8 @@ void IntentionManager::InitMsgHandler()
             MsgCallbackBind2(&CooperateClient::OnCoordinationState, &cooperate_)},
         {MessageId::HOT_AREA_ADD_LISTENER,
             MsgCallbackBind2(&CooperateClient::OnHotAreaListener, &cooperate_)},
+        {MessageId::MOUSE_LOCATION_ADD_LISTENER,
+            MsgCallbackBind2(&CooperateClient::OnMouseLocationListener, &cooperate_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragClient::OnNotifyResult, &drag_)},
@@ -222,7 +224,7 @@ int32_t IntentionManager::RegisterEventListener(const std::string &networkId, st
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t IntentionManager::UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr)
+int32_t IntentionManager::UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
@@ -235,7 +237,6 @@ int32_t IntentionManager::UnregisterEventListener(const std::string &networkId, 
     FI_HILOGW("Coordination does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION
-    
 }
 
 int32_t IntentionManager::UpdateDragStyle(DragCursorStyle style)

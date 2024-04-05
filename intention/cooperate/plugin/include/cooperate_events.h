@@ -60,6 +60,11 @@ enum class CooperateEventType {
     DSOFTBUS_STOP_COOPERATE,
     DSOFTBUS_RELAY_COOPERATE,
     DSOFTBUS_RELAY_COOPERATE_FINISHED,
+    DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_MOUSE_LOCATION,
 };
 
 struct Coordinate {
@@ -89,7 +94,6 @@ using RegisterHotareaListenerEvent = RegisterListenerEvent;
 using UnregisterHotareaListenerEvent = RegisterListenerEvent;
 using EnableCooperateEvent = RegisterListenerEvent;
 using DisableCooperateEvent = RegisterListenerEvent;
-using UnregisterEventListenerEvent = RegisterEventListenerEvent;
 
 struct StartCooperateEvent {
     int32_t pid;
@@ -110,11 +114,12 @@ struct GetCooperateStateEvent {
     std::string networkId;
 };
 
-
 struct RegisterEventListenerEvent {
     int32_t pid;
     std::string networkId;
 };
+using UnregisterEventListenerEvent = RegisterEventListenerEvent;
+
 struct DumpEvent {
     int32_t fd;
 };
@@ -167,18 +172,30 @@ struct DSoftbusRelayCooperate {
 };
 
 struct DSoftbusSubscribeMouseLocation {
-
+    std::string networkId; 
+    std::string remoteNetworkId;
 };
 
 struct DSoftbusRelaySubscribeMouseLocation {
-
+    std::string networkId; 
+    std::string remoteNetworkId;
+    bool result { false };
 };
 
-
+struct LocationInfo {
+    int32_t displayX;
+    int32_t displayY;
+    int32_t displayWidth;
+    int32_t displayHeight;
+};
 struct DSoftbusSyncMouseLocation {
-
+    std::string networkId; 
+    std::string remoteNetworkId;
+    LocationInfo mouseLocation;
 };
 
+using DSoftbusRelayUnSubscribeMouseLocation = DSoftbusRelaySubscribeMouseLocation;
+using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
 
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
 
@@ -197,6 +214,10 @@ struct CooperateEvent {
         StartCooperateEvent,
         StopCooperateEvent,
         GetCooperateStateEvent,
+        RegisterEventListenerEvent,
+        DSoftbusSubscribeMouseLocation,
+        DSoftbusRelaySubscribeMouseLocation,
+        DSoftbusSyncMouseLocation,
         DumpEvent,
         DDMBoardOnlineEvent,
         InputHotplugEvent,

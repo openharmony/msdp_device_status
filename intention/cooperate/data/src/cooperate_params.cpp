@@ -101,6 +101,19 @@ bool RegisterEventListenerParam::Unmarshalling(MessageParcel &parcel)
 {
     return parcel.ReadString(networkId);
 }
+
+GetCooperateStateSyncParam::GetCooperateStateSyncParam(const std::string &udId) : udId(udId)
+{}
+
+bool GetCooperateStateSyncParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteString(udId);
+}
+
+bool GetCooperateStateSyncParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadString(udId);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

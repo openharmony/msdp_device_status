@@ -54,22 +54,58 @@ void DDPAdapter::RemoveWatch(const std::string &networkId)
     ddp_->RemoveWatch(networkId);
 }
 
-int32_t DDPAdapter::GetProperty(const std::string &networkId, const std::string &name, bool &value)
+void DDPAdapter::OnProfileChanged(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    return ddp_->GetProperty(networkId, name, value);
+    ddp_->OnProfileChanged(networkId);
 }
 
-int32_t DDPAdapter::GetProperty(const std::string &networkId, const std::string &name, int32_t &value)
+std::string DDPAdapter::GetNetworkIdByUdId(const std::string &udId)
 {
     CALL_DEBUG_ENTER;
-    return ddp_->GetProperty(networkId, name, value);
+    return ddp_->GetNetworkIdByUdId(udId);
 }
 
-int32_t DDPAdapter::GetProperty(const std::string &networkId, const std::string &name, std::string &value)
+std::string DDPAdapter::GetUdIdByNetworkId(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    return ddp_->GetProperty(networkId, name, value);
+    return ddp_->GetUdIdByNetworkId(networkId);
+}
+
+std::string DDPAdapter::GetLocalNetworkId()
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetLocalNetworkId();
+}
+
+int32_t DDPAdapter::UpdateCrossingSwitchState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->UpdateCrossingSwitchState(state);
+}
+
+int32_t DDPAdapter::GetCrossingSwitchState(const std::string &udId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetCrossingSwitchState(udId, state);
+}
+
+int32_t DDPAdapter::GetProperty(const std::string &udId, const std::string &name, bool &value)
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetProperty(udId, name, value);
+}
+
+int32_t DDPAdapter::GetProperty(const std::string &udId, const std::string &name, int32_t &value)
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetProperty(udId, name, value);
+}
+
+int32_t DDPAdapter::GetProperty(const std::string &udId, const std::string &name, std::string &value)
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetProperty(udId, name, value);
 }
 
 int32_t DDPAdapter::SetProperty(const std::string &name, bool value)

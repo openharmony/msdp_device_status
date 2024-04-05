@@ -232,6 +232,26 @@ bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
             OnRelayCooperateFinish(networkId, packet);
             break;
         }
+        case MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION: {
+            OnSubscribeMouseLocation(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION: {
+            OnUnSubscribeMouseLocation(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION: {
+            OnRelaySubscribeLocation(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION: {
+            OnRelayUnSubscribeLocation(networkId, packet);
+            break;
+        }
+        case MessageId::DSOFTBUS_MOUSE_LOCATION: {
+            OnRemoteMouseLocation(networkId, packet);
+            break;
+        }
         default: {
             return false;
         }
@@ -362,6 +382,88 @@ void DSoftbusHandler::OnRelayCooperateFinish(const std::string &networkId, NetPa
         CooperateEventType::DSOFTBUS_RELAY_COOPERATE_FINISHED,
         event));
 }
+
+void DSoftbusHandler::OnSubscribeMouseLocation(const std::string &networKId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSubscribeMouseLocation event {
+        .networkId = networKId,
+    };
+    packet >> event.remoteNetworkId;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
+        event));
+}
+
+void DSoftbusHandler::OnUnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusUnSubscribeMouseLocation event {
+        .networkId = networKId,
+    };
+    packet >> event.remoteNetworkId;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
+        event));
+}
+
+void DSoftbusHandler::OnRelaySubscribeLocation(const std::string& networKId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusRelaySubscribeMouseLocation event {
+        .networkId = networKId,
+    };
+    packet >> event.remoteNetworkId >> event.result;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION,
+        event));
+}
+
+void DSoftbusHandler::OnRelayUnSubscribeLocation(const std::string& networKId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusRelayUnSubscribeMouseLocation event {
+        .networkId = networKId,
+    };
+    packet >> event.remoteNetworkId >> event.result;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION,
+        event));
+}
+
+void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet)
+{
+    CALL_INFO_TRACE;
+    DSoftbusSyncMouseLocation event {
+        .networkId = networKId,
+    };
+    packet >> event.remoteNetworkId >> event.mouseLocation.displayX >>
+        event.mouseLocation.displayY >> event.mouseLocation.displayWidth >> event.mouseLocation.displayHeight;
+    if (packet.ChkRWError()) {
+        FI_HILOGE("Failed to read data packet");
+        return;
+    }
+    SendEvent(CooperateEvent(
+        CooperateEventType::DSOFTBUS_MOUSE_LOCATION,
+        event));
+}
+
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

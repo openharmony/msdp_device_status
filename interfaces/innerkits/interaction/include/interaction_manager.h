@@ -26,7 +26,7 @@
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
 #include "i_hotarea_listener.h"
-#include "i_location_listener.h"
+#include "i_event_listener.h"
 #include "i_start_drag_listener.h"
 #include "i_subscript_listener.h"
 
@@ -129,9 +129,7 @@ public:
     */
     int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
 
-
     int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
-
 
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 

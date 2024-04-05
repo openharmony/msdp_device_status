@@ -18,6 +18,7 @@
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "CooperateServer"
@@ -120,7 +121,15 @@ int32_t CooperateServer::AddWatch(CallingContext &context, uint32_t id, MessageP
             return cooperate->RegisterHotAreaListener(context.pid);
         }
         case CooperateRequestID::REGISTER_EVENT_LISTENER: {
-
+            CHKPR(context_, RET_ERR);
+            ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
+            CHKPR(cooperate, RET_ERR);
+            RegisterEventListenerParam param;
+            if (!param.Unmarshalling(data)) {
+                FI_HILOGE("RegisterEventListenerParam::Unmarshalling fail");
+                return RET_ERR;
+            }
+            return cooperate->RegisterEventListener(context.pid, param.networkId);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -146,7 +155,15 @@ int32_t CooperateServer::RemoveWatch(CallingContext &context, uint32_t id, Messa
             return cooperate->UnregisterHotAreaListener(context.pid);
         }
         case CooperateRequestID::UNREGISTER_EVENT_LISTENER: {
-            
+            CHKPR(context_, RET_ERR);
+            ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
+            CHKPR(cooperate, RET_ERR);
+            UnregisterEventListenerParam param;
+            if (!param.Unmarshalling(data)) {
+                FI_HILOGE("UnregisterEventListenerParam::Unmarshalling fail");
+                return RET_ERR;
+            }
+            return cooperate->UnregisterEventListener(context.pid, param.networkId);
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);
@@ -175,6 +192,28 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
             ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
             CHKPR(cooperate, RET_ERR);
             return cooperate->GetCooperateState(context.pid, param.userData, param.networkId);
+        }
+        case CooperateRequestID::GET_COOPERATE_STATE_SYNC: {
+            GetCooperateStateSyncParam param;
+            if (!param.Unmarshalling(data)) {
+                FI_HILOGE("GetCooperateStateParam::Unmarshalling fail");
+                return RET_ERR;
+            }
+            CHKPR(context_, RET_ERR);
+            ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
+            CHKPR(cooperate, RET_ERR);
+            bool state { false };
+            if (cooperate->GetCooperateState(param.udId, state) != RET_OK) {
+                FI_HILOGE("GetCooperateState failed");
+                return RET_ERR;
+            }
+            FI_HILOGI("GetCrossingSwitchState -> GetCooperateState for udId: %{public}s successfully,"
+                "state: %{public}s", Utility::Anonymize(param.udId), state ? "true" : "false");
+            if (!BoolenReply(state).Marshalling(reply)) {
+                FI_HILOGE("Marshalling state failed");
+                return RET_ERR;
+            }
+            return RET_OK;
         }
         default: {
             FI_HILOGE("Unexpected request ID (%{public}u)", id);

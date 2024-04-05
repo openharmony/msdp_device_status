@@ -14,7 +14,6 @@
  */
 
 #include <future>
-#include <optional>
 #include <utility>
 #include <vector>
 
@@ -22,12 +21,14 @@
 
 #include "i_event_listener.h"
 
+#include "devicestatus_define.h"
+#include "devicestatus_errors.h"
 #include "interaction_manager.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
 #undef LOG_TAG
-#define LOG_TAG "EventListenerTest"
+#define LOG_TAG "MouseLocationListenerTest"
 
 namespace OHOS {
 namespace Msdp {
@@ -40,7 +41,7 @@ const char* g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
 constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };  
 } // namespace
 
-class EventListenerTest : public testing::Test {
+class MouseLocationListenerTest : public testing::Test {
 public:
     void SetUp();
     void TearDown();
@@ -48,11 +49,11 @@ public:
 };
 
 
-void EventListenerTest::SetUpTestCase() {}
+void MouseLocationListenerTest::SetUpTestCase() {}
 
-void EventListenerTest::SetUp() {}
+void MouseLocationListenerTest::SetUp() {}
 
-void EventListenerTest::TearDown()
+void MouseLocationListenerTest::TearDown()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
@@ -60,11 +61,13 @@ void EventListenerTest::TearDown()
 class EventListener : public IEventListener {
     void OnEvent(const Event &event) override ;
 };
-void EventListener::OnEvent(const Event &event) {
 
+void EventListener::OnEvent(const Event &event) {
+    FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
+        event.displayX, event.displayY, event.displayWidth, event.displayHeight); 
 }
 
-void EventListenerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
+void MouseLocationListenerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
 {
     CALL_DEBUG_ENTER;
     if (perms == nullptr || permAmount == 0) {
@@ -79,7 +82,7 @@ void EventListenerTest::SetPermission(const std::string &level, const char** per
         .dcaps = nullptr,
         .perms = perms,
         .acls = nullptr,
-        .processName = "EventListenerTest",
+        .processName = "MouseLocationListenerTest",
         .aplStr = level.c_str(),
     };
     g_tokenID = GetAccessTokenId(&infoInstance);
@@ -87,7 +90,7 @@ void EventListenerTest::SetPermission(const std::string &level, const char** per
     OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-void EventListenerTest::RemovePermission()
+void MouseLocationListenerTest::RemovePermission()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::DeleteToken(g_tokenID);
@@ -103,11 +106,12 @@ void EventListenerTest::RemovePermission()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, RegisterEventListener_00, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, RegisterEventListener_00, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string networkId { "Detfault" };
-    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener();
+    std::string networkId { "Default" };
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, nullptr);
+    ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
 }
 
 /**
@@ -116,9 +120,13 @@ HWTEST_F(EventListenerTest, RegisterEventListener_00, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, UnregisterEventListener_01, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::string networkId { "Default" };
+    auto listener = std::make_shared<EventListener>();
+    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
 }
 
 /**
@@ -127,9 +135,12 @@ HWTEST_F(EventListenerTest, UnregisterEventListener_01, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, RegisterEventListener_02, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, RegisterEventListener_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    std::string networkId { "Default" };
+    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
+    ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
 }
 
 /**
@@ -138,7 +149,7 @@ HWTEST_F(EventListenerTest, RegisterEventListener_02, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, UnregisterEventListener_03, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
 }
@@ -149,7 +160,7 @@ HWTEST_F(EventListenerTest, UnregisterEventListener_03, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, RegisterEventListener_04, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, RegisterEventListener_04, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
 }
@@ -160,7 +171,7 @@ HWTEST_F(EventListenerTest, RegisterEventListener_04, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventListenerTest, UnregisterEventListener_05, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_05, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
 }
