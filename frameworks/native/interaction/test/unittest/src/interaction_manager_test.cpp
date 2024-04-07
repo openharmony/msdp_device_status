@@ -590,7 +590,9 @@ void InputEventCallbackTest::OnInputEvent(std::shared_ptr<MMI::PointerEvent> poi
     ASSERT_TRUE(pointerEvent != nullptr);
     auto pointerAction = pointerEvent->GetPointerAction();
     ASSERT_TRUE(pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE ||
-                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP);
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP ||
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW ||
+                pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
     ASSERT_TRUE(!pointerEvent->GetBuffer().empty());
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
@@ -1161,7 +1163,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_StartDrag_Failed_Mouse, 
         dragData->shadowInfos = {};
         ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
             std::make_shared<UnitTestStartDragListener>(callback));
-        ASSERT_EQ(ret, RET_ERR);
+        ASSERT_EQ(ret, ERR_INVALID_VALUE);
     }
 }
 

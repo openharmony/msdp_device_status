@@ -958,19 +958,20 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     g_drawingInfo.pixelMapX = dragData.shadowInfos.front().x;
     g_drawingInfo.pixelMapY = dragData.shadowInfos.front().y;
     float dragOriginDpi = DRAG_DATA_MGR.GetDragOriginDpi();
-    float scalingValue = 0.0f;
     if (dragOriginDpi > EPSILON) {
-        scalingValue = GetScaling() / dragOriginDpi;
+        float scalingValue = GetScaling() / dragOriginDpi;
         CHKPV(g_drawingInfo.pixelMap);
         g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * scalingValue;
         g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * scalingValue;
+        if (fabs(scalingValue - 1.0f) > EPSILON) {
+            float widthScale = CalculateWidthScale();
+            CHKPV(g_drawingInfo.pixelMap);
+            g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+            g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
+            g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
+        }
     }
-    float widthScale = CalculateWidthScale();
-    CHKPV(g_drawingInfo.pixelMap);
-    g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
-    g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
-    g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
     g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
     g_drawingInfo.lastPixelMapY = g_drawingInfo.pixelMapY;
     g_drawingInfo.currentDragNum = dragData.dragNum;
@@ -989,7 +990,7 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
     for (size_t i = 1; i < shadowInfosSize; ++i) {
         std::shared_ptr<Media::PixelMap> pixelMap = dragData.shadowInfos[i].pixelMap;
         if (dragOriginDpi > EPSILON) {
-            scalingValue = GetScaling() / dragOriginDpi;
+            float scalingValue = GetScaling() / dragOriginDpi;
             CHKPV(pixelMap);
             pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         }
