@@ -121,7 +121,7 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
     }
     devCooperateEvent_.insert_or_assign(param.userData, event);
 #ifdef ENABLE_PERFORMANCE_CHECK
-    DumpPerformaceInfo();
+    DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
     return RET_OK;
 }
@@ -369,7 +369,7 @@ void CooperateClient::FinishTrace(int32_t userData)
     }
 }
 
-void CooperateClient::DumpPerformaceInfo()
+void CooperateClient::DumpPerformanceInfo()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
@@ -383,8 +383,8 @@ void CooperateClient::DumpPerformaceInfo()
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
         performanceInfo_.minDuration);
     std::string durationStr;
-    for (const auto &duraion : performanceInfo_.durationList) {
-        durationStr += std::to_string(duraion) + ", ";
+    for (const auto &duration : performanceInfo_.durationList) {
+        durationStr += std::to_string(duration) + ", ";
     }
     FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
 }

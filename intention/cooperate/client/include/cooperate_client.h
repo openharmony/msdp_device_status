@@ -92,7 +92,7 @@ private:
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
     void FinishTrace(int32_t userData);
-    void DumpPerformaceInfo();
+    void DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
 
     std::list<CooperateListenerPtr> devCooperateListener_;
