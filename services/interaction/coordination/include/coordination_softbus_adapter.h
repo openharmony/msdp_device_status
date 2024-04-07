@@ -49,7 +49,7 @@ public:
     int32_t OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
     void OnBytes(int32_t socket, const void* data, uint32_t dataLen);
-    void RegisterRecvFunc(std::function<void(void*, uint32_t)> callback);
+    void RegisterRecvFunc(std::function<void(const void*, uint32_t)> callback);
     int32_t SendData(const std::string &networkId, Parcel &parcel);
     static std::shared_ptr<CoordinationSoftbusAdapter> GetInstance();
     int32_t NotifyUnchainedResult(const std::string &localNetworkId,
@@ -74,7 +74,7 @@ private:
     std::mutex operationMutex_;
     std::string localSessionName_;
     std::condition_variable openSessionWaitCond_;
-    std::function<void(void*, uint32_t)> onRecvDataCallback_;
+    std::function<void(const void*, uint32_t)> onRecvDataCallback_;
     int32_t socketFd_ { -1 };
 };
 } // namespace DeviceStatus

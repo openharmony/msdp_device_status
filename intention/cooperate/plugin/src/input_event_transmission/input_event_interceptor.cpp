@@ -204,7 +204,8 @@ void InputEventInterceptor::ReportPointerEvent(std::shared_ptr<MMI::PointerEvent
 bool InputEventInterceptor::DifferentiateMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent)
 {
     if ((pointerEvent->GetSourceType() != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_MOVE)) {
+        ((pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_MOVE) &&
+         (pointerEvent->GetPointerAction() != MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         return true;
     }
     MMI::PointerEvent::PointerItem item;
