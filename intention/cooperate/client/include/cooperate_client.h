@@ -100,7 +100,7 @@ private:
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;
     std::atomic_bool isListeningProcess_ { false };
-    #ifdef ENABLE_PERFORMANCE_CHECK
+#ifdef ENABLE_PERFORMANCE_CHECK
     struct PerformanceInfo {
         std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;
         int32_t activateNum { 0 };
