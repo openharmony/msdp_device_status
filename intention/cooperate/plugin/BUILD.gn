@@ -67,10 +67,9 @@ ohos_shared_library("intention_cooperate") {
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
-    "ipc:ipc_single",
-    "ipc:ipc_single",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
+    "ipc:ipc_single",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
