@@ -57,6 +57,21 @@ public:
         int32_t errCode { 0 };
         CallbackData data;
     };
+    struct MouseCallbackData {
+        int32_t displayX { -1 };
+        int32_t displayY { -1 };
+        int32_t displayWidth { -1 };
+        int32_t displayHeight { -1 };
+    };
+    struct MouseCallbackInfo : RefBase {
+        MouseCallbackInfo() = default;
+        ~MouseCallbackInfo() = default;
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
+        int32_t errCode { 0 };
+        MouseCallbackData data;
+    };
     template <typename T>
     static void DeletePtr(T &ptr)
     {

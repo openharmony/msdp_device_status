@@ -37,10 +37,6 @@ public:
     static napi_value GetState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-    /**
-     * 监听接口加在这里，On Off重名怎么处理
-     * 
-    */
 
     std::shared_ptr<JsCooperateManager> GetJsCoordinationMgr();
 

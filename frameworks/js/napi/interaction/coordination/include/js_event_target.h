@@ -45,6 +45,8 @@ public:
     static void EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
+    void AddListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle);
+    void RemoveListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> callback);
     void ResetEnv();
     void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;
@@ -62,6 +64,8 @@ private:
 
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
         coordinationListeners_ {};
+    inline static std::map<std::string_view, std::vector<sptr<JsUtil::MouseCallbackInfo>>>
+        mouseLocationListeners_ {};
     std::atomic_bool isListeningProcess_ { false };
 };
 } // namespace DeviceStatus

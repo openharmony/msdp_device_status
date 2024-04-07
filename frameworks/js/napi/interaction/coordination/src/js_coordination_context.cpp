@@ -337,6 +337,93 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+napi_value JsCoordinationContext::RegisterMouseLocation(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    size_t argc = 3;
+    napi_value argv[3] = { nullptr };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter mismatch error");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return nullptr;
+    }
+
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
+    if ((COOPERATE_MOUSE_NAME.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperateMouse");
+        return nullptr;
+    }
+    // 不需要添加这个 RegisterMouseLocation UnregisterMouseLocation 根据type的类型将各种类型的监听事件区分开来
+    char networkId[MAX_STRING_LEN] = { 0 };
+    size_t len = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[1], networkId, sizeof(networkId), &len), GET_VALUE_STRING_UTF8);
+
+    JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
+    CHKPP(jsDev);
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
+    if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    jsCoordinationMgr->RegisterListener(env, type, networkId, argv[2]);
+    return nullptr;
+}
+
+napi_value JsCoordinationContext::UnregisterMouseLocation(napi_env env, napi_callback_info info)
+{
+    CALL_INFO_TRACE;
+    napi_value argv[3] = { nullptr };
+    size_t argc = 3;
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    if (argc <= 1) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "type", "string");
+        return nullptr;
+    }
+
+    char type[MAX_STRING_LEN] = { 0 };
+    size_t length = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
+    if ((COOPERATE_MOUSE_NAME.compare(type)) != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperateMouse");
+        return nullptr;
+    }
+
+    char networkId[MAX_STRING_LEN] = { 0 };
+    size_t len = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[1], networkId, sizeof(networkId), &len), GET_VALUE_STRING_UTF8);
+
+    JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
+    CHKPP(jsDev);
+    std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
+    CHKPP(jsCoordinationMgr);
+    if (argc == 2) {
+        jsCoordinationMgr->UnregisterListener(env, type, networkId);
+        return nullptr;
+    }
+    if (UtilNapi::TypeOf(env, argv[2], napi_undefined) || UtilNapi::TypeOf(env, argv[2], napi_null)) {
+        jsCoordinationMgr->UnregisterListener(env, type, networkId);
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    jsCoordinationMgr->UnregisterListener(env, type, networkId, argv[2]);
+    return nullptr;
+}
+
 std::shared_ptr<JsCoordinationManager> JsCoordinationContext::GetJsCoordinationMgr()
 {
     std::lock_guard<std::mutex> guard(mutex_);

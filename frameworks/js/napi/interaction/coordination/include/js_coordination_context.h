@@ -43,6 +43,8 @@ public:
     static napi_value GetCooperateSwitchState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
+    static napi_value RegisterMouseLocation(napi_env env, napi_callback_info info);
+    static napi_value UnregisterMouseLocation(napi_env env, napi_callback_info info);
     std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:

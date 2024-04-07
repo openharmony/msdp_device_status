@@ -235,6 +235,23 @@ MONITOR_LABEL:
     }
 }
 
+void JsEventTarget::AddListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle)
+{
+    CALL_INFO_TRACE;
+    std::string listenerType = type;
+    bool isCompatible = (type == COOPERATE_MOUSE_NAME ? true : false);
+    std::lock_guard<std::mutex> guard(mutex_);
+
+}
+
+void JsEventTarget::RemoveListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle)
+{
+    std::string listenerType = type;
+    bool isCompatible = (type == COOPERATE_MOUSE_NAME ? true : false);
+    std::lock_guard<std::mutex> guard(mutex_);
+    
+}
+
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> callback)
 {
     CALL_INFO_TRACE;
