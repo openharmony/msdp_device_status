@@ -383,7 +383,7 @@ void CooperateClient::DumpPerformaceInfo()
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
         performanceInfo_.minDuration);
     std::string durationStr;
-    for (const auto &duraion : performaceInfo_.durationList) {
+    for (const auto &duraion : performanceInfo_.durationList) {
         durationStr += std::to_string(duraion) + ", ";
     }
     FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
