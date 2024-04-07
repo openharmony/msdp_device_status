@@ -186,7 +186,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
                 return RET_ERR;
             }
             FI_HILOGI("GetCrossingSwitchState -> GetCooperateState for udId: %{public}s successfully, state: %{public}s"
-            , Utility::Anonymize(param.udId), state ? "true" : "false");
+                , Utility::Anonymize(param.udId), state ? "true" : "false");
             if (!BoolenReply(state).Marshalling(reply)) {
                 FI_HILOGE("Marshalling state failed");
                 return RET_ERR;
