@@ -349,6 +349,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         FI_HILOGE("type:%{public}d already exists", type);
         return nullptr;
     }
+    std::lock_guard<std::mutex> guard(g_obj->mutex_);
     auto callbackIter = callbacks_.find(type);
     if (callbackIter != callbacks_.end()) {
         FI_HILOGD("Callback exists");
@@ -415,6 +416,7 @@ napi_value DeviceStatusNapi::UnsubscribeDeviceStatus(napi_env env, napi_callback
 napi_value DeviceStatusNapi::UnsubscribeCallback(napi_env env, int32_t type, int32_t event)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(g_obj->mutex_);
     auto callbackIter = callbacks_.find(type);
     if (callbackIter == callbacks_.end()) {
         NAPI_ASSERT(env, false, "No existed callback");
