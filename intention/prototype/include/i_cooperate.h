@@ -16,15 +16,37 @@
 #ifndef I_COOPERATE_H
 #define I_COOPERATE_H
 
+#include <memory>
 #include <string>
 
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+struct Coordinate {
+    int32_t x;
+    int32_t y;
+};
+using NormalizedCoordinate = Coordinate;
+
+class ICooperateObserver {
+public:
+    ICooperateObserver() = default;
+    virtual ~ICooperateObserver() = default;
+
+    virtual void OnTransitionOut(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
+    virtual void OnTransitionIn(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
+    virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
+    virtual void OnRelay(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
+    virtual void OnReset() = 0;
+};
+
 class ICooperate {
 public:
     ICooperate() = default;
     virtual ~ICooperate() = default;
+
+    virtual void AddObserver(std::shared_ptr<ICooperateObserver> observer) = 0;
+    virtual void RemoveObserver(std::shared_ptr<ICooperateObserver> observer) = 0;
 
     virtual int32_t RegisterListener(int32_t pid) = 0;
     virtual int32_t UnregisterListener(int32_t pid) = 0;
@@ -38,7 +60,7 @@ public:
     virtual int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) = 0;
 
     virtual int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) = 0;
-
+    virtual int32_t GetCooperateState(const std::string &udId, bool &state) = 0;
     virtual void Dump(int32_t fd) = 0;
 };
 } // namespace DeviceStatus

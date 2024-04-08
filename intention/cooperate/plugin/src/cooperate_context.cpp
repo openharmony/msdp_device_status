@@ -34,6 +34,7 @@ namespace DeviceStatus {
 namespace Cooperate {
 namespace {
 const std::string COOPERATE_SWITCH { "currentStatus" };
+const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
 } // namespace
 
@@ -87,7 +88,8 @@ void DeviceProfileObserver::OnProfileChanged(const std::string &networkId)
     FI_HILOGI("Profile of \'%{public}s\' has changed", Utility::Anonymize(networkId));
     bool switchStatus = false;
 
-    int32_t ret = env_->GetDP().GetProperty(networkId, COOPERATE_SWITCH, switchStatus);
+    auto udId = env_->GetDP().GetUdIdByNetworkId(networkId);
+    int32_t ret = env_->GetDP().GetCrossingSwitchState(udId, switchStatus);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to query switch status of \'%{public}s\'", Utility::Anonymize(networkId));
         return;
@@ -140,15 +142,32 @@ Context::Context(IContext *env)
       inputEventBuilder_(env), inputEventInterceptor_(env), env_(env)
 {}
 
+IDDPAdapter& Context::GetDP() const
+{
+    return env_->GetDP();
+}
+
 void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
 {
     sender_ = sender;
     dsoftbus_.AttachSender(sender);
 }
 
+void Context::AddObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CHKPV(observer);
+    observers_.insert(observer);
+}
+
+void Context::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    observers_.erase(observer);
+}
+
 void Context::Enable()
 {
     CALL_DEBUG_ENTER;
+    StartEventHandler();
     EnableDDM();
     EnableDDP();
     EnableDevMgr();
@@ -160,6 +179,19 @@ void Context::Disable()
     DisableDevMgr();
     DisableDDP();
     DisableDDM();
+    StopEventHandler();
+}
+
+int32_t Context::StartEventHandler()
+{
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    return RET_OK;
+}
+
+void Context::StopEventHandler()
+{
+    eventHandler_.reset();
 }
 
 int32_t Context::EnableDDM()
@@ -225,7 +257,7 @@ NormalizedCoordinate Context::NormalizedCursorPosition() const
 
 void Context::EnableCooperate(const EnableCooperateEvent &event)
 {
-    int32_t ret = env_->GetDP().SetProperty(COOPERATE_SWITCH, true);
+    int32_t ret = env_->GetDP().UpdateCrossingSwitchState(true);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to update switch status");
     }
@@ -233,7 +265,7 @@ void Context::EnableCooperate(const EnableCooperateEvent &event)
 
 void Context::DisableCooperate(const DisableCooperateEvent &event)
 {
-    int32_t ret = env_->GetDP().SetProperty(COOPERATE_SWITCH, false);
+    int32_t ret = env_->GetDP().UpdateCrossingSwitchState(false);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to update switch status");
     }
@@ -248,7 +280,8 @@ void Context::StartCooperate(const StartCooperateEvent &event)
 void Context::OnPointerEvent(const InputPointerEvent &event)
 {
     if ((event.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE)) {
+        ((event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) ||
+         (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         cursorPos_ = event.position;
     }
 }
@@ -262,6 +295,76 @@ void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
 {
     remoteNetworkId_ = event.targetNetworkId;
+}
+
+void Context::OnTransitionOut()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of transition out");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of transition out");
+                CHKPV(observer);
+                observer->OnTransitionOut(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnTransitionIn()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of transition in");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of transition in");
+                CHKPV(observer);
+                observer->OnTransitionIn(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnBack()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of come back");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of come back");
+                CHKPV(observer);
+                observer->OnBack(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnRelay(const std::string &networkId)
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of relay cooperation");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of relay cooperation");
+                CHKPV(observer);
+                observer->OnRelay(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnResetCooperation()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of reset cooperation");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer] {
+                FI_HILOGI("Notify one observer of reset cooperation");
+                CHKPV(observer);
+                observer->OnReset();
+            });
+    }
 }
 
 void Context::SetCursorPosition(const Coordinate &cursorPos)
@@ -284,6 +387,30 @@ void Context::ResetCursorPosition()
     };
     SetCursorPosition(defaultCursorPos);
 }
+
+#ifdef ENABLE_PERFORMANCE_CHECK
+void Context::StartTrace(const std::string &name)
+{
+    std::lock_guard guard { lock_ };
+    if (traces_.find(name) != traces_.end()) {
+        return;
+    }
+    traces_.emplace(name, std::chrono::steady_clock::now());
+    FI_HILOGI("[PERF]Start tracing \'%{public}s\'", name.c_str());
+}
+
+void Context::FinishTrace(const std::string &name)
+{
+    std::lock_guard guard { lock_ };
+    if (auto iter = traces_.find(name); iter != traces_.end()) {
+        FI_HILOGI("[PERF]Finish tracing \'%{public}s\', elapsed:%{public}lld ms", name.c_str(),
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - iter->second).count());
+        traces_.erase(iter);
+    }
+}
+#endif // ENABLE_PERFORMANCE_CHECK
+
 } // namespace Cooperate
 } // namespace DeviceStatus
 } // namespace Msdp

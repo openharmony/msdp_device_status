@@ -15,6 +15,12 @@
 
 #include "cooperate.h"
 
+#ifdef ENABLE_PERFORMANCE_CHECK
+#include <sstream>
+#include "utility.h"
+#endif // ENABLE_PERFORMANCE_CHECK
+
+
 #include "devicestatus_define.h"
 
 #undef LOG_TAG
@@ -24,8 +30,6 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-namespace {
-} // namespace
 
 Cooperate::Cooperate(IContext *env)
     : context_(env), sm_(env)
@@ -40,6 +44,26 @@ Cooperate::~Cooperate()
 {
     StopWorker();
     context_.Disable();
+}
+
+void Cooperate::AddObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::ADD_OBSERVER,
+        AddObserverEvent {
+            .observer = observer
+        }));
+}
+
+void Cooperate::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::REMOVE_OBSERVER,
+        RemoveObserverEvent {
+            .observer = observer
+        }));
 }
 
 int32_t Cooperate::RegisterListener(int32_t pid)
@@ -115,6 +139,12 @@ int32_t Cooperate::Disable(int32_t pid, int32_t userData)
 int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId)
 {
     CALL_DEBUG_ENTER;
+
+#ifdef ENABLE_PERFORMANCE_CHECK
+    std::ostringstream ss;
+    ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId);
+    context_.StartTrace(ss.str());
+#endif // ENABLE_PERFORMANCE_CHECK
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::START,
         StartCooperateEvent {
@@ -150,6 +180,12 @@ int32_t Cooperate::GetCooperateState(int32_t pid, int32_t userData, const std::s
             .networkId = networkId,
         }));
     return RET_OK;
+}
+
+int32_t Cooperate::GetCooperateState(const std::string &udId, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    return context_.GetDP().GetCrossingSwitchState(udId, state);
 }
 
 void Cooperate::Dump(int32_t fd)

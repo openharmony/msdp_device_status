@@ -34,7 +34,8 @@ ohos_shared_library("fusion_dm_binding") {
 
   external_deps = [
     "c_utils:utils",
-    "device_info_manager:distributed_device_profile_client",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "device_manager:devicemanagersdk",
     "hilog:libhilog",
   ]

@@ -19,6 +19,8 @@
 #include <string>
 #include <variant>
 
+#include "i_cooperate.h"
+
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
@@ -33,6 +35,8 @@ enum CooperateState : size_t {
 enum class CooperateEventType {
     NOOP,
     QUIT,
+    ADD_OBSERVER,
+    REMOVE_OBSERVER,
     REGISTER_LISTENER,
     UNREGISTER_LISTENER,
     REGISTER_HOTAREA_LISTENER,
@@ -60,12 +64,6 @@ enum class CooperateEventType {
     DSOFTBUS_RELAY_COOPERATE_FINISHED,
 };
 
-struct Coordinate {
-    int32_t x;
-    int32_t y;
-};
-using NormalizedCoordinate = Coordinate;
-
 struct Rectangle {
     int32_t width;
     int32_t height;
@@ -73,9 +71,10 @@ struct Rectangle {
     int32_t y;
 };
 
-struct UpdateStateEvent {
-    CooperateState current;
+struct AddObserverEvent {
+    std::shared_ptr<ICooperateObserver> observer;
 };
+using RemoveObserverEvent = AddObserverEvent;
 
 struct RegisterListenerEvent {
     int32_t pid;
@@ -170,7 +169,7 @@ struct CooperateEvent {
 
     CooperateEventType type;
     std::variant<
-        UpdateStateEvent,
+        AddObserverEvent,
         RegisterListenerEvent,
         StartCooperateEvent,
         StopCooperateEvent,

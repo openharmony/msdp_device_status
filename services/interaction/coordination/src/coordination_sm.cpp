@@ -1195,8 +1195,7 @@ void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::PointerE
 
 void CoordinationSM::MonitorConsumer::OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const {}
 
-void CoordinationSM::RegisterStateChange(CooStateChangeType type,
-    std::function<void(CoordinationState, CoordinationState)> callback)
+void CoordinationSM::RegisterStateChange(CooStateChangeType type, std::function<void()> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
@@ -1221,27 +1220,27 @@ void CoordinationSM::StateChangedNotify(CoordinationState oldState, Coordination
 {
     CALL_DEBUG_ENTER;
     if ((oldState == CoordinationState::STATE_FREE) && (newState == CoordinationState::STATE_IN)) {
-        ChangeNotify(CooStateChangeType::STATE_FREE_TO_IN, oldState, newState);
+        ChangeNotify(CooStateChangeType::STATE_FREE_TO_IN);
         return;
     }
     if ((oldState == CoordinationState::STATE_FREE) && (newState == CoordinationState::STATE_OUT)) {
-        ChangeNotify(CooStateChangeType::STATE_FREE_TO_OUT, oldState, newState);
+        ChangeNotify(CooStateChangeType::STATE_FREE_TO_OUT);
         return;
     }
     if ((oldState == CoordinationState::STATE_IN) && (newState == CoordinationState::STATE_FREE)) {
-        ChangeNotify(CooStateChangeType::STATE_IN_TO_FREE, oldState, newState);
+        ChangeNotify(CooStateChangeType::STATE_IN_TO_FREE);
         return;
     }
     if ((oldState == CoordinationState::STATE_OUT) && (newState == CoordinationState::STATE_FREE)) {
-        ChangeNotify(CooStateChangeType::STATE_OUT_TO_FREE, oldState, newState);
+        ChangeNotify(CooStateChangeType::STATE_OUT_TO_FREE);
     }
 }
 
-void CoordinationSM::ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState)
+void CoordinationSM::ChangeNotify(CooStateChangeType type)
 {
     auto item = stateChangedCallbacks_[type];
     if (item != nullptr) {
-        item(oldState, newState);
+        item();
     }
 }
 

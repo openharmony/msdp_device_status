@@ -255,7 +255,7 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult)
 {
-    FI_HILOGI("mainWindow:%{public}d", dropResult.mainWindow);
+    FI_HILOGI("mainWindow:%{public}d,dragResult:%{public}d", dropResult.mainWindow, dropResult.result);
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;

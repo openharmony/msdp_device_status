@@ -147,8 +147,7 @@ public:
     void RemoveMonitor();
     void RemoveInterceptor();
     bool IsNeedFilterOut(const std::string &networkId, const std::shared_ptr<MMI::KeyEvent> keyEvent);
-    void RegisterStateChange(CooStateChangeType type,
-        std::function<void(CoordinationState, CoordinationState)> callback);
+    void RegisterStateChange(CooStateChangeType type, std::function<void()> callback);
     bool UnchainCoordination(const std::string &localNetworkId, const std::string &remoteNetworkId);
     void SetUnchainStatus(bool isUnchained);
     void NotifyChainRemoved();
@@ -171,7 +170,7 @@ private:
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
     void StateChangedNotify(CoordinationState oldState, CoordinationState newState);
-    void ChangeNotify(CooStateChangeType type, CoordinationState oldState, CoordinationState newState);
+    void ChangeNotify(CooStateChangeType type);
     void NotifyRemoteNetworkId(const std::string &remoteNetworkId);
     void NotifyMouseLocation(int32_t x, int32_t y);
     void SetPointerVisible();
@@ -206,7 +205,7 @@ private:
     int32_t interceptorId_ { -1 };
     int32_t monitorId_ { -1 };
     int32_t filterId_ { -1 };
-    std::map<CooStateChangeType, std::function<void(CoordinationState, CoordinationState)>> stateChangedCallbacks_;
+    std::map<CooStateChangeType, std::function<void()>> stateChangedCallbacks_;
     std::function<void(std::string)> remoteNetworkIdCallback_;
     std::function<void(int32_t, int32_t)> mouseLocationCallback_;
     std::function<void(void)> notifyDragCancelCallback_;

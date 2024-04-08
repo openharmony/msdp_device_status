@@ -964,12 +964,14 @@ void DragDrawing::InitDrawingInfo(const DragData &dragData)
         g_drawingInfo.pixelMap->scale(scalingValue, scalingValue, Media::AntiAliasingOption::HIGH);
         g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * scalingValue;
         g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * scalingValue;
+        if (fabs(scalingValue - 1.0f) > EPSILON) {
+            float widthScale = CalculateWidthScale();
+            CHKPV(g_drawingInfo.pixelMap);
+            g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
+            g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
+            g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
+        }
     }
-    float widthScale = CalculateWidthScale();
-    CHKPV(g_drawingInfo.pixelMap);
-    g_drawingInfo.pixelMap->scale(widthScale, widthScale, Media::AntiAliasingOption::HIGH);
-    g_drawingInfo.pixelMapX = g_drawingInfo.pixelMapX * widthScale;
-    g_drawingInfo.pixelMapY = g_drawingInfo.pixelMapY * widthScale;
     g_drawingInfo.lastPixelMapX = g_drawingInfo.pixelMapX;
     g_drawingInfo.lastPixelMapY = g_drawingInfo.pixelMapY;
     g_drawingInfo.currentDragNum = dragData.dragNum;

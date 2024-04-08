@@ -21,7 +21,6 @@
 #include "nocopyable.h"
 
 #include "i_context.h"
-#include "i_cooperate.h"
 #include "state_machine.h"
 
 namespace OHOS {
@@ -34,6 +33,9 @@ public:
     ~Cooperate();
     DISALLOW_COPY_AND_MOVE(Cooperate);
 
+    void AddObserver(std::shared_ptr<ICooperateObserver> observer) override;
+    void RemoveObserver(std::shared_ptr<ICooperateObserver> observer) override;
+
     int32_t RegisterListener(int32_t pid) override;
     int32_t UnregisterListener(int32_t pid) override;
     int32_t RegisterHotAreaListener(int32_t pid) override;
@@ -45,7 +47,7 @@ public:
     int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) override;
 
     int32_t GetCooperateState(int32_t pid, int32_t userData, const std::string &networkId) override;
-
+    int32_t GetCooperateState(const std::string &udId, bool &state) override;
     void Dump(int32_t fd) override;
 
 private:

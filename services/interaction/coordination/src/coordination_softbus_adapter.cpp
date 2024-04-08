@@ -557,7 +557,7 @@ void CoordinationSoftbusAdapter::HandleSessionData(int32_t socket, const std::st
     if (!cJSON_IsObject(parser.json)) {
         FI_HILOGI("Handle session data, parser json is not object");
         CHKPV(onRecvDataCallback_);
-        onRecvDataCallback_(reinterpret_cast<void *> (const_cast<char *> (message.c_str())), message.size());
+        onRecvDataCallback_(message.c_str(), message.size());
         return;
     }
     HandleCoordinationSessionData(socket, parser);
@@ -628,7 +628,7 @@ void CoordinationSoftbusAdapter::OnShutdown(int32_t socket, ShutdownReason reaso
     socketFd_ = -1;
 }
 
-void CoordinationSoftbusAdapter::RegisterRecvFunc(std::function<void(void*, uint32_t)> callback)
+void CoordinationSoftbusAdapter::RegisterRecvFunc(std::function<void(const void*, uint32_t)> callback)
 {
     CALL_DEBUG_ENTER;
     CHKPV(callback);
