@@ -78,8 +78,10 @@ public:
         const std::string &networkId, CooperateStateCallback callback,
         bool isCheckPermission = false);
     int32_t GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state);
-    int32_t RegisterEventListener(ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener);
-    int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId, MouseLocationListenerPtr listener = nullptr);
+    int32_t RegisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
+        MouseLocationListenerPtr listener);
+    int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
+        MouseLocationListenerPtr listener = nullptr);
     int32_t AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener);
     int32_t RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener = nullptr);
 

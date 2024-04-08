@@ -117,20 +117,30 @@ public:
     int32_t GetCoordinationState(const std::string &udId, bool &state);
 
     /**
+     * @brief Registers a listener for mouse pointer position information on the specified device.
+     * @param networkId Indicates the descriptor of the input device.
+     * @param listener Indicates the listener for mouse pointer position information on the specified device.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 9
+     */
+    int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
+
+    /**
+     * @brief Unregisters a listener for mouse pointer position information on the specified device.
+     * @param networkId Indicates the descriptor of the input device.
+     * @param listener Indicates the listener mouse pointer position information on the specified device.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 9
+     */
+    int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
+
+    /**
      * @brief Starts dragging.
      * @param dragData Indicates additional data used for dragging.
      * @param listener Indicates the listener used to notify dragging result etc.
      * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
      * @since 10
      */
-
-    /**
-     * 该接口的networkId 不区分设备，也可以通过该接口监听多模事件, 如此，穿越动效只能由穿越管理控制了
-    */
-    int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
-
-    int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
-
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
 
     /**

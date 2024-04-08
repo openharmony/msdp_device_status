@@ -30,7 +30,7 @@ class IEventListener {
 public:
     IEventListener() = default;
     virtual ~IEventListener() = default;
-    virtual void OnEvent(const Event &event) = 0;
+    virtual void OnMouseLocationEvent(const std::string &networkId, const Event &event) = 0;
 };
 } // namespace Msdp
 } // namespace OHOS

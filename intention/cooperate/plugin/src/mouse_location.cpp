@@ -159,7 +159,8 @@ void MouseLocation::SyncLocationToRemote(const std::string &networkId, const Loc
     SyncMouseLocation(softbusEvent.networkId, softbusEvent);
 }
 
-int32_t MouseLocation::RelaySubscribeMouseLocation(const std::string &networkId, const DSoftbusRelaySubscribeMouseLocation &event)
+int32_t MouseLocation::RelaySubscribeMouseLocation(const std::string &networkId,
+    const DSoftbusRelaySubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION);
@@ -175,7 +176,8 @@ int32_t MouseLocation::RelaySubscribeMouseLocation(const std::string &networkId,
     return ret;
 }
 
-int32_t MouseLocation::RelayUnSubscribeMouseLocation(const std::string &networkId, const DSoftbusRelayUnSubscribeMouseLocation &event)
+int32_t MouseLocation::RelayUnSubscribeMouseLocation(const std::string &networkId,
+    const DSoftbusRelayUnSubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION);
@@ -207,7 +209,8 @@ int32_t MouseLocation::SubscribeMouseLocation(const std::string &networkId, cons
     return ret;
 }
 
-int32_t MouseLocation::UnSubscribeMouseLocation(const std::string &networkId, const DSoftbusUnSubscribeMouseLocation &event)
+int32_t MouseLocation::UnSubscribeMouseLocation(const std::string &networkId,
+    const DSoftbusUnSubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION);
@@ -240,7 +243,8 @@ int32_t MouseLocation::SyncMouseLocation(const std::string &networkId, const DSo
     return ret;
 }
 
-void MouseLocation::ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo, int32_t pid)
+void MouseLocation::ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo,
+    int32_t pid)
 {
     auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
     CHKPV(session);

@@ -67,7 +67,7 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
 int32_t DragClient::StopDrag(ITunnelClient &tunnel, const DragDropResult &dropResult)
 {
     CALL_DEBUG_ENTER;
-    StopDragParam param(dropResult);
+    StopDragParam param { dropResult };
     DefaultReply reply;
 
     int32_t ret = tunnel.Stop(Intention::DRAG, param, reply);

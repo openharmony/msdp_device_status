@@ -58,6 +58,7 @@ public:
         CallbackData data;
     };
     struct MouseCallbackData {
+        std::string networkId;
         int32_t displayX { -1 };
         int32_t displayY { -1 };
         int32_t displayWidth { -1 };

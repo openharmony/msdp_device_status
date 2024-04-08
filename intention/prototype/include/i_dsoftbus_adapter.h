@@ -20,6 +20,7 @@
 #include <string>
 
 #include "net_packet.h"
+#include "parcel.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -32,6 +33,7 @@ public:
     virtual void OnBind(const std::string &networkId) = 0;
     virtual void OnShutdown(const std::string &networkId) = 0;
     virtual bool OnPacket(const std::string &networkId, NetPacket &packet) = 0;
+    virtual bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen) = 0;
 };
 
 class IDSoftbusAdapter {
@@ -50,6 +52,7 @@ public:
     virtual void CloseAllSessions() = 0;
 
     virtual int32_t SendPacket(const std::string &networkId, NetPacket &packet) = 0;
+    virtual int32_t SendParcel(const std::string &networkId, Parcel &parcel) = 0;
 
     static std::string GetLocalNetworkId();
 };

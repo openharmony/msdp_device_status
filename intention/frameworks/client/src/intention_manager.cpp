@@ -224,7 +224,8 @@ int32_t IntentionManager::RegisterEventListener(const std::string &networkId, st
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 }
 
-int32_t IntentionManager::UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
+int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
+    std::shared_ptr<IEventListener> listener)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COORDINATION

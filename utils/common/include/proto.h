@@ -68,7 +68,9 @@ enum class MessageId : int32_t {
     DRAG_NOTIFY_RESULT,
     DRAG_STATE_LISTENER,
     DRAG_NOTIFY_HIDE_ICON,
-    DRAG_STYLE_LISTENER
+    DRAG_STYLE_LISTENER,
+
+    MAX_MESSAGE_ID
 };
 
 enum TokenType : int32_t {

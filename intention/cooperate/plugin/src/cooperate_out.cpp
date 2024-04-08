@@ -129,6 +129,7 @@ void CooperateOut::Initial::OnComeBack(Context &context, const CooperateEvent &e
     context.RemoteStartSuccess(notice);
     context.eventMgr_.RemoteStartFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnBack();
 }
 
 void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
@@ -160,6 +161,7 @@ void CooperateOut::Initial::OnRemoteStop(Context &context, const CooperateEvent 
     context.inputEventInterceptor_.Disable();
     context.eventMgr_.RemoteStopFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnResetCooperation();
 }
 
 void CooperateOut::Initial::OnRelay(Context &context, const CooperateEvent &event)
@@ -323,6 +325,7 @@ void CooperateOut::RemoteStart::OnSuccess(Context &context, const DSoftbusStartC
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(event);
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
+    context.OnResetCooperation();
 }
 
 void CooperateOut::RemoteStart::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -459,6 +462,7 @@ void CooperateOut::StopCooperate(Context &context, const CooperateEvent &event)
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
 
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnResetCooperation();
 }
 
 void CooperateOut::UnchainConnections(Context &context, const StopCooperateEvent &event) const

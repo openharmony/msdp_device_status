@@ -248,7 +248,7 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
         eventListener_.erase(networkId);
         FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
         return RET_OK;
-    } 
+    }
     eventListener_[networkId].erase(listener);
     FI_HILOGD("Remove listener for networkId:%{public}s", Utility::Anonymize(networkId));
     if (eventListener_[networkId].empty()) {
@@ -420,7 +420,7 @@ void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, c
     }
     for (const auto &listener : eventListener_[networkId]) {
         FI_HILOGD("Trigger listener for networkId:%{public}s", Utility::Anonymize(networkId));
-        listener->OnEvent(event);
+        listener->OnMouseLocationEvent(networkId, event);
     }
 }
 

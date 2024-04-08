@@ -46,6 +46,26 @@ Cooperate::~Cooperate()
     context_.Disable();
 }
 
+void Cooperate::AddObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::ADD_OBSERVER,
+        AddObserverEvent {
+            .observer = observer
+        }));
+}
+
+void Cooperate::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    context_.Sender().Send(CooperateEvent(
+        CooperateEventType::REMOVE_OBSERVER,
+        RemoveObserverEvent {
+            .observer = observer
+        }));
+}
+
 int32_t Cooperate::RegisterListener(int32_t pid)
 {
     CALL_DEBUG_ENTER;

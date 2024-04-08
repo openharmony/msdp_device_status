@@ -43,8 +43,6 @@ public:
     static napi_value GetCooperateSwitchState(napi_env env, napi_callback_info info);
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
-    static napi_value RegisterMouseLocation(napi_env env, napi_callback_info info);
-    static napi_value UnregisterMouseLocation(napi_env env, napi_callback_info info);
     std::shared_ptr<JsCoordinationManager> GetJsCoordinationMgr();
 
 private:
@@ -54,6 +52,10 @@ private:
     static napi_value DeactivateCompatible(napi_env env, napi_callback_info info, bool isCompatible = false);
     static napi_value GetCrossingSwitchStateCompatible(napi_env env,
         napi_callback_info info, bool isCompatible = false);
+    static napi_value RegisterCooperateListener(napi_env env, const std::string &type, napi_callback_info info);
+    static napi_value UnregisterCooperateListener(napi_env env, const std::string &type, napi_callback_info info);
+    static napi_value RegisterMouseListener(napi_env env, napi_callback_info info);
+    static napi_value UnregisterMouseListener(napi_env env, napi_callback_info info);
 
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);

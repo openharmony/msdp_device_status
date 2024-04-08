@@ -13,19 +13,24 @@
  * limitations under the License.
  */
 
-#include <future>
-#include <utility>
 #include <vector>
 
 #include <unistd.h>
 
-#include "i_event_listener.h"
+#include "accesstoken_kit.h"
+#include "device_manager.h"
+#include "dm_device_info.h"
+#include <gtest/gtest.h>
+#include "nativetoken_kit.h"
+#include "pointer_event.h"
+#include "securec.h"
+#include "token_setproc.h"
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
-#include "nativetoken_kit.h"
-#include "token_setproc.h"
+#include "i_event_listener.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "MouseLocationListenerTest"
@@ -36,9 +41,11 @@ namespace DeviceStatus {
 using namespace testing::ext;
 namespace {
 uint64_t g_tokenID { 0 };
-const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
+const std::string SYSTEM_BASIC { "system_basic" };
 const char* g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
-constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };  
+const std::string PKG_NAME_PREFIX { "DBinderBus_Dms_" };
+constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
+#define DSTB_HARDWARE DistributedHardware::DeviceManager::GetInstance()
 } // namespace
 
 class MouseLocationListenerTest : public testing::Test {
@@ -46,6 +53,9 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
+    static void RemovePermission();
+    static std::string GetLocalNetworkId();
 };
 
 
@@ -58,13 +68,26 @@ void MouseLocationListenerTest::TearDown()
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
 }
 
+std::string MouseLocationListenerTest::GetLocalNetworkId()
+{
+    auto packageName = PKG_NAME_PREFIX + std::to_string(getpid());
+    OHOS::DistributedHardware::DmDeviceInfo dmDeviceInfo;
+    if (int32_t errCode = DSTB_HARDWARE.GetLocalDeviceInfo(packageName, dmDeviceInfo); errCode != RET_OK) {
+        FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
+        return {};
+    }
+    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId));
+    return dmDeviceInfo.networkId;
+}
+
 class EventListener : public IEventListener {
-    void OnEvent(const Event &event) override ;
+    void OnMouseLocationEvent(const std::string &networkId, const Event &event) override;
 };
 
-void EventListener::OnEvent(const Event &event) {
-    FI_HILOGI("DisplayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
-        event.displayX, event.displayY, event.displayWidth, event.displayHeight); 
+void EventListener::OnMouseLocationEvent(const std::string &networkId, const Event &event) {
+    FI_HILOGI("NetworkId: %{public}s, DisplayX:%{public}d, displayY:%{public}d,"
+        "displayWidth:%{public}d, displayHeight:%{public}d", Utility::Anonymize(networkId),
+        event.displayX, event.displayY, event.displayWidth, event.displayHeight);
 }
 
 void MouseLocationListenerTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
@@ -102,78 +125,101 @@ void MouseLocationListenerTest::RemovePermission()
 
 /**
  * @tc.name: RegisterEventListener_00
- * @tc.desc: Event Listener, local networkId
+ * @tc.desc: Local NetworkId, Valid Listener.
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(MouseLocationListenerTest, RegisterEventListener_00, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string networkId { "Default" };
-    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, nullptr);
-    ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::string networkId = GetLocalNetworkId();
+    auto listener = std::make_shared<EventListener>();
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
+    RemovePermission();
 }
 
 /**
- * @tc.name: UnregisterEventListener_01
- * @tc.desc: Event Listener, local networkId
+ * @tc.name: RegisterEventListener_01
+ * @tc.desc: Local networkId, NULL Listener.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_01, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, RegisterEventListener_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string networkId { "Default" };
-    auto listener = std::make_shared<EventListener>();
-    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::string networkId = GetLocalNetworkId();
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, nullptr);
     ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
+    RemovePermission();
 }
 
 /**
  * @tc.name: RegisterEventListener_02
- * @tc.desc: Event Listener, remote networkId
+ * @tc.desc: Default NetworkId, Valid Listener 
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(MouseLocationListenerTest, RegisterEventListener_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
     std::string networkId { "Default" };
-    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
+    auto listener = std::make_shared<EventListener>();
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
+    RemovePermission();
+}
+
+/**
+ * @tc.name: RegisterEventListener_03
+ * @tc.desc: Default NetworkId, Invalid Listener 
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseLocationListenerTest, RegisterEventListener_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::string networkId { "Default" };
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, nullptr);
     ASSERT_EQ(ret, COMMON_PARAMETER_ERROR);
+    RemovePermission();
 }
 
 /**
- * @tc.name: UnregisterEventListener_03
- * @tc.desc: Event Listener, remote networkId
+ * @tc.name: UnregisterEventListener_00
+ * @tc.desc: Local NetworkId, Valid Listener.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_03, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_04, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::string networkId = GetLocalNetworkId();
+    auto listener = std::make_shared<EventListener>();
+    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
+    RemovePermission();
 }
 
 /**
- * @tc.name: RegisterEventListener_04
- * @tc.desc: Event Listener, invalid listener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseLocationListenerTest, RegisterEventListener_04, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-}
-
-/**
- * @tc.name: UnregisterEventListener_05
- * @tc.desc: Event Listener, invalid listener
+ * @tc.name: UnregisterEventListener_01
+ * @tc.desc: Local networkId, NULL Listener.
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_05, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::string networkId = GetLocalNetworkId();
+    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
+    ASSERT_EQ(ret, RET_OK);
+    RemovePermission();
 }
 
 } // namespace DeviceStatus

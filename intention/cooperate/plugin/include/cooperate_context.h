@@ -16,6 +16,7 @@
 #ifndef COOPERATE_CONTEXT_H
 #define COOPERATE_CONTEXT_H
 
+#include "event_handler.h"
 #include "nocopyable.h"
 
 #ifdef ENABLE_PERFORMANCE_CHECK
@@ -45,10 +46,13 @@ public:
     DISALLOW_COPY_AND_MOVE(Context);
 
     void AttachSender(Channel<CooperateEvent>::Sender sender);
+    void AddObserver(std::shared_ptr<ICooperateObserver> observer);
+    void RemoveObserver(std::shared_ptr<ICooperateObserver> observer);
     void Enable();
     void Disable();
 
     Channel<CooperateEvent>::Sender Sender() const;
+    std::shared_ptr<AppExecFwk::EventHandler> EventHandler() const;
     IDDPAdapter& GetDP() const;
     std::string Local() const;
     std::string Peer() const;
@@ -66,6 +70,12 @@ public:
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
 
+    void OnTransitionOut();
+    void OnTransitionIn();
+    void OnBack();
+    void OnRelay(const std::string &networkId);
+    void OnResetCooperation();
+
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(const std::string &name);
     void FinishTrace(const std::string &name);
@@ -80,6 +90,8 @@ public:
     InputEventInterceptor inputEventInterceptor_;
 
 private:
+    int32_t StartEventHandler();
+    void StopEventHandler();
     int32_t EnableDDM();
     void DisableDDM();
     int32_t EnableDDP();
@@ -94,9 +106,11 @@ private:
     std::string remoteNetworkId_;
     int32_t startDeviceId_ { -1 };
     Coordinate cursorPos_ {};
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_;
     std::shared_ptr<IBoardObserver> boardObserver_;
     std::shared_ptr<IDeviceProfileObserver> dpObserver_;
     std::shared_ptr<IDeviceObserver> hotplugObserver_;
+    std::set<std::shared_ptr<ICooperateObserver>> observers_;
 
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::mutex lock_;
@@ -107,6 +121,11 @@ private:
 inline Channel<CooperateEvent>::Sender Context::Sender() const
 {
     return sender_;
+}
+
+inline std::shared_ptr<AppExecFwk::EventHandler> Context::EventHandler() const
+{
+    return eventHandler_;
 }
 
 inline std::string Context::Local() const

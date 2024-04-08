@@ -19,6 +19,8 @@
 #include <string>
 
 #include "coordination_message.h"
+#include "i_coordination_listener.h"
+#include "i_event_listener.h"
 
 namespace OHOS {
 namespace Msdp {

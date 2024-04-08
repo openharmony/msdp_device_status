@@ -60,7 +60,8 @@ private:
     int32_t UnSubscribeMouseLocation(const std::string &networkId, const DSoftbusUnSubscribeMouseLocation &event);
     int32_t SyncMouseLocation(const std::string &networkId, const DSoftbusSyncMouseLocation &event);
     int32_t RelaySubscribeMouseLocation(const std::string &networkId, const DSoftbusRelaySubscribeMouseLocation &event);
-    int32_t RelayUnSubscribeMouseLocation(const std::string &networkId, const DSoftbusRelayUnSubscribeMouseLocation &event);
+    int32_t RelayUnSubscribeMouseLocation(const std::string &networkId,
+        const DSoftbusRelayUnSubscribeMouseLocation &event);
     void ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo, int32_t pid);
     void TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> pointerEvent, LocationInfo &locationInfo);
     bool HasRemoteSubscriber();

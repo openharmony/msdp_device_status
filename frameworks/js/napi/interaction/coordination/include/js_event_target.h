@@ -32,7 +32,9 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
-class JsEventTarget : public ICoordinationListener, public std::enable_shared_from_this<JsEventTarget> {
+class JsEventTarget : public ICoordinationListener,
+                      public IEventListener,
+                      public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
@@ -47,9 +49,11 @@ public:
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     void AddListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> callback);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> callback);
+    napi_value CreateMouseCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::MouseCallbackInfo> callback);
     void ResetEnv();
     void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override;
+    void OnMouseLocationEvent(const std::string &networkId, const Event &event) override;
 
 private:
     static void CallPreparePromiseWork(uv_work_t *work, int32_t status);
@@ -61,10 +65,11 @@ private:
     static void CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
+    static void EmitMouseLocationEvent(uv_work_t *work, int32_t status);
 
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
         coordinationListeners_ {};
-    inline static std::map<std::string_view, std::vector<sptr<JsUtil::MouseCallbackInfo>>>
+    inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>>
         mouseLocationListeners_ {};
     std::atomic_bool isListeningProcess_ { false };
 };

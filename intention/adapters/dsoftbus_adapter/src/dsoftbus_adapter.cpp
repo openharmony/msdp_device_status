@@ -59,6 +59,11 @@ int32_t DSoftbusAdapter::SendPacket(const std::string &networkId, NetPacket &pac
 {
     return DSoftbusAdapterImpl::GetInstance()->SendPacket(networkId, packet);
 }
+
+int32_t DSoftbusAdapter::SendParcel(const std::string &networkId, Parcel &parcel)
+{
+    return DSoftbusAdapterImpl::GetInstance()->SendParcel(networkId, parcel);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
