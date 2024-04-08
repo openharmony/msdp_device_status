@@ -55,6 +55,13 @@ void CooperateIn::OnLeaveState(Context & context)
     CALL_INFO_TRACE;
 }
 
+std::set<int32_t> CooperateIn::Initial::filterPointerActions_ {
+    MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW,
+    MMI::PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW,
+};
+
 void CooperateIn::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateIn &parent)
 {
     auto s11 = std::make_shared<RelayCooperate>(parent, self);
@@ -137,6 +144,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     context.dsoftbus_.ComeBack(context.Peer(), notice);
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnBack();
 }
 
 void CooperateIn::Initial::OnRelay(Context &context, const CooperateEvent &event)
@@ -199,6 +207,7 @@ void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &
     context.inputEventBuilder_.Disable();
     context.eventMgr_.RemoteStopFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnResetCooperation();
 }
 
 void CooperateIn::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -212,6 +221,7 @@ void CooperateIn::Initial::OnPointerEvent(Context &context, const CooperateEvent
     InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
 
     if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
+        (filterPointerActions_.find(notice.pointerAction) != filterPointerActions_.end()) ||
         !InputEventBuilder::IsLocalEvent(notice)) {
         return;
     }
@@ -546,6 +556,7 @@ void CooperateIn::RelayConfirmation::OnNormal(Context &context, const CooperateE
 
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnRelay(parent_.process_.Peer());
 }
 
 void CooperateIn::RelayConfirmation::OnProgress(Context &context, const CooperateEvent &event)
@@ -638,6 +649,7 @@ void CooperateIn::RemoteStart::OnSuccess(Context &context, const DSoftbusStartCo
     context.RemoteStartSuccess(event);
     context.inputEventBuilder_.Update(context);
     context.eventMgr_.RemoteStartFinish(event);
+    context.OnResetCooperation();
 }
 
 void CooperateIn::RemoteStart::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -761,6 +773,7 @@ void CooperateIn::StopCooperate(Context &context, const CooperateEvent &event)
     DSoftbusStopCooperate notice {};
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
+    context.OnResetCooperation();
 }
 
 void CooperateIn::UnchainConnections(Context &context, const StopCooperateEvent &event) const

@@ -47,6 +47,11 @@ class DSoftbusHandler final {
             return parent_.OnPacket(networkId, packet);
         }
 
+        bool OnRawData(const std::string &networkId, const void *data, uint32_t dataLen) override
+        {
+            return false;
+        }
+
     private:
         DSoftbusHandler &parent_;
     };

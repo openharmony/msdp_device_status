@@ -58,6 +58,7 @@ private:
         void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
 
         CooperateIn &parent_;
+        static std::set<int32_t> filterPointerActions_;
         std::shared_ptr<ICooperateStep> relay_ { nullptr };
         std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
     };

@@ -159,6 +159,22 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
     return RET_OK;
 }
 
+int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &parcel)
+{
+    CALL_DEBUG_ENTER;
+    int32_t socket = FindConnection(networkId);
+    if (socket < 0) {
+        FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
+        return RET_ERR;
+    }
+    int32_t ret = ::SendBytes(socket, reinterpret_cast<const void*>(parcel.GetData()), parcel.GetDataSize());
+    if (ret != SOFTBUS_OK) {
+        FI_HILOGE("DSOFTBUS::SendBytes fail, error:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 static void OnBindLink(int32_t socket, PeerSocketInfo info)
 {
     DSoftbusAdapterImpl::GetInstance()->OnBind(socket, info);
@@ -234,13 +250,18 @@ void DSoftbusAdapterImpl::OnBytes(int32_t socket, const void *data, uint32_t dat
         FI_HILOGE("Invalid socket: %{public}d", socket);
         return;
     }
-    std::string networkId = iter->first;
-    CircleStreamBuffer &circleBuffer = iter->second.buffer_;
+    const std::string networkId = iter->first;
 
-    if (!circleBuffer.Write(reinterpret_cast<const char *>(data), dataLen)) {
-        FI_HILOGE("Failed to write buffer");
+    if (*reinterpret_cast<const uint32_t*>(data) < static_cast<uint32_t>(MessageId::MAX_MESSAGE_ID)) {
+        CircleStreamBuffer &circleBuffer = iter->second.buffer_;
+
+        if (!circleBuffer.Write(reinterpret_cast<const char*>(data), dataLen)) {
+            FI_HILOGE("Failed to write buffer");
+        }
+        HandleSessionData(networkId, circleBuffer);
+    } else {
+        HandleRawData(networkId, data, dataLen);
     }
-    HandleSessionData(networkId, circleBuffer);
 }
 
 int32_t DSoftbusAdapterImpl::InitSocket(SocketInfo info, int32_t socketType, int32_t &socket)
@@ -441,6 +462,18 @@ void DSoftbusAdapterImpl::HandlePacket(const std::string &networkId, NetPacket &
         std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
         if ((observer != nullptr) &&
             observer->OnPacket(networkId, packet)) {
+            return;
+        }
+    }
+}
+
+void DSoftbusAdapterImpl::HandleRawData(const std::string &networkId, const void *data, uint32_t dataLen)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : observers_) {
+        std::shared_ptr<IDSoftbusObserver> observer = item.Lock();
+        if ((observer != nullptr) &&
+            observer->OnRawData(networkId, data, dataLen)) {
             return;
         }
     }

@@ -36,6 +36,8 @@ StateMachine::StateMachine(IContext *env)
     states_[COOPERATE_STATE_OUT] = std::make_shared<CooperateOut>(*this, env);
     states_[COOPERATE_STATE_IN] = std::make_shared<CooperateIn>(*this, env);
 
+    AddHandler(CooperateEventType::ADD_OBSERVER, &StateMachine::AddObserver);
+    AddHandler(CooperateEventType::REMOVE_OBSERVER, &StateMachine::RemoveObserver);
     AddHandler(CooperateEventType::REGISTER_LISTENER, &StateMachine::RegisterListener);
     AddHandler(CooperateEventType::UNREGISTER_LISTENER, &StateMachine::UnregisterListener);
     AddHandler(CooperateEventType::REGISTER_HOTAREA_LISTENER, &StateMachine::RegisterHotAreaListener);
@@ -81,6 +83,18 @@ void StateMachine::OnQuit(Context &context)
     CALL_DEBUG_ENTER;
     RemoveWatches(context);
     RemoveMonitor(context);
+}
+
+void StateMachine::AddObserver(Context &context, const CooperateEvent &event)
+{
+    AddObserverEvent notice = std::get<AddObserverEvent>(event.event);
+    context.AddObserver(notice.observer);
+}
+
+void StateMachine::RemoveObserver(Context &context, const CooperateEvent &event)
+{
+    RemoveObserverEvent notice = std::get<RemoveObserverEvent>(event.event);
+    context.RemoveObserver(notice.observer);
 }
 
 void StateMachine::RegisterListener(Context &context, const CooperateEvent &event)

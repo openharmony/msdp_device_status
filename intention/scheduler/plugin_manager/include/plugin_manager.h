@@ -24,7 +24,6 @@
 #include "nocopyable.h"
 
 #include "i_context.h"
-#include "i_cooperate.h"
 #include "i_plugin_manager.h"
 
 namespace OHOS {

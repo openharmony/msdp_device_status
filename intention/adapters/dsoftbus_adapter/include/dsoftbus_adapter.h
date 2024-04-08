@@ -40,6 +40,7 @@ public:
     void CloseAllSessions() override;
 
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
+    int32_t SendParcel(const std::string &networkId, Parcel &parcel) override;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
