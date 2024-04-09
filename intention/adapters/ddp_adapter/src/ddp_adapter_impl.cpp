@@ -386,7 +386,7 @@ std::string DDPAdapterImpl::GetLocalNetworkId()
         FI_HILOGE("GetLocalBasicInfo failed, errCode:%{public}d", errCode);
         return {};
     }
-    FI_HILOGI("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId));
+    FI_HILOGD("LocalNetworkId:%{public}s", Utility::Anonymize(dmDeviceInfo.networkId));
     return dmDeviceInfo.networkId;
 }
 
@@ -421,7 +421,7 @@ std::string DDPAdapterImpl::GetUdIdByNetworkId(const std::string &networkId)
         FI_HILOGE("GetUdIdByNetworkId failed, errCode:%{public}d, networkId:%{public}s, udId:%{public}s", errCode,
             Utility::Anonymize(networkId), Utility::Anonymize(udId));
     }
-    FI_HILOGI("udId:%{public}s networkId:%{public}s", Utility::Anonymize(udId), Utility::Anonymize(networkId));
+    FI_HILOGI("UdId:%{public}s networkId:%{public}s", Utility::Anonymize(udId), Utility::Anonymize(networkId));
     return udId;
 }
 

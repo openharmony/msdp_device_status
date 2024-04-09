@@ -69,7 +69,6 @@ ohos_shared_library("intention_cooperate") {
     "image_framework:image_native",
     "input:libmmi-client",
     "ipc:ipc_single",
-    "ipc:ipc_single",
     "window_manager:libdm",
     "window_manager:libwmutil_base",
   ]

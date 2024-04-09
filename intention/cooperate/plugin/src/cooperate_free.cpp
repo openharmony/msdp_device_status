@@ -219,7 +219,7 @@ void CooperateFree::ContactRemote::OnNormal(Context &context)
     context.OnTransitionOut();
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
-    ss << "start_cooperation_with " << Utility::Anonymize(context.Peer());
+    ss << "start_cooperation_with_ " << Utility::Anonymize(context.Peer());
     context.FinishTrace(ss.str());
 #endif // ENABLE_PERFORMANCE_CHECK
 }

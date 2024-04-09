@@ -91,8 +91,8 @@ private:
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
-    void FinishTrance(int32_t userData);
-    void DumpPerformaceInfo();
+    void FinishTrace(int32_t userData);
+    void DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
 
     std::list<CooperateListenerPtr> devCooperateListener_;
@@ -101,7 +101,7 @@ private:
     mutable std::mutex mtx_;
     std::atomic_bool isListeningProcess_ { false };
 #ifdef ENABLE_PERFORMANCE_CHECK
-    struct PerformaceInfo {
+    struct PerformanceInfo {
         std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;
         int32_t activateNum { 0 };
         int32_t successNum { 0 };
@@ -112,8 +112,8 @@ private:
         int32_t minDuration { std::numeric_limits<int32_t>::max() };
         std::vector<int32_t> durationList;
     };
-    std::mutex performaceLock_;
-    PerformaceInfo performaceInfo_;
+    std::mutex performanceLock_;
+    PerformanceInfo performanceInfo_;
 #endif // ENABLE_PERFORMANCE_CHECK
 };
 } // namespace DeviceStatus
