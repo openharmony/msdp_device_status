@@ -1419,6 +1419,10 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
+    if (cJSON_IsNumber(cornerRadius)) {
+        filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
         if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
@@ -1451,10 +1455,6 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_blur_style");
     if (cJSON_IsNumber(blurStyle)) {
         extraInfo.blurStyle = blurStyle->valueint;
-    }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
-    if (cJSON_IsNumber(cornerRadius)) {
-        extraInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
     }
     cJSON *allowDistributed = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_allow_distributed");
     if (cJSON_IsBool(allowDistributed)) {
@@ -1531,14 +1531,14 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
+        if ((filterInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
             (fabs(filterInfo->dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo->dipScale) < extraInfo->cornerRadius)) {
+            / filterInfo->dipScale) < filterInfo->cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                extraInfo->cornerRadius, filterInfo->dipScale);
+                filterInfo->cornerRadius, filterInfo->dipScale);
             return;
         }
-        filterNode->SetCornerRadius(extraInfo->cornerRadius * filterInfo->dipScale);
+        filterNode->SetCornerRadius(filterInfo->cornerRadius * filterInfo->dipScale);
         FI_HILOGD("Add filter successfully");
     }
     FI_HILOGD("leave");
@@ -2025,19 +2025,18 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation)
 bool DragDrawing::ParserRadius(float &radius)
 {
     FilterInfo *filterInfo = &g_drawingInfo.filterInfo;
-    ExtraInfo *extraInfo = &g_drawingInfo.extraInfo;
-    if (extraInfo == nullptr || filterInfo == nullptr) {
+    if (filterInfo == nullptr) {
         FI_HILOGE("Pointer is nullptr");
         return false;
     }
-    if ((extraInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
+    if ((filterInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
         (fabs(filterInfo->dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-        / filterInfo->dipScale) < extraInfo->cornerRadius)) {
+        / filterInfo->dipScale) < filterInfo->cornerRadius)) {
         FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-            extraInfo->cornerRadius, filterInfo->dipScale);
+            filterInfo->cornerRadius, filterInfo->dipScale);
         return false;
     }
-    radius = extraInfo->cornerRadius * filterInfo->dipScale;
+    radius = filterInfo->cornerRadius * filterInfo->dipScale;
     return true;
 }
 
@@ -2107,7 +2106,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionX(0);
     pixelMapNode->SetBgImagePositionY(0);
     pixelMapNode->SetBgImage(rosenImage);
-    pixelMapNode->SetCornerRadius(g_drawingInfo.extraInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
+    pixelMapNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
     pixelMapNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
