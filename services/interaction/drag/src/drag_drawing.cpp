@@ -1456,6 +1456,10 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsNumber(blurStyle)) {
         extraInfo.blurStyle = blurStyle->valueint;
     }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_corner_radius");
+    if (cJSON_IsNumber(cornerRadius)) {
+        extraInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    }
     cJSON *allowDistributed = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_allow_distributed");
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
