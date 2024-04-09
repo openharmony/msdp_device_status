@@ -631,7 +631,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragOpacity001, 
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-    dragData->extraInfo = " { \"dip_opacity\": nullptr } ";
+    dragData->filterInfo = " { \"dip_opacity\": nullptr } ";
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
@@ -663,7 +663,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragOpacity002, 
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-    dragData->extraInfo = " { \"dip_opacity\": 3.0 } ";
+    dragData->filterInfo = " { \"dip_opacity\": 3.0 } ";
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
@@ -695,7 +695,7 @@ HWTEST_F(InteractionDragDrawingTest, InteractionDragDrawingTest_DragOpacity003, 
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_MULTIPLE, false, SHADOW_NUM_ONE);
     ASSERT_TRUE(dragData);
-    dragData->extraInfo = " { \"dip_opacity\": 0.60 } ";
+    dragData->filterInfo = " { \"dip_opacity\": 0.60 } ";
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {

@@ -1418,6 +1418,14 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
+    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
+    if (cJSON_IsNumber(opacity)) {
+        if ((opacity->valuedouble) > MAX_OPACITY) {
+            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
+        } else {
+            filterInfo.opacity = static_cast<float>(opacity->valuedouble);
+        }
+    }
     return true;
 }
 
@@ -1450,14 +1458,6 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     cJSON *allowDistributed = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_allow_distributed");
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
-    }
-    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_opacity");
-    if (cJSON_IsNumber(opacity)) {
-        if ((opacity->valuedouble) > MAX_OPACITY) {
-            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
-        } else {
-            extraInfo.opacity = static_cast<float>(opacity->valuedouble);
-        }
     }
     return true;
 }
@@ -2107,7 +2107,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionY(0);
     pixelMapNode->SetBgImage(rosenImage);
     pixelMapNode->SetCornerRadius(g_drawingInfo.extraInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
-    pixelMapNode->SetAlpha(g_drawingInfo.extraInfo.opacity);
+    pixelMapNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
