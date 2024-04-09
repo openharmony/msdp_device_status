@@ -216,7 +216,7 @@ void CooperateFree::ContactRemote::OnNormal(Context &context)
     context.dsoftbus_.StartCooperateFinish(context.Peer(), notice);
     context.eventMgr_.StartCooperateFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_OUT);
-
+    context.OnTransitionOut();
 #ifdef ENABLE_PERFORMANCE_CHECK
     std::ostringstream ss;
     ss << "start_cooperation_with_ " << Utility::Anonymize(context.Peer());
@@ -375,6 +375,7 @@ void CooperateFree::RemoteStart::OnSuccess(Context &context, const DSoftbusStart
     context.inputEventBuilder_.Enable(context);
     context.eventMgr_.RemoteStartFinish(event);
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
+    context.OnTransitionIn();
 }
 
 void CooperateFree::RemoteStart::OnAppClosed(Context &context, const CooperateEvent &event)

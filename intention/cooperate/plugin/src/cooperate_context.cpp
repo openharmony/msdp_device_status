@@ -34,6 +34,7 @@ namespace DeviceStatus {
 namespace Cooperate {
 namespace {
 const std::string COOPERATE_SWITCH { "currentStatus" };
+const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
 } // namespace
 
@@ -152,9 +153,21 @@ void Context::AttachSender(Channel<CooperateEvent>::Sender sender)
     dsoftbus_.AttachSender(sender);
 }
 
+void Context::AddObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    CHKPV(observer);
+    observers_.insert(observer);
+}
+
+void Context::RemoveObserver(std::shared_ptr<ICooperateObserver> observer)
+{
+    observers_.erase(observer);
+}
+
 void Context::Enable()
 {
     CALL_DEBUG_ENTER;
+    StartEventHandler();
     EnableDDM();
     EnableDDP();
     EnableDevMgr();
@@ -166,6 +179,19 @@ void Context::Disable()
     DisableDevMgr();
     DisableDDP();
     DisableDDM();
+    StopEventHandler();
+}
+
+int32_t Context::StartEventHandler()
+{
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    return RET_OK;
+}
+
+void Context::StopEventHandler()
+{
+    eventHandler_.reset();
 }
 
 int32_t Context::EnableDDM()
@@ -254,7 +280,8 @@ void Context::StartCooperate(const StartCooperateEvent &event)
 void Context::OnPointerEvent(const InputPointerEvent &event)
 {
     if ((event.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE)) {
+        ((event.pointerAction == MMI::PointerEvent::POINTER_ACTION_MOVE) ||
+         (event.pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         cursorPos_ = event.position;
     }
 }
@@ -268,6 +295,76 @@ void Context::RemoteStartSuccess(const DSoftbusStartCooperateFinished &event)
 void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
 {
     remoteNetworkId_ = event.targetNetworkId;
+}
+
+void Context::OnTransitionOut()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of transition out");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of transition out");
+                CHKPV(observer);
+                observer->OnTransitionOut(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnTransitionIn()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of transition in");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of transition in");
+                CHKPV(observer);
+                observer->OnTransitionIn(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnBack()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of come back");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of come back");
+                CHKPV(observer);
+                observer->OnBack(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnRelay(const std::string &networkId)
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of relay cooperation");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer(), cursorPos = NormalizedCursorPosition()] {
+                FI_HILOGI("Notify one observer of relay cooperation");
+                CHKPV(observer);
+                observer->OnRelay(remoteNetworkId, cursorPos);
+            });
+    }
+}
+
+void Context::OnResetCooperation()
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of reset cooperation");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer] {
+                FI_HILOGI("Notify one observer of reset cooperation");
+                CHKPV(observer);
+                observer->OnReset();
+            });
+    }
 }
 
 void Context::SetCursorPosition(const Coordinate &cursorPos)

@@ -64,6 +64,7 @@ ohos_shared_library("intention_cooperate") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",

@@ -81,6 +81,7 @@ bool StopDragParam::Unmarshalling(MessageParcel &parcel)
         (dragBehavior > static_cast<int32_t>(DragBehavior::MOVE))) {
         return false;
     }
+    dropResult_.dragBehavior = static_cast<DragBehavior>(dragBehavior);
     return true;
 }
 

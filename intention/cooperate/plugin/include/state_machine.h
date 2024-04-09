@@ -36,6 +36,8 @@ private:
     void TransiteTo(Context &context, CooperateState state) override;
     void AddHandler(CooperateEventType event, void (StateMachine::*handler)(Context&, const CooperateEvent&));
     void OnQuit(Context &context);
+    void AddObserver(Context &context, const CooperateEvent &event);
+    void RemoveObserver(Context &context, const CooperateEvent &event);
     void RegisterListener(Context &context, const CooperateEvent &event);
     void UnregisterListener(Context &context, const CooperateEvent &event);
     void RegisterHotAreaListener(Context &context, const CooperateEvent &event);

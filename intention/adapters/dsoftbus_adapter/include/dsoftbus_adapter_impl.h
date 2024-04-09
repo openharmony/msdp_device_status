@@ -80,6 +80,7 @@ public:
     void CloseAllSessions() override;
 
     int32_t SendPacket(const std::string &networkId, NetPacket &packet) override;
+    int32_t SendParcel(const std::string &networkId, Parcel &parcel) override;
 
     void OnBind(int32_t socket, PeerSocketInfo info);
     void OnShutdown(int32_t socket, ShutdownReason reason);
@@ -98,8 +99,9 @@ private:
     int32_t FindConnection(const std::string &networkId);
     void HandleSessionData(const std::string &networkId, CircleStreamBuffer &circleBuffer);
     void HandlePacket(const std::string &networkId, NetPacket &packet);
+    void HandleRawData(const std::string &networkId, const void *data, uint32_t dataLen);
 
-    std::mutex lock_;
+    std::recursive_mutex lock_;
     int32_t socketFd_ { -1 };
     std::string localSessionName_;
     std::set<Observer> observers_;
