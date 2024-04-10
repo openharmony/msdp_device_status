@@ -126,8 +126,8 @@ constexpr float BEZIER_040 { 0.40f };
 constexpr float BEZIER_060 { 0.60f };
 constexpr float BEZIER_067 { 0.67f };
 constexpr float BEZIER_100 { 1.00f };
+constexpr float MIN_OPACITY { 0.0f };
 constexpr float MAX_OPACITY { 1.0f };
-constexpr float MIN_OPACITY { 0.4f };
 constexpr int32_t TIME_DRAG_CHANGE_STYLE { 50 };
 constexpr int32_t TIME_DRAG_STYLE { 100 };
 constexpr int32_t TIME_STOP_FAIL_WINDOW { 125 };
@@ -1419,6 +1419,18 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
+    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
+    if (cJSON_IsNumber(cornerRadius)) {
+        filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    }
+    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
+    if (cJSON_IsNumber(opacity)) {
+        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
+            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
+        } else {
+            filterInfo.opacity = static_cast<float>(opacity->valuedouble);
+        }
+    }
     return true;
 }
 
@@ -1451,14 +1463,6 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     cJSON *allowDistributed = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "drag_allow_distributed");
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
-    }
-    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(extraInfoParser.json, "dip_opacity");
-    if (cJSON_IsNumber(opacity)) {
-        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) < MIN_OPACITY) {
-            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
-        } else {
-            extraInfo.opacity = static_cast<float>(opacity->valuedouble);
-        }
     }
     return true;
 }
@@ -2026,7 +2030,7 @@ bool DragDrawing::ParserRadius(float &radius)
 {
     FilterInfo *filterInfo = &g_drawingInfo.filterInfo;
     ExtraInfo *extraInfo = &g_drawingInfo.extraInfo;
-    if (extraInfo == nullptr || filterInfo == nullptr) {
+    if (filterInfo == nullptr || extraInfo == nullptr) {
         FI_HILOGE("Pointer is nullptr");
         return false;
     }
@@ -2107,8 +2111,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionX(0);
     pixelMapNode->SetBgImagePositionY(0);
     pixelMapNode->SetBgImage(rosenImage);
-    pixelMapNode->SetCornerRadius(g_drawingInfo.extraInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
-    pixelMapNode->SetAlpha(g_drawingInfo.extraInfo.opacity);
+    pixelMapNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
+    pixelMapNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
 }

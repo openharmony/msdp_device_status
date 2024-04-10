@@ -119,6 +119,8 @@ private:
 
 struct FilterInfo {
     float dipScale { 0.0f };
+    float cornerRadius { 0.0f };
+    float opacity { 0.95f };
 };
 
 struct ExtraInfo {
@@ -126,7 +128,6 @@ struct ExtraInfo {
     int32_t blurStyle { -1 };
     float cornerRadius { 0.0f };
     bool allowDistributed { true };
-    float opacity { 0.95f };
 };
 
 enum class ScreenSizeType {
