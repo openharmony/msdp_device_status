@@ -121,7 +121,7 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
     }
     devCooperateEvent_.insert_or_assign(param.userData, event);
 #ifdef ENABLE_PERFORMANCE_CHECK
-    DumpPerformaceInfo();
+    DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
     return RET_OK;
 }
@@ -194,7 +194,7 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
         FI_HILOGE("Get cooperate state failed udId: %{public}s", Utility::Anonymize(udId));
         return RET_ERR;
     }
-    FI_HILOGI(" GetCooperateState for udId: %{public}s successfully,state: %{public}s",
+    FI_HILOGI("GetCooperateState for udId: %{public}s successfully,state: %{public}s",
         Utility::Anonymize(udId), state ? "true" : "false");
     state = reply.state;
     return RET_OK;
@@ -316,7 +316,7 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     }
 #ifdef ENABLE_PERFORMANCE_CHECK
     if (CoordinationMessage(nType) == CoordinationMessage::ACTIVATE_SUCCESS) {
-        FinishTrance(userData);
+        FinishTrace(userData);
     }
 #endif // ENABLE_PERFORMANCE_CHECK
     OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
@@ -410,66 +410,52 @@ void CooperateClient::OnDevHotAreaListener(int32_t displayX,
     }
 }
 
-void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, const Event &event)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (eventListener_.find(networkId) == eventListener_.end()) {
-        FI_HILOGI("No listener for networkId:%{public}s is registered", Utility::Anonymize(networkId));
-        return;
-    }
-    for (const auto &listener : eventListener_[networkId]) {
-        FI_HILOGD("Trigger listener for networkId:%{public}s", Utility::Anonymize(networkId));
-        listener->OnMouseLocationEvent(networkId, event);
-    }
-}
-
 #ifdef ENABLE_PERFORMANCE_CHECK
 void CooperateClient::StartTrace(int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard { performaceLock_ };
-    performaceInfo_.traces_.emplace(userData, std::chrono::steady_clock::now());
-    performaceInfo_.activateNum += 1;
+    std::lock_guard guard { performanceLock_ };
+    performanceInfo_.traces_.emplace(userData, std::chrono::steady_clock::now());
+    performanceInfo_.activateNum += 1;
     FI_HILOGI("[PERF] Start tracing \'%{public}d\'", userData);
 }
 
-void CooperateClient::FinishTrance(int32_t userData)
+void CooperateClient::FinishTrace(int32_t userData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard { performaceLock_ };
+    std::lock_guard guard { performanceLock_ };
     int32_t hundred = { 100 };
-    if (auto iter = performaceInfo_.traces_.find(userData); iter != performaceInfo_.traces_.end()) {
+    if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
         auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - iter->second).count();
         FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
-        performaceInfo_.traces_.erase(iter);
-        performaceInfo_.successNum += 1;
-        performaceInfo_.failNum = performaceInfo_.traces_.size();
-        performaceInfo_.successRate = (performaceInfo_.successNum * hundred) / performaceInfo_.activateNum;
-        performaceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performaceInfo_.minDuration);
-        performaceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performaceInfo_.maxDuration);
-        performaceInfo_.durationList.push_back(curDuration);
+        performanceInfo_.traces_.erase(iter);
+        performanceInfo_.successNum += 1;
+        performanceInfo_.failNum = performanceInfo_.traces_.size();
+        performanceInfo_.successRate = (performanceInfo_.successNum * hundred) / performanceInfo_.activateNum;
+        performanceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performanceInfo_.minDuration);
+        performanceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performanceInfo_.maxDuration);
+        performanceInfo_.durationList.push_back(curDuration);
     } else {
         FI_HILOGW("[PERF] Finish tracing with something wrong");
     }
 }
 
-void CooperateClient::DumpPerformaceInfo()
+void CooperateClient::DumpPerformanceInfo()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard { performaceLock_ };
+    std::lock_guard guard { performanceLock_ };
     int32_t sumDuration = std::accumulate(
-        performaceInfo_.durationList.begin(), performaceInfo_.durationList.end(), 0);
-    performaceInfo_.averageDuration = sumDuration / performaceInfo_.durationList.size();
-    FI_HILOGI("[PERF] performaceInfo:"
+        performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
+    performanceInfo_.averageDuration = sumDuration / performanceInfo_.durationList.size();
+    FI_HILOGI("[PERF] performanceInfo:"
         "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}d "
         "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d ",
-        performaceInfo_.activateNum, performaceInfo_.successNum, performaceInfo_.failNum,
-        performaceInfo_.successRate, performaceInfo_.averageDuration, performaceInfo_.maxDuration,
-        performaceInfo_.minDuration);
+        performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
+        performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
+        performanceInfo_.minDuration);
     std::string durationStr;
-    for (const auto &duration : performaceInfo_.durationList) {
+    for (const auto &duration : performanceInfo_.durationList) {
         durationStr += std::to_string(duration) + ", ";
     }
     FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());

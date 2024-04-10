@@ -38,7 +38,7 @@ public:
     std::string GetUdIdByNetworkId(const std::string &networkId) override;
     std::string GetLocalNetworkId() override;
     int32_t UpdateCrossingSwitchState(bool state) override;
-    int32_t GetCrossingSwitchState(const std::string &udId, bool &state)override;
+    int32_t GetCrossingSwitchState(const std::string &udId, bool &state) override;
 
     int32_t GetProperty(const std::string &udId, const std::string &name, bool &value) override;
     int32_t GetProperty(const std::string &udId, const std::string &name, int32_t &value) override;
