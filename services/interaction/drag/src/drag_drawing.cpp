@@ -2029,18 +2029,19 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation)
 bool DragDrawing::ParserRadius(float &radius)
 {
     FilterInfo *filterInfo = &g_drawingInfo.filterInfo;
-    if (filterInfo == nullptr) {
+    ExtraInfo *extraInfo = &g_drawingInfo.extraInfo;
+    if (filterInfo == nullptr || extraInfo == nullptr) {
         FI_HILOGE("Pointer is nullptr");
         return false;
     }
-    if ((filterInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
+    if ((extraInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
         (fabs(filterInfo->dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-        / filterInfo->dipScale) < filterInfo->cornerRadius)) {
+        / filterInfo->dipScale) < extraInfo->cornerRadius)) {
         FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-            filterInfo->cornerRadius, filterInfo->dipScale);
+            extraInfo->cornerRadius, filterInfo->dipScale);
         return false;
     }
-    radius = filterInfo->cornerRadius * filterInfo->dipScale;
+    radius = extraInfo->cornerRadius * filterInfo->dipScale;
     return true;
 }
 
