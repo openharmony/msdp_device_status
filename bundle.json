@@ -22,6 +22,7 @@
     "deps": {
       "components": [
         "access_token",
+        "cJSON",
         "hilog",
         "ipc",
         "safwk",
@@ -49,7 +50,6 @@
         "dfs_service"
       ],
       "third_party": [
-        "cJSON",
         "libxml2",
         "libuv",
         "openssl",
