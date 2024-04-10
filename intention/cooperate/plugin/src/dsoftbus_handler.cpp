@@ -31,7 +31,34 @@ namespace Cooperate {
 DSoftbusHandler::DSoftbusHandler(IContext *env)
     : env_(env)
 {
+    handles_ = {
+        { static_cast<int32_t>(MessageId::DSOFTBUS_START_COOPERATE),
+            &DSoftbusHandler::OnStartCooperate },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_START_COOPERATE_RESPONSE),
+            &DSoftbusHandler::OnStartCooperateResponse },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_START_COOPERATE_FINISHED),
+            &DSoftbusHandler::OnStartCooperateFinish },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_STOP_COOPERATE),
+            &DSoftbusHandler::OnStopCooperate },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_COME_BACK),
+            &DSoftbusHandler::OnComeBack },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE),
+            &DSoftbusHandler::OnRelayCooperate },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_RELAY_COOPERATE_FINISHED),
+            &DSoftbusHandler::OnRelayCooperateFinish },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION),
+            &DSoftbusHandler::OnSubscribeMouseLocation },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION),
+            &DSoftbusHandler::OnUnSubscribeMouseLocation },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION),
+            &DSoftbusHandler::OnReplySubscribeLocation },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION),
+            &DSoftbusHandler::OnReplyUnSubscribeLocation },
+        { static_cast<int32_t>(MessageId::DSOFTBUS_MOUSE_LOCATION),
+            &DSoftbusHandler::OnRemoteMouseLocation }
+    };
     observer_ = std::make_shared<DSoftbusObserver>(*this);
+    CHKPV(env_);
     env_->GetDSoftbus().AddObserver(observer_);
 }
 
@@ -203,60 +230,14 @@ void DSoftbusHandler::OnShutdown(const std::string &networkId)
 bool DSoftbusHandler::OnPacket(const std::string &networkId, NetPacket &packet)
 {
     CALL_DEBUG_ENTER;
-    switch (packet.GetMsgId()) {
-        case MessageId::DSOFTBUS_START_COOPERATE: {
-            OnStartCooperate(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_START_COOPERATE_RESPONSE: {
-            OnStartCooperateResponse(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_START_COOPERATE_FINISHED: {
-            OnStartCooperateFinish(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_STOP_COOPERATE: {
-            OnStopCooperate(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_COME_BACK: {
-            OnComeBack(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_RELAY_COOPERATE: {
-            OnRelayCooperate(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_RELAY_COOPERATE_FINISHED: {
-            OnRelayCooperateFinish(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION: {
-            OnSubscribeMouseLocation(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION: {
-            OnUnSubscribeMouseLocation(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION: {
-            OnRelaySubscribeLocation(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION: {
-            OnRelayUnSubscribeLocation(networkId, packet);
-            break;
-        }
-        case MessageId::DSOFTBUS_MOUSE_LOCATION: {
-            OnRemoteMouseLocation(networkId, packet);
-            break;
-        }
-        default: {
-            return false;
-        }
+    int32_t messageId = static_cast<int32_t> (packet.GetMsgId());
+    auto it = handles_.find(messageId);
+    if (it != handles_.end()) {
+        (this->*(it->second))(networkId, packet);
+        return true;
     }
-    return true;
+    FI_HILOGE("Unsupported messageId:%{public}d from '%{public}s", messageId, Utility::Anonymize(networkId));
+    return false;
 }
 
 void DSoftbusHandler::SendEvent(const CooperateEvent &event)
@@ -386,10 +367,8 @@ void DSoftbusHandler::OnRelayCooperateFinish(const std::string &networkId, NetPa
 void DSoftbusHandler::OnSubscribeMouseLocation(const std::string &networKId, NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    DSoftbusSubscribeMouseLocation event {
-        .networkId = networKId,
-    };
-    packet >> event.remoteNetworkId;
+    DSoftbusSubscribeMouseLocation event;
+    packet >> event.networkId >> event.remoteNetworkId;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");
         return;
@@ -402,10 +381,8 @@ void DSoftbusHandler::OnSubscribeMouseLocation(const std::string &networKId, Net
 void DSoftbusHandler::OnUnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    DSoftbusUnSubscribeMouseLocation event {
-        .networkId = networKId,
-    };
-    packet >> event.remoteNetworkId;
+    DSoftbusUnSubscribeMouseLocation event;
+    packet >> event.networkId >> event.remoteNetworkId;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");
         return;
@@ -415,45 +392,39 @@ void DSoftbusHandler::OnUnSubscribeMouseLocation(const std::string& networKId, N
         event));
 }
 
-void DSoftbusHandler::OnRelaySubscribeLocation(const std::string& networKId, NetPacket &packet)
+void DSoftbusHandler::OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    DSoftbusRelaySubscribeMouseLocation event {
-        .networkId = networKId,
-    };
-    packet >> event.remoteNetworkId >> event.result;
+    DSoftbusReplySubscribeMouseLocation event;
+    packet >> event.networkId >> event.remoteNetworkId >> event.result;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");
         return;
     }
     SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION,
+        CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
         event));
 }
 
-void DSoftbusHandler::OnRelayUnSubscribeLocation(const std::string& networKId, NetPacket &packet)
+void DSoftbusHandler::OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet)
 {
     CALL_INFO_TRACE;
-    DSoftbusRelayUnSubscribeMouseLocation event {
-        .networkId = networKId,
-    };
-    packet >> event.remoteNetworkId >> event.result;
+    DSoftbusReplyUnSubscribeMouseLocation event;
+    packet >> event.networkId >> event.remoteNetworkId >> event.result;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");
         return;
     }
     SendEvent(CooperateEvent(
-        CooperateEventType::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION,
+        CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
         event));
 }
 
 void DSoftbusHandler::OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet)
 {
-    CALL_INFO_TRACE;
-    DSoftbusSyncMouseLocation event {
-        .networkId = networKId,
-    };
-    packet >> event.remoteNetworkId >> event.mouseLocation.displayX >>
+    CALL_DEBUG_ENTER;
+    DSoftbusSyncMouseLocation event;
+    packet >> event.networkId >> event.remoteNetworkId >> event.mouseLocation.displayX >>
         event.mouseLocation.displayY >> event.mouseLocation.displayWidth >> event.mouseLocation.displayHeight;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to read data packet");

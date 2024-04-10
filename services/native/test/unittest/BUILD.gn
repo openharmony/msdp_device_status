@@ -145,7 +145,6 @@ ohos_unittest("CoordinationSMTest") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
     "//third_party/openssl:libcrypto_shared",
   ]
@@ -154,6 +153,7 @@ ohos_unittest("CoordinationSMTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_manager:devicemanagersdk",
     "distributed_input:libdinput_sdk",
     "hilog:libhilog",
@@ -177,11 +177,11 @@ ohos_unittest("CoordinationSoftbusAdapterTest") {
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/coordination:coordination",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "distributed_input:libdinput_sdk",

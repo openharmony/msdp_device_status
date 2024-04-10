@@ -27,6 +27,7 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 class DSoftbusHandler final {
+    using SoftbusHandleType = void (DSoftbusHandler::*)(const std::string &networkId, NetPacket &packet);
     class DSoftbusObserver final : public IDSoftbusObserver {
     public:
         DSoftbusObserver(DSoftbusHandler &parent) : parent_(parent) {}
@@ -90,14 +91,15 @@ private:
     void OnRelayCooperateFinish(const std::string &networkId, NetPacket &packet);
     void OnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet);
     void OnUnSubscribeMouseLocation(const std::string& networKId, NetPacket &packet);
-    void OnRelaySubscribeLocation(const std::string& networKId, NetPacket &packet);
-    void OnRelayUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
+    void OnReplySubscribeLocation(const std::string& networKId, NetPacket &packet);
+    void OnReplyUnSubscribeLocation(const std::string& networKId, NetPacket &packet);
     void OnRemoteMouseLocation(const std::string& networKId, NetPacket &packet);
 
     IContext *env_ { nullptr };
     std::mutex lock_;
     Channel<CooperateEvent>::Sender sender_;
     std::shared_ptr<DSoftbusObserver> observer_;
+    std::map<int32_t, SoftbusHandleType> handles_;
 };
 } // namespace Cooperate
 } // namespace DeviceStatus

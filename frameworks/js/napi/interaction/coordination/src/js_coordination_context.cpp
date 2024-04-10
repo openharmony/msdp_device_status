@@ -18,6 +18,7 @@
 #include "devicestatus_define.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "JsCoordinationContext"
@@ -270,7 +271,7 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
     napi_value argv[1] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc == 0) {
+    if (argc < 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter mismatch error");
         return nullptr;
     }
@@ -285,12 +286,13 @@ napi_value JsCoordinationContext::On(napi_env env, napi_callback_info info)
 
     if ((COOPERATE_NAME.compare(type)) == 0 || (COOPERATE_MESSAGE_NAME.compare(type)) == 0) {
         return RegisterCooperateListener(env, type, info);
-    } else if ((COOPERATE_MOUSE_NAME.compare(type)) == 0) {
-        return RegisterMouseListener(env, info);
-    } else {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate, cooperateMessage or cooperateMouse");
-        return nullptr;
     }
+    if ((COOPERATE_MOUSE_NAME.compare(type)) == 0) {
+        return RegisterMouseListener(env, info);
+    }
+    FI_HILOGE("Unknow type:%{public}s", std::string(type).c_str());
+    THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate, cooperateMessage or cooperateMouse");
+    return nullptr;
 }
 
 napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
@@ -299,7 +301,7 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
     napi_value argv[1] = { nullptr };
     size_t argc = 1;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
@@ -313,12 +315,13 @@ napi_value JsCoordinationContext::Off(napi_env env, napi_callback_info info)
 
     if ((COOPERATE_NAME.compare(type)) == 0 || (COOPERATE_MESSAGE_NAME.compare(type)) == 0) {
         return UnregisterCooperateListener(env, type, info);
-    } else if ((COOPERATE_MOUSE_NAME.compare(type)) == 0) {
-        return UnregisterMouseListener(env, info);
-    } else {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate, cooperateMessage or cooperateMouse");
-        return nullptr;
     }
+    if ((COOPERATE_MOUSE_NAME.compare(type)) == 0) {
+        return UnregisterMouseListener(env, info);
+    }
+    FI_HILOGE("Unknow type:%{public}s", std::string(type).c_str());
+    THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Type must be cooperate, cooperateMessage or cooperateMouse");
+    return nullptr;
 }
 
 napi_value JsCoordinationContext::RegisterCooperateListener(
@@ -328,6 +331,10 @@ napi_value JsCoordinationContext::RegisterCooperateListener(
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
@@ -347,23 +354,29 @@ napi_value JsCoordinationContext::UnregisterCooperateListener(
     size_t argc = 2;
     napi_value argv[2] = { nullptr };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
+        return nullptr;
+    }
     JsCoordinationContext *jsDev = JsCoordinationContext::GetInstance(env);
     CHKPP(jsDev);
     std::shared_ptr<JsCoordinationManager> jsCoordinationMgr = jsDev->GetJsCoordinationMgr();
     CHKPP(jsCoordinationMgr);
-    if (argc == 1) {
+    if (argc < 2) {
         jsCoordinationMgr->UnregisterListener(env, type);
         return nullptr;
     }
     if (UtilNapi::TypeOf(env, argv[1], napi_undefined) || UtilNapi::TypeOf(env, argv[1], napi_null)) {
+        FI_HILOGW("Undefined callback, unregister all listener of type:%{public}s", type.c_str());
         jsCoordinationMgr->UnregisterListener(env, type);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+    if (UtilNapi::TypeOf(env, argv[1], napi_function)) {
+        jsCoordinationMgr->UnregisterListener(env, type, argv[1]);
         return nullptr;
     }
-    jsCoordinationMgr->UnregisterListener(env, type, argv[1]);
+    THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+    FI_HILOGE("UnregisterCooperateListener failed, invalid parameter");
     return nullptr;
 }
 
@@ -377,7 +390,6 @@ napi_value JsCoordinationContext::RegisterMouseListener(napi_env env, napi_callb
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
-
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
@@ -409,12 +421,10 @@ napi_value JsCoordinationContext::UnregisterMouseListener(napi_env env, napi_cal
     napi_value argv[3] = { nullptr };
     size_t argc = 3;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-
-    if (argc == 1) {
+    if (argc < 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong number of parameters");
         return nullptr;
     }
-
     char type[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
@@ -437,14 +447,16 @@ napi_value JsCoordinationContext::UnregisterMouseListener(napi_env env, napi_cal
         return nullptr;
     }
     if (UtilNapi::TypeOf(env, argv[2], napi_undefined) || UtilNapi::TypeOf(env, argv[2], napi_null)) {
+        FI_HILOGW("Undefined callback, unregister all listener of networkId:%{public}s", Utility::Anonymize(networkId));
         jsCoordinationMgr->UnregisterListener(env, type, networkId);
         return nullptr;
     }
-    if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
-        THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+    if (UtilNapi::TypeOf(env, argv[2], napi_function)) {
+        jsCoordinationMgr->UnregisterListener(env, type, networkId, argv[2]);
         return nullptr;
     }
-    jsCoordinationMgr->UnregisterListener(env, type, networkId, argv[2]);
+    THROWERR(env, COMMON_PARAMETER_ERROR, "callback", "function");
+    FI_HILOGE("UnregisterMouseListener failed, invalid parameter");
     return nullptr;
 }
 
@@ -483,7 +495,7 @@ napi_value JsCoordinationContext::CreateInstance(napi_env env)
     uint32_t refCount = 0;
     status = napi_reference_ref(env, jsContext->contextRef_, &refCount);
     if (status != napi_ok) {
-        FI_HILOGE("reference to nullptr");
+        FI_HILOGE("Reference to nullptr");
         napi_delete_reference(env, jsContext->contextRef_);
         return nullptr;
     }

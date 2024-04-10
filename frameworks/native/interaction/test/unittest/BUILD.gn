@@ -71,6 +71,13 @@ ohos_unittest("InteractionDragDrawingTest") {
 }
 
 ohos_unittest("InteractionMouseLocationTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
   module_out_path = module_output_path
   include_dirs = [
     "${device_status_interfaces_path}/innerkits/interaction/include",
@@ -79,9 +86,9 @@ ohos_unittest("InteractionMouseLocationTest") {
   ]
 
   sources = [
-    "src/mouse_location_listener_test.cpp",
     "${device_status_utils_path}/src/utility.cpp",
-    ]
+    "src/mouse_location_listener_test.cpp",
+  ]
 
   deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
   external_deps = [

@@ -25,8 +25,8 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
-#include "i_hotarea_listener.h"
 #include "i_event_listener.h"
+#include "i_hotarea_listener.h"
 #include "i_start_drag_listener.h"
 #include "i_subscript_listener.h"
 

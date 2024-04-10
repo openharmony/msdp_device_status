@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  fusion_intention_framework = false
+  fusion_intention_framework = true
   fusion_rust_enabled = false
   fusion_interaction_coordination = false
   fusion_drag_enable_monitor = true
@@ -29,9 +29,9 @@ declare_args() {
   }
 }
 
-# if (fusion_interaction_coordination) {
-#   import("//base/msdp/motion/motion.gni")
-# }
+if (fusion_interaction_coordination) {
+  import("//base/msdp/motion/motion.gni")
+}
 
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"

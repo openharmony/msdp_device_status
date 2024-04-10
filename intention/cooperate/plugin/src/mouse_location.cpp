@@ -29,90 +29,113 @@ namespace Cooperate {
 
 void MouseLocation::AddListener(const RegisterEventListenerEvent &event)
 {
-    if (auto localNetworkId = env_->GetDP().GetLocalNetworkId(); localNetworkId == event.networkId) {
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    localNetworkId_ = context_->GetDP().GetLocalNetworkId();
+    if (event.networkId == localNetworkId_) {
         FI_HILOGI("Add local mouse location listener");
-        localNetworkId_ = event.networkId;
         localListeners_.insert(event.pid);
         return;
     }
-    DSoftbusSubscribeMouseLocation softbusEvent;
-    softbusEvent.networkId = event.networkId;
-    SubscribeMouseLocation(event.networkId, softbusEvent);
+    FI_HILOGI("Add remote mouse location listener, networkId:%{public}s", Utility::Anonymize(event.networkId));
+    DSoftbusSubscribeMouseLocation softbusEvent {
+        .networkId = localNetworkId_,
+        .remoteNetworkId = event.networkId,
+    };
+    SubscribeMouseLocation(softbusEvent);
     listeners_[event.networkId].insert(event.pid);
 }
 
 void MouseLocation::RemoveListener(const UnregisterEventListenerEvent &event)
 {
-    if (auto localNetworkId = env_->GetDP().GetLocalNetworkId(); localNetworkId == event.networkId) {
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    localNetworkId_ = context_->GetDP().GetLocalNetworkId();
+    if (event.networkId == localNetworkId_) {
         FI_HILOGI("Remove local mouse location listener");
         localListeners_.erase(event.pid);
         return;
     }
-    DSoftbusSubscribeMouseLocation softbusEvent;
-    softbusEvent.networkId = event.networkId;
-    UnSubscribeMouseLocation(event.networkId, softbusEvent);
+    DSoftbusUnSubscribeMouseLocation softbusEvent {
+        .networkId = localNetworkId_,
+        .remoteNetworkId = event.networkId,
+    };
+    UnSubscribeMouseLocation(softbusEvent);
     if (listeners_.find(event.networkId) != listeners_.end()) {
         FI_HILOGE("No listener for networkId:%{public}s", Utility::Anonymize(event.networkId));
         return;
     }
-    listeners_.erase(event.networkId);
+    listeners_[event.networkId].erase(event.pid);
+    if (listeners_[event.networkId].empty()) {
+        listeners_.erase(event.networkId);
+    }
 }
 
 void MouseLocation::OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice)
 {
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     remoteSubscribers_.insert(notice.networkId);
-    FI_HILOGI("Subscriber for networkId:%{public}s successfully", Utility::Anonymize(notice.networkId));
-    DSoftbusRelaySubscribeMouseLocation event = {
+    FI_HILOGI("Add subscriber for networkId:%{public}s successfully", Utility::Anonymize(notice.networkId));
+    DSoftbusReplySubscribeMouseLocation event = {
         .networkId = notice.remoteNetworkId,
         .remoteNetworkId = notice.networkId,
         .result = true,
     };
-    RelaySubscribeMouseLocation(notice.networkId, event);
+    FI_HILOGI("ReplySubscribeMouseLocation from networkId:%{public}s to networkId:%{public}s",
+        Utility::Anonymize(event.networkId), Utility::Anonymize(event.remoteNetworkId));
+    ReplySubscribeMouseLocation(event);
 }
 
 void MouseLocation::OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &notice)
 {
+    CALL_INFO_TRACE;
+    CHKPV(context_);
+    localNetworkId_ = context_->GetDP().GetLocalNetworkId();
     if (remoteSubscribers_.find(notice.networkId) == remoteSubscribers_.end()) {
         FI_HILOGE("No subscriber for networkId:%{public}s stored in remote subscriber",
             Utility::Anonymize(notice.networkId));
         return;
     }
     remoteSubscribers_.erase(notice.networkId);
-    DSoftbusRelayUnSubscribeMouseLocation event = {
+    DSoftbusReplyUnSubscribeMouseLocation event = {
         .networkId = notice.remoteNetworkId,
         .remoteNetworkId = notice.networkId,
         .result = true,
     };
-    RelaySubscribeMouseLocation(notice.networkId, event);
+    FI_HILOGI("ReplyUnSubscribeMouseLocation from networkId:%{public}s to networkId:%{public}s",
+        Utility::Anonymize(event.networkId), Utility::Anonymize(event.remoteNetworkId));
+    ReplyUnSubscribeMouseLocation(event);
 }
 
-void MouseLocation::OnRelaySubscribeMouseLocation(const DSoftbusRelaySubscribeMouseLocation &notice)
+void MouseLocation::OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice)
 {
-    if (!notice.result) {
-        FI_HILOGE("SubscribeMouseLocation failed, networkId:%{public}s, remoteNetworkId:%{public}s",
+    if (notice.result) {
+        FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
-        return;
+    } else {
+        FI_HILOGI("SubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
+            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
     }
-    FI_HILOGI("SubscribeMouseLocation successfully, networkId:%{public}s, remoteNetworkId:%{public}s",
-        Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
 }
 
-void MouseLocation::OnRelayUnSubscribeMouseLocation(const DSoftbusRelayUnSubscribeMouseLocation &notice)
+void MouseLocation::OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice)
 {
-    if (!notice.result) {
-        FI_HILOGE("UnSubscribeMouseLocation failed, networkId:%{public}s, remoteNetworkId:%{public}s",
+    if (notice.result) {
+        FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s successfully, localNetworkId:%{public}s",
             Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
-        return;
+    } else {
+        FI_HILOGI("UnSubscribeMouseLocation of networkId:%{public}s failed, localNetworkId:%{public}s",
+            Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
     }
-    FI_HILOGI("UnSubscribeMouseLocation successfully, networkId:%{public}s, remoteNetworkId:%{public}s",
-        Utility::Anonymize(notice.networkId), Utility::Anonymize(notice.remoteNetworkId));
 }
 
 void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice)
 {
     CALL_DEBUG_ENTER;
     if (listeners_.find(notice.networkId) == listeners_.end()) {
-        FI_HILOGE("No listener stored in listeners");
+        FI_HILOGE("No listener for networkId:%{public}s stored in listeners", Utility::Anonymize(notice.networkId));
         return;
     }
     LocationInfo locationInfo {
@@ -121,7 +144,7 @@ void MouseLocation::OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notic
         .displayWidth = notice.mouseLocation.displayWidth,
         .displayHeight = notice.mouseLocation.displayHeight
         };
-    for (const auto pid : listeners_[notice.networkId]) {
+    for (auto pid : listeners_[notice.networkId]) {
         ReportMouseLocationToListener(notice.networkId, locationInfo, pid);
     }
 }
@@ -132,7 +155,7 @@ void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     LocationInfo locationInfo;
     TransferToLocationInfo(pointerEvent, locationInfo);
     if (HasLocalListener()) {
-        for (const auto pid : localListeners_) {
+        for (auto pid : localListeners_) {
             ReportMouseLocationToListener(localNetworkId_, locationInfo, pid);
         }
     }
@@ -145,55 +168,55 @@ void MouseLocation::ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     }
 }
 
-void MouseLocation::SyncLocationToRemote(const std::string &networkId, const LocationInfo &locationInfo)
+void MouseLocation::SyncLocationToRemote(const std::string &remoteNetworkId, const LocationInfo &locationInfo)
 {
-    DSoftbusSyncMouseLocation softbusEvent;
-    softbusEvent.networkId = networkId;
-    softbusEvent.remoteNetworkId = "";
-    softbusEvent.mouseLocation = {
-        .displayX = locationInfo.displayX,
-        .displayY = locationInfo.displayY,
-        .displayWidth = locationInfo.displayWidth,
-        .displayHeight = locationInfo.displayHeight
+    CALL_DEBUG_ENTER;
+    DSoftbusSyncMouseLocation softbusEvent {
+        .networkId = localNetworkId_,
+        .remoteNetworkId = remoteNetworkId,
+        .mouseLocation = {
+            .displayX = locationInfo.displayX,
+            .displayY = locationInfo.displayY,
+            .displayWidth = locationInfo.displayWidth,
+            .displayHeight = locationInfo.displayHeight,
+        },
     };
-    SyncMouseLocation(softbusEvent.networkId, softbusEvent);
+    SyncMouseLocation(softbusEvent);
 }
 
-int32_t MouseLocation::RelaySubscribeMouseLocation(const std::string &networkId,
-    const DSoftbusRelaySubscribeMouseLocation &event)
+int32_t MouseLocation::ReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
-    NetPacket packet(MessageId::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION);
+    NetPacket packet(MessageId::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId << event.result;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
-    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to SendPacket");
+    if (SendPacket(event.remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
-int32_t MouseLocation::RelayUnSubscribeMouseLocation(const std::string &networkId,
-    const DSoftbusRelayUnSubscribeMouseLocation &event)
+int32_t MouseLocation::ReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
-    NetPacket packet(MessageId::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION);
+    NetPacket packet(MessageId::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId << event.result;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
-    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to SendPacket");
+    if (SendPacket(event.remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
-int32_t MouseLocation::SubscribeMouseLocation(const std::string &networkId, const DSoftbusSubscribeMouseLocation &event)
+int32_t MouseLocation::SubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION);
@@ -202,15 +225,14 @@ int32_t MouseLocation::SubscribeMouseLocation(const std::string &networkId, cons
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
-    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to SendPacket");
+    if (SendPacket(event.remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
-int32_t MouseLocation::UnSubscribeMouseLocation(const std::string &networkId,
-    const DSoftbusUnSubscribeMouseLocation &event)
+int32_t MouseLocation::UnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &event)
 {
     CALL_INFO_TRACE;
     NetPacket packet(MessageId::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION);
@@ -219,34 +241,36 @@ int32_t MouseLocation::UnSubscribeMouseLocation(const std::string &networkId,
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
-    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to SendPacket");
+    if (SendPacket(event.remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
-int32_t MouseLocation::SyncMouseLocation(const std::string &networkId, const DSoftbusSyncMouseLocation &event)
+int32_t MouseLocation::SyncMouseLocation(const DSoftbusSyncMouseLocation &event)
 {
-    CALL_INFO_TRACE;
-    NetPacket packet(MessageId::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION);
+    CALL_DEBUG_ENTER;
+    NetPacket packet(MessageId::DSOFTBUS_MOUSE_LOCATION);
     packet << event.networkId << event.remoteNetworkId << event.mouseLocation.displayX <<
         event.mouseLocation.displayY << event.mouseLocation.displayWidth << event.mouseLocation.displayHeight;
     if (packet.ChkRWError()) {
         FI_HILOGE("Failed to write data packet");
         return RET_ERR;
     }
-    int32_t ret = env_->GetDSoftbus().SendPacket(networkId, packet);
-    if (ret != RET_OK) {
-        FI_HILOGE("Failed to SendPacket");
+    if (SendPacket(event.remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed");
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 void MouseLocation::ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo,
     int32_t pid)
 {
-    auto session = env_->GetSocketSessionManager().FindSessionByPid(pid);
+    CALL_DEBUG_ENTER;
+    CHKPV(context_);
+    auto session = context_->GetSocketSessionManager().FindSessionByPid(pid);
     CHKPV(session);
     NetPacket pkt(MessageId::MOUSE_LOCATION_ADD_LISTENER);
     pkt << networkId << locationInfo.displayX << locationInfo.displayY <<
@@ -263,6 +287,7 @@ void MouseLocation::ReportMouseLocationToListener(const std::string &networkId, 
 
 void MouseLocation::TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> pointerEvent, LocationInfo &locationInfo)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
@@ -281,12 +306,29 @@ void MouseLocation::TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> po
 
 bool MouseLocation::HasRemoteSubscriber()
 {
+    CALL_DEBUG_ENTER;
     return !remoteSubscribers_.empty();
 }
 
 bool MouseLocation::HasLocalListener()
 {
+    CALL_DEBUG_ENTER;
     return !localListeners_.empty();
+}
+
+int32_t MouseLocation::SendPacket(const std::string &remoteNetworkId, NetPacket &packet)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(context_, RET_ERR);
+    if (context_->GetDSoftbus().OpenSession(remoteNetworkId) != RET_OK) {
+        FI_HILOGE("Failed to connect to %{public}s", Utility::Anonymize(remoteNetworkId));
+        return RET_ERR;
+    }
+    if (context_->GetDSoftbus().SendPacket(remoteNetworkId, packet) != RET_OK) {
+        FI_HILOGE("SendPacket failed to %{public}s", Utility::Anonymize(remoteNetworkId));
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 } // namespace Cooperate

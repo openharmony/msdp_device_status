@@ -39,12 +39,12 @@ ohos_shared_library("devicestatus_mock") {
 
   public_configs = [ ":devicestatus_srv_public_config" ]
 
-  deps = [
-    "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson_static",
-  ]
+  deps = [ "${device_status_utils_path}:devicestatus_util" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson_static",
+    "hilog:libhilog",
+  ]
 
   defines = []
   if (device_status_sensor_enable) {
@@ -85,12 +85,12 @@ ohos_shared_library("devicestatus_algo") {
   deps = [
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson_static",
     "//third_party/jsoncpp",
   ]
 
   external_deps = [
     "ability_base:base",
+    "cJSON:cjson_static",
     "hilog:libhilog",
     "input:libmmi-client",
     "ipc:ipc_single",

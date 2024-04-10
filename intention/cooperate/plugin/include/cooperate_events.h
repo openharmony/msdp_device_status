@@ -66,8 +66,8 @@ enum class CooperateEventType {
     DSOFTBUS_RELAY_COOPERATE_FINISHED,
     DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
-    DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION,
-    DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
     DSOFTBUS_MOUSE_LOCATION,
 };
 
@@ -171,12 +171,12 @@ struct DSoftbusRelayCooperate {
 };
 
 struct DSoftbusSubscribeMouseLocation {
-    std::string networkId; 
+    std::string networkId;
     std::string remoteNetworkId;
 };
 
-struct DSoftbusRelaySubscribeMouseLocation {
-    std::string networkId; 
+struct DSoftbusReplySubscribeMouseLocation {
+    std::string networkId;
     std::string remoteNetworkId;
     bool result { false };
 };
@@ -193,7 +193,7 @@ struct DSoftbusSyncMouseLocation {
     LocationInfo mouseLocation;
 };
 
-using DSoftbusRelayUnSubscribeMouseLocation = DSoftbusRelaySubscribeMouseLocation;
+using DSoftbusReplyUnSubscribeMouseLocation = DSoftbusReplySubscribeMouseLocation;
 using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
 
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
@@ -215,7 +215,7 @@ struct CooperateEvent {
         GetCooperateStateEvent,
         RegisterEventListenerEvent,
         DSoftbusSubscribeMouseLocation,
-        DSoftbusRelaySubscribeMouseLocation,
+        DSoftbusReplySubscribeMouseLocation,
         DSoftbusSyncMouseLocation,
         DumpEvent,
         DDMBoardOnlineEvent,

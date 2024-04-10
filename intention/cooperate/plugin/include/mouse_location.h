@@ -31,7 +31,6 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 class MouseLocation {
-
 struct LocationInfo {
     int32_t displayX { -1 };
     int32_t displayY { -1 };
@@ -40,7 +39,7 @@ struct LocationInfo {
 };
 
 public:
-    MouseLocation(IContext *env) : env_(env) {}
+    MouseLocation(IContext *context) : context_(context) {}
     ~MouseLocation() = default;
     DISALLOW_COPY_AND_MOVE(MouseLocation);
     void AddListener(const RegisterEventListenerEvent &event);
@@ -48,27 +47,27 @@ public:
 
     void OnSubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &notice);
     void OnUnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &notice);
-    void OnRelaySubscribeMouseLocation(const DSoftbusRelaySubscribeMouseLocation &notice);
-    void OnRelayUnSubscribeMouseLocation(const DSoftbusRelayUnSubscribeMouseLocation &notice);
+    void OnReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &notice);
+    void OnReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &notice);
     void OnRemoteMouseLocation(const DSoftbusSyncMouseLocation &notice);
 
     void ProcessData(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    void SyncLocationToRemote(const std::string &networkId, const LocationInfo &locationInfo);
+    void SyncLocationToRemote(const std::string &remoteNetworkId, const LocationInfo &locationInfo);
 
 private:
-    int32_t SubscribeMouseLocation(const std::string &networkId, const DSoftbusSubscribeMouseLocation &event);
-    int32_t UnSubscribeMouseLocation(const std::string &networkId, const DSoftbusUnSubscribeMouseLocation &event);
-    int32_t SyncMouseLocation(const std::string &networkId, const DSoftbusSyncMouseLocation &event);
-    int32_t RelaySubscribeMouseLocation(const std::string &networkId, const DSoftbusRelaySubscribeMouseLocation &event);
-    int32_t RelayUnSubscribeMouseLocation(const std::string &networkId,
-        const DSoftbusRelayUnSubscribeMouseLocation &event);
+    int32_t SubscribeMouseLocation(const DSoftbusSubscribeMouseLocation &event);
+    int32_t UnSubscribeMouseLocation(const DSoftbusUnSubscribeMouseLocation &event);
+    int32_t SyncMouseLocation(const DSoftbusSyncMouseLocation &event);
+    int32_t ReplySubscribeMouseLocation(const DSoftbusReplySubscribeMouseLocation &event);
+    int32_t ReplyUnSubscribeMouseLocation(const DSoftbusReplyUnSubscribeMouseLocation &event);
+    int32_t SendPacket(const std::string &remoteNetworkId, NetPacket &packet);
     void ReportMouseLocationToListener(const std::string &networkId, const LocationInfo &locationInfo, int32_t pid);
     void TransferToLocationInfo(std::shared_ptr<MMI::PointerEvent> pointerEvent, LocationInfo &locationInfo);
     bool HasRemoteSubscriber();
     bool HasLocalListener();
 
 private:
-    IContext *env_ { nullptr };
+    IContext *context_ { nullptr };
     std::string localNetworkId_;
     std::set<int32_t> localListeners_;
     std::set<std::string> remoteSubscribers_;

@@ -55,10 +55,10 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
         &StateMachine::OnSoftbusUnSubscribeMouseLocation);
-    AddHandler(CooperateEventType::DSOFTBUS_RELAY_SUBSCRIBE_MOUSE_LOCATION,
-        &StateMachine::OnSoftbusRelaySubscribeMouseLocation);
-    AddHandler(CooperateEventType::DSOFTBUS_RELAY_UNSUBSCRIBE_MOUSE_LOCATION,
-        &StateMachine::OnSoftbusRelayUnSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
+        &StateMachine::OnSoftbusReplySubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
+        &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
     AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
 }
 
@@ -233,18 +233,18 @@ void StateMachine::OnSoftbusUnSubscribeMouseLocation(Context &context, const Coo
     context.mouseLocation_.OnUnSubscribeMouseLocation(notice);
 }
 
-void StateMachine::OnSoftbusRelaySubscribeMouseLocation(Context &context, const CooperateEvent &event)
+void StateMachine::OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    DSoftbusRelaySubscribeMouseLocation notice = std::get<DSoftbusRelaySubscribeMouseLocation>(event.event);
-    context.mouseLocation_.OnRelaySubscribeMouseLocation(notice);
+    DSoftbusReplySubscribeMouseLocation notice = std::get<DSoftbusReplySubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnReplySubscribeMouseLocation(notice);
 }
 
-void StateMachine::OnSoftbusRelayUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+void StateMachine::OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
-    DSoftbusRelayUnSubscribeMouseLocation notice = std::get<DSoftbusRelayUnSubscribeMouseLocation>(event.event);
-    context.mouseLocation_.OnRelayUnSubscribeMouseLocation(notice);
+    DSoftbusReplyUnSubscribeMouseLocation notice = std::get<DSoftbusReplyUnSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnReplyUnSubscribeMouseLocation(notice);
 }
 
 void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent &event)
@@ -281,6 +281,7 @@ void StateMachine::AddMonitor(Context &context)
     if (monitorId_ >= 0) {
         return;
     }
+    CHKPV(env_);
     monitorId_ = env_->GetInput().AddMonitor(
         [sender = context.Sender(), &hotArea = context.hotArea_, &mouseLocation = context.mouseLocation_] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {

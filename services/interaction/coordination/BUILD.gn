@@ -65,12 +65,12 @@ ohos_shared_library("coordination") {
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
     "//third_party/openssl:libcrypto_shared",
   ]
 
   external_deps = [
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

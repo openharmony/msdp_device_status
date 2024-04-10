@@ -32,6 +32,11 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+#ifdef ENABLE_PERFORMANCE_CHECK
+constexpr int32_t PERCENTAGE { 100 };
+#endif // ENABLE_PERFORMANCE_CHECK
+} // namespace
 
 int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel,
     CooperateListenerPtr listener, bool isCheckPermission)
@@ -219,7 +224,7 @@ int32_t CooperateClient::RegisterEventListener(ITunnelClient &tunnel,
         return ret;
     }
     eventListener_[networkId].insert(listener);
-    FI_HILOGI("RegisterEventListener for networkId:%{public}s successfully", Utility::Anonymize(networkId));
+    FI_HILOGI("Add listener for networkId:%{public}s successfully", Utility::Anonymize(networkId));
     return RET_OK;
 }
 
@@ -410,6 +415,23 @@ void CooperateClient::OnDevHotAreaListener(int32_t displayX,
     }
 }
 
+void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, const Event &event)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) == eventListener_.end()) {
+        FI_HILOGI("No listener for networkId:%{public}s is registered", Utility::Anonymize(networkId));
+        return;
+    }
+    for (const auto &listener : eventListener_[networkId]) {
+            CHKPC(listener);
+            listener->OnMouseLocationEvent(networkId, event);
+            FI_HILOGD("Trigger listener for networkId:%{public}s,"
+            "displayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
+            Utility::Anonymize(networkId), event.displayX, event.displayY, event.displayWidth, event.displayHeight);
+    }
+}
+
 #ifdef ENABLE_PERFORMANCE_CHECK
 void CooperateClient::StartTrace(int32_t userData)
 {
@@ -424,7 +446,6 @@ void CooperateClient::FinishTrace(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
-    int32_t hundred = { 100 };
     if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
         auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - iter->second).count();
@@ -432,7 +453,7 @@ void CooperateClient::FinishTrace(int32_t userData)
         performanceInfo_.traces_.erase(iter);
         performanceInfo_.successNum += 1;
         performanceInfo_.failNum = performanceInfo_.traces_.size();
-        performanceInfo_.successRate = (performanceInfo_.successNum * hundred) / performanceInfo_.activateNum;
+        performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / performanceInfo_.activateNum;
         performanceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performanceInfo_.minDuration);
         performanceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performanceInfo_.maxDuration);
         performanceInfo_.durationList.push_back(curDuration);

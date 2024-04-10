@@ -53,8 +53,8 @@ private:
     void OnPointerEvent(Context &context, const CooperateEvent &event);
     void OnSoftbusSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
-    void OnSoftbusRelaySubscribeMouseLocation(Context &context, const CooperateEvent &event);
-    void OnSoftbusRelayUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
+    void OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event);
+    void OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);

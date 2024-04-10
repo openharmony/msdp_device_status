@@ -27,6 +27,7 @@
 #include "uv.h"
 
 #include "i_coordination_listener.h"
+#include "i_event_listener.h"
 #include "js_util.h"
 
 namespace OHOS {
@@ -66,12 +67,12 @@ private:
     static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
     static void EmitMouseLocationEvent(uv_work_t *work, int32_t status);
+    bool IsHandleExist(napi_env env, const std::string &networkId, napi_value handle);
 
-    inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>>
-        coordinationListeners_ {};
-    inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>>
-        mouseLocationListeners_ {};
+private:
     std::atomic_bool isListeningProcess_ { false };
+    inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>> coordinationListeners_;
+    inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>> mouseLocationListeners_;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
