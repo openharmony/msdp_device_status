@@ -59,8 +59,6 @@ enum class CooperateEventType {
     DSOFTBUS_SESSION_OPEND,
     DSOFTBUS_SESSION_CLOSED,
     DSOFTBUS_START_COOPERATE,
-    DSOFTBUS_START_COOPERATE_RESPONSE,
-    DSOFTBUS_START_COOPERATE_FINISHED,
     DSOFTBUS_COME_BACK,
     DSOFTBUS_STOP_COOPERATE,
     DSOFTBUS_RELAY_COOPERATE,
@@ -152,17 +150,16 @@ struct InputPointerEvent {
 
 using DSoftbusSessionOpened = DDMBoardOnlineEvent;
 using DSoftbusSessionClosed = DDMBoardOnlineEvent;
-using DSoftbusStartCooperate = DDMBoardOnlineEvent;
-using DSoftbusStartCooperateResponse = DDMBoardOnlineEvent;
 
-struct DSoftbusStartCooperateFinished {
+struct DSoftbusStartCooperate {
     std::string networkId;
     std::string originNetworkId;
     bool success;
     NormalizedCoordinate cursorPos;
 };
 
-using DSoftbusComeBack = DSoftbusStartCooperateFinished;
+using DSoftbusStartCooperateFinished = DSoftbusStartCooperate;
+using DSoftbusComeBack = DSoftbusStartCooperate;
 using DSoftbusStopCooperate = DDMBoardOnlineEvent;
 using DSoftbusStopCooperateFinished = DDMBoardOnlineEvent;
 
@@ -223,7 +220,7 @@ struct CooperateEvent {
         DDMBoardOnlineEvent,
         InputHotplugEvent,
         InputPointerEvent,
-        DSoftbusStartCooperateFinished,
+        DSoftbusStartCooperate,
         DSoftbusRelayCooperate
     > event;
 };
