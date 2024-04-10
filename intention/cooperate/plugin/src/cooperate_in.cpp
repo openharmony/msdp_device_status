@@ -138,6 +138,7 @@ void CooperateIn::Initial::OnComeBack(Context &context, const CooperateEvent &ev
     FI_HILOGI("[come back] To \'%{public}s\'", Utility::Anonymize(context.Peer()));
 
     DSoftbusComeBack notice {
+        .originNetworkId = context.Local(),
         .success = true,
         .cursorPos = context.NormalizedCursorPosition(),
     };

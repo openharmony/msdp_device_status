@@ -47,7 +47,6 @@ ohos_unittest("device_status_algorithm_test") {
     "${device_status_interfaces_path}/innerkits:devicestatus_client",
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
-    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",
   ]
@@ -55,6 +54,7 @@ ohos_unittest("device_status_algorithm_test") {
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson_static",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -86,7 +86,6 @@ ohos_unittest("device_status_datahub_test") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
     "../../../libs:devicestatus_mock",
-    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",
   ]
@@ -94,6 +93,7 @@ ohos_unittest("device_status_datahub_test") {
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson_static",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -124,7 +124,6 @@ ohos_unittest("device_status_mock_test") {
     "${device_status_root_path}/services:devicestatus_static_service",
     "../../../libs:devicestatus_algo",
     "../../../libs:devicestatus_mock",
-    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp",
   ]
@@ -132,6 +131,7 @@ ohos_unittest("device_status_mock_test") {
   external_deps = [
     "ability_base:base",
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson_static",
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",

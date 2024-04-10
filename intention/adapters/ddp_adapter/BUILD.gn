@@ -44,10 +44,10 @@ ohos_source_set("intention_ddp_adapter") {
   deps = [
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "device_manager:devicemanagersdk",

@@ -62,7 +62,6 @@ ohos_shared_library("interaction_drag") {
     "${device_status_root_path}/etc/drag_icon:device_status_drag_icon",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_utils_path}:devicestatus_util",
-    "//third_party/cJSON:cjson",
     "//third_party/libxml2:xml2",
   ]
 
@@ -71,6 +70,7 @@ ohos_shared_library("interaction_drag") {
 
   external_deps = [
     "ability_base:want",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "device_info_manager:distributed_device_profile_common",

@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
-  fusion_intention_framework = false
+  fusion_intention_framework = true
   fusion_rust_enabled = false
   fusion_interaction_coordination = false
   fusion_drag_enable_monitor = true
