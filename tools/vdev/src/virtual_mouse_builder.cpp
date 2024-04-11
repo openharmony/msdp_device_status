@@ -266,7 +266,8 @@ void VirtualMouseBuilder::ReadMoveAction(int32_t argc, char *argv[])
 {
     CALL_DEBUG_ENTER;
     CHKPV(optarg);
-    if (!Utility::IsInteger(std::string(optarg)) || (optind < 0) || (optind >= argc)) {
+    if (!Utility::IsInteger(std::string(optarg)) || (optind < 0) || (optind >= argc) ||
+        !Utility::IsInteger(argv[optind])) {
         std::cout << "Invalid arguments for Option \'-m\'." << std::endl;
         ShowUsage();
         return;

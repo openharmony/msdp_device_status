@@ -151,6 +151,11 @@ bool VirtualDeviceBuilder::ExecuteUnmount(const char *id, const char *name, cons
         return false;
     }
     spath << "/cmdline";
+    char realPath[PATH_MAX] = { 0 };
+    if (realpath(spath.str().c_str(), realPath) == nullptr) {
+        std::cout << "Invalid path" << spath.str().c_str() <<std::endl;
+        return false;
+    }
     std::ifstream stream(spath.str(), std::ios::in);
     if (!stream.is_open()) {
         return false;

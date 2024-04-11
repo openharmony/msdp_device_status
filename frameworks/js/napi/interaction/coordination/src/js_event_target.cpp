@@ -580,6 +580,7 @@ void JsEventTarget::CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t
     if (resultObj[1] == nullptr) {
         FI_HILOGE("The object is nullptr");
         napi_close_handle_scope(cb->env, scope);
+        return;
     }
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
@@ -616,9 +617,11 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_open_handle_scope(item->env, &scope);
         if (item->env == nullptr) {
             FI_HILOGW("item->env is nullptr, skip then continue");
+            napi_close_handle_scope(item->env, scope);
             continue;
         }
         if (item->ref != temp->ref) {
+            napi_close_handle_scope(item->env, scope);
             continue;
         }
 

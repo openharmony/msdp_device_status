@@ -561,6 +561,7 @@ void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t stat
     if (resultObj[1] == nullptr) {
         FI_HILOGE("Get start async, object is nullptr");
         napi_close_handle_scope(cb->env, scope);
+        return;
     }
     napi_value handlerInfo = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handlerInfo), GET_REFERENCE_VALUE, scope);
@@ -594,8 +595,13 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
     for (const auto &item : msgEvent->second) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        CHKPC(item->env);
+        if (item->env == nullptr) {
+            FI_HILOGW("item->env is nullptr, skip then continue")
+            napi_close_handle_scope(item->env, scope);
+            continue;
+        }
         if (item->ref != temp->ref) {
+            napi_close_handle_scope(item->env, scope);
             continue;
         }
         napi_value deviceDescriptor = nullptr;

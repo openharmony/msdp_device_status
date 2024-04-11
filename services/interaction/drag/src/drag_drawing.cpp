@@ -163,7 +163,10 @@ struct DragData g_dragData;
 bool CheckNodesValid()
 {
     FI_HILOGD("enter");
-    if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds");
+        return false;
+    }else if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
         FI_HILOGE("Nodes invalid");
         return false;
     }

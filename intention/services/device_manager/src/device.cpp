@@ -364,6 +364,11 @@ std::string Device::MakeConfigFileName() const
 int32_t Device::ReadConfigFile(const std::string &filePath)
 {
     CALL_DEBUG_ENTER;
+    char realPath[PATH_MAX] = { 0 };
+    if (realpath(filepath.c_str()), realPath == nullptr) {
+        FI_HILOGE("Path is error,path is %{pubilc}s", filePath.c_str());
+        return RET_ERR;
+    }
     std::ifstream cfgFile(filePath);
     if (!cfgFile.is_open()) {
         FI_HILOGE("Failed to open config file");
@@ -382,7 +387,10 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
             continue;
         }
         pos = tmp.find('=');
-        if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
+        if (tmp.size() == 0) {
+            FI_HILOGE("tmp.size() - 1 will overflow");
+            return RET_ERR;
+        }else if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
             FI_HILOGE("Find config item error");
             cfgFile.close();
             return RET_ERR;
