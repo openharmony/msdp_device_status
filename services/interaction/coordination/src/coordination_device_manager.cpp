@@ -144,7 +144,7 @@ std::string CoordinationDeviceManager::Device::GenerateDescriptor()
         FI_HILOGD("Generate descriptor, physicalPath:%{public}s", phys.c_str());
         std::vector<std::string> idParts;
         StringSplit(phys.c_str(), SPLIT_SYMBOL, idParts);
-        if (idParts.size() == NETWORK_ID_NUMS) {
+        if (idParts.size() == NETWORK_ID_NUMS && idParts.size() > DESCRIPTOR_INDEX) {
             descriptor = idParts[DESCRIPTOR_INDEX];
         }
         return descriptor;
