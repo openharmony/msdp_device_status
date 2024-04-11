@@ -103,7 +103,10 @@ int32_t VirtualTouchScreen::DownButton(int32_t slot, int32_t x, int32_t y)
         slot = N_SLOTS_AVAILABLE - 1;
     }
     bool firstTouchDown = std::none_of(slots_.cbegin(), slots_.cend(), [](const auto &slot) { return slot.active; });
-
+    if (slots_.size() <= slot) {
+        FI_HILOGE("The index is out of bounds");
+        return RET_ERR;
+    }
     slots_[slot].coord.x = std::min(std::max(x, 0), screenWidth_ - 1);
     slots_[slot].coord.y = std::min(std::max(y, 0), screenHeight_ - 1);
     slots_[slot].active = true;
@@ -125,6 +128,10 @@ int32_t VirtualTouchScreen::UpButton(int32_t slot)
     if (slot < 0 || slot >= N_SLOTS_AVAILABLE) {
         FI_HILOGD("Slot out of range, slot:%{public}d", slot);
         slot = N_SLOTS_AVAILABLE - 1;
+    }
+    if (slots_.size() <= slot) {
+        FI_HILOGE("The index is out of bounds");
+        return RET_ERR;
     }
     if (!slots_[slot].active) {
         FI_HILOGE("Slot [%{public}d] is not active", slot);
@@ -152,6 +159,10 @@ int32_t VirtualTouchScreen::Move(int32_t slot, int32_t dx, int32_t dy)
     CALL_DEBUG_ENTER;
     if (slot < 0 || slot >= N_SLOTS_AVAILABLE) {
         slot = N_SLOTS_AVAILABLE - 1;
+    }
+    if (slots_.size() <= slot) {
+        FI_HILOGE("The index is out of bounds");
+        return RET_ERR;
     }
     if (!slots_[slot].active) {
         FI_HILOGE("slot [%{public}d] is not active", slot);
@@ -189,6 +200,10 @@ int32_t VirtualTouchScreen::MoveTo(int32_t slot, int32_t x, int32_t y)
     CALL_DEBUG_ENTER;
     if (slot < 0 || slot >= N_SLOTS_AVAILABLE) {
         slot = N_SLOTS_AVAILABLE - 1;
+    }
+    if (slots_.size() <= slot) {
+        FI_HILOGE("The index is out of bounds");
+        return RET_ERR;
     }
     if (!slots_[slot].active) {
         FI_HILOGE("slot [%{public}d] is not active", slot);
