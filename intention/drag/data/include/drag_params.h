@@ -47,7 +47,7 @@ enum DragRequestID : uint32_t {
 };
 
 struct StartDragParam final : public ParamBase {
-    StartDragParam(DragData &dragData);
+    explicit StartDragParam(DragData &dragData);
     explicit StartDragParam(const DragData &dragData);
 
     bool Marshalling(MessageParcel &parcel) const override;

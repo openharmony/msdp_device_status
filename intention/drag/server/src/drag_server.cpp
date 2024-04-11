@@ -307,7 +307,7 @@ int32_t DragServer::GetDragData(CallingContext &context, MessageParcel &data, Me
         FI_HILOGE("IDragManager::GetDragData fail, error:%{public}d", ret);
         return ret;
     }
-    GetDragDataReply dragDataReply { dragData };
+    GetDragDataReply dragDataReply { static_cast<const DragData&>(dragData) };
 
     if (!dragDataReply.Marshalling(reply)) {
         FI_HILOGE("GetDragDataReply::Marshalling fail");
