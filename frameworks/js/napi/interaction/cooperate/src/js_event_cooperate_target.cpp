@@ -576,7 +576,6 @@ void JsEventCooperateTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t stat
 void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtilCooperate::DeletePtr<uv_work_t*>(work);
@@ -585,6 +584,7 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
     }
     sptr<JsUtilCooperate::CallbackInfo> temp(static_cast<JsUtilCooperate::CallbackInfo*>(work->data));
     JsUtilCooperate::DeletePtr<uv_work_t*>(work);
+    std::lock_guard<std::mutex> guard(mutex_);
     temp->DecStrongRef(nullptr);
     auto msgEvent = coordinationListeners_.find(COORDINATION);
     if (msgEvent == coordinationListeners_.end()) {
@@ -592,13 +592,12 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         return;
     }
     for (const auto &item : msgEvent->second) {
-        napi_handle_scope scope = nullptr;
-        napi_open_handle_scope(item->env, &scope);
-        if (item->env == nullptr || item->ref != temp->ref) {
-            FI_HILOGW("item->env is nullptr, skip then continue")
-            napi_close_handle_scope(item->env, scope);
+        CHKPC(item->env);
+        if (item->ref != temp->ref) {
             continue;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(item->env, &scope);
         napi_value deviceDescriptor = nullptr;
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);

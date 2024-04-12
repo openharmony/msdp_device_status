@@ -613,18 +613,12 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
     }
 
     for (const auto &item : messageEvent->second) {
+        CHKPC(item->env);
+        if (item->ref != temp->ref) {
+            continue;
+        }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        if (item->env == nullptr) {
-            FI_HILOGW("item->env is nullptr, skip then continue");
-            napi_close_handle_scope(item->env, scope);
-            continue;
-        }
-        if (item->ref != temp->ref) {
-            napi_close_handle_scope(item->env, scope);
-            continue;
-        }
-
         napi_value deviceDescriptor = nullptr;
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
