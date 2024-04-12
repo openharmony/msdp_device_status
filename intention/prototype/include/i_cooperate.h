@@ -38,6 +38,7 @@ public:
     virtual void OnBack(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnRelay(const std::string &remoteNetworkId, const NormalizedCoordinate &cursorPos) = 0;
     virtual void OnReset() = 0;
+    virtual void CloseDistributedFileConnection(const std::string &remoteNetworkId) {}
 };
 
 class ICooperate {

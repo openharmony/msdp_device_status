@@ -36,6 +36,7 @@ public:
     int32_t GetUid() const override;
     int32_t GetPid() const override;
     std::string ToString() const override;
+    std::string GetProgramName() const override;
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
@@ -48,6 +49,7 @@ private:
     int32_t uid_ { -1 };
     int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
+    std::string programName_;
 };
 
 inline int32_t SocketSession::GetUid() const
@@ -63,6 +65,11 @@ inline int32_t SocketSession::GetPid() const
 inline int32_t SocketSession::GetFd() const
 {
     return fd_;
+}
+
+inline std::string SocketSession::GetProgramName() const
+{
+    return programName_;
 }
 } // namespace Msdp
 } // namespace OHOS

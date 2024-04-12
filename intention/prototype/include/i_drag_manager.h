@@ -48,7 +48,7 @@ public:
     virtual int32_t RemoveSubscriptListener(SessionPtr session) = 0;
     virtual int32_t StartDrag(const DragData &dragData, SessionPtr sess) = 0;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    virtual int32_t StopDrag(const DragDropResult &dropResult) = 0;
+    virtual int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") = 0;
     virtual int32_t GetDragData(DragData &dragData) = 0;
     virtual int32_t GetDragTargetPid() const = 0;
     virtual int32_t GetUdKey(std::string &udKey) const = 0;

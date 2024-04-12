@@ -74,6 +74,7 @@ public:
     void OnBack();
     void OnRelay(const std::string &networkId);
     void OnResetCooperation();
+    void CloseDistributedFileConnection(const std::string &remoteNetworkId);
 
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(const std::string &name);

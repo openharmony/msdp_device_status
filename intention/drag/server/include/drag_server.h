@@ -18,6 +18,7 @@
 
 #include "nocopyable.h"
 
+#include "accesstoken_kit.h"
 #include "i_context.h"
 #include "i_plugin.h"
 
@@ -55,6 +56,7 @@ private:
     int32_t GetDragAction(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t GetExtraInfo(CallingContext &context, MessageParcel &data, MessageParcel &reply);
     int32_t EnterTextEditorArea(CallingContext &context, MessageParcel &data, MessageParcel &reply);
+    std::string GetPackageName(Security::AccessToken::AccessTokenID tokenId);
 
     IContext *env_ { nullptr };
 };

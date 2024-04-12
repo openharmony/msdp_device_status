@@ -353,6 +353,21 @@ void Context::OnRelay(const std::string &networkId)
     }
 }
 
+void Context::CloseDistributedFileConnection(const std::string &remoteNetworkId)
+{
+    CHKPV(eventHandler_);
+    FI_HILOGI("Notify observers of device offline");
+    for (const auto &observer : observers_) {
+        eventHandler_->PostTask(
+            [observer, remoteNetworkId = Peer()] {
+                FI_HILOGI("Notify one observer of device offline, remoteNetworkId:%{public}s",
+                    Utility::Anonymize(remoteNetworkId));
+                CHKPV(observer);
+                observer->CloseDistributedFileConnection(remoteNetworkId);
+            });
+    }
+}
+
 void Context::OnResetCooperation()
 {
     CHKPV(eventHandler_);
