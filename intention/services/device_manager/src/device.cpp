@@ -365,8 +365,8 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
 {
     CALL_DEBUG_ENTER;
     char realPath[PATH_MAX] = { 0 };
-    if (realpath(filepath.c_str()), realPath == nullptr) {
-        FI_HILOGE("Path is error,path is %{pubilc}s", filePath.c_str());
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        FI_HILOGE("Path is error, path is %{pubilc}s", filePath.c_str());
         return RET_ERR;
     }
     std::ifstream cfgFile(filePath);
