@@ -46,6 +46,8 @@ enum class CooperateEventType {
     START,
     STOP,
     GET_COOPERATE_STATE,
+    REGISTER_EVENT_LISTENER,
+    UNREGISTER_EVENT_LISTENER,
     DUMP,
     APP_CLOSED,
     DDM_BOARD_ONLINE,
@@ -62,6 +64,11 @@ enum class CooperateEventType {
     DSOFTBUS_STOP_COOPERATE,
     DSOFTBUS_RELAY_COOPERATE,
     DSOFTBUS_RELAY_COOPERATE_FINISHED,
+    DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
+    DSOFTBUS_MOUSE_LOCATION,
 };
 
 struct Rectangle {
@@ -105,6 +112,12 @@ struct GetCooperateStateEvent {
     int32_t userData;
     std::string networkId;
 };
+
+struct RegisterEventListenerEvent {
+    int32_t pid;
+    std::string networkId;
+};
+using UnregisterEventListenerEvent = RegisterEventListenerEvent;
 
 struct DumpEvent {
     int32_t fd;
@@ -157,6 +170,32 @@ struct DSoftbusRelayCooperate {
     bool normal;
 };
 
+struct DSoftbusSubscribeMouseLocation {
+    std::string networkId;
+    std::string remoteNetworkId;
+};
+
+struct DSoftbusReplySubscribeMouseLocation {
+    std::string networkId;
+    std::string remoteNetworkId;
+    bool result { false };
+};
+
+struct LocationInfo {
+    int32_t displayX;
+    int32_t displayY;
+    int32_t displayWidth;
+    int32_t displayHeight;
+};
+struct DSoftbusSyncMouseLocation {
+    std::string networkId;
+    std::string remoteNetworkId;
+    LocationInfo mouseLocation;
+};
+
+using DSoftbusReplyUnSubscribeMouseLocation = DSoftbusReplySubscribeMouseLocation;
+using DSoftbusUnSubscribeMouseLocation = DSoftbusSubscribeMouseLocation;
+
 using DSoftbusRelayCooperateFinished = DSoftbusRelayCooperate;
 
 struct CooperateEvent {
@@ -174,6 +213,10 @@ struct CooperateEvent {
         StartCooperateEvent,
         StopCooperateEvent,
         GetCooperateStateEvent,
+        RegisterEventListenerEvent,
+        DSoftbusSubscribeMouseLocation,
+        DSoftbusReplySubscribeMouseLocation,
+        DSoftbusSyncMouseLocation,
         DumpEvent,
         DDMBoardOnlineEvent,
         InputHotplugEvent,

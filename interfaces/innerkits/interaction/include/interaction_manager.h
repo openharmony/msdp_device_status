@@ -25,8 +25,9 @@
 #include "drag_data.h"
 #include "i_coordination_listener.h"
 #include "i_drag_listener.h"
-#include "i_start_drag_listener.h"
+#include "i_event_listener.h"
 #include "i_hotarea_listener.h"
+#include "i_start_drag_listener.h"
 #include "i_subscript_listener.h"
 
 namespace OHOS {
@@ -114,6 +115,24 @@ public:
      * @since 12
      */
     int32_t GetCoordinationState(const std::string &udId, bool &state);
+
+    /**
+     * @brief Registers a listener for mouse pointer position information on the specified device.
+     * @param networkId Indicates the descriptor of the input device.
+     * @param listener Indicates the listener for mouse pointer position information on the specified device.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 9
+     */
+    int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
+
+    /**
+     * @brief Unregisters a listener for mouse pointer position information on the specified device.
+     * @param networkId Indicates the descriptor of the input device.
+     * @param listener Indicates the listener mouse pointer position information on the specified device.
+     * @return Returns <b>0</b> if the operation is successful; returns a non-zero value otherwise.
+     * @since 9
+     */
+    int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
 
     /**
      * @brief Starts dragging.

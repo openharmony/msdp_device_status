@@ -60,6 +60,8 @@ void IntentionManager::InitMsgHandler()
             MsgCallbackBind2(&CooperateClient::OnCoordinationState, &cooperate_)},
         {MessageId::HOT_AREA_ADD_LISTENER,
             MsgCallbackBind2(&CooperateClient::OnHotAreaListener, &cooperate_)},
+        {MessageId::MOUSE_LOCATION_ADD_LISTENER,
+            MsgCallbackBind2(&CooperateClient::OnMouseLocationListener, &cooperate_)},
 #endif // OHOS_BUILD_ENABLE_COORDINATION
         {MessageId::DRAG_NOTIFY_RESULT,
             MsgCallbackBind2(&DragClient::OnNotifyResult, &drag_)},
@@ -202,6 +204,37 @@ int32_t IntentionManager::GetCoordinationState(const std::string &udId, bool &st
 #else
     (void)(udId);
     (void)(state);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+int32_t IntentionManager::RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitClient();
+    return cooperate_.RegisterEventListener(*tunnel_, networkId, listener);
+#else
+    (void)(networkId);
+    (void)(listener);
+    FI_HILOGW("Coordination does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COORDINATION
+}
+
+int32_t IntentionManager::UnregisterEventListener(const std::string &networkId,
+    std::shared_ptr<IEventListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COORDINATION
+    std::lock_guard<std::mutex> guard(mutex_);
+    InitClient();
+    return cooperate_.UnregisterEventListener(*tunnel_, networkId, listener);
+#else
+    (void)(networkId);
+    (void)(listener);
     FI_HILOGW("Coordination does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COORDINATION

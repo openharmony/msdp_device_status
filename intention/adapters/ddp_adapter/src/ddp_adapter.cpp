@@ -72,6 +72,12 @@ std::string DDPAdapter::GetUdIdByNetworkId(const std::string &networkId)
     return ddp_->GetUdIdByNetworkId(networkId);
 }
 
+std::string DDPAdapter::GetLocalNetworkId()
+{
+    CALL_DEBUG_ENTER;
+    return ddp_->GetLocalNetworkId();
+}
+
 int32_t DDPAdapter::UpdateCrossingSwitchState(bool state)
 {
     CALL_DEBUG_ENTER;

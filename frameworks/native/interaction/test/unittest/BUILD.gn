@@ -70,9 +70,46 @@ ohos_unittest("InteractionDragDrawingTest") {
   ]
 }
 
+ohos_unittest("InteractionMouseLocationTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_utils_path}",
+    "${device_status_utils_path}/include",
+  ]
+
+  sources = [
+    "${device_status_utils_path}/src/utility.cpp",
+    "src/mouse_location_listener_test.cpp",
+  ]
+
+  deps = [ "${device_status_interfaces_path}/innerkits:devicestatus_client" ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "window_manager:libdm",
+  ]
+}
+
 group("unittest") {
   testonly = true
-  deps = [ ":InteractionDragDrawingTest" ]
+  deps = [
+    ":InteractionDragDrawingTest",
+    ":InteractionMouseLocationTest",
+  ]
   if (build_variant == "root" && root_perf_main != "root_main") {
     deps += [ ":InteractionManagerTest" ]
   }

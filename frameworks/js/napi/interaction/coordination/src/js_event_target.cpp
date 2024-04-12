@@ -20,6 +20,7 @@
 #include "interaction_manager.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
+#include "utility.h"
 
 #undef LOG_TAG
 #define LOG_TAG "JsEventTarget"
@@ -181,7 +182,11 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     sptr<JsUtil::CallbackInfo> monitor = new (std::nothrow) JsUtil::CallbackInfo();
-    CHKPV(monitor);
+    if (monitor == nullptr) {
+        FI_HILOGE("Null monitor, release callback");
+        RELEASE_CALLBACKINFO(env, ref);
+        return;
+    }
     monitor->env = env;
     monitor->ref = ref;
     monitor->data.type = type;
@@ -235,7 +240,85 @@ MONITOR_LABEL:
     }
 }
 
+void JsEventTarget::AddListener(napi_env env, const std::string &type, const std::string &networkId, napi_value handle)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (IsHandleExist(env, networkId, handle)) {
+        FI_HILOGE("Current handle for networkId:%{public}s already exists", Utility::Anonymize(networkId));
+        return;
+    }
+    napi_ref ref = nullptr;
+    CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
+    sptr<JsUtil::MouseCallbackInfo> monitor = new (std::nothrow) JsUtil::MouseCallbackInfo();
+    if (monitor == nullptr) {
+        FI_HILOGE("Null monitor, release callback");
+        RELEASE_CALLBACKINFO(env, ref);
+        return;
+    }
+    monitor->env = env;
+    monitor->ref = ref;
+    monitor->data.networkId = networkId;
+    mouseLocationListeners_[networkId].push_back(monitor);
+    if (int32_t errCode = INTERACTION_MGR->RegisterEventListener(networkId, shared_from_this());
+        errCode != RET_OK) {
+        FI_HILOGE("RegisterEventListener for networkId:%{public}s failed, ret:%{public}d",
+            Utility::Anonymize(networkId), errCode);
+        UtilNapiError::HandleExecuteResult(env, errCode, "on", COOPERATE_PERMISSION);
+        RELEASE_CALLBACKINFO(env, ref);
+    }
+}
+
+void JsEventTarget::RemoveListener(napi_env env, const std::string &type, const std::string &networkId,
+    napi_value handle)
+{
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
+        FI_HILOGE("Not listener for networkId:%{public}s exists", Utility::Anonymize(networkId));
+        return;
+    }
+    if (handle == nullptr) {
+        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
+        mouseLocationListeners_.erase(networkId);
+    } else {
+        for (auto iter = mouseLocationListeners_[networkId].begin();
+            iter != mouseLocationListeners_[networkId].end();) {
+            if (JsUtil::IsSameHandle(env, handle, (*iter)->ref)) {
+                iter = mouseLocationListeners_[networkId].erase(iter);
+                break;
+            } else {
+                ++iter;
+            }
+        }
+    }
+    if (mouseLocationListeners_.find(networkId) != mouseLocationListeners_.end() &&
+        mouseLocationListeners_[networkId].empty()) {
+        mouseLocationListeners_.erase(networkId);
+    }
+    if (int32_t errCode = INTERACTION_MGR->UnregisterEventListener(networkId, shared_from_this());
+        errCode != RET_OK) {
+        FI_HILOGE("UnregisterEventListener for networkId:%{public}s failed, ret:%{public}d",
+            Utility::Anonymize(networkId), errCode);
+        UtilNapiError::HandleExecuteResult(env, errCode, "off", COOPERATE_PERMISSION);
+    }
+}
+
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> callback)
+{
+    CALL_INFO_TRACE;
+    CHKPP(callback);
+    callback->env = env;
+    napi_value napiPromise = nullptr;
+    if (handle == nullptr) {
+        CHKRP(napi_create_promise(env, &callback->deferred, &napiPromise), CREATE_PROMISE);
+    } else {
+        CHKRP(napi_create_reference(env, handle, 1, &callback->ref), CREATE_REFERENCE);
+    }
+    return napiPromise;
+}
+
+napi_value JsEventTarget::CreateMouseCallbackInfo(napi_env env, napi_value handle,
+    sptr<JsUtil::MouseCallbackInfo> callback)
 {
     CALL_INFO_TRACE;
     CHKPP(callback);
@@ -283,6 +366,39 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
             FI_HILOGE("uv_queue_work_with_qos failed");
             item->DecStrongRef(nullptr);
             JsUtil::DeletePtr<uv_work_t*>(work);
+        }
+    }
+}
+
+void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Event &event)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
+        FI_HILOGE("Find listener for %{public}s failed", Utility::Anonymize(networkId));
+        return;
+    }
+
+    for (auto &item : mouseLocationListeners_[networkId]) {
+        CHKPC(item);
+        CHKPC(item->env);
+        uv_loop_s *loop = nullptr;
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
+        item->data.networkId = networkId;
+        item->data.displayX = event.displayX;
+        item->data.displayY = event.displayY;
+        item->data.displayWidth = event.displayWidth;
+        item->data.displayHeight = event.displayHeight;
+        item->IncStrongRef(nullptr);
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
+        work->data = item.GetRefPtr();
+        int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+            EmitMouseLocationEvent, uv_qos_default);
+        if (ret != 0) {
+            FI_HILOGE("uv_queue_work_with_qos failed");
+            JsUtil::DeletePtr<uv_work_t*>(work);
+            item->DecStrongRef(nullptr);
         }
     }
 }
@@ -643,6 +759,85 @@ void JsEventTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32_t status
         napi_close_handle_scope(item->env, scope);
     }
 }
+
+void JsEventTarget::EmitMouseLocationEvent(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        FI_HILOGE("Emit mouse location event, check data is nullptr");
+        return;
+    }
+
+    sptr<JsUtil::MouseCallbackInfo> temp(static_cast<JsUtil::MouseCallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    temp->DecStrongRef(nullptr);
+    auto mouseLocationEvent = mouseLocationListeners_.find(temp->data.networkId);
+    if (mouseLocationEvent == mouseLocationListeners_.end()) {
+        FI_HILOGE("Not exist mouseLocationEvent");
+        return;
+    }
+    for (const auto &item : mouseLocationEvent->second) {
+        if (item->env == nullptr) {
+            FI_HILOGW("Item->env is nullptr, skip then continue");
+            continue;
+        }
+        if (item->ref != temp->ref) {
+            continue;
+        }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(item->env, &scope);
+
+        napi_value displayX = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.displayX), &displayX),
+            CREATE_INT32, scope);
+        napi_value displayY = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.displayY), &displayY),
+            CREATE_INT32, scope);
+        napi_value displayWidth = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.displayWidth),
+            &displayWidth), CREATE_INT32, scope);
+        napi_value displayHeight = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.displayHeight),
+            &displayHeight), CREATE_INT32, scope);
+
+        napi_value object = nullptr;
+        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "displayX", displayX),
+            SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "displayY", displayY),
+            SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "displayWidth", displayWidth),
+            SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "displayHeight", displayHeight),
+            SET_NAMED_PROPERTY, scope);
+
+        napi_value handler = nullptr;
+        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
+        napi_value ret = nullptr;
+        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
+        napi_close_handle_scope(item->env, scope);
+    }
+}
+
+bool JsEventTarget::IsHandleExist(napi_env env, const std::string &networkId, napi_value handle)
+{
+    if (mouseLocationListeners_.find(networkId) == mouseLocationListeners_.end()) {
+        FI_HILOGW("No handle of networkId:%{public}s exists", Utility::Anonymize(networkId));
+        return false;
+    }
+    for (const auto &item : mouseLocationListeners_[networkId]) {
+        CHKPC(item);
+        if (JsUtil::IsSameHandle(env, handle, item->ref)) {
+            FI_HILOGE("The handle already exists");
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

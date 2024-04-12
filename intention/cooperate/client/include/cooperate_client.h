@@ -20,6 +20,7 @@
 #include <list>
 #include <map>
 #include <mutex>
+#include <set>
 #ifdef ENABLE_PERFORMANCE_CHECK
 #include <chrono>
 #include <vector>
@@ -29,6 +30,7 @@
 
 #include "coordination_message.h"
 #include "i_coordination_listener.h"
+#include "i_event_listener.h"
 #include "i_hotarea_listener.h"
 #include "i_tunnel_client.h"
 #include "net_packet.h"
@@ -44,6 +46,7 @@ public:
     using CooperateStateCallback = std::function<void(bool)>;
     using CooperateListenerPtr = std::shared_ptr<ICoordinationListener>;
     using HotAreaListenerPtr = std::shared_ptr<IHotAreaListener>;
+    using MouseLocationListenerPtr = std::shared_ptr<IEventListener>;
 
     struct CooperateEvent {
         CooperateEvent(CooperateMessageCallback callback) : msgCb(callback) {}
@@ -75,6 +78,10 @@ public:
         const std::string &networkId, CooperateStateCallback callback,
         bool isCheckPermission = false);
     int32_t GetCooperateState(ITunnelClient &tunnel, const std::string &udId, bool &state);
+    int32_t RegisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
+        MouseLocationListenerPtr listener);
+    int32_t UnregisterEventListener(ITunnelClient &tunnel, const std::string &networkId,
+        MouseLocationListenerPtr listener = nullptr);
     int32_t AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener);
     int32_t RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener = nullptr);
 
@@ -82,6 +89,7 @@ public:
     int32_t OnCoordinationMessage(const StreamClient &client, NetPacket &pkt);
     int32_t OnCoordinationState(const StreamClient &client, NetPacket &pkt);
     int32_t OnHotAreaListener(const StreamClient &client, NetPacket &pkt);
+    int32_t OnMouseLocationListener(const StreamClient &client, NetPacket &pkt);
 
 private:
     int32_t GenerateRequestID();
@@ -89,6 +97,7 @@ private:
     void OnCooperateMessageEvent(int32_t userData, const std::string &networkId, CoordinationMessage msg);
     void OnCooperateStateEvent(int32_t userData, bool state);
     void OnDevHotAreaListener(int32_t displayX, int32_t displayY, HotAreaType type, bool isEdge);
+    void OnDevMouseLocationListener(const std::string &networkId, const Event &event);
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
     void FinishTrace(int32_t userData);
@@ -96,10 +105,12 @@ private:
 #endif // ENABLE_PERFORMANCE_CHECK
 
     std::list<CooperateListenerPtr> devCooperateListener_;
+    std::map<std::string, std::set<MouseLocationListenerPtr>> eventListener_;
     std::list<HotAreaListenerPtr> devHotAreaListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     mutable std::mutex mtx_;
     std::atomic_bool isListeningProcess_ { false };
+
 #ifdef ENABLE_PERFORMANCE_CHECK
     struct PerformanceInfo {
         std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;

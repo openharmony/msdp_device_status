@@ -36,6 +36,7 @@ public:
     void OnProfileChanged(const std::string &networkId) override;
     std::string GetNetworkIdByUdId(const std::string &udId) override;
     std::string GetUdIdByNetworkId(const std::string &networkId) override;
+    std::string GetLocalNetworkId() override;
     int32_t UpdateCrossingSwitchState(bool state) override;
     int32_t GetCrossingSwitchState(const std::string &udId, bool &state) override;
 

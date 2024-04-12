@@ -16,6 +16,8 @@
 #ifndef COOPERATE_PARAMS_H
 #define COOPERATE_PARAMS_H
 
+#include <string>
+
 #include "intention_identity.h"
 
 namespace OHOS {
@@ -29,6 +31,8 @@ enum CooperateRequestID : uint32_t {
     UNREGISTER_HOTAREA_LISTENER,
     GET_COOPERATE_STATE,
     GET_COOPERATE_STATE_SYNC,
+    REGISTER_EVENT_LISTENER,
+    UNREGISTER_EVENT_LISTENER,
 };
 
 struct StartCooperateParam final : public ParamBase {
@@ -65,6 +69,16 @@ struct GetCooperateStateParam final : public ParamBase {
     int32_t userData { -1 };
     bool checkPermission { false };
 };
+
+struct RegisterEventListenerParam final : public ParamBase {
+    RegisterEventListenerParam() = default;
+    RegisterEventListenerParam(const std::string &networkId);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+    std::string networkId;
+};
+
+using UnregisterEventListenerParam = RegisterEventListenerParam;
 
 struct GetCooperateStateSyncParam final : public ParamBase {
     GetCooperateStateSyncParam() = default;

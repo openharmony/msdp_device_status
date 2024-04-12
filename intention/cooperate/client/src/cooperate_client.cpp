@@ -32,6 +32,11 @@
 namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
+namespace {
+#ifdef ENABLE_PERFORMANCE_CHECK
+constexpr int32_t PERCENTAGE { 100 };
+#endif // ENABLE_PERFORMANCE_CHECK
+} // namespace
 
 int32_t CooperateClient::RegisterListener(ITunnelClient &tunnel,
     CooperateListenerPtr listener, bool isCheckPermission)
@@ -200,6 +205,64 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
     return RET_OK;
 }
 
+int32_t CooperateClient::RegisterEventListener(ITunnelClient &tunnel,
+    const std::string &networkId, MouseLocationListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(listener, COMMON_PARAMETER_ERROR);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) != eventListener_.end() &&
+        eventListener_[networkId].find(listener) != eventListener_[networkId].end()) {
+        FI_HILOGE("This listener for networkId:%{public}s already exists", Utility::Anonymize(networkId));
+        return RET_ERR;
+    }
+    RegisterEventListenerParam param { networkId };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.AddWatch(Intention::COOPERATE, CooperateRequestID::REGISTER_EVENT_LISTENER, param, reply);
+        ret != RET_OK) {
+        FI_HILOGE("RegisterEventListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    eventListener_[networkId].insert(listener);
+    FI_HILOGI("Add listener for networkId:%{public}s successfully", Utility::Anonymize(networkId));
+    return RET_OK;
+}
+
+int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
+    const std::string &networkId, MouseLocationListenerPtr listener)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) == eventListener_.end()) {
+        FI_HILOGE("No listener for networkId:%{public}s is registered", Utility::Anonymize(networkId));
+        return RET_ERR;
+    }
+    if (eventListener_.find(networkId) != eventListener_.end() && listener != nullptr &&
+        eventListener_[networkId].find(listener) == eventListener_[networkId].end()) {
+        FI_HILOGE("Current listener for networkId:%{public}s is not registered", Utility::Anonymize(networkId));
+        return RET_ERR;
+    }
+    UnregisterEventListenerParam param { networkId };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
+        CooperateRequestID::UNREGISTER_EVENT_LISTENER, param, reply); ret != RET_OK) {
+        FI_HILOGE("UnregisterEventListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    if (listener == nullptr) {
+        eventListener_.erase(networkId);
+        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
+        return RET_OK;
+    }
+    eventListener_[networkId].erase(listener);
+    FI_HILOGD("Remove listener for networkId:%{public}s", Utility::Anonymize(networkId));
+    if (eventListener_[networkId].empty()) {
+        eventListener_.erase(networkId);
+        FI_HILOGD("No listener for networkId:%{public}s, clean current networkId", Utility::Anonymize(networkId));
+    }
+    return RET_OK;
+}
+
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
     return RET_ERR;
@@ -328,6 +391,20 @@ int32_t CooperateClient::OnHotAreaListener(const StreamClient &client, NetPacket
     return RET_OK;
 }
 
+int32_t CooperateClient::OnMouseLocationListener(const StreamClient &client, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::string networkId;
+    Event event;
+    pkt >> networkId >> event.displayX >> event.displayY >> event.displayWidth >> event.displayHeight;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    OnDevMouseLocationListener(networkId, event);
+    return RET_OK;
+}
+
 void CooperateClient::OnDevHotAreaListener(int32_t displayX,
     int32_t displayY, HotAreaType type, bool isEdge)
 {
@@ -335,6 +412,23 @@ void CooperateClient::OnDevHotAreaListener(int32_t displayX,
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devHotAreaListener_) {
         item->OnHotAreaMessage(displayX, displayY, type, isEdge);
+    }
+}
+
+void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, const Event &event)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (eventListener_.find(networkId) == eventListener_.end()) {
+        FI_HILOGI("No listener for networkId:%{public}s is registered", Utility::Anonymize(networkId));
+        return;
+    }
+    for (const auto &listener : eventListener_[networkId]) {
+            CHKPC(listener);
+            listener->OnMouseLocationEvent(networkId, event);
+            FI_HILOGD("Trigger listener for networkId:%{public}s,"
+            "displayX:%{public}d, displayY:%{public}d, displayWidth:%{public}d, displayHeight:%{public}d",
+            Utility::Anonymize(networkId), event.displayX, event.displayY, event.displayWidth, event.displayHeight);
     }
 }
 
@@ -352,7 +446,6 @@ void CooperateClient::FinishTrace(int32_t userData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
-    int32_t hundred = { 100 };
     if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
         auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - iter->second).count();
@@ -360,7 +453,7 @@ void CooperateClient::FinishTrace(int32_t userData)
         performanceInfo_.traces_.erase(iter);
         performanceInfo_.successNum += 1;
         performanceInfo_.failNum = performanceInfo_.traces_.size();
-        performanceInfo_.successRate = (performanceInfo_.successNum * hundred) / performanceInfo_.activateNum;
+        performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / performanceInfo_.activateNum;
         performanceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performanceInfo_.minDuration);
         performanceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performanceInfo_.maxDuration);
         performanceInfo_.durationList.push_back(curDuration);

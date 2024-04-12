@@ -117,6 +117,20 @@ void JsCoordinationManager::UnregisterListener(napi_env env, const std::string &
     RemoveListener(env, type, handle);
 }
 
+void JsCoordinationManager::RegisterListener(napi_env env, const std::string &type, const std::string &networkId,
+    napi_value handle)
+{
+    CALL_INFO_TRACE;
+    AddListener(env, type, networkId, handle);
+}
+
+void JsCoordinationManager::UnregisterListener(napi_env env, const std::string &type, const std::string &networkId,
+    napi_value handle)
+{
+    CALL_INFO_TRACE;
+    RemoveListener(env, type, networkId, handle);
+}
+
 void JsCoordinationManager::ResetEnv()
 {
     CALL_INFO_TRACE;

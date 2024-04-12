@@ -40,6 +40,8 @@ public:
     int32_t UnregisterListener(int32_t pid) override;
     int32_t RegisterHotAreaListener(int32_t pid) override;
     int32_t UnregisterHotAreaListener(int32_t pid) override;
+    int32_t RegisterEventListener(int32_t pid, const std::string &networkId) override;
+    int32_t UnregisterEventListener(int32_t pid, const std::string &networkId) override;
 
     int32_t Enable(int32_t pid, int32_t userData) override;
     int32_t Disable(int32_t pid, int32_t userData) override;

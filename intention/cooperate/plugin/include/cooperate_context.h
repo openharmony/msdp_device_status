@@ -33,6 +33,7 @@
 #include "input_event_transmission/input_event_builder.h"
 #include "input_event_transmission/input_event_interceptor.h"
 #include "i_context.h"
+#include "mouse_location.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -84,6 +85,7 @@ public:
     DSoftbusHandler dsoftbus_;
     EventManager eventMgr_;
     HotArea hotArea_;
+    MouseLocation mouseLocation_;
     InputEventBuilder inputEventBuilder_;
     InputEventInterceptor inputEventInterceptor_;
 

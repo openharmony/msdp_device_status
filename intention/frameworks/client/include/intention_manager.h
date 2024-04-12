@@ -24,6 +24,7 @@
 #include "drag_client.h"
 #include "drag_data.h"
 #include "drag_manager_impl.h"
+#include "i_event_listener.h"
 #include "socket_client.h"
 #include "tunnel_client.h"
 
@@ -50,6 +51,8 @@ public:
     int32_t GetCoordinationState(const std::string &networkId, std::function<void(bool)> callback,
         bool isCompatible = false);
     int32_t GetCoordinationState(const std::string &udId, bool &state);
+    int32_t RegisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener);
+    int32_t UnregisterEventListener(const std::string &networkId, std::shared_ptr<IEventListener> listener = nullptr);
     int32_t UpdateDragStyle(DragCursorStyle style);
     int32_t StartDrag(const DragData &dragData, std::shared_ptr<IStartDragListener> listener);
     int32_t StopDrag(const DragDropResult &dropResult);

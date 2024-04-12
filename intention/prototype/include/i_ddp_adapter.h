@@ -42,6 +42,7 @@ public:
     virtual void OnProfileChanged(const std::string &networkId) = 0;
     virtual std::string GetNetworkIdByUdId(const std::string &udId) = 0;
     virtual std::string GetUdIdByNetworkId(const std::string &networkId) = 0;
+    virtual std::string GetLocalNetworkId() = 0;
     virtual int32_t UpdateCrossingSwitchState(bool state) = 0;
     virtual int32_t GetCrossingSwitchState(const std::string &udId, bool &state) = 0;
 

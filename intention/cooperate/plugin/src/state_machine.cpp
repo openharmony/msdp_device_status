@@ -45,11 +45,21 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::ENABLE, &StateMachine::EnableCooperate);
     AddHandler(CooperateEventType::DISABLE, &StateMachine::DisableCooperate);
     AddHandler(CooperateEventType::GET_COOPERATE_STATE, &StateMachine::GetCooperateState);
+    AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER, &StateMachine::RegisterEventListener);
+    AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER, &StateMachine::UnregisterEventListener);
     AddHandler(CooperateEventType::DDM_BOARD_ONLINE, &StateMachine::OnBoardOnline);
     AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &StateMachine::OnBoardOffline);
     AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &StateMachine::OnProfileChanged);
     AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &StateMachine::OnPointerEvent);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &StateMachine::OnSoftbusSessionClosed);
+    AddHandler(CooperateEventType::DSOFTBUS_SUBSCRIBE_MOUSE_LOCATION, &StateMachine::OnSoftbusSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_UNSUBSCRIBE_MOUSE_LOCATION,
+        &StateMachine::OnSoftbusUnSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_REPLY_SUBSCRIBE_MOUSE_LOCATION,
+        &StateMachine::OnSoftbusReplySubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_REPLY_UNSUBSCRIBE_MOUSE_LOCATION,
+        &StateMachine::OnSoftbusReplyUnSubscribeMouseLocation);
+    AddHandler(CooperateEventType::DSOFTBUS_MOUSE_LOCATION, &StateMachine::OnSoftbusMouseLocation);
 }
 
 void StateMachine::OnEvent(Context &context, const CooperateEvent &event)
@@ -147,6 +157,18 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
 {}
 
+void StateMachine::RegisterEventListener(Context &context, const CooperateEvent &event)
+{
+    RegisterEventListenerEvent notice = std::get<RegisterEventListenerEvent>(event.event);
+    context.mouseLocation_.AddListener(notice);
+}
+
+void StateMachine::UnregisterEventListener(Context &context, const CooperateEvent &event)
+{
+    UnregisterEventListenerEvent notice = std::get<UnregisterEventListenerEvent>(event.event);
+    context.mouseLocation_.RemoveListener(notice);
+}
+
 void StateMachine::OnBoardOnline(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
@@ -197,6 +219,41 @@ void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent
     Transfer(context, event);
 }
 
+void StateMachine::OnSoftbusSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusSubscribeMouseLocation notice = std::get<DSoftbusSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusUnSubscribeMouseLocation notice = std::get<DSoftbusUnSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnUnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusReplySubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusReplySubscribeMouseLocation notice = std::get<DSoftbusReplySubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnReplySubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusReplyUnSubscribeMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusReplyUnSubscribeMouseLocation notice = std::get<DSoftbusReplyUnSubscribeMouseLocation>(event.event);
+    context.mouseLocation_.OnReplyUnSubscribeMouseLocation(notice);
+}
+
+void StateMachine::OnSoftbusMouseLocation(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    DSoftbusSyncMouseLocation notice = std::get<DSoftbusSyncMouseLocation>(event.event);
+    context.mouseLocation_.OnRemoteMouseLocation(notice);
+}
+
 void StateMachine::Transfer(Context &context, const CooperateEvent &event)
 {
     states_[current_]->OnEvent(context, event);
@@ -224,10 +281,12 @@ void StateMachine::AddMonitor(Context &context)
     if (monitorId_ >= 0) {
         return;
     }
+    CHKPV(env_);
     monitorId_ = env_->GetInput().AddMonitor(
-        [sender = context.Sender(), &hotArea = context.hotArea_](
+        [sender = context.Sender(), &hotArea = context.hotArea_, &mouseLocation = context.mouseLocation_] (
             std::shared_ptr<MMI::PointerEvent> pointerEvent) mutable {
             hotArea.ProcessData(pointerEvent);
+            mouseLocation.ProcessData(pointerEvent);
 
             MMI::PointerEvent::PointerItem pointerItem;
             if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
