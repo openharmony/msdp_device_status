@@ -583,7 +583,6 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
         FI_HILOGE("The data is nullptr");
         return;
     }
-
     sptr<JsUtilCooperate::CallbackInfo> temp(static_cast<JsUtilCooperate::CallbackInfo*>(work->data));
     JsUtilCooperate::DeletePtr<uv_work_t*>(work);
     temp->DecStrongRef(nullptr);
@@ -595,12 +594,8 @@ void JsEventCooperateTarget::EmitCoordinationMessageEvent(uv_work_t *work, int32
     for (const auto &item : msgEvent->second) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        if (item->env == nullptr) {
+        if (item->env == nullptr || item->ref != temp->ref) {
             FI_HILOGW("item->env is nullptr, skip then continue")
-            napi_close_handle_scope(item->env, scope);
-            continue;
-        }
-        if (item->ref != temp->ref) {
             napi_close_handle_scope(item->env, scope);
             continue;
         }

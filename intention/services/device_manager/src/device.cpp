@@ -390,7 +390,7 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
         if (tmp.size() == 0) {
             FI_HILOGE("tmp.size() - 1 will overflow");
             return RET_ERR;
-        }else if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
+        } else if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
             FI_HILOGE("Find config item error");
             cfgFile.close();
             return RET_ERR;

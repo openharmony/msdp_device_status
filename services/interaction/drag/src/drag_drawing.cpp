@@ -166,7 +166,7 @@ bool CheckNodesValid()
     if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
         FI_HILOGE("The index is out of bounds");
         return false;
-    }else if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
+    } else if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
         FI_HILOGE("Nodes invalid");
         return false;
     }
@@ -1649,7 +1649,7 @@ int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
     if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
         FI_HILOGE("The index is out of bounds");
         return RET_ERR;
-    }else if (ModifyPreviewStyle(g_drawingInfo.nodes[PIXEL_MAP_INDEX], previewStyle) != RET_OK) {
+    } else if (ModifyPreviewStyle(g_drawingInfo.nodes[PIXEL_MAP_INDEX], previewStyle) != RET_OK) {
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }

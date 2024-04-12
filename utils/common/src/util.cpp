@@ -168,7 +168,7 @@ std::string GetAnonyString(const std::string &value)
     if (strLen == 0) {
         FI_HILOGE("strLen is 0, value will overflow");
         return "empty";
-    }else if (strLen <= SHORT_KEY_LENGTH) {
+    } else if (strLen <= SHORT_KEY_LENGTH) {
         str += value[0];
         str += anonyStr;
         str += value[strLen - 1];
