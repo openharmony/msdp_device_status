@@ -163,7 +163,10 @@ struct DragData g_dragData;
 bool CheckNodesValid()
 {
     FI_HILOGD("enter");
-    if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return false;
+    } else if (g_drawingInfo.nodes.empty() || g_drawingInfo.nodes[DRAG_STYLE_INDEX] == nullptr) {
         FI_HILOGE("Nodes invalid");
         return false;
     }
@@ -223,12 +226,12 @@ int32_t DragDrawing::Init(const DragData &dragData)
         return INIT_FAIL;
     }
     DragAnimationData dragAnimationData;
-    if (InitDragAnimationData(dragAnimationData) != RET_OK) {
-        FI_HILOGE("Init drag animation data failed");
+    if (!CheckNodesValid() || InitDragAnimationData(dragAnimationData) != RET_OK) {
+        FI_HILOGE("Init drag animation data or check nodes valid failed");
         return INIT_FAIL;
     }
-    if (!CheckNodesValid()) {
-        FI_HILOGE("Check nodes valid failed");
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX || g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return INIT_FAIL;
     }
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
@@ -347,6 +350,10 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
         FI_HILOGE("Check nodes valid failed");
         return RET_ERR;
     }
+    if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return RET_ERR;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPR(shadowNode, RET_ERR);
     DrawShadow(shadowNode);
@@ -375,6 +382,10 @@ void DragDrawing::OnDragSuccess()
         FI_HILOGE("Check nodes valid failed");
         return;
     }
+    if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX || g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> shadowNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(shadowNode);
     std::shared_ptr<Rosen::RSCanvasNode> styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -399,6 +410,10 @@ void DragDrawing::EraseMouseIcon()
     FI_HILOGI("enter");
     if (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT) {
         FI_HILOGE("Nodes size invalid, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
@@ -560,6 +575,10 @@ void DragDrawing::StartStyleAnimation(float startScale, float endScale, int32_t 
         FI_HILOGE("needBreakStyleScaleAnimation_ or hasRunningStopAnimation_, return");
         return;
     }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     RemoveStyleNodeModifier(dragStyleNode);
@@ -612,6 +631,10 @@ void DragDrawing::OnDragStyleAnimation()
     FI_HILOGD("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -668,6 +691,10 @@ void DragDrawing::OnStopAnimationSuccess()
     FI_HILOGD("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -737,6 +764,10 @@ void DragDrawing::OnStopAnimationFail()
     FI_HILOGD("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
+        return;
+    }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return;
     }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -834,6 +865,10 @@ int32_t DragDrawing::DrawMouseIcon()
     FI_HILOGD("enter");
     if (g_drawingInfo.nodes.size() < MOUSE_NODE_MIN_COUNT) {
         FI_HILOGE("Nodes size invalid, node size:%{public}zu", g_drawingInfo.nodes.size());
+        return RET_ERR;
+    }
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
@@ -1145,6 +1180,10 @@ void DragDrawing::RemoveModifier()
         return;
     }
 
+    if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX || g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
     if (drawPixelMapModifier_ != nullptr) {
@@ -1514,6 +1553,10 @@ void DragDrawing::SetRotation(Rosen::Rotation rotation)
 void DragDrawing::ProcessFilter()
 {
     FI_HILOGD("enter");
+    if (g_drawingInfo.nodes.size() <= BACKGROUND_FILTER_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
     CHKPV(g_drawingInfo.pixelMap);
@@ -1603,7 +1646,10 @@ float DragDrawing::RadiusVp2Sigma(float radiusVp, float dipScale)
 int32_t DragDrawing::UpdatePreviewStyle(const PreviewStyle &previewStyle)
 {
     FI_HILOGD("enter");
-    if (ModifyPreviewStyle(g_drawingInfo.nodes[PIXEL_MAP_INDEX], previewStyle) != RET_OK) {
+    if (g_drawingInfo.nodes.size() <= PIXEL_MAP_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return RET_ERR;
+    } else if (ModifyPreviewStyle(g_drawingInfo.nodes[PIXEL_MAP_INDEX], previewStyle) != RET_OK) {
         FI_HILOGE("ModifyPreviewStyle failed");
         return RET_ERR;
     }
@@ -1676,6 +1722,10 @@ void DragDrawing::DoDrawMouse()
         FI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
         return;
     }
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     int32_t pointerStyleId = pointerStyle.id;
@@ -1696,6 +1746,10 @@ int32_t DragDrawing::UpdateDefaultDragStyle(DragCursorStyle style)
 {
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
+        return RET_ERR;
+    }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
         return RET_ERR;
     }
     if (!g_drawingInfo.isCurrentDefaultStyle) {
@@ -1719,6 +1773,10 @@ int32_t DragDrawing::UpdateValidDragStyle(DragCursorStyle style)
     if (g_drawingInfo.isCurrentDefaultStyle) {
         if (!CheckNodesValid()) {
             FI_HILOGE("Check nodes valid failed");
+            return RET_ERR;
+        }
+        if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+            FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
             return RET_ERR;
         }
         std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
@@ -2017,6 +2075,10 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation)
             FI_HILOGE("Check nodes valid failed");
             return RET_ERR;
         }
+        if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+            FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+            return RET_ERR;
+        }
         std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
         CHKPR(mouseIconNode, RET_ERR);
         mouseIconNode->SetPivot(DEFAULT_PIVOT, DEFAULT_PIVOT);
@@ -2168,6 +2230,10 @@ void DrawMouseIconModifier::OnDraw(std::shared_ptr<Media::PixelMap> pixelMap, in
     }
     g_drawingInfo.mouseWidth = pixelMap->GetWidth();
     g_drawingInfo.mouseHeight = pixelMap->GetHeight();
+    if (g_drawingInfo.nodes.size() <= MOUSE_ICON_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> mouseIconNode = g_drawingInfo.nodes[MOUSE_ICON_INDEX];
     CHKPV(mouseIconNode);
     mouseIconNode->SetBgImageWidth(pixelMap->GetWidth());
@@ -2225,6 +2291,10 @@ void DrawStyleChangeModifier::Draw(Rosen::RSDrawingContext &context) const
         FI_HILOGE("Check nodes valid failed");
         return;
     }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     CHKPV(g_drawingInfo.pixelMap);
@@ -2277,6 +2347,10 @@ void DrawStyleScaleModifier::Draw(Rosen::RSDrawingContext &context) const
         FI_HILOGE("Check nodes valid failed");
         return;
     }
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     CHKPV(scale_);
@@ -2308,6 +2382,10 @@ void DrawDragStopModifier::Draw(Rosen::RSDrawingContext &context) const
     CHKPV(g_drawingInfo.parentNode);
     g_drawingInfo.parentNode->SetAlpha(alpha_->Get());
     g_drawingInfo.parentNode->SetScale(scale_->Get(), scale_->Get());
+    if (g_drawingInfo.nodes.size() <= DRAG_STYLE_INDEX) {
+        FI_HILOGE("The index is out of bounds, node size is %{public}zu", g_drawingInfo.nodes.size());
+        return;
+    }
     std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(dragStyleNode);
     dragStyleNode->SetScale(styleScale_->Get());

@@ -105,6 +105,11 @@ IPlugin* PluginManager::Plugin<IPlugin>::GetInstance()
 template<typename IPlugin>
 std::unique_ptr<PluginManager::Plugin<IPlugin>> PluginManager::LoadLibrary(IContext *context, const char *libPath)
 {
+    char realPath[PATH_MAX] = { 0 };
+    if (realpath(libPath, realPath) == nullptr) {
+        FI_HILOGE("Path is error, path is %{public}s", libPath);
+        return nullptr;
+    }
     void *handle = ::dlopen(libPath, RTLD_NOW);
     return (handle != nullptr ? std::make_unique<Plugin<IPlugin>>(context, handle) : nullptr);
 }

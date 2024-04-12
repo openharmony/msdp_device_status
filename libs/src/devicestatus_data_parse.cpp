@@ -122,6 +122,10 @@ bool DeviceStatusDataParse::DeviceStatusDataInit(const std::string& fileData, bo
 bool DeviceStatusDataParse::DisableCount(const Type type)
 {
     CALL_DEBUG_ENTER;
+    if (tempcount_.size() <= static_cast<int32_t>(type)) {
+        FI_HILOGE("The index is out of bounds, size is %{public}zu", tempcount_.size());
+        return false;
+    }
     tempcount_[static_cast<int32_t>(type)] = static_cast<int32_t>(TypeValue::INVALID);
     return true;
 }
