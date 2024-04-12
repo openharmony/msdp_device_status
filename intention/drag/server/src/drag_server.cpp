@@ -51,6 +51,7 @@ int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageP
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
+    CHKPR(env_, RET_ERR);
     return env_->GetDragManager().StartDrag(dragData, context.pid);
 }
 
@@ -63,7 +64,8 @@ int32_t DragServer::Stop(CallingContext &context, MessageParcel &data, MessagePa
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-    return env_->GetDragManager().StopDrag(param.dropResult_);
+    CHKPR(env_, RET_ERR);
+    return env_->GetDragManager().StopDrag(param.dropResult_, GetPackageName(context.tokenId));
 }
 
 int32_t DragServer::AddWatch(CallingContext &context, uint32_t id, MessageParcel &data, MessageParcel &reply)
@@ -397,6 +399,38 @@ int32_t DragServer::EnterTextEditorArea(CallingContext &context, MessageParcel &
         return RET_ERR;
     }
     return env_->GetDragManager().EnterTextEditorArea(param.enable_);
+}
+
+std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
+{
+    std::string packageName = std::string();
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
+            Security::AccessToken::HapTokenInfo hapInfo;
+            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+                FI_HILOGE("Get hap token info failed");
+            } else {
+                packageName = hapInfo.bundleName;
+            }
+            break;
+        }
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE:
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != 0) {
+                FI_HILOGE("Get native token info failed");
+            } else {
+                packageName = tokenInfo.processName;
+            }
+            break;
+        }
+        default: {
+            FI_HILOGW("token type not match");
+            break;
+        }
+    }
+    return packageName;
 }
 } // namespace DeviceStatus
 } // namespace Msdp

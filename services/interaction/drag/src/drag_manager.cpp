@@ -185,7 +185,7 @@ int32_t DragManager::RemoveSubscriptListener(SessionPtr session)
     return RET_OK;
 }
 
-void DragManager::PrintDragData(const DragData &dragData)
+void DragManager::PrintDragData(const DragData &dragData, const std::string &packageName)
 {
     FI_HILOGI("enter");
     for (const auto& shadowInfo : dragData.shadowInfos) {
@@ -204,10 +204,10 @@ void DragManager::PrintDragData(const DragData &dragData)
     }
     FI_HILOGI("SourceType:%{public}d, pointerId:%{public}d, displayId:%{public}d,"
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
-        " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s",
-        dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
-        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,
-        GetAnonyString(dragData.udKey).c_str(), dragData.hasCoordinateCorrected, summarys.c_str());
+        " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s,"
+        " packageName:%{public}s", dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
+        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation, GetAnonyString(dragData.udKey).c_str(),
+        dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -217,21 +217,23 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 {
     FI_HILOGI("enter");
-    PrintDragData(dragData);
     if (dragState_ == DragState::START) {
         FI_HILOGE("Drag instance already exists, no need to start drag again");
         return RET_ERR;
     }
+    std::string packageName = std::string();
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     CHKPR(context_, RET_ERR);
     dragOutSession_ = context_->GetSocketSessionManager().FindSessionByPid(pid);
     if (dragOutSession_ != nullptr) {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
             std::bind(&DragManager::OnSessionLost, this, std::placeholders::_1));
+        packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     }
 #else
     dragOutSession_ = sess;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
         FI_HILOGE("Failed to init data manager");
         return RET_ERR;
@@ -253,9 +255,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     return RET_OK;
 }
 
-int32_t DragManager::StopDrag(const DragDropResult &dropResult)
+int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
 {
-    FI_HILOGI("mainWindow:%{public}d,dragResult:%{public}d", dropResult.mainWindow, dropResult.result);
+    std::string dragOutPkgName =
+        (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
+    FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
+        "drag Out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
+        dragOutPkgName.c_str());
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;
@@ -930,7 +936,7 @@ int32_t DragManager::GetDragSummary(std::map<std::string, int64_t> &summarys)
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     summarys = dragData.summarys;
     if (summarys.empty()) {
-        FI_HILOGW("Summarys is empty");
+        FI_HILOGD("Summarys is empty");
     }
     return RET_OK;
 }

@@ -191,6 +191,7 @@ void StateMachine::OnBoardOffline(Context &context, const CooperateEvent &event)
         onlineBoards_.erase(iter);
         FI_HILOGD("Remove watch \'%{public}s\'", Utility::Anonymize(offlineEvent.networkId));
         env_->GetDP().RemoveWatch(offlineEvent.networkId);
+        context.CloseDistributedFileConnection(std::string());
         Transfer(context, event);
     }
 }

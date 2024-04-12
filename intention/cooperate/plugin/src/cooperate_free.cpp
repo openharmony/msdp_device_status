@@ -74,6 +74,7 @@ void CooperateFree::UnchainConnections(Context &context, const StopCooperateEven
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
+        context.CloseDistributedFileConnection(std::string());
     }
 }
 
@@ -141,6 +142,7 @@ void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const Coop
     CALL_INFO_TRACE;
     DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEvent &event)
@@ -272,6 +274,7 @@ void CooperateFree::ContactRemote::OnSoftbusSessionClosed(Context &context, cons
         OnReset(context, event);
     }
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateFree::ContactRemote::OnProgress(Context &context, const CooperateEvent &event)
@@ -421,6 +424,7 @@ void CooperateFree::RemoteStart::OnSoftbusSessionClosed(Context &context, const 
         OnReset(context, event);
     }
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateFree::RemoteStart::OnProgress(Context &context, const CooperateEvent &event)

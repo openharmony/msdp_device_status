@@ -31,7 +31,7 @@ namespace DeviceStatus {
 
 SocketSession::SocketSession(const std::string &programName, int32_t moduleType,
                              int32_t tokenType, int32_t fd, int32_t uid, int32_t pid)
-    : fd_(fd), uid_(uid), pid_(pid), tokenType_(tokenType)
+    : fd_(fd), uid_(uid), pid_(pid), tokenType_(tokenType), programName_(programName)
 {}
 
 SocketSession::~SocketSession()

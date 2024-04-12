@@ -57,7 +57,7 @@ public:
     int32_t RemoveSubscriptListener(SessionPtr session) override;
     int32_t StartDrag(const DragData &dragData, SessionPtr sess) override;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
-    int32_t StopDrag(const DragDropResult &dropResult) override;
+    int32_t StopDrag(const DragDropResult &dropResult, const std::string &packageName = "") override;
     int32_t GetDragTargetPid() const override;
     int32_t GetUdKey(std::string &udKey) const override;
     void SendDragData(int32_t targetTid, const std::string &udKey);
@@ -116,7 +116,7 @@ public:
     };
 #endif //OHOS_DRAG_ENABLE_MONITOR
 private:
-    void PrintDragData(const DragData &dragData);
+    void PrintDragData(const DragData &dragData, const std::string &packageName = "");
     int32_t AddDragEventHandler(int32_t sourceType);
     int32_t AddPointerEventHandler(uint32_t deviceTags);
     int32_t AddKeyEventMonitor();

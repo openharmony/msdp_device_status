@@ -262,6 +262,7 @@ void CooperateIn::Initial::OnSoftbusSessionClosed(Context &context, const Cooper
     FI_HILOGI("[softbus session closed] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
     parent_.StopCooperate(context, event);
     context.eventMgr_.OnSoftbusSessionClosed(notice);
+    context.CloseDistributedFileConnection(std::string());
 }
 
 void CooperateIn::Initial::OnProgress(Context &context, const CooperateEvent &event)
@@ -383,6 +384,7 @@ void CooperateIn::RelayCooperate::OnSoftbusSessionClosed(Context &context, const
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
         context.eventMgr_.OnSoftbusSessionClosed(notice);
+        context.CloseDistributedFileConnection(std::string());
     }
     OnReset(context, event);
 }
@@ -521,6 +523,7 @@ void CooperateIn::RelayConfirmation::OnSoftbusSessionClosed(Context &context, co
     if (context.IsPeer(notice.networkId)) {
         parent_.StopCooperate(context, event);
         context.eventMgr_.OnSoftbusSessionClosed(notice);
+        context.CloseDistributedFileConnection(std::string());
     }
     OnReset(context, event);
 }
@@ -725,6 +728,7 @@ void CooperateIn::RemoteStart::OnSoftbusSessionClosed(Context &context, const Co
             });
     } else if (parent_.process_.IsPeer(notice.networkId)) {
         FI_HILOGI("[remote start] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
+        context.CloseDistributedFileConnection(std::string());
         OnReset(context, event);
     }
 }
@@ -783,6 +787,7 @@ void CooperateIn::UnchainConnections(Context &context, const StopCooperateEvent 
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
+        context.CloseDistributedFileConnection(std::string());
     }
 }
 } // namespace Cooperate
