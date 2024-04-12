@@ -206,7 +206,7 @@ void DragManager::PrintDragData(const DragData &dragData, const std::string &pac
         " displayX:%{public}d, displayY:%{public}d, dragNum:%{public}d,"
         " hasCanceledAnimation:%{public}d, udKey:%{public}s, hasCoordinateCorrected:%{public}d, summarys:%{public}s,"
         " packageName:%{public}s", dragData.sourceType, dragData.pointerId, dragData.displayId, dragData.displayX,
-        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation,GetAnonyString(dragData.udKey).c_str(),
+        dragData.displayY, dragData.dragNum, dragData.hasCanceledAnimation, GetAnonyString(dragData.udKey).c_str(),
         dragData.hasCoordinateCorrected, summarys.c_str(), packageName.c_str());
 }
 
@@ -232,6 +232,9 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
 #else
     dragOutSession_ = sess;
+    if (dragOutSession_ != nullptr) {
+        packageName = (sess == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
+    }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
