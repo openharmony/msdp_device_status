@@ -232,9 +232,6 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     }
 #else
     dragOutSession_ = sess;
-    if (dragOutSession_ != nullptr) {
-        packageName = (sess == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
-    }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     PrintDragData(dragData, packageName);
     if (InitDataManager(dragData) != RET_OK) {
