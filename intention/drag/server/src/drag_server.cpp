@@ -52,6 +52,9 @@ int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageP
         return RET_ERR;
     }
     CHKPR(env_, RET_ERR);
+    auto session = env_->GetSocketSessionManager().FindSessionByPid(context.pid);
+    CHKPR(session, RET_ERR);
+    session->SetProgramName(GetPackageName(context.tokenId));
     return env_->GetDragManager().StartDrag(dragData, context.pid);
 }
 

@@ -44,6 +44,7 @@ public:
     virtual int32_t GetFd() const = 0;
     virtual std::string ToString() const = 0;
     virtual std::string GetProgramName() const = 0;
+    virtual void SetProgramName(const std::string programName) = 0;
 };
 
 using SocketSessionPtr = std::shared_ptr<ISocketSession>;
