@@ -129,7 +129,6 @@ void DSoftbusAdapterImpl::CloseAllSessions()
 int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard(lock_);
     auto iter = sessions_.find(networkId);
     return (iter != sessions_.end() ? iter->second.socket_ : -1);
 }
@@ -137,6 +136,7 @@ int32_t DSoftbusAdapterImpl::FindConnection(const std::string &networkId)
 int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket &packet)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
         FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
@@ -162,6 +162,7 @@ int32_t DSoftbusAdapterImpl::SendPacket(const std::string &networkId, NetPacket 
 int32_t DSoftbusAdapterImpl::SendParcel(const std::string &networkId, Parcel &parcel)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(lock_);
     int32_t socket = FindConnection(networkId);
     if (socket < 0) {
         FI_HILOGE("Node \'%{public}s\' is not connected", Utility::Anonymize(networkId));
@@ -424,6 +425,12 @@ void DSoftbusAdapterImpl::ConfigTcpAlive(int32_t socket)
     result = setsockopt(handle, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
     if (result != RET_OK) {
         FI_HILOGE("Config tcp alive, setsockopt enable alive failed");
+        return;
+    }
+    int32_t TimeoutMs { 15000 };
+    result = setsockopt(handle, IPPROTO_TCP, TCP_USER_TIMEOUT, &TimeoutMs, sizeof(TimeoutMs));
+    if (result != RET_OK) {
+        FI_HILOGE("Failed to enable setsockopt for timeout, %{public}d", result);
         return;
     }
 }

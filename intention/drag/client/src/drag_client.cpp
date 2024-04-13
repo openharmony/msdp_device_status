@@ -33,6 +33,10 @@ int32_t DragClient::StartDrag(ITunnelClient &tunnel,
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
+    if (dragData.shadowInfos.empty()) {
+        FI_HILOGE("shadowInfos is empty");
+        return ERR_INVALID_VALUE;
+    }
     for (const auto& shadowInfo : dragData.shadowInfos) {
         CHKPR(shadowInfo.pixelMap, RET_ERR);
         if ((shadowInfo.x > 0) || (shadowInfo.y > 0) ||
