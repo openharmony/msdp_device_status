@@ -19,6 +19,7 @@
 #include "cooperate_in.h"
 #include "cooperate_out.h"
 #include "devicestatus_define.h"
+#include "devicestatus_errors.h"
 #include "utility.h"
 
 #undef LOG_TAG
@@ -44,6 +45,7 @@ StateMachine::StateMachine(IContext *env)
     AddHandler(CooperateEventType::UNREGISTER_HOTAREA_LISTENER, &StateMachine::UnregisterHotAreaListener);
     AddHandler(CooperateEventType::ENABLE, &StateMachine::EnableCooperate);
     AddHandler(CooperateEventType::DISABLE, &StateMachine::DisableCooperate);
+    AddHandler(CooperateEventType::START, &StateMachine::StartCooperate);
     AddHandler(CooperateEventType::GET_COOPERATE_STATE, &StateMachine::GetCooperateState);
     AddHandler(CooperateEventType::REGISTER_EVENT_LISTENER, &StateMachine::RegisterEventListener);
     AddHandler(CooperateEventType::UNREGISTER_EVENT_LISTENER, &StateMachine::UnregisterEventListener);
@@ -151,6 +153,19 @@ void StateMachine::DisableCooperate(Context &context, const CooperateEvent &even
     context.eventMgr_.DisableCooperate(disableEvent);
     RemoveSessionObserver(context, disableEvent);
     RemoveMonitor(context);
+    Transfer(context, event);
+}
+
+void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
+{
+    CALL_DEBUG_ENTER;
+    StartCooperateEvent startEvent = std::get<StartCooperateEvent>(event.event);
+    if (!context.IsAllowCooperate()) {
+        FI_HILOGI("Not allow cooperate");
+        startEvent.errCode->set_value(COMMON_NOT_ALLOWED_DISTRIBUTED);
+        return;
+    }
+    startEvent.errCode->set_value(RET_OK);
     Transfer(context, event);
 }
 

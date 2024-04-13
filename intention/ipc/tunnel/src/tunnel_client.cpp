@@ -119,7 +119,7 @@ int32_t TunnelClient::Start(Intention intention, ParamBase &data, ParamBase &rep
     int32_t ret = devicestatusProxy_->Start(intention, dataParcel, replyParcel);
     if (ret != RET_OK) {
         FI_HILOGE("proxy::Start fail");
-        return RET_ERR;
+        return ret;
     }
     if (!reply.Unmarshalling(replyParcel)) {
         FI_HILOGE("ParamBase::Unmarshalling fail");

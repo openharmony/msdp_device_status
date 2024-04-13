@@ -16,6 +16,7 @@
 #ifndef COOPERATE_EVENTS_H
 #define COOPERATE_EVENTS_H
 
+#include <future>
 #include <string>
 #include <variant>
 
@@ -99,6 +100,7 @@ struct StartCooperateEvent {
     int32_t userData;
     std::string remoteNetworkId;
     int32_t startDeviceId;
+    std::shared_ptr<std::promise<int32_t>> errCode;
 };
 
 struct StopCooperateEvent {

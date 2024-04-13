@@ -145,15 +145,16 @@ int32_t Cooperate::Start(int32_t pid, int32_t userData, const std::string &remot
     ss << "start_cooperation_with_" << Utility::Anonymize(remoteNetworkId);
     context_.StartTrace(ss.str());
 #endif // ENABLE_PERFORMANCE_CHECK
-    context_.Sender().Send(CooperateEvent(
-        CooperateEventType::START,
-        StartCooperateEvent {
-            .pid = pid,
-            .userData = userData,
-            .remoteNetworkId = remoteNetworkId,
-            .startDeviceId = startDeviceId,
-        }));
-    return RET_OK;
+    StartCooperateEvent event{
+        .pid = pid,
+        .userData = userData,
+        .remoteNetworkId = remoteNetworkId,
+        .startDeviceId = startDeviceId,
+        .errCode = std::make_shared<std::promise<int32_t>>(),
+    };
+    auto errCode = event.errCode->get_future();
+    context_.Sender().Send(CooperateEvent(CooperateEventType::START, event));
+    return errCode.get();
 }
 
 int32_t Cooperate::Stop(int32_t pid, int32_t userData, bool isUnchained)
