@@ -70,6 +70,7 @@ public:
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
 
+    bool IsAllowCooperate();
     void OnTransitionOut();
     void OnTransitionIn();
     void OnBack();

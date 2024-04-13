@@ -297,6 +297,14 @@ void Context::RelayCooperate(const DSoftbusRelayCooperate &event)
     remoteNetworkId_ = event.targetNetworkId;
 }
 
+bool Context::IsAllowCooperate()
+{
+    FI_HILOGI("Notify observers of allow cooperate");
+    return std::all_of(observers_.cbegin(), observers_.cend(), [](const auto &observer) {
+        return observer->IsAllowCooperate();
+    });
+}
+
 void Context::OnTransitionOut()
 {
     CHKPV(eventHandler_);
