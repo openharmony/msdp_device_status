@@ -1561,13 +1561,11 @@ void DragDrawing::ProcessFilter()
     CHKPV(filterNode);
     CHKPV(g_drawingInfo.pixelMap);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
-    FilterInfo *filterInfo = &g_drawingInfo.filterInfo;
-    ExtraInfo *extraInfo = &g_drawingInfo.extraInfo;
-    CHKPV(extraInfo);
-    CHKPV(filterInfo);
-    if (extraInfo->componentType == BIG_FOLDER_LABEL) {
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    ExtraInfo extraInfo = g_drawingInfo.extraInfo;
+    if (extraInfo.componentType == BIG_FOLDER_LABEL) {
         std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-            RadiusVp2Sigma(RADIUS_VP, filterInfo->dipScale),
+            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
             DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
         if (backFilter == nullptr) {
             FI_HILOGE("Create backgroundFilter failed");
@@ -1578,14 +1576,14 @@ void DragDrawing::ProcessFilter()
             g_drawingInfo.pixelMap->GetHeight());
         filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
             g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
-            (fabs(filterInfo->dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo->dipScale) < extraInfo->cornerRadius)) {
+        if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+            / filterInfo.dipScale) < extraInfo.cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                extraInfo->cornerRadius, filterInfo->dipScale);
+                extraInfo.cornerRadius, filterInfo.dipScale);
             return;
         }
-        filterNode->SetCornerRadius(extraInfo->cornerRadius * filterInfo->dipScale);
+        filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
         FI_HILOGD("Add filter successfully");
     }
     FI_HILOGD("leave");
@@ -2090,20 +2088,16 @@ int32_t DragDrawing::DoRotateDragWindow(float rotation)
 
 bool DragDrawing::ParserRadius(float &radius)
 {
-    FilterInfo *filterInfo = &g_drawingInfo.filterInfo;
-    ExtraInfo *extraInfo = &g_drawingInfo.extraInfo;
-    if (filterInfo == nullptr || extraInfo == nullptr) {
-        FI_HILOGE("Pointer is nullptr");
-        return false;
-    }
-    if ((extraInfo->cornerRadius < 0) || (filterInfo->dipScale < 0) ||
-        (fabs(filterInfo->dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-        / filterInfo->dipScale) < extraInfo->cornerRadius)) {
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    ExtraInfo extraInfo = g_drawingInfo.extraInfo;
+    if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < extraInfo.cornerRadius)) {
         FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-            extraInfo->cornerRadius, filterInfo->dipScale);
+            extraInfo.cornerRadius, filterInfo.dipScale);
         return false;
     }
-    radius = extraInfo->cornerRadius * filterInfo->dipScale;
+    radius = extraInfo.cornerRadius * filterInfo.dipScale;
     return true;
 }
 
@@ -2154,9 +2148,6 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
     CHKPV(g_drawingInfo.pixelMap);
-    auto rosenImage = std::make_shared<Rosen::RSImage>();
-    rosenImage->SetPixelMap(g_drawingInfo.pixelMap);
-    rosenImage->SetImageRepeat(0);
     int32_t pixelMapWidth = g_drawingInfo.pixelMap->GetWidth();
     int32_t pixelMapHeight = g_drawingInfo.pixelMap->GetHeight();
     if (!CheckNodesValid()) {
@@ -2172,9 +2163,13 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImageHeight(pixelMapHeight);
     pixelMapNode->SetBgImagePositionX(0);
     pixelMapNode->SetBgImagePositionY(0);
-    pixelMapNode->SetBgImage(rosenImage);
-    pixelMapNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
-    pixelMapNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
+    Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
+    auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
+    cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    pixelMapNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
+    pixelMapNode->SetAlpha(filterInfo.opacity);
+    pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
 }
