@@ -51,7 +51,7 @@ int32_t DragServer::Start(CallingContext &context, MessageParcel &data, MessageP
         FI_HILOGE("Failed to unmarshalling param");
         return RET_ERR;
     }
-    auto session = env->GetSocketSessionManager().FindSessionByPid(context.pid);
+    auto session = env_->GetSocketSessionManager().FindSessionByPid(context.pid);
     CHKPR(session, RET_ERR);
     session->SetProgramName(GetPackageName(context.tokenId));
     CHKPR(env_, RET_ERR);
