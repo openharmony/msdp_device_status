@@ -73,7 +73,7 @@ inline std::string SocketSession::GetProgramName() const
     return programName_;
 }
 
-inline void SocketSession::SetProgramName(const std::string programName);
+inline void SocketSession::SetProgramName(const std::string programName)
 {
     programName_ = programName;
 }
