@@ -228,8 +228,8 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
     if (dragOutSession_ != nullptr) {
         context_->GetSocketSessionManager().AddSessionDeletedCallback(pid,
             std::bind(&DragManager::OnSessionLost, this, std::placeholders::_1));
-        packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     }
+    packageName = (pid == -1) ? "Cross-device drag" : dragOutSession_->GetProgramName();
 #else
     dragOutSession_ = sess;
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
