@@ -35,7 +35,7 @@ namespace DeviceStatus {
 namespace {
 #ifdef ENABLE_PERFORMANCE_CHECK
 constexpr int32_t PERCENTAGE { 100 };
-constexpr int32_t FAILDURATION { -100 };
+constexpr int32_t FAILURE_DURATION { -100 };
 #endif // ENABLE_PERFORMANCE_CHECK
 } // namespace
 
@@ -322,7 +322,6 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
         return RET_ERR;
     }
 #ifdef ENABLE_PERFORMANCE_CHECK
-    performanceInfo_.firstSuccess = true;
     FinishTrace(userData, CoordinationMessage(nType));
 #endif // ENABLE_PERFORMANCE_CHECK
     OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
@@ -440,9 +439,6 @@ void CooperateClient::StartTrace(int32_t userData)
     std::lock_guard guard { performanceLock_ };
     performanceInfo_.traces_.emplace(userData, std::chrono::steady_clock::now());
     performanceInfo_.activateNum += 1;
-    if (performanceInfo_.firstSuccess == true) {
-        performanceInfo_.failBeforeSuccess = performanceInfo_.failNum;
-    }
     FI_HILOGI("[PERF] Start tracing \'%{public}d\'", userData);
 }
 
@@ -450,6 +446,10 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
+    if (performanceInfo_.firstSuccess == false) {
+        performanceInfo_.firstSuccess = true;
+        performanceInfo_.failBeforeSuccess = performanceInfo_.failNum;
+    }
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
         if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
             auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -465,7 +465,7 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
     }
     if (msg == CoordinationMessage::ACTIVATE_FAIL) {
         FI_HILOGW("[PERF] Finish tracing with something wrong");
-        auto curDuration = FAILDURATION;
+        auto curDuration = FAILURE_DURATION;
         performanceInfo_.durationList.push_back(curDuration);
     }
 }
@@ -478,7 +478,7 @@ void CooperateClient::DumpPerformanceInfo()
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
     performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) /
         (performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess);
-    performanceInfo_.averageDuration = (sumDuration - performanceInfo_.failNum *FAILDURATION ) /               
+    performanceInfo_.averageDuration = (sumDuration - performanceInfo_.failNum *FAILURE_DURATION ) /               
         (performanceInfo_.durationList.size() - performanceInfo_.failNum);
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}f "
