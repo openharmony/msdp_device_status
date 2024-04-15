@@ -35,6 +35,7 @@ namespace DeviceStatus {
 namespace {
 #ifdef ENABLE_PERFORMANCE_CHECK
 constexpr int32_t PERCENTAGE { 100 };
+constexpr int32_t DURATION { 100 };
 constexpr int32_t FAILURE_DURATION { -100 };
 #endif // ENABLE_PERFORMANCE_CHECK
 } // namespace
@@ -475,9 +476,9 @@ void CooperateClient::DumpPerformanceInfo()
     std::lock_guard guard { performanceLock_ };
     int32_t sumDuration = std::accumulate(
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
-    performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) /
-        (performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess);
-    performanceInfo_.averageDuration = (sumDuration - performanceInfo_.failNum *FAILURE_DURATION ) /               
+    float_t activateSuccNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
+    performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / activateSuccNum;
+    performanceInfo_.averageDuration = (sumDuration + performanceInfo_.failNum * DURATION) /               
         (performanceInfo_.durationList.size() - performanceInfo_.failNum);
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}f "
