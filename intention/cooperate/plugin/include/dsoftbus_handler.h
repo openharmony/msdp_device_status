@@ -68,8 +68,6 @@ public:
     void CloseAllSessions();
 
     int32_t StartCooperate(const std::string &networkId, const DSoftbusStartCooperate &event);
-    int32_t StartCooperateResponse(const std::string &networkId, const DSoftbusStartCooperateResponse &event);
-    int32_t StartCooperateFinish(const std::string &networkId, const DSoftbusStartCooperateFinished &event);
     int32_t StopCooperate(const std::string &networkId, const DSoftbusStopCooperate &event);
     int32_t ComeBack(const std::string &networkId, const DSoftbusComeBack &event);
     int32_t RelayCooperate(const std::string &networkId, const DSoftbusRelayCooperate &event);
@@ -83,8 +81,6 @@ private:
     void SendEvent(const CooperateEvent &event);
     void OnCommunicationFailure(const std::string &networkId);
     void OnStartCooperate(const std::string &networkId, NetPacket &packet);
-    void OnStartCooperateResponse(const std::string &networkId, NetPacket &packet);
-    void OnStartCooperateFinish(const std::string &networkId, NetPacket &packet);
     void OnStopCooperate(const std::string &networkId, NetPacket &packet);
     void OnComeBack(const std::string &networkId, NetPacket &packet);
     void OnRelayCooperate(const std::string &networkId, NetPacket &packet);

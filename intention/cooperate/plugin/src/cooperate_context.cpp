@@ -250,8 +250,8 @@ NormalizedCoordinate Context::NormalizedCursorPosition() const
         return cursorPos_;
     }
     return NormalizedCoordinate {
-        .x = static_cast<int32_t>(cursorPos_.x * PERCENT / displayRect.width),
-        .y = static_cast<int32_t>(cursorPos_.y * PERCENT / displayRect.height),
+        .x = static_cast<int32_t>((cursorPos_.x + 1) * PERCENT / displayRect.width),
+        .y = static_cast<int32_t>((cursorPos_.y + 1) * PERCENT / displayRect.height),
     };
 }
 
@@ -400,6 +400,8 @@ void Context::SetCursorPosition(const Coordinate &cursorPos)
     cursorPos_.x = static_cast<int32_t>(xPercent * display->GetWidth());
     cursorPos_.y = static_cast<int32_t>(yPercent * display->GetHeight());
     env_->GetInput().SetPointerLocation(cursorPos_.x, cursorPos_.y);
+    FI_HILOGI("Set cursor position (%{public}d,%{public}d)(%{public}d,%{public}d)(%{public}d,%{public}d)",
+        cursorPos.x, cursorPos.y, cursorPos_.x, cursorPos_.y, display->GetWidth(), display->GetHeight());
 }
 
 void Context::ResetCursorPosition()

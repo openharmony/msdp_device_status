@@ -60,30 +60,6 @@ private:
         CooperateIn &parent_;
         static std::set<int32_t> filterPointerActions_;
         std::shared_ptr<ICooperateStep> relay_ { nullptr };
-        std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
-    };
-
-    class RelayCooperate : public ICooperateStep {
-    public:
-        RelayCooperate(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
-        ~RelayCooperate() = default;
-
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-
-    private:
-        void OnDisable(Context &context, const CooperateEvent &event);
-        void OnStop(Context &context, const CooperateEvent &event);
-        void OnResponse(Context &context, const CooperateEvent &event);
-        void OnNormal(Context &context, const CooperateEvent &event);
-        void OnAppClosed(Context &context, const CooperateEvent &event);
-        void OnPointerEvent(Context &context, const CooperateEvent &event);
-        void OnBoardOffline(Context &context, const CooperateEvent &event);
-        void OnSwitchChanged(Context &context, const CooperateEvent &event);
-        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
-
-        CooperateIn &parent_;
-        int32_t timerId_ { -1 };
     };
 
     class RelayConfirmation : public ICooperateStep {
@@ -99,29 +75,6 @@ private:
         void OnStop(Context &context, const CooperateEvent &event);
         void OnResponse(Context &context, const CooperateEvent &event);
         void OnNormal(Context &context, const CooperateEvent &event);
-        void OnAppClosed(Context &context, const CooperateEvent &event);
-        void OnPointerEvent(Context &context, const CooperateEvent &event);
-        void OnBoardOffline(Context &context, const CooperateEvent &event);
-        void OnSwitchChanged(Context &context, const CooperateEvent &event);
-        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
-
-        CooperateIn &parent_;
-        int32_t timerId_ { -1 };
-    };
-
-    class RemoteStart : public ICooperateStep {
-    public:
-        RemoteStart(CooperateIn &parent, std::shared_ptr<ICooperateStep> prev);
-        ~RemoteStart() = default;
-
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-
-    private:
-        void OnDisable(Context &context, const CooperateEvent &event);
-        void OnStop(Context &context, const CooperateEvent &event);
-        void OnRemoteStartFinished(Context &context, const CooperateEvent &event);
-        void OnSuccess(Context &context, const DSoftbusStartCooperateFinished &notice);
         void OnAppClosed(Context &context, const CooperateEvent &event);
         void OnPointerEvent(Context &context, const CooperateEvent &event);
         void OnBoardOffline(Context &context, const CooperateEvent &event);

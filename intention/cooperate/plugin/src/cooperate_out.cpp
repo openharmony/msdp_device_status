@@ -56,19 +56,10 @@ void CooperateOut::OnLeaveState(Context &context)
 }
 
 void CooperateOut::Initial::BuildChains(std::shared_ptr<Initial> self, CooperateOut &parent)
-{
-    auto s11 = std::make_shared<RemoteStart>(parent, self);
-    self->remoteStart_ = s11;
-    s11->SetNext(self);
-}
+{}
 
 void CooperateOut::Initial::RemoveChains(std::shared_ptr<Initial> self)
-{
-    if (self->remoteStart_ != nullptr) {
-        self->remoteStart_->SetNext(nullptr);
-        self->remoteStart_ = nullptr;
-    }
-}
+{}
 
 CooperateOut::Initial::Initial(CooperateOut &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
@@ -95,7 +86,6 @@ void CooperateOut::Initial::OnDisable(Context &context, const CooperateEvent &ev
 
 void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_INFO_TRACE;
     StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
 
     context.eventMgr_.StopCooperate(param);
@@ -136,17 +126,26 @@ void CooperateOut::Initial::OnRemoteStart(Context &context, const CooperateEvent
 {
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
 
-    if (context.IsPeer(notice.networkId) || context.IsLocal(notice.networkId)) {
+    if (context.IsLocal(notice.networkId)) {
         return;
     }
     FI_HILOGI("[remote start] Request from \'%{public}s\'", Utility::Anonymize(notice.networkId));
-    parent_.process_.RemoteStart(context, notice);
-    context.eventMgr_.RemoteStart(notice);
-
-    if (remoteStart_ != nullptr) {
-        Switch(remoteStart_);
-        remoteStart_->OnProgress(context, event);
+    if (context.IsPeer(notice.networkId)) {
+        FI_HILOGI("[remote start] Reset on request from peer");
+        parent_.StopCooperate(context, event);
+        return;
     }
+    context.inputEventInterceptor_.Disable();
+
+    DSoftbusStopCooperate stopNotice {};
+    context.dsoftbus_.StopCooperate(context.Peer(), stopNotice);
+
+    context.RemoteStartSuccess(notice);
+    context.inputEventBuilder_.Enable(context);
+    context.eventMgr_.RemoteStartFinish(notice);
+    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()));
+    TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
+    context.OnResetCooperation();
 }
 
 void CooperateOut::Initial::OnRemoteStop(Context &context, const CooperateEvent &event)
@@ -159,6 +158,7 @@ void CooperateOut::Initial::OnRemoteStop(Context &context, const CooperateEvent 
     FI_HILOGI("[remote stop] Notification from \'%{public}s\'", Utility::Anonymize(notice.networkId));
     context.eventMgr_.RemoteStop(notice);
     context.inputEventInterceptor_.Disable();
+    context.ResetCursorPosition();
     context.eventMgr_.RemoteStopFinish(notice);
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
@@ -260,202 +260,6 @@ void CooperateOut::Initial::OnProgress(Context &context, const CooperateEvent &e
 void CooperateOut::Initial::OnReset(Context &context, const CooperateEvent &event)
 {}
 
-CooperateOut::RemoteStart::RemoteStart(CooperateOut &parent, std::shared_ptr<ICooperateStep> prev)
-    : ICooperateStep(parent, prev), parent_(parent)
-{
-    AddHandler(CooperateEventType::DISABLE, &CooperateOut::RemoteStart::OnDisable, this);
-    AddHandler(CooperateEventType::STOP, &CooperateOut::RemoteStart::OnStop, this);
-    AddHandler(CooperateEventType::APP_CLOSED, &CooperateOut::RemoteStart::OnAppClosed, this);
-    AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &CooperateOut::RemoteStart::OnHotplug, this);
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, &CooperateOut::RemoteStart::OnPointerEvent, this);
-    AddHandler(CooperateEventType::DDM_BOARD_OFFLINE, &CooperateOut::RemoteStart::OnBoardOffline, this);
-    AddHandler(CooperateEventType::DDP_COOPERATE_SWITCH_CHANGED, &CooperateOut::RemoteStart::OnSwitchChanged, this);
-    AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateOut::RemoteStart::OnSoftbusSessionClosed, this);
-    AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE_FINISHED,
-        &CooperateOut::RemoteStart::OnRemoteStartFinished, this);
-}
-
-void CooperateOut::RemoteStart::OnDisable(Context &context, const CooperateEvent &event)
-{
-    DSoftbusStopCooperate notice {};
-    context.dsoftbus_.StopCooperate(parent_.process_.Peer(), notice);
-
-    FI_HILOGI("[remote start] Disable cooperation");
-    parent_.StopCooperate(context, event);
-    OnReset(context, event);
-}
-
-void CooperateOut::RemoteStart::OnStop(Context &context, const CooperateEvent &event)
-{
-    DSoftbusStopCooperate notice {};
-    context.dsoftbus_.StopCooperate(parent_.process_.Peer(), notice);
-
-    FI_HILOGI("[remote start] Stop cooperation");
-    parent_.StopCooperate(context, event);
-    OnReset(context, event);
-
-    StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
-    parent_.UnchainConnections(context, param);
-}
-
-void CooperateOut::RemoteStart::OnRemoteStartFinished(Context &context, const CooperateEvent &event)
-{
-    DSoftbusStartCooperateFinished notice = std::get<DSoftbusStartCooperateFinished>(event.event);
-    if (!parent_.process_.IsPeer(notice.networkId)) {
-        return;
-    }
-    FI_HILOGI("[remote start] Confirmmation from \'%{public}s\'", Utility::Anonymize(notice.networkId));
-    parent_.env_->GetTimerManager().RemoveTimer(timerId_);
-    if (notice.success) {
-        OnSuccess(context, notice);
-        Proceed(context, event);
-    } else {
-        OnReset(context, event);
-    }
-}
-
-void CooperateOut::RemoteStart::OnSuccess(Context &context, const DSoftbusStartCooperateFinished &event)
-{
-    FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(event.networkId));
-    context.inputEventInterceptor_.Disable();
-
-    DSoftbusStopCooperate notice {};
-    context.dsoftbus_.StopCooperate(context.Peer(), notice);
-
-    context.RemoteStartSuccess(event);
-    context.inputEventBuilder_.Enable(context);
-    context.eventMgr_.RemoteStartFinish(event);
-    TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
-    context.OnResetCooperation();
-}
-
-void CooperateOut::RemoteStart::OnAppClosed(Context &context, const CooperateEvent &event)
-{
-    DSoftbusStopCooperate notice {};
-    context.dsoftbus_.StopCooperate(parent_.process_.Peer(), notice);
-
-    FI_HILOGI("[remote start] Stop cooperation on app closed");
-    parent_.StopCooperate(context, event);
-    OnReset(context, event);
-}
-
-void CooperateOut::RemoteStart::OnHotplug(Context &context, const CooperateEvent &event)
-{
-    InputHotplugEvent notice = std::get<InputHotplugEvent>(event.event);
-
-    if (notice.deviceId != context.StartDeviceId()) {
-        return;
-    }
-    FI_HILOGI("[remote start] The dedicated pointer unplugged");
-    parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
-        [sender = context.Sender(), event]() mutable {
-            sender.Send(event);
-        });
-}
-
-void CooperateOut::RemoteStart::OnPointerEvent(Context &context, const CooperateEvent &event)
-{
-    InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
-
-    if ((notice.sourceType != MMI::PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (notice.deviceId == context.StartDeviceId())) {
-        return;
-    }
-    DSoftbusStopCooperate stopNotice {};
-    context.dsoftbus_.StopCooperate(parent_.process_.Peer(), stopNotice);
-
-    FI_HILOGI("[remote start] Stop cooperation on operation of local pointer");
-    parent_.StopCooperate(context, event);
-    OnReset(context, event);
-}
-
-void CooperateOut::RemoteStart::OnBoardOffline(Context &context, const CooperateEvent &event)
-{
-    DDMBoardOfflineEvent notice = std::get<DDMBoardOfflineEvent>(event.event);
-
-    if (context.IsPeer(notice.networkId)) {
-        parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
-            [sender = context.Sender(), event]() mutable {
-                sender.Send(event);
-            });
-    } else if (parent_.process_.IsPeer(notice.networkId)) {
-        FI_HILOGI("[remote start] Peer(\'%{public}s\') is offline", Utility::Anonymize(notice.networkId));
-        OnReset(context, event);
-    }
-}
-
-void CooperateOut::RemoteStart::OnSwitchChanged(Context &context, const CooperateEvent &event)
-{
-    DDPCooperateSwitchChanged notice = std::get<DDPCooperateSwitchChanged>(event.event);
-
-    if (notice.normal) {
-        return;
-    }
-    if (context.IsPeer(notice.networkId)) {
-        parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
-            [sender = context.Sender(), event]() mutable {
-                sender.Send(event);
-            });
-    } else if (parent_.process_.IsPeer(notice.networkId)) {
-        DSoftbusStopCooperate stopNotice {};
-        context.dsoftbus_.StopCooperate(parent_.process_.Peer(), stopNotice);
-
-        FI_HILOGI("[remote start] Peer(\'%{public}s\') switch off", Utility::Anonymize(notice.networkId));
-        OnReset(context, event);
-    }
-}
-
-void CooperateOut::RemoteStart::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)
-{
-    DSoftbusSessionClosed notice = std::get<DSoftbusSessionClosed>(event.event);
-
-    if (context.IsPeer(notice.networkId)) {
-        parent_.env_->GetTimerManager().AddTimer(DEFAULT_COOLING_TIME, REPEAT_ONCE,
-            [sender = context.Sender(), event]() mutable {
-                sender.Send(event);
-            });
-    } else if (parent_.process_.IsPeer(notice.networkId)) {
-        FI_HILOGI("[remote start] Disconnected with \'%{public}s\'", Utility::Anonymize(notice.networkId));
-        context.CloseDistributedFileConnection(std::string());
-        OnReset(context, event);
-    }
-}
-
-void CooperateOut::RemoteStart::OnProgress(Context &context, const CooperateEvent &event)
-{
-    std::string remoteNetworkId = parent_.process_.Peer();
-
-    DSoftbusStartCooperateResponse resp {
-        .normal = true,
-    };
-    int32_t ret = context.dsoftbus_.StartCooperateResponse(remoteNetworkId, resp);
-    if (ret != RET_OK) {
-        FI_HILOGE("[remote start] Failed to answer \'%{public}s\'", Utility::Anonymize(remoteNetworkId));
-        OnReset(context, event);
-        return;
-    }
-    timerId_ = parent_.env_->GetTimerManager().AddTimer(DEFAULT_TIMEOUT, REPEAT_ONCE,
-        [sender = context.Sender(), remoteNetworkId]() mutable {
-            sender.Send(CooperateEvent(
-                CooperateEventType::DSOFTBUS_START_COOPERATE_FINISHED,
-                DSoftbusStartCooperateFinished {
-                    .networkId = remoteNetworkId,
-                    .success = false,
-                }));
-        });
-}
-
-void CooperateOut::RemoteStart::OnReset(Context &context, const CooperateEvent &event)
-{
-    FI_HILOGI("[remote start] reset cooperation with \'%{public}s\'", Utility::Anonymize(parent_.process_.Peer()));
-    DSoftbusStartCooperateFinished notice {
-        .networkId = parent_.process_.Peer(),
-        .success = false,
-    };
-    context.eventMgr_.RemoteStartFinish(notice);
-    Reset(context, event);
-}
-
 void CooperateOut::StopCooperate(Context &context, const CooperateEvent &event)
 {
     context.inputEventInterceptor_.Disable();
@@ -463,6 +267,7 @@ void CooperateOut::StopCooperate(Context &context, const CooperateEvent &event)
     DSoftbusStopCooperate notice {};
     context.dsoftbus_.StopCooperate(context.Peer(), notice);
 
+    context.ResetCursorPosition();
     TransiteTo(context, CooperateState::COOPERATE_STATE_FREE);
     context.OnResetCooperation();
 }

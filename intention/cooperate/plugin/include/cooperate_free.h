@@ -53,53 +53,6 @@ private:
         void OnRemoteStart(Context &context, const CooperateEvent &event);
 
         CooperateFree &parent_;
-        std::shared_ptr<ICooperateStep> start_ { nullptr };
-        std::shared_ptr<ICooperateStep> remoteStart_ { nullptr };
-    };
-
-    class ContactRemote final : public ICooperateStep {
-    public:
-        ContactRemote(CooperateFree &parent, std::shared_ptr<ICooperateStep> prev);
-        ~ContactRemote() = default;
-
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-
-    private:
-        void OnDisable(Context &context, const CooperateEvent &event);
-        void OnStop(Context &context, const CooperateEvent &event);
-        void OnResponse(Context &context, const CooperateEvent &event);
-        void OnNormal(Context &context);
-        void OnAppClosed(Context &context, const CooperateEvent &event);
-        void OnHotplug(Context &context, const CooperateEvent &event);
-        void OnBoardOffline(Context &context, const CooperateEvent &event);
-        void OnSwitchChanged(Context &context, const CooperateEvent &event);
-        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
-
-        CooperateFree &parent_;
-        int32_t timerId_ { -1 };
-    };
-
-    class RemoteStart final : public ICooperateStep {
-    public:
-        RemoteStart(CooperateFree &parent, std::shared_ptr<ICooperateStep> prev);
-        ~RemoteStart() = default;
-
-        void OnProgress(Context &context, const CooperateEvent &event) override;
-        void OnReset(Context &context, const CooperateEvent &event) override;
-
-    private:
-        void OnDisable(Context &context, const CooperateEvent &event);
-        void OnStop(Context &context, const CooperateEvent &event);
-        void OnRemoteStartFinished(Context &context, const CooperateEvent &event);
-        void OnSuccess(Context &context, const DSoftbusStartCooperateFinished &event);
-        void OnAppClosed(Context &context, const CooperateEvent &event);
-        void OnBoardOffline(Context &context, const CooperateEvent &event);
-        void OnSwitchChanged(Context &context, const CooperateEvent &event);
-        void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
-
-        CooperateFree &parent_;
-        int32_t timerId_ { -1 };
     };
 
     bool IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const;

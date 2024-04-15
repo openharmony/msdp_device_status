@@ -26,7 +26,6 @@
 
 #include "cooperate_events.h"
 #include "ddm_adapter.h"
-#include "ddp_adapter.h"
 #include "dsoftbus_handler.h"
 #include "event_manager.h"
 #include "hot_area.h"
@@ -69,6 +68,7 @@ public:
     void RemoteStartSuccess(const DSoftbusStartCooperateFinished &event);
     void RelayCooperate(const DSoftbusRelayCooperate &event);
     void OnPointerEvent(const InputPointerEvent &event);
+    void ResetCursorPosition();
 
     bool IsAllowCooperate();
     void OnTransitionOut();
@@ -101,7 +101,6 @@ private:
     int32_t EnableDevMgr();
     void DisableDevMgr();
     void SetCursorPosition(const Coordinate &cursorPos);
-    void ResetCursorPosition();
 
     IContext *env_ { nullptr };
     Channel<CooperateEvent>::Sender sender_;
