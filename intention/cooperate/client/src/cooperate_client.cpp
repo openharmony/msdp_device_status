@@ -127,6 +127,7 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
     devCooperateEvent_.insert_or_assign(param.userData, event);
 #ifdef ENABLE_PERFORMANCE_CHECK
     DumpPerformanceInfo();
+    performanceInfo_ = {};
 #endif // ENABLE_PERFORMANCE_CHECK
     return RET_OK;
 }
@@ -321,7 +322,13 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
     }
 #ifdef ENABLE_PERFORMANCE_CHECK
     if (CoordinationMessage(nType) == CoordinationMessage::ACTIVATE_SUCCESS) {
-        FinishTrace(userData);
+        performanceInfo_.firstSuccess = true;
+        complete = true;
+        FinishTrace(userData, complete);
+    } else {
+        if (CoordinationMessage(nType) == CoordinationMessage::ACTIVATE_FAIL) {
+            complete = false;
+            FinishTrace(userData, complete);
     }
 #endif // ENABLE_PERFORMANCE_CHECK
     OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
@@ -439,26 +446,32 @@ void CooperateClient::StartTrace(int32_t userData)
     std::lock_guard guard { performanceLock_ };
     performanceInfo_.traces_.emplace(userData, std::chrono::steady_clock::now());
     performanceInfo_.activateNum += 1;
+    if (performanceInfo_.firstSuccess == true) {
+        performanceInfo_.firstSuccessNum = performanceInfo_.failNum;
+    }
     FI_HILOGI("[PERF] Start tracing \'%{public}d\'", userData);
 }
 
-void CooperateClient::FinishTrace(int32_t userData)
+void CooperateClient::FinishTrace(int32_t userData, bool complete)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
-    if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
-        auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - iter->second).count();
-        FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
-        performanceInfo_.traces_.erase(iter);
-        performanceInfo_.successNum += 1;
-        performanceInfo_.failNum = performanceInfo_.traces_.size();
-        performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / performanceInfo_.activateNum;
-        performanceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performanceInfo_.minDuration);
-        performanceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performanceInfo_.maxDuration);
-        performanceInfo_.durationList.push_back(curDuration);
+    if (complete == true) {
+        if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
+            auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - iter->second).count();
+            FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
+            performanceInfo_.traces_.erase(iter);
+            performanceInfo_.successNum += 1;
+            performanceInfo_.failNum = performanceInfo_.traces_.size();
+            performanceInfo_.minDuration = std::min(static_cast<int32_t> (curDuration), performanceInfo_.minDuration);
+            performanceInfo_.maxDuration = std::max(static_cast<int32_t> (curDuration), performanceInfo_.maxDuration);
+            performanceInfo_.durationList.push_back(curDuration);
+        }
     } else {
         FI_HILOGW("[PERF] Finish tracing with something wrong");
+        auto curDuration = -100;
+        performanceInfo_.push_back(curDuration);
     }
 }
 
@@ -468,9 +481,12 @@ void CooperateClient::DumpPerformanceInfo()
     std::lock_guard guard { performanceLock_ };
     int32_t sumDuration = std::accumulate(
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
-    performanceInfo_.averageDuration = sumDuration / performanceInfo_.durationList.size();
+    performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) /
+        (performanceInfo_.activateNum - performanceInfo_.firstSuccessNum);
+    performanceInfo_.averageDuration = (sumDuration - performanceInfo_.firstSuccessNum * PERCENTAGE) /               
+        (performanceInfo_.durationList.size() - performanceInfo_.firstSuccessNum);
     FI_HILOGI("[PERF] performanceInfo:"
-        "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}d "
+        "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}f "
         "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d ",
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
