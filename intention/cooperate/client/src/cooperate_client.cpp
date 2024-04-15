@@ -128,7 +128,6 @@ int32_t CooperateClient::Disable(ITunnelClient &tunnel,
     devCooperateEvent_.insert_or_assign(param.userData, event);
 #ifdef ENABLE_PERFORMANCE_CHECK
     DumpPerformanceInfo();
-    performanceInfo_ = {};
 #endif // ENABLE_PERFORMANCE_CHECK
     return RET_OK;
 }
@@ -491,6 +490,7 @@ void CooperateClient::DumpPerformanceInfo()
         durationStr += std::to_string(duration) + ", ";
     }
     FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
+    performanceInfo_ = {};
 }
 #endif // ENABLE_PERFORMANCE_CHECK
 } // namespace DeviceStatus
