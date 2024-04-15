@@ -2181,7 +2181,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
             g_drawingInfo.extraInfo.cornerRadius, g_drawingInfo.filterInfo.path.c_str());
         pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
         pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
-        pixelMapNode->SetShadowRadius(g_drawingInfo.extraInfo.cornerRadius);
+        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.cornerRadius);
         pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
     } else {
         FI_HILOGD("path is empty");
