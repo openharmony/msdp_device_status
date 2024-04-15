@@ -100,7 +100,7 @@ private:
     void OnDevMouseLocationListener(const std::string &networkId, const Event &event);
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
-    void FinishTrace(int32_t userData, bool complete);
+    void FinishTrace(int32_t userData, CoordinationMessage msg);
     void DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
 
@@ -120,12 +120,11 @@ private:
         float successRate { 0.0f };
         int32_t averageDuration { 0 };
         bool firstSuccess { false };
-        int32_t firstSuccessNum { 0 };
+        int32_t failBeforeSuccess { 0 };
         int32_t maxDuration { std::numeric_limits<int32_t>::min() };
         int32_t minDuration { std::numeric_limits<int32_t>::max() };
         std::vector<int32_t> durationList;
     };
-    bool complete { false };
     std::mutex performanceLock_;
     PerformanceInfo performanceInfo_;
 #endif // ENABLE_PERFORMANCE_CHECK
