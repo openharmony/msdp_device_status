@@ -42,6 +42,11 @@ constexpr int32_t TIMEOUT_MS { 3000 };
 constexpr int32_t INTERVAL_MS { 500 };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 std::atomic<int64_t> g_startFilterTime { -1 };
+const std::string DRAG_STYLE_DEFAULT {"DEFAULT"};
+const std::string DRAG_STYLE_FORBIDDEN {"FORBIDDEN"};
+const std::string DRAG_STYLE_COPY {"COPY"};
+const std::string DRAG_STYLE_MOVE {"MOVE"};
+const std::string DRAG_STYLE_UNKNOW {"UNKNOW"};
 #ifdef OHOS_DRAG_ENABLE_INTERCEPTOR
 constexpr int32_t DRAG_PRIORITY { 500 };
 #endif // OHOS_DRAG_ENABLE_INTERCEPTOR
@@ -1104,21 +1109,21 @@ std::string DragManager::GetDragStyleName(DragCursorStyle style)
 {
     switch (style) {
         case DragCursorStyle::DEFAULT : {
-            return "DEFAULT";
+            return DRAG_STYLE_DEFAULT;
         }
         case DragCursorStyle::FORBIDDEN : {
-            return "FORBIDDEN";
+            return DRAG_STYLE_FORBIDDEN;
         }
         case DragCursorStyle::COPY : {
-            return "COPY";
+            return DRAG_STYLE_COPY;
         }
         case DragCursorStyle::MOVE : {
-            return "MOVE";
+            return DRAG_STYLE_MOVE;
         }
         default:
             break;
     }
-    return "UNKNOW";
+    return DRAG_STYLE_UNKNOW;
 }
 
 DragCursorStyle DragManager::GetRealDragStyle(DragCursorStyle style)
