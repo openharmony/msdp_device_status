@@ -54,8 +54,6 @@ void InputEventInterceptor::Enable(Context &context)
     startDeviceId_ = context.StartDeviceId();
     sender_ = context.Sender();
     FI_HILOGI("Cursor transite out at (%{public}d, %{public}d)", cursorPos_.x, cursorPos_.y);
-    SetupBound();
-    CheckBound();
 
     interceptorId_ = env_->GetInput().AddInterceptor(
         std::bind(&InputEventInterceptor::OnPointerEvent, this, std::placeholders::_1),
@@ -63,6 +61,8 @@ void InputEventInterceptor::Enable(Context &context)
     if (interceptorId_ < 0) {
         FI_HILOGE("Input::AddInterceptor fail");
     }
+    SetupBound();
+    CheckBound();
 }
 
 void InputEventInterceptor::Disable()
