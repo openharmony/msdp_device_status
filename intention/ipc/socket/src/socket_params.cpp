@@ -57,7 +57,7 @@ bool AllocSocketPairReply::Unmarshalling(MessageParcel &parcel)
         result = true;
     }
     socketFd = parcel.ReadFileDescriptor();
-    if (socketFd >= 0 && result = true) {
+    if (socketFd >= 0 && result == true) {
         return true;
     }
     return false;
