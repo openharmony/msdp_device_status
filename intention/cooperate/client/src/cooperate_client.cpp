@@ -478,10 +478,10 @@ void CooperateClient::DumpPerformanceInfo()
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
     float_t activateSuccNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
     performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / activateSuccNum;
-    performanceInfo_.averageDuration = (sumDuration + performanceInfo_.failNum * DURATION) /               
+    performanceInfo_.averageDuration = (sumDuration + performanceInfo_.failNum * DURATION) /
         (performanceInfo_.durationList.size() - performanceInfo_.failNum);
     FI_HILOGI("[PERF] performanceInfo:"
-        "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}f "
+        "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}.2f "
         "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d ",
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
