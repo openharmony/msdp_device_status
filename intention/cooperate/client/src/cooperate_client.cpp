@@ -447,8 +447,8 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
-        if (performanceInfo_.firstSuccess == false) {
-            performanceInfo_.firstSuccess = true;
+        if (performanceInfo_.isFirstSuccess == false) {
+            performanceInfo_.isFirstSuccess = true;
             performanceInfo_.failBeforeSucc = performanceInfo_.failNum;
             if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
                 auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
