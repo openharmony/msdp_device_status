@@ -450,6 +450,17 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
         if (performanceInfo_.firstSuccess == false) {
             performanceInfo_.firstSuccess = true;
             performanceInfo_.failBeforeSucc = performanceInfo_.failNum;
+            if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
+                auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - iter->second).count();
+                FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
+                performanceInfo_.traces_.erase(iter);
+                performanceInfo_.successNum += 1;
+                performanceInfo_.firstDuration = curDuration;
+                performanceInfo_.failNum = performanceInfo_.traces_.size();
+                performanceInfo_.durationList.push_back(curDuration);
+                }
+            return ;
         }
         if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
             auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -476,22 +487,28 @@ void CooperateClient::DumpPerformanceInfo()
     std::lock_guard guard { performanceLock_ };
     int32_t sumDuration = std::accumulate(
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
-    float activateSuccNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSucc;
-    performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / activateSuccNum;
+    if (performanceInfo_.activateNum == performanceInfo_.failNum) {
+        FI_HILOGE("[PERF] Dividend is zero");
+        return ;
+    }
+    float successNum =performanceInfo_.successNum;
+    performanceInfo_.successRate = (successNum * PERCENTAGE) /
+        (performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess);
     performanceInfo_.averageDuration = (sumDuration + performanceInfo_.failNum * DURATION) /
-        (performanceInfo_.durationList.size() - performanceInfo_.failNum);
+        (performanceInfo_.activateNum - performanceInfo_.failNum);
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}.2f "
-        "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d failBeforeSucc: %{public}d",
+        "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d failBeforeSucc: %{public}d "
+        "firstDuration:  %{public}d"
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
-        performanceInfo_.minDuration, performanceInfo_.failBeforeSucc);
+        performanceInfo_.minDuration, performanceInfo_.failBeforeSucc, performanceInfo_.firstDuration);
     std::string durationStr;
     for (const auto &duration : performanceInfo_.durationList) {
         durationStr += std::to_string(duration) + ", ";
     }
     FI_HILOGI("[PERF] Duration: %{public}s", durationStr.c_str());
-    performanceInfo_ = {};
+    performanceInfo_ = PerformanceInfo();
 }
 #endif // ENABLE_PERFORMANCE_CHECK
 } // namespace DeviceStatus
