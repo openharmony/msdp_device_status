@@ -34,6 +34,7 @@ ohos_source_set("intention_drag_data") {
 
   include_dirs = [
     "include",
+    "${device_status_root_path}/intention/data/include",
     "${device_status_root_path}/interfaces/innerkits/interaction/include",
   ]
 
