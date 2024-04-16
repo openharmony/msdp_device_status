@@ -66,9 +66,8 @@ int32_t CooperateServer::Disable(CallingContext &context, MessageParcel &data, M
     CHKPR(cooperate, RET_ERR);
     cooperate->Disable(context.pid, param.userData);
     unloadTimerId_ = context_->GetTimerManager().AddTimer(DEFAULT_UNLOAD_COOLING_TIME_MS, REPEAT_ONCE,
-        [env = context_]() {
+        []() {
             FI_HILOGI("Unload \'cooperate\' module");
-            env->GetPluginManager().UnloadCooperate();
         });
     if (unloadTimerId_ < 0) {
         FI_HILOGE("AddTimer failed, will not unload Cooperate");
