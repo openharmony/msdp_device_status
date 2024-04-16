@@ -119,7 +119,8 @@ private:
         int32_t failNum { 0 };
         float successRate { 0.0f };
         int32_t averageDuration { 0 };
-        bool firstSuccess { false };
+        bool isFirstSuccess { false };
+        int32_t firstDuration;
         int32_t failBeforeSuccess { 0 };
         int32_t maxDuration { std::numeric_limits<int32_t>::min() };
         int32_t minDuration { std::numeric_limits<int32_t>::max() };
