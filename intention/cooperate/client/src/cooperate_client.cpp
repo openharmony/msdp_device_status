@@ -449,7 +449,7 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
         if (performanceInfo_.firstSuccess == false) {
             performanceInfo_.firstSuccess = true;
-            performanceInfo_.failBeforeSuccess = performanceInfo_.failNum;
+            performanceInfo_.failBeforeSucc = performanceInfo_.failNum;
         }
         if (auto iter = performanceInfo_.traces_.find(userData); iter != performanceInfo_.traces_.end()) {
             auto curDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -476,16 +476,16 @@ void CooperateClient::DumpPerformanceInfo()
     std::lock_guard guard { performanceLock_ };
     int32_t sumDuration = std::accumulate(
         performanceInfo_.durationList.begin(), performanceInfo_.durationList.end(), 0);
-    float_t activateSuccNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
+    float activateSuccNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSucc;
     performanceInfo_.successRate = (performanceInfo_.successNum * PERCENTAGE) / activateSuccNum;
     performanceInfo_.averageDuration = (sumDuration + performanceInfo_.failNum * DURATION) /
         (performanceInfo_.durationList.size() - performanceInfo_.failNum);
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum: %{public}d successNum: %{public}d failNum: %{public}d successRate: %{public}.2f "
-        "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d ",
+        "averageDuration: %{public}d maxDuration: %{public}d minDuration: %{public}d failBeforeSucc: %{public}d",
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
-        performanceInfo_.minDuration);
+        performanceInfo_.minDuration, performanceInfo_.failBeforeSucc);
     std::string durationStr;
     for (const auto &duration : performanceInfo_.durationList) {
         durationStr += std::to_string(duration) + ", ";
