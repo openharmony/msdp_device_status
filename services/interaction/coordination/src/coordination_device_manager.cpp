@@ -93,6 +93,11 @@ std::string CoordinationDeviceManager::Device::GetUniq() const
 bool CoordinationDeviceManager::Device::IsPointerDevice() const
 {
     CHKPF(device_);
+    const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+    const std::string name = GetName();
+    if (FINGER_PRINT == name) {
+        return false;
+    }
     return device_->IsPointerDevice();
 }
 
