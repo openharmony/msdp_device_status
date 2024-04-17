@@ -94,8 +94,7 @@ std::string CoordinationDeviceManager::Device::GetUniq() const
 bool CoordinationDeviceManager::Device::IsPointerDevice() const
 {
     CHKPF(device_);
-    const std::string name = GetName();
-    if (FINGER_PRINT == name) {
+    if (GetName() == FINGER_PRINT) {
         return false;
     }
     return device_->IsPointerDevice();
