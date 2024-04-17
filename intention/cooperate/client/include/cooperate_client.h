@@ -115,7 +115,7 @@ private:
 #ifdef ENABLE_PERFORMANCE_CHECK
     struct PerformanceInfo {
         std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;
-        int32_t activateNum { -1 };
+        int32_t activateNum { 0 };
         int32_t successNum { -1 };
         int32_t failNum { -1 };
         float successRate { 0.0f };
