@@ -436,12 +436,12 @@ void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, c
 int32_t CooperateClient::GetFirstSuccessIndex()
 {
     CALL_DEBUG_ENTER;
-    int32_t durationLen =  performanceInfo_.durationList.size();
-    for (int32_t i = 0; i < durationLen; ++ i) {
+    size_t durationLen =  performanceInfo_.durationList.size();
+    for (size_t i = 0; i < durationLen; ++ i) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
             performanceInfo_.successNum = 1;
-            FI_HILOGI("[PERF] First success index:%{public}d", i);
-            return i;
+            FI_HILOGI("[PERF] First success index:%{public}zu", i);
+            return static_cast<int32_t>(i);
         }
     }
     return INVALID_INDEX;
@@ -466,12 +466,10 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
             FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
             performanceInfo_.traces_.erase(iter);
             performanceInfo_.durationList.push_back(curDuration);
-            return;
         }
-        FI_HILOGW("[PERF] FinishTrace with something wrong");
-        return;
+        else { FI_HILOGW("[PERF] FinishTrace with something wrong"); }
     }
-    if (msg == CoordinationMessage::ACTIVATE_FAIL) {
+    if else (msg == CoordinationMessage::ACTIVATE_FAIL) {
         FI_HILOGW("[PERF] Activate coordination failed");
         performanceInfo_.traces_.erase(userData);
         performanceInfo_.durationList.push_back(FAILURE_DURATION);
@@ -483,7 +481,7 @@ void CooperateClient::DumpPerformanceInfo()
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
     int32_t firstSuccessIndex = GetFirstSuccessIndex();
-    int32_t durationLen = performanceInfo_.durationList.size();
+    size_t durationLen = performanceInfo_.durationList.size();
     if (firstSuccessIndex < 0 || firstSuccessIndex >= durationLen) {
         FI_HILOGE("[PERF] DumpPerformanceInfo failed, invalid first success index");
         return;
@@ -492,7 +490,7 @@ void CooperateClient::DumpPerformanceInfo()
     performanceInfo_.failBeforeSuccess = firstSuccessIndex;
     performanceInfo_.firstSuccessDuration = performanceInfo_.durationList[firstSuccessIndex];
     int32_t successDurationSum = performanceInfo_.firstSuccessDuration;
-    for (int32_t i = firstSuccessIndex + 1; i < durationLen; ++ i) {
+    for (int32_t i = firstSuccessIndex + 1; i < durationLen; i++) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
             successDurationSum += performanceInfo_.durationList[i];
             performanceInfo_.minDuration = std::min(performanceInfo_.durationList[i], performanceInfo_.minDuration);
@@ -512,8 +510,8 @@ void CooperateClient::DumpPerformanceInfo()
     }
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum:%{public}d successNum:%{public}d failNum:%{public}d successRate:%{public}.2f "
-        "averageDuration:%{public}d maxDuration:%{public}d minDuration:%{public}d failBeforeSucc:%{public}d "
-        "firstSuccessDuration:%{public}d",
+        "averageDuration:%{public}dms maxDuration:%{public}dms minDuration:%{public}dms failBeforeSucc:%{public}d "
+        "firstSuccessDuration:%{public}dms",
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
         performanceInfo_.minDuration, performanceInfo_.failBeforeSuccess, performanceInfo_.firstSuccessDuration);
