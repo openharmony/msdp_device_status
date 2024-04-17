@@ -436,10 +436,10 @@ void CooperateClient::OnDevMouseLocationListener(const std::string &networkId, c
 int32_t CooperateClient::GetFirstSuccessIndex()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard guard { performanceLock_ };
     int32_t durationLen =  performanceInfo_.durationList.size();
     for (int32_t i = 0; i < durationLen; ++ i) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
+            performanceInfo_.successNum = 1;
             FI_HILOGI("[PERF] First success index:%{public}d", i);
             return i;
         }
@@ -491,8 +491,8 @@ void CooperateClient::DumpPerformanceInfo()
     performanceInfo_.failNum = firstSuccessIndex;
     performanceInfo_.failBeforeSuccess = firstSuccessIndex;
     performanceInfo_.firstSuccessDuration = performanceInfo_.durationList[firstSuccessIndex];
-    int32_t successDurationSum { 0 };
-    for (int32_t i = firstSuccessIndex; i < durationLen; ++ i) {
+    int32_t successDurationSum = performanceInfo_.firstSuccessDuration;
+    for (int32_t i = firstSuccessIndex + 1; i < durationLen; ++ i) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
             successDurationSum += performanceInfo_.durationList[i];
             performanceInfo_.minDuration = std::min(performanceInfo_.durationList[i], performanceInfo_.minDuration);
@@ -504,7 +504,7 @@ void CooperateClient::DumpPerformanceInfo()
     }
     if (int32_t validActivateNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
         validActivateNum > 0) {
-        performanceInfo_.successRate = (static_cast<float> (performanceInfo_.successNum) * PERCENTAGE) / validActivateNum;
+        performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) / validActivateNum;
     }
     if (performanceInfo_.successNum > 0) {
         performanceInfo_.averageDuration = successDurationSum / performanceInfo_.successNum;
