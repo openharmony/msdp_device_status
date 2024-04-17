@@ -456,7 +456,7 @@ void CooperateClient::StartTrace(int32_t userData)
 }
 
 void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
- {
+{
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
     if (msg == CoordinationMessage::ACTIVATE_SUCCESS) {
@@ -476,7 +476,7 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
         performanceInfo_.traces_.erase(userData);
         performanceInfo_.durationList.push_back(FAILURE_DURATION);
     }
- }
+}
 
 void CooperateClient::DumpPerformanceInfo()
 {
@@ -504,7 +504,8 @@ void CooperateClient::DumpPerformanceInfo()
     }
     if (int32_t validActivateNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
         validActivateNum > 0) {
-        performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) / validActivateNum;
+        performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) /
+            validActivateNum;
     }
     if (performanceInfo_.successNum > 0) {
         performanceInfo_.averageDuration = successDurationSum / performanceInfo_.successNum;
