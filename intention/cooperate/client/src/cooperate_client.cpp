@@ -467,9 +467,11 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
             performanceInfo_.traces_.erase(iter);
             performanceInfo_.durationList.push_back(curDuration);
         }
-        else { FI_HILOGW("[PERF] FinishTrace with something wrong"); }
+        else {
+            FI_HILOGW("[PERF] FinishTrace with something wrong");
+            }
     }
-    if else (msg == CoordinationMessage::ACTIVATE_FAIL) {
+    else if (msg == CoordinationMessage::ACTIVATE_FAIL) {
         FI_HILOGW("[PERF] Activate coordination failed");
         performanceInfo_.traces_.erase(userData);
         performanceInfo_.durationList.push_back(FAILURE_DURATION);
