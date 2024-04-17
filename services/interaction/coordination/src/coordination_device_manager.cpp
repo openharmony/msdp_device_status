@@ -33,6 +33,7 @@ namespace DeviceStatus {
 namespace {
 constexpr size_t NETWORK_ID_NUMS { 3 };
 constexpr size_t DESCRIPTOR_INDEX { 2 };
+const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
 } // namespace
 
 CoordinationDeviceManager::CoordinationDeviceManager() {}
@@ -93,7 +94,6 @@ std::string CoordinationDeviceManager::Device::GetUniq() const
 bool CoordinationDeviceManager::Device::IsPointerDevice() const
 {
     CHKPF(device_);
-    const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
     const std::string name = GetName();
     if (FINGER_PRINT == name) {
         return false;
