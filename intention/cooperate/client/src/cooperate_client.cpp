@@ -437,7 +437,7 @@ int32_t CooperateClient::GetFirstSuccessIndex()
 {
     CALL_DEBUG_ENTER;
     size_t durationLen =  performanceInfo_.durationList.size();
-    for (size_t i = 0; i < durationLen; ++ i) {
+    for (size_t i = 0; i < durationLen; ++i) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
             performanceInfo_.successNum = 1;
             FI_HILOGI("[PERF] First success index:%{public}zu", i);
