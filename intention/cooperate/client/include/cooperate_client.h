@@ -100,7 +100,8 @@ private:
     void OnDevMouseLocationListener(const std::string &networkId, const Event &event);
 #ifdef ENABLE_PERFORMANCE_CHECK
     void StartTrace(int32_t userData);
-    void FinishTrace(int32_t userData);
+    void FinishTrace(int32_t userData, CoordinationMessage msg);
+    int32_t GetFirstSuccessIndex();
     void DumpPerformanceInfo();
 #endif // ENABLE_PERFORMANCE_CHECK
 
@@ -115,10 +116,12 @@ private:
     struct PerformanceInfo {
         std::map<int32_t, std::chrono::time_point<std::chrono::steady_clock>> traces_;
         int32_t activateNum { 0 };
-        int32_t successNum { 0 };
-        int32_t failNum { 0 };
-        int32_t successRate { 0 };
-        int32_t averageDuration { 0 };
+        int32_t successNum { -1 };
+        int32_t failNum { -1 };
+        float successRate { 0.0f };
+        int32_t averageDuration { -1 };
+        int32_t failBeforeSuccess { -1 };
+        int32_t firstSuccessDuration { -1 };
         int32_t maxDuration { std::numeric_limits<int32_t>::min() };
         int32_t minDuration { std::numeric_limits<int32_t>::max() };
         std::vector<int32_t> durationList;
