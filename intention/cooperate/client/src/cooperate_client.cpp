@@ -466,7 +466,7 @@ void CooperateClient::FinishTrace(int32_t userData, CoordinationMessage msg)
             FI_HILOGI("[PERF] Finish tracing \'%{public}d\', elapsed: %{public}lld ms", userData, curDuration);
             performanceInfo_.traces_.erase(iter);
             performanceInfo_.durationList.push_back(curDuration);
-        }else {
+        } else {
             FI_HILOGW("[PERF] FinishTrace with something wrong");
         }
     } else if (msg == CoordinationMessage::ACTIVATE_FAIL) {
