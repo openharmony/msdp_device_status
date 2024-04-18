@@ -481,7 +481,7 @@ void CooperateClient::DumpPerformanceInfo()
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
     int32_t firstSuccessIndex = GetFirstSuccessIndex();
-    size_t durationLen = performanceInfo_.durationList.size();
+    size_t durationLen = static_cast<int32_t>(performanceInfo_.durationList.size());
     if (firstSuccessIndex < 0 || firstSuccessIndex >= durationLen) {
         FI_HILOGE("[PERF] DumpPerformanceInfo failed, invalid first success index");
         return;
@@ -500,8 +500,8 @@ void CooperateClient::DumpPerformanceInfo()
             performanceInfo_.failNum += 1;
         }
     }
-    if (int32_t validActivateNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
-        validActivateNum > 0) {
+    int32_t validActivateNum = performanceInfo_.activateNum - performanceInfo_.failBeforeSuccess;
+    if (validActivateNum > 0) {
         performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) /
             validActivateNum;
     }
@@ -510,8 +510,8 @@ void CooperateClient::DumpPerformanceInfo()
     }
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum:%{public}d successNum:%{public}d failNum:%{public}d successRate:%{public}.2f "
-        "averageDuration:%{public}dms maxDuration:%{public}dms minDuration:%{public}dms failBeforeSucc:%{public}d "
-        "firstSuccessDuration:%{public}dms",
+        "averageDuration:%{public}d ms maxDuration:%{public}d ms minDuration:%{public}d ms failBeforeSucc:%{public}d "
+        "firstSuccessDuration:%{public}d ms",
         performanceInfo_.activateNum, performanceInfo_.successNum, performanceInfo_.failNum,
         performanceInfo_.successRate, performanceInfo_.averageDuration, performanceInfo_.maxDuration,
         performanceInfo_.minDuration, performanceInfo_.failBeforeSuccess, performanceInfo_.firstSuccessDuration);
