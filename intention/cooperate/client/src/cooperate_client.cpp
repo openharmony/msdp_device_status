@@ -481,7 +481,7 @@ void CooperateClient::DumpPerformanceInfo()
     CALL_DEBUG_ENTER;
     std::lock_guard guard { performanceLock_ };
     int32_t firstSuccessIndex = GetFirstSuccessIndex();
-    size_t durationLen = static_cast<int32_t>(performanceInfo_.durationList.size());
+    int32_t durationLen = static_cast<int32_t>(performanceInfo_.durationList.size());
     if (firstSuccessIndex < 0 || firstSuccessIndex >= durationLen) {
         FI_HILOGE("[PERF] DumpPerformanceInfo failed, invalid first success index");
         return;
