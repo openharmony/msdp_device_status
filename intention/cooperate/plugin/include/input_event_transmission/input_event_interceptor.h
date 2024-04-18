@@ -39,20 +39,11 @@ public:
     void Update(Context &context);
 
 private:
-    void SetupBound();
-    void CheckBound();
-    void CheckTrans(const Coordinate &cursorPos);
     void OnPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
     void OnKeyEvent(std::shared_ptr<MMI::KeyEvent> keyEvent);
     void ReportPointerEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent);
-    bool DifferentiateMotion(std::shared_ptr<MMI::PointerEvent> pointerEvent);
 
     IContext *env_ { nullptr };
-    bool inTrans_ { false };
-    Coordinate cursorPos_ {};
-    Coordinate transCursorPos_ {};
-    Rectangle cursorBound_ {};
-    Rectangle displayBound_ {};
     int32_t interceptorId_ { -1 };
     int32_t startDeviceId_ { -1 };
     std::string remoteNetworkId_;
