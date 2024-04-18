@@ -136,8 +136,8 @@ bool InputEventBuilder::AccumulateMotion(std::shared_ptr<MMI::PointerEvent> poin
         FI_HILOGE("Corrupted pointer event");
         return false;
     }
-    cursorPos_.pos.x += item.GetDisplayX();
-    cursorPos_.pos.y += item.GetDisplayY();
+    cursorPos_.pos.x += item.GetRawDx();
+    cursorPos_.pos.y += item.GetRawDy();
 
     if (cursorPos_.displayId < 0) {
         auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();

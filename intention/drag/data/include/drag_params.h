@@ -17,6 +17,7 @@
 #define DRAG_PARAMS_H
 #include <memory>
 
+#include "default_params.h"
 #include "drag_data.h"
 #include "intention_identity.h"
 
@@ -176,15 +177,7 @@ struct GetDragStateReply final : public ParamBase {
     DragState dragState_ { DragState::ERROR };
 };
 
-struct EnterTextEditorAreaParam final : public ParamBase {
-    EnterTextEditorAreaParam() = default;
-    explicit EnterTextEditorAreaParam(bool enable);
-
-    bool Marshalling(MessageParcel &parcel) const override;
-    bool Unmarshalling(MessageParcel &parcel) override;
-
-    bool enable_ { false };
-};
+using EnterTextEditorAreaParam = BoolenReply;
 
 struct GetDragActionReply final : public ParamBase {
     GetDragActionReply() = default;
