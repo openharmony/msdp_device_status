@@ -52,11 +52,9 @@ bool AllocSocketPairReply::Marshalling(MessageParcel &parcel) const
 
 bool AllocSocketPairReply::Unmarshalling(MessageParcel &parcel)
 {
-    if (!parcel.ReadInt32(tokenType)) {
-        return false;
-    }
+    bool ret = parcel.ReadInt32(tokenType);
     socketFd = parcel.ReadFileDescriptor();
-    return (socketFd >= 0);
+    return (ret && (socketFd >= 0));
 }
 } // namespace DeviceStatus
 } // namespace Msdp
