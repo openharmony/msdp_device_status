@@ -26,6 +26,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
+namespace {
+const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+}
+
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
     : ICooperateState(parent), env_(env)
 {
@@ -64,7 +68,10 @@ bool CooperateFree::IsRemoteInputDevice(std::shared_ptr<IDevice> dev) const
 bool CooperateFree::HasLocalPointerDevice() const
 {
     return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
-        return ((dev != nullptr) && dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
+        if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
+            return false;
+        }
+        return (dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
     });
 }
 
