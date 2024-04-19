@@ -71,7 +71,7 @@ bool CooperateFree::HasLocalPointerDevice() const
         if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
             return false;
         }
-        return (() && dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
+        return (dev->IsPointerDevice() && !IsRemoteInputDevice(dev));
     });
 }
 
