@@ -38,8 +38,11 @@ constexpr int32_t DISPLAY_ID { 0 };
 constexpr int32_t DISPLAY_Y { 50 };
 constexpr int32_t DRAG_NUM_ONE { 1 };
 constexpr int32_t INT32_BYTE { 4 };
-int32_t SHADOWINFO_X { 0 };
-int32_t SHADOWINFO_Y { 0 };
+constexpr int32_t PROMISE_WAIT_SPAN_MS { 2000 };
+int32_t g_shadowinfo_x { 0 };
+int32_t g_shadowinfo_y { 0 };
+constexpr bool HAS_CUSTOM_ANIMATION { true };
+constexpr int32_t TARGET_MAIN_WINDOW { 0 };
 constexpr bool HAS_CANCELED_ANIMATION { true };
 const std::string UD_KEY { "Unified data key" };
 const std::string FILTER_INFO { "Undefined filter info" };
@@ -102,7 +105,7 @@ std::optional<DragData> DragManagerTest::CreateDragData(int32_t sourceType,
             FI_HILOGE("pixelMap nullptr");
             return std::nullopt;
         }
-        dragData.shadowInfos.push_back({ pixelMap, SHADOWINFO_X, SHADOWINFO_Y });
+        dragData.shadowInfos.push_back({ pixelMap, g_shadowinfo_x, g_shadowinfo_y });
     }
     dragData.buffer = std::vector<uint8_t>(MAX_BUFFER_SIZE, 0);
     dragData.extraInfo = FILTER_INFO;
@@ -266,7 +269,7 @@ HWTEST_F(DragManagerTest, DragManagerTest3, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     std::promise<bool> promiseFlag;
-    SHADOWINFO_X = 2;
+    g_shadowinfo_x = 2;
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
             notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result);
@@ -289,7 +292,7 @@ HWTEST_F(DragManagerTest, DragManagerTest3, TestSize.Level0)
 HWTEST_F(DragManagerTest, DragManagerTest4, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
-    SHADOWINFO_X = 0;
+    g_shadowinfo_x = 0;
     std::promise<bool> promiseFlag;
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
         FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d",
@@ -430,6 +433,141 @@ HWTEST_F(DragManagerTest, DragManagerTest13, TestSize.Level0)
     ShadowInfo shadowInfo = { pixelMap, 1, 0 };
     int32_t ret = InteractionManager::GetInstance()->UpdateShadowPic(shadowInfo);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest14
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest14, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    std::vector<DragCursorStyle> dragCursorStyles = {DragCursorStyle::DEFAULT,
+        DragCursorStyle::FORBIDDEN, DragCursorStyle::COPY, DragCursorStyle::MOVE};
+    for (const auto& dragCursorStyle : dragCursorStyles) {
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(dragCursorStyle);
+        ASSERT_EQ(ret, RET_OK);
+    }
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS,
+        HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);}
+
+/**
+ * @tc.name: DragManagerTest15
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest15, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS,
+        HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);}
+
+/**
+ * @tc.name: DragManagerTest16
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest16, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    std::string udKey;
+    ret = InteractionManager::GetInstance()->GetUdKey(udKey);
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS,
+        HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);}
+
+/**
+ * @tc.name: DragManagerTest17
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest17, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::promise<bool> promiseFlag;
+    std::future<bool> futureFlag = promiseFlag.get_future();
+    auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
+        FI_HILOGD("displayX:%{public}d, displayY:%{public}d, result:%{public}d, target:%{public}d",
+            notifyMessage.displayX, notifyMessage.displayY, notifyMessage.result, notifyMessage.targetPid);
+        promiseFlag.set_value(true);
+    };
+    std::optional<DragData> dragData = CreateDragData(
+        MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
+    ASSERT_TRUE(dragData);
+    int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
+        std::make_shared<TestStartDragListener>(callback));
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(false);
+    ASSERT_EQ(ret, RET_OK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS,
+        HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
+    ret = InteractionManager::GetInstance()->StopDrag(dropResult);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+        std::future_status::timeout);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
