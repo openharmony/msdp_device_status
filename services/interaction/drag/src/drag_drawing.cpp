@@ -2310,16 +2310,16 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
-    // if (g_drawingInfo.filterInfo.shadowEnable) {
+    if (g_drawingInfo.filterInfo.shadowEnable) {
     SetDragShadow(pixelMapNode);
-    // }
+    }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
-    // pixelMapNode->SetBgImageWidth(pixelMapWidth);
-    // pixelMapNode->SetBgImageHeight(pixelMapHeight);
-    // pixelMapNode->SetBgImagePositionX(0);
-    // pixelMapNode->SetBgImagePositionY(0);
+    pixelMapNode->SetBgImageWidth(pixelMapWidth);
+    pixelMapNode->SetBgImageHeight(pixelMapHeight);
+    pixelMapNode->SetBgImagePositionX(0);
+    pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
