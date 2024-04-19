@@ -1440,6 +1440,73 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     FI_HILOGD("leave");
 }
 
+
+void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+{
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return;
+    }
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
+    if (cJSON_IsNumber(offsetX)) {
+        filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
+    }
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
+    if (cJSON_IsNumber(offsetY)) {
+        filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
+    }
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
+    if (cJSON_IsString(argb)) {
+        std::string str = argb->valuestring;
+        uint32_t argbValue = 0;
+        std::istringstream iss(str);
+        iss >> std::hex >> argbValue;
+        filterInfo.argb = argbValue;
+    }
+}
+
+void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+{
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return;
+    }
+    cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
+    if (cJSON_IsNumber(shadowCorner)) {
+        filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
+    }
+    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_filled");
+    if (cJSON_IsBool(shadowIsFilled)) {
+        filterInfo.shadowIsFilled = cJSON_IsTrue(shadowIsFilled);
+    }
+    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_mask");
+    if (cJSON_IsBool(shadowMask)) {
+        filterInfo.shadowMask = cJSON_IsTrue(shadowMask);
+    }
+    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
+    if (cJSON_IsNumber(shadowColorStrategy)) {
+        filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
+    }
+}
+
+void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+{
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return;
+    }
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
+    if (cJSON_IsString(path)) {
+        filterInfo.path = path->valuestring;
+    }
+}
+
 bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
@@ -1461,6 +1528,24 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
     if (cJSON_IsNumber(cornerRadius)) {
         filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    }
+    cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
+    if (cJSON_IsString(cornerRadius)) {
+        filterInfo.dragType = dragType->valuestring;
+    }
+    cJSON *shadowEnable = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_enable");
+    if (cJSON_IsBool(shadowEnable)) {
+        filterInfo.shadowEnable = cJSON_IsTrue(shadowEnable);
+    }
+    if (filterInfo.shadowEnable) {
+        ParserDragShadowInfo(filterInfoStr, filterInfo);
+        if (filterInfo.dragType == "text") {
+            ParserTextDragShadowInfo(filterInfoStr, filterInfo);
+        } else if (filterInfo.dragType == "non-text") {
+            ParserNonTextDragShadowInfo(filterInfoStr, filterInfo);
+        } else {
+            FI_HILOGW("Wrong drag type");
+        }
     }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
@@ -2144,6 +2229,72 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     FI_HILOGD("leave");
 }
 
+Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ToShadowColorStrategy(
+    ShadowColorStrategy shadowColorStrategy) const
+{
+    if (shadowColorStrategy == ShadowColorStrategy::NONE) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE ;
+    } else if (shadowColorStrategy == ShadowColorStrategy::AVERAGE) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE ;
+    } else if (shadowColorStrategy == ShadowColorStrategy::PRIMARY) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN ;
+    } else {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE;
+    }
+}
+
+void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    // if (!g_drawingInfo.filterInfo.path.empty()) {  //要考虑跨设备拖拽得缩放
+    //     FI_HILOGD("offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, radius:%{public}f, path:%{public}s",
+    //         g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY, g_drawingInfo.filterInfo.argb,
+    //         g_drawingInfo.filterInfo.shadowCorner, g_drawingInfo.filterInfo.path.c_str());
+    //     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
+    //     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+    //     pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
+    // } else {
+    //     FI_HILOGD("path is empty");
+    // }
+    pixelMapNode->SetShadowOffset(0, 0);
+    pixelMapNode->SetShadowColor(0xff000000);
+    pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath("M247 0L1117 0Q1117.96 0 1118.91 0.0469772Q1119.87 0.0939544 1120.82 0.187796Q1121.78 0.281637 1122.72 0.422116Q1123.67 0.562595 1124.61 0.749374Q1125.55 0.936153 1126.48 1.16878Q1127.4 1.40141 1128.32 1.67933Q1129.24 1.95724 1130.14 2.27978Q1131.04 2.60232 1131.92 2.9687Q1132.81 3.33508 1133.67 3.74442Q1134.54 4.15376 1135.38 4.60507Q1136.23 5.05638 1137.05 5.54858Q1137.87 6.04078 1138.67 6.57268Q1139.46 7.10459 1140.23 7.67491Q1141 8.24523 1141.74 8.85259Q1142.48 9.45996 1143.19 10.1029Q1143.9 10.7459 1144.58 11.4228Q1145.25 12.0998 1145.9 12.8092Q1146.54 13.5186 1147.15 14.2587Q1147.75 14.9987 1148.32 15.7677Q1148.9 16.5367 1149.43 17.3328Q1149.96 18.1288 1150.45 18.95Q1150.94 19.7712 1151.39 20.6155Q1151.85 21.4599 1152.26 22.3253Q1152.66 23.1908 1153.03 24.0753Q1153.4 24.9599 1153.72 25.8613Q1154.04 26.7627 1154.32 27.6789Q1154.6 28.5951 1154.83 29.5238Q1155.06 30.4525 1155.25 31.3915Q1155.44 32.3305 1155.58 33.2775Q1155.72 34.2245 1155.81 35.1773Q1155.91 36.1301 1155.95 37.0864Q1156 38.0426 1156 39L1156 76Q1156 76.9574 1155.95 77.9136Q1155.91 78.8699 1155.81 79.8227Q1155.72 80.7755 1155.58 81.7225Q1155.44 82.6695 1155.25 83.6085Q1155.06 84.5475 1154.83 85.4762Q1154.6 86.4049 1154.32 87.3211Q1154.04 88.2373 1153.72 89.1387Q1153.4 90.0401 1153.03 90.9247Q1152.67 91.8092 1152.26 92.6746Q1151.85 93.5401 1151.4 94.3845Q1150.94 95.2288 1150.45 96.05Q1149.96 96.8712 1149.43 97.6672Q1148.9 98.4633 1148.33 99.2323Q1147.75 100.001 1147.15 100.741Q1146.54 101.481 1145.9 102.191Q1145.25 102.9 1144.58 103.577Q1143.9 104.254 1143.19 104.897Q1142.48 105.54 1141.74 106.147Q1141 106.755 1140.23 107.325Q1139.46 107.895 1138.67 108.427Q1137.87 108.959 1137.05 109.451Q1136.23 109.944 1135.38 110.395Q1134.54 110.846 1133.67 111.256Q1132.81 111.665 1131.92 112.031Q1131.04 112.398 1130.14 112.72Q1129.24 113.043 1128.32 113.321Q1127.4 113.599 1126.48 113.831Q1125.55 114.064 1124.61 114.251Q1123.67 114.437 1122.72 114.578Q1121.78 114.718 1120.82 114.812Q1119.87 114.906 1118.91 114.953Q1117.96 115 1117 115L715 115Q714.043 115 713.086 115.047Q712.13 115.094 711.177 115.188Q710.225 115.282 709.278 115.422Q708.33 115.563 707.391 115.749Q706.452 115.936 705.524 116.169Q704.595 116.401 703.679 116.679Q702.763 116.957 701.861 117.28Q700.96 117.602 700.075 117.969Q699.191 118.335 698.325 118.744Q697.46 119.154 696.616 119.605Q695.771 120.056 694.95 120.549Q694.129 121.041 693.333 121.573Q692.537 122.105 691.768 122.675Q690.999 123.245 690.259 123.853Q689.519 124.46 688.809 125.103Q688.1 125.746 687.423 126.423Q686.746 127.1 686.103 127.809Q685.46 128.519 684.853 129.259Q684.245 129.999 683.675 130.768Q683.104 131.537 682.573 132.333Q682.041 133.129 681.549 133.95Q681.056 134.771 680.605 135.616Q680.154 136.46 679.744 137.325Q679.335 138.191 678.969 139.075Q678.602 139.96 678.28 140.861Q677.957 141.763 677.679 142.679Q677.401 143.595 677.169 144.524Q676.936 145.452 676.749 146.391Q676.563 147.33 676.422 148.278Q676.282 149.225 676.188 150.177Q676.094 151.13 676.047 152.086Q6"));
+    pixelMapNode->SetShadowMask(false);
+    pixelMapNode->SetShadowIsFilled(false);
+    pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
+        static_cast<ShadowColorStrategy>(0)));
+}
+
+void DrawPixelMapModifier::SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    // pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
+    // pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+    // pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadowCorner * g_drawingInfo.filterInfo.dipScale);
+    // pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
+    // pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
+    // pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
+    //     static_cast<ShadowColorStrategy>(g_drawingInfo.filterInfo.shadowColorStrategy)));
+
+    pixelMapNode->SetShadowOffset(0, 0);
+    pixelMapNode->SetShadowColor(0x33000000);
+    pixelMapNode->SetShadowRadius(10);
+    pixelMapNode->SetShadowMask(false);
+    pixelMapNode->SetShadowIsFilled(false);
+    pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
+        static_cast<ShadowColorStrategy>(0)));
+
+}
+
+void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    // if (g_drawingInfo.filterInfo.dragType == "text") {
+        SetNonTextDragShadow(pixelMapNode);
+    // } else if (g_drawingInfo.filterInfo.dragType == "non-text") {
+    //     SetNonTextDragShadow(pixelMapNode);
+    // } else {
+    //     FI_HILOGW("Wrong drag type");
+    // }
+}
+
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
@@ -2156,13 +2307,16 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
+    // if (g_drawingInfo.filterInfo.shadowEnable) {
+    SetDragShadow(pixelMapNode);
+    // }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
-    pixelMapNode->SetBgImageWidth(pixelMapWidth);
-    pixelMapNode->SetBgImageHeight(pixelMapHeight);
-    pixelMapNode->SetBgImagePositionX(0);
-    pixelMapNode->SetBgImagePositionY(0);
+    // pixelMapNode->SetBgImageWidth(pixelMapWidth);
+    // pixelMapNode->SetBgImageHeight(pixelMapHeight);
+    // pixelMapNode->SetBgImagePositionX(0);
+    // pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
