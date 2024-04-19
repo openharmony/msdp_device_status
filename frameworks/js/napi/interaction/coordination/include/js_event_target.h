@@ -23,6 +23,7 @@
 #include <string_view>
 #include <vector>
 
+#include "event_handler.h"
 #include "nocopyable.h"
 #include "uv.h"
 
@@ -57,8 +58,8 @@ public:
     void OnMouseLocationEvent(const std::string &networkId, const Event &event) override;
 
 private:
-    static void CallPreparePromiseWork(uv_work_t *work, int32_t status);
-    static void CallPrepareAsyncWork(uv_work_t *work, int32_t status);
+    static void CallPreparePromiseWork(sptr<JsUtil::CallbackInfo>cb);
+    static void CallPrepareAsyncWork(sptr<JsUtil::CallbackInfo>cb);
     static void CallActivatePromiseWork(uv_work_t *work, int32_t status);
     static void CallActivateAsyncWork(uv_work_t *work, int32_t status);
     static void CallDeactivatePromiseWork(uv_work_t *work, int32_t status);
@@ -66,13 +67,14 @@ private:
     static void CallGetCrossingSwitchStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetCrossingSwitchStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCoordinationMessageEvent(uv_work_t *work, int32_t status);
-    static void EmitMouseLocationEvent(uv_work_t *work, int32_t status);
+    static void EmitMouseLocationEvent(const JsUtil::MouseCallbackData &mouseEvent);
     bool IsHandleExist(napi_env env, const std::string &networkId, napi_value handle);
 
 private:
     std::atomic_bool isListeningProcess_ { false };
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>> coordinationListeners_;
     inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>> mouseLocationListeners_;
+    inline static std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace DeviceStatus
 } // namespace Msdp
