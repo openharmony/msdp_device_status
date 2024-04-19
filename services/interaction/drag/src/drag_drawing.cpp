@@ -2270,7 +2270,7 @@ void DrawPixelMapModifier::SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasN
 void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
     if (g_drawingInfo.filterInfo.dragType == "text") {
-        SetNonTextDragShadow(pixelMapNode);
+        SetTextDragShadow(pixelMapNode);
     } else if (g_drawingInfo.filterInfo.dragType == "non-text") {
         SetNonTextDragShadow(pixelMapNode);
     } else {
