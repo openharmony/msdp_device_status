@@ -1550,26 +1550,6 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
-    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
-    if (cJSON_IsNumber(offsetX)) {
-        filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
-    }
-    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
-    if (cJSON_IsNumber(offsetY)) {
-        filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
-    }
-    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
-    if (cJSON_IsString(argb)) {
-        std::string str = argb->valuestring;
-        uint32_t argbValue = 0;
-        std::istringstream iss(str);
-        iss >> std::hex >> argbValue;
-        filterInfo.argb = argbValue;
-    }
-    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
-    if (cJSON_IsString(path)) {
-        filterInfo.path = path->valuestring;
-    }
     return true;
 }
 
