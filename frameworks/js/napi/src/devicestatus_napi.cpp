@@ -17,6 +17,7 @@
 
 #include <js_native_api.h>
 
+#include "event_handler.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -50,26 +51,22 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(env_, &loop);
-    CHKPV(loop);
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
-    FI_HILOGD("devicestatusData.type:%{public}d, devicestatusData.value:%{public}d",
-        devicestatusData.type, devicestatusData.value);
-    data_ = devicestatusData;
-    work->data = static_cast<void *>(&data_);
-    int32_t ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {}, EmitOnEvent, uv_qos_default);
-    if (ret != 0) {
-        FI_HILOGE("Failed to uv_queue_work_with_qos");
+    std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
+    auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
+    if (runner != nullptr) {
+        eventHander_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
+    auto task = [devicestatusData] () {
+        FI_HLOGI("Execute lamdba");
+        EmitOnEvent(devicestatusData);
+    }
+    CHKPV(eventHander_);
+    eventHander_->PostTask(task);
 }
 
-void DeviceStatusCallback::EmitOnEvent(uv_work_t *work, int32_t status)
+void DeviceStatusCallback::EmitOnEvent(const Data &data)
 {
-    CHKPV(work);
-    Data* data = static_cast<Data*>(work->data);
-    delete work;
+    Data* data = static_cast<Data*>(data);
     CHKPV(data);
     DeviceStatusNapi* deviceStatusNapi = DeviceStatusNapi::GetDeviceStatusNapi();
     CHKPV(deviceStatusNapi);
