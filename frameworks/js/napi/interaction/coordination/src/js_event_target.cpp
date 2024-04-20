@@ -600,17 +600,17 @@ void JsEventTarget::EmitCoordinationMessageEvent(const JsUtil::CallbackInfo &coo
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         napi_value deviceDescriptor = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, cooMessageEvent.deviceDescriptor.c_str(),
+        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, cooMessageEvent.data.deviceDescriptor.c_str(),
             NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
         napi_value eventMsg = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(cooMessageEvent.msg), &eventMsg),
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(cooMessageEvent.data.msg), &eventMsg),
             CREATE_INT32, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "networkId", deviceDescriptor),
             SET_NAMED_PROPERTY, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object,
-            ((cooMessageEvent.type == COOPERATE_MESSAGE_NAME) ? "CooperateState" : "msg"), eventMsg),
+            ((cooMessageEvent.data.type == COOPERATE_MESSAGE_NAME) ? "CooperateState" : "msg"), eventMsg),
             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;
