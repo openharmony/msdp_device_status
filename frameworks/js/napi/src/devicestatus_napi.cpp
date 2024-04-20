@@ -348,7 +348,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         FI_HILOGD("Callback exists");
         return nullptr;
     }
-    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
+    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback();
     CHKPP(callback);
     int32_t subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
         static_cast<ActivityEvent>(event), static_cast<ReportLatencyNs>(latency), callback);
