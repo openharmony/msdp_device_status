@@ -42,7 +42,7 @@ JsEventCooperateTarget::JsEventCooperateTarget()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHander_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
     auto ret = coordinationListeners_.insert({ COORDINATION,
         std::vector<sptr<JsUtilCooperate::CallbackInfo>>()});
@@ -60,15 +60,15 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
     cb->data.enableResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
     cb->data.errCode = static_cast<int32_t>(msg);
     auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallEnablePromiseWork(cb);
         } else {
             CallEnableAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
@@ -80,15 +80,15 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
     cb->data.startResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallStartPromiseWork(cb);
         } else {
             CallStartAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
@@ -100,15 +100,15 @@ void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
     cb->data.stopResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
      auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallStopPromiseWork(cb);
         } else {
             CallStopAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> cb, bool state)
@@ -118,15 +118,15 @@ void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> 
     CHKPV(cb->env);
     cb->data.coordinationOpened = state;
     auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallGetStatePromiseWork(cb);
         } else {
             CallGetStateAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventCooperateTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
@@ -226,8 +226,8 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventCooperateTarget::CallEnablePromiseWork(sptr<JsUtilCooperate::CallbackInfo> cb)

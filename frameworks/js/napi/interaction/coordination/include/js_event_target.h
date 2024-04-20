@@ -74,7 +74,7 @@ private:
     std::atomic_bool isListeningProcess_ { false };
     inline static std::map<std::string_view, std::vector<sptr<JsUtil::CallbackInfo>>> coordinationListeners_;
     inline static std::map<std::string, std::vector<sptr<JsUtil::MouseCallbackInfo>>> mouseLocationListeners_;
-    inline static std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
+    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
 };
 } // namespace DeviceStatus
 } // namespace Msdp

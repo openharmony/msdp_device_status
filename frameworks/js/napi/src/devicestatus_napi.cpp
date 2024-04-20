@@ -51,17 +51,17 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    std::shared_ptr<AppExeFwk::EventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHander_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
     auto task = [devicestatusData] () {
         FI_HLOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void DeviceStatusCallback::EmitOnEvent(const Data &data)

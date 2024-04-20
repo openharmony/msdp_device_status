@@ -41,7 +41,7 @@ JsEventTarget::JsEventTarget()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHander_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
     auto ret = coordinationListeners_.insert({ COOPERATE_NAME, std::vector<sptr<JsUtil::CallbackInfo>>() });
     if (!ret.second) {
@@ -57,15 +57,15 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
     cb->data.prepareResult = (msg == CoordinationMessage::PREPARE || msg == CoordinationMessage::UNPREPARE);
     cb->data.errCode = static_cast<int32_t>(msg);
     auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallPreparePromiseWork(cb);
         } else {
             CallPrepareAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::string &remoteNetworkId,
@@ -77,15 +77,15 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
     cb->data.activateResult = (msg == CoordinationMessage::ACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
     auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallActivatePromiseWork(cb);
         } else {
             CallActivateAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::string &networkId,
@@ -97,15 +97,15 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     cb->data.deactivateResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
         auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallDeactivatePromiseWork(cb);
         } else {
             CallDeactivateAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, bool state)
@@ -115,15 +115,15 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(cb->env);
     cb->data.coordinationOpened = state;
             auto task = [cb]() {
-        Fi_HILOG("Execute lambda");
+        FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallGetCrossingSwitchStatePromiseWork(cb);
         } else {
             CallGetCrossingSwitchStateAsyncWork(cb);
         }
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
@@ -325,8 +325,8 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Event &event)
@@ -348,8 +348,8 @@ void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Eve
         FI_HLOGI("Execute lamdba");
         EmitMouseLocationEvent(mouseEvent);
     }
-    CHKPV(eventHander_);
-    eventHander_->PostTask(task);
+    CHKPV(eventHandler_);
+    eventHandler_->PostTask(task);
 }
 
 void JsEventTarget::CallPreparePromiseWork(sptr<JsUtil::CallbackInfo>cb)
