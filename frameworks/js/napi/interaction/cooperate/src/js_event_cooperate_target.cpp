@@ -42,7 +42,7 @@ JsEventCooperateTarget::JsEventCooperateTarget()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
     auto ret = coordinationListeners_.insert({ COORDINATION,
         std::vector<sptr<JsUtilCooperate::CallbackInfo>>()});
@@ -218,12 +218,13 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
         FI_HILOGE("Failed to find the %{public}s", std::string(COORDINATION).c_str());
         return;
     }
-    JsUtilCooperate::CallbackInfo cooMessageEvent = {
-        .data.deviceDescriptor = networkId;
-        .data.msg = msg;
+    JsUtilCooperate::CallbackInfo cooMessageEvent;
+    cooMessageEvent.data = {
+        .deviceDescriptor = networkId,
+        .msg = msg,
     };
     auto task = [cooMessageEvent]() {
-        FI_HLOGI("Execute lamdba");
+        FI_HILOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     };
     CHKPV(eventHandler_);
