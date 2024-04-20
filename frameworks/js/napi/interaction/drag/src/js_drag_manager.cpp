@@ -32,7 +32,7 @@ JsDragManager::JsDragManager()
     CALL_DEBUG_ENTER;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
 }
 void JsDragManager::ResetEnv()
@@ -143,7 +143,7 @@ void JsDragManager::OnDragMessage(DragState state)
         return;
     }
     CallbackInfo dragMsgEvent = {
-        .state = state;
+        .state = state,
     };
     auto task = [dragMsgEvent]() {
         FI_HILOGI("Execute lamdba");

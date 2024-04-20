@@ -52,7 +52,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
     std::lock_guard<std::mutex> guard(mutex_);
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
-        eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
     auto task = [devicestatusData]() {
         FI_HILOGI("Execute lamdba");
