@@ -17,7 +17,6 @@
 
 #include <js_native_api.h>
 
-#include "event_handler.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -51,7 +50,6 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
         eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
