@@ -42,15 +42,15 @@ bool DefaultReply::Unmarshalling(MessageParcel &parcel)
     return true;
 }
 
-BoolenReply::BoolenReply(bool state) : state(state)
+BooleanReply::BooleanReply(bool state) : state(state)
 {}
 
-bool BoolenReply::Marshalling(MessageParcel &parcel) const
+__attribute__((no_sanitize("cfi"))) bool BooleanReply::Marshalling(MessageParcel &parcel) const
 {
     return parcel.WriteBool(state);
 }
 
-bool BoolenReply::Unmarshalling(MessageParcel &parcel)
+bool BooleanReply::Unmarshalling(MessageParcel &parcel)
 {
     return parcel.ReadBool(state);
 }
