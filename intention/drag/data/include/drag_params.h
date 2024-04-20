@@ -177,7 +177,7 @@ struct GetDragStateReply final : public ParamBase {
     DragState dragState_ { DragState::ERROR };
 };
 
-using EnterTextEditorAreaParam = BoolenReply;
+using EnterTextEditorAreaParam = BooleanReply;
 
 struct GetDragActionReply final : public ParamBase {
     GetDragActionReply() = default;
