@@ -55,7 +55,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
         eventHandler_ = std::make_shared<AppExecFwk::EventRunner>(runner);
     }
     auto task = [devicestatusData]() {
-        FI_HLOGI("Execute lamdba");
+        FI_HILOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
     };
     CHKPV(eventHandler_);
