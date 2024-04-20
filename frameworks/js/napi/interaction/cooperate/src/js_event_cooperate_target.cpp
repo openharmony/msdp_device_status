@@ -99,7 +99,7 @@ void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
     CHKPV(cb->env);
     cb->data.stopResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
-     auto task = [cb]() {
+    auto task = [cb]() {
         FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallStopPromiseWork(cb);
@@ -222,7 +222,7 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
         .data.deviceDescriptor = networkId;
         .data.msg = msg;
     }
-    auto task = [cooMessageEvent] () {
+    auto task = [cooMessageEvent]() {
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
     }

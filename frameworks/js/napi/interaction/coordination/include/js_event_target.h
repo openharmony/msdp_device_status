@@ -58,14 +58,14 @@ public:
     void OnMouseLocationEvent(const std::string &networkId, const Event &event) override;
 
 private:
-    static void CallPreparePromiseWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallPrepareAsyncWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallActivatePromiseWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallActivateAsyncWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallDeactivatePromiseWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallDeactivateAsyncWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallGetCrossingSwitchStatePromiseWork(sptr<JsUtil::CallbackInfo>cb);
-    static void CallGetCrossingSwitchStateAsyncWork(sptr<JsUtil::CallbackInfo>cb);
+    static void CallPreparePromiseWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallPrepareAsyncWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallActivatePromiseWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallActivateAsyncWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallDeactivatePromiseWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallDeactivateAsyncWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallGetCrossingSwitchStatePromiseWork(sptr<JsUtil::CallbackInfo> cb);
+    static void CallGetCrossingSwitchStateAsyncWork(sptr<JsUtil::CallbackInfo> cb);
     static void EmitCoordinationMessageEvent(const JsUtil::CallbackInfo &cooMessageEvent);
     static void EmitMouseLocationEvent(const JsUtil::MouseCallbackData &mouseEvent);
     bool IsHandleExist(napi_env env, const std::string &networkId, napi_value handle);
