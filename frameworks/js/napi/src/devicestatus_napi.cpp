@@ -59,7 +59,7 @@ void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
     auto task = [devicestatusData]() {
         FI_HLOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }

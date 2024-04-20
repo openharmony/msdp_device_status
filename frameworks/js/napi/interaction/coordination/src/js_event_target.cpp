@@ -63,7 +63,7 @@ void JsEventTarget::EmitJsPrepare(sptr<JsUtil::CallbackInfo> cb, const std::stri
         } else {
             CallPrepareAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -83,7 +83,7 @@ void JsEventTarget::EmitJsActivate(sptr<JsUtil::CallbackInfo> cb, const std::str
         } else {
             CallActivateAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -103,7 +103,7 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
         } else {
             CallDeactivateAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -121,7 +121,7 @@ void JsEventTarget::EmitJsGetCrossingSwitchState(sptr<JsUtil::CallbackInfo> cb, 
         } else {
             CallGetCrossingSwitchStateAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -320,11 +320,11 @@ void JsEventTarget::OnCoordinationMessage(const std::string &networkId, Coordina
     JsUtil::CallbackInfo cooMessageEvent = {
         .data.deviceDescriptor = networkId;
         .data.msg = msg;
-    }
+    };
     auto task = [cooMessageEvent]() {
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -343,11 +343,11 @@ void JsEventTarget::OnMouseLocationEvent(const std::string &networkId, const Eve
         .displayY = event.displayY;
         .displayWidth = event.displayWidth;
         .displayHeight = event.displayHeight;
-    }
+    };
     auto task = [mouseEvent]() {
         FI_HLOGI("Execute lamdba");
         EmitMouseLocationEvent(mouseEvent);
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }

@@ -66,7 +66,7 @@ void JsEventCooperateTarget::EmitJsEnable(sptr<JsUtilCooperate::CallbackInfo> cb
         } else {
             CallEnableAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -86,7 +86,7 @@ void JsEventCooperateTarget::EmitJsStart(sptr<JsUtilCooperate::CallbackInfo> cb,
         } else {
             CallStartAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -106,7 +106,7 @@ void JsEventCooperateTarget::EmitJsStop(sptr<JsUtilCooperate::CallbackInfo> cb,
         } else {
             CallStopAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -124,7 +124,7 @@ void JsEventCooperateTarget::EmitJsGetState(sptr<JsUtilCooperate::CallbackInfo> 
         } else {
             CallGetStateAsyncWork(cb);
         }
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
@@ -221,11 +221,11 @@ void JsEventCooperateTarget::OnCoordinationMessage(const std::string &networkId,
     JsUtilCooperate::CallbackInfo cooMessageEvent = {
         .data.deviceDescriptor = networkId;
         .data.msg = msg;
-    }
+    };
     auto task = [cooMessageEvent]() {
         FI_HLOGI("Execute lamdba");
         EmitCoordinationMessageEvent(cooMessageEvent);
-    }
+    };
     CHKPV(eventHandler_);
     eventHandler_->PostTask(task);
 }
