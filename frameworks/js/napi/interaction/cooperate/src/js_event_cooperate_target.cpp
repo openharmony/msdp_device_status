@@ -14,6 +14,7 @@
  */
 
 #include "js_event_cooperate_target.h"
+#include "js_util_cooperate.h"
 
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
