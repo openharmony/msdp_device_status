@@ -1473,6 +1473,10 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
+    cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
+    if (cJSON_IsNumber(elevation)) {
+        filterInfo.elevation = elevation->valueint;
+    }
 }
 
 void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
@@ -1525,7 +1529,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
     }
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
-    if (cJSON_IsString(cornerRadius)) {
+    if (cJSON_IsString(dragType)) {
         filterInfo.dragType = dragType->valuestring;
     }
     cJSON *shadowEnable = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_enable");

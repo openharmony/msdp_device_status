@@ -141,6 +141,7 @@ struct FilterInfo {
     float offsetY { 0.0f };
     uint32_t argb { 0 };
     std::string path;
+    int32_t elevation { 0 };
 };
 
 struct ExtraInfo {
