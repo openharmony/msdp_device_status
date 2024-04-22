@@ -15,6 +15,8 @@
 
 #include "cooperate_server.h"
 
+#include <chrono>
+
 #include "cooperate_params.h"
 #include "default_params.h"
 #include "devicestatus_define.h"
@@ -29,6 +31,7 @@ namespace DeviceStatus {
 namespace {
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t DEFAULT_UNLOAD_COOLING_TIME_MS { 60000 };
+constexpr int32_t SYNC_TASK_TIMEOUT_DURATION { 2500 };
 }
 
 CooperateServer::CooperateServer(IContext *context)
@@ -171,6 +174,12 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
     CHKPR(context_, RET_ERR);
     ICooperate* cooperate = context_->GetPluginManager().LoadCooperate();
     CHKPR(cooperate, RET_ERR);
+    auto enterStamp = std::chrono::steady_clock::now();
+    auto checkParcelValid = [&enterStamp] () {
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - enterStamp).count();
+            return duration < SYNC_TASK_TIMEOUT_DURATION;
+    };
     switch (id) {
         case CooperateRequestID::GET_COOPERATE_STATE: {
             GetCooperateStateParam param;
@@ -193,6 +202,10 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
             }
             FI_HILOGI("GetCooperateState for udId:%{public}s successfully, state:%{public}s",
                 Utility::Anonymize(param.udId), state ? "true" : "false");
+            if (!checkParcelValid()) {
+                FI_HILOGE("CheckParcelValid failed");
+                return RET_ERR;
+            }
             if (!BoolenReply(state).Marshalling(reply)) {
                 FI_HILOGE("Marshalling state failed");
                 return RET_ERR;
