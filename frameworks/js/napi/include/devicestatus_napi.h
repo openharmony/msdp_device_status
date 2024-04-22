@@ -33,7 +33,7 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusCallback : public DeviceStatusCallbackStub {
 public:
-    explicit DeviceStatusCallback() {}
+    DeviceStatusCallback() {}
     virtual ~DeviceStatusCallback() {};
     void OnDeviceStatusChanged(const Data &devicestatusData) override;
     static void EmitOnEvent(const Data &data);
