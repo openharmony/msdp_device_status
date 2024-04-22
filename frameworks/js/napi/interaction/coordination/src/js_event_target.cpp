@@ -96,7 +96,7 @@ void JsEventTarget::EmitJsDeactivate(sptr<JsUtil::CallbackInfo> cb, const std::s
     CHKPV(cb->env);
     cb->data.deactivateResult = (msg == CoordinationMessage::DEACTIVATE_SUCCESS);
     cb->data.errCode = static_cast<int32_t>(msg);
-        auto task = [cb]() {
+    auto task = [cb]() {
         FI_HILOGI("Execute lambda");
         if (cb->ref == nullptr) {
             CallDeactivatePromiseWork(cb);
