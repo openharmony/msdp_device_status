@@ -827,6 +827,8 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         return RET_ERR;
     }
     dragAction_.store(DragAction::MOVE);
+    FI_HILOGI("Stop drag, appened extra data");
+    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -835,8 +837,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
             MMI::InputManager::GetInstance()->SetPointerVisible(true);
         }
     }
-    FI_HILOGI("Stop drag, appened extra data");
-    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     return HandleDragResult(result, hasCustomAnimation);
 }
 
