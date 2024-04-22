@@ -1473,11 +1473,6 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
-    cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
-    if (cJSON_IsNumber(elevation)) {
-        filterInfo.elevation = elevation->valueint;
-    }
-}
 
 void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
@@ -1487,9 +1482,20 @@ void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, 
         FI_HILOGE("FilterInfo is not json object");
         return;
     }
-    cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
-    if (cJSON_IsNumber(shadowCorner)) {
-        filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
+    cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_hardwareacceleration");
+    if (cJSON_IsBool(isHardwareAcceleration)) {
+        filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
+    }
+    if (filterInfo.isHardwareAcceleratio) {
+        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_elevation");
+        if (cJSON_IsNumber(elevation)) {
+            filterInfo.elevation = static_cast<float>(elevation->valuedouble);
+        }
+    } else {
+        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
+        if (cJSON_IsNumber(shadowCorner)) {
+            filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
+        }
     }
 }
 
@@ -2264,11 +2270,15 @@ void DrawPixelMapModifier::SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasN
 {
     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
-    pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadowCorner * g_drawingInfo.filterInfo.dipScale);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
     pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
     pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
         static_cast<ShadowColorStrategy>(g_drawingInfo.filterInfo.shadowColorStrategy)));
+    if (g_drawingInfo.filterInfo.isHardwareAcceleration) {
+        pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation)
+    } else {
+        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadow_corner);
+    }
 }
 
 void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const

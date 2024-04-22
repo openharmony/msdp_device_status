@@ -130,8 +130,8 @@ private:
 struct FilterInfo {
     std::string dragType;
     bool shadowEnable { true };
-    bool shadowIsFilled { true };
-    bool shadowMask { true };
+    bool shadowIsFilled { false };
+    bool shadowMask { false };
     int32_t shadowColorStrategy { 0 };
     float shadowCorner { 0.0F };
     float dipScale { 0.0f };
@@ -141,7 +141,8 @@ struct FilterInfo {
     float offsetY { 0.0f };
     uint32_t argb { 0 };
     std::string path;
-    int32_t elevation { 0 };
+    float elevation { 0.0f };
+    bool isHardwareAcceleration { false };
 };
 
 struct ExtraInfo {
