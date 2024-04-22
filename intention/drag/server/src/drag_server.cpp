@@ -401,7 +401,7 @@ int32_t DragServer::EnterTextEditorArea(CallingContext &context, MessageParcel &
         FI_HILOGE("EnterTextEditorAreaParam::Unmarshalling fail");
         return RET_ERR;
     }
-    return env_->GetDragManager().EnterTextEditorArea(param.enable_);
+    return env_->GetDragManager().EnterTextEditorArea(param.state);
 }
 
 std::string DragServer::GetPackageName(Security::AccessToken::AccessTokenID tokenId)

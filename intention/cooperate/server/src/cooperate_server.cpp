@@ -206,7 +206,7 @@ int32_t CooperateServer::GetParam(CallingContext &context, uint32_t id, MessageP
                 FI_HILOGE("CheckParcelValid failed");
                 return RET_ERR;
             }
-            if (!BoolenReply(state).Marshalling(reply)) {
+            if (!BooleanReply(state).Marshalling(reply)) {
                 FI_HILOGE("Marshalling state failed");
                 return RET_ERR;
             }

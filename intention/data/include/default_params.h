@@ -23,7 +23,7 @@ namespace Msdp {
 namespace DeviceStatus {
 struct DefaultParam final : public ParamBase {
     DefaultParam() = default;
-    DefaultParam(int32_t userData);
+    explicit DefaultParam(int32_t userData);
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
 
@@ -35,9 +35,9 @@ struct DefaultReply final : public ParamBase {
     bool Unmarshalling(MessageParcel &parcel) override;
 };
 
-struct BoolenReply final : public ParamBase {
-    BoolenReply() = default;
-    BoolenReply(bool state);
+struct BooleanReply final : public ParamBase {
+    BooleanReply() = default;
+    explicit BooleanReply(bool state);
     bool Marshalling(MessageParcel &parcel) const override;
     bool Unmarshalling(MessageParcel &parcel) override;
     bool state { false };
