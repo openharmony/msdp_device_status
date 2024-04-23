@@ -518,6 +518,209 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_004, TestSize.Level1)
     bool isEqual = Utility::IsEqual("abcd******abcd", result);
     ASSERT_TRUE(isEqual);
 }
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_001
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_TRUE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_002
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_003
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "xxx/not_exist_file.txt";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_004
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = nullptr;
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_001
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = "isempty";
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_FALSE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_002
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = "";
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_TRUE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_003
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = nullptr;
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_TRUE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_001
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "abcde";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_002
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "edcba";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_003
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "";
+    const char *str2 = "";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_004
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_005
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "";
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_006
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = nullptr;
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_007
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
