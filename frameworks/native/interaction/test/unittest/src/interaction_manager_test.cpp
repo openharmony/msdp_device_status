@@ -735,7 +735,7 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_ActivateCoordination, Te
     int32_t ret = InteractionManager::GetInstance()->ActivateCoordination(remoteNetworkId, startDeviceId,
         fun, isCompatible);
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
-    ASSERT_TRUE((ret == RER_OK || ret == COMMON_NOT_ALLOWED_DISTRIBUTED));
+    ASSERT_TRUE((ret == RET_OK || ret == COMMON_NOT_ALLOWED_DISTRIBUTED));
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COORDINATION
