@@ -285,7 +285,7 @@ void JsEventCooperateTarget::CallEnableAsyncWork(sptr<JsUtilCooperate::CallbackI
         return;
     }
     napi_value processor = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, & processor), GET_REFERENCE_VALUE, scope);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &processor), GET_REFERENCE_VALUE, scope);
     napi_value ret = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, processor, 1, &object, &ret), CALL_FUNCTION, scope);
     RELEASE_CALLBACKINFO(cb->env, cb->ref);
