@@ -244,6 +244,21 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
         FI_HILOGE("Current listener for networkId:%{public}s is not registered", Utility::Anonymize(networkId));
         return RET_ERR;
     }
+    if (listener == nullptr) {
+        eventListener_.erase(networkId);
+        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
+    } else {
+        eventListener_[networkId].erase(listener);
+        FI_HILOGI("Remove listener for networkId:%{public}s", Utility::Anonymize(networkId));
+        if (eventListener_[networkId].empty()) {
+            eventListener_.erase(networkId);
+            FI_HILOGD("No listener for networkId:%{public}s, clean current networkId", Utility::Anonymize(networkId));
+        }
+    }
+    if (eventListener_.find(networkId) != eventListener_.end()) {
+        FI_HILOGD("UnregisterEventListener for networkId:%{public}s successfully", Utility::Anonymize(networkId));
+        return RET_OK;
+    }
     UnregisterEventListenerParam param { networkId };
     DefaultReply reply;
     if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
@@ -251,28 +266,59 @@ int32_t CooperateClient::UnregisterEventListener(ITunnelClient &tunnel,
         FI_HILOGE("UnregisterEventListener failed, ret:%{public}d", ret);
         return ret;
     }
-    if (listener == nullptr) {
-        eventListener_.erase(networkId);
-        FI_HILOGI("Remove all listener for networkId:%{public}s", Utility::Anonymize(networkId));
-        return RET_OK;
-    }
-    eventListener_[networkId].erase(listener);
-    FI_HILOGD("Remove listener for networkId:%{public}s", Utility::Anonymize(networkId));
-    if (eventListener_[networkId].empty()) {
-        eventListener_.erase(networkId);
-        FI_HILOGD("No listener for networkId:%{public}s, clean current networkId", Utility::Anonymize(networkId));
-    }
+    FI_HILOGD("Unregister all Listener for networkId:%{public}s successfully", Utility::Anonymize(networkId));
     return RET_OK;
 }
 
 int32_t CooperateClient::AddHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    CHKPR(listener, RET_ERR);
+    if (std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) != devHotAreaListener_.end()) {
+        FI_HILOGD("Current listener is registered already");
+        return RET_ERR;
+    }
+    RegisterHotAreaListenerParam param { GenerateRequestID(), false };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.AddWatch(Intention::COOPERATE,
+        CooperateRequestID::REGISTER_HOTAREA_LISTENER, param, reply); ret != RET_OK) {
+        FI_HILOGE("AddHotAreaListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    devHotAreaListener_.push_back(listener);
+    return RET_OK;
 }
 
 int32_t CooperateClient::RemoveHotAreaListener(ITunnelClient &tunnel, HotAreaListenerPtr listener)
 {
-    return RET_ERR;
+    CALL_DEBUG_ENTER;
+    if (listener != nullptr &&
+        std::find(devHotAreaListener_.begin(), devHotAreaListener_.end(), listener) == devHotAreaListener_.end()) {
+        FI_HILOGD("Current listener is not registered");
+        return RET_ERR;
+    }
+    if (listener == nullptr) {
+        devHotAreaListener_.clear();
+    } else {
+        for (auto it = devHotAreaListener_.begin(); it != devHotAreaListener_.end(); ++it) {
+            if (*it == listener) {
+                devHotAreaListener_.erase(it);
+            }
+        }
+    }
+    if (!devHotAreaListener_.empty()) {
+        FI_HILOGI("RemoveHotAreaListener successfully");
+        return RET_OK;
+    }
+    UnregisterHotAreaListenerParam param { GenerateRequestID(), false };
+    DefaultReply reply;
+    if (int32_t ret = tunnel.RemoveWatch(Intention::COOPERATE,
+        CooperateRequestID::UNREGISTER_HOTAREA_LISTENER, param, reply); ret != RET_OK) {
+        FI_HILOGE("RemoveHotAreaListener failed, ret:%{public}d", ret);
+        return ret;
+    }
+    FI_HILOGI("Remove all hot area listener successfully");
+    return RET_OK;
 }
 
 int32_t CooperateClient::GenerateRequestID()

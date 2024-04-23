@@ -114,6 +114,23 @@ bool GetCooperateStateSyncParam::Unmarshalling(MessageParcel &parcel)
 {
     return parcel.ReadString(udId);
 }
+
+RegisterHotAreaListenerParam::RegisterHotAreaListenerParam(int32_t userData, bool checkPermission) : userData(userData),
+    checkPermission(checkPermission)
+{}
+
+bool RegisterHotAreaListenerParam::Marshalling(MessageParcel &parcel) const
+{
+    return parcel.WriteInt32(userData) &&
+        parcel.WriteBool(checkPermission);
+}
+
+bool RegisterHotAreaListenerParam::Unmarshalling(MessageParcel &parcel)
+{
+    return parcel.ReadInt32(userData) &&
+        parcel.ReadBool(checkPermission);
+}
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
