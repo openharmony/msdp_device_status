@@ -31,6 +31,7 @@ public:
     static std::optional<DragData> CreateDragData(int32_t sourceType, int32_t pointerId, int32_t dragNum,
         bool hasCoordinateCorrected, int32_t shadowNum);
     static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    static void AssignToAnimation(PreviewAnimation &animation);
 };
 } // namespace DeviceStatus
 } // namespace Msdp
