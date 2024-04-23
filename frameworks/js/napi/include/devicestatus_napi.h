@@ -19,6 +19,7 @@
 #include <map>
 #include <tuple>
 
+#include "event_handler.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include <uv.h>
@@ -32,14 +33,13 @@ namespace Msdp {
 namespace DeviceStatus {
 class DeviceStatusCallback : public DeviceStatusCallbackStub {
 public:
-    explicit DeviceStatusCallback(napi_env env) : env_(env) {}
+    DeviceStatusCallback() {}
     virtual ~DeviceStatusCallback() {};
     void OnDeviceStatusChanged(const Data &devicestatusData) override;
-    static void EmitOnEvent(uv_work_t *work, int32_t status);
+    static void EmitOnEvent(const Data &data);
 private:
-    napi_env env_ { nullptr };
+    inline static std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     std::mutex mutex_;
-    Data data_;
 };
 
 class DeviceStatusNapi : public DeviceStatusEvent {
