@@ -40,6 +40,8 @@ const std::string NETWORK_ID = { "abcd123456ef" };
 const std::string EXPECT_ID = { "abcd******56ef" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+constexpr size_t SIZE1 {10};
+constexpr size_t SIZE2 {20};
 } // namespace
 
 class UtilityTest : public testing::Test {
@@ -720,6 +722,214 @@ HWTEST_F(UtilityTest, UtityTest_IsEqual_007, TestSize.Level1)
     const char *str2 = nullptr;
     bool isEqual = Utility::IsEqual(str1, str2);
     ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_001
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str = Utility::ConcatAsString(str1);
+    EXPECT_STREQ(str.c_str(), str1.c_str());
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_002
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str = Utility::ConcatAsString(str1, str2);
+    EXPECT_STREQ(str.c_str(), "abcdefghij");
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_003
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str3 = "klmno";
+    std::string str = Utility::ConcatAsString(str1, str2, str3);
+    EXPECT_STREQ(str.c_str(), "abcdefghijklmno");
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_004
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str3 = "";
+    std::string str = Utility::ConcatAsString(str1, str2, str3);
+    EXPECT_STREQ(str.c_str(), "abcdefghij");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_001
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abc de";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_002
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abcde";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_003
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = " abcde";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_004
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abcde ";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_005
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "    ";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "");
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_001
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char dest[] = "0";
+    size_t size = SIZE1;
+    char src[] = "abcdefghijklmnopqrst";
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, size - 1);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_002
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char *dest = nullptr;
+    size_t size = SIZE2;
+    char *src = nullptr;
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_003
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char dest[] = {0};
+    size_t size = SIZE2;
+    char *src = nullptr;
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_004
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char *dest = nullptr;
+    size_t size = SIZE2;
+    char src[] = "dadaaaaaaaddsadada";
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_GetSysClockTime_001
+ * @tc.desc: Get system time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_GetSysClockTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t time = Utility::GetSysClockTime();
+    EXPECT_NE(time, 0);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
