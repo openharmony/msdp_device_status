@@ -1334,8 +1334,9 @@ bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent);
-    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        FI_HILOGI("Current event is down");
+    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_MOVE ||
+        pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        FI_HILOGI("Current event action:%{public}d, need remove filter now", pointerEvent->GetPointerAction());
         auto *context = COOR_EVENT_MGR->GetIContext();
         CHKPF(context);
         int32_t ret = context->GetDelegateTasks().PostAsyncTask(
@@ -1344,8 +1345,17 @@ bool PointerFilter::OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent
             FI_HILOGE("Posting async task failed");
         }
         filterId_ = -1;
+        return false;
+    }
+    if (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN ||
+        pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP ||
+        pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_DOWN ||
+        pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_UP) {
+        FI_HILOGI("The event is an injection event, a down or up event and should not be consumed,"
+            "action:%{public}d", pointerEvent->GetPointerAction());
         return true;
     }
+    FI_HILOGI("The event should be consumed, action:%{public}d", pointerEvent->GetPointerAction());
     return false;
 }
 } // namespace DeviceStatus
