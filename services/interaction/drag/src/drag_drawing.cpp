@@ -688,7 +688,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
 
 void DragDrawing::OnStopAnimationSuccess()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -734,7 +734,8 @@ void DragDrawing::OnStopAnimationSuccess()
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
     });
-    FI_HILOGD("leave");
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
@@ -750,8 +751,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
-    } else {
-        StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
     RunAnimation(animateCb);
@@ -761,7 +760,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
 
 void DragDrawing::OnStopAnimationFail()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -801,7 +800,8 @@ void DragDrawing::OnStopAnimationFail()
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
     });
-    FI_HILOGD("leave");
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
@@ -817,8 +817,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
-    } else {
-        StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
     RunAnimation(animateCb);
@@ -928,6 +926,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 
 int32_t DragDrawing::StartVsync()
 {
+    FI_HILOGI("enter");
     if (receiver_ == nullptr) {
         CHKPR(handler_, RET_ERR);
         receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
@@ -946,6 +945,7 @@ int32_t DragDrawing::StartVsync()
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
+    FI_HILOGI("enter");
     return ret;
 }
 
