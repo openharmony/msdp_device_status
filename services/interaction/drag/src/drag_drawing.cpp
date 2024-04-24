@@ -498,7 +498,6 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     }
     auto dragDropStartExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragStartExtHandler_, "OnStartDragExt"));
     if (dragDropStartExtFunc == nullptr) {
-    if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
         dragExtHandler_ = nullptr;
