@@ -530,7 +530,7 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t di
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    auto dragDropExtFunc = reinterpret_cast(dlsym(dragExtHandler_, "OnDragExt"));
+    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
