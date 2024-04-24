@@ -496,7 +496,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
+    auto dragDropStartExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragStartExtHandler_, "OnStartDragExt"));
+    if (dragDropStartExtFunc == nullptr) {
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
@@ -509,11 +510,47 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, &g_dragData))) {
+    if (!handler_->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
     FI_HILOGD("leave");
+}
+
+void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t displayX, int32_t displayY) {
+    FI_HILOGD("dragType:%{public}d, pointId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+        dragType, pointId, displayX, displayY);
+    if (pointId < 0) {
+        FI_HILOGE("Invalid pointId:%{public}d", pointId);
+        return;
+    }
+    RotateDisplayXY(displayX, displayY);
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.dragType = dragType;
+    dragEventInfo.pointId = pointId;
+    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
+    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+        return;
+    }
+    auto dragDropExtFunc = reinterpret_cast(dlsym(dragExtHandler_, "OnDragExt"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+    if (handler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        CHKPV(runner);
+        handler_ = std::make_sharedAppExecFwk::EventHandler(std::move(runner));
+}
+    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+        FI_HILOGE("Start style animation failed");
+    }
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
