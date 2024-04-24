@@ -492,7 +492,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    auto dragDropStartExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragStartExtHandler_, "OnStartDragExt"));
+    auto dragDropStartExtFunc = reinterpret_cast<DragStartExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
     if (dragDropStartExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
@@ -512,7 +512,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     FI_HILOGD("leave");
 }
 
-void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t displayX, int32_t displayY) {
+void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t displayX, int32_t displayY)
+{
     FI_HILOGD("dragType:%{public}d, pointId:%{public}d, displayX:%{public}d, displayY:%{public}d",
         dragType, pointId, displayX, displayY);
     if (pointId < 0) {
