@@ -35,6 +35,7 @@
 
 #include "devicestatus_define.h"
 #include "fi_log.h"
+#include "if_stream_wrap.h"
 #include "napi_constants.h"
 #include "utility.h"
 #include "virtual_mouse.h"
@@ -156,12 +157,13 @@ bool VirtualDeviceBuilder::ExecuteUnmount(const char *id, const char *name, cons
         std::cout << "Invalid path" << spath.str().c_str() << std::endl;
         return false;
     }
-    std::ifstream stream(spath.str(), std::ios::in);
-    if (!stream.is_open()) {
+    IfStreamWrap fileStream;
+    fileStream.ifStream = std::ifstream(spath.str(), std::ios::in);
+    if (!fileStream.IsOpen()) {
         return false;
     }
     std::string sLine;
-    while (std::getline(stream, sLine)) {
+    while (std::getline(fileStream.ifStream, sLine)) {
         ConcatenationName(sLine);
         if (std::regex_search(sLine, pattern)) {
             std::cout << "\tfound: \'" << direntName << "\'" << std::endl;
@@ -404,15 +406,15 @@ int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
         return RET_ERR;
     }
     std::cout << "Read input data from \'" << realPath << "\'" << std::endl;
-    std::ifstream stream(realPath);
-    if (!stream.is_open()) {
+    IfStreamWrap fileStream;
+    fileStream.ifStream = std::ifstream(realPath);
+    if (!fileStream.IsOpen()) {
         FI_HILOGE("Could not open the file");
         return RET_ERR;
     }
-    model = nlohmann::json::parse(stream, nullptr, false);
+    model = nlohmann::json::parse(fileStream.ifStream, nullptr, false);
     if (model.is_discarded()) {
         FI_HILOGE("model parse failed");
-        stream.close();
         return RET_ERR;
     }
     return RET_OK;
