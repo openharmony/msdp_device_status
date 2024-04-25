@@ -1043,6 +1043,160 @@ HWTEST_F(DragManagerTest, DragManagerTest30, TestSize.Level0)
     int32_t ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_ERR);
 }
+
+/**
+ * @tc.name: DragManagerTest31
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest31, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->SetDragWindowVisible(true);
+    ASSERT_EQ(ret, RET_ERR);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP_MS));
+    ret = InteractionManager::GetInstance()->SetDragWindowVisible(false);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest32
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest32, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = -1;
+    std::vector<DragCursorStyle> dragCursorStyles = {DragCursorStyle::FORBIDDEN,
+        DragCursorStyle::COPY, DragCursorStyle::MOVE};
+    for (const auto& dragCursorStyle : dragCursorStyles) {
+        ret = InteractionManager::GetInstance()->UpdateDragStyle(dragCursorStyle);
+        ASSERT_EQ(ret, RET_ERR);
+    }
+}
+
+/**
+ * @tc.name: DragManagerTest33
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest33, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
+    ASSERT_NE(pixelMap, nullptr);
+    ShadowInfo shadowInfo = { pixelMap, 0, 0 };
+    int32_t ret = InteractionManager::GetInstance()->UpdateShadowPic(shadowInfo);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest34
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest34, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    ASSERT_TRUE(pid > 0);
+}
+
+/**
+ * @tc.name: DragManagerTest35
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest35, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string udKey;
+    int32_t ret = InteractionManager::GetInstance()->GetUdKey(udKey);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest36
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest36, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t ret = InteractionManager::GetInstance()->GetShadowOffset(offsetX, offsetY, width, height);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest37
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest37, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragData replyDragData;
+    int32_t ret = InteractionManager::GetInstance()->GetDragData(replyDragData);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest38
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest38, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    PreviewStyle previewStyleOut;
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR };
+    previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
+    int32_t ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleOut);
+    ASSERT_EQ(ret, RET_ERR);
+    PreviewStyle previewStyleIn;
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
+    previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
+    ret = InteractionManager::GetInstance()->UpdatePreviewStyle(previewStyleIn);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest39
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest39, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    PreviewStyle previewStyleIn;
+    previewStyleIn.types = { PreviewType::FOREGROUND_COLOR };
+    previewStyleIn.foregroundColor = FOREGROUND_COLOR_IN;
+    PreviewAnimation animationIn;
+    AssignToAnimation(animationIn);
+    int32_t ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleIn, animationIn);
+    ASSERT_EQ(ret, RET_ERR);
+    PreviewStyle previewStyleOut;
+    previewStyleOut.types = { PreviewType::FOREGROUND_COLOR };
+    previewStyleOut.foregroundColor = FOREGROUND_COLOR_OUT;
+    PreviewAnimation animationOut;
+    AssignToAnimation(animationOut);
+    ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
+    ASSERT_EQ(ret, RET_ERR);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
