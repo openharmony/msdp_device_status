@@ -149,7 +149,7 @@ enum class DragEvent {
 
 struct DragEventInfo {
     DragEvent dragType;
-    int32_t pointId { -1 };
+    int32_t pointerId { -1 };
     int32_t displayX { -1 };
     int32_t displayY { -1 };
 };

@@ -461,12 +461,12 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
-    int32_t pointId = pointerEvent->GetPointerId();
+    int32_t pointerId = pointerEvent->GetPointerId();
     int32_t displayX = pointerItem.GetDisplayX();
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
-        pointerEvent->GetSourceType(), pointId, displayX, displayY);
-    dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointId, displayX, displayY);
+        pointerEvent->GetSourceType(), pointerId, displayX, displayY);
+    dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), displayX, displayY);
 }
 

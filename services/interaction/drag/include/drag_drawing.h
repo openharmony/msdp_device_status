@@ -188,7 +188,7 @@ public:
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
     int32_t UpdateDragStyle(DragCursorStyle style);
-    void NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t displayX = -1, int32_t displayY = -1);
+    void NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX = -1, int32_t displayY = -1);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);

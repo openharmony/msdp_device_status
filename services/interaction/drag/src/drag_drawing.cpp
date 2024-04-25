@@ -512,24 +512,24 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
     FI_HILOGD("leave");
 }
 
-void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t displayX, int32_t displayY)
+void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX, int32_t displayY)
 {
-    FI_HILOGD("dragType:%{public}d, pointId:%{public}d, displayX:%{public}d, displayY:%{public}d",
-        dragType, pointId, displayX, displayY);
-    if (pointId < 0) {
-        FI_HILOGE("Invalid pointId:%{public}d", pointId);
+    FI_HILOGD("dragType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+        dragType, pointerId, displayX, displayY);
+    if (pointerId < 0) {
+        FI_HILOGE("Invalid pointId:%{public}d", pointerId);
+        return;
+    }
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
     dragEventInfo.dragType = dragType;
-    dragEventInfo.pointId = pointId;
+    dragEventInfo.pointerId = pointerId;
     dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
     dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
-    if (dragExtHandler_ == nullptr) {
-        FI_HILOGE("Fail to open drag drop extension library");
-        return;
-    }
     auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
@@ -544,7 +544,7 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointId, int32_t di
         handler_ = std::make_sharedAppExecFwk::EventHandler(std::move(runner));
 }
     if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
-        FI_HILOGE("Start style animation failed");
+        FI_HILOGE("notify info failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
 }
