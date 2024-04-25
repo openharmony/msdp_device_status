@@ -536,7 +536,7 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
-        handler_ = std::make_sharedAppExecFwk::EventHandler(std::move(runner));
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
