@@ -1507,7 +1507,8 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
-    cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_hardwareacceleration");
+    cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(
+        filterInfoParser.json, "shadow_is_hardwareacceleration");
     if (cJSON_IsBool(isHardwareAcceleration)) {
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
     }
