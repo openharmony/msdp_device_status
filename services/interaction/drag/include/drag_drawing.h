@@ -59,7 +59,6 @@ public:
     ~DrawPixelMapModifier() = default;
     void SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
     void SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
-    void SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
     Rosen::SHADOW_COLOR_STRATEGY ToShadowColorStrategy(ShadowColorStrategy shadowColorStrategy) const;
     void Draw(Rosen::RSDrawingContext &context) const override;
 };

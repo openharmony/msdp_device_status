@@ -1507,6 +1507,7 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
+}
 
 void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
@@ -1520,7 +1521,7 @@ void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, 
     if (cJSON_IsBool(isHardwareAcceleration)) {
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
     }
-    if (filterInfo.isHardwareAcceleratio) {
+    if (filterInfo.isHardwareAcceleration) {
         cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_elevation");
         if (cJSON_IsNumber(elevation)) {
             filterInfo.elevation = static_cast<float>(elevation->valuedouble);
@@ -2285,23 +2286,18 @@ Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ToShadowColorStrategy(
 void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
     if (!g_drawingInfo.filterInfo.path.empty()) {
-        FI_HILOGD("offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, radius:%{public}f, path:%{public}s",
-            g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY, g_drawingInfo.filterInfo.argb,
-            g_drawingInfo.filterInfo.shadowCorner, g_drawingInfo.filterInfo.path.c_str());
-        pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
-        pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+        FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
         pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
-        pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
-        pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
-        pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
-            static_cast<ShadowColorStrategy>(g_drawingInfo.filterInfo.shadowColorStrategy)));
     } else {
         FI_HILOGD("path is empty");
     }
 }
 
-void DrawPixelMapModifier::SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
+    FI_HILOGD("offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, radius:%{public}f",
+        g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY,
+        g_drawingInfo.filterInfo.argb, g_drawingInfo.filterInfo.shadowCorner);
     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
@@ -2309,21 +2305,13 @@ void DrawPixelMapModifier::SetNonTextDragShadow(std::shared_ptr<Rosen::RSCanvasN
     pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
         static_cast<ShadowColorStrategy>(g_drawingInfo.filterInfo.shadowColorStrategy)));
     if (g_drawingInfo.filterInfo.isHardwareAcceleration) {
-        pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation)
+        pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation);
     } else {
-        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadow_corner);
+        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadowCorner);
     }
-}
-
-void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
-{
     if (g_drawingInfo.filterInfo.dragType == "text") {
         SetTextDragShadow(pixelMapNode);
-    } else if (g_drawingInfo.filterInfo.dragType == "non-text") {
-        SetNonTextDragShadow(pixelMapNode);
-    } else {
-        FI_HILOGW("Wrong drag type");
-    }
+    } 
 }
 
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
@@ -2350,8 +2338,16 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
-    cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    if (!filterInfo.path.empty()) {
+        auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
+        cvs->Save();
+        cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+        cvs->Restore();
+    } else {
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    }
     pixelMapNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
     pixelMapNode->SetAlpha(filterInfo.opacity);
     pixelMapNode->FinishRecording();
