@@ -141,6 +141,19 @@ enum class PreviewType {
     SCALE = 3
 };
 
+enum class DragEvent {
+    DRAG_START = 0,
+    DRAG_MOVE = 1,
+    DRAG_UP = 2
+};
+
+struct DragEventInfo {
+    DragEvent dragType;
+    int32_t pointerId { -1 };
+    int32_t displayX { -1 };
+    int32_t displayY { -1 };
+};
+
 struct PreviewStyle {
     std::vector<PreviewType> types;
     uint32_t foregroundColor { 0 };

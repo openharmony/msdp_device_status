@@ -89,6 +89,17 @@ struct GetCooperateStateSyncParam final : public ParamBase {
     std::string udId;
 };
 
+struct RegisterHotAreaListenerParam final : public ParamBase {
+    RegisterHotAreaListenerParam() = default;
+    RegisterHotAreaListenerParam(int32_t userData, bool checkPermission);
+    bool Marshalling(MessageParcel &parcel) const override;
+    bool Unmarshalling(MessageParcel &parcel) override;
+    int32_t userData { -1 };
+    bool checkPermission { false };
+};
+
+using UnregisterHotAreaListenerParam = RegisterHotAreaListenerParam;
+
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS

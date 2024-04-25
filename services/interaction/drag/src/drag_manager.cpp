@@ -441,6 +441,7 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         OnDragMove(pointerEvent);
         return;
     }
+    FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
@@ -448,9 +449,10 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
         if (ret != RET_OK) {
             FI_HILOGE("Post async task failed");
         }
+        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
         return;
     }
-    FI_HILOGD("Unknow action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
+    FI_HILOGD("Unknown action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
         pointerEvent->GetSourceType(), pointerEvent->GetPointerId(), pointerAction);
 }
 
@@ -459,10 +461,13 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     CHKPV(pointerEvent);
     MMI::PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    int32_t displayX = pointerItem.GetDisplayX();
+    int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
-        pointerEvent->GetSourceType(), pointerEvent->GetPointerId(),
-        pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+        pointerEvent->GetSourceType(), pointerId, displayX, displayY);
+    dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
+    dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), displayX, displayY);
 }
 
 void DragManager::SendDragData(int32_t targetTid, const std::string &udKey)
@@ -827,6 +832,8 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
         return RET_ERR;
     }
     dragAction_.store(DragAction::MOVE);
+    FI_HILOGI("Stop drag, appened extra data");
+    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     DragData dragData = DRAG_DATA_MGR.GetDragData();
     if (dragData.sourceType == MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
         dragDrawing_.EraseMouseIcon();
@@ -835,8 +842,6 @@ int32_t DragManager::OnStopDrag(DragResult result, bool hasCustomAnimation)
             MMI::InputManager::GetInstance()->SetPointerVisible(true);
         }
     }
-    FI_HILOGI("Stop drag, appened extra data");
-    MMI::InputManager::GetInstance()->AppendExtraData(DragManager::CreateExtraData(false));
     return HandleDragResult(result, hasCustomAnimation);
 }
 

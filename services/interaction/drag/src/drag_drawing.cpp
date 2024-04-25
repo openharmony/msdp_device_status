@@ -151,11 +151,7 @@ const std::string FORBID_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Fo
 const std::string MOUSE_DRAG_DEFAULT_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Default.svg" };
 const std::string MOUSE_DRAG_CURSOR_CIRCLE_PATH { "/system/etc/device_status/drag_icon/Mouse_Drag_Cursor_Circle.png" };
 const std::string MOVE_DRAG_PATH { "/system/etc/device_status/drag_icon/Move_Drag.svg" };
-#ifdef __aarch64__
 const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib64/drag_drop_ext/libdrag_drop_ext.z.so" };
-#else
-const std::string DRAG_DROP_EXTENSION_SO_PATH { "/system/lib/drag_drop_ext/libdrag_drop_ext.z.so" };
-#endif
 const std::string BIG_FOLDER_LABEL { "scb_folder" };
 struct DrawingInfo g_drawingInfo;
 struct DragData g_dragData;
@@ -496,8 +492,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
-    if (dragDropExtFunc == nullptr) {
+    auto dragDropStartExtFunc = reinterpret_cast<DragStartExtFunc>(dlsym(dragExtHandler_, "OnStartDragExt"));
+    if (dragDropStartExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
         dlclose(dragExtHandler_);
         dragExtHandler_ = nullptr;
@@ -509,11 +505,49 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, &g_dragData))) {
+    if (!handler_->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
     FI_HILOGD("leave");
+}
+
+void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX, int32_t displayY)
+{
+    FI_HILOGD("dragType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
+        dragType, pointerId, displayX, displayY);
+    if (pointerId < 0) {
+        FI_HILOGE("Invalid pointId:%{public}d", pointerId);
+        return;
+    }
+
+    if (dragExtHandler_ == nullptr) {
+        FI_HILOGE("Fail to open drag drop extension library");
+        return;
+    }
+    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+    if (handler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        CHKPV(runner);
+        handler_ = std::make_sharedAppExecFwk::EventHandler(std::move(runner));
+    }
+    RotateDisplayXY(displayX, displayY);
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.dragType = dragType;
+    dragEventInfo.pointerId = pointerId;
+    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
+    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
+    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+        FI_HILOGE("notify drag info failed");
+    }
+#endif // OHOS_DRAG_ENABLE_ANIMATION
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -688,7 +722,7 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
 
 void DragDrawing::OnStopAnimationSuccess()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -734,7 +768,8 @@ void DragDrawing::OnStopAnimationSuccess()
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
     });
-    FI_HILOGD("leave");
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowNode,
@@ -750,8 +785,6 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
-    } else {
-        StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
     RunAnimation(animateCb);
@@ -761,7 +794,7 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
 
 void DragDrawing::OnStopAnimationFail()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     if (!CheckNodesValid()) {
         FI_HILOGE("Check nodes valid failed");
         return;
@@ -801,7 +834,8 @@ void DragDrawing::OnStopAnimationFail()
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
     });
-    FI_HILOGD("leave");
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode,
@@ -817,8 +851,6 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
-    } else {
-        StartVsync();
     }
 #else // OHOS_DRAG_ENABLE_ANIMATION
     RunAnimation(animateCb);
@@ -928,6 +960,7 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
 
 int32_t DragDrawing::StartVsync()
 {
+    FI_HILOGI("enter");
     if (receiver_ == nullptr) {
         CHKPR(handler_, RET_ERR);
         receiver_ = Rosen::RSInterfaces::GetInstance().CreateVSyncReceiver("DragDrawing", handler_);
@@ -946,6 +979,7 @@ int32_t DragDrawing::StartVsync()
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
+    FI_HILOGI("enter");
     return ret;
 }
 

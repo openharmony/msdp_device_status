@@ -170,7 +170,27 @@ void StateMachine::StartCooperate(Context &context, const CooperateEvent &event)
 }
 
 void StateMachine::GetCooperateState(Context &context, const CooperateEvent &event)
-{}
+{
+    CALL_DEBUG_ENTER;
+    GetCooperateStateEvent stateEvent = std::get<GetCooperateStateEvent>(event.event);
+    bool switchStatus { false };
+    auto udId = env_->GetDP().GetUdIdByNetworkId(stateEvent.networkId);
+    if (env_->GetDP().GetCrossingSwitchState(udId, switchStatus) != RET_OK) {
+        FI_HILOGE("GetCrossingSwitchState for udId:%{public}s failed", Utility::Anonymize(udId));
+        return;
+    }
+    auto session = env_->GetSocketSessionManager().FindSessionByPid(stateEvent.pid);
+    CHKPV(session);
+    NetPacket pkt(MessageId::COORDINATION_GET_STATE);
+    pkt << stateEvent.userData << switchStatus;
+    if (pkt.ChkRWError()) {
+        FI_HILOGE("Packet write data failed");
+        return;
+    }
+    if (!session->SendMsg(pkt)) {
+        FI_HILOGE("Sending failed");
+    }
+}
 
 void StateMachine::RegisterEventListener(Context &context, const CooperateEvent &event)
 {

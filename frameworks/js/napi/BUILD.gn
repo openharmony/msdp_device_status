@@ -53,6 +53,7 @@ ohos_shared_library("stationary") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",

@@ -40,6 +40,8 @@ const std::string NETWORK_ID = { "abcd123456ef" };
 const std::string EXPECT_ID = { "abcd******56ef" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 constexpr int32_t FILE_SIZE_MAX { 0x5000 };
+constexpr size_t SIZE1 {10};
+constexpr size_t SIZE2 {20};
 } // namespace
 
 class UtilityTest : public testing::Test {
@@ -517,6 +519,743 @@ HWTEST_F(UtilityTest, UtityTest_Anonymize2_004, TestSize.Level1)
         __LINE__, id.c_str(), result);
     bool isEqual = Utility::IsEqual("abcd******abcd", result);
     ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_001
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "/system/etc/device_status/drag_icon/Copy_Drag.svg";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_TRUE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_002
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_003
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = "xxx/not_exist_file.txt";
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_DoesFileExist_004
+ * @tc.desc: Check the file is or not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_DoesFileExist_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *filePath = nullptr;
+    bool isExist = Utility::DoesFileExist(filePath);
+    ASSERT_FALSE(isExist);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_001
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = "isempty";
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_FALSE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_002
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = "";
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_TRUE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEmpty_003
+ * @tc.desc: Check string is or not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEmpty_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str = nullptr;
+    bool isEmpty = Utility::IsEmpty(str);
+    ASSERT_TRUE(isEmpty);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_001
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "abcde";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_002
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "edcba";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_003
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "";
+    const char *str2 = "";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_004
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = "";
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_005
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "";
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_006
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = nullptr;
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_TRUE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_IsEqual_007
+ * @tc.desc: Check string is or not equal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_IsEqual_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *str1 = "abcde";
+    const char *str2 = nullptr;
+    bool isEqual = Utility::IsEqual(str1, str2);
+    ASSERT_FALSE(isEqual);
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_001
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str = Utility::ConcatAsString(str1);
+    EXPECT_STREQ(str.c_str(), str1.c_str());
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_002
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str = Utility::ConcatAsString(str1, str2);
+    EXPECT_STREQ(str.c_str(), "abcdefghij");
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_003
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str3 = "klmno";
+    std::string str = Utility::ConcatAsString(str1, str2, str3);
+    EXPECT_STREQ(str.c_str(), "abcdefghijklmno");
+}
+
+/**
+ * @tc.name: UtityTest_ConcatAsString_004
+ * @tc.desc: Splicing strings
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_ConcatAsString_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str1 = "abcde";
+    std::string str2 = "fghij";
+    std::string str3 = "";
+    std::string str = Utility::ConcatAsString(str1, str2, str3);
+    EXPECT_STREQ(str.c_str(), "abcdefghij");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_001
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abc de";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_002
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abcde";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_003
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = " abcde";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_004
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "abcde ";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "abcde");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveSpace_005
+ * @tc.desc: Remove string space
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveSpace_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string str = "    ";
+    Utility::RemoveSpace(str);
+    EXPECT_STREQ(str.c_str(), "");
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_001
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char dest[] = "0";
+    size_t size = SIZE1;
+    char src[] = "abcdefghijklmnopqrst";
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, size - 1);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_002
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char *dest = nullptr;
+    size_t size = SIZE2;
+    char *src = nullptr;
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_003
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char dest[] = {0};
+    size_t size = SIZE2;
+    char *src = nullptr;
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_CopyNulstr_004
+ * @tc.desc: Copy string to target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_CopyNulstr_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char *dest = nullptr;
+    size_t size = SIZE2;
+    char src[] = "dadaaaaaaaddsadada";
+    size_t len = Utility::CopyNulstr(dest, size, src);
+    EXPECT_EQ(len, 0);
+}
+
+/**
+ * @tc.name: UtityTest_GetSysClockTime_001
+ * @tc.desc: Get system time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_GetSysClockTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t time = Utility::GetSysClockTime();
+    EXPECT_NE(time, 0);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_001
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "HelloWorld";
+    const char *examplePrefix = "Hello";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_002
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "HelloWorld";
+    const char *examplePrefix = "HelloWorld";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_003
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "HelloWorld";
+    const char *examplePrefix = "";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_004
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "Hello";
+    const char *examplePrefix = "HelloWorld";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_005
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "";
+    const char *examplePrefix = "HelloWorld";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith1_006
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith1_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char *exampleStr = "";
+    const char *examplePrefix = "";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_001
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "abc12345";
+    std::string examplePrefix = "abc";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_002
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "abc";
+    std::string examplePrefix = "abc";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_003
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "abc12345";
+    std::string examplePrefix = "";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_004
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "abc";
+    std::string examplePrefix = "abcdefg";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_005
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "";
+    std::string examplePrefix = "abc";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_StartWith2_006
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_StartWith2_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string exampleStr = "";
+    std::string examplePrefix = "";
+    bool ret = Utility::StartWith(exampleStr, examplePrefix);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars1_001
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars1_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char path2[] = "abcd";
+    Utility::RemoveTrailingChars('d', path2);
+    ASSERT_STREQ(path2, "abc");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars1_002
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars1_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char path2[] = "abcd";
+    Utility::RemoveTrailingChars('d', path2);
+    ASSERT_STREQ(path2, "abc");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars1_003
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars1_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char path2[] = "abacda";
+    Utility::RemoveTrailingChars('a', path2);
+    ASSERT_STREQ(path2, "abacd");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars1_004
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars1_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char path2[] = "abacda";
+    Utility::RemoveTrailingChars('f', path2);
+    ASSERT_STREQ(path2, "abacda");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars1_005
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars1_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    char path2[] = "";
+    Utility::RemoveTrailingChars('f', path2);
+    ASSERT_STREQ(path2, "");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars2_001
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars2_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string path1 = "cd";
+    std::string path2 = "abcd";
+    Utility::RemoveTrailingChars(path1, path2);
+    ASSERT_STREQ(path2.c_str(), "ab");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars2_002
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars2_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string path1 = "c";
+    std::string path2 = "abdc";
+    Utility::RemoveTrailingChars(path1, path2);
+    ASSERT_STREQ(path2.c_str(), "abd");
+}
+
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars2_003
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars2_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string path1 = "a";
+    std::string path2 = "abacda";
+    Utility::RemoveTrailingChars(path1, path2);
+    ASSERT_STREQ(path2.c_str(), "abacd");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars2_004
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars2_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string path1 = "e";
+    std::string path2 = "abc";
+    Utility::RemoveTrailingChars(path1, path2);
+    ASSERT_STREQ(path2.c_str(), "abc");
+}
+
+/**
+ * @tc.name: UtityTest_RemoveTrailingChars2_005
+ * @tc.desc:
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UtilityTest, UtityTest_RemoveTrailingChars2_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string path1 = "";
+    std::string path2 = "abc";
+    Utility::RemoveTrailingChars(path1, path2);
+    ASSERT_STREQ(path2.c_str(), "abc");
 }
 } // namespace DeviceStatus
 } // namespace Msdp

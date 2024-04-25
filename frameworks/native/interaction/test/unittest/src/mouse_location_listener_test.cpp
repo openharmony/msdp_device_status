@@ -142,13 +142,15 @@ HWTEST_F(MouseLocationListenerTest, RegisterEventListener_01, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_04, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_00, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string networkId { "Default" };
     auto listener = std::make_shared<EventListener>();
-    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
-    ASSERT_EQ(ret, RET_ERR);
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -157,11 +159,14 @@ HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_04, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_05, TestSize.Level1)
+HWTEST_F(MouseLocationListenerTest, UnregisterEventListener_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::string networkId { "Default" };
-    int32_t ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
+    auto listener = std::make_shared<EventListener>();
+    int32_t ret = InteractionManager::GetInstance()->RegisterEventListener(networkId, listener);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InteractionManager::GetInstance()->UnregisterEventListener(networkId, nullptr);
     ASSERT_EQ(ret, RET_OK);
 }
 } // namespace DeviceStatus
