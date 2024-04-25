@@ -15,6 +15,10 @@
 
 #include "state_machine.h"
 
+#include "application_state_observer_stub.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+
 #include "cooperate_free.h"
 #include "cooperate_in.h"
 #include "cooperate_out.h"
@@ -29,6 +33,26 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
+
+class AppStateObserver final : public AppExecFwk::ApplicationStateObserverStub {
+public:
+    explicit AppStateObserver(Channel<CooperateEvent>::Sender sender);
+    ~AppStateObserver() = default;
+
+    void OnProcessDied(const AppExecFwk::ProcessData &processData) override;
+
+private:
+    Channel<CooperateEvent>::Sender sender_;
+};
+
+AppStateObserver::AppStateObserver(Channel<CooperateEvent>::Sender sender)
+    : sender_(sender) {}
+
+void AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData &processData)
+{
+    FI_HILOGI("\'%{public}s\' died", processData.bundleName.c_str());
+    sender_.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
+}
 
 StateMachine::StateMachine(IContext *env)
     : env_(env)
@@ -295,20 +319,52 @@ void StateMachine::Transfer(Context &context, const CooperateEvent &event)
     states_[current_]->OnEvent(context, event);
 }
 
+sptr<AppExecFwk::IAppMgr> StateMachine::GetAppMgr()
+{
+    auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHKPP(saMgr);
+    auto appMgrObj = saMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
+    CHKPP(appMgrObj);
+    return iface_cast<AppExecFwk::IAppMgr>(appMgrObj);
+}
+
+int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender)
+{
+    auto appMgr = GetAppMgr();
+    CHKPR(appMgr, RET_ERR);
+    appStateObserver_ = sptr<AppStateObserver>::MakeSptr(sender);
+    std::vector<std::string> bundleNames { "com.huawei.associateassistant" };
+    FI_HILOGI("Register application(\"com.huawei.associateassistant\") state observer");
+    auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_, bundleNames);
+    if (err != ERR_OK) {
+        appStateObserver_.clear();
+        FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void StateMachine::UnregisterApplicationStateObserver()
+{
+    CHKPV(appStateObserver_);
+    auto appMgr = GetAppMgr();
+    CHKPV(appMgr);
+    FI_HILOGI("Unregister application(\"com.huawei.associateassistant\") state observer");
+    auto err = appMgr->UnregisterApplicationStateObserver(appStateObserver_);
+    if (err != ERR_OK) {
+        FI_HILOGE("IAppMgr::UnregisterApplicationStateObserver fail, error:%{public}d", err);
+    }
+    appStateObserver_.clear();
+}
+
 void StateMachine::AddSessionObserver(Context &context, const EnableCooperateEvent &event)
 {
-    env_->GetSocketSessionManager().AddSessionDeletedCallback(
-        event.pid,
-        [sender = context.Sender()](SocketSessionPtr session) mutable {
-            CHKPV(session);
-            FI_HILOGI("Disconnected with AssociateAssistant(%{public}d)", session->GetPid());
-            sender.Send(CooperateEvent(CooperateEventType::APP_CLOSED));
-        });
+    RegisterApplicationStateObserver(context.Sender());
 }
 
 void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperateEvent &event)
 {
-    env_->GetSocketSessionManager().RemoveSessionDeletedCallback(event.pid);
+    UnregisterApplicationStateObserver();
 }
 
 void StateMachine::AddMonitor(Context &context)

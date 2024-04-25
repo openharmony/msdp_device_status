@@ -204,6 +204,8 @@ void CooperateIn::Initial::OnRemoteStop(Context &context, const CooperateEvent &
 
 void CooperateIn::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
 {
+    FI_HILOGI("[app closed] Close all connections");
+    context.dsoftbus_.CloseAllSessions();
     FI_HILOGI("[app closed] Stop cooperation");
     parent_.StopCooperate(context, event);
 }
@@ -297,6 +299,8 @@ void CooperateIn::RelayConfirmation::OnStop(Context &context, const CooperateEve
 
 void CooperateIn::RelayConfirmation::OnAppClosed(Context &context, const CooperateEvent &event)
 {
+    FI_HILOGI("[app closed] Close all connections");
+    context.dsoftbus_.CloseAllSessions();
     FI_HILOGI("[relay cooperate] Stop cooperation on app closed");
     parent_.StopCooperate(context, event);
     OnReset(context, event);
