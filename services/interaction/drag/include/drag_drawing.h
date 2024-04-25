@@ -263,7 +263,6 @@ private:
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
-    void ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);

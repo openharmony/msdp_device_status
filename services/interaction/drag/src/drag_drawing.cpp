@@ -1507,16 +1507,6 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
-}
-
-void DragDrawing::ParserNonTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
-{
-    JsonParser filterInfoParser;
-    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
-    if (!cJSON_IsObject(filterInfoParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
-        return;
-    }
     cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_hardwareacceleration");
     if (cJSON_IsBool(isHardwareAcceleration)) {
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
@@ -1581,10 +1571,6 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         ParserDragShadowInfo(filterInfoStr, filterInfo);
         if (filterInfo.dragType == "text") {
             ParserTextDragShadowInfo(filterInfoStr, filterInfo);
-        } else if (filterInfo.dragType == "non-text") {
-            ParserNonTextDragShadowInfo(filterInfoStr, filterInfo);
-        } else {
-            FI_HILOGW("Wrong drag type");
         }
     }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
