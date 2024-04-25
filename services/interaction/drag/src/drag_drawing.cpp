@@ -520,16 +520,11 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Invalid pointId:%{public}d", pointerId);
         return;
     }
+
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    RotateDisplayXY(displayX, displayY);
-    struct DragEventInfo dragEventInfo;
-    dragEventInfo.dragType = dragType;
-    dragEventInfo.pointerId = pointerId;
-    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
-    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
     auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
@@ -542,9 +537,15 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_sharedAppExecFwk::EventHandler(std::move(runner));
-}
+    }
+    RotateDisplayXY(displayX, displayY);
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.dragType = dragType;
+    dragEventInfo.pointerId = pointerId;
+    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
+    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
     if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
-        FI_HILOGE("notify info failed");
+        FI_HILOGE("notify drag info failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
 }
