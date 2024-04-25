@@ -31,6 +31,7 @@
 #include "devicestatus_define.h"
 #include "devicestatus_errors.h"
 #include "fi_log.h"
+#include "if_stream_wrap.h"
 #include "napi_constants.h"
 #include "utility.h"
 
@@ -369,18 +370,18 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
         FI_HILOGE("Path is error, path is %{pubilc}s", filePath.c_str());
         return RET_ERR;
     }
-    std::ifstream cfgFile(filePath);
-    if (!cfgFile.is_open()) {
+    IfStreamWrap cfgFile;
+    cfgFile.ifStream = std::ifstream(filePath);
+    if (!cfgFile.IsOpen()) {
         FI_HILOGE("Failed to open config file");
         return FILE_OPEN_FAIL;
     }
     std::string tmp;
-    while (std::getline(cfgFile, tmp)) {
+    while (std::getline(cfgFile.ifStream, tmp)) {
         Utility::RemoveSpace(tmp);
         size_t pos = tmp.find('#');
         if ((pos != tmp.npos) && (pos != COMMENT_SUBSCRIPT)) {
             FI_HILOGE("File format is error");
-            cfgFile.close();
             return RET_ERR;
         }
         if (tmp.empty() || (tmp.front() == '#')) {
@@ -392,18 +393,15 @@ int32_t Device::ReadConfigFile(const std::string &filePath)
             return RET_ERR;
         } else if ((pos == (tmp.size() - 1)) || (pos == tmp.npos)) {
             FI_HILOGE("Find config item error");
-            cfgFile.close();
             return RET_ERR;
         }
         std::string configItem = tmp.substr(0, pos);
         std::string value = tmp.substr(pos + 1);
         if (ConfigItemSwitch(configItem, value) == RET_ERR) {
             FI_HILOGE("Configuration item error");
-            cfgFile.close();
             return RET_ERR;
         }
     }
-    cfgFile.close();
     return RET_OK;
 }
 
