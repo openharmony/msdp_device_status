@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "display_manager.h"
+#include "xcollie/watchdog.h"
 
 #include "ddm_adapter.h"
 #include "ddp_adapter.h"
@@ -186,6 +187,10 @@ int32_t Context::StartEventHandler()
 {
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
     return RET_OK;
 }
 

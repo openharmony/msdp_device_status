@@ -262,11 +262,13 @@ int32_t DragManager::StartDrag(const DragData &dragData, SessionPtr sess)
 
 int32_t DragManager::StopDrag(const DragDropResult &dropResult, const std::string &packageName)
 {
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     std::string dragOutPkgName =
         (dragOutSession_ == nullptr) ? "Cross-device drag" : dragOutSession_->GetProgramName();
     FI_HILOGI("mainWindow:%{public}d, dragResult:%{public}d, drop packageName:%{public}s,"
         "drag Out packageName:%{public}s", dropResult.mainWindow, dropResult.result, packageName.c_str(),
         dragOutPkgName.c_str());
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     if (dragState_ == DragState::STOP) {
         FI_HILOGE("No drag instance running, can not stop drag");
         return RET_ERR;

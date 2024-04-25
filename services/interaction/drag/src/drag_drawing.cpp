@@ -38,6 +38,7 @@
 #include "ui/rs_surface_extractor.h"
 #include "ui/rs_surface_node.h"
 #include "ui/rs_ui_director.h"
+#include "xcollie/watchdog.h"
 
 #include "animation_curve.h"
 #include "devicestatus_define.h"
@@ -508,6 +509,10 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+        if (ret != RET_OK) {
+            FI_HILOGW("add watch dog failed");
+        }
     }
     if (!handler_->PostTask(std::bind(dragDropExtFunc, &g_dragData))) {
         FI_HILOGE("Start style animation failed");
@@ -654,6 +659,10 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+        if (ret != RET_OK) {
+            FI_HILOGW("add watch dog failed");
+        }
     }
     CheckStyleNodeModifier(dragStyleNode);
     handler_->PostTask(std::bind(&DragDrawing::ChangeStyleAnimation, this));
@@ -671,6 +680,10 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+        if (ret != RET_OK) {
+            FI_HILOGW("add watch dog failed");
+        }
     }
     if (drawSVGModifier_ != nullptr) {
         dragStyleNode->RemoveModifier(drawSVGModifier_);
@@ -747,6 +760,10 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -814,6 +831,10 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
         FI_HILOGE("Failed to stop style animation");
         RunAnimation(animateCb);
@@ -838,6 +859,10 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
     if (!handler_->PostTask(cb)) {
         FI_HILOGE("Send vsync event failed");
         return RET_ERR;

@@ -16,6 +16,7 @@
 #include "socket_client.h"
 
 #include "event_handler.h"
+#include "xcollie/watchdog.h"
 
 #include "devicestatus_define.h"
 #include "intention_identity.h"
@@ -37,6 +38,10 @@ SocketClient::SocketClient(std::shared_ptr<ITunnelClient> tunnel)
 {
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_ClientEventHandler", eventHandler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
 }
 
 bool SocketClient::RegisterEvent(MessageId id, std::function<int32_t(const StreamClient&, NetPacket&)> callback)

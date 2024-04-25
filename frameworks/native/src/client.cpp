@@ -18,6 +18,8 @@
 #include <cinttypes>
 #include <condition_variable>
 
+#include "xcollie/watchdog.h"
+
 #include "devicestatus_client.h"
 #include "fd_listener.h"
 #include "fi_log.h"
@@ -106,6 +108,10 @@ bool Client::StartEventRunner()
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPF(runner);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_ClientEventHandler", eventHandler_);
+    if (ret != RET_OK) {
+        FI_HILOGW("add watch dog failed");
+    }
 
     FI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
 

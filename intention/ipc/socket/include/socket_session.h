@@ -37,7 +37,7 @@ public:
     int32_t GetPid() const override;
     std::string ToString() const override;
     std::string GetProgramName() const override;
-    void SetProgramName(const std::string programName) override;
+    void SetProgramName(const std::string &programName) override;
 
     int32_t GetFd() const override;
     void Dispatch(const struct epoll_event &ev) override;
@@ -73,7 +73,7 @@ inline std::string SocketSession::GetProgramName() const
     return programName_;
 }
 
-inline void SocketSession::SetProgramName(const std::string programName)
+inline void SocketSession::SetProgramName(const std::string &programName)
 {
     programName_ = programName;
 }
