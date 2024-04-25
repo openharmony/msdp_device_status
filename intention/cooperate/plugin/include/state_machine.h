@@ -18,6 +18,9 @@
 
 #include "nocopyable.h"
 
+#include "app_mgr_interface.h"
+#include "iapplication_state_observer.h"
+
 #include "i_cooperate_state.h"
 
 namespace OHOS {
@@ -59,6 +62,9 @@ private:
     void OnSoftbusMouseLocation(Context &context, const CooperateEvent &event);
     void OnSoftbusSessionClosed(Context &context, const CooperateEvent &event);
     void Transfer(Context &context, const CooperateEvent &event);
+    sptr<AppExecFwk::IAppMgr> GetAppMgr();
+    int32_t RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender);
+    void UnregisterApplicationStateObserver();
     void AddSessionObserver(Context &context, const EnableCooperateEvent &event);
     void RemoveSessionObserver(Context &context, const DisableCooperateEvent &event);
     void AddMonitor(Context &context);
@@ -71,6 +77,7 @@ private:
     std::array<std::shared_ptr<ICooperateState>, N_COOPERATE_STATES> states_;
     std::set<std::string> onlineBoards_;
     int32_t monitorId_ { -1 };
+    sptr<AppExecFwk::IApplicationStateObserver> appStateObserver_ { nullptr };
 };
 } // namespace Cooperate
 } // namespace DeviceStatus
