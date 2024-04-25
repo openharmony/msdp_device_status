@@ -35,7 +35,8 @@ namespace Msdp {
 namespace DeviceStatus {
 struct DrawingInfo;
 class DragDrawing;
-using DragExtFunc = void (*)(DragData *dragData);
+using DragStartExtFunc = void (*)(DragData &dragData);
+using DragExtFunc = void (*)(DragEventInfo &dragEventInfo);
 class DrawSVGModifier : public Rosen::RSContentStyleModifier {
 public:
     explicit DrawSVGModifier(std::shared_ptr<Media::PixelMap> stylePixelMap) : stylePixelMap_(stylePixelMap) {}
@@ -187,6 +188,7 @@ public:
     int32_t Init(const DragData &dragData);
     void Draw(int32_t displayId, int32_t displayX, int32_t displayY, bool isNeedAdjustDisplayXY = true);
     int32_t UpdateDragStyle(DragCursorStyle style);
+    void NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t displayX = -1, int32_t displayY = -1);
     int32_t UpdateShadowPic(const ShadowInfo &shadowInfo);
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
