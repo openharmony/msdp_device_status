@@ -46,7 +46,9 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-DeviceStatusCallback::DeviceStatusCallback(napi_env env) {
+DeviceStatusCallback::DeviceStatusCallback(napi_env env)
+{
+    CALL_DEBUG_ENTER;
     env_ = env;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
