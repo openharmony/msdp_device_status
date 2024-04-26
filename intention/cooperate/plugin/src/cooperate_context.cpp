@@ -189,7 +189,8 @@ int32_t Context::StartEventHandler()
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_, WATCHDOG_TIMWVAL);
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_,
+        WATCHDOG_TIMWVAL);
     if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
