@@ -329,7 +329,8 @@ sptr<AppExecFwk::IAppMgr> StateMachine::GetAppMgr()
     return iface_cast<AppExecFwk::IAppMgr>(appMgrObj);
 }
 
-int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender, const std::string &bundleName)
+int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender,
+    const std::string &bundleName)
 {
     CALL_INFO_TRACE;
     clientBundleNames_.push_back(bundleName);
