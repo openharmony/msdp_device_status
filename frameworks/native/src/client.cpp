@@ -36,6 +36,7 @@ namespace DeviceStatus {
 using namespace AppExecFwk;
 namespace {
 const std::string THREAD_NAME { "os_ClientEventHandler" };
+const uint64_t WATCHDOG_TIMWVAL { 5000 };
 } // namespace
 
 Client::~Client()
@@ -108,8 +109,8 @@ bool Client::StartEventRunner()
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPF(runner);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_ClientEventHandler", eventHandler_);
-    if (ret != RET_OK) {
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_ClientEventHandler", eventHandler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
 

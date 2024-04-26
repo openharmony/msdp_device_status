@@ -37,6 +37,7 @@ namespace {
 const std::string COOPERATE_SWITCH { "currentStatus" };
 const std::string THREAD_NAME { "os_Cooperate_EventHandler" };
 constexpr double PERCENT { 100.0 };
+const uint64_t WATCHDOG_TIMWVAL { 5000 };
 } // namespace
 
 class BoardObserver final : public IBoardObserver {
@@ -186,9 +187,10 @@ void Context::Disable()
 int32_t Context::StartEventHandler()
 {
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    CHKPR(runner, RET_ERR);
     eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_);
-    if (ret != RET_OK) {
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_Cooperate_EventHandler", eventHandler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
     return RET_OK;

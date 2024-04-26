@@ -145,6 +145,7 @@ constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
+const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -509,8 +510,8 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-        if (ret != RET_OK) {
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
             FI_HILOGW("add watch dog failed");
         }
     }
@@ -659,8 +660,8 @@ void DragDrawing::OnDragStyleAnimation()
     if (handler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-        if (ret != RET_OK) {
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
             FI_HILOGW("add watch dog failed");
         }
     }
@@ -680,8 +681,8 @@ void DragDrawing::OnDragStyle(std::shared_ptr<Rosen::RSCanvasNode> dragStyleNode
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         CHKPV(runner);
         handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-        if (ret != RET_OK) {
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
             FI_HILOGW("add watch dog failed");
         }
     }
@@ -760,8 +761,8 @@ void DragDrawing::OnStopDragSuccess(std::shared_ptr<Rosen::RSCanvasNode> shadowN
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-    if (ret != RET_OK) {
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationSuccess, this))) {
@@ -831,8 +832,8 @@ void DragDrawing::OnStopDragFail(std::shared_ptr<Rosen::RSSurfaceNode> surfaceNo
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPV(runner);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-    if (ret != RET_OK) {
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
     if (!handler_->PostTask(std::bind(&DragDrawing::OnStopAnimationFail, this))) {
@@ -859,8 +860,8 @@ int32_t DragDrawing::RunAnimation(std::function<int32_t()> cb)
     auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
     CHKPR(runner, RET_ERR);
     handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_);
-    if (ret != RET_OK) {
+    int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
+    if (ret != 0) {
         FI_HILOGW("add watch dog failed");
     }
     if (!handler_->PostTask(cb)) {
