@@ -17,5 +17,8 @@ group("device_status_unittest") {
   testonly = true
   deps = []
 
-  deps += [ "utils:UtilityTest" ]
+  deps += [
+    "intentiontest:DragManagerTest",
+    "utils:UtilityTest",
+  ]
 }
