@@ -129,7 +129,7 @@ private:
 
 struct FilterInfo {
     std::string dragType;
-    bool shadowEnable { true };
+    bool shadowEnable { false };
     bool shadowIsFilled { false };
     bool shadowMask { false };
     int32_t shadowColorStrategy { 0 };
@@ -264,6 +264,7 @@ private:
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void PrintDragShadowInfo();
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);

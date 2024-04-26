@@ -1539,6 +1539,24 @@ void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, Fil
     }
 }
 
+void DragDrawing::PrintDragShadowInfo()
+{
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    if (!filterInfo.shadowEnable) {
+        FI_HILOGI("Not supported shadow");
+        return;
+    }
+    FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
+        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
+        filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
+        filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
+        filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
+    if (!filterInfo.path.empty()) {
+        FI_HILOGI("%{public}s", filterInfo.path.c_str());
+    }
+}
+
 bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
     FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s", filterInfoStr.size(), filterInfoStr.c_str());
@@ -1573,6 +1591,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         if (filterInfo.dragType == "text") {
             ParserTextDragShadowInfo(filterInfoStr, filterInfo);
         }
+        PrintDragShadowInfo();
     }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
@@ -2282,9 +2301,6 @@ void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode
 
 void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
 {
-    FI_HILOGD("offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, radius:%{public}f",
-        g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY,
-        g_drawingInfo.filterInfo.argb, g_drawingInfo.filterInfo.shadowCorner);
     pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
@@ -2326,7 +2342,8 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
-    if (!filterInfo.path.empty()) {
+    if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
+        g_drawingInfo.filterInfo.dragType == "text") {
         auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
         cvs->Save();
         cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
