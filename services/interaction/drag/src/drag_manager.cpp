@@ -444,12 +444,15 @@ void DragManager::DragCallback(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     FI_HILOGI("DragCallback, pointerAction:%{public}d", pointerAction);
     if (pointerAction == MMI::PointerEvent::POINTER_ACTION_PULL_UP) {
         CHKPV(context_);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
+        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
+#endif // OHOS_DRAG_ENABLE_ANIMATION
         int32_t ret = context_->GetDelegateTasks().PostAsyncTask(
             std::bind(&DragManager::OnDragUp, this, pointerEvent));
         if (ret != RET_OK) {
             FI_HILOGE("Post async task failed");
         }
-        dragDrawing_.NotifyDragInfo(DragEvent::DRAG_UP, pointerEvent->GetPointerId());
+
         return;
     }
     FI_HILOGD("Unknown action, sourceType:%{public}d, pointerId:%{public}d, pointerAction:%{public}d",
@@ -466,7 +469,9 @@ void DragManager::OnDragMove(std::shared_ptr<MMI::PointerEvent> pointerEvent)
     int32_t displayY = pointerItem.GetDisplayY();
     FI_HILOGD("SourceType:%{public}d, pointerId:%{public}d, displayX:%{public}d, displayY:%{public}d",
         pointerEvent->GetSourceType(), pointerId, displayX, displayY);
+#ifdef OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.NotifyDragInfo(DragEvent::DRAG_MOVE, pointerId, displayX, displayY);
+#endif // OHOS_DRAG_ENABLE_ANIMATION
     dragDrawing_.Draw(pointerEvent->GetTargetDisplayId(), displayX, displayY);
 }
 

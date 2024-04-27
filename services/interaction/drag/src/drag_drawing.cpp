@@ -144,6 +144,7 @@ constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
+const std::string DRAG_DROP_THREAD_NAME { "os_DragDropEventRunner" };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
 const std::string FORBID_DRAG_PATH { "/system/etc/device_status/drag_icon/Forbid_Drag.svg" };
@@ -520,23 +521,9 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Invalid pointId:%{public}d", pointerId);
         return;
     }
-
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
-    }
-    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
-    if (dragDropExtFunc == nullptr) {
-        FI_HILOGE("Fail to get drag drop extension function");
-        dlclose(dragExtHandler_);
-        dragExtHandler_ = nullptr;
-        return;
-    }
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
     }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
@@ -544,10 +531,24 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
     dragEventInfo.pointerId = pointerId;
     dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
     dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+    auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
+    if (dragDropExtFunc == nullptr) {
+        FI_HILOGE("Fail to get drag drop extension function");
+        dlclose(dragExtHandler_);
+        dragExtHandler_ = nullptr;
+        return;
+    }
+    if (dragDropHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(DRAG_DROP_THREAD_NAME);
+        CHKPV(runner);
+        dragDropHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    }
+    if (!dragDropHandler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
         FI_HILOGE("notify drag info failed");
     }
-#endif // OHOS_DRAG_ENABLE_ANIMATION
+    if (dragType == DragEvent::DRAG_UP) {
+        dragDropHandler_ == nullptr;
+    }
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)

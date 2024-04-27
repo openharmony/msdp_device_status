@@ -283,6 +283,7 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> dragDropHandler_ { nullptr };
     std::atomic_bool hasRunningStopAnimation_ { false };
     std::atomic_bool hasRunningScaleAnimation_ { false };
     std::atomic_bool needBreakStyleScaleAnimation_ { false };
