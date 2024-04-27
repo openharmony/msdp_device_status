@@ -321,6 +321,7 @@ void StateMachine::Transfer(Context &context, const CooperateEvent &event)
 
 sptr<AppExecFwk::IAppMgr> StateMachine::GetAppMgr()
 {
+    CALL_INFO_TRACE;
     auto saMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPP(saMgr);
     auto appMgrObj = saMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
@@ -328,15 +329,17 @@ sptr<AppExecFwk::IAppMgr> StateMachine::GetAppMgr()
     return iface_cast<AppExecFwk::IAppMgr>(appMgrObj);
 }
 
-int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender)
+int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::Sender sender,
+    const std::string &bundleName)
 {
+    CALL_INFO_TRACE;
+    clientBundleNames_.push_back(bundleName);
+    FI_HILOGI("Register application %{public}s state observer", bundleName.c_str());
     auto appMgr = GetAppMgr();
     CHKPR(appMgr, RET_ERR);
     appStateObserver_ = sptr<AppStateObserver>::MakeSptr(sender);
-    std::vector<std::string> bundleNames { "com.huawei.associateassistant" };
-    FI_HILOGI("Register application(\"com.huawei.associateassistant\") state observer");
-    auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_, bundleNames);
-    if (err != ERR_OK) {
+    auto err = appMgr->RegisterApplicationStateObserver(appStateObserver_, clientBundleNames_);
+    if (err != RET_OK) {
         appStateObserver_.clear();
         FI_HILOGE("IAppMgr::RegisterApplicationStateObserver fail, error:%{public}d", err);
         return RET_ERR;
@@ -346,12 +349,13 @@ int32_t StateMachine::RegisterApplicationStateObserver(Channel<CooperateEvent>::
 
 void StateMachine::UnregisterApplicationStateObserver()
 {
+    CALL_INFO_TRACE;
     CHKPV(appStateObserver_);
     auto appMgr = GetAppMgr();
     CHKPV(appMgr);
-    FI_HILOGI("Unregister application(\"com.huawei.associateassistant\") state observer");
+    FI_HILOGI("Unregister application associateassistant state observer");
     auto err = appMgr->UnregisterApplicationStateObserver(appStateObserver_);
-    if (err != ERR_OK) {
+    if (err != RET_OK) {
         FI_HILOGE("IAppMgr::UnregisterApplicationStateObserver fail, error:%{public}d", err);
     }
     appStateObserver_.clear();
@@ -359,7 +363,42 @@ void StateMachine::UnregisterApplicationStateObserver()
 
 void StateMachine::AddSessionObserver(Context &context, const EnableCooperateEvent &event)
 {
-    RegisterApplicationStateObserver(context.Sender());
+    CALL_INFO_TRACE;
+    std::string packageName = GetPackageName(event.tokenId);
+    RegisterApplicationStateObserver(context.Sender(), packageName);
+}
+
+std::string StateMachine::GetPackageName(Security::AccessToken::AccessTokenID tokenId)
+{
+    CALL_INFO_TRACE;
+    std::string bundleName {"Default"};
+    int32_t tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    switch (tokenType) {
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
+            Security::AccessToken::HapTokenInfo hapInfo;
+            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != RET_OK) {
+                FI_HILOGE("Get hap token info failed");
+            } else {
+                bundleName = hapInfo.bundleName;
+            }
+            break;
+        }
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE:
+        case Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL: {
+            Security::AccessToken::NativeTokenInfo tokenInfo;
+            if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != RET_OK) {
+                FI_HILOGE("Get native token info failed");
+            } else {
+                bundleName = tokenInfo.processName;
+            }
+            break;
+        }
+        default: {
+            FI_HILOGW("token type not match");
+            break;
+        }
+    }
+    return bundleName;
 }
 
 void StateMachine::RemoveSessionObserver(Context &context, const DisableCooperateEvent &event)
