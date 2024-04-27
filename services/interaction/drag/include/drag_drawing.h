@@ -28,6 +28,7 @@
 
 #include "vsync_receiver.h"
 #include "drag_data.h"
+#include "i_context.h"
 #include "i_drag_animation.h"
 
 namespace OHOS {
@@ -152,6 +153,7 @@ struct DrawingInfo {
     std::atomic_bool isCurrentDefaultStyle { false };
     bool isInitUiDirector { true };
     bool isExistScalingValue { false };
+    std::atomic_bool needDestroyDragWindow { false };
     int32_t sourceType { -1 };
     int32_t currentDragNum { -1 };
     DragCursorStyle currentStyle { DragCursorStyle::DEFAULT };
@@ -166,6 +168,8 @@ struct DrawingInfo {
     int32_t mouseHeight { 0 };
     int32_t rootNodeWidth { -1 };
     int32_t rootNodeHeight { -1 };
+    std::atomic<int64_t> startNum { -1 };
+    int32_t timerId { -1 };
     float scalingValue { 0.0 };
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> nodes;
     std::vector<std::shared_ptr<Rosen::RSCanvasNode>> multiSelectedNodes;
@@ -175,6 +179,7 @@ struct DrawingInfo {
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode { nullptr };
     std::shared_ptr<Media::PixelMap> pixelMap { nullptr };
     std::shared_ptr<Media::PixelMap> stylePixelMap { nullptr };
+    IContext* context { nullptr };
     ExtraInfo extraInfo;
     FilterInfo filterInfo;
 };
@@ -193,8 +198,8 @@ public:
     int32_t UpdatePreviewStyle(const PreviewStyle &previewStyle);
     int32_t UpdatePreviewStyleWithAnimation(const PreviewStyle &previewStyle, const PreviewAnimation &animation);
     int32_t StartVsync();
-    void OnDragSuccess();
-    void OnDragFail();
+    void OnDragSuccess(IContext* context);
+    void OnDragFail(IContext* context);
     void EraseMouseIcon();
     void DestroyDragWindow();
     void UpdateDrawingState();
@@ -266,11 +271,12 @@ private:
     void RotateDisplayXY(int32_t &displayX, int32_t &displayY);
     void RotatePixelMapXY(int32_t &pixelMapX, int32_t &pixelMapY);
     void ResetAnimationParameter();
+    void ResetAnimationFlag(bool isForce = false);
+    void DoEndAnimation();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
 
 private:
-    int64_t startNum_ { -1 };
     int64_t interruptNum_ { -1 };
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::shared_ptr<DrawSVGModifier> drawSVGModifier_ { nullptr };
@@ -288,7 +294,6 @@ private:
     std::atomic_bool needBreakStyleScaleAnimation_ { false };
     std::atomic_bool hasRunningAnimation_ { false };
     void* dragExtHandler_ { nullptr };
-    bool needDestroyDragWindow_ { false };
     bool needRotatePixelMapXY_ { false };
     uint64_t screenId_ { 0 };
     Rosen::Rotation rotation_ { Rosen::Rotation::ROTATION_0 };

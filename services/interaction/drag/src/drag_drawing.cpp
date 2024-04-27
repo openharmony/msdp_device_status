@@ -136,6 +136,7 @@ constexpr int32_t TIME_STOP_SUCCESS_STYLE { 150 };
 constexpr int32_t TIME_STOP { 0 };
 constexpr int64_t TIME_SLEEP { 30000 };
 constexpr int32_t INTERRUPT_SCALE { 15 };
+constexpr int32_t TIMEOUT_MS { 500 };
 constexpr float MAX_SCREEN_WIDTH_SM { 320.0f };
 constexpr float MAX_SCREEN_WIDTH_MD { 600.0f };
 constexpr float MAX_SCREEN_WIDTH_LG { 840.0f };
@@ -371,7 +372,7 @@ int32_t DragDrawing::UpdateShadowPic(const ShadowInfo &shadowInfo)
     return RET_OK;
 }
 
-void DragDrawing::OnDragSuccess()
+void DragDrawing::OnDragSuccess(IContext* context)
 {
     FI_HILOGI("enter");
     if (!CheckNodesValid()) {
@@ -386,17 +387,19 @@ void DragDrawing::OnDragSuccess()
     CHKPV(shadowNode);
     std::shared_ptr<Rosen::RSCanvasNode> styleNode = g_drawingInfo.nodes[DRAG_STYLE_INDEX];
     CHKPV(styleNode);
+    g_drawingInfo.context = context;
     OnStopDragSuccess(shadowNode, styleNode);
     FI_HILOGI("leave");
 }
 
-void DragDrawing::OnDragFail()
+void DragDrawing::OnDragFail(IContext* context)
 {
     FI_HILOGI("enter");
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode = g_drawingInfo.surfaceNode;
     CHKPV(surfaceNode);
     std::shared_ptr<Rosen::RSNode> rootNode = g_drawingInfo.rootNode;
     CHKPV(rootNode);
+    g_drawingInfo.context = context;
     OnStopDragFail(surfaceNode, rootNode);
     FI_HILOGI("leave");
 }
@@ -427,7 +430,7 @@ void DragDrawing::EraseMouseIcon()
 
 void DragDrawing::DestroyDragWindow()
 {
-    FI_HILOGD("enter");
+    FI_HILOGI("enter");
     ResetParameter();
     RemoveModifier();
     ClearMultiSelectedData();
@@ -455,7 +458,7 @@ void DragDrawing::DestroyDragWindow()
     CHKPV(rsUiDirector_);
     rsUiDirector_->SetRoot(-1);
     rsUiDirector_->SendMessages();
-    FI_HILOGD("leave");
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::UpdateDrawingState()
@@ -583,20 +586,20 @@ void DragDrawing::RemoveStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> s
 void DragDrawing::UpdateAnimationProtocol(Rosen::RSAnimationTimingProtocol protocol)
 {
     FI_HILOGD("enter");
-    startNum_ = START_TIME;
+    g_drawingInfo.startNum = START_TIME;
     interruptNum_ = START_TIME * INTERRUPT_SCALE;
     hasRunningAnimation_ = true;
     bool stopSignal = true;
     CHKPV(rsUiDirector_);
     while (hasRunningAnimation_) {
-        hasRunningAnimation_ = rsUiDirector_->FlushAnimation(startNum_);
+        hasRunningAnimation_ = rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
         rsUiDirector_->FlushModifier();
         rsUiDirector_->SendMessages();
-        if ((startNum_ >= interruptNum_) && stopSignal) {
+        if ((g_drawingInfo.startNum >= interruptNum_) && stopSignal) {
             protocol.SetDuration(TIME_STOP);
             stopSignal = false;
         }
-        startNum_ += INTERVAL_TIME;
+        g_drawingInfo.startNum += INTERVAL_TIME;
         usleep(TIME_SLEEP);
     }
     FI_HILOGD("leave");
@@ -740,8 +743,6 @@ void DragDrawing::OnStopAnimationSuccess()
     }
     CHKPV(g_drawingInfo.rootNode);
     hasRunningStopAnimation_ = true;
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
     if (drawDragStopModifier_ != nullptr) {
         g_drawingInfo.rootNode->RemoveModifier(drawDragStopModifier_);
         drawDragStopModifier_ = nullptr;
@@ -768,7 +769,7 @@ void DragDrawing::OnStopAnimationSuccess()
             drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         });
     });
-    StartVsync();
+    DoEndAnimation();
     FI_HILOGI("leave");
 }
 
@@ -817,8 +818,6 @@ void DragDrawing::OnStopAnimationFail()
     }
     drawDragStopModifier_ = std::make_shared<DrawDragStopModifier>();
     hasRunningStopAnimation_ = true;
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
     g_drawingInfo.rootNode->AddModifier(drawDragStopModifier_);
     drawDragStopModifier_->SetAlpha(BEGIN_ALPHA);
     drawDragStopModifier_->SetScale(BEGIN_SCALE);
@@ -834,7 +833,7 @@ void DragDrawing::OnStopAnimationFail()
         drawDragStopModifier_->SetStyleScale(START_STYLE_SCALE);
         drawDragStopModifier_->SetStyleAlpha(END_STYLE_ALPHA);
     });
-    StartVsync();
+    DoEndAnimation();
     FI_HILOGI("leave");
 }
 
@@ -950,12 +949,10 @@ int32_t DragDrawing::InitVSync(float endAlpha, float endScale)
         drawDynamicEffectModifier_->SetAlpha(endAlpha);
         drawDynamicEffectModifier_->SetScale(endScale);
     });
-    CHKPR(g_drawingInfo.parentNode, RET_ERR);
     Rosen::RSTransaction::FlushImplicitTransaction();
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = true;
+    DoEndAnimation();
     FI_HILOGD("leave");
-    return StartVsync();
+    return RET_OK;
 }
 
 int32_t DragDrawing::StartVsync()
@@ -979,7 +976,7 @@ int32_t DragDrawing::StartVsync()
     if (ret != RET_OK) {
         FI_HILOGE("Request next vsync failed");
     }
-    FI_HILOGI("enter");
+    FI_HILOGI("leave");
     return ret;
 }
 
@@ -987,19 +984,14 @@ void DragDrawing::OnVsync()
 {
     FI_HILOGD("enter");
     CHKPV(rsUiDirector_);
-    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(startNum_);
+    bool hasRunningAnimation = rsUiDirector_->FlushAnimation(g_drawingInfo.startNum);
     rsUiDirector_->FlushModifier();
+    rsUiDirector_->SendMessages();
     if (!hasRunningAnimation) {
-        FI_HILOGD("Stop runner, hasRunningAnimation:%{public}d", hasRunningAnimation);
-        if (needDestroyDragWindow_) {
-            CHKPV(g_drawingInfo.rootNode);
-            if (drawDynamicEffectModifier_ != nullptr) {
-                g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
-                drawDynamicEffectModifier_ = nullptr;
-            }
-            DestroyDragWindow();
-            g_drawingInfo.isRunning = false;
-            ResetAnimationParameter();
+        FI_HILOGI("Stop runner, hasRunningAnimation:%{public}d, needDestroyDragWindow:%{public}d",
+            hasRunningAnimation, g_drawingInfo.needDestroyDragWindow.load());
+        if (g_drawingInfo.needDestroyDragWindow) {
+            ResetAnimationFlag();
         }
         return;
     }
@@ -1012,7 +1004,7 @@ void DragDrawing::OnVsync()
         FI_HILOGE("Request next vsync failed");
     }
     rsUiDirector_->SendMessages();
-    startNum_ += INTERVAL_TIME;
+    g_drawingInfo.startNum += INTERVAL_TIME;
     FI_HILOGD("leave");
 }
 
@@ -1636,8 +1628,8 @@ int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
         g_drawingInfo.parentNode->SetFrame(positionX, positionY, g_drawingInfo.pixelMap->GetWidth() + adjustSize,
             g_drawingInfo.pixelMap->GetHeight() + adjustSize);
     });
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = false;
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
     StartVsync();
     FI_HILOGD("leave");
     return RET_OK;
@@ -2049,13 +2041,49 @@ void DragDrawing::ResetAnimationParameter()
     handler_ = nullptr;
     CHKPV(receiver_);
     receiver_ = nullptr;
+    FI_HILOGI("leave");
+}
+
+void DragDrawing::ResetAnimationFlag(bool isForce)
+{
+    FI_HILOGI("enter");
+    if (!isForce && (g_drawingInfo.context != nullptr) && (g_drawingInfo.timerId >= 0)) {
+        g_drawingInfo.context->GetTimerManager().RemoveTimer(g_drawingInfo.timerId);
+        g_drawingInfo.timerId = -1;
+    }
+    if (drawDynamicEffectModifier_ != nullptr) {
+        CHKPV(g_drawingInfo.rootNode);
+        g_drawingInfo.rootNode->RemoveModifier(drawDynamicEffectModifier_);
+        drawDynamicEffectModifier_ = nullptr;
+    }
+    DestroyDragWindow();
+    g_drawingInfo.isRunning = false;
+    g_drawingInfo.timerId = -1;
+    ResetAnimationParameter();
+    FI_HILOGI("leave");
+}
+
+void DragDrawing::DoEndAnimation()
+{
+    FI_HILOGI("enter");
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = true;
+    if (g_drawingInfo.context != nullptr) {
+        int32_t repeatCount = 1;
+        g_drawingInfo.timerId = g_drawingInfo.context->GetTimerManager().AddTimer(TIMEOUT_MS, repeatCount, [this]() {
+            FI_HILOGW("Timeout, automatically reset animation flag");
+            ResetAnimationFlag(true);
+        });
+    }
+    StartVsync();
+    FI_HILOGI("leave");
 }
 
 void DragDrawing::ResetParameter()
 {
     FI_HILOGI("enter");
-    startNum_ = START_TIME;
-    needDestroyDragWindow_ = false;
+    g_drawingInfo.startNum = START_TIME;
+    g_drawingInfo.needDestroyDragWindow = false;
     needRotatePixelMapXY_ = false;
     hasRunningStopAnimation_ = false;
     g_drawingInfo.sourceType = -1;
