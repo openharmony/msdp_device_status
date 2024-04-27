@@ -18,9 +18,9 @@
 
 #include "nocopyable.h"
 
+#include "accesstoken_kit.h"
 #include "app_mgr_interface.h"
 #include "iapplication_state_observer.h"
-#include "accesstoken_kit.h"
 
 #include "i_cooperate_state.h"
 
