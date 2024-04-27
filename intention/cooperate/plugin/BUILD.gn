@@ -68,6 +68,7 @@ ohos_shared_library("intention_cooperate") {
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "eventhandler:libeventhandler",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "image_framework:image_native",
     "input:libmmi-client",
