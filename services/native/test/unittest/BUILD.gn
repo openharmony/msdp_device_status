@@ -54,6 +54,7 @@ ohos_unittest("test_devicestatus_service") {
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
@@ -82,6 +83,7 @@ ohos_unittest("DeviceStatusAgentTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -108,6 +110,7 @@ ohos_unittest("DragDataManagerTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "graphic_2d:window_animation",
     "hilog:libhilog",
