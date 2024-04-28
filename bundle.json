@@ -21,6 +21,7 @@
     "ram": "~4096KB",
     "deps": {
       "components": [
+        "ability_runtime",
         "access_token",
         "cJSON",
         "hilog",
@@ -47,7 +48,8 @@
         "dsoftbus",
         "motion",
         "ylong_runtime",
-        "dfs_service"
+        "dfs_service",
+        "hicollie"
       ],
       "third_party": [
         "libxml2",
@@ -97,8 +99,6 @@
           "name": "//base/msdp/device_status/services/interaction/drag:interaction_drag",
           "header": {
             "header_files": [
-              "interaction/drag/include/i_drag_animation.h",
-              "interaction/drag/include/drag_drawing.h",
               "interaction/drag/include/drag_data_manager.h"
             ],
             "header_base": "//base/msdp/device_status/services"

@@ -90,6 +90,7 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
 {
     AddHandler(CooperateEventType::START, &CooperateFree::Initial::OnStart, this);
     AddHandler(CooperateEventType::STOP, &CooperateFree::Initial::OnStop, this);
+    AddHandler(CooperateEventType::APP_CLOSED, &CooperateFree::Initial::OnAppClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_SESSION_CLOSED, &CooperateFree::Initial::OnSoftbusSessionClosed, this);
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, &CooperateFree::Initial::OnRemoteStart, this);
 }
@@ -145,6 +146,12 @@ void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &even
     CALL_INFO_TRACE;
     StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
     parent_.UnchainConnections(context, notice);
+}
+
+void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
+{
+    FI_HILOGI("[app closed] Close all connections");
+    context.dsoftbus_.CloseAllSessions();
 }
 
 void CooperateFree::Initial::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)

@@ -17,8 +17,5 @@ group("devicestatussystem_test") {
   testonly = true
   deps = []
 
-  deps += [
-    "systemtest:systemtest",
-    "unittest/intentiontest:unittest",
-  ]
+  deps += [ "systemtest:systemtest" ]
 }

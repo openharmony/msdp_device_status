@@ -110,13 +110,14 @@ int32_t Cooperate::UnregisterHotAreaListener(int32_t pid)
     return RET_OK;
 }
 
-int32_t Cooperate::Enable(int32_t pid, int32_t userData)
+int32_t Cooperate::Enable(int32_t tokenId, int32_t pid, int32_t userData)
 {
     CALL_DEBUG_ENTER;
     StartWorker();
     context_.Sender().Send(CooperateEvent(
         CooperateEventType::ENABLE,
         EnableCooperateEvent {
+            .tokenId = tokenId,
             .pid = pid,
             .userData = userData,
         }));

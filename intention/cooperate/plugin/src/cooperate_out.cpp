@@ -203,6 +203,8 @@ void CooperateOut::Initial::OnHotplug(Context &context, const CooperateEvent &ev
 
 void CooperateOut::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
 {
+    FI_HILOGI("[app closed] Close all connections");
+    context.dsoftbus_.CloseAllSessions();
     FI_HILOGI("[app closed] Stop cooperation");
     parent_.StopCooperate(context, event);
 }

@@ -55,7 +55,7 @@ public:
     virtual int32_t RegisterHotAreaListener(int32_t pid) = 0;
     virtual int32_t UnregisterHotAreaListener(int32_t pid) = 0;
 
-    virtual int32_t Enable(int32_t pid, int32_t userData) = 0;
+    virtual int32_t Enable(int32_t tokenId, int32_t pid, int32_t userData) = 0;
     virtual int32_t Disable(int32_t pid, int32_t userData) = 0;
     virtual int32_t Start(int32_t pid, int32_t userData,
         const std::string &remoteNetworkId, int32_t startDeviceId) = 0;

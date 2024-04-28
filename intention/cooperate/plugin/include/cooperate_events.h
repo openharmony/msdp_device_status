@@ -90,7 +90,6 @@ struct RegisterListenerEvent {
 using UnregisterListenerEvent = RegisterListenerEvent;
 using RegisterHotareaListenerEvent = RegisterListenerEvent;
 using UnregisterHotareaListenerEvent = RegisterListenerEvent;
-using EnableCooperateEvent = RegisterListenerEvent;
 using DisableCooperateEvent = RegisterListenerEvent;
 
 struct StartCooperateEvent {
@@ -99,6 +98,12 @@ struct StartCooperateEvent {
     std::string remoteNetworkId;
     int32_t startDeviceId;
     std::shared_ptr<std::promise<int32_t>> errCode;
+};
+
+struct EnableCooperateEvent {
+    int32_t tokenId;
+    int32_t pid;
+    int32_t userData;
 };
 
 struct StopCooperateEvent {
@@ -211,6 +216,7 @@ struct CooperateEvent {
         RegisterListenerEvent,
         StartCooperateEvent,
         StopCooperateEvent,
+        EnableCooperateEvent,
         GetCooperateStateEvent,
         RegisterEventListenerEvent,
         DSoftbusSubscribeMouseLocation,
