@@ -1503,6 +1503,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 
 void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
+    CHKPV(filterInfoParser);
     cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetX");
     if (cJSON_IsNumber(offsetX)) {
         filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
@@ -1547,6 +1548,7 @@ void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filt
 
 void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
+    CHKPV(filterInfoParser);
     cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
