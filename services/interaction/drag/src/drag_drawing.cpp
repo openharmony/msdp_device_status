@@ -146,6 +146,7 @@ constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
+const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
 const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
@@ -505,16 +506,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
-    }
-    if (!handler_->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -529,7 +521,6 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Invalid pointId:%{public}d", pointerId);
         return;
     }
-
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
@@ -541,22 +532,30 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         dragExtHandler_ = nullptr;
         return;
     }
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
     dragEventInfo.dragType = dragType;
     dragEventInfo.pointerId = pointerId;
     dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
     dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
         FI_HILOGE("notify drag info failed");
     }
-#endif // OHOS_DRAG_ENABLE_ANIMATION
+    if (dragType == DragEvent::DRAG_UP) {
+        superHubHandler_ = nullptr;
+    }
+}
+std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
+{
+    if (superHubHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
+            FI_HILOGW("add watch dog failed");
+        }
+        superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    }
+    return superHubHandler_;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
