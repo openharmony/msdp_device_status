@@ -293,6 +293,7 @@ private:
     void DoEndAnimation();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
+    std::shared_ptr<AppExecFwk::EventHandler> GetDragDropHandler();
 
 private:
     int64_t interruptNum_ { -1 };
