@@ -130,13 +130,14 @@ private:
     void OnDeviceMgr(const epoll_event &ev);
     int32_t EnableDevMgr(int32_t nRetries);
     void DisableDevMgr();
-    int32_t OnAddHotAreaListener(int32_t pid);
-    int32_t OnRemoveHotAreaListener(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     void EnableDSoftbus();
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    int32_t OnAddHotAreaListener(int32_t pid);
+    int32_t OnRemoveHotAreaListener(int32_t pid);
     int32_t OnRegisterCoordinationListener(int32_t pid);
     int32_t OnUnregisterCoordinationListener(int32_t pid);
     int32_t OnPrepareCoordination(int32_t pid, int32_t userData);
@@ -146,6 +147,7 @@ private:
     int32_t OnDeactivateCoordination(int32_t pid, int32_t userData, bool isUnchained);
     int32_t OnGetCoordinationState(int32_t pid, int32_t userData, const std::string &networkId);
     int32_t OnGetCoordinationStateSync(const std::string &udId, bool &state);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 
 private:

@@ -28,7 +28,9 @@
 #include "unique_fd.h"
 
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "coordination_sm.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #endif // OHOS_BUILD_ENABLE_COORDINATION
 #include "devicestatus_common.h"
 #include "devicestatus_define.h"
@@ -124,7 +126,9 @@ void DeviceStatusDumper::ExecutDump(int32_t fd, const std::vector<Data> &datas, 
         }
         case 'o': {
 #ifdef OHOS_BUILD_ENABLE_COORDINATION
+#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
             COOR_SM->Dump(fd);
+#endif OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #else
             dprintf(fd, "device coordination is not supported\n");
 #endif // OHOS_BUILD_ENABLE_COORDINATION

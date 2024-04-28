@@ -33,7 +33,6 @@
         "napi",
         "image_framework",
         "eventhandler",
-        "distributed_input",
         "device_manager",
         "sensor",
         "init",
@@ -100,16 +99,6 @@
           "header": {
             "header_files": [
               "interaction/drag/include/drag_data_manager.h"
-            ],
-            "header_base": "//base/msdp/device_status/services"
-          }
-        },
-        {
-          "name": "//base/msdp/device_status/services/interaction/coordination:coordination",
-          "header": {
-            "header_files": [
-              "interaction/coordination/include/coordination_softbus_adapter.h",
-              "interaction/coordination/include/coordination_sm.h"
             ],
             "header_base": "//base/msdp/device_status/services"
           }
