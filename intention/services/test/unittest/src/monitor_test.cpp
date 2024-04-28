@@ -111,6 +111,6 @@ HWTEST_F(MonitorTest, MonitorTest04, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(monitor.AddDevice(TEST_DEV_NODE));
     ASSERT_NO_FATAL_FAILURE(monitor.RemoveDevice(TEST_DEV_NODE));
 }
-}
-}
-}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS

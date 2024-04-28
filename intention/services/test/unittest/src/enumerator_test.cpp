@@ -56,10 +56,12 @@ class TestDeviceMgr : public IDeviceMgr {
 public:
     TestDeviceMgr() = default;
     ~TestDeviceMgr() = default;
-    void AddDevice(const std::string &devNode) override {
+    void AddDevice(const std::string &devNode) override
+    {
         devMgr.DeviceManager::AddDevice(devNode);
     }
-    void RemoveDevice(const std::string &devNode) override {
+    void RemoveDevice(const std::string &devNode) override
+    {
         devMgr.DeviceManager::RemoveDevice(devNode);
     }
 private:
@@ -79,7 +81,6 @@ HWTEST_F(EnumeratorTest, EnumeratorTest01, TestSize.Level1)
     IDeviceMgr *deviceMgr = testDevMgr.get();
     ASSERT_NO_FATAL_FAILURE(enumerator.SetDeviceMgr(deviceMgr));
     ASSERT_NO_FATAL_FAILURE(enumerator.AddDevice(TEST_DEV_NODE));
-
 }
 
 /**
@@ -92,8 +93,8 @@ HWTEST_F(EnumeratorTest, EnumeratorTest02, TestSize.Level1)
 {
     Enumerator enumerator;
     ASSERT_NO_FATAL_FAILURE(enumerator.ScanDevices());
-    ASSERT_NO_FATAL_FAILURE(enumerator.ScanAndAddDevices());   
+    ASSERT_NO_FATAL_FAILURE(enumerator.ScanAndAddDevices());
 }
-}
-}
-}
+} // namespace DeviceStatus
+} // namespace Msdp
+} // namespace OHOS
