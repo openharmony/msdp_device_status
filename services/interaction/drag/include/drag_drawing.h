@@ -256,8 +256,8 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
-    void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
-    void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
+    void ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
     void PrintDragShadowInfo();
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);

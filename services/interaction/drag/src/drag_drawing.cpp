@@ -1501,35 +1501,29 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 }
 
 
-void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+void DragDrawing::ParserDragShadowInfo(cJSON *filterInfoParser, FilterInfo &filterInfo)
 {
-    JsonParser filterInfoParser;
-    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
-    if (!cJSON_IsObject(filterInfoParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
-        return;
-    }
-    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetX");
     if (cJSON_IsNumber(offsetX)) {
         filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
     }
-    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetY");
     if (cJSON_IsNumber(offsetY)) {
         filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
     }
-    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_argb");
     if (cJSON_IsNumber(argb)) {
         filterInfo.argb = static_cast<uint32_t>(argb->valueint);
     }
-    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_filled");
+    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_is_filled");
     if (cJSON_IsBool(shadowIsFilled)) {
         filterInfo.shadowIsFilled = cJSON_IsTrue(shadowIsFilled);
     }
-    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_mask");
+    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_mask");
     if (cJSON_IsBool(shadowMask)) {
         filterInfo.shadowMask = cJSON_IsTrue(shadowMask);
     }
-    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
+    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_color_strategy");
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
@@ -1539,32 +1533,24 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
     }
     if (filterInfo.isHardwareAcceleration) {
-        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_elevation");
+        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_elevation");
         if (cJSON_IsNumber(elevation)) {
             filterInfo.elevation = static_cast<float>(elevation->valuedouble);
         }
     } else {
-        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
+        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
         if (cJSON_IsNumber(shadowCorner)) {
             filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
         }
     }
-    cJSON_Delete(filterInfoParser.json);
 }
 
-void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
-    JsonParser filterInfoParser;
-    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
-    if (!cJSON_IsObject(filterInfoParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
-        return;
-    }
-    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
     }
-    cJSON_Delete(filterInfoParser.json);
 }
 
 void DragDrawing::PrintDragShadowInfo()
@@ -1615,9 +1601,9 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         filterInfo.shadowEnable = cJSON_IsTrue(shadowEnable);
     }
     if (filterInfo.shadowEnable) {
-        ParserDragShadowInfo(filterInfoStr, filterInfo);
+        ParserDragShadowInfo(filterInfoParser.json, filterInfo);
         if (filterInfo.dragType == "text") {
-            ParserTextDragShadowInfo(filterInfoStr, filterInfo);
+            ParserTextDragShadowInfo(filterInfoParser.json, filterInfo);
         }
         PrintDragShadowInfo();
     }
