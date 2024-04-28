@@ -534,12 +534,6 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Fail to open drag drop extension library");
         return;
     }
-    RotateDisplayXY(displayX, displayY);
-    struct DragEventInfo dragEventInfo;
-    dragEventInfo.dragType = dragType;
-    dragEventInfo.pointerId = pointerId;
-    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
-    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
     auto dragDropExtFunc = reinterpret_cast<DragExtFunc>(dlsym(dragExtHandler_, "OnDragExt"));
     if (dragDropExtFunc == nullptr) {
         FI_HILOGE("Fail to get drag drop extension function");
@@ -547,6 +541,12 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         dragExtHandler_ = nullptr;
         return;
     }
+    RotateDisplayXY(displayX, displayY);
+    struct DragEventInfo dragEventInfo;
+    dragEventInfo.dragType = dragType;
+    dragEventInfo.pointerId = pointerId;
+    dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
+    dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
     if (dragDropHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(DRAG_DROP_THREAD_NAME);
         CHKPV(runner);
