@@ -902,6 +902,7 @@ void DragManager::RegisterNotifyPullUp(std::function<void(bool)> callback)
 void DragManager::StateChangedNotify(DragState state)
 {
     FI_HILOGD("enter");
+    CHKPV(stateChangedCallback_);
     if (state == DragState::STOP) {
         stateChangedCallback_(state);
     } else if (dragState_ != DragState::MOTION_DRAGGING) {
