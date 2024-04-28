@@ -19,7 +19,7 @@ module_output_path = "${device_status_part_name}/unit_out"
 ohos_unittest("MonitorTest") {
   module_out_path = module_output_path
 
-include_dirs = [
+  include_dirs = [
     "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
@@ -52,7 +52,7 @@ include_dirs = [
 ohos_unittest("EnumeratorTest") {
   module_out_path = module_output_path
 
-include_dirs = [
+  include_dirs = [
     "${device_status_root_path}/intention/services/device_manager/include",
     "${device_status_root_path}/libs/interface",
     "${device_status_service_path}/communication/service/include",
@@ -87,7 +87,7 @@ group("unittest") {
   deps = []
 
   deps += [
-    ":MonitorTest",
     ":EnumeratorTest",
+    ":MonitorTest",
   ]
 }
