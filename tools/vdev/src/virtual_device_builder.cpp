@@ -394,20 +394,21 @@ void VirtualDeviceBuilder::WaitFor(const char *name, int32_t timeout)
 int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
 {
     CALL_DEBUG_ENTER;
+    std::string pathStr(path);
     CHKPR(path, RET_ERR);
     char realPath[PATH_MAX] {};
 
-    if (realpath(path, realPath) == nullptr) {
-        std::cout << "Invalid path: " << path << std::endl;
+    if (realpath(pathStr.c_str(), realPath) == nullptr) {
+        std::cout << "Invalid path: " << pathStr << std::endl;
         return RET_ERR;
     }
     if (Utility::GetFileSize(realPath) > MAXIMUM_FILESIZE_ALLOWED) {
         std::cout << "File is too large" << std::endl;
         return RET_ERR;
     }
-    std::cout << "Read input data from \'" << realPath << "\'" << std::endl;
+    std::cout << "Read input data from \'" << pathStr << "\'" << std::endl;
     IfStreamWrap fileStream;
-    fileStream.ifStream = std::ifstream(realPath);
+    fileStream.ifStream = std::ifstream(pathStr);
     if (!fileStream.IsOpen()) {
         FI_HILOGE("Could not open the file");
         return RET_ERR;
