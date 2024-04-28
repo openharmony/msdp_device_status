@@ -102,6 +102,7 @@ ohos_unittest("DragDataManagerTest") {
   ]
 
   deps = [
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
     "${device_status_service_path}/interaction/drag:interaction_drag",
     "${device_status_utils_path}:devicestatus_util",
     "//third_party/googletest:gtest_main",

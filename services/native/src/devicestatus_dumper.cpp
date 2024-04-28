@@ -353,7 +353,7 @@ std::string DeviceStatusDumper::GetPackageName(Security::AccessToken::AccessToke
         }
         case Security::AccessToken::ATokenTypeEnum::TOKEN_HAP: {
             Security::AccessToken::HapTokenInfo hapInfo;
-            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != 0) {
+            if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo) != RET_OK) {
                 FI_HILOGE("Get hap token info fail");
                 return packageName;
             }

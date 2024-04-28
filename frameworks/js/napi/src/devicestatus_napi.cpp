@@ -46,14 +46,20 @@ thread_local DeviceStatusNapi *g_obj = nullptr;
 std::map<int32_t, sptr<IRemoteDevStaCallback>> DeviceStatusNapi::callbacks_;
 napi_ref DeviceStatusNapi::devicestatusValueRef_ = nullptr;
 
-void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
+DeviceStatusCallback::DeviceStatusCallback(napi_env env)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
+    env_ = env;
     auto runner = AppExecFwk::EventRunner::GetMainEventRunner();
     if (runner != nullptr) {
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
     }
+}
+
+void DeviceStatusCallback::OnDeviceStatusChanged(const Data &devicestatusData)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     auto task = [devicestatusData]() {
         FI_HILOGI("Execute lamdba");
         EmitOnEvent(devicestatusData);
@@ -348,7 +354,7 @@ napi_value DeviceStatusNapi::SubscribeDeviceStatusCallback(napi_env env, napi_ca
         FI_HILOGD("Callback exists");
         return nullptr;
     }
-    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback();
+    sptr<IRemoteDevStaCallback> callback = new (std::nothrow) DeviceStatusCallback(env);
     CHKPP(callback);
     int32_t subscribeRet = StationaryManager::GetInstance()->SubscribeCallback(static_cast<Type>(type),
         static_cast<ActivityEvent>(event), static_cast<ReportLatencyNs>(latency), callback);

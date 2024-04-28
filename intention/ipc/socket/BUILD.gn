@@ -140,6 +140,7 @@ ohos_source_set("intention_socket_connection") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "hicollie:libhicollie",
     "hilog:libhilog",
   ]
 

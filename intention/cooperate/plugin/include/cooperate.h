@@ -43,7 +43,7 @@ public:
     int32_t RegisterEventListener(int32_t pid, const std::string &networkId) override;
     int32_t UnregisterEventListener(int32_t pid, const std::string &networkId) override;
 
-    int32_t Enable(int32_t pid, int32_t userData) override;
+    int32_t Enable(int32_t tokenId, int32_t pid, int32_t userData) override;
     int32_t Disable(int32_t pid, int32_t userData) override;
     int32_t Start(int32_t pid, int32_t userData, const std::string &remoteNetworkId, int32_t startDeviceId) override;
     int32_t Stop(int32_t pid, int32_t userData, bool isUnchained) override;
