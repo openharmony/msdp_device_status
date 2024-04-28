@@ -35,7 +35,7 @@
             "OHOS::Msdp::DeviceStatus::Utility::GetFileSize(char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::GetFileSize(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::Utility::RemoveSpace(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
-            "OHOS::Msdp::DeviceStatus::Utility::CopyNulstr(char*, unsigned int, char const*)";
+            "OHOS::Msdp::DeviceStatus::Utility::CopyNulstr(char*, unsigned long, char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::StartWith(char const*, char const*)";
             "OHOS::Msdp::DeviceStatus::Utility::StartWith(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
             "OHOS::Msdp::DeviceStatus::Utility::RemoveTrailingChars(char, char*)";
