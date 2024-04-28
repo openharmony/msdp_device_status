@@ -1501,7 +1501,7 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 }
 
 
-void DragDrawing::ParserDragShadowInfo(cJSON *filterInfoParser, FilterInfo &filterInfo)
+void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
     cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetX");
     if (cJSON_IsNumber(offsetX)) {
