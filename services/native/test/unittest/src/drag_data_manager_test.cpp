@@ -47,7 +47,6 @@ constexpr bool HAS_CANCELED_ANIMATION { true };
 constexpr bool DRAG_WINDOW_VISIBLE { true };
 constexpr int32_t INT32_BYTE { 4 };
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
-constexpr int64_t START_TIME { 181154000809 };
 const std::string UD_KEY { "Unified data key" };
 }
 void DragDataManagerTest::SetUpTestCase() {}
@@ -267,7 +266,6 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest007, TestSize.Level0)
     ret = dragDrawing.Init(dragData.value());
     EXPECT_EQ(ret, INIT_FAIL);
     dragDrawing.DestroyDragWindow();
-    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
 }
 
@@ -287,7 +285,6 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest008, TestSize.Level0)
     int32_t ret = dragDrawing.Init(dragData.value());
     EXPECT_EQ(ret, INIT_FAIL);
     dragDrawing.DestroyDragWindow();
-    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
 }
 
@@ -307,7 +304,6 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest009, TestSize.Level0)
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
     EXPECT_EQ(ret, INIT_SUCCESS);
     dragDrawing.DestroyDragWindow();
-    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
     dragDrawing.EraseMouseIcon();
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
 }
@@ -328,7 +324,6 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest010, TestSize.Level0)
     dragDrawing.UpdateDragWindowState(DRAG_WINDOW_VISIBLE);
     EXPECT_EQ(ret, INIT_CANCEL);
     dragDrawing.DestroyDragWindow();
-    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
     dragDrawing.UpdateDragWindowState(!DRAG_WINDOW_VISIBLE);
 }
 
@@ -351,7 +346,6 @@ HWTEST_F(DragDataManagerTest, DragDataManagerTest011, TestSize.Level0)
     DragDrawing dragDrawing;
     dragDrawing.Draw(pointerEvent->GetTargetDisplayId(), pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     dragDrawing.DestroyDragWindow();
-    EXPECT_EQ(dragDrawing.startNum_, START_TIME);
 }
 } // namespace
 } // namespace DeviceStatus

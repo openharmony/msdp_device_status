@@ -962,7 +962,7 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
     switch (result) {
         case DragResult::DRAG_SUCCESS: {
             if (!hasCustomAnimation) {
-                dragDrawing_.OnDragSuccess();
+                dragDrawing_.OnDragSuccess(context_);
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
@@ -972,7 +972,7 @@ int32_t DragManager::HandleDragResult(DragResult result, bool hasCustomAnimation
         case DragResult::DRAG_FAIL:
         case DragResult::DRAG_CANCEL: {
             if (!hasCustomAnimation) {
-                dragDrawing_.OnDragFail();
+                dragDrawing_.OnDragFail(context_);
             } else {
                 dragDrawing_.DestroyDragWindow();
                 dragDrawing_.UpdateDrawingState();
