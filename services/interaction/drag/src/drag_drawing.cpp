@@ -1616,7 +1616,6 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
-    cJSON_Delete(filterInfoParser.json);
     return true;
 }
 
@@ -1650,7 +1649,6 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
-    cJSON_Delete(extraInfoParser.json);
     return true;
 }
 
