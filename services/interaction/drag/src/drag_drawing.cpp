@@ -44,7 +44,6 @@
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
 #include "drag_hisysevent.h"
-#include "json_parser.h"
 #include "include/util.h"
 
 #undef LOG_TAG
@@ -1529,7 +1528,7 @@ void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filt
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
     cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(
-        filterInfoParser.json, "shadow_is_hardwareacceleration");
+        filterInfoParser, "shadow_is_hardwareacceleration");
     if (cJSON_IsBool(isHardwareAcceleration)) {
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
     }

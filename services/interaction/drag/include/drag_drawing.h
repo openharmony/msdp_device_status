@@ -21,6 +21,7 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
