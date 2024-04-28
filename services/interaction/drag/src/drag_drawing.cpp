@@ -1500,10 +1500,94 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
     FI_HILOGD("leave");
 }
 
+
+void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+{
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return;
+    }
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
+    if (cJSON_IsNumber(offsetX)) {
+        filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
+    }
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
+    if (cJSON_IsNumber(offsetY)) {
+        filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
+    }
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
+    if (cJSON_IsNumber(argb)) {
+        filterInfo.argb = static_cast<uint32_t>(argb->valueint);
+    }
+    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_filled");
+    if (cJSON_IsBool(shadowIsFilled)) {
+        filterInfo.shadowIsFilled = cJSON_IsTrue(shadowIsFilled);
+    }
+    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_mask");
+    if (cJSON_IsBool(shadowMask)) {
+        filterInfo.shadowMask = cJSON_IsTrue(shadowMask);
+    }
+    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
+    if (cJSON_IsNumber(shadowColorStrategy)) {
+        filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
+    }
+    cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(
+        filterInfoParser.json, "shadow_is_hardwareacceleration");
+    if (cJSON_IsBool(isHardwareAcceleration)) {
+        filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
+    }
+    if (filterInfo.isHardwareAcceleration) {
+        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_elevation");
+        if (cJSON_IsNumber(elevation)) {
+            filterInfo.elevation = static_cast<float>(elevation->valuedouble);
+        }
+    } else {
+        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
+        if (cJSON_IsNumber(shadowCorner)) {
+            filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
+        }
+    }
+    cJSON_Delete(filterInfoParser.json);
+}
+
+void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+{
+    JsonParser filterInfoParser;
+    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
+    if (!cJSON_IsObject(filterInfoParser.json)) {
+        FI_HILOGE("FilterInfo is not json object");
+        return;
+    }
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
+    if (cJSON_IsString(path)) {
+        filterInfo.path = path->valuestring;
+    }
+    cJSON_Delete(filterInfoParser.json);
+}
+
+void DragDrawing::PrintDragShadowInfo()
+{
+    FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    if (!filterInfo.shadowEnable) {
+        FI_HILOGI("Not supported shadow");
+        return;
+    }
+    FI_HILOGI("dragType:%{public}s, shadowIsFilled:%{public}s, shadowMask:%{public}s, shadowColorStrategy :%{public}d, "
+        "shadowCorner:%{public}f, offsetX:%{public}f, offsetY:%{public}f, argb:%{public}u, elevation:%{public}f, "
+        "isHardwareAcceleration:%{public}s", filterInfo.dragType.c_str(),
+        filterInfo.shadowIsFilled ? "true" : "false", filterInfo.shadowMask ? "true" : "false",
+        filterInfo.shadowColorStrategy, filterInfo.shadowCorner, filterInfo.offsetX, filterInfo.offsetY,
+        filterInfo.argb, filterInfo.elevation, filterInfo.isHardwareAcceleration ? "true" : "false");
+    if (!filterInfo.path.empty()) {
+        FI_HILOGI("%{public}s", filterInfo.path.c_str());
+    }
+}
+
 bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
 {
-    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s",
-        filterInfoStr.size(), filterInfoStr.c_str());
+    FI_HILOGD("FilterInfo size:%{public}zu, filterInfo:%{public}s", filterInfoStr.size(), filterInfoStr.c_str());
     if (filterInfoStr.empty()) {
         FI_HILOGD("FilterInfo is empty");
         return false;
@@ -1522,6 +1606,21 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(cornerRadius)) {
         filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
     }
+    cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
+    if (cJSON_IsString(dragType)) {
+        filterInfo.dragType = dragType->valuestring;
+    }
+    cJSON *shadowEnable = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_enable");
+    if (cJSON_IsBool(shadowEnable)) {
+        filterInfo.shadowEnable = cJSON_IsTrue(shadowEnable);
+    }
+    if (filterInfo.shadowEnable) {
+        ParserDragShadowInfo(filterInfoStr, filterInfo);
+        if (filterInfo.dragType == "text") {
+            ParserTextDragShadowInfo(filterInfoStr, filterInfo);
+        }
+        PrintDragShadowInfo();
+    }
     cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
         if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
@@ -1530,6 +1629,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
+    cJSON_Delete(filterInfoParser.json);
     return true;
 }
 
@@ -1563,6 +1663,7 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
+    cJSON_Delete(extraInfoParser.json);
     return true;
 }
 
@@ -2204,6 +2305,46 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     FI_HILOGD("leave");
 }
 
+Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(int32_t shadowColorStrategy) const
+{
+    if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE ;
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE ;
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN)) {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN ;
+    } else {
+        return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE;
+    }
+}
+
+void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    if (!g_drawingInfo.filterInfo.path.empty()) {
+        FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
+        pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
+    } else {
+        FI_HILOGW("path is empty");
+    }
+}
+
+void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const
+{
+    pixelMapNode->SetShadowOffset(g_drawingInfo.filterInfo.offsetX, g_drawingInfo.filterInfo.offsetY);
+    pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
+    pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
+    pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
+    pixelMapNode->SetShadowColorStrategy(ConvertShadowColorStrategy(g_drawingInfo.filterInfo.shadowColorStrategy));
+    if (g_drawingInfo.filterInfo.isHardwareAcceleration) {
+        pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation);
+    } else {
+        pixelMapNode->SetShadowRadius(g_drawingInfo.filterInfo.shadowCorner);
+    }
+    if (g_drawingInfo.filterInfo.dragType == "text") {
+        SetTextDragShadow(pixelMapNode);
+    }
+}
+
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
 {
     FI_HILOGD("enter");
@@ -2216,6 +2357,9 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     }
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = g_drawingInfo.nodes[PIXEL_MAP_INDEX];
     CHKPV(pixelMapNode);
+    if (g_drawingInfo.filterInfo.shadowEnable) {
+        SetDragShadow(pixelMapNode);
+    }
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     pixelMapNode->SetBounds(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
     pixelMapNode->SetFrame(DEFAULT_POSITION_X, adjustSize, pixelMapWidth, pixelMapHeight);
@@ -2225,8 +2369,18 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
-    cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    CHKPV(cvs);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
+        g_drawingInfo.filterInfo.dragType == "text") {
+        auto rsPath = Rosen::RSPath::CreateRSPath(filterInfo.path);
+        cvs->Save();
+        cvs->ClipPath(rsPath->GetDrawingPath(), Rosen::Drawing::ClipOp::INTERSECT, true);
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+        cvs->Restore();
+    } else {
+        cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
+    }
     pixelMapNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
     pixelMapNode->SetAlpha(filterInfo.opacity);
     pixelMapNode->FinishRecording();

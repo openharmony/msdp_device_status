@@ -51,6 +51,9 @@ class DrawPixelMapModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawPixelMapModifier() = default;
     ~DrawPixelMapModifier() = default;
+    void SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
+    void SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
+    Rosen::SHADOW_COLOR_STRATEGY ConvertShadowColorStrategy(int32_t shadowColorStrategy) const;
     void Draw(Rosen::RSDrawingContext &context) const override;
 };
 
@@ -119,9 +122,21 @@ private:
 };
 
 struct FilterInfo {
+    std::string dragType;
+    bool shadowEnable { false };
+    bool shadowIsFilled { false };
+    bool shadowMask { false };
+    int32_t shadowColorStrategy { 0 };
+    float shadowCorner { 0.0F };
     float dipScale { 0.0f };
     float cornerRadius { 0.0f };
     float opacity { 0.95f };
+    float offsetX { 0.0f };
+    float offsetY { 0.0f };
+    uint32_t argb { 0 };
+    std::string path;
+    float elevation { 0.0f };
+    bool isHardwareAcceleration { false };
 };
 
 struct ExtraInfo {
@@ -241,6 +256,9 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void PrintDragShadowInfo();
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
     static float RadiusVp2Sigma(float radiusVp, float dipScale);
