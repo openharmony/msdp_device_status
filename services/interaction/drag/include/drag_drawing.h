@@ -47,19 +47,13 @@ private:
     std::shared_ptr<Media::PixelMap> stylePixelMap_ { nullptr };
 };
 
-enum class ShadowColorStrategy : char {
-    NONE,
-    AVERAGE,
-    PRIMARY
-};
-
 class DrawPixelMapModifier : public Rosen::RSContentStyleModifier {
 public:
     DrawPixelMapModifier() = default;
     ~DrawPixelMapModifier() = default;
     void SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
     void SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode) const;
-    Rosen::SHADOW_COLOR_STRATEGY ConvertShadowColorStrategy(ShadowColorStrategy shadowColorStrategy) const;
+    Rosen::SHADOW_COLOR_STRATEGY ConvertShadowColorStrategy(int32_t shadowColorStrategy) const;
     void Draw(Rosen::RSDrawingContext &context) const override;
 };
 

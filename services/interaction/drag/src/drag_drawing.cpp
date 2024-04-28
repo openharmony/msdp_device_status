@@ -1523,6 +1523,7 @@ void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterI
             filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
         }
     }
+    cJSON_Delete(filterInfoParser.json);
 }
 
 void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
@@ -1537,6 +1538,7 @@ void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, Fil
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
     }
+    cJSON_Delete(filterInfoParser.json);
 }
 
 void DragDrawing::PrintDragShadowInfo()
@@ -1601,6 +1603,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
+    cJSON_Delete(filterInfoParser.json);
     return true;
 }
 
@@ -1634,6 +1637,7 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
+    cJSON_Delete(extraInfoParser.json);
     return true;
 }
 
@@ -2275,14 +2279,13 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     FI_HILOGD("leave");
 }
 
-Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(
-    ShadowColorStrategy shadowColorStrategy) const
+Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(int32_t shadowColorStrategy) const
 {
-    if (shadowColorStrategy == ShadowColorStrategy::NONE) {
+    if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE)) {
         return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE ;
-    } else if (shadowColorStrategy == ShadowColorStrategy::AVERAGE) {
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE)) {
         return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_AVERAGE ;
-    } else if (shadowColorStrategy == ShadowColorStrategy::PRIMARY) {
+    } else if (shadowColorStrategy == static_cast<int32_t>(Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN)) {
         return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_MAIN ;
     } else {
         return Rosen::SHADOW_COLOR_STRATEGY::COLOR_STRATEGY_NONE;
@@ -2295,7 +2298,7 @@ void DrawPixelMapModifier::SetTextDragShadow(std::shared_ptr<Rosen::RSCanvasNode
         FI_HILOGD("path:%{public}s", g_drawingInfo.filterInfo.path.c_str());
         pixelMapNode->SetShadowPath(Rosen::RSPath::CreateRSPath(g_drawingInfo.filterInfo.path));
     } else {
-        FI_HILOGD("path is empty");
+        FI_HILOGW("path is empty");
     }
 }
 
@@ -2305,8 +2308,7 @@ void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pi
     pixelMapNode->SetShadowColor(g_drawingInfo.filterInfo.argb);
     pixelMapNode->SetShadowMask(g_drawingInfo.filterInfo.shadowMask);
     pixelMapNode->SetShadowIsFilled(g_drawingInfo.filterInfo.shadowIsFilled);
-    pixelMapNode->SetShadowColorStrategy(ToShadowColorStrategy(
-        static_cast<ShadowColorStrategy>(g_drawingInfo.filterInfo.shadowColorStrategy)));
+    pixelMapNode->SetShadowColorStrategy(ConvertShadowColorStrategy(g_drawingInfo.filterInfo.shadowColorStrategy));
     if (g_drawingInfo.filterInfo.isHardwareAcceleration) {
         pixelMapNode->SetShadowElevation(g_drawingInfo.filterInfo.elevation);
     } else {
@@ -2341,6 +2343,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     pixelMapNode->SetBgImagePositionY(0);
     Rosen::Drawing::AdaptiveImageInfo rsImageInfo = { 1, 0, {}, 1, 0, pixelMapWidth, pixelMapHeight };
     auto cvs = pixelMapNode->BeginRecording(pixelMapWidth, pixelMapHeight);
+    CHKPV(cvs);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (g_drawingInfo.filterInfo.shadowEnable && !filterInfo.path.empty() &&
         g_drawingInfo.filterInfo.dragType == "text") {
