@@ -16,6 +16,5 @@ import("../../../device_status.gni")
 
 group("intention_services_test") {
   testonly = true
-  deps = []
-  deps += [ "unittest:unittest" ]
+  deps = [ "unittest:unittest" ]
 }
