@@ -406,9 +406,8 @@ int32_t VirtualDeviceBuilder::ReadFile(const char *path, json &model)
         return RET_ERR;
     }
     std::cout << "Read input data from \'" << realPath << "\'" << std::endl;
-    std::string pathStr(realPath);
     IfStreamWrap fileStream;
-    fileStream.ifStream = std::ifstream(pathStr);
+    fileStream.ifStream = std::ifstream(std::string(realPath));
     if (!fileStream.IsOpen()) {
         FI_HILOGE("Could not open the file");
         return RET_ERR;
