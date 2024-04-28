@@ -2275,7 +2275,7 @@ void DrawSVGModifier::Draw(Rosen::RSDrawingContext& context) const
     FI_HILOGD("leave");
 }
 
-Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ToShadowColorStrategy(
+Rosen::SHADOW_COLOR_STRATEGY DrawPixelMapModifier::ConvertShadowColorStrategy(
     ShadowColorStrategy shadowColorStrategy) const
 {
     if (shadowColorStrategy == ShadowColorStrategy::NONE) {
@@ -2314,7 +2314,7 @@ void DrawPixelMapModifier::SetDragShadow(std::shared_ptr<Rosen::RSCanvasNode> pi
     }
     if (g_drawingInfo.filterInfo.dragType == "text") {
         SetTextDragShadow(pixelMapNode);
-    } 
+    }
 }
 
 void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
