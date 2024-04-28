@@ -542,7 +542,7 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("notify drag info failed");
     }
     if (dragType == DragEvent::DRAG_UP) {
-        dragDropHandler_ = nullptr;
+        superHubHandler_ = nullptr;
     }
 }
 std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
