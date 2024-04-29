@@ -16,8 +16,10 @@
 #include <future>
 #include "pointer_event.h"
 #include "securec.h"
+#include "message_parcel.h"
 
 #include "drag_manager_test.h"
+#include "drag_params.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
 
@@ -43,6 +45,7 @@ constexpr int32_t FOREGROUND_COLOR_IN { 0x33FF0000 };
 constexpr int32_t FOREGROUND_COLOR_OUT { 0x00000000 };
 int32_t g_shadowinfo_x { 0 };
 int32_t g_shadowinfo_y { 0 };
+constexpr int32_t WINDOW_ID { -1 };
 constexpr int32_t ANIMATION_DURATION { 500 };
 const std::string CURVE_NAME { "cubic-bezier" };
 constexpr bool HAS_CUSTOM_ANIMATION { true };
@@ -242,7 +245,7 @@ HWTEST_F(DragManagerTest, DragManagerTest1, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(), nullptr);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -264,7 +267,7 @@ HWTEST_F(DragManagerTest, DragManagerTest2, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, 0);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, ERR_INVALID_VALUE);
@@ -288,7 +291,7 @@ HWTEST_F(DragManagerTest, DragManagerTest3, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_ERR);
@@ -312,7 +315,7 @@ HWTEST_F(DragManagerTest, DragManagerTest4, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, -1, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_ERR);
@@ -457,7 +460,7 @@ HWTEST_F(DragManagerTest, DragManagerTest14, TestSize.Level0)
     CALL_TEST_DEBUG;
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_MOUSE, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     std::promise<bool> promiseFlag;
     std::future<bool> futureFlag = promiseFlag.get_future();
     auto callback = [&promiseFlag](const DragNotifyMsg &notifyMessage) {
@@ -479,7 +482,7 @@ HWTEST_F(DragManagerTest, DragManagerTest14, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);}
 
 /**
@@ -500,7 +503,7 @@ HWTEST_F(DragManagerTest, DragManagerTest15, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -509,7 +512,7 @@ HWTEST_F(DragManagerTest, DragManagerTest15, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);}
 
 /**
@@ -530,7 +533,7 @@ HWTEST_F(DragManagerTest, DragManagerTest16, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -541,7 +544,7 @@ HWTEST_F(DragManagerTest, DragManagerTest16, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);}
 
 /**
@@ -562,7 +565,7 @@ HWTEST_F(DragManagerTest, DragManagerTest17, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -577,7 +580,7 @@ HWTEST_F(DragManagerTest, DragManagerTest17, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -603,7 +606,7 @@ HWTEST_F(DragManagerTest, DragManagerTest18, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -615,7 +618,7 @@ HWTEST_F(DragManagerTest, DragManagerTest18, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -637,7 +640,7 @@ HWTEST_F(DragManagerTest, DragManagerTest19, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -652,7 +655,7 @@ HWTEST_F(DragManagerTest, DragManagerTest19, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -674,7 +677,7 @@ HWTEST_F(DragManagerTest, DragManagerTest20, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -687,7 +690,7 @@ HWTEST_F(DragManagerTest, DragManagerTest20, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -709,7 +712,7 @@ HWTEST_F(DragManagerTest, DragManagerTest21, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -722,7 +725,7 @@ HWTEST_F(DragManagerTest, DragManagerTest21, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -744,7 +747,7 @@ HWTEST_F(DragManagerTest, DragManagerTest22, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -757,7 +760,7 @@ HWTEST_F(DragManagerTest, DragManagerTest22, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -779,7 +782,7 @@ HWTEST_F(DragManagerTest, DragManagerTest23, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -792,7 +795,7 @@ HWTEST_F(DragManagerTest, DragManagerTest23, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -814,7 +817,7 @@ HWTEST_F(DragManagerTest, DragManagerTest24, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -835,7 +838,7 @@ HWTEST_F(DragManagerTest, DragManagerTest24, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -857,7 +860,7 @@ HWTEST_F(DragManagerTest, DragManagerTest25, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -881,7 +884,7 @@ HWTEST_F(DragManagerTest, DragManagerTest25, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -903,7 +906,7 @@ HWTEST_F(DragManagerTest, DragManagerTest26, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     const std::string udType = "general.message";
     constexpr int64_t recordSize = 20;
     std::map<std::string, int64_t> summarys = { { udType, recordSize } };
@@ -920,7 +923,7 @@ HWTEST_F(DragManagerTest, DragManagerTest26, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -942,7 +945,7 @@ HWTEST_F(DragManagerTest, DragManagerTest27, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -957,7 +960,7 @@ HWTEST_F(DragManagerTest, DragManagerTest27, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -979,7 +982,7 @@ HWTEST_F(DragManagerTest, DragManagerTest28, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -991,7 +994,7 @@ HWTEST_F(DragManagerTest, DragManagerTest28, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -1013,7 +1016,7 @@ HWTEST_F(DragManagerTest, DragManagerTest29, TestSize.Level0)
     };
     std::optional<DragData> dragData = CreateDragData(
         MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN, POINTER_ID, DRAG_NUM_ONE, false, SHADOW_NUM_ONE);
-    ASSERT_TRUE(dragData);
+    EXPECT_TRUE(dragData);
     int32_t ret = InteractionManager::GetInstance()->StartDrag(dragData.value(),
         std::make_shared<TestStartDragListener>(callback));
     ASSERT_EQ(ret, RET_OK);
@@ -1025,7 +1028,7 @@ HWTEST_F(DragManagerTest, DragManagerTest29, TestSize.Level0)
         HAS_CUSTOM_ANIMATION, TARGET_MAIN_WINDOW };
     ret = InteractionManager::GetInstance()->StopDrag(dropResult);
     ASSERT_EQ(ret, RET_OK);
-    ASSERT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
+    EXPECT_TRUE(futureFlag.wait_for(std::chrono::milliseconds(PROMISE_WAIT_SPAN_MS)) !=
         std::future_status::timeout);
 }
 
@@ -1104,7 +1107,7 @@ HWTEST_F(DragManagerTest, DragManagerTest34, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
-    ASSERT_TRUE(pid > 0);
+    EXPECT_GT(pid, 0);
 }
 
 /**
@@ -1196,6 +1199,439 @@ HWTEST_F(DragManagerTest, DragManagerTest39, TestSize.Level0)
     AssignToAnimation(animationOut);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest40
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest40, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest41
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest41, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragAction dragAction { DragAction::INVALID };
+    int32_t ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest42
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest42, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    int32_t ret = InteractionManager::GetInstance()->GetExtraInfo(extraInfo);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest43
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest43, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->AddPrivilege();
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest44
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest44, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    StopDragParam param {};
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest45
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest45, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    SetDragWindowVisibleParam param {};
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest46
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest46, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    MessageParcel data;
+    GetDragTargetPidReply targetPidReply { pid };
+    bool ret = targetPidReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest47
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest47, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    MessageParcel data;
+    GetDragTargetPidReply targetPidReply { pid };
+    bool ret = targetPidReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest48
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest48, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string udKey;
+    MessageParcel data;
+    GetUdKeyReply udKeyReply { std::move(udKey) };
+    bool ret = udKeyReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest49
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest49, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ShadowOffset shadowOffset {};
+    MessageParcel data;
+    GetShadowOffsetReply shadowOffsetReply { shadowOffset };
+    bool ret = shadowOffsetReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest50
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest50, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    UpdatePreviewAnimationParam param {};
+    MessageParcel data;
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest51
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest51, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::map<std::string, int64_t> summaries;
+    GetDragSummaryReply summaryReply { std::move(summaries) };
+    MessageParcel data;
+    bool ret = summaryReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest52
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest52, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState {};
+    GetDragStateReply dragStateReply { dragState };
+    MessageParcel data;
+    bool ret = dragStateReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest53
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest53, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragAction dragAction {};
+    GetDragActionReply dragActionReply { dragAction };
+    MessageParcel data;
+    bool ret = dragActionReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest54
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest54, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    GetExtraInfoReply extraInfoReply { std::move(extraInfo) };
+    MessageParcel data;
+    bool ret = extraInfoReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest55
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest55, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    GetExtraInfoReply extraInfoReply { std::move(extraInfo) };
+    MessageParcel data;
+    bool ret = extraInfoReply.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest56
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest56, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdateDragStyleParam param;
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest57
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest57, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdateDragStyleParam param;
+    MessageParcel data;
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest58
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNCdSession
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest58, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdateShadowPicParam param;
+    MessageParcel data;
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest59
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest59, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdateShadowPicParam param;
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest60
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest60, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdatePreviewStyleParam param;
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest61
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest61, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    UpdatePreviewStyleParam param;
+    MessageParcel data;
+    bool ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest62
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest62, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION, WINDOW_ID };
+    StopDragParam param { dropResult };
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);    
+    ret = param.Unmarshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest63
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest63, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragDropResult dropResult { DragResult::DRAG_SUCCESS, HAS_CUSTOM_ANIMATION,
+        WINDOW_ID, static_cast<DragBehavior>(-2)};
+    StopDragParam param { dropResult };
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+    ret = param.Unmarshalling(data);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest64
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest64, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    SetDragWindowVisibleParam param { true, true };
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+    ret = param.Unmarshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest65
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest65, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    UpdateDragStyleParam param { DragCursorStyle::DEFAULT };
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+    ret = param.Unmarshalling(data);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DragManagerTest66
+ * @tc.desc: Drag Drawingx`
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest66, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(PIXEL_MAP_WIDTH, PIXEL_MAP_HEIGHT);
+    ASSERT_NE(pixelMap, nullptr);
+    ShadowInfo shadowInfo = { pixelMap, 0, 0 };
+    std::string extraInfo;
+    UpdateShadowPicParam param { shadowInfo };
+    MessageParcel data;
+    bool ret = param.Marshalling(data);
+    EXPECT_TRUE(ret);
+    ret = param.Unmarshalling(data);
+    EXPECT_TRUE(ret);
 }
 } // namespace DeviceStatus
 } // namespace Msdp

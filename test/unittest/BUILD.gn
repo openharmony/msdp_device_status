@@ -19,6 +19,7 @@ group("device_status_unittest") {
 
   deps += [
     "intentiontest:DragManagerTest",
+    "intentiontest:SocketSessionTest",
     "utils:UtilityTest",
   ]
 }
