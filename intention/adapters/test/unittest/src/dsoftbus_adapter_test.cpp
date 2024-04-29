@@ -378,6 +378,36 @@ HWTEST_F(DsoftbusAdapterTest, HandleRawData, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::GetInstance()->HandleRawData(networkId, data, sizeof(data)));
     RemovePermission();
 }
+
+/**
+ * @tc.name: TestCloseAllSessions
+ * @tc.desc: Test CloseAllSessions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestCloseAllSessions, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->CloseAllSessions());
+    RemovePermission();
+}
+
+/**
+ * @tc.name: TestDestroyInstance
+ * @tc.desc: Test Destroy Instance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DsoftbusAdapterTest, TestDestroyInstance, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
+    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::DestroyInstance());
+    RemovePermission();
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
