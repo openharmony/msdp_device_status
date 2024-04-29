@@ -1158,9 +1158,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = Rosen::RSCanvasNode::Create();
     CHKPV(filterNode);
     g_drawingInfo.nodes.emplace_back(filterNode);
-    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        ProcessFilter();
-    }
+    ProcessFilter();
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
@@ -1629,8 +1627,45 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
+    ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
     cJSON_Delete(filterInfoParser.json);
     return true;
+}
+
+void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo)
+{
+    if (BlurInfoInfoStr == nullptr) {
+        FI_HILOGD("BlurInfoInfoStr is empty");
+        return;
+    }
+    float tempCoef1 = 0.0f;
+    cJSON *coef1 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef1");
+    if (cJSON_IsNumber(coef1)) {
+        tempCoef1 = static_cast<float>(coef1->valuedouble);
+    }
+    float tempCoef2 = 0.0f;
+    cJSON *coef2 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef2");
+    if (cJSON_IsNumber(coef2)) {
+        tempCoef2 = static_cast<float>(coef2->valuedouble);
+    }
+    filterInfo.coef = { tempCoef1, tempCoef2 };
+    cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
+    if (cJSON_IsNumber(blurRadius)) {
+        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+    }
+    cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
+    if (cJSON_IsNumber(blurStaturation)) {
+        filterInfo.blurStaturation = static_cast<float>(blurStaturation->valuedouble);
+    }
+    cJSON *blurBrightness = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_brightness");
+    if (cJSON_IsNumber(blurBrightness)) {
+        filterInfo.blurBrightness = static_cast<float>(blurBrightness->valuedouble);
+    }
+    cJSON *blurColor = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_color");
+    if (cJSON_IsNumber(blurColor)) {
+        filterInfo.blurColor = blurColor->valueint;
+    }
+    return;
 }
 
 bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo)
@@ -1724,7 +1759,17 @@ void DragDrawing::ProcessFilter()
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     ExtraInfo extraInfo = g_drawingInfo.extraInfo;
-    if (extraInfo.componentType == BIG_FOLDER_LABEL) {
+    if (extraInfo.blurStyle != -1) {
+        Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)extraInfo.blurStyle;
+        std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+            filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
+        if (backFilter == nullptr) {
+            FI_HILOGE("Create backgroundFilter failed");
+            return;
+        }
+        filterNode->SetBackgroundFilter(backFilter);
+    } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
         std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
             RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
             DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
@@ -1733,20 +1778,21 @@ void DragDrawing::ProcessFilter()
             return;
         }
         filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
-            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo.dipScale) < extraInfo.cornerRadius)) {
-            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                extraInfo.cornerRadius, filterInfo.dipScale);
-            return;
-        }
-        filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
-        FI_HILOGD("Add filter successfully");
     }
+    filterNode->SetGreyCoef(filterInfo.coef);
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < extraInfo.cornerRadius)) {
+        FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+            extraInfo.cornerRadius, filterInfo.dipScale);
+        return;
+    }
+    filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
+    FI_HILOGD("Add filter successfully");
     FI_HILOGD("leave");
 }
 
@@ -2078,6 +2124,7 @@ void DragDrawing::InitMultiSelectedNodes()
             degrees = NEGATIVE_ANGLE;
         }
         multiSelectedNode->SetRotation(degrees);
+        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
         multiSelectedNode->SetAlpha(alpha);
         g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }

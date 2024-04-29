@@ -21,6 +21,7 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
@@ -137,6 +138,11 @@ struct FilterInfo {
     std::string path;
     float elevation { 0.0f };
     bool isHardwareAcceleration { false };
+    Rosen::Vector2f coef;
+    float blurRadius { 0.0f };
+    float blurStaturation { 0.0f };
+    float blurBrightness { 0.0f };
+    int32_t blurColor { -1 };
 };
 
 struct ExtraInfo {
@@ -256,6 +262,7 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo);
     void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void PrintDragShadowInfo();
