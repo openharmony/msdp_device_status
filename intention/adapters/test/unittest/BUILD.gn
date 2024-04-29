@@ -28,13 +28,11 @@ ohos_unittest("InputAdapterTest") {
   include_dirs = [
     "${device_status_utils_path}",
     "${device_status_utils_path}/include",
-    "${device_status_intention_path}/prototype/include",
     "${device_status_root_path}/intention/prototype/include",
   ]
 
   sources = [ "src/input_adapter_test.cpp" ]
 
-  deps = [ "${device_status_intention_path}/adapters/input_adapter:intention_input_adapter" ]
   deps = [ "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter" ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
