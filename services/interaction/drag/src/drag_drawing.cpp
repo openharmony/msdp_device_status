@@ -1611,14 +1611,6 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         }
         PrintDragShadowInfo();
     }
-    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
-    if (cJSON_IsNumber(opacity)) {
-        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
-            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
-        } else {
-            filterInfo.opacity = static_cast<float>(opacity->valuedouble);
-        }
-    }
     ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
     return true;
 }
@@ -1626,6 +1618,14 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
 void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo)
 {
     CHKPV(BlurInfoInfoStr);
+    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "dip_opacity");
+    if (cJSON_IsNumber(opacity)) {
+        if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
+            FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
+        } else {
+            filterInfo.opacity = static_cast<float>(opacity->valuedouble);
+        }
+    }
     float tempCoef1 = 0.0f;
     cJSON *coef1 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef1");
     if (cJSON_IsNumber(coef1)) {
@@ -1746,60 +1746,77 @@ void DragDrawing::ProcessFilter()
     }
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
-    CHKPV(g_drawingInfo.pixelMap);
-    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    CHKPV(g_drawingInfo.pixelMap); 
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
-    ExtraInfo extraInfo = g_drawingInfo.extraInfo;
     if (filterInfo.blurStyle != -1) {
-        Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
-        std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
-            filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
-        if (backFilter == nullptr) {
-            FI_HILOGE("Create backgroundFilter failed");
-            return;
-        }
-        filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetGreyCoef(filterInfo.coef);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                              g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                             g_drawingInfo.pixelMap->GetHeight());
-        if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
-            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo.dipScale) < filterInfo.blurRadius)) {
-            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                      filterInfo.blurRadius, filterInfo.dipScale);
-            return;
-        }
-        filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
-        filterNode->SetAlpha(filterInfo.opacity);
-    } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
-         std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
-            DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
-        if (backFilter == nullptr) {
-            FI_HILOGE("Create backgroundFilter failed");
-            return;
-        }
-        filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetGreyCoef(filterInfo.coef);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                              g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                             g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
-            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo.dipScale) < extraInfo.cornerRadius)) {
-            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                      extraInfo.cornerRadius, filterInfo.dipScale);
-            return;
-        }
-        filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
-        filterNode->SetAlpha(filterInfo.opacity);
+        SetCustomDragBlur(filterInfo, filterNode);
+    } else {
+        ExtraInfo extraInfo = g_drawingInfo.extraInfo;
+        SetComponentDragBlur(filterInfo, extraInfo, filterNode);
     }
     FI_HILOGD("Add filter successfully");
     FI_HILOGD("leave");
+}
+
+void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                            g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                            g_drawingInfo.pixelMap->GetHeight());
+    if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < filterInfo.blurRadius)) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                    filterInfo.blurRadius, filterInfo.dipScale);
+            return;
+        }
+    filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+}
+
+void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
+    std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                            g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+                            g_drawingInfo.pixelMap->GetHeight());
+    if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < extraInfo.cornerRadius)) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                    extraInfo.cornerRadius, filterInfo.dipScale);
+            return;
+        }
+    filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+    return;
 }
 
 int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)

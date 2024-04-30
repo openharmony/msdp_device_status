@@ -272,6 +272,9 @@ private:
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
     void ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo);
+    void SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode);
+    void SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
+        std::shared_ptr<Rosen::RSCanvasNode> filterNode);
     void ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
     void ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
     void PrintDragShadowInfo();
