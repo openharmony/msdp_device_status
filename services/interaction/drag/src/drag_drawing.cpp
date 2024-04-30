@@ -911,7 +911,7 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     shadowNode->AddModifier(drawPixelMapModifier_);
-    shadowNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
+    shadowNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
     shadowNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
@@ -1580,9 +1580,21 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
-    if (cJSON_IsNumber(cornerRadius)) {
-        filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
+    if (cJSON_IsNumber(cornerRadius1)) {
+        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius1->valuedouble);
+    }
+    cJSON *cornerRadius2 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius2");
+    if (cJSON_IsNumber(cornerRadius2)) {
+        filterInfo.cornerRadius2 = static_cast<float>(cornerRadius2->valuedouble);
+    }
+    cJSON *cornerRadius3 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius3");
+    if (cJSON_IsNumber(cornerRadius3)) {
+        filterInfo.cornerRadius3 = static_cast<float>(cornerRadius3->valuedouble);
+    }
+    cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius4");
+    if (cJSON_IsNumber(cornerRadius4)) {
+        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius4->valuedouble);
     }
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
     if (cJSON_IsString(dragType)) {
@@ -1640,6 +1652,10 @@ void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filte
     cJSON *blurColor = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_color");
     if (cJSON_IsNumber(blurColor)) {
         filterInfo.blurColor = blurColor->valueint;
+    }
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_style");
+    if (cJSON_IsNumber(blurStyle)) {
+        filterInfo.blurStyle = blurStyle->valueint;
     }
     return;
 }
@@ -1734,8 +1750,8 @@ void DragDrawing::ProcessFilter()
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     ExtraInfo extraInfo = g_drawingInfo.extraInfo;
-    if (extraInfo.blurStyle != -1) {
-        Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)extraInfo.blurStyle;
+    if (filterInfo.blurStyle != -1) {
+        Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
         std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
             RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
             filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
@@ -2114,7 +2130,7 @@ void DragDrawing::InitMultiSelectedNodes()
             degrees = NEGATIVE_ANGLE;
         }
         multiSelectedNode->SetRotation(degrees);
-        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius * g_drawingInfo.filterInfo.dipScale);
+        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
         multiSelectedNode->SetAlpha(alpha);
         g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }

@@ -131,7 +131,10 @@ struct FilterInfo {
     int32_t shadowColorStrategy { 0 };
     float shadowCorner { 0.0F };
     float dipScale { 0.0f };
-    float cornerRadius { 0.0f };
+    float cornerRadius1 { 0.0f };
+    float cornerRadius2 { 0.0f };
+    float cornerRadius3 { 0.0f };
+    float cornerRadius4 { 0.0f };
     float opacity { 0.95f };
     float offsetX { 0.0f };
     float offsetY { 0.0f };
@@ -140,10 +143,11 @@ struct FilterInfo {
     float elevation { 0.0f };
     bool isHardwareAcceleration { false };
     Rosen::Vector2f coef;
-    float blurRadius { 0.0f };
-    float blurStaturation { 0.0f };
-    float blurBrightness { 0.0f };
+    float blurRadius { -1.0f };
+    float blurStaturation { -1.0f };
+    float blurBrightness { -1.0f };
     int32_t blurColor { -1 };
+    int32_t blurStyle { -1 };
 };
 
 struct ExtraInfo {
