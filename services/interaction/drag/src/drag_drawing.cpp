@@ -44,7 +44,6 @@
 #include "devicestatus_define.h"
 #include "drag_data_manager.h"
 #include "drag_hisysevent.h"
-#include "json_parser.h"
 #include "include/util.h"
 
 #undef LOG_TAG
@@ -146,6 +145,7 @@ constexpr float SCALE_SM { 3.0f / 4 };
 constexpr float SCALE_MD { 4.0f / 8 };
 constexpr float SCALE_LG { 5.0f / 12 };
 const std::string THREAD_NAME { "os_AnimationEventRunner" };
+const std::string SUPER_HUB_THREAD_NAME { "os_SuperHubEventRunner" };
 const uint64_t WATCHDOG_TIMWVAL { 5000 };
 const std::string COPY_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_Drag.svg" };
 const std::string COPY_ONE_DRAG_PATH { "/system/etc/device_status/drag_icon/Copy_One_Drag.svg" };
@@ -505,16 +505,7 @@ void DragDrawing::OnStartDrag(const DragAnimationData &dragAnimationData,
         return;
     }
 #ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-        int ret = HiviewDFX::Watchdog::GetInstance().AddThread("os_AnimationEventRunner", handler_, WATCHDOG_TIMWVAL);
-        if (ret != 0) {
-            FI_HILOGW("add watch dog failed");
-        }
-    }
-    if (!handler_->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropStartExtFunc, g_dragData))) {
         FI_HILOGE("Start style animation failed");
     }
 #endif // OHOS_DRAG_ENABLE_ANIMATION
@@ -529,7 +520,6 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         FI_HILOGE("Invalid pointId:%{public}d", pointerId);
         return;
     }
-
     if (dragExtHandler_ == nullptr) {
         FI_HILOGE("Fail to open drag drop extension library");
         return;
@@ -541,22 +531,30 @@ void DragDrawing::NotifyDragInfo(DragEvent dragType, int32_t pointerId, int32_t 
         dragExtHandler_ = nullptr;
         return;
     }
-#ifdef OHOS_DRAG_ENABLE_ANIMATION
-    if (handler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        CHKPV(runner);
-        handler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
-    }
     RotateDisplayXY(displayX, displayY);
     struct DragEventInfo dragEventInfo;
     dragEventInfo.dragType = dragType;
     dragEventInfo.pointerId = pointerId;
     dragEventInfo.displayX = displayX < 0 ? 0 : displayX;
     dragEventInfo.displayY = displayY < 0 ? 0 : displayY;
-    if (!handler_->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
+    if (!GetSuperHubHandler()->PostTask(std::bind(dragDropExtFunc, dragEventInfo))) {
         FI_HILOGE("notify drag info failed");
     }
-#endif // OHOS_DRAG_ENABLE_ANIMATION
+    if (dragType == DragEvent::DRAG_UP) {
+        superHubHandler_ = nullptr;
+    }
+}
+std::shared_ptr<AppExecFwk::EventHandler> DragDrawing::GetSuperHubHandler()
+{
+    if (superHubHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(SUPER_HUB_THREAD_NAME);
+        int ret = HiviewDFX::Watchdog::GetInstance().AddThread(SUPER_HUB_THREAD_NAME, handler_, WATCHDOG_TIMWVAL);
+        if (ret != 0) {
+            FI_HILOGW("add watch dog failed");
+        }
+        superHubHandler_ = std::make_shared<AppExecFwk::EventHandler>(std::move(runner));
+    }
+    return superHubHandler_;
 }
 
 void DragDrawing::CheckStyleNodeModifier(std::shared_ptr<Rosen::RSCanvasNode> styleNode)
@@ -1493,70 +1491,58 @@ void DragDrawing::SetDecodeOptions(Media::DecodeOptions &decodeOpts)
 }
 
 
-void DragDrawing::ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+void DragDrawing::ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
-    JsonParser filterInfoParser;
-    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
-    if (!cJSON_IsObject(filterInfoParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
-        return;
-    }
-    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetX");
+    CHKPV(filterInfoParser);
+    cJSON *offsetX = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetX");
     if (cJSON_IsNumber(offsetX)) {
         filterInfo.offsetX = static_cast<float>(offsetX->valuedouble);
     }
-    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_offsetY");
+    cJSON *offsetY = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_offsetY");
     if (cJSON_IsNumber(offsetY)) {
         filterInfo.offsetY = static_cast<float>(offsetY->valuedouble);
     }
-    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_argb");
+    cJSON *argb = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_argb");
     if (cJSON_IsNumber(argb)) {
         filterInfo.argb = static_cast<uint32_t>(argb->valueint);
     }
-    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_is_filled");
+    cJSON *shadowIsFilled   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_is_filled");
     if (cJSON_IsBool(shadowIsFilled)) {
         filterInfo.shadowIsFilled = cJSON_IsTrue(shadowIsFilled);
     }
-    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_mask");
+    cJSON *shadowMask   = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_mask");
     if (cJSON_IsBool(shadowMask)) {
         filterInfo.shadowMask = cJSON_IsTrue(shadowMask);
     }
-    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_color_strategy");
+    cJSON *shadowColorStrategy  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_color_strategy");
     if (cJSON_IsNumber(shadowColorStrategy)) {
         filterInfo.shadowColorStrategy = shadowColorStrategy->valueint;
     }
     cJSON *isHardwareAcceleration  = cJSON_GetObjectItemCaseSensitive(
-        filterInfoParser.json, "shadow_is_hardwareacceleration");
+        filterInfoParser, "shadow_is_hardwareacceleration");
     if (cJSON_IsBool(isHardwareAcceleration)) {
         filterInfo.isHardwareAcceleration = cJSON_IsTrue(isHardwareAcceleration);
     }
     if (filterInfo.isHardwareAcceleration) {
-        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_elevation");
+        cJSON *elevation  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_elevation");
         if (cJSON_IsNumber(elevation)) {
             filterInfo.elevation = static_cast<float>(elevation->valuedouble);
         }
     } else {
-        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "shadow_corner");
+        cJSON *shadowCorner  = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "shadow_corner");
         if (cJSON_IsNumber(shadowCorner)) {
             filterInfo.shadowCorner = static_cast<float>(shadowCorner->valuedouble);
         }
     }
-    cJSON_Delete(filterInfoParser.json);
 }
 
-void DragDrawing::ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo)
+void DragDrawing::ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo)
 {
-    JsonParser filterInfoParser;
-    filterInfoParser.json = cJSON_Parse(filterInfoStr.c_str());
-    if (!cJSON_IsObject(filterInfoParser.json)) {
-        FI_HILOGE("FilterInfo is not json object");
-        return;
-    }
-    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_shadow_path");
+    CHKPV(filterInfoParser);
+    cJSON *path = cJSON_GetObjectItemCaseSensitive(filterInfoParser, "drag_shadow_path");
     if (cJSON_IsString(path)) {
         filterInfo.path = path->valuestring;
     }
-    cJSON_Delete(filterInfoParser.json);
 }
 
 void DragDrawing::PrintDragShadowInfo()
@@ -1607,9 +1593,9 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         filterInfo.shadowEnable = cJSON_IsTrue(shadowEnable);
     }
     if (filterInfo.shadowEnable) {
-        ParserDragShadowInfo(filterInfoStr, filterInfo);
+        ParserDragShadowInfo(filterInfoParser.json, filterInfo);
         if (filterInfo.dragType == "text") {
-            ParserTextDragShadowInfo(filterInfoStr, filterInfo);
+            ParserTextDragShadowInfo(filterInfoParser.json, filterInfo);
         }
         PrintDragShadowInfo();
     }
@@ -1621,7 +1607,6 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
-    cJSON_Delete(filterInfoParser.json);
     return true;
 }
 
@@ -1655,7 +1640,6 @@ bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &ex
     if (cJSON_IsBool(allowDistributed)) {
         extraInfo.allowDistributed = cJSON_IsTrue(allowDistributed) ? true : false;
     }
-    cJSON_Delete(extraInfoParser.json);
     return true;
 }
 

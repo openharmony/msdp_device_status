@@ -21,6 +21,7 @@
 #include "display_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "json_parser.h"
 #include "libxml/tree.h"
 #include "libxml/parser.h"
 #include "modifier/rs_extended_modifier.h"
@@ -261,8 +262,8 @@ private:
     bool NeedAdjustSvgInfo();
     void SetDecodeOptions(Media::DecodeOptions &decodeOpts);
     bool ParserFilterInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
-    void ParserDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
-    void ParserTextDragShadowInfo(const std::string &filterInfoStr, FilterInfo &filterInfo);
+    void ParserDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
+    void ParserTextDragShadowInfo(cJSON* filterInfoParser, FilterInfo &filterInfo);
     void PrintDragShadowInfo();
     void ProcessFilter();
     bool ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo);
@@ -293,6 +294,7 @@ private:
     void DoEndAnimation();
     void ResetParameter();
     int32_t DoRotateDragWindow(float rotation);
+    std::shared_ptr<AppExecFwk::EventHandler> GetSuperHubHandler();
 
 private:
     int64_t interruptNum_ { -1 };
@@ -307,6 +309,7 @@ private:
     std::shared_ptr<Rosen::RSUIDirector> rsUiDirector_ { nullptr };
     std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
     std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> superHubHandler_ { nullptr };
     std::atomic_bool hasRunningStopAnimation_ { false };
     std::atomic_bool hasRunningScaleAnimation_ { false };
     std::atomic_bool needBreakStyleScaleAnimation_ { false };

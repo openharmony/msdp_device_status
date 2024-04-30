@@ -1555,7 +1555,7 @@ HWTEST_F(DragManagerTest, DragManagerTest62, TestSize.Level0)
     StopDragParam param { dropResult };
     MessageParcel data;
     bool ret = param.Marshalling(data);
-    EXPECT_TRUE(ret);    
+    EXPECT_TRUE(ret);
     ret = param.Unmarshalling(data);
     EXPECT_TRUE(ret);
 }
