@@ -130,11 +130,7 @@ ohos_unittest("DdpAdapterTest") {
     "${device_status_intention_path}/prototype/include",
     "${device_status_root_path}/utils/ipc/include",
   ]
-    "c_utils:utils",
-    "device_manager:devicemanagersdk",
-    "dsoftbus:softbus_client",
-    "hilog:libhilog",
-    "input:libmmi-client",
+
   sources = [ "src/ddp_adapter_test.cpp" ]
   deps = [ "${device_status_intention_path}/adapters/ddp_adapter:intention_ddp_adapter" ]
   external_deps = [
