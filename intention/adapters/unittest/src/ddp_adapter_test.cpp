@@ -240,6 +240,173 @@ HWTEST_F(DdpAdapterTest, TestGetUdIdByNetworkId, TestSize.Level1)
     DDPAdapterImpl dDPAdapterImpl;
     dDPAdapterImpl.GetUdIdByNetworkId(networkId);
 }
+
+/**
+ * @tc.name: TestUnregisterProfileListener
+ * @tc.desc: Test UnregisterProfileListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestUnregisterProfileListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    int32_t ret = dDPAdapterImpl.UnregisterProfileListener(networkId);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestUpdateCrossingSwitchState_1
+ * @tc.desc: Test UpdateCrossingSwitchState_1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestUpdateCrossingSwitchState_1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    bool state = true;
+    int32_t ret = dDPAdapterImpl.UpdateCrossingSwitchState(state);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestPutCharacteristicProfile
+ * @tc.desc: Test PutCharacteristicProfile
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestPutCharacteristicProfile, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    const std::string profileStr = "profileStr";
+    int32_t ret = dDPAdapterImpl.PutCharacteristicProfile(profileStr);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestDDPAdapterAddWatch
+ * @tc.desc: Test AddWatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterAddWatch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    DDPAdapter dDPAdapter;
+    auto networkId = dDPAdapter.GetLocalNetworkId();
+    dDPAdapter.AddWatch(networkId);
+    dDPAdapter.RemoveWatch(networkId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterGetLocalNetworkId
+ * @tc.desc: Test GetLocalNetworkId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterGetLocalNetworkId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    DDPAdapter dDPAdapter;
+    auto networkId = dDPAdapter.GetLocalNetworkId();
+    dDPAdapter.OnProfileChanged(networkId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterGetLocalUdId
+ * @tc.desc: Test GetLocalUdId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterGetLocalUdId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    auto udId = dDPAdapterImpl.GetLocalUdId();
+    DDPAdapter dDPAdapter;
+    dDPAdapter.GetNetworkIdByUdId(udId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterOnProfileChanged_1
+ * @tc.desc: Test OnProfileChanged_1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterOnProfileChanged_1, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    DDPAdapter dDPAdapter;
+    auto networkId = dDPAdapter.GetLocalNetworkId();
+    dDPAdapter.OnProfileChanged(networkId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterOnProfileChanged_2
+ * @tc.desc: Test OnProfileChanged_2
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterOnProfileChanged_2, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    auto udId = dDPAdapterImpl.GetLocalUdId();
+    DDPAdapter dDPAdapter;
+    dDPAdapter.GetNetworkIdByUdId(udId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterGetUdIdByNetworkId
+ * @tc.desc: Test GetUdIdByNetworkId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterGetUdIdByNetworkId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapterImpl dDPAdapterImpl;
+    DDPAdapter dDPAdapter;
+    auto networkId = dDPAdapter.GetLocalNetworkId();
+    dDPAdapter.GetUdIdByNetworkId(networkId);
+}
+
+/**
+ * @tc.name: TestDDPAdapterUpdateCrossingSwitchState
+ * @tc.desc: Test UpdateCrossingSwitchState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterUpdateCrossingSwitchState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapter dDPAdapter;
+    bool state = false;
+    int32_t ret = dDPAdapter.UpdateCrossingSwitchState(state);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TestDDPAdapterGetCrossingSwitchState
+ * @tc.desc: Test GetCrossingSwitchState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DdpAdapterTest, TestDDPAdapterGetCrossingSwitchState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DDPAdapter dDPAdapter;
+    bool state = true;
+    DDPAdapterImpl dDPAdapterImpl;
+    auto udId = dDPAdapterImpl.GetLocalUdId();
+    int32_t ret = dDPAdapter.GetCrossingSwitchState(udId, state);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace DeviceStatus
 } // namespace Msdp
 } // namespace OHOS
