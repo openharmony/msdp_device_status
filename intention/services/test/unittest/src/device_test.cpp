@@ -51,7 +51,8 @@ HWTEST_F(DeviceTest, OpenTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
+    Device *dev = new Device(deviceId);
+    CHKPV(dev);
     dev->SetDevPath(devPath_);
     int32_t ret = dev->Open();
     EXPECT_EQ(ret, RET_OK);
@@ -67,7 +68,8 @@ HWTEST_F(DeviceTest, OpenTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
+    Device *dev = new Device(deviceId);
+    CHKPV(dev);
     int32_t ret = dev->Open();
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -81,7 +83,8 @@ HWTEST_F(DeviceTest, CloseTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
+    Device *dev = new Device(deviceId);
+    CHKPV(dev);
     dev->Close();
 }
 
