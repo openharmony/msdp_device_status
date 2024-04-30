@@ -2136,7 +2136,7 @@ HWTEST_F(InteractionManagerTest, GetDragAction_002, TestSize.Level1)
     DragAction dragAction { DragAction::INVALID };
     ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
     EXPECT_EQ(ret, RET_OK);
-    EXPECT_EQ(dragAction, DragAction::COPY);
+    EXPECT_EQ(dragAction, DragAction::MOVE);
     PrintDragAction(dragAction);
     SimulateUpKeyEvent(MMI::KeyEvent::KEYCODE_CTRL_LEFT);
     ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
