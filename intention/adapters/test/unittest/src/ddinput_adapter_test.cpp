@@ -47,7 +47,7 @@ constexpr int32_t TIME_WAIT_FOR_OP_MS { 20 };
 const std::string SYSTEM_CORE { "system_core" };
 uint64_t g_tokenID { 0 };
 const char* g_cores[] = { "ohos.permission.INPUT_MONITORING" };
-std::string DEFAUIT_NETWORKID { "Default NetworkId" };
+const std::string DEFAUIT_NETWORKID { "Default NetworkId" };
 } // namespace
 
 class DDInputAdapterTest : public testing::Test {
