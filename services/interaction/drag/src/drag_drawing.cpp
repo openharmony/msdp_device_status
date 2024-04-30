@@ -1806,12 +1806,12 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
         g_drawingInfo.pixelMap->GetHeight());
     filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-        g_drawingInfo.pixelMap->GetHeight());             
+        g_drawingInfo.pixelMap->GetHeight());
     if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < extraInfo.cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                extraInfo.cornerRadius, filterInfo.dipScale); 
+                extraInfo.cornerRadius, filterInfo.dipScale);
             return;
         }
     filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
