@@ -18,6 +18,7 @@ group("device_status_unittest") {
   deps = []
 
   deps += [
+    "intention/common:unittest",
     "intentiontest:DragManagerTest",
     "utils:UtilityTest",
   ]
