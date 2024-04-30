@@ -33,6 +33,17 @@ using namespace testing::ext;
 DeviceManager devmg_;
 const std::string devNode_ = { "event0" };
 const std::string devPath_ = { "/dev/input/event0" };
+constexpr int32_t INDEX_TWO { 2 };
+constexpr int32_t INDEX_THREE { 3 };
+constexpr int32_t INDEX_NINE { 9 };
+constexpr int32_t INDEX_TWELVE { 12 };
+constexpr int32_t INDEX_TWENTY_THREE { 23 };
+constexpr int32_t NUM_ONE { 1 };
+constexpr int32_t NUM_SIXTY_FOUR { 64 };
+constexpr int32_t NUM_HUNDRED_TWENTY_EIGHT { 128 };
+constexpr int32_t NUM_THIRTY_TWO { 32 };
+constexpr int32_t NUM_TWO { 2 };
+int32_t deviceId_ = devmg_.ParseDeviceId(devNode_);
 
 class DeviceTest : public testing::Test {
 public:
@@ -279,6 +290,88 @@ HWTEST_F(DeviceTest, DispatchTest001, TestSize.Level0)
     dev->Dispatch(ev);
     delete dev;
     dev = nullptr;
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest001
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_TWO] = NUM_ONE;
+    dev.JudgeKeyboardType();
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest002
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest002, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_TWELVE] = NUM_SIXTY_FOUR;
+    dev.bus_ = BUS_BLUETOOTH;
+    dev.JudgeKeyboardType();
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest003
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest003, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_NINE] = NUM_HUNDRED_TWENTY_EIGHT;
+    dev.JudgeKeyboardType();
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest004
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest004, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
+    dev.JudgeKeyboardType();
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest005
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest005, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
+    dev.keyBitmask_[INDEX_TWELVE] = NUM_TWO;
+    dev.JudgeKeyboardType();
+}
+
+/**
+ * @tc.name: JudgeKeyboardTypeTest006
+ * @tc.desc: Test func named JudgeKeyboardType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, JudgeKeyboardTypeTest006, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    Device dev(deviceId_);
+    dev.keyBitmask_[INDEX_THREE] = NUM_THIRTY_TWO;
+    dev.keyBitmask_[INDEX_TWELVE] = NUM_TWO;
+    dev.keyBitmask_[INDEX_TWENTY_THREE] = NUM_SIXTY_FOUR;
+    dev.JudgeKeyboardType();
 }
 } // namespace DeviceStatus
 } // namespace Msdp
