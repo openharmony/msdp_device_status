@@ -714,6 +714,50 @@ HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationList
     RemovePermission();
 }
 
+/**
+ * @tc.name: InteractionManagerTest_RegisterCoordinationListener_003
+ * @tc.desc: Register coordination listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InteractionManagerTest, InteractionManagerTest_RegisterCoordinationListener_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    FI_HILOGD("InteractionManagerTest_RegisterCoordinationListener_003 enter");
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    class CoordinationListenerTest : public ICoordinationListener {
+    public:
+        CoordinationListenerTest() : ICoordinationListener() {}
+        void OnCoordinationMessage(const std::string &networkId, CoordinationMessage msg) override
+        {
+            FI_HILOGD("Register coordination listener test");
+            (void) networkId;
+        };
+    };
+    std::shared_ptr<CoordinationListenerTest> consumer =
+        std::make_shared<CoordinationListenerTest>();
+    bool isCompatible = true;
+    int32_t ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCompatible);
+    #ifdef OHOS_BUILD_ENABLE_COORDINATION
+        ASSERT_EQ(ret, RET_OK);
+    #else
+        ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    #endif // OHOS_BUILD_ENABLE_COORDINATION
+        ret = InteractionManager::GetInstance()->RegisterCoordinationListener(consumer, isCompatible);
+    #ifdef OHOS_BUILD_ENABLE_COORDINATION
+        ASSERT_EQ(ret, RET_ERR);
+    #else
+        ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    #endif // OHOS_BUILD_ENABLE_COORDINATION
+        ret = InteractionManager::GetInstance()->UnregisterCoordinationListener(consumer, isCompatible);
+    #ifdef OHOS_BUILD_ENABLE_COORDINATION
+        ASSERT_EQ(ret, RET_OK);
+    #else
+        ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    #endif // OHOS_BUILD_ENABLE_COORDINATION
+    RemovePermission();
+    FI_HILOGD("InteractionManagerTest_RegisterCoordinationListener_003 finish");
+}
 
 /**
  * @tc.name: InteractionManagerTest_ActivateCoordination

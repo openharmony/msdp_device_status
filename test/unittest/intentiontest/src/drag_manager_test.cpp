@@ -16,8 +16,10 @@
 #include <future>
 #include "pointer_event.h"
 #include "securec.h"
+#include "message_parcel.h"
 
 #include "drag_manager_test.h"
+#include "drag_params.h"
 #include "devicestatus_errors.h"
 #include "interaction_manager.h"
 
@@ -1196,6 +1198,235 @@ HWTEST_F(DragManagerTest, DragManagerTest39, TestSize.Level0)
     AssignToAnimation(animationOut);
     ret = InteractionManager::GetInstance()->UpdatePreviewStyleWithAnimation(previewStyleOut, animationOut);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest40
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest40, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->EnterTextEditorArea(true);
+    ASSERT_EQ(ret, RET_ERR);
+    ret = InteractionManager::GetInstance()->EnterTextEditorArea(false);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest41
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest41, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragAction dragAction { DragAction::INVALID };
+    int32_t ret = InteractionManager::GetInstance()->GetDragAction(dragAction);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest42
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest42, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    int32_t ret = InteractionManager::GetInstance()->GetExtraInfo(extraInfo);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest43
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest43, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InteractionManager::GetInstance()->AddPrivilege();
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: DragManagerTest44
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest44, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    StopDragParam param {};
+    bool ret = param.Unmarshalling(data);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DragManagerTest45
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest45, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    MessageParcel data;
+    SetDragWindowVisibleParam param {};
+    bool ret = param.Unmarshalling(data);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DragManagerTest46
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest46, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    MessageParcel data;
+    GetDragTargetPidReply targetPidReply { pid };
+    bool ret = targetPidReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest47
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest47, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t pid = InteractionManager::GetInstance()->GetDragTargetPid();
+    MessageParcel data;
+    GetDragTargetPidReply targetPidReply { pid };
+    bool ret = targetPidReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest48
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest48, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string udKey;
+    MessageParcel data;
+    GetUdKeyReply udKeyReply { std::move(udKey) };
+    bool ret = udKeyReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest49
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest49, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    ShadowOffset shadowOffset {};
+    MessageParcel data;
+    GetShadowOffsetReply shadowOffsetReply { shadowOffset };
+    bool ret = shadowOffsetReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest50
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest50, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    UpdatePreviewAnimationParam param {};
+    MessageParcel data;
+    bool ret = param.Unmarshalling(data);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: DragManagerTest51
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest51, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::map<std::string, int64_t> summaries;
+    GetDragSummaryReply summaryReply { std::move(summaries) };
+    MessageParcel data;
+    bool ret = summaryReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest52
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest52, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragState dragState {};
+    GetDragStateReply dragStateReply { dragState };
+    MessageParcel data;
+    bool ret = dragStateReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest53
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest53, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    DragAction dragAction {};
+    GetDragActionReply dragActionReply { dragAction };
+    MessageParcel data;
+    bool ret = dragActionReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: DragManagerTest54
+ * @tc.desc: Drag Drawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DragManagerTest, DragManagerTest54, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    std::string extraInfo;
+    GetExtraInfoReply extraInfoReply { std::move(extraInfo) };
+    MessageParcel data;
+    bool ret = extraInfoReply.Marshalling(data);
+    ASSERT_EQ(ret, true);
 }
 } // namespace DeviceStatus
 } // namespace Msdp
