@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,8 +87,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest002, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_ABSOLUTE_STILL &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT));
+#endif // OHOS_BUILD_ENABLE_COORDINATION
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -133,8 +137,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest005, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_CAR_BLUETOOTH &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -179,8 +187,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest008, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_HORIZONTAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -225,8 +237,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest011, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_RELATIVE_STILL &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -271,8 +287,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest014, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_STILL &&
         (data.value <= OnChangedValue::VALUE_EXIT && data.value >= OnChangedValue::VALUE_INVALID));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -317,8 +337,12 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest017, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
 }
 
@@ -348,15 +372,23 @@ HWTEST_F(DeviceStatusServiceTest, GetDeviceStatusDataTest019, TestSize.Level0)
     Data data = g_client->GetDeviceStatusData(g_type);
     GTEST_LOG_(INFO) << "type: " << data.type;
     GTEST_LOG_(INFO) << "value: " << data.value;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data.type == Type::TYPE_VERTICAL_POSITION &&
         (data.value >= OnChangedValue::VALUE_INVALID && data.value <= OnChangedValue::VALUE_EXIT));
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     GTEST_LOG_(INFO) << "GetDeviceStatusData failed";
     Data invalidData;
     invalidData.type = Type::TYPE_INVALID;
     invalidData.value = OnChangedValue::VALUE_INVALID;
     invalidData.status = Status::STATUS_INVALID;
     invalidData.movement = 0.0f;
+#ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
+    GTEST_LOG_(INFO) << "INTENTION_FRAMEWORK, UNSUPPORTED " << data.value;
+#else
     EXPECT_TRUE(data != invalidData);
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 }
 } // namespace
 } // namespace DeviceStatus
