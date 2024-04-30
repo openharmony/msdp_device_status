@@ -36,16 +36,11 @@ const std::string devPath_ = { "/dev/input/event0" };
 
 class DeviceTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
-
-void DeviceTest::SetUpTestCase() {}
-void DeviceTest::TearDownTestCase() {}
-void DeviceTest::SetUp() {}
-void DeviceTest::TearDown() {}
 
 /**
  * @tc.name: OpenTest001
@@ -56,9 +51,7 @@ HWTEST_F(DeviceTest, OpenTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = devmg_.FindDevice(devPath_);
-    dev = std::make_shared<Device>(deviceId);
-    CHKPV(dev);
+    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
     dev->SetDevPath(devPath_);
     int32_t ret = dev->Open();
     EXPECT_EQ(ret, RET_OK);
@@ -74,9 +67,7 @@ HWTEST_F(DeviceTest, OpenTest002, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = devmg_.FindDevice(devPath_);
-    dev = std::make_shared<Device>(deviceId);
-    CHKPV(dev);
+    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
     int32_t ret = dev->Open();
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -90,9 +81,7 @@ HWTEST_F(DeviceTest, CloseTest001, TestSize.Level0)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = devmg_.ParseDeviceId(devNode_);
-    std::shared_ptr<IDevice> dev = devmg_.FindDevice(devPath_);
-    dev = std::make_shared<Device>(deviceId);
-    CHKPV(dev);
+    std::shared_ptr<IDevice> dev = std::make_shared<Device>(deviceId);
     dev->Close();
 }
 
@@ -251,6 +240,40 @@ HWTEST_F(DeviceTest, ReadTomlFileTest001, TestSize.Level0)
     CHKPV(dev);
     int32_t ret = dev->ReadTomlFile(filePath);
     EXPECT_EQ(ret, RET_ERR);
+    delete dev;
+    dev = nullptr;
+}
+
+/**
+ * @tc.name: HasRelCoordTest001
+ * @tc.desc: Test func named HasRelCoord
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, HasRelCoordTest001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = devmg_.ParseDeviceId(devNode_);
+    Device *dev = new Device(deviceId);
+    CHKPV(dev);
+    bool ret = dev->HasRelCoord();
+    EXPECT_EQ(ret, false);
+    delete dev;
+    dev = nullptr;
+}
+
+/**
+ * @tc.name: DispatchTest001
+ * @tc.desc: Test func named Dispatch
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceTest, DispatchTest001, TestSize.Level0)
+{
+    CALL_TEST_DEBUG;
+    const struct epoll_event ev {};
+    int32_t deviceId = devmg_.ParseDeviceId(devNode_);
+    Device *dev = new Device(deviceId);
+    CHKPV(dev);
+    dev->Dispatch(ev);
     delete dev;
     dev = nullptr;
 }
