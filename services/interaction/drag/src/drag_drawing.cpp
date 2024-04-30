@@ -1746,7 +1746,7 @@ void DragDrawing::ProcessFilter()
     }
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
-    CHKPV(g_drawingInfo.pixelMap); 
+    CHKPV(g_drawingInfo.pixelMap);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (filterInfo.blurStyle != -1) {
         SetCustomDragBlur(filterInfo, filterNode);
@@ -1774,14 +1774,14 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
     filterNode->SetGreyCoef(filterInfo.coef);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                            g_drawingInfo.pixelMap->GetHeight());
+        g_drawingInfo.pixelMap->GetHeight());
     filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                            g_drawingInfo.pixelMap->GetHeight());
+        g_drawingInfo.pixelMap->GetHeight());
     if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < filterInfo.blurRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                    filterInfo.blurRadius, filterInfo.dipScale);
+                filterInfo.blurRadius, filterInfo.dipScale);
             return;
         }
     filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
@@ -1804,14 +1804,14 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
     filterNode->SetGreyCoef(filterInfo.coef);
     int32_t adjustSize = TWELVE_SIZE * GetScaling();
     filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                            g_drawingInfo.pixelMap->GetHeight());
+        g_drawingInfo.pixelMap->GetHeight());
     filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-                            g_drawingInfo.pixelMap->GetHeight());
+        g_drawingInfo.pixelMap->GetHeight());             
     if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
         (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
         / filterInfo.dipScale) < extraInfo.cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
-                    extraInfo.cornerRadius, filterInfo.dipScale);
+                extraInfo.cornerRadius, filterInfo.dipScale); 
             return;
         }
     filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
