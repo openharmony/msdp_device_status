@@ -129,8 +129,8 @@ HWTEST_F(DsoftbusAdapterTest, TestEnable, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Enable());
+    DSoftbusAdapter dSoftbusAdapter;
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Enable());
     RemovePermission();
 }
 
@@ -144,8 +144,8 @@ HWTEST_F(DsoftbusAdapterTest, TestDisable, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Disable());
+    DSoftbusAdapter dSoftbusAdapter;
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Disable());
     RemovePermission();
 }
 
@@ -159,11 +159,11 @@ HWTEST_F(DsoftbusAdapterTest, TestAddObserver, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::shared_ptr<IDSoftbusObserver> observer = std::make_shared<DSoftbusObserver>();
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Enable());
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->AddObserver(observer));
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Disable());
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Enable());
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.AddObserver(observer));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Disable());
     RemovePermission();
 }
 /**
@@ -176,12 +176,12 @@ HWTEST_F(DsoftbusAdapterTest, TestRemoveObserver, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::shared_ptr<IDSoftbusObserver> observer = std::make_shared<DSoftbusObserver>();
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Enable());
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->AddObserver(observer));
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->RemoveObserver(observer));
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->Disable());
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Enable());
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.AddObserver(observer));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.RemoveObserver(observer));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.Disable());
     RemovePermission();
 }
 
@@ -195,9 +195,9 @@ HWTEST_F(DsoftbusAdapterTest, TestOpenSession, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::string networkId("softbus");
-    int32_t ret = dSoftbusAdapter->OpenSession(networkId);
+    int32_t ret = dSoftbusAdapter.OpenSession(networkId);
     ASSERT_EQ(ret, RET_ERR);
     RemovePermission();
 }
@@ -212,11 +212,11 @@ HWTEST_F(DsoftbusAdapterTest, TestCloseSession, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::string networkId("softbus");
-    int32_t ret = dSoftbusAdapter->OpenSession(networkId);
+    int32_t ret = dSoftbusAdapter.OpenSession(networkId);
     ASSERT_EQ(ret, RET_ERR);
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->CloseSession(networkId));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.CloseSession(networkId));
     RemovePermission();
 }
 
@@ -230,10 +230,10 @@ HWTEST_F(DsoftbusAdapterTest, SendPacket, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::string networkId("softbus");
     NetPacket packet(MessageId::DSOFTBUS_START_COOPERATE);
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->SendPacket(networkId, packet));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.SendPacket(networkId, packet));
     RemovePermission();
 }
 
@@ -247,10 +247,10 @@ HWTEST_F(DsoftbusAdapterTest, SendParcel, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     std::string networkId("softbus");
     Parcel parcel;
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->SendParcel(networkId, parcel));
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.SendParcel(networkId, parcel));
     RemovePermission();
 }
 
@@ -264,7 +264,7 @@ HWTEST_F(DsoftbusAdapterTest, SetupServer, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     int32_t ret = DSoftbusAdapterImpl::GetInstance()->SetupServer();
     ASSERT_EQ(ret, RET_ERR);
     RemovePermission();
@@ -280,7 +280,6 @@ HWTEST_F(DsoftbusAdapterTest, ConfigTcpAlive, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
     ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::GetInstance()->ConfigTcpAlive(SOCKET));
     RemovePermission();
 }
@@ -295,7 +294,7 @@ HWTEST_F(DsoftbusAdapterTest, InitSocket, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     char name[DEVICE_NAME_SIZE_MAX] {};
     char peerName[DEVICE_NAME_SIZE_MAX] { SERVER_SESSION_NAME };
     char peerNetworkId[PKG_NAME_SIZE_MAX] {};
@@ -389,8 +388,8 @@ HWTEST_F(DsoftbusAdapterTest, TestCloseAllSessions, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
-    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter->CloseAllSessions());
+    DSoftbusAdapter dSoftbusAdapter;
+    ASSERT_NO_FATAL_FAILURE(dSoftbusAdapter.CloseAllSessions());
     RemovePermission();
 }
 
@@ -404,7 +403,7 @@ HWTEST_F(DsoftbusAdapterTest, TestDestroyInstance, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     SetPermission(SYSTEM_CORE, g_cores, sizeof(g_cores) / sizeof(g_cores[0]));
-    std::shared_ptr<DSoftbusAdapter>dSoftbusAdapter = std::make_shared<DSoftbusAdapter>();
+    DSoftbusAdapter dSoftbusAdapter;
     ASSERT_NO_FATAL_FAILURE(DSoftbusAdapterImpl::DestroyInstance());
     RemovePermission();
 }
