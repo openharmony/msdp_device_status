@@ -1786,6 +1786,7 @@ void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_pt
         }
     filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
     filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set custom drag blur successfully");
 }
 
 void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
@@ -1816,6 +1817,7 @@ void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const Extra
         }
     filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
     filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set component drag blur successfully");
     return;
 }
 
