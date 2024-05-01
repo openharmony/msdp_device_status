@@ -1748,10 +1748,10 @@ void DragDrawing::ProcessFilter()
     CHKPV(filterNode);
     CHKPV(g_drawingInfo.pixelMap);
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
+    ExtraInfo extraInfo = g_drawingInfo.extraInfo;
     if (filterInfo.blurStyle != -1) {
         SetCustomDragBlur(filterInfo, filterNode);
     } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
-        ExtraInfo extraInfo = g_drawingInfo.extraInfo;
         SetComponentDragBlur(filterInfo, extraInfo, filterNode);
     }
     FI_HILOGD("Add filter successfully");
