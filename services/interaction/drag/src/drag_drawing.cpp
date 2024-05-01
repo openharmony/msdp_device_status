@@ -1594,7 +1594,7 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     }
     cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius4");
     if (cJSON_IsNumber(cornerRadius4)) {
-        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius4->valuedouble);
+        filterInfo.cornerRadius4 = static_cast<float>(cornerRadius4->valuedouble);
     }
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
     if (cJSON_IsString(dragType)) {
@@ -1750,7 +1750,7 @@ void DragDrawing::ProcessFilter()
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     if (filterInfo.blurStyle != -1) {
         SetCustomDragBlur(filterInfo, filterNode);
-    } else {
+    } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
         ExtraInfo extraInfo = g_drawingInfo.extraInfo;
         SetComponentDragBlur(filterInfo, extraInfo, filterNode);
     }
