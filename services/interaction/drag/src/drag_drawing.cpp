@@ -911,6 +911,8 @@ int32_t DragDrawing::DrawShadow(std::shared_ptr<Rosen::RSCanvasNode> shadowNode)
     }
     drawPixelMapModifier_ = std::make_shared<DrawPixelMapModifier>();
     shadowNode->AddModifier(drawPixelMapModifier_);
+    shadowNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
+    shadowNode->SetAlpha(g_drawingInfo.filterInfo.opacity);
     FI_HILOGD("leave");
     return RET_OK;
 }
@@ -1148,9 +1150,7 @@ void DragDrawing::InitCanvas(int32_t width, int32_t height)
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = Rosen::RSCanvasNode::Create();
     CHKPV(filterNode);
     g_drawingInfo.nodes.emplace_back(filterNode);
-    if (g_drawingInfo.sourceType == MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        ProcessFilter();
-    }
+    ProcessFilter();
     std::shared_ptr<Rosen::RSCanvasNode> pixelMapNode = Rosen::RSCanvasNode::Create();
     CHKPV(pixelMapNode);
     pixelMapNode->SetForegroundColor(TRANSPARENT_COLOR_ARGB);
@@ -1580,9 +1580,21 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
     if (cJSON_IsNumber(dipScale)) {
         filterInfo.dipScale = static_cast<float>(dipScale->valuedouble);
     }
-    cJSON *cornerRadius = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius");
-    if (cJSON_IsNumber(cornerRadius)) {
-        filterInfo.cornerRadius = static_cast<float>(cornerRadius->valuedouble);
+    cJSON *cornerRadius1 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius1");
+    if (cJSON_IsNumber(cornerRadius1)) {
+        filterInfo.cornerRadius1 = static_cast<float>(cornerRadius1->valuedouble);
+    }
+    cJSON *cornerRadius2 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius2");
+    if (cJSON_IsNumber(cornerRadius2)) {
+        filterInfo.cornerRadius2 = static_cast<float>(cornerRadius2->valuedouble);
+    }
+    cJSON *cornerRadius3 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius3");
+    if (cJSON_IsNumber(cornerRadius3)) {
+        filterInfo.cornerRadius3 = static_cast<float>(cornerRadius3->valuedouble);
+    }
+    cJSON *cornerRadius4 = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_corner_radius4");
+    if (cJSON_IsNumber(cornerRadius4)) {
+        filterInfo.cornerRadius4 = static_cast<float>(cornerRadius4->valuedouble);
     }
     cJSON *dragType = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "drag_type");
     if (cJSON_IsString(dragType)) {
@@ -1599,7 +1611,14 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
         }
         PrintDragShadowInfo();
     }
-    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(filterInfoParser.json, "dip_opacity");
+    ParserBlurInfo(filterInfoParser.json, g_drawingInfo.filterInfo);
+    return true;
+}
+
+void DragDrawing::ParserBlurInfo(const cJSON *BlurInfoInfoStr, FilterInfo &filterInfo)
+{
+    CHKPV(BlurInfoInfoStr);
+    cJSON *opacity = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "dip_opacity");
     if (cJSON_IsNumber(opacity)) {
         if ((opacity->valuedouble) > MAX_OPACITY || (opacity->valuedouble) <= MIN_OPACITY) {
             FI_HILOGE("Parser opacity limits abnormal, opacity:%{public}f", opacity->valuedouble);
@@ -1607,7 +1626,38 @@ bool DragDrawing::ParserFilterInfo(const std::string &filterInfoStr, FilterInfo 
             filterInfo.opacity = static_cast<float>(opacity->valuedouble);
         }
     }
-    return true;
+    float tempCoef1 = 0.0f;
+    cJSON *coef1 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef1");
+    if (cJSON_IsNumber(coef1)) {
+        tempCoef1 = static_cast<float>(coef1->valuedouble);
+    }
+    float tempCoef2 = 0.0f;
+    cJSON *coef2 = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_coef2");
+    if (cJSON_IsNumber(coef2)) {
+        tempCoef2 = static_cast<float>(coef2->valuedouble);
+    }
+    filterInfo.coef = { tempCoef1, tempCoef2 };
+    cJSON *blurRadius = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_radius");
+    if (cJSON_IsNumber(blurRadius)) {
+        filterInfo.blurRadius = static_cast<float>(blurRadius->valuedouble);
+    }
+    cJSON *blurStaturation = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_staturation");
+    if (cJSON_IsNumber(blurStaturation)) {
+        filterInfo.blurStaturation = static_cast<float>(blurStaturation->valuedouble);
+    }
+    cJSON *blurBrightness = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_brightness");
+    if (cJSON_IsNumber(blurBrightness)) {
+        filterInfo.blurBrightness = static_cast<float>(blurBrightness->valuedouble);
+    }
+    cJSON *blurColor = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_color");
+    if (cJSON_IsNumber(blurColor)) {
+        filterInfo.blurColor = blurColor->valueint;
+    }
+    cJSON *blurStyle = cJSON_GetObjectItemCaseSensitive(BlurInfoInfoStr, "blur_style");
+    if (cJSON_IsNumber(blurStyle)) {
+        filterInfo.blurStyle = blurStyle->valueint;
+    }
+    return;
 }
 
 bool DragDrawing::ParserExtraInfo(const std::string &extraInfoStr, ExtraInfo &extraInfo)
@@ -1697,33 +1747,78 @@ void DragDrawing::ProcessFilter()
     std::shared_ptr<Rosen::RSCanvasNode> filterNode = g_drawingInfo.nodes[BACKGROUND_FILTER_INDEX];
     CHKPV(filterNode);
     CHKPV(g_drawingInfo.pixelMap);
-    int32_t adjustSize = TWELVE_SIZE * GetScaling();
     FilterInfo filterInfo = g_drawingInfo.filterInfo;
     ExtraInfo extraInfo = g_drawingInfo.extraInfo;
-    if (extraInfo.componentType == BIG_FOLDER_LABEL) {
-        std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
-            RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
-            DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
-        if (backFilter == nullptr) {
-            FI_HILOGE("Create backgroundFilter failed");
+    if (filterInfo.blurStyle != -1) {
+        SetCustomDragBlur(filterInfo, filterNode);
+    } else if (extraInfo.componentType == BIG_FOLDER_LABEL) {
+        SetComponentDragBlur(filterInfo, extraInfo, filterNode);
+    }
+    FI_HILOGD("Add filter successfully");
+    FI_HILOGD("leave");
+}
+
+void DragDrawing::SetCustomDragBlur(const FilterInfo &filterInfo, std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    Rosen::BLUR_COLOR_MODE mode = (Rosen::BLUR_COLOR_MODE)filterInfo.blurStyle;
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        filterInfo.blurStaturation, filterInfo.blurBrightness, filterInfo.blurColor, mode);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    if ((filterInfo.blurRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < filterInfo.blurRadius)) {
+            FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
+                filterInfo.blurRadius, filterInfo.dipScale);
             return;
         }
-        filterNode->SetBackgroundFilter(backFilter);
-        filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
-            g_drawingInfo.pixelMap->GetHeight());
-        if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
-            (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
-            / filterInfo.dipScale) < extraInfo.cornerRadius)) {
+    filterNode->SetCornerRadius(filterInfo.blurRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set custom drag blur successfully");
+}
+
+void DragDrawing::SetComponentDragBlur(const FilterInfo &filterInfo, const ExtraInfo &extraInfo,
+    std::shared_ptr<Rosen::RSCanvasNode> filterNode)
+{
+    CHKPV(filterNode);
+    CHKPV(g_drawingInfo.pixelMap);
+    std::shared_ptr<Rosen::RSFilter> backFilter = Rosen::RSFilter::CreateMaterialFilter(
+        RadiusVp2Sigma(RADIUS_VP, filterInfo.dipScale),
+        DEFAULT_SATURATION, DEFAULT_BRIGHTNESS, DEFAULT_COLOR_VALUE);
+    if (backFilter == nullptr) {
+        FI_HILOGE("Create backgroundFilter failed");
+        return;
+    }
+    filterNode->SetBackgroundFilter(backFilter);
+    filterNode->SetGreyCoef(filterInfo.coef);
+    int32_t adjustSize = TWELVE_SIZE * GetScaling();
+    filterNode->SetBounds(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    filterNode->SetFrame(DEFAULT_POSITION_X, adjustSize, g_drawingInfo.pixelMap->GetWidth(),
+        g_drawingInfo.pixelMap->GetHeight());
+    if ((extraInfo.cornerRadius < 0) || (filterInfo.dipScale < 0) ||
+        (fabs(filterInfo.dipScale) < EPSILON) || ((std::numeric_limits<float>::max()
+        / filterInfo.dipScale) < extraInfo.cornerRadius)) {
             FI_HILOGE("Invalid parameters, cornerRadius:%{public}f, dipScale:%{public}f",
                 extraInfo.cornerRadius, filterInfo.dipScale);
             return;
         }
-        filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
-        FI_HILOGD("Add filter successfully");
-    }
-    FI_HILOGD("leave");
+    filterNode->SetCornerRadius(extraInfo.cornerRadius * filterInfo.dipScale);
+    filterNode->SetAlpha(filterInfo.opacity);
+    FI_HILOGD("Set component drag blur successfully");
+    return;
 }
 
 int32_t DragDrawing::SetNodesLocation(int32_t positionX, int32_t positionY)
@@ -2054,6 +2149,7 @@ void DragDrawing::InitMultiSelectedNodes()
             degrees = NEGATIVE_ANGLE;
         }
         multiSelectedNode->SetRotation(degrees);
+        multiSelectedNode->SetCornerRadius(g_drawingInfo.filterInfo.cornerRadius1 * g_drawingInfo.filterInfo.dipScale);
         multiSelectedNode->SetAlpha(alpha);
         g_drawingInfo.multiSelectedNodes.emplace_back(multiSelectedNode);
     }
@@ -2393,8 +2489,7 @@ void DrawPixelMapModifier::Draw(Rosen::RSDrawingContext &context) const
     } else {
         cvs->DrawPixelMapWithParm(g_drawingInfo.pixelMap, rsImageInfo, Rosen::Drawing::SamplingOptions());
     }
-    pixelMapNode->SetCornerRadius(filterInfo.cornerRadius * filterInfo.dipScale);
-    pixelMapNode->SetAlpha(filterInfo.opacity);
+    pixelMapNode->SetClipToBounds(true);
     pixelMapNode->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
     FI_HILOGD("leave");
