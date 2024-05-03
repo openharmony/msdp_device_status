@@ -77,6 +77,7 @@ bool CooperateFree::HasLocalPointerDevice() const
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
 {
+    CALL_INFO_TRACE;
     if (event.isUnchained) {
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
@@ -109,6 +110,7 @@ void CooperateFree::Initial::RemoveChains(std::shared_ptr<Initial> initial)
 
 void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &event)
 {
+    CALL_INFO_TRACE;
     StartCooperateEvent notice = std::get<StartCooperateEvent>(event.event);
     FI_HILOGI("[start cooperation] With \'%{public}s\'", Utility::Anonymize(notice.remoteNetworkId));
     context.StartCooperate(notice);

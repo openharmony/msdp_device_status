@@ -65,6 +65,7 @@ CooperateOut::Initial::Initial(CooperateOut &parent)
     : ICooperateStep(parent, nullptr), parent_(parent)
 {
     AddHandler(CooperateEventType::DISABLE, &CooperateOut::Initial::OnDisable, this);
+    AddHandler(CooperateEventType::START, &CooperateOut::Initial::OnStart, this);
     AddHandler(CooperateEventType::STOP, &CooperateOut::Initial::OnStop, this);
     AddHandler(CooperateEventType::APP_CLOSED, &CooperateOut::Initial::OnAppClosed, this);
     AddHandler(CooperateEventType::INPUT_HOTPLUG_EVENT, &CooperateOut::Initial::OnHotplug, this);
@@ -82,6 +83,19 @@ void CooperateOut::Initial::OnDisable(Context &context, const CooperateEvent &ev
 {
     FI_HILOGI("[disable cooperation] Stop cooperation");
     parent_.StopCooperate(context, event);
+}
+
+void CooperateOut::Initial::OnStart(Context &context, const CooperateEvent &event)
+{
+    StartCooperateEvent param = std::get<StartCooperateEvent>(event.event);
+
+    context.eventMgr_.StartCooperate(param);
+    FI_HILOGE("[start] Start cooperation with \'%{public}s\', report failure when out",
+        Utility::Anonymize(context.Peer()));
+    DSoftbusStartCooperateFinished failNotice {
+        .success = false,
+    };
+    context.eventMgr_.StartCooperateFinish(failNotice);
 }
 
 void CooperateOut::Initial::OnStop(Context &context, const CooperateEvent &event)

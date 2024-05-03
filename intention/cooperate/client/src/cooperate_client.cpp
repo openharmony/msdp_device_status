@@ -202,7 +202,7 @@ int32_t CooperateClient::GetCooperateState(ITunnelClient &tunnel, const std::str
         return RET_ERR;
     }
     FI_HILOGI("GetCooperateState for udId: %{public}s successfully,state: %{public}s",
-        Utility::Anonymize(udId), state ? "true" : "false");
+        Utility::Anonymize(udId), reply.state ? "true" : "false");
     state = reply.state;
     return RET_OK;
 }
@@ -334,7 +334,7 @@ int32_t CooperateClient::GenerateRequestID()
 
 int32_t CooperateClient::OnCoordinationListener(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t userData = 0;
     std::string networkId;
     int32_t nType = 0;
@@ -343,13 +343,14 @@ int32_t CooperateClient::OnCoordinationListener(const StreamClient &client, NetP
         FI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
+    FI_HILOGI("NetworkId:%{public}s, nType:%{public}d", Utility::Anonymize(networkId), nType);
     OnDevCooperateListener(networkId, CoordinationMessage(nType));
     return RET_OK;
 }
 
 void CooperateClient::OnDevCooperateListener(const std::string &networkId, CoordinationMessage msg)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         item->OnCoordinationMessage(networkId, msg);
@@ -358,7 +359,7 @@ void CooperateClient::OnDevCooperateListener(const std::string &networkId, Coord
 
 int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t userData = 0;
     std::string networkId;
     int32_t nType = 0;
@@ -370,6 +371,7 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
 #ifdef ENABLE_PERFORMANCE_CHECK
     FinishTrace(userData, CoordinationMessage(nType));
 #endif // ENABLE_PERFORMANCE_CHECK
+    FI_HILOGI("NetworkId:%{public}s, nType:%{public}d", Utility::Anonymize(networkId), nType);
     OnCooperateMessageEvent(userData, networkId, CoordinationMessage(nType));
     return RET_OK;
 }
@@ -377,7 +379,7 @@ int32_t CooperateClient::OnCoordinationMessage(const StreamClient &client, NetPa
 void CooperateClient::OnCooperateMessageEvent(int32_t userData,
     const std::string &networkId, CoordinationMessage msg)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = devCooperateEvent_.find(userData);
@@ -392,7 +394,7 @@ void CooperateClient::OnCooperateMessageEvent(int32_t userData,
 
 int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPacket &pkt)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t userData = 0;
     bool state = false;
 
@@ -401,13 +403,14 @@ int32_t CooperateClient::OnCoordinationState(const StreamClient &client, NetPack
         FI_HILOGE("Packet read coordination msg failed");
         return RET_ERR;
     }
+    FI_HILOGI("State%{public}s", state ? "true" : "false");
     OnCooperateStateEvent(userData, state);
     return RET_OK;
 }
 
 void CooperateClient::OnCooperateStateEvent(int32_t userData, bool state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = devCooperateEvent_.find(userData);

@@ -45,6 +45,7 @@ private:
 
     private:
         void OnDisable(Context &context, const CooperateEvent &event);
+        void OnStart(Context &context, const CooperateEvent &event);
         void OnStop(Context &context, const CooperateEvent &event);
         void OnComeBack(Context &context, const CooperateEvent &event);
         void OnRemoteStart(Context &context, const CooperateEvent &event);
