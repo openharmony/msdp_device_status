@@ -61,25 +61,25 @@ public:
     virtual ~IContextTest() = default;
 
     IDelegateTasks& GetDelegateTasks() override
-    { 
+    {
         return delegateTasksTest_;
     }
     IDeviceManager& GetDeviceManager() override
-    { 
+    {
         return deviceManagerTest_;
     }
     ITimerManager& GetTimerManager() override
-    { 
+    {
         return timerManagerTest_;
     }
     IDragManager& GetDragManager() override
-    { 
+    {
         return dragManagerTest_;
     }
 
 #ifdef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
     ISocketSessionManager& GetSocketSessionManager() override
-    { 
+    {
         return socketSessionManager_;
     }
     IPluginManager& GetPluginManager() override
@@ -91,15 +91,15 @@ public:
         return inputAdapter_;
     }
     IDInputAdapter& GetDInput() override
-    { 
+    {
         return dInputAdapter_;
     }
     IDSoftbusAdapter& GetDSoftbus() override
-    { 
+    {
         return dSoftbusAdapter_;
     }
     IDDPAdapter& GetDP() override
-    { 
+    {
         return ddpAdapter_;
     }
 #endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
@@ -231,7 +231,7 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest07, TestSize.Leve
     uint32_t events = EPOLLIN | EPOLLOUT;
     struct epoll_event ev {};
     ev.events = events;
-    ev.data.ptr = nullptr; 
+    ev.data.ptr = nullptr;
     ASSERT_NO_FATAL_FAILURE(deviceManager->Dispatch(ev));
 }
 
