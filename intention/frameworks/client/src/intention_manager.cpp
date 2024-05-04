@@ -80,6 +80,22 @@ void IntentionManager::InitMsgHandler()
     }
 }
 
+int32_t IntentionManager::SubscribeCallback(Type type, ActivityEvent event, ReportLatencyNs latency,
+    sptr<IRemoteDevStaCallback> callback)
+{
+    return stationary_.SubscribeCallback(*tunnel_, type, event, latency, callback);
+}
+
+int32_t IntentionManager::UnsubscribeCallback(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback)
+{
+    return stationary_.UnsubscribeCallback(*tunnel_, type, event, callback);
+}
+
+Data IntentionManager::GetDeviceStatusData(const Type type)
+{
+    return stationary_.GetDeviceStatusData(*tunnel_, type);
+}
+
 int32_t IntentionManager::RegisterCoordinationListener(
     std::shared_ptr<ICoordinationListener> listener, bool isCompatible)
 {

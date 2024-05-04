@@ -267,8 +267,10 @@ void StateMachine::OnPointerEvent(Context &context, const CooperateEvent &event)
 {
     CALL_DEBUG_ENTER;
     InputPointerEvent pointerEvent = std::get<InputPointerEvent>(event.event);
+    Coordinate cursorPos = context.CursorPosition();
     context.OnPointerEvent(pointerEvent);
-    Transfer(context, event);
+    pointerEvent.position = cursorPos;
+    Transfer(context, CooperateEvent { CooperateEventType::INPUT_POINTER_EVENT, pointerEvent });
 }
 
 void StateMachine::OnSoftbusSessionClosed(Context &context, const CooperateEvent &event)

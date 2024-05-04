@@ -23,7 +23,9 @@
 #include <input_manager.h>
 
 #include "drag_data.h"
+#ifndef OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 #include "stream_session.h"
+#endif // OHOS_BUILD_ENABLE_INTENTION_FRAMEWORK
 
 namespace OHOS {
 namespace Msdp {

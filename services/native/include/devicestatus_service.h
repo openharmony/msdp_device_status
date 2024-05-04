@@ -74,7 +74,6 @@ public:
     void Unsubscribe(Type type, ActivityEvent event, sptr<IRemoteDevStaCallback> callback) override;
     Data GetCache(const Type &type) override;
     bool IsServiceReady() const;
-    std::shared_ptr<DeviceStatusManager> GetDeviceStatusManager() const;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     void ReportSensorSysEvent(int32_t type, bool enable);
     int32_t RegisterCoordinationListener(bool isCompatible = false) override;

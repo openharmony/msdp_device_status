@@ -23,6 +23,7 @@
 #include "intention_stub.h"
 #include "i_context.h"
 #include "socket_server.h"
+#include "stationary_server.h"
 
 namespace OHOS {
 namespace Msdp {
@@ -49,6 +50,7 @@ private:
 private:
     IContext *context_ { nullptr };
     SocketServer socketServer_;
+    StationaryServer stationary_;
     CooperateServer cooperate_;
     DragServer drag_;
 };

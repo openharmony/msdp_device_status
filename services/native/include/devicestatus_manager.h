@@ -31,7 +31,7 @@ using namespace Security::AccessToken;
 class DeviceStatusService;
 class DeviceStatusManager {
 public:
-    explicit DeviceStatusManager(const wptr<DeviceStatusService> &ms) : ms_(ms) {}
+    DeviceStatusManager() = default;
     ~DeviceStatusManager() = default;
 
     class DeviceStatusCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -64,7 +64,6 @@ private:
     };
     static constexpr int32_t argSize_ { TYPE_MAX };
 
-    const wptr<DeviceStatusService> ms_;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> devicestatusCBDeathRecipient_ { nullptr };
     std::shared_ptr<DeviceStatusMsdpClientImpl> msdpImpl_ { nullptr };
