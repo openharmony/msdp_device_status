@@ -535,10 +535,10 @@ void CooperateClient::DumpPerformanceInfo()
     performanceInfo_.failNum = firstSuccessIndex;
     performanceInfo_.failBeforeSuccess = firstSuccessIndex;
     performanceInfo_.firstSuccessDuration = performanceInfo_.durationList[firstSuccessIndex];
-    int32_t successDurationSum = performanceInfo_.firstSuccessDuration;
+    int32_t successDurationSumWithoutFirst { 0 };
     for (int32_t i = firstSuccessIndex + 1; i < durationLen; i++) {
         if (performanceInfo_.durationList[i] != FAILURE_DURATION) {
-            successDurationSum += performanceInfo_.durationList[i];
+            successDurationSumWithoutFirst += performanceInfo_.durationList[i];
             performanceInfo_.minDuration = std::min(performanceInfo_.durationList[i], performanceInfo_.minDuration);
             performanceInfo_.maxDuration = std::max(performanceInfo_.durationList[i], performanceInfo_.maxDuration);
             performanceInfo_.successNum += 1;
@@ -551,8 +551,8 @@ void CooperateClient::DumpPerformanceInfo()
         performanceInfo_.successRate = (static_cast<float>(performanceInfo_.successNum) * PERCENTAGE) /
             validActivateNum;
     }
-    if (performanceInfo_.successNum > 0) {
-        performanceInfo_.averageDuration = successDurationSum / performanceInfo_.successNum;
+    if (int32_t successNumWithoutFirst = performanceInfo_.successNum - 1; successNumWithoutFirst > 0) {
+        performanceInfo_.averageDuration = successDurationSumWithoutFirst / successNumWithoutFirst;
     }
     FI_HILOGI("[PERF] performanceInfo:"
         "activateNum:%{public}d successNum:%{public}d failNum:%{public}d successRate:%{public}.2f "
