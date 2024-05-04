@@ -293,7 +293,7 @@ HWTEST_F(IntentionDeviceManagerTest, IntentionDeviceManagerTest010, TestSize.Lev
 
 /**
  * @tc.name: IntentionDeviceManagerTest011
- * @tc.desc: test AddDeviceObserver
+ * @tc.desc: test AnyOf
  * @tc.type: FUNC
  * @tc.require:
  */
